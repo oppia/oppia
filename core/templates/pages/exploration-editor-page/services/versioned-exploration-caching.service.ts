@@ -19,9 +19,9 @@
  * exploration versions.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
 
 export interface VersionedExplorationData {
   [explorationId: string]: {
@@ -30,7 +30,7 @@ export interface VersionedExplorationData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VersionedExplorationCachingService {
   _versionedExplorationDataCache: VersionedExplorationData = {};
@@ -44,15 +44,16 @@ export class VersionedExplorationCachingService {
   isCached(explorationId: string, version: number): boolean {
     return (
       this._versionedExplorationDataCache.hasOwnProperty(explorationId) &&
-      this._versionedExplorationDataCache[explorationId].hasOwnProperty(
-        version));
+      this._versionedExplorationDataCache[explorationId].hasOwnProperty(version)
+    );
   }
 
   /**
    * Retrieves the cached exploration data for the given id and version.
    */
   retrieveCachedVersionedExplorationData(
-      explorationId: string, version: number
+    explorationId: string,
+    version: number
   ): FetchExplorationBackendResponse {
     return this._versionedExplorationDataCache[explorationId][version];
   }
@@ -62,15 +63,16 @@ export class VersionedExplorationCachingService {
    * version.
    */
   cacheVersionedExplorationData(
-      explorationId: string, version: number,
-      explorationData: FetchExplorationBackendResponse
+    explorationId: string,
+    version: number,
+    explorationData: FetchExplorationBackendResponse
   ): void {
     if (this._versionedExplorationDataCache.hasOwnProperty(explorationId)) {
-      this._versionedExplorationDataCache[explorationId][
-        version] = explorationData;
+      this._versionedExplorationDataCache[explorationId][version] =
+        explorationData;
     } else {
       this._versionedExplorationDataCache[explorationId] = {
-        [version]: explorationData
+        [version]: explorationData,
       };
     }
   }
@@ -79,7 +81,8 @@ export class VersionedExplorationCachingService {
    * Removes the cached exploration data for the given id and version.
    */
   removeCachedVersionedExplorationData(
-      explorationId: string, version: number
+    explorationId: string,
+    version: number
   ): void {
     if (this.isCached(explorationId, version)) {
       delete this._versionedExplorationDataCache[explorationId][version];
@@ -94,6 +97,9 @@ export class VersionedExplorationCachingService {
   }
 }
 
-angular.module('oppia').factory(
-  'VersionedExplorationCachingService',
-  downgradeInjectable(VersionedExplorationCachingService));
+angular
+  .module('oppia')
+  .factory(
+    'VersionedExplorationCachingService',
+    downgradeInjectable(VersionedExplorationCachingService)
+  );

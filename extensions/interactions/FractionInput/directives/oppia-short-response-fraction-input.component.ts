@@ -15,33 +15,34 @@
 /**
  * @fileoverview Directive for the FractionInput short response.
  */
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Fraction } from 'domain/objects/fraction.model';
-import { FractionAnswer } from 'interactions/answer-defs';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Fraction} from 'domain/objects/fraction.model';
+import {FractionAnswer} from 'interactions/answer-defs';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-fraction-input',
   templateUrl: './fraction-input-short-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ShortResponseFractionInput {
   @Input() answer: string = '';
   escapedAnswer: string = '';
 
-  constructor(
-    private readonly htmlEscaperService: HtmlEscaperService
-  ) {}
+  constructor(private readonly htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    const fraction: FractionAnswer = (
-      this.htmlEscaperService.escapedJsonToObj(this.answer) as FractionAnswer);
+    const fraction: FractionAnswer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as FractionAnswer;
     this.escapedAnswer = Fraction.fromDict(fraction).toString();
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseFractionInput', downgradeComponent({
-    component: ShortResponseFractionInput
-  }) as angular.IDirectiveFactory);
+  'oppiaShortResponseFractionInput',
+  downgradeComponent({
+    component: ShortResponseFractionInput,
+  }) as angular.IDirectiveFactory
+);

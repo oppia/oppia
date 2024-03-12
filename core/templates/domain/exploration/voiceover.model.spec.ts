@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for the voiceover-model.
  */
 
-import { Voiceover } from
-  'domain/exploration/voiceover.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 describe('Voiceover object factory', () => {
   let voiceover: Voiceover;
@@ -27,36 +26,42 @@ describe('Voiceover object factory', () => {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
-      duration_secs: 10.0
+      duration_secs: 10.0,
     });
   });
 
   it('should correctly mark voiceover as needing update', () => {
     voiceover.markAsNeedingUpdate();
-    expect(voiceover).toEqual(Voiceover.createFromBackendDict({
-      filename: 'a.mp3',
-      file_size_bytes: 200000,
-      needs_update: true,
-      duration_secs: 10.0
-    }));
+    expect(voiceover).toEqual(
+      Voiceover.createFromBackendDict({
+        filename: 'a.mp3',
+        file_size_bytes: 200000,
+        needs_update: true,
+        duration_secs: 10.0,
+      })
+    );
   });
 
   it('should toggle needs update attribute correctly', () => {
     voiceover.toggleNeedsUpdateAttribute();
-    expect(voiceover).toEqual(Voiceover.createFromBackendDict({
-      filename: 'a.mp3',
-      file_size_bytes: 200000,
-      needs_update: true,
-      duration_secs: 10.0
-    }));
+    expect(voiceover).toEqual(
+      Voiceover.createFromBackendDict({
+        filename: 'a.mp3',
+        file_size_bytes: 200000,
+        needs_update: true,
+        duration_secs: 10.0,
+      })
+    );
 
     voiceover.toggleNeedsUpdateAttribute();
-    expect(voiceover).toEqual(Voiceover.createFromBackendDict({
-      filename: 'a.mp3',
-      file_size_bytes: 200000,
-      needs_update: false,
-      duration_secs: 10.0
-    }));
+    expect(voiceover).toEqual(
+      Voiceover.createFromBackendDict({
+        filename: 'a.mp3',
+        file_size_bytes: 200000,
+        needs_update: false,
+        duration_secs: 10.0,
+      })
+    );
   });
 
   it('should convert to backend dict correctly', () => {
@@ -64,7 +69,7 @@ describe('Voiceover object factory', () => {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
-      duration_secs: 10.0
+      duration_secs: 10.0,
     });
   });
 
@@ -74,14 +79,13 @@ describe('Voiceover object factory', () => {
         filename: 'filename.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        duration_secs: 5.0
+        duration_secs: 5.0,
       })
     );
   });
 
   it('should get the correct file size in MB', () => {
     var NUM_BYTES_IN_MB = 1 << 20;
-    expect(voiceover.getFileSizeMB()).toEqual(
-      200000 / NUM_BYTES_IN_MB);
+    expect(voiceover.getFileSizeMB()).toEqual(200000 / NUM_BYTES_IN_MB);
   });
 });

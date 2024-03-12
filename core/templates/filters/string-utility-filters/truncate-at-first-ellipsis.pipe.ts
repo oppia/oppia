@@ -16,7 +16,7 @@
  * @fileoverview TruncateAtFirstEllipsis pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 // Filter that truncates a string at the first '...'.
 @Pipe({name: 'truncateAtFirstEllipsis'})
@@ -27,6 +27,6 @@ export class TruncateAtFirstEllipsisPipe implements PipeTransform {
       return '';
     }
     let matchLocation = input.search(this.pattern);
-    return matchLocation === -1 ? input : (input.substring(0, matchLocation));
+    return matchLocation === -1 ? input : input.substring(0, matchLocation);
   }
 }

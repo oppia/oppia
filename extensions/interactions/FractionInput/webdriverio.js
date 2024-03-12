@@ -17,39 +17,43 @@
  * in webdriverio.
  */
 
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 
-var customizeInteraction = async function(elem, requireSimplestForm) {
-  await objects.BooleanEditor(elem.$(
-    '<schema-based-bool-editor>')).setValue(requireSimplestForm);
+var customizeInteraction = async function (elem, requireSimplestForm) {
+  await objects
+    .BooleanEditor(elem.$('<schema-based-bool-editor>'))
+    .setValue(requireSimplestForm);
 };
 
-var expectInteractionDetailsToMatch = async function(elem) {
-  expect(
-    await elem.$(
-      '<oppia-interactive-fraction-input>').isExisting()
-  ).toBe(true);
+var expectInteractionDetailsToMatch = async function (elem) {
+  expect(await elem.$('<oppia-interactive-fraction-input>').isExisting()).toBe(
+    true
+  );
 };
 
-var submitAnswer = async function(elem, answer) {
-  var interactiveFractionInput = elem.$('<oppia-interactive-fraction-input>')
+var submitAnswer = async function (elem, answer) {
+  var interactiveFractionInput = elem
+    .$('<oppia-interactive-fraction-input>')
     .$('<input>');
   await action.setValue(
-    'Interactive Fraction Input', interactiveFractionInput, answer + '\n');
+    'Interactive Fraction Input',
+    interactiveFractionInput,
+    answer + '\n'
+  );
 };
 
 var answerObjectType = 'Fraction';
 
-
-var testSuite = [{
-  interactionArguments: [false],
-  ruleArguments: ['IsExactlyEqualTo', '1/2'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['4/8'],
-  correctAnswers: ['1/2']
-}];
+var testSuite = [
+  {
+    interactionArguments: [false],
+    ruleArguments: ['IsExactlyEqualTo', '1/2'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['4/8'],
+    correctAnswers: ['1/2'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

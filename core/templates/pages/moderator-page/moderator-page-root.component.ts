@@ -16,9 +16,9 @@
  * @fileoverview Moderator page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-moderator-page-root',
@@ -26,7 +26,6 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 })
 export class ModeratorPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.TITLE;
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN
+    .META as unknown as Readonly<MetaTagData>[];
 }

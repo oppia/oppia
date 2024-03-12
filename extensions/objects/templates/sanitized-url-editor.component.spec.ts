@@ -16,15 +16,27 @@
  * @fileoverview Unit tests for sanitized URL editor.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ChangeDetectorRef } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { SanitizedUrlEditorComponent } from './sanitized-url-editor.component';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { DirectivesModule } from 'directives/directives.module';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ChangeDetectorRef} from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {SanitizedUrlEditorComponent} from './sanitized-url-editor.component';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {DirectivesModule} from 'directives/directives.module';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
 
 describe('SanitizedUrlEditorComponent', () => {
   let component: SanitizedUrlEditorComponent;
@@ -32,18 +44,21 @@ describe('SanitizedUrlEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [FormsModule, SharedFormsModule,
+      imports: [
+        FormsModule,
+        SharedFormsModule,
         DirectivesModule,
         HttpClientTestingModule,
         TranslateModule.forRoot({
           loader: {
             provide: TranslateLoader,
-            useClass: TranslateFakeLoader
-          }
-        })],
+            useClass: TranslateFakeLoader,
+          },
+        }),
+      ],
       declarations: [SanitizedUrlEditorComponent],
       schemas: [NO_ERRORS_SCHEMA],
-      providers: [TranslateService]
+      providers: [TranslateService],
     }).compileComponents();
   }));
 
@@ -57,16 +72,16 @@ describe('SanitizedUrlEditorComponent', () => {
       type: 'unicode',
       validators: [
         {
-          id: 'is_nonempty'
+          id: 'is_nonempty',
         },
         {
           id: 'is_regex_matched',
-          regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))'
-        }
+          regexPattern: '(^https:\\/\\/.*)|(^(?!.*:\\/\\/)(.*))',
+        },
       ],
       ui_config: {
-        placeholder: 'https://www.example.com'
-      }
+        placeholder: 'https://www.example.com',
+      },
     });
   });
 
@@ -74,14 +89,18 @@ describe('SanitizedUrlEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     component.value = '';
 
     component.updateValue('http://oppia.org/');
 
     expect(component.value).toBe('http://oppia.org/');
-    expect(component.valueChanged.emit).toHaveBeenCalledWith('http://oppia.org/');
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(
+      'http://oppia.org/'
+    );
     expect(detectChangesSpy).toHaveBeenCalled();
   });
 
@@ -89,45 +108,47 @@ describe('SanitizedUrlEditorComponent', () => {
     spyOn(component.valueChanged, 'emit');
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     component.value = 'http://oppia.org/';
 
     component.updateValue('http://oppia.org/');
 
     expect(component.value).toBe('http://oppia.org/');
-    expect(component.valueChanged.emit).not.toHaveBeenCalledWith('http://oppia.org/');
+    expect(component.valueChanged.emit).not.toHaveBeenCalledWith(
+      'http://oppia.org/'
+    );
     expect(detectChangesSpy).not.toHaveBeenCalled();
   });
 
-  it(
-    'should emit the correct form validity when validation changes',
-    fakeAsync(() => {
-      fixture.detectChanges();
-      flush();
-      // The statusChanges property in the form used in the component is an
-      // observable which is triggered by changes to the form state in the
-      // template. Since we are not doing template-based testing, we need to
-      // mock the statusChanges property of the form.
-      const mockFormStatusChangeEmitter = new EventEmitter();
-      spyOnProperty(
-        component.form, 'statusChanges'
-      ).and.returnValue(mockFormStatusChangeEmitter);
-      const validityChangeSpy = spyOn(component.validityChange, 'emit');
-      component.ngAfterViewInit();
+  it('should emit the correct form validity when validation changes', fakeAsync(() => {
+    fixture.detectChanges();
+    flush();
+    // The statusChanges property in the form used in the component is an
+    // observable which is triggered by changes to the form state in the
+    // template. Since we are not doing template-based testing, we need to
+    // mock the statusChanges property of the form.
+    const mockFormStatusChangeEmitter = new EventEmitter();
+    spyOnProperty(component.form, 'statusChanges').and.returnValue(
+      mockFormStatusChangeEmitter
+    );
+    const validityChangeSpy = spyOn(component.validityChange, 'emit');
+    component.ngAfterViewInit();
 
-      expect(validityChangeSpy).not.toHaveBeenCalled();
+    expect(validityChangeSpy).not.toHaveBeenCalled();
 
-      mockFormStatusChangeEmitter.emit('INVALID');
-      // The subscription to statusChanges is asynchronous, so we need to
-      // tick() to trigger the callback.
-      tick();
-      expect(validityChangeSpy).toHaveBeenCalledWith({validUrl: false});
+    mockFormStatusChangeEmitter.emit('INVALID');
+    // The subscription to statusChanges is asynchronous, so we need to
+    // tick() to trigger the callback.
+    tick();
+    expect(validityChangeSpy).toHaveBeenCalledWith({validUrl: false});
 
-      mockFormStatusChangeEmitter.emit();
-      // The subscription to statusChanges is asynchronous, so we need to
-      // tick() to trigger the callback.
-      tick();
-      expect(validityChangeSpy).toHaveBeenCalledWith({validUrl: true});
-    }));
+    mockFormStatusChangeEmitter.emit();
+    // The subscription to statusChanges is asynchronous, so we need to
+    // tick() to trigger the callback.
+    tick();
+    expect(validityChangeSpy).toHaveBeenCalledWith({validUrl: true});
+  }));
 });

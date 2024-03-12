@@ -16,15 +16,18 @@
  * @fileoverview Unit tests for StatsReportingBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ContextService } from 'services/context.service';
-import { InterpolationValuesType, UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { StatsReportingBackendApiService } from
-  'domain/exploration/stats-reporting-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {
+  InterpolationValuesType,
+  UrlInterpolationService,
+} from 'domain/utilities/url-interpolation.service';
+import {StatsReportingBackendApiService} from 'domain/exploration/stats-reporting-backend-api.service';
 
 describe('Stats reporting backend API Service', () => {
   let contextService: ContextService;
@@ -51,23 +54,24 @@ describe('Stats reporting backend API Service', () => {
         total_hit_count: 3,
         first_hit_count: 5,
         num_times_solution_viewed: 6,
-        num_completions: 0
-      }
-    }
+        num_completions: 0,
+      },
+    },
   };
   let params = {
-    param1: 'value'
+    param1: 'value',
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     contextService = TestBed.get(ContextService);
     httpTestingController = TestBed.get(HttpTestingController);
     statsReportingBackendApiService = TestBed.get(
-      StatsReportingBackendApiService);
+      StatsReportingBackendApiService
+    );
     urlInterpolationService = TestBed.get(UrlInterpolationService);
   });
 
@@ -77,11 +81,18 @@ describe('Stats reporting backend API Service', () => {
 
   it('should post stats correctly.', fakeAsync(() => {
     statsReportingBackendApiService.postsStatsAsync(
-      aggregatedStats, expVersion, expId, currentState, nextExpId,
-      previousState, nextState);
+      aggregatedStats,
+      expVersion,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/stats_events/expId');
+      '/explorehandler/stats_events/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -90,11 +101,20 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record exp start correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordExpStartedAsync(
-      params, sessionId, currentState, expVersion, expId, currentState,
-      nextExpId, previousState, nextState);
+      params,
+      sessionId,
+      currentState,
+      expVersion,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/exploration_start_event/expId');
+      '/explorehandler/exploration_start_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -103,11 +123,21 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record state hit correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordStateHitAsync(
-      timeSpent, expVersion, nextState, params, sessionId, expId, currentState,
-      nextExpId, previousState, nextState);
+      timeSpent,
+      expVersion,
+      nextState,
+      params,
+      sessionId,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/state_hit_event/expId');
+      '/explorehandler/state_hit_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -116,11 +146,19 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record exploration actually started correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordExplorationActuallyStartedAsync(
-      expVersion, currentState, sessionId, expId, currentState,
-      nextExpId, previousState, nextState);
+      expVersion,
+      currentState,
+      sessionId,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/exploration_actual_start_event/expId');
+      '/explorehandler/exploration_actual_start_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -129,11 +167,20 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record solution hit correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordSolutionHitAsync(
-      timeSpent, expVersion, currentState, sessionId, expId, currentState,
-      nextExpId, previousState, nextState);
+      timeSpent,
+      expVersion,
+      currentState,
+      sessionId,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/solution_hit_event/expId');
+      '/explorehandler/solution_hit_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -142,11 +189,21 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record leave for refresher exp correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordLeaveForRefresherExpAsync(
-      expVersion, expId, currentState, sessionId, timeSpent, expId,
-      currentState, nextExpId, previousState, nextState);
+      expVersion,
+      expId,
+      currentState,
+      sessionId,
+      timeSpent,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/leave_for_refresher_exp_event/expId');
+      '/explorehandler/leave_for_refresher_exp_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -155,11 +212,20 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record state completion correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordStateCompletedAsync(
-      expVersion, sessionId, currentState, timeSpent, expId,
-      currentState, nextExpId, previousState, nextState);
+      expVersion,
+      sessionId,
+      currentState,
+      timeSpent,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/state_complete_event/expId');
+      '/explorehandler/state_complete_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -168,11 +234,22 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record exploration completion correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordExplorationCompletedAsync(
-      timeSpent, collectionId, params, sessionId, currentState, expVersion,
-      expId, currentState, nextExpId, previousState, nextState);
+      timeSpent,
+      collectionId,
+      params,
+      sessionId,
+      currentState,
+      expVersion,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/exploration_complete_event/expId');
+      '/explorehandler/exploration_complete_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -181,12 +258,25 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record answer submission correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordAnswerSubmittedAsync(
-      'answer', params, expVersion, sessionId, timeSpent, previousState,
-      1, 2, 'category', expId, currentState, nextExpId, previousState,
-      nextState);
+      'answer',
+      params,
+      expVersion,
+      sessionId,
+      timeSpent,
+      previousState,
+      1,
+      2,
+      'category',
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/answer_submitted_event/expId');
+      '/explorehandler/answer_submitted_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
@@ -195,36 +285,57 @@ describe('Stats reporting backend API Service', () => {
 
   it('should record exp leave correctly.', fakeAsync(() => {
     statsReportingBackendApiService.recordMaybeLeaveEventAsync(
-      timeSpent, collectionId, params, sessionId, currentState, expVersion,
-      expId, currentState, nextExpId, previousState, nextState);
+      timeSpent,
+      collectionId,
+      params,
+      sessionId,
+      currentState,
+      expVersion,
+      expId,
+      currentState,
+      nextExpId,
+      previousState,
+      nextState
+    );
 
     let req = httpTestingController.expectOne(
-      '/explorehandler/exploration_maybe_leave_event/expId');
+      '/explorehandler/exploration_maybe_leave_event/expId'
+    );
     expect(req.request.method).toEqual('POST');
     req.flush({});
 
     flushMicrotasks();
   }));
 
-  it('should handle errors correctly.', fakeAsync(async() => {
+  it('should handle errors correctly.', fakeAsync(async () => {
     let mockGetExpId = () => {
       return 'expId';
     };
 
     let mockInterpolateUrl = (
-        urlTemplate: string,
-        interpolationValues: InterpolationValuesType) => {
+      urlTemplate: string,
+      interpolationValues: InterpolationValuesType
+    ) => {
       throw new Error('Error');
     };
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.callFake(
-      mockInterpolateUrl);
+      mockInterpolateUrl
+    );
 
     spyOn(contextService, 'getExplorationId').and.callFake(mockGetExpId);
 
     flushMicrotasks();
-    await expectAsync(statsReportingBackendApiService.postsStatsAsync(
-      aggregatedStats, expVersion, expId, currentState, nextExpId,
-      previousState, nextState)).toBeRejectedWithError();
+    await expectAsync(
+      statsReportingBackendApiService.postsStatsAsync(
+        aggregatedStats,
+        expVersion,
+        expId,
+        currentState,
+        nextExpId,
+        previousState,
+        nextState
+      )
+    ).toBeRejectedWithError();
   }));
 });

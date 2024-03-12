@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the RevertExplorationModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA, ElementRef } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { RevertExplorationModalComponent } from './revert-exploration-modal.component';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {RevertExplorationModalComponent} from './revert-exploration-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -38,24 +37,24 @@ class MockExplorationDataService {
   explorationId: string = 'exp1';
 }
 
-describe('Revert Exploration Modal Component', function() {
+describe('Revert Exploration Modal Component', function () {
   let component: RevertExplorationModalComponent;
   let fixture: ComponentFixture<RevertExplorationModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        RevertExplorationModalComponent
+      declarations: [RevertExplorationModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
+        {
+          provide: ExplorationDataService,
+          useClass: MockExplorationDataService,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      },
-      {
-        provide: ExplorationDataService,
-        useClass: MockExplorationDataService
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

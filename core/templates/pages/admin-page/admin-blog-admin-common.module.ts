@@ -19,25 +19,15 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { RolesAndActionsVisualizerComponent } from './roles-tab/roles-and-actions-visualizer.component';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {RolesAndActionsVisualizerComponent} from './roles-tab/roles-and-actions-visualizer.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MatProgressSpinnerModule
-  ],
-  declarations: [
-    RolesAndActionsVisualizerComponent
-  ],
-  entryComponents: [
-    RolesAndActionsVisualizerComponent
-  ],
-  exports: [
-    RolesAndActionsVisualizerComponent
-  ],
+  imports: [CommonModule, MatProgressSpinnerModule],
+  declarations: [RolesAndActionsVisualizerComponent],
+  entryComponents: [RolesAndActionsVisualizerComponent],
+  exports: [RolesAndActionsVisualizerComponent],
 })
-
-export class AdminBlogAdminCommonModule { }
+export class AdminBlogAdminCommonModule {}

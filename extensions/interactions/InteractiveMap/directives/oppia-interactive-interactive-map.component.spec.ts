@@ -16,52 +16,53 @@
  * @fileoverview Component for the InteractiveMap interaction.
  */
 
-import { EventEmitter } from '@angular/core';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { InteractiveMapAnswer } from 'interactions/answer-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { icon, LatLng, LeafletMouseEvent, tileLayer } from 'leaflet';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { InteractiveInteractiveMapComponent } from './oppia-interactive-interactive-map.component';
+import {EventEmitter} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {InteractiveMapAnswer} from 'interactions/answer-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {icon, LatLng, LeafletMouseEvent, tileLayer} from 'leaflet';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {InteractiveInteractiveMapComponent} from './oppia-interactive-interactive-map.component';
 
 describe('InteractiveInteractiveMapComponent', () => {
   let component: InteractiveInteractiveMapComponent;
   let fixture: ComponentFixture<InteractiveInteractiveMapComponent>;
   let playerPositionService: PlayerPositionService;
   let currentInteractionService: CurrentInteractionService;
-  let interactionAttributesExtractorService:
-    InteractionAttributesExtractorService;
+  let interactionAttributesExtractorService: InteractionAttributesExtractorService;
   let mockNewCardAvailableEmitter = new EventEmitter();
 
   class mockInteractionAttributesExtractorService {
     getValuesFromAttributes(
-        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+      interactionId: InteractionSpecsKey,
+      attributes: Record<string, string>
     ) {
       return {
         latitude: {
-          value: JSON.parse(attributes.latitudeWithValue)
+          value: JSON.parse(attributes.latitudeWithValue),
         },
         longitude: {
-          value: JSON.parse(attributes.longitudeWithValue)
+          value: JSON.parse(attributes.longitudeWithValue),
         },
         zoom: {
-          value: JSON.parse(attributes.zoomWithValue)
-        }
+          value: JSON.parse(attributes.zoomWithValue),
+        },
       };
     }
   }
 
   let mockCurrentInteractionService = {
     onSubmit: (
-        answer: InteractiveMapAnswer, rulesService: CurrentInteractionService
-    ) => {
-    },
+      answer: InteractiveMapAnswer,
+      rulesService: CurrentInteractionService
+    ) => {},
     registerCurrentInteraction: (
-        submitAnswer: Function, validateExpressionFn: Function,
-    ) => {}
+      submitAnswer: Function,
+      validateExpressionFn: Function
+    ) => {},
   };
 
   beforeEach(async(() => {
@@ -70,20 +71,21 @@ describe('InteractiveInteractiveMapComponent', () => {
       providers: [
         {
           provide: InteractionAttributesExtractorService,
-          useClass: mockInteractionAttributesExtractorService
+          useClass: mockInteractionAttributesExtractorService,
         },
         {
           provide: CurrentInteractionService,
-          useValue: mockCurrentInteractionService
-        }
+          useValue: mockCurrentInteractionService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     interactionAttributesExtractorService = TestBed.inject(
-      InteractionAttributesExtractorService);
+      InteractionAttributesExtractorService
+    );
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     fixture = TestBed.createComponent(InteractiveInteractiveMapComponent);
@@ -104,62 +106,73 @@ describe('InteractiveInteractiveMapComponent', () => {
 
     expect(component.coords).toEqual([45, 50]);
     expect(component.zoomLevel).toBe(10);
-    expect(component.mapOptions).toEqual(jasmine.objectContaining({
-      layers: [tileLayer(
-        'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        { attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
-      )
-      ],
-      zoom: 10,
-      center: {
-        lat: 45,
-        lng: 50
-      }
-    }));
-    expect(component.mapMarkers.getLatLng())
-      .toEqual(new LatLng(50, 55));
+    expect(component.mapOptions).toEqual(
+      jasmine.objectContaining({
+        layers: [
+          tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution:
+              '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          }),
+        ],
+        zoom: 10,
+        center: {
+          lat: 45,
+          lng: 50,
+        },
+      })
+    );
+    expect(component.mapMarkers.getLatLng()).toEqual(new LatLng(50, 55));
     expect(component.mapMarkers.options).toEqual({
       icon: icon({
-        iconUrl: '/extensions/interactions/InteractiveMap/static' +
-      '/marker-icon.png',
+        iconUrl:
+          '/extensions/interactions/InteractiveMap/static' + '/marker-icon.png',
         iconSize: [25, 41],
         iconAnchor: [12, 41],
-        shadowUrl: '/extensions/interactions/InteractiveMap/static' +
-       '/marker-shadow.png',
+        shadowUrl:
+          '/extensions/interactions/InteractiveMap/static' +
+          '/marker-shadow.png',
         shadowSize: [41, 41],
         shadowAnchor: [13, 41],
-        iconRetinaUrl: '/extensions/interactions/InteractiveMap/' +
-        'static/marker-icon-2x.png',
-        shadowRetinaUrl: '/extensions/interactions/InteractiveMap/' +
-        'static/marker-shadow.png'
-      })
+        iconRetinaUrl:
+          '/extensions/interactions/InteractiveMap/' +
+          'static/marker-icon-2x.png',
+        shadowRetinaUrl:
+          '/extensions/interactions/InteractiveMap/' +
+          'static/marker-shadow.png',
+      }),
     });
   });
 
-  it('should initialise coordinates as 0 when latitude and ' +
-  'longitude are undefined', () => {
-    spyOn(interactionAttributesExtractorService, 'getValuesFromAttributes').and
-      .returnValue({
+  it(
+    'should initialise coordinates as 0 when latitude and ' +
+      'longitude are undefined',
+    () => {
+      spyOn(
+        interactionAttributesExtractorService,
+        'getValuesFromAttributes'
+      ).and.returnValue({
         latitude: {
-          value: undefined
+          value: undefined,
         },
         longitude: {
-          value: undefined
+          value: undefined,
         },
         zoom: {
-          value: 10
-        }
+          value: 10,
+        },
       });
-    component.lastAnswer = null;
+      component.lastAnswer = null;
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.coords).toEqual([0, 0]);
-  });
+      expect(component.coords).toEqual([0, 0]);
+    }
+  );
 
   it('should set interaction as inactive when a new card is displayed', () => {
     spyOnProperty(playerPositionService, 'onNewCardAvailable').and.returnValue(
-      mockNewCardAvailableEmitter);
+      mockNewCardAvailableEmitter
+    );
     component.lastAnswer = null;
     component.ngOnInit();
 
@@ -172,7 +185,7 @@ describe('InteractiveInteractiveMapComponent', () => {
     expect(component.overlayStyle).toEqual({
       'background-color': '#fff',
       opacity: 0.5,
-      'z-index': 1001
+      'z-index': 1001,
     });
   });
 
@@ -181,19 +194,17 @@ describe('InteractiveInteractiveMapComponent', () => {
     let e = {
       latlng: {
         lat: 60,
-        lng: 65
-      }
+        lng: 65,
+      },
     } as LeafletMouseEvent;
     component.ngOnInit();
     component.interactionIsActive = true;
 
-    expect(component.mapMarkers.getLatLng())
-      .toEqual(new LatLng(50, 55));
+    expect(component.mapMarkers.getLatLng()).toEqual(new LatLng(50, 55));
 
     component.leafletClick(e);
 
-    expect(component.mapMarkers.getLatLng())
-      .toEqual(new LatLng(60, 65));
+    expect(component.mapMarkers.getLatLng()).toEqual(new LatLng(60, 65));
     expect(currentInteractionService.onSubmit).toHaveBeenCalled();
   });
 
@@ -202,19 +213,17 @@ describe('InteractiveInteractiveMapComponent', () => {
     let e = {
       latlng: {
         lat: 60,
-        lng: 65
-      }
+        lng: 65,
+      },
     } as LeafletMouseEvent;
     component.ngOnInit();
     component.interactionIsActive = false;
 
-    expect(component.mapMarkers.getLatLng())
-      .toEqual(new LatLng(50, 55));
+    expect(component.mapMarkers.getLatLng()).toEqual(new LatLng(50, 55));
 
     component.leafletClick(e);
 
-    expect(component.mapMarkers.getLatLng())
-      .toEqual(new LatLng(50, 55));
+    expect(component.mapMarkers.getLatLng()).toEqual(new LatLng(50, 55));
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
   });
 
@@ -226,7 +235,7 @@ describe('InteractiveInteractiveMapComponent', () => {
     expect(component.overlayStyle).toEqual({
       'background-color': '#fff',
       opacity: 0.5,
-      'z-index': 1001
+      'z-index': 1001,
     });
   });
 
@@ -248,7 +257,7 @@ describe('InteractiveInteractiveMapComponent', () => {
     expect(component.overlayStyle).toEqual({
       'background-color': '#fff',
       opacity: 0,
-      'z-index': 0
+      'z-index': 0,
     });
   });
 

@@ -16,21 +16,21 @@
  * @fileoverview Component for flag exploration modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { PlayerPositionService } from '../services/player-position.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {PlayerPositionService} from '../services/player-position.service';
 
 export interface FlagExplorationModalResult {
-  'report_type': boolean;
-  'report_text': string;
+  report_type: boolean;
+  report_text: string;
   state: string;
 }
 
 @Component({
   selector: 'oppia-flag-exploration-modal',
-  templateUrl: './flag-exploration-modal.component.html'
+  templateUrl: './flag-exploration-modal.component.html',
 })
 export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
@@ -62,7 +62,7 @@ export class FlagExplorationModalComponent extends ConfirmOrCancelModal {
       this.ngbActiveModal.close({
         report_type: this.flag,
         report_text: this.flagMessageTextareaIsShown,
-        state: this.stateName
+        state: this.stateName,
       });
     }
   }

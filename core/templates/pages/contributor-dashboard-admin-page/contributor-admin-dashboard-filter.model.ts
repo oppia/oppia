@@ -17,7 +17,7 @@
  * admin Dashboard.
  */
 
-import { ContributorDashboardAdminPageConstants as PageConstants } from './contributor-dashboard-admin-page.constants';
+import {ContributorDashboardAdminPageConstants as PageConstants} from './contributor-dashboard-admin-page.constants';
 
 export class ContributorAdminDashboardFilter {
   topicIds: string[];
@@ -26,27 +26,31 @@ export class ContributorAdminDashboardFilter {
   lastActivity?: number;
 
   /**
- * @param {String} languageCode - Language Code to filter for.
- * @param {String[]} topicIds - keywords to filter for.
- * @param {string} sort - sort options.
- * @param {number} lastActivity - number of days since last activity.
- */
+   * @param {String} languageCode - Language Code to filter for.
+   * @param {String[]} topicIds - keywords to filter for.
+   * @param {string} sort - sort options.
+   * @param {number} lastActivity - number of days since last activity.
+   */
   constructor(
-      topicIds: string[], languageCode?: string,
-      sort?: string | null, lastActivity?: number) {
+    topicIds: string[],
+    languageCode?: string,
+    sort?: string | null,
+    lastActivity?: number
+  ) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
     this.lastActivity = lastActivity;
   }
 
-
   /**
- * @returns {ContributorAdminDashboardFilter} - A new
- *   ContributorAdminDashboardFilter instance.
- */
+   * @returns {ContributorAdminDashboardFilter} - A new
+   *   ContributorAdminDashboardFilter instance.
+   */
   static createDefault(): ContributorAdminDashboardFilter {
     return new ContributorAdminDashboardFilter(
-      [], PageConstants.DEFAULT_LANGUAGE_FILTER);
+      [],
+      PageConstants.DEFAULT_LANGUAGE_FILTER
+    );
   }
 }

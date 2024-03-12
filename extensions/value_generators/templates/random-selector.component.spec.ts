@@ -16,20 +16,18 @@
  * @fileoverview Unit tests for random selector value generator.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { RandomSelectorComponent } from './random-selector.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {RandomSelectorComponent} from './random-selector.component';
 
-describe('RandomSelector component', function() {
+describe('RandomSelector component', function () {
   let component: RandomSelectorComponent;
   let fixture: ComponentFixture<RandomSelectorComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        RandomSelectorComponent
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [RandomSelectorComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -46,18 +44,25 @@ describe('RandomSelector component', function() {
       // because of the need to test validations. This happens because
       // the value of the property is null.
       // @ts-ignore
-      list_of_values: null, value: null,
-    };
-  });
-
-  it('should initialise component', () => {
-    component.customizationArgs = {
+      list_of_values: null,
       // This throws "Argument of type 'null' is not assignable to
       // parameter of type 'AnswerGroup[]'." We need to suppress this error
       // because of the need to test validations. This happens because
       // the value of the property is null.
       // @ts-ignore
-      list_of_values: ['test'], value: null,
+      value: null,
+    };
+  });
+
+  it('should initialise component', () => {
+    component.customizationArgs = {
+      list_of_values: ['test'],
+      // This throws "Argument of type 'null' is not assignable to
+      // parameter of type 'AnswerGroup[]'." We need to suppress this error
+      // because of the need to test validations. This happens because
+      // the value of the property is null.
+      // @ts-ignore
+      value: null,
     };
 
     component.ngOnInit();
@@ -65,22 +70,26 @@ describe('RandomSelector component', function() {
     expect(component.SCHEMA).toEqual({
       type: 'list',
       items: {
-        type: 'unicode'
+        type: 'unicode',
       },
       ui_config: {
-        add_element_text: 'Add New Choice'
-      }
+        add_element_text: 'Add New Choice',
+      },
     });
     expect(component.getTemplateUrl()).toBe(
-      '/value_generator_handler/generatorId');
+      '/value_generator_handler/generatorId'
+    );
     expect(component.generatorId).toBe('generatorId');
     expect(component.customizationArgs.list_of_values).toEqual(['test']);
   });
 
-  it('should initialise list_of_values as an empty array when list_of_values' +
-  ' is not defined', () => {
-    component.ngOnInit();
+  it(
+    'should initialise list_of_values as an empty array when list_of_values' +
+      ' is not defined',
+    () => {
+      component.ngOnInit();
 
-    expect(component.customizationArgs.list_of_values).toEqual([]);
-  });
+      expect(component.customizationArgs.list_of_values).toEqual([]);
+    }
+  );
 });

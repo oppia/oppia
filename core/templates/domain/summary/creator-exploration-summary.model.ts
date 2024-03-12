@@ -26,68 +26,75 @@ interface ExplorationRatings {
 
 export interface HumanReadableContributorsSummary {
   [username: string]: {
-    'num_commits': number;
+    num_commits: number;
   };
 }
 
 export interface CreatorExplorationSummaryBackendDict {
-  'category': string;
-  'community_owned': boolean;
-  'activity_type': string;
-  'last_updated_msec': number;
-  'ratings': ExplorationRatings;
-  'id': string;
-  'created_on_msec': number;
-  'human_readable_contributors_summary': HumanReadableContributorsSummary;
-  'language_code': string;
-  'num_views': number;
-  'objective': string;
-  'status': string;
-  'tags': string[];
-  'thumbnail_bg_color': string;
-  'thumbnail_icon_url': string;
-  'title': string;
-  'num_total_threads': number;
-  'num_open_threads': number;
+  category: string;
+  community_owned: boolean;
+  activity_type: string;
+  last_updated_msec: number;
+  ratings: ExplorationRatings;
+  id: string;
+  created_on_msec: number;
+  human_readable_contributors_summary: HumanReadableContributorsSummary;
+  language_code: string;
+  num_views: number;
+  objective: string;
+  status: string;
+  tags: string[];
+  thumbnail_bg_color: string;
+  thumbnail_icon_url: string;
+  title: string;
+  num_total_threads: number;
+  num_open_threads: number;
 }
 
 export class CreatorExplorationSummary {
   constructor(
-      public category: string,
-      public communityOwned: boolean,
-      public id: string,
-      public languageCode: string,
-      public numViews: number,
-      public objective: string,
-      public status: string,
-      public tags: string[],
-      public thumbnailBgColor: string,
-      public thumbnailIconUrl: string,
-      public title: string,
-      public activityType: string,
-      public lastUpdatedMsec: number,
-      public createdOnMsec: number,
-      public ratings: ExplorationRatings,
-      public humanReadableContributorsSummary:
-      HumanReadableContributorsSummary,
-      public numTotalThreads: number,
-      public numOpenThreads: number) {}
+    public category: string,
+    public communityOwned: boolean,
+    public id: string,
+    public languageCode: string,
+    public numViews: number,
+    public objective: string,
+    public status: string,
+    public tags: string[],
+    public thumbnailBgColor: string,
+    public thumbnailIconUrl: string,
+    public title: string,
+    public activityType: string,
+    public lastUpdatedMsec: number,
+    public createdOnMsec: number,
+    public ratings: ExplorationRatings,
+    public humanReadableContributorsSummary: HumanReadableContributorsSummary,
+    public numTotalThreads: number,
+    public numOpenThreads: number
+  ) {}
 
   static createFromBackendDict(
-      expSummaryBacknedDict: CreatorExplorationSummaryBackendDict):
-      CreatorExplorationSummary {
+    expSummaryBacknedDict: CreatorExplorationSummaryBackendDict
+  ): CreatorExplorationSummary {
     return new CreatorExplorationSummary(
-      expSummaryBacknedDict.category, expSummaryBacknedDict.community_owned,
-      expSummaryBacknedDict.id, expSummaryBacknedDict.language_code,
-      expSummaryBacknedDict.num_views, expSummaryBacknedDict.objective,
-      expSummaryBacknedDict.status, expSummaryBacknedDict.tags,
+      expSummaryBacknedDict.category,
+      expSummaryBacknedDict.community_owned,
+      expSummaryBacknedDict.id,
+      expSummaryBacknedDict.language_code,
+      expSummaryBacknedDict.num_views,
+      expSummaryBacknedDict.objective,
+      expSummaryBacknedDict.status,
+      expSummaryBacknedDict.tags,
       expSummaryBacknedDict.thumbnail_bg_color,
-      expSummaryBacknedDict.thumbnail_icon_url, expSummaryBacknedDict.title,
+      expSummaryBacknedDict.thumbnail_icon_url,
+      expSummaryBacknedDict.title,
       expSummaryBacknedDict.activity_type,
       expSummaryBacknedDict.last_updated_msec,
-      expSummaryBacknedDict.created_on_msec, expSummaryBacknedDict.ratings,
+      expSummaryBacknedDict.created_on_msec,
+      expSummaryBacknedDict.ratings,
       expSummaryBacknedDict.human_readable_contributors_summary,
       expSummaryBacknedDict.num_total_threads,
-      expSummaryBacknedDict.num_open_threads);
+      expSummaryBacknedDict.num_open_threads
+    );
   }
 }

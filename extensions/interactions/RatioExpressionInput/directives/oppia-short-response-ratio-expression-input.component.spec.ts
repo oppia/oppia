@@ -17,10 +17,10 @@
  * component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseRatioExpressionInputComponent } from './oppia-short-response-ratio-expression-input.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseRatioExpressionInputComponent} from './oppia-short-response-ratio-expression-input.component';
 
 describe('ShortResponseRatioExpressionInput', () => {
   let component: ShortResponseRatioExpressionInputComponent;
@@ -38,16 +38,17 @@ describe('ShortResponseRatioExpressionInput', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: mockHtmlEscaperService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = (
-      TestBed.createComponent(ShortResponseRatioExpressionInputComponent));
+    fixture = TestBed.createComponent(
+      ShortResponseRatioExpressionInputComponent
+    );
     component = fixture.componentInstance;
   });
 

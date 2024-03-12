@@ -19,52 +19,52 @@
 
 var waitFor = require('./waitFor.js');
 
-var ProfilePage = function() {
+var ProfilePage = function () {
   var allExplorationCardElement = $('.e2e-test-exploration-dashboard-card');
-  var allExplorationCardSelector = function() {
+  var allExplorationCardSelector = function () {
     return $$('.e2e-test-exploration-dashboard-card');
   };
   var bio = $('.e2e-test-profile-bio');
   var createdExplorationStat = $('.e2e-test-profile-created-stat');
   var userProfilePhoto = $('.e2e-test-profile-user-photo');
   var interestPlaceholder = $('.e2e-test-profile-no-interest');
-  var interestsSelector = function() {
+  var interestsSelector = function () {
     return $$('.e2e-test-profile-interest');
   };
 
-  this.get = async function(userName) {
+  this.get = async function (userName) {
     await browser.url('/profile/' + userName);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectUserToHaveProfilePhoto = async function() {
+  this.expectUserToHaveProfilePhoto = async function () {
     await waitFor.visibilityOf(
       userProfilePhoto,
-      'User profile photo taking too long to display');
+      'User profile photo taking too long to display'
+    );
   };
 
-  this.expectUserToHaveBio = async function(expectedText) {
-    await waitFor.visibilityOf(
-      bio,
-      'Bio is taking too long to appear');
+  this.expectUserToHaveBio = async function (expectedText) {
+    await waitFor.visibilityOf(bio, 'Bio is taking too long to appear');
     expect(await bio.getText()).toMatch(expectedText);
   };
 
-  this.expectUserToHaveNoInterests = async function() {
+  this.expectUserToHaveNoInterests = async function () {
     var interests = await interestsSelector();
     var numInterests = interests.length;
     expect(numInterests).toEqual(0);
   };
 
-  this.expectUserToHaveInterests = async function(expectedInterests) {
+  this.expectUserToHaveInterests = async function (expectedInterests) {
     var interests = await interestsSelector();
     var numInterests = interests.length;
     expect(numInterests).toEqual(expectedInterests.length);
 
-    var interestTexts = await interests.map(async function(interestElem) {
+    var interestTexts = await interests.map(async function (interestElem) {
       await waitFor.visibilityOf(
         interestElem,
-        'InterestElem is taking too long to appear');
+        'InterestElem is taking too long to appear'
+      );
       return await interestElem.getText();
     });
     for (var index = 0; index < interestTexts.length; index++) {
@@ -73,43 +73,48 @@ var ProfilePage = function() {
     }
   };
 
-  this.expectUserToHaveInterestPlaceholder = async function(expectedText) {
+  this.expectUserToHaveInterestPlaceholder = async function (expectedText) {
     await waitFor.visibilityOf(
       interestPlaceholder,
-      'Interest place holder is taking too long to appear');
+      'Interest place holder is taking too long to appear'
+    );
     expect(await interestPlaceholder.getText()).toMatch(expectedText);
   };
 
-  this.expectUserToNotHaveInterestPlaceholder = async function() {
+  this.expectUserToNotHaveInterestPlaceholder = async function () {
     expect(await interestPlaceholder.isExisting()).toBe(false);
   };
 
-  this.expectToHaveExplorationCards = async function() {
+  this.expectToHaveExplorationCards = async function () {
     await waitFor.visibilityOf(
       allExplorationCardElement,
-      'Exploration cards is not present or taking time to display');
+      'Exploration cards is not present or taking time to display'
+    );
   };
 
-  this.expectToHaveExplorationCardByName = async function(explorationName) {
+  this.expectToHaveExplorationCardByName = async function (explorationName) {
     var allExplorationCardElements = allExplorationCardSelector();
     var explorationsCardByName = await allExplorationCardElements.filter(
-      async function(card) {
+      async function (card) {
         var cardTitle = card.$('.e2e-test-exp-summary-tile-title');
         await waitFor.visibilityOf(
           cardTitle,
-          'CardTitle is not present or taking too long to display');
+          'CardTitle is not present or taking too long to display'
+        );
         var title = await cardTitle.getText();
         return title === explorationName;
-      });
+      }
+    );
 
-    if (await explorationsCardByName.length === 0) {
+    if ((await explorationsCardByName.length) === 0) {
       throw new Error(
-        'There is no exploration card with name ' + explorationName);
+        'There is no exploration card with name ' + explorationName
+      );
     }
     expect(await explorationsCardByName.length).toBeGreaterThanOrEqual(1);
   };
 
-  this.expectToHaveCreatedExplorationStat = async function(expectedStat) {
+  this.expectToHaveCreatedExplorationStat = async function (expectedStat) {
     expect(await createdExplorationStat.getText()).toMatch(expectedStat);
   };
 };

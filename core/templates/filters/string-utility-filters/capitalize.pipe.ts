@@ -16,11 +16,11 @@
  * @fileoverview Capitalize pipe for Oppia.
  */
 
-import { Injectable, Pipe, PipeTransform } from '@angular/core';
+import {Injectable, Pipe, PipeTransform} from '@angular/core';
 
 @Pipe({name: 'capitalizePipe'})
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CapitalizePipe implements PipeTransform {
   transform(input: string): string {

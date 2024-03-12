@@ -71,26 +71,32 @@
  *     constraints) as well as the output value and type should be documented.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { ExpressionParserService } from
-  'expressions/expression-parser.service';
-import { EnvDict, Expr, ExpressionSyntaxTreeService, SystemEnv } from
-  'expressions/expression-syntax-tree.service';
+import {ExpressionParserService} from 'expressions/expression-parser.service';
+import {
+  EnvDict,
+  Expr,
+  ExpressionSyntaxTreeService,
+  SystemEnv,
+} from 'expressions/expression-syntax-tree.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExpressionEvaluatorService {
   constructor(
-      private expressionParserService: ExpressionParserService,
-      private expressionSyntaxTreeService: ExpressionSyntaxTreeService) {}
+    private expressionParserService: ExpressionParserService,
+    private expressionSyntaxTreeService: ExpressionSyntaxTreeService
+  ) {}
 
   evaluateExpression(expression: string, envs: EnvDict[]): Expr {
     return this.expressionSyntaxTreeService.applyFunctionToParseTree(
-      this.expressionParserService.parse(expression), envs,
-      (parsed, envs) => this.evaluate(parsed, envs));
+      this.expressionParserService.parse(expression),
+      envs,
+      (parsed, envs) => this.evaluate(parsed, envs)
+    );
   }
 
   /**
@@ -106,20 +112,24 @@ export class ExpressionEvaluatorService {
     if (parsed instanceof Array) {
       if (parsed.length === 0) {
         throw new Error(
-          'Parser generated an intermediate node with zero children');
+          'Parser generated an intermediate node with zero children'
+        );
       }
 
       if (parsed[0] === '#') {
         const varName = parsed[1] as string;
-        return (
-          this.expressionSyntaxTreeService.lookupEnvs(varName, envs) as Expr);
+        return this.expressionSyntaxTreeService.lookupEnvs(
+          varName,
+          envs
+        ) as Expr;
       }
 
       // Otherwise, this must be a function/operator expression.
       const funcName = parsed[0] as string;
       const funcArgs = parsed.slice(1).map(item => this.evaluate(item, envs));
       const funcEnvs = this.expressionSyntaxTreeService.lookupEnvs(
-        funcName, envs
+        funcName,
+        envs
       ) as SystemEnv;
       return funcEnvs.eval(funcArgs as string[]);
     }
@@ -129,6 +139,9 @@ export class ExpressionEvaluatorService {
   }
 }
 
-angular.module('oppia').factory(
-  'ExpressionEvaluatorService',
-  downgradeInjectable(ExpressionEvaluatorService));
+angular
+  .module('oppia')
+  .factory(
+    'ExpressionEvaluatorService',
+    downgradeInjectable(ExpressionEvaluatorService)
+  );

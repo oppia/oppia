@@ -16,30 +16,29 @@
  * @fileoverview Unit tests for ProfilePageBackendApiService.
  */
 
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
-import { ProfilePageBackendApiService } from
-  'pages/profile-page/profile-page-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ProfilePageBackendApiService} from 'pages/profile-page/profile-page-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 describe('Profile test backend API service', () => {
   let profilePageBackendApiService: ProfilePageBackendApiService;
   let httpTestingController: HttpTestingController;
   let urlService: UrlService;
-  let expectedBody = { creator_username: 'testUsername' };
+  let expectedBody = {creator_username: 'testUsername'};
 
   let ERROR_STATUS_CODE = 500;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProfilePageBackendApiService]
+      providers: [ProfilePageBackendApiService],
     });
-    profilePageBackendApiService = TestBed.get(
-      ProfilePageBackendApiService);
+    profilePageBackendApiService = TestBed.get(ProfilePageBackendApiService);
     httpTestingController = TestBed.get(HttpTestingController);
 
     urlService = TestBed.get(UrlService);
@@ -50,184 +49,211 @@ describe('Profile test backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully post subscribe to ' +
-    'the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should successfully post subscribe to ' + 'the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.subscribeAsync('testUsername').then(
-      successHandler, failHandler);
+      profilePageBackendApiService
+        .subscribeAsync('testUsername')
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/subscribehandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(expectedBody);
-    req.flush({});
+      let req = httpTestingController.expectOne('/subscribehandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(expectedBody);
+      req.flush({});
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  })
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
   );
 
-  it('should use the rejection handler if the backend request' +
-    'failed on subscribe', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should use the rejection handler if the backend request' +
+      'failed on subscribe',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.subscribeAsync('testUsername').then(
-      successHandler, failHandler);
+      profilePageBackendApiService
+        .subscribeAsync('testUsername')
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/subscribehandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(expectedBody);
-    req.flush('Error loading data.', {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
+      let req = httpTestingController.expectOne('/subscribehandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(expectedBody);
+      req.flush('Error loading data.', {
+        status: ERROR_STATUS_CODE,
+        statusText: 'Invalid Request',
+      });
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
-
-  it('should successfully post unsubscribe to ' +
-    'the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    profilePageBackendApiService.unsubscribeAsync('testUsername').then(
-      successHandler, failHandler);
-
-    let req = httpTestingController.expectOne('/unsubscribehandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(expectedBody);
-    req.flush({});
-
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  })
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
   );
 
-  it('should use the rejection handler if the backend request' +
-    'failed on unsubscribe', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should successfully post unsubscribe to ' + 'the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.unsubscribeAsync('testUsername').then(
-      successHandler, failHandler);
+      profilePageBackendApiService
+        .unsubscribeAsync('testUsername')
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne('/unsubscribehandler');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(expectedBody);
-    req.flush('Error loading data.', {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
+      let req = httpTestingController.expectOne('/unsubscribehandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(expectedBody);
+      req.flush({});
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
-
-  it('should successfully fetch profile data from ' +
-    'the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    profilePageBackendApiService.fetchProfileDataAsync().then(
-      successHandler, failHandler);
-
-    let req = httpTestingController
-      .expectOne('/profilehandler/data/testUsername');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      username: 'user1',
-      profile_is_of_current_user: false,
-      is_user_visiting_own_profile: false,
-      created_exp_summary_dicts: [{
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      }],
-      is_already_subscribed: false,
-      first_contribution_msec: null,
-      user_impact_score: 0,
-      edited_exp_summary_dicts: [{
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      }],
-      subject_interests: [],
-      username_of_viewed_profile: 'user2',
-      user_bio: 'hi',
-    });
-
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  })
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
   );
 
-  it('should use the rejection handler if the backend request' +
-    'failed on fetch profile data', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should use the rejection handler if the backend request' +
+      'failed on unsubscribe',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    profilePageBackendApiService.fetchProfileDataAsync().then(
-      successHandler, failHandler);
+      profilePageBackendApiService
+        .unsubscribeAsync('testUsername')
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController
-      .expectOne('/profilehandler/data/testUsername');
-    expect(req.request.method).toEqual('GET');
-    req.flush('Error loading data.', {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
+      let req = httpTestingController.expectOne('/unsubscribehandler');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(expectedBody);
+      req.flush('Error loading data.', {
+        status: ERROR_STATUS_CODE,
+        statusText: 'Invalid Request',
+      });
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should successfully fetch profile data from ' + 'the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      profilePageBackendApiService
+        .fetchProfileDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/profilehandler/data/testUsername'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        username: 'user1',
+        profile_is_of_current_user: false,
+        is_user_visiting_own_profile: false,
+        created_exp_summary_dicts: [
+          {
+            last_updated_msec: 1591296737470.528,
+            community_owned: false,
+            objective: 'Test Objective',
+            id: '44LKoKLlIbGe',
+            num_views: 0,
+            thumbnail_icon_url: '/subjects/Algebra.svg',
+            human_readable_contributors_summary: {},
+            language_code: 'en',
+            thumbnail_bg_color: '#cc4b00',
+            created_on_msec: 1591296635736.666,
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            },
+            status: 'public',
+            tags: [],
+            activity_type: 'exploration',
+            category: 'Algebra',
+            title: 'Test Title',
+          },
+        ],
+        is_already_subscribed: false,
+        first_contribution_msec: null,
+        user_impact_score: 0,
+        edited_exp_summary_dicts: [
+          {
+            last_updated_msec: 1591296737470.528,
+            community_owned: false,
+            objective: 'Test Objective',
+            id: '44LKoKLlIbGe',
+            num_views: 0,
+            thumbnail_icon_url: '/subjects/Algebra.svg',
+            human_readable_contributors_summary: {},
+            language_code: 'en',
+            thumbnail_bg_color: '#cc4b00',
+            created_on_msec: 1591296635736.666,
+            ratings: {
+              1: 0,
+              2: 0,
+              3: 0,
+              4: 0,
+              5: 0,
+            },
+            status: 'public',
+            tags: [],
+            activity_type: 'exploration',
+            category: 'Algebra',
+            title: 'Test Title',
+          },
+        ],
+        subject_interests: [],
+        username_of_viewed_profile: 'user2',
+        user_bio: 'hi',
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should use the rejection handler if the backend request' +
+      'failed on fetch profile data',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      profilePageBackendApiService
+        .fetchProfileDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/profilehandler/data/testUsername'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading data.', {
+        status: ERROR_STATUS_CODE,
+        statusText: 'Invalid Request',
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });

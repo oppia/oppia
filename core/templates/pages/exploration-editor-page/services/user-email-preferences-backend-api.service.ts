@@ -17,37 +17,44 @@
  * for the exploration settings.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ExplorationDataService } from './exploration-data.service';
-import { EmailPreferencesData, RequestParams } from './user-email-preferences.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ExplorationDataService} from './exploration-data.service';
+import {
+  EmailPreferencesData,
+  RequestParams,
+} from './user-email-preferences.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserEmailPreferencesBackendApiService {
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService,
     private explorationDataService: ExplorationDataService
-  ) { }
+  ) {}
 
   async saveChangeToBackendAsync(
-      requestParams: RequestParams
+    requestParams: RequestParams
   ): Promise<EmailPreferencesData> {
     let emailPreferencesUrl = this.urlInterpolationService.interpolateUrl(
-      '/createhandler/notificationpreferences/<exploration_id>', {
-        exploration_id: this.explorationDataService.explorationId
+      '/createhandler/notificationpreferences/<exploration_id>',
+      {
+        exploration_id: this.explorationDataService.explorationId,
       }
     );
-    return this.http.put<EmailPreferencesData>(
-      emailPreferencesUrl, requestParams).toPromise();
+    return this.http
+      .put<EmailPreferencesData>(emailPreferencesUrl, requestParams)
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'UserEmailPreferencesBackendApiService',
-  downgradeInjectable(UserEmailPreferencesBackendApiService)
-);
+angular
+  .module('oppia')
+  .factory(
+    'UserEmailPreferencesBackendApiService',
+    downgradeInjectable(UserEmailPreferencesBackendApiService)
+  );

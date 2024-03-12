@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for skill preview modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SkillPreviewModalComponent } from './skill-preview-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {SkillPreviewModalComponent} from './skill-preview-modal.component';
 
 describe('Skill Preview Modal Component', () => {
   let fixture: ComponentFixture<SkillPreviewModalComponent>;
@@ -27,13 +27,9 @@ describe('Skill Preview Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        SkillPreviewModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [SkillPreviewModalComponent],
+      providers: [NgbActiveModal],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

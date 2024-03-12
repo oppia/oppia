@@ -16,21 +16,17 @@
  * @fileoverview Close language accent removal confirmation modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-language-accent-removal-confirm-modal',
-  templateUrl: './language-accent-removal-confirm-modal.component.html'
+  templateUrl: './language-accent-removal-confirm-modal.component.html',
 })
-export class VoiceoverRemovalConfirmModalComponent
-  extends ConfirmOrCancelModal {
+export class VoiceoverRemovalConfirmModalComponent extends ConfirmOrCancelModal {
   languageAccentDescription: string = '';
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

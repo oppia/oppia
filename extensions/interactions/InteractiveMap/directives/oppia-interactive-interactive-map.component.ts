@@ -20,17 +20,26 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { InteractiveMapCustomizationArgs } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { Subscription } from 'rxjs';
-import { InteractiveMapRulesService } from './interactive-map-rules.service';
-import { icon, LatLng, latLng, LeafletMouseEvent, Marker, marker, TileLayer, tileLayer } from 'leaflet';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {InteractiveMapCustomizationArgs} from 'interactions/customization-args-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {Subscription} from 'rxjs';
+import {InteractiveMapRulesService} from './interactive-map-rules.service';
+import {
+  icon,
+  LatLng,
+  latLng,
+  LeafletMouseEvent,
+  Marker,
+  marker,
+  TileLayer,
+  tileLayer,
+} from 'leaflet';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 interface OverlayStyle {
   'background-color': string;
@@ -46,7 +55,7 @@ interface MapOptions {
 
 @Component({
   selector: 'oppia-interactive-interactive-map',
-  templateUrl: './interactive-map-interaction.component.html'
+  templateUrl: './interactive-map-interaction.component.html',
 })
 export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -65,11 +74,12 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   overlayStyle!: OverlayStyle;
 
   zoom!: number;
-  private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  private _attribution =
+    '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   optionsSpec = {
-    layers: [{ url: this._optionsUrl, attribution: this._attribution }],
-    zoom: 0
+    layers: [{url: this._optionsUrl, attribution: this._attribution}],
+    zoom: 0,
   };
 
   directiveSubscriptions = new Subscription();
@@ -78,47 +88,43 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
   constructor(
     private browserCheckerService: BrowserCheckerService,
     private currentInteractionService: CurrentInteractionService,
-    private interactionAttributesExtractorService:
-     InteractionAttributesExtractorService,
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private interactiveMapRulesService: InteractiveMapRulesService,
     private playerPositionService: PlayerPositionService,
     private urlInterpolationService: UrlInterpolationService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.playerPositionService.onNewCardAvailable.subscribe(
-        () => {
-          this.interactionIsActive = false;
-          this.setOverlay();
-        }
-      )
+      this.playerPositionService.onNewCardAvailable.subscribe(() => {
+        this.interactionIsActive = false;
+        this.setOverlay();
+      })
     );
 
-    const { latitude, longitude, zoom } = (
+    const {latitude, longitude, zoom} =
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'InteractiveMap',
         this._getArgs()
-      ) as InteractiveMapCustomizationArgs
-    );
+      ) as InteractiveMapCustomizationArgs;
     this.coords = [latitude.value, longitude.value];
     if (latitude.value === undefined || longitude.value === undefined) {
       this.coords = [0, 0];
     }
     this.zoom = zoom.value;
     this.zoomLevel = parseInt(this.zoom + '', 10) || 0;
-    this.interactionIsActive = (this.lastAnswer === null);
+    this.interactionIsActive = this.lastAnswer === null;
     this.mapOptions = {
-      layers: [tileLayer(
-        this.optionsSpec.layers[0].url,
-        { attribution: this.optionsSpec.layers[0].attribution }
-      )],
+      layers: [
+        tileLayer(this.optionsSpec.layers[0].url, {
+          attribution: this.optionsSpec.layers[0].attribution,
+        }),
+      ],
       zoom: this.zoomLevel,
-      center: latLng([this.coords[0], this.coords[1]])
+      center: latLng([this.coords[0], this.coords[1]]),
     };
     if (!this.interactionIsActive && this.lastAnswer !== null) {
-      this._changeMarkerPosition(
-        this.lastAnswer[0], this.lastAnswer[1]);
+      this._changeMarkerPosition(this.lastAnswer[0], this.lastAnswer[1]);
     }
   }
 
@@ -126,37 +132,37 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     return {
       latitudeWithValue: this.latitudeWithValue,
       longitudeWithValue: this.longitudeWithValue,
-      zoomWithValue: this.zoomWithValue
+      zoomWithValue: this.zoomWithValue,
     };
   }
 
   private _changeMarkerPosition(lat: number, lng: number): void {
-    const newMarker = marker(
-      [lat, lng],
-      {
-        icon: icon({
-          iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
-            '/interactions/InteractiveMap/static/marker-icon.png'),
-          // The size of the icon image in pixels.
-          iconSize: [25, 41],
-          // The coordinates of the "tip" of the icon.
-          iconAnchor: [12, 41],
-          shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
-            '/interactions/InteractiveMap/static/marker-shadow.png'),
-          // The size of the shadow image in pixels.
-          shadowSize: [41, 41],
-          // The coordinates of the "tip" of the shadow.
-          shadowAnchor: [13, 41],
-          // The URL to a retina sized version of the icon image.
-          // Used for Retina screen devices.
-          iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
-            '/interactions/InteractiveMap/static/marker-icon-2x.png'),
-          shadowRetinaUrl: (
-            this.urlInterpolationService.getExtensionResourceUrl(
-              '/interactions/InteractiveMap/static/marker-shadow.png'))
-        })
-      }
-    );
+    const newMarker = marker([lat, lng], {
+      icon: icon({
+        iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-icon.png'
+        ),
+        // The size of the icon image in pixels.
+        iconSize: [25, 41],
+        // The coordinates of the "tip" of the icon.
+        iconAnchor: [12, 41],
+        shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-shadow.png'
+        ),
+        // The size of the shadow image in pixels.
+        shadowSize: [41, 41],
+        // The coordinates of the "tip" of the shadow.
+        shadowAnchor: [13, 41],
+        // The URL to a retina sized version of the icon image.
+        // Used for Retina screen devices.
+        iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-icon-2x.png'
+        ),
+        shadowRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-shadow.png'
+        ),
+      }),
+    });
     this.mapMarkers = newMarker;
   }
 
@@ -166,7 +172,8 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
       const newLng = e.latlng.lng;
       this._changeMarkerPosition(newLat, newLng);
       this.currentInteractionService.onSubmit(
-        [newLat, newLng], this.interactiveMapRulesService
+        [newLat, newLng],
+        this.interactiveMapRulesService
       );
     }
   }
@@ -187,7 +194,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     this.overlayStyle = {
       'background-color': '#fff',
       opacity: 0.5,
-      'z-index': 1001
+      'z-index': 1001,
     };
   }
 
@@ -195,7 +202,7 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
     this.overlayStyle = {
       'background-color': '#fff',
       opacity: 0,
-      'z-index': 0
+      'z-index': 0,
     };
   }
 
@@ -207,5 +214,6 @@ export class InteractiveInteractiveMapComponent implements OnInit, OnDestroy {
 angular.module('oppia').directive(
   'oppiaInteractiveInteractiveMap',
   downgradeComponent({
-    component: InteractiveInteractiveMapComponent
-  }));
+    component: InteractiveInteractiveMapComponent,
+  })
+);

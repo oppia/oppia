@@ -16,20 +16,20 @@
  * @fileoverview Modal and functionality for the create topic button.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { CreateNewTopicModalComponent } from 'pages/topics-and-skills-dashboard-page/modals/create-new-topic-modal.component';
-import { AlertsService } from 'services/alerts.service';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TopicCreationBackendApiService} from 'domain/topic/topic-creation-backend-api.service';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CreateNewTopicModalComponent} from 'pages/topics-and-skills-dashboard-page/modals/create-new-topic-modal.component';
+import {AlertsService} from 'services/alerts.service';
+import {ContextService} from 'services/context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TopicCreationService {
   TOPIC_EDITOR_URL_TEMPLATE: string = '/topic_editor/<topic_id>';
@@ -42,8 +42,7 @@ export class TopicCreationService {
     private contextService: ContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private topicCreationBackendApiService: TopicCreationBackendApiService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -57,47 +56,57 @@ export class TopicCreationService {
       windowClass: 'create-new-topic',
     });
 
-    modalRef.result.then((newlyCreatedTopic) => {
-      if (!newlyCreatedTopic.isValid()) {
-        throw new Error('Topic fields cannot be empty');
+    modalRef.result.then(
+      newlyCreatedTopic => {
+        if (!newlyCreatedTopic.isValid()) {
+          throw new Error('Topic fields cannot be empty');
+        }
+        this.topicCreationInProgress = true;
+        this.alertsService.clearWarnings();
+        // The window.open has to be initialized separately since if the 'open
+        // new tab' action does not directly result from a user input (which
+        // is not the case, if we wait for result from the backend before
+        // opening a new tab), some browsers block it as a popup. Here, the
+        // new tab is created as soon as the user clicks the 'Create' button
+        // and filled with URL once the details are fetched from the backend.
+        let newTab = this.windowRef.nativeWindow.open() as Window;
+        let imagesData = this.imageLocalStorageService.getStoredImagesData();
+        let bgColor = this.imageLocalStorageService.getThumbnailBgColor();
+        if (bgColor === null) {
+          throw new Error('Background color not found.');
+        }
+        this.topicCreationBackendApiService
+          .createTopicAsync(newlyCreatedTopic, imagesData, bgColor)
+          .then(
+            response => {
+              this.topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized.emit();
+              this.topicCreationInProgress = false;
+              this.imageLocalStorageService.flushStoredImagesData();
+              this.contextService.resetImageSaveDestination();
+              newTab.location.href =
+                this.urlInterpolationService.interpolateUrl(
+                  this.TOPIC_EDITOR_URL_TEMPLATE,
+                  {
+                    topic_id: response.topicId,
+                  }
+                );
+            },
+            errorResponse => {
+              newTab.close();
+              this.topicCreationInProgress = false;
+              this.alertsService.addWarning(errorResponse.error);
+            }
+          );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
       }
-      this.topicCreationInProgress = true;
-      this.alertsService.clearWarnings();
-      // The window.open has to be initialized separately since if the 'open
-      // new tab' action does not directly result from a user input (which
-      // is not the case, if we wait for result from the backend before
-      // opening a new tab), some browsers block it as a popup. Here, the
-      // new tab is created as soon as the user clicks the 'Create' button
-      // and filled with URL once the details are fetched from the backend.
-      let newTab = this.windowRef.nativeWindow.open() as Window;
-      let imagesData = this.imageLocalStorageService.getStoredImagesData();
-      let bgColor = this.imageLocalStorageService.getThumbnailBgColor();
-      if (bgColor === null) {
-        throw new Error('Background color not found.');
-      }
-      this.topicCreationBackendApiService.createTopicAsync(
-        newlyCreatedTopic, imagesData, bgColor).then((response) => {
-        this.topicsAndSkillsDashboardBackendApiService
-          .onTopicsAndSkillsDashboardReinitialized.emit();
-        this.topicCreationInProgress = false;
-        this.imageLocalStorageService.flushStoredImagesData();
-        this.contextService.resetImageSaveDestination();
-        newTab.location.href = this.urlInterpolationService.interpolateUrl(
-          this.TOPIC_EDITOR_URL_TEMPLATE, {
-            topic_id: response.topicId
-          });
-      }, (errorResponse) => {
-        newTab.close();
-        this.topicCreationInProgress = false;
-        this.alertsService.addWarning(errorResponse.error);
-      });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
-    });
+    );
   }
 }
 
-angular.module('oppia').factory('TopicCreationService',
-  downgradeInjectable(TopicCreationService));
+angular
+  .module('oppia')
+  .factory('TopicCreationService', downgradeInjectable(TopicCreationService));

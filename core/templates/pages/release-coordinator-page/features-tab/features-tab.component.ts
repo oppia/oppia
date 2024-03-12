@@ -16,23 +16,20 @@
  * @fileoverview Component for the feature tab on the release coordinator page.
  */
 
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit, EventEmitter, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { LoaderService } from 'services/loader.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { FeatureFlagDummyBackendApiService } from
-  'domain/feature-flag/feature-flag-dummy-backend-api.service';
-import { FeatureFlagBackendApiService } from
-  'domain/feature-flag/feature-flag-backend-api.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { FeatureFlag } from 'domain/feature-flag/feature-flag.model';
-import { HttpErrorResponse } from '@angular/common/http';
-
+import {LoaderService} from 'services/loader.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {FeatureFlagDummyBackendApiService} from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
+import {FeatureFlagBackendApiService} from 'domain/feature-flag/feature-flag-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
+import {HttpErrorResponse} from '@angular/common/http';
 
 interface IntSchema {
   type: 'int';
@@ -41,7 +38,7 @@ interface IntSchema {
 
 @Component({
   selector: 'features-tab',
-  templateUrl: './features-tab.component.html'
+  templateUrl: './features-tab.component.html',
 })
 export class FeaturesTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
@@ -66,7 +63,7 @@ export class FeaturesTabComponent implements OnInit {
     private apiService: FeatureFlagBackendApiService,
     private featureService: PlatformFeatureService,
     private dummyApiService: FeatureFlagDummyBackendApiService,
-    private loaderService: LoaderService,
+    private loaderService: LoaderService
   ) {}
 
   async reloadFeatureFlagsAsync(): Promise<void> {
@@ -75,20 +72,24 @@ export class FeaturesTabComponent implements OnInit {
     this.featureFlagsAreFetched = true;
     this.featureFlags = data.featureFlags;
     this.featureFlagNameToBackupMap = new Map(
-      this.featureFlags.map(feature => [feature.name, cloneDeep(feature)]));
+      this.featureFlags.map(feature => [feature.name, cloneDeep(feature)])
+    );
     this.loaderService.hideLoadingScreen();
   }
 
   getSchema(): IntSchema {
     return {
       type: 'int',
-      validators: [{
-        id: 'is_at_least',
-        min_value: 1
-      }, {
-        id: 'is_at_most',
-        max_value: 100
-      }]
+      validators: [
+        {
+          id: 'is_at_least',
+          min_value: 1,
+        },
+        {
+          id: 'is_at_most',
+          max_value: 100,
+        },
+      ],
     };
   }
 
@@ -109,9 +110,18 @@ export class FeaturesTabComponent implements OnInit {
     const millisecond = parseInt(timeParts[3], 10);
 
     const parsedDate = new Date(
-      year, month, day, hour, minute, second, millisecond);
+      year,
+      month,
+      day,
+      hour,
+      minute,
+      second,
+      millisecond
+    );
     const options: Intl.DateTimeFormatOptions = {
-      day: '2-digit', month: 'short', year: 'numeric'
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
     };
     return parsedDate.toLocaleDateString('en-US', options);
   }
@@ -130,10 +140,10 @@ export class FeaturesTabComponent implements OnInit {
     if (this.serverStage === this.DEV_SERVER_STAGE) {
       return true;
     } else if (this.serverStage === this.TEST_SERVER_STAGE) {
-      return (
-        feature.featureStage === this.TEST_SERVER_STAGE ||
+      return feature.featureStage === this.TEST_SERVER_STAGE ||
         feature.featureStage === this.PROD_SERVER_STAGE
-      ) ? true : false;
+        ? true
+        : false;
     } else if (this.serverStage === this.PROD_SERVER_STAGE) {
       return feature.featureStage === this.PROD_SERVER_STAGE ? true : false;
     }
@@ -141,8 +151,11 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   async updateFeatureFlag(feature: FeatureFlag): Promise<void> {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This action is irreversible. Are you sure?'
+      )
+    ) {
       return;
     }
     const issues = this.validateFeatureFlag(feature);
@@ -152,16 +165,19 @@ export class FeaturesTabComponent implements OnInit {
     }
     try {
       await this.apiService.updateFeatureFlag(
-        feature.name, feature.forceEnableForAllUsers, feature.rolloutPercentage,
-        feature.userGroupIds);
+        feature.name,
+        feature.forceEnableForAllUsers,
+        feature.rolloutPercentage,
+        feature.userGroupIds
+      );
 
       this.featureFlagNameToBackupMap.set(feature.name, cloneDeep(feature));
 
       this.setStatusMessage.emit('Saved successfully.');
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
     } catch (e: unknown) {
       if (e instanceof HttpErrorResponse) {
         if (e.error && e.error.error) {
@@ -176,13 +192,14 @@ export class FeaturesTabComponent implements OnInit {
   }
 
   clearChanges(featureFlag: FeatureFlag): void {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This will revert all changes you made. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This will revert all changes you made. Are you sure?'
+      )
+    ) {
       return;
     }
-    const backup = this.featureFlagNameToBackupMap.get(
-      featureFlag.name
-    );
+    const backup = this.featureFlagNameToBackupMap.get(featureFlag.name);
 
     if (backup) {
       featureFlag.forceEnableForAllUsers = backup.forceEnableForAllUsers;
@@ -198,11 +215,11 @@ export class FeaturesTabComponent implements OnInit {
     }
     return (
       !isEqual(
-        original.forceEnableForAllUsers, feature.forceEnableForAllUsers
-      ) || !isEqual(
-        original.rolloutPercentage, feature.rolloutPercentage
-      ) || !isEqual(
-        original.userGroupIds, feature.userGroupIds)
+        original.forceEnableForAllUsers,
+        feature.forceEnableForAllUsers
+      ) ||
+      !isEqual(original.rolloutPercentage, feature.rolloutPercentage) ||
+      !isEqual(original.userGroupIds, feature.userGroupIds)
     );
   }
 
@@ -234,11 +251,10 @@ export class FeaturesTabComponent implements OnInit {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.loaderService.onLoadingMessageChange.subscribe(
-        (message: string) => {
-          this.loadingMessage = message;
-        }
-      ));
+      this.loaderService.onLoadingMessageChange.subscribe((message: string) => {
+        this.loadingMessage = message;
+      })
+    );
     this.loaderService.showLoadingScreen('Loading');
     this.reloadFeatureFlagsAsync();
     this.reloadDummyHandlerStatusAsync();
@@ -249,6 +265,9 @@ export class FeaturesTabComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'adminFeaturesTab', downgradeComponent(
-    {component: FeaturesTabComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'adminFeaturesTab',
+    downgradeComponent({component: FeaturesTabComponent})
+  );

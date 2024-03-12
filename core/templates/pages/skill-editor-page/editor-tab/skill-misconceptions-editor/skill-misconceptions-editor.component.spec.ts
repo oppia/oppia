@@ -16,19 +16,28 @@
  * @fileoverview Unit tests for SkillMisconceptionsEditorComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { of, Subscription } from 'rxjs';
-import { ConceptCard } from 'domain/skill/concept-card.model';
-import { Misconception, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { DeleteMisconceptionModalComponent } from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { SkillMisconceptionsEditorComponent } from './skill-misconceptions-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {of, Subscription} from 'rxjs';
+import {ConceptCard} from 'domain/skill/concept-card.model';
+import {
+  Misconception,
+  MisconceptionObjectFactory,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {DeleteMisconceptionModalComponent} from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {SkillMisconceptionsEditorComponent} from './skill-misconceptions-editor.component';
 
 describe('Skill Misconceptions Editor Component', () => {
   let component: SkillMisconceptionsEditorComponent;
@@ -50,9 +59,7 @@ describe('Skill Misconceptions Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        SkillMisconceptionsEditorComponent
-      ],
+      declarations: [SkillMisconceptionsEditorComponent],
       providers: [
         ChangeDetectorRef,
         SkillEditorStateService,
@@ -61,11 +68,11 @@ describe('Skill Misconceptions Editor Component', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
-          }
-        }
+            getResizeEvent: () => of(resizeEvent),
+          },
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -79,10 +86,25 @@ describe('Skill Misconceptions Editor Component', () => {
     misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     sampleSkill = new Skill(
-      'id1', 'description', [], [], {} as ConceptCard, 'en',
-      1, 0, 'id1', false, []);
+      'id1',
+      'description',
+      [],
+      [],
+      {} as ConceptCard,
+      'en',
+      1,
+      0,
+      'id1',
+      false,
+      []
+    );
     sampleMisconception = misconceptionObjectFactory.create(
-      1, 'misconceptionName', 'notes', 'feedback', false);
+      1,
+      'misconceptionName',
+      'notes',
+      'feedback',
+      false
+    );
     sampleSkill._misconceptions = [sampleMisconception];
 
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
@@ -90,8 +112,9 @@ describe('Skill Misconceptions Editor Component', () => {
 
   beforeEach(() => {
     testSubscriptions = new Subscription();
-    testSubscriptions.add(skillEditorStateService.onSkillChange.subscribe(
-      skillChangeSpy));
+    testSubscriptions.add(
+      skillEditorStateService.onSkillChange.subscribe(skillChangeSpy)
+    );
   });
 
   afterEach(() => {
@@ -102,7 +125,8 @@ describe('Skill Misconceptions Editor Component', () => {
     // Misconception list is shown only when window is not narrow.
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     spyOnProperty(skillEditorStateService, 'onSkillChange').and.returnValue(
-      mockOnSkillChangeEmitter);
+      mockOnSkillChangeEmitter
+    );
 
     expect(component.skill).toBe(undefined);
     expect(component.misconceptions).toBeUndefined();
@@ -125,97 +149,118 @@ describe('Skill Misconceptions Editor Component', () => {
     expect(component.getMisconceptionsChange.emit).toHaveBeenCalled();
   });
 
-  it('should toggle misconceptionList when toggle ' +
-    'button is clicked', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    component.misconceptionsListIsShown = false;
+  it(
+    'should toggle misconceptionList when toggle ' + 'button is clicked',
+    () => {
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+      component.misconceptionsListIsShown = false;
 
-    component.toggleMisconceptionLists();
-    expect(component.misconceptionsListIsShown).toBe(true);
+      component.toggleMisconceptionLists();
+      expect(component.misconceptionsListIsShown).toBe(true);
 
-    component.toggleMisconceptionLists();
-    expect(component.misconceptionsListIsShown).toBe(false);
-  });
+      component.toggleMisconceptionLists();
+      expect(component.misconceptionsListIsShown).toBe(false);
+    }
+  );
 
-  it('should open add misconception modal when clicking on add ' +
-    'button', fakeAsync(() => {
-    component.skill = sampleSkill;
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve({
-        misconception: sampleMisconception
-      })
-    } as NgbModalRef);
-    spyOn(skillUpdateService, 'addMisconception').and.callThrough();
+  it(
+    'should open add misconception modal when clicking on add ' + 'button',
+    fakeAsync(() => {
+      component.skill = sampleSkill;
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.resolve({
+          misconception: sampleMisconception,
+        }),
+      } as NgbModalRef);
+      spyOn(skillUpdateService, 'addMisconception').and.callThrough();
 
-    component.openAddMisconceptionModal();
-    tick();
+      component.openAddMisconceptionModal();
+      tick();
 
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(skillUpdateService.addMisconception).toHaveBeenCalledWith(
-      sampleSkill, sampleMisconception);
-  }));
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(skillUpdateService.addMisconception).toHaveBeenCalledWith(
+        sampleSkill,
+        sampleMisconception
+      );
+    })
+  );
 
-  it('should close add misconception modal when clicking on close ' +
-    'button', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.reject()
-    } as NgbModalRef);
-    spyOn(skillUpdateService, 'addMisconception').and.callThrough();
+  it(
+    'should close add misconception modal when clicking on close ' + 'button',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject(),
+      } as NgbModalRef);
+      spyOn(skillUpdateService, 'addMisconception').and.callThrough();
 
-    component.openAddMisconceptionModal();
+      component.openAddMisconceptionModal();
 
-    expect(ngbModal.open).toHaveBeenCalled();
-    expect(skillUpdateService.addMisconception).not.toHaveBeenCalled();
-  }));
+      expect(ngbModal.open).toHaveBeenCalled();
+      expect(skillUpdateService.addMisconception).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should open delete misconception modal when clicking on delete ' +
-    'button', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        index: 'index'
-      },
-      result: Promise.resolve({
-        result: {
-          id: 'id'
-        }
-      })
-    } as NgbModalRef);
-    spyOn(skillUpdateService, 'deleteMisconception').and.returnValue();
+  it(
+    'should open delete misconception modal when clicking on delete ' +
+      'button',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          index: 'index',
+        },
+        result: Promise.resolve({
+          result: {
+            id: 'id',
+          },
+        }),
+      } as NgbModalRef);
+      spyOn(skillUpdateService, 'deleteMisconception').and.returnValue();
 
-    component.ngOnInit();
-    component.openDeleteMisconceptionModal(1, '1');
-    tick();
+      component.ngOnInit();
+      component.openDeleteMisconceptionModal(1, '1');
+      tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      DeleteMisconceptionModalComponent, {backdrop: 'static'});
-    expect(skillUpdateService.deleteMisconception).toHaveBeenCalled();
-  }));
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        DeleteMisconceptionModalComponent,
+        {backdrop: 'static'}
+      );
+      expect(skillUpdateService.deleteMisconception).toHaveBeenCalled();
+    })
+  );
 
-  it('should close delete misconception modal when clicking on ' +
-    'close button', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        index: 'index'
-      },
-      result: Promise.reject()
-    } as NgbModalRef);
-    spyOn(skillUpdateService, 'deleteMisconception').and.callThrough();
+  it(
+    'should close delete misconception modal when clicking on ' +
+      'close button',
+    fakeAsync(() => {
+      spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {
+          index: 'index',
+        },
+        result: Promise.reject(),
+      } as NgbModalRef);
+      spyOn(skillUpdateService, 'deleteMisconception').and.callThrough();
 
-    component.ngOnInit();
-    component.openDeleteMisconceptionModal(1, '1');
-    tick();
+      component.ngOnInit();
+      component.openDeleteMisconceptionModal(1, '1');
+      tick();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      DeleteMisconceptionModalComponent, {backdrop: 'static'});
-    expect(skillUpdateService.deleteMisconception).not.toHaveBeenCalled();
-  }));
+      expect(ngbModal.open).toHaveBeenCalledWith(
+        DeleteMisconceptionModalComponent,
+        {backdrop: 'static'}
+      );
+      expect(skillUpdateService.deleteMisconception).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should return misconception name given input as misconception ' +
-    'when calling \'getMisconceptionSummary \'', () => {
-    let name = component.getMisconceptionSummary(sampleMisconception);
+  it(
+    'should return misconception name given input as misconception ' +
+      "when calling 'getMisconceptionSummary '",
+    () => {
+      let name = component.getMisconceptionSummary(sampleMisconception);
 
-    expect(name).toBe('misconceptionName');
-  });
+      expect(name).toBe('misconceptionName');
+    }
+  );
 
   it('should change active misconception index', () => {
     component.activeMisconceptionIndex = 1;
@@ -225,19 +270,21 @@ describe('Skill Misconceptions Editor Component', () => {
     expect(component.activeMisconceptionIndex).toBe(2);
   });
 
-  it('should set active misconception index to null if ' +
-    'oldIndex is newIndex', () => {
-    component.activeMisconceptionIndex = 1;
+  it(
+    'should set active misconception index to null if ' +
+      'oldIndex is newIndex',
+    () => {
+      component.activeMisconceptionIndex = 1;
 
-    component.changeActiveMisconceptionIndex(1);
+      component.changeActiveMisconceptionIndex(1);
 
-    expect(component.activeMisconceptionIndex).toBe(null);
-  });
+      expect(component.activeMisconceptionIndex).toBe(null);
+    }
+  );
 
   it('should toggle skill editor card on clicking', () => {
     component.skillEditorCardIsShown = true;
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(true);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
     component.toggleSkillEditorCard();
 
@@ -251,7 +298,8 @@ describe('Skill Misconceptions Editor Component', () => {
   it('should show Misconceptions list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockEventEmitter);
+      mockEventEmitter
+    );
     component.windowIsNarrow = false;
 
     expect(component.misconceptionsListIsShown).toBe(false);

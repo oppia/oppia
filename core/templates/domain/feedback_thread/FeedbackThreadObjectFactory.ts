@@ -17,23 +17,23 @@
    thread domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import { ThreadMessageSummary } from 'domain/feedback_message/ThreadMessageSummary.model';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
+import {ThreadMessageSummary} from 'domain/feedback_message/ThreadMessageSummary.model';
 
 export interface FeedbackThreadBackendDict {
-  'status': string;
-  'subject': string;
-  'summary': string;
-  'original_author_username': string;
-  'last_updated_msecs': number;
-  'message_count': number;
-  'state_name': string;
-  'thread_id': string;
-  'last_nonempty_message_author': string;
-  'last_nonempty_message_text': string;
+  status: string;
+  subject: string;
+  summary: string;
+  original_author_username: string;
+  last_updated_msecs: number;
+  message_count: number;
+  state_name: string;
+  thread_id: string;
+  last_nonempty_message_author: string;
+  last_nonempty_message_text: string;
 }
 
 export class FeedbackThread {
@@ -49,10 +49,16 @@ export class FeedbackThread {
   messages: ThreadMessage[] = [];
 
   constructor(
-      status: string, subject: string, summary: string,
-      originalAuthorName: string, lastUpdatedMsecs: number,
-      messageCount: number, stateName: string, threadId: string,
-      lastNonemptyMessageSummary: ThreadMessageSummary) {
+    status: string,
+    subject: string,
+    summary: string,
+    originalAuthorName: string,
+    lastUpdatedMsecs: number,
+    messageCount: number,
+    stateName: string,
+    threadId: string,
+    lastNonemptyMessageSummary: ThreadMessageSummary
+  ) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -88,9 +94,11 @@ export class FeedbackThread {
 @Injectable({providedIn: 'root'})
 export class FeedbackThreadObjectFactory {
   createFromBackendDict(
-      feedbackThreadBackendDict: FeedbackThreadBackendDict): FeedbackThread {
+    feedbackThreadBackendDict: FeedbackThreadBackendDict
+  ): FeedbackThread {
     return new FeedbackThread(
-      feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+      feedbackThreadBackendDict.status,
+      feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
       feedbackThreadBackendDict.original_author_username,
       feedbackThreadBackendDict.last_updated_msecs,
@@ -99,10 +107,15 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.thread_id,
       new ThreadMessageSummary(
         feedbackThreadBackendDict.last_nonempty_message_author,
-        feedbackThreadBackendDict.last_nonempty_message_text));
+        feedbackThreadBackendDict.last_nonempty_message_text
+      )
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'FeedbackThreadObjectFactory',
-  downgradeInjectable(FeedbackThreadObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'FeedbackThreadObjectFactory',
+    downgradeInjectable(FeedbackThreadObjectFactory)
+  );

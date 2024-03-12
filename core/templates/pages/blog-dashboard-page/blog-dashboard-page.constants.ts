@@ -26,12 +26,12 @@ export const BlogDashboardPageConstants = {
   BLOG_DASHBOARD_TAB_URLS: {
     PUBLISHED: '#/published',
     DRAFTS: '#/drafts',
-    BLOG_POST_EDITOR: '#/blog_post_editor/<blog_post_id>'
+    BLOG_POST_EDITOR: '#/blog_post_editor/<blog_post_id>',
   },
 
   BLOG_POST_ACTIONS: {
     DELETE: 'delete',
     UNPUBLISH: 'unpublish',
-    PUBLISH: 'publish'
-  }
+    PUBLISH: 'publish',
+  },
 } as const;

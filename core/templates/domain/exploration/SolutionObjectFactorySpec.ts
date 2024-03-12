@@ -16,21 +16,18 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {
-  CapitalizePipe
-} from 'filters/string-utility-filters/capitalize.pipe';
-import { ConvertToPlainTextPipe } from
-  'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { Solution, SolutionObjectFactory } from
-  'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from
-  'domain/exploration/subtitled-html.model';
-import { Interaction } from './InteractionObjectFactory';
+  Solution,
+  SolutionObjectFactory,
+} from 'domain/exploration/SolutionObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {Interaction} from './InteractionObjectFactory';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {
@@ -41,8 +38,8 @@ describe('Solution object factory', () => {
           CamelCaseToHyphensPipe,
           CapitalizePipe,
           ConvertToPlainTextPipe,
-          FormatRtePreviewPipe
-        ]
+          FormatRtePreviewPipe,
+        ],
       });
       sof = TestBed.inject(SolutionObjectFactory);
       solution = sof.createFromBackendDict({
@@ -50,8 +47,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
-        }
+          html: 'This is the explanation to the answer',
+        },
       });
     });
 
@@ -61,8 +58,8 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
-        }
+          html: 'This is the explanation to the answer',
+        },
       };
 
       expect(solution.toBackendDict()).toEqual(expectedSolution);
@@ -73,14 +70,15 @@ describe('Solution object factory', () => {
         true,
         'This is the correct answer!',
         'This is the explanation to the answer',
-        'solution');
+        'solution'
+      );
       const expectedSolution = {
         answer_is_exclusive: true,
         correct_answer: 'This is the correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
-        }
+          html: 'This is the explanation to the answer',
+        },
       };
 
       expect(solutionFromScratch.toBackendDict()).toEqual(expectedSolution);
@@ -89,7 +87,7 @@ describe('Solution object factory', () => {
     it('should create summary correctly', () => {
       const graphInputCustomizationArgs = {
         graph: {
-          value: { },
+          value: {},
         },
         canAddVertex: {
           value: true,
@@ -111,93 +109,109 @@ describe('Solution object factory', () => {
         },
         canEditEdgeWeight: {
           value: true,
-        }
+        },
       };
-      expect(solution.getSummary(
-        'GraphInput', graphInputCustomizationArgs)).toEqual(
-        'One solution is "[Graph]". This is the explanation to the answer.');
+      expect(
+        solution.getSummary('GraphInput', graphInputCustomizationArgs)
+      ).toEqual(
+        'One solution is "[Graph]". This is the explanation to the answer.'
+      );
       const musicNotesInputCustomizationArgs = {
         sequenceToGuess: {
-          value: [{
-            readableNoteName: 'name',
-            noteDuration: {
-              num: 1,
-              den: 1
-            }}]
+          value: [
+            {
+              readableNoteName: 'name',
+              noteDuration: {
+                num: 1,
+                den: 1,
+              },
+            },
+          ],
         },
         initialSequence: {
-          value: [{
-            readableNoteName: 'name',
-            noteDuration: {
-              num: 1,
-              den: 1
-            }}]
-        }
+          value: [
+            {
+              readableNoteName: 'name',
+              noteDuration: {
+                num: 1,
+                den: 1,
+              },
+            },
+          ],
+        },
       };
-      expect(solution.getSummary(
-        'MusicNotesInput', musicNotesInputCustomizationArgs)).toEqual(
+      expect(
+        solution.getSummary('MusicNotesInput', musicNotesInputCustomizationArgs)
+      ).toEqual(
         'One solution is "[Music Notes]". This is the explanation to the' +
-        ' answer.');
+          ' answer.'
+      );
       const textInputCustomizationArgs = {
         placeholder: {
-          value: { }
+          value: {},
         },
         rows: {
-          value: 1
-        }
+          value: 1,
+        },
       };
-      expect(solution.getSummary(
-        'TextInput', textInputCustomizationArgs)).toEqual(
+      expect(
+        solution.getSummary('TextInput', textInputCustomizationArgs)
+      ).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
-        'This is the explanation to the answer.');
+          'This is the explanation to the answer.'
+      );
 
       solution.setCorrectAnswer({
         code: 'a=10',
         error: '',
         evaluation: '',
-        output: ''
+        output: '',
       });
       const codeReplCustomizationArgs = {
         language: {
-          value: 'lang'
+          value: 'lang',
         },
         placeholder: {
-          value: 'placeholder'
+          value: 'placeholder',
         },
         preCode: {
-          value: 'preCode'
+          value: 'preCode',
         },
         postCode: {
-          value: 'postCode'
-        }
+          value: 'postCode',
+        },
       };
-      expect(solution.getSummary(
-        'CodeRepl', codeReplCustomizationArgs)).toEqual(
-        'One solution is "a=10". This is the explanation to the answer.');
+      expect(
+        solution.getSummary('CodeRepl', codeReplCustomizationArgs)
+      ).toEqual(
+        'One solution is "a=10". This is the explanation to the answer.'
+      );
 
       solution.setCorrectAnswer({
         isNegative: false,
         wholeNumber: 0,
         numerator: 1,
-        denominator: 6
+        denominator: 6,
       });
       const fractionInputCustomizationArgs = {
         requireSimplestForm: {
-          value: true
+          value: true,
         },
         allowImproperFraction: {
-          value: true
+          value: true,
         },
         allowNonzeroIntegerPart: {
-          value: true
+          value: true,
         },
         customPlaceholder: {
-          value: { }
-        }
+          value: {},
+        },
       };
-      expect(solution.getSummary(
-        'FractionInput', fractionInputCustomizationArgs)).toEqual(
-        'One solution is "1/6". This is the explanation to the answer.');
+      expect(
+        solution.getSummary('FractionInput', fractionInputCustomizationArgs)
+      ).toEqual(
+        'One solution is "1/6". This is the explanation to the answer.'
+      );
 
       solution.setCorrectAnswer({
         type: 'real',
@@ -206,62 +220,83 @@ describe('Solution object factory', () => {
           isNegative: false,
           wholeNumber: 0,
           numerator: 0,
-          denominator: 1
+          denominator: 1,
         },
-        units: []
+        units: [],
       });
-      const numberWithUnitsCustomizationArgs = { };
-      expect(solution.getSummary(
-        'NumberWithUnits', numberWithUnitsCustomizationArgs)).toEqual(
-        'One solution is "1". This is the explanation to the answer.');
+      const numberWithUnitsCustomizationArgs = {};
+      expect(
+        solution.getSummary('NumberWithUnits', numberWithUnitsCustomizationArgs)
+      ).toEqual('One solution is "1". This is the explanation to the answer.');
 
       solution.setCorrectAnswer([
         ['content_id_1', 'content_id_3'],
-        ['content_id_2']
+        ['content_id_2'],
       ]);
       const dragAndDropCustomizationArgs = {
         choices: {
           value: [
             new SubtitledHtml('html_1', 'content_id_1'),
             new SubtitledHtml('html_2', 'content_id_2'),
-            new SubtitledHtml('html_3', 'content_id_3')
-          ]
-        }
+            new SubtitledHtml('html_3', 'content_id_3'),
+          ],
+        },
       };
 
       expect(
         solution.getSummary(
-          'DragAndDropSortInput', dragAndDropCustomizationArgs)
+          'DragAndDropSortInput',
+          dragAndDropCustomizationArgs
+        )
       ).toEqual(
         'One solution is "[[html_1,html_3],[html_2]]". ' +
-        'This is the explanation to the answer.');
+          'This is the explanation to the answer.'
+      );
     });
 
     it('should get oppia short answer', () => {
-      const interaction = new Interaction([], [], {
-        choices: {
-          value: [new SubtitledHtml('This is a choice', 'id1')]
-        }
-      }, null, [], '0', null);
+      const interaction = new Interaction(
+        [],
+        [],
+        {
+          choices: {
+            value: [new SubtitledHtml('This is a choice', 'id1')],
+          },
+        },
+        null,
+        [],
+        '0',
+        null
+      );
       const expectedShortAnswerHtml = {
         prefix: 'One',
-        answer: '<oppia-short-response-0 answer="&amp;quot;' +
-        'This is a correct answer!&amp;quot;" choices="' +
-        '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
-        '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
-        '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>'
+        answer:
+          '<oppia-short-response-0 answer="&amp;quot;' +
+          'This is a correct answer!&amp;quot;" choices="' +
+          '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
+          '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
+          '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>',
       };
 
       expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
-        expectedShortAnswerHtml);
+        expectedShortAnswerHtml
+      );
     });
 
-    it('should throw an error if Interaction\'s id is null', () => {
-      const interaction = new Interaction([], [], {
-        choices: {
-          value: [new SubtitledHtml('This is a choice', '')]
-        }
-      }, null, [], null, null);
+    it("should throw an error if Interaction's id is null", () => {
+      const interaction = new Interaction(
+        [],
+        [],
+        {
+          choices: {
+            value: [new SubtitledHtml('This is a choice', '')],
+          },
+        },
+        null,
+        [],
+        null,
+        null
+      );
 
       expect(() => {
         solution.getOppiaShortAnswerResponseHtml(interaction);
@@ -274,14 +309,15 @@ describe('Solution object factory', () => {
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
-          html: 'This is the explanation to the answer'
-        }
+          html: 'This is the explanation to the answer',
+        },
       });
 
       expect(solution.answerIsExclusive).toBe(true);
       expect(solution.getSummary('TestInput', {})).toEqual(
         'The only solution is "&quot;This is a correct answer!&quot;". ' +
-        'This is the explanation to the answer.');
+          'This is the explanation to the answer.'
+      );
     });
 
     it('should change the explanation correctly', () => {
@@ -293,10 +329,12 @@ describe('Solution object factory', () => {
 
       expect(solution.explanation).toBe(newExplanation);
       expect(solution.getOppiaSolutionExplanationResponseHtml()).toBe(
-        newExplanation.html);
+        newExplanation.html
+      );
       expect(solution.getSummary('TestInput', {})).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
-        'This is the new explanation to the answer.');
+          'This is the new explanation to the answer.'
+      );
     });
   });
 });

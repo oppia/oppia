@@ -16,22 +16,22 @@
  * @fileoverview Component for non strict validation fail modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-save-validation-fail-modal',
-  templateUrl: './save-validation-fail-modal.component.html'
+  templateUrl: './save-validation-fail-modal.component.html',
 })
 export class SaveValidationFailModalComponent extends ConfirmOrCancelModal {
   MSECS_TO_REFRESH: number = 20;
 
   constructor(
     private windowRef: WindowRef,
-    private ngbActiveModal: NgbActiveModal,
+    private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }

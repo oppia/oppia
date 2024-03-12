@@ -16,9 +16,9 @@
  * @fileoverview Email Dashboard page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-email-dashboard-page-root',
@@ -28,7 +28,6 @@ export class EmailDashboardPageRootComponent extends BaseRootComponent {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.TITLE;
 
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .EMAIL_DASHBOARD.META as unknown as Readonly<MetaTagData>[];
 }

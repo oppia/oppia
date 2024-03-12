@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for collection permissions card component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { CollectionRights } from 'domain/collection/collection-rights.model';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { CollectionPermissionsCardComponent } from './collection-permissions-card.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {CollectionRights} from 'domain/collection/collection-rights.model';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
+import {CollectionPermissionsCardComponent} from './collection-permissions-card.component';
 
 describe('Collection permissions card component', () => {
   let fixture: ComponentFixture<CollectionPermissionsCardComponent>;
@@ -30,16 +30,10 @@ describe('Collection permissions card component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        CollectionPermissionsCardComponent
-      ],
-      providers: [
-        CollectionEditorStateService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [HttpClientTestingModule],
+      declarations: [CollectionPermissionsCardComponent],
+      providers: [CollectionEditorStateService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -55,17 +49,20 @@ describe('Collection permissions card component', () => {
       can_edit: null,
       can_unpublish: null,
       is_private: null,
-      owner_names: []
+      owner_names: [],
     });
     spyOn(collectionEditorStateService, 'getCollectionRights').and.returnValue(
-      mockCollectionRights);
+      mockCollectionRights
+    );
     componentInstance.ngOnInit();
     expect(componentInstance.collectionRights).toEqual(mockCollectionRights);
   });
 
   it('should tell if page has loaded', () => {
     spyOn(collectionEditorStateService, 'hasLoadedCollection').and.returnValues(
-      false, true);
+      false,
+      true
+    );
     expect(componentInstance.hasPageLoaded()).toBeFalse();
     expect(componentInstance.hasPageLoaded()).toBeTrue();
   });

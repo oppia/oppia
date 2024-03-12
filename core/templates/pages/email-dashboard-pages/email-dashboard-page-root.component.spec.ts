@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for Email Dashboard Page Root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { AppConstants } from '../../app.constants';
-import { PageHeadService } from '../../services/page-head.service';
-import { EmailDashboardPageRootComponent } from './email-dashboard-page-root.component';
+import {AppConstants} from '../../app.constants';
+import {PageHeadService} from '../../services/page-head.service';
+import {EmailDashboardPageRootComponent} from './email-dashboard-page-root.component';
 
 describe('EmailDashboardPageRootComponent', () => {
   let fixture: ComponentFixture<EmailDashboardPageRootComponent>;
@@ -43,8 +43,10 @@ describe('EmailDashboardPageRootComponent', () => {
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.TITLE
+    );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.META
+    );
   });
 });

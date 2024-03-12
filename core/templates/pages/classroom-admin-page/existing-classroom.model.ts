@@ -16,10 +16,9 @@
  * @fileoverview Existing classroom model.
  */
 
-import { ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
-import { NewClassroom, NewClassroomData } from './new-classroom.model';
+import {ClassroomDict} from '../../domain/classroom/classroom-backend-api.service';
+import {NewClassroom, NewClassroomData} from './new-classroom.model';
 import cloneDeep from 'lodash/cloneDeep';
-
 
 export interface TopicIdToPrerequisiteTopicIds {
   [topicId: string]: string[];
@@ -28,7 +27,6 @@ export interface TopicIdToPrerequisiteTopicIds {
 export interface TopicIdToTopicName {
   [topicId: string]: string;
 }
-
 
 interface ExistingClassroom extends NewClassroom {
   _courseDetails: string;
@@ -45,9 +43,10 @@ interface ExistingClassroom extends NewClassroom {
 
 export type ClassroomData = ExistingClassroom | NewClassroom;
 
-
-export class ExistingClassroomData extends
-    NewClassroomData implements ExistingClassroom {
+export class ExistingClassroomData
+  extends NewClassroomData
+  implements ExistingClassroom
+{
   _courseDetails: string;
   _topicListIntro: string;
   _topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds;
@@ -55,12 +54,12 @@ export class ExistingClassroomData extends
   _topicIdToTopicName!: TopicIdToTopicName;
 
   constructor(
-      classroomId: string,
-      name: string,
-      urlFragment: string,
-      courseDetails: string,
-      topicListIntro: string,
-      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    classroomId: string,
+    name: string,
+    urlFragment: string,
+    courseDetails: string,
+    topicListIntro: string,
+    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ) {
     super(classroomId, name, urlFragment);
     this._courseDetails = courseDetails;
@@ -68,7 +67,8 @@ export class ExistingClassroomData extends
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
     this._topicsCountInClassroom = 0;
     this._topicsCountInClassroom = Object.keys(
-      this._topicIdToPrerequisiteTopicIds).length;
+      this._topicIdToPrerequisiteTopicIds
+    ).length;
   }
 
   getCourseDetails(): string {
@@ -92,13 +92,13 @@ export class ExistingClassroomData extends
   }
 
   setTopicIdToPrerequisiteTopicId(
-      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ): void {
     this._topicIdToPrerequisiteTopicIds = topicIdToPrerequisiteTopicIds;
   }
 
   static createClassroomFromDict(
-      classroomDict: ClassroomDict
+    classroomDict: ClassroomDict
   ): ExistingClassroomData {
     return new ExistingClassroomData(
       classroomDict.classroomId,
@@ -117,7 +117,7 @@ export class ExistingClassroomData extends
       urlFragment: this._urlFragment,
       courseDetails: this._courseDetails,
       topicListIntro: this._topicListIntro,
-      topicIdToPrerequisiteTopicIds: this._topicIdToPrerequisiteTopicIds
+      topicIdToPrerequisiteTopicIds: this._topicIdToPrerequisiteTopicIds,
     };
     return classroomDict;
   }
@@ -125,13 +125,12 @@ export class ExistingClassroomData extends
   generateGraphErrorMsg(circularlyDependentTopics: string[]): string {
     let errorMsg = 'There is a cycle in the prerequisite dependencies. \n';
     for (let topicName of circularlyDependentTopics) {
-      errorMsg += (topicName + ' \u2192 ');
+      errorMsg += topicName + ' \u2192 ';
     }
-    errorMsg += (circularlyDependentTopics[0] + '.');
-    errorMsg += (
+    errorMsg += circularlyDependentTopics[0] + '.';
+    errorMsg +=
       ' Please remove the circular dependency. You can click ' +
-      'on "View Graph" below to see a visualization of the dependencies.'
-    );
+      'on "View Graph" below to see a visualization of the dependencies.';
     return errorMsg;
   }
 
@@ -140,7 +139,8 @@ export class ExistingClassroomData extends
     for (let currentTopicId in this._topicIdToPrerequisiteTopicIds) {
       topicIdToChildTopicId = {};
       let ancestors = cloneDeep(
-        this._topicIdToPrerequisiteTopicIds[currentTopicId]);
+        this._topicIdToPrerequisiteTopicIds[currentTopicId]
+      );
 
       for (let topicId of ancestors) {
         topicIdToChildTopicId[topicId] = currentTopicId;
@@ -173,20 +173,19 @@ export class ExistingClassroomData extends
         ancestors.splice(lengthOfAncestor - 1, 1);
 
         if (
-          visitedTopicIdsForCurrentTopic.indexOf(
-            lastTopicIdInAncestor) !== -1
+          visitedTopicIdsForCurrentTopic.indexOf(lastTopicIdInAncestor) !== -1
         ) {
           continue;
         }
 
         ancestors = ancestors.concat(
-          this._topicIdToPrerequisiteTopicIds[lastTopicIdInAncestor]);
+          this._topicIdToPrerequisiteTopicIds[lastTopicIdInAncestor]
+        );
         visitedTopicIdsForCurrentTopic.push(lastTopicIdInAncestor);
 
-        for (
-          let topicId of
-          this._topicIdToPrerequisiteTopicIds[lastTopicIdInAncestor]
-        ) {
+        for (let topicId of this._topicIdToPrerequisiteTopicIds[
+          lastTopicIdInAncestor
+        ]) {
           topicIdToChildTopicId[topicId] = lastTopicIdInAncestor;
         }
       }
@@ -205,23 +204,20 @@ export class ExistingClassroomData extends
   }
 
   addPrerequisiteTopicId(
-      currentTopicId: string,
-      prerequisiteTopicId: string
+    currentTopicId: string,
+    prerequisiteTopicId: string
   ): void {
     this._topicIdToPrerequisiteTopicIds[currentTopicId].push(
-      prerequisiteTopicId);
+      prerequisiteTopicId
+    );
   }
 
-  removeDependency(
-      currentTopicId: string,
-      prerequisiteTopicId: string
-  ): void {
-    const index = (
+  removeDependency(currentTopicId: string, prerequisiteTopicId: string): void {
+    const index =
       this._topicIdToPrerequisiteTopicIds[currentTopicId].indexOf(
-        prerequisiteTopicId)
-    );
-    this._topicIdToPrerequisiteTopicIds[currentTopicId].splice(
-      index, 1);
+        prerequisiteTopicId
+      );
+    this._topicIdToPrerequisiteTopicIds[currentTopicId].splice(index, 1);
   }
 
   getPrerequisiteTopicIds(topicId: string): string[] {

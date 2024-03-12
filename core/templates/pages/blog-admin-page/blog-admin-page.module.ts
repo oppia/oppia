@@ -16,19 +16,19 @@
  * @fileoverview Module for the blog-admin page.
  */
 
-import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { AdminBlogAdminCommonModule } from 'pages/admin-page/admin-blog-admin-common.module';
-import { BlogAdminPageComponent } from './blog-admin-page.component';
-import { BlogAdminPageRootComponent } from './blog-admin-page-root.component';
-import { BlogAdminAuthGuard } from './blog-admin-auth.guard';
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {BlogAdminNavbarComponent} from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {AdminBlogAdminCommonModule} from 'pages/admin-page/admin-blog-admin-common.module';
+import {BlogAdminPageComponent} from './blog-admin-page.component';
+import {BlogAdminPageRootComponent} from './blog-admin-page-root.component';
+import {BlogAdminAuthGuard} from './blog-admin-auth.guard';
 
 @NgModule({
   imports: [
@@ -50,11 +50,8 @@ import { BlogAdminAuthGuard } from './blog-admin-auth.guard';
   declarations: [
     BlogAdminNavbarComponent,
     BlogAdminPageComponent,
-    BlogAdminPageRootComponent
+    BlogAdminPageRootComponent,
   ],
-  entryComponents: [
-    BlogAdminNavbarComponent,
-    BlogAdminPageComponent
-  ],
+  entryComponents: [BlogAdminNavbarComponent, BlogAdminPageComponent],
 })
 export class BlogAdminPageModule {}

@@ -52,68 +52,70 @@ ruleTester.run('test-message-style', rule, {
  * oppia-noninteractive-link in oppia.css for the new directive.
  */
 
- var a =5;`
+ var a =5;`,
   ],
 
   invalid: [
     {
-      code:
-        `// We only run the e2e action checks on end-to-end test files
+      code: `// We only run the e2e action checks on end-to-end test files
         // The following must be off so that we can enable
         var a = 5;
         `,
-      errors: [{
-        message: (
-          'Invalid punctuation used at the end of the comment'),
-        type: null
-      }]
+      errors: [
+        {
+          message: 'Invalid punctuation used at the end of the comment',
+          type: null,
+        },
+      ],
     },
     {
-      code:
-        `// Taking a variable name a.
+      code: `// Taking a variable name a.
         var a = 5;
 
         // assign it value to 5 above
         `,
-      errors: [{
-        message: (
-          'Invalid punctuation used at the end of the comment'),
-        type: null
-      }]
+      errors: [
+        {
+          message: 'Invalid punctuation used at the end of the comment',
+          type: null,
+        },
+      ],
     },
     {
-      code:
-        `// This throw "Type '($provide) => string' is not assignable to
+      code: `// This throw "Type '($provide) => string' is not assignable to
         // type 'string'". this need to suppress because typescript
         // expects the module name to be an string but a custom module is
         // needed here.
         // @ts-ignore
         var x = 5;
         `,
-      errors: [{
-        message: (
-          'Please add a comment above the @ts-ignore explaining the' +
-          ' @ts-ignore. The format of comment should be -> This throws "...".' +
-          ' We need to suppress this error because ...'),
-        type: null
-      }]
+      errors: [
+        {
+          message:
+            'Please add a comment above the @ts-ignore explaining the' +
+            ' @ts-ignore. The format of comment should be -> This throws "...".' +
+            ' We need to suppress this error because ...',
+          type: null,
+        },
+      ],
     },
     {
-      code:
-        `// This throw "Argument of type '() -> Promise<unknown>'
+      code: `// This throw "Argument of type '() -> Promise<unknown>'
         // is not assignable to parameter of type 'PromiseLike<string>'.
         // this need to be suppressed because we need to mock the
         // getTokenAsync function for testing purposes.
         // @ts-expect-error
         var s = 9;
         `,
-      errors: [{
-        message: (
-          'Please add a comment above the @ts-expect-error explaining the' +
-          ' @ts-expect-error. The format of comment should be ->' +
-          ' This throws "...". We need to suppress this error because ...'),
-        type: null
-      }]
-    }
-  ]
+      errors: [
+        {
+          message:
+            'Please add a comment above the @ts-expect-error explaining the' +
+            ' @ts-expect-error. The format of comment should be ->' +
+            ' This throws "...". We need to suppress this error because ...',
+          type: null,
+        },
+      ],
+    },
+  ],
 });

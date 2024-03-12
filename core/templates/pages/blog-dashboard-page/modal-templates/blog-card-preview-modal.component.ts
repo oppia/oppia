@@ -16,20 +16,22 @@
  * @fileoverview Component for confirming blog post actions.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { BlogDashboardPageService } from '../services/blog-dashboard-page.service';
-import { BlogPostData } from 'domain/blog/blog-post.model';
-import { BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {BlogDashboardPageService} from '../services/blog-dashboard-page.service';
+import {BlogPostData} from 'domain/blog/blog-post.model';
+import {BlogPostSummary} from 'domain/blog/blog-post-summary.model';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 @Component({
   selector: 'oppia-blog-card-preview-modal',
   templateUrl: './blog-card-preview-modal.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class BlogCardPreviewModalComponent
-    extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -38,19 +40,19 @@ export class BlogCardPreviewModalComponent
   summaryContent!: string;
   blogHomePageLink: string = '';
   constructor(
-      ngbActiveModal: NgbActiveModal,
-      private blogDashboardPageService: BlogDashboardPageService,
-      private truncatePipe: TruncatePipe,
+    ngbActiveModal: NgbActiveModal,
+    private blogDashboardPageService: BlogDashboardPageService,
+    private truncatePipe: TruncatePipe
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
     this.blogPostData = this.blogDashboardPageService.blogPostData;
-    let rawContent = this.blogPostData.content.replace(
-      /<strong>(.*?)<\/strong>/g, ' ').replace(/<h1>(.*?)<\/h1>/g, ' ');
-    this.summaryContent = this.truncatePipe.transform(
-      rawContent, 300);
+    let rawContent = this.blogPostData.content
+      .replace(/<strong>(.*?)<\/strong>/g, ' ')
+      .replace(/<h1>(.*?)<\/h1>/g, ' ');
+    this.summaryContent = this.truncatePipe.transform(rawContent, 300);
     let dateString;
     if (this.blogPostData.publishedOn) {
       dateString = this.blogPostData.publishedOn;
@@ -58,7 +60,7 @@ export class BlogCardPreviewModalComponent
       dateString = this.blogPostData.lastUpdated;
     }
 
-    this.blogPostSummary = new BlogPostSummary (
+    this.blogPostSummary = new BlogPostSummary(
       this.blogPostData.id,
       '',
       this.blogPostData.displayedAuthorName,
@@ -68,12 +70,12 @@ export class BlogCardPreviewModalComponent
       this.blogPostData.thumbnailFilename,
       this.blogPostData.urlFragment,
       this.blogPostData.lastUpdated,
-      dateString,
+      dateString
     );
-    this.blogHomePageLink = (
-      '<a href=\"\/blog\" rel=\"noopener\" target=\"_blank\"><span>' +
+    this.blogHomePageLink =
+      '<a href="/blog" rel="noopener" target="_blank"><span>' +
       '( link </span><span ' +
-      'class=\"fas fa-external-link-alt oppia-open-new-tab-icon\">' +
-      '</span> )</a>');
+      'class="fas fa-external-link-alt oppia-open-new-tab-icon">' +
+      '</span> )</a>';
   }
 }

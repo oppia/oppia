@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Item Selection rules.
  */
 
-import { ItemSelectionInputRulesService } from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import {ItemSelectionInputRulesService} from 'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
 
 describe('Item Selection rules service', () => {
   beforeEach(angular.mock.module('oppia'));
@@ -26,87 +26,118 @@ describe('Item Selection rules service', () => {
     isirs = new ItemSelectionInputRulesService();
   });
 
-  it('should have a correct \'equals\' rule', () => {
+  it("should have a correct 'equals' rule", () => {
     var RULE_INPUT: {x: string[]} = {
-      x: ['rule_input_1', 'rule_input_2', 'rule_input_3']
+      x: ['rule_input_1', 'rule_input_2', 'rule_input_3'],
     };
-    expect(isirs.Equals(
-      ['rule_input_1', 'rule_input_2', 'rule_input_3'],
-      RULE_INPUT)).toBe(true);
-    expect(isirs.Equals(
-      ['rule_input_2', 'rule_input_3', 'rule_input_1'],
-      RULE_INPUT)).toBe(true);
+    expect(
+      isirs.Equals(['rule_input_1', 'rule_input_2', 'rule_input_3'], RULE_INPUT)
+    ).toBe(true);
+    expect(
+      isirs.Equals(['rule_input_2', 'rule_input_3', 'rule_input_1'], RULE_INPUT)
+    ).toBe(true);
     expect(isirs.Equals(['rule_input_2'], RULE_INPUT)).toBe(false);
     expect(isirs.Equals(['rule_input_3'], RULE_INPUT)).toBe(false);
     expect(isirs.Equals(['rule_input_4'], RULE_INPUT)).toBe(false);
-    expect(isirs.Equals(
-      ['rule_input_1', 'rule_input_5'],
-      RULE_INPUT)).toBe(false);
+    expect(isirs.Equals(['rule_input_1', 'rule_input_5'], RULE_INPUT)).toBe(
+      false
+    );
   });
 
-  it('should have a correct \'contains at least one of\' rule', () => {
+  it("should have a correct 'contains at least one of' rule", () => {
     var RULE_INPUT: {x: string[]} = {
-      x: ['rule_input_1']
+      x: ['rule_input_1'],
     };
-    expect(isirs.ContainsAtLeastOneOf(
-      ['rule_input_1', 'rule_input_2'], RULE_INPUT)).toBe(true);
-    expect(isirs.ContainsAtLeastOneOf(
-      ['rule_input_3', 'rule_input_1'], RULE_INPUT)).toBe(true);
+    expect(
+      isirs.ContainsAtLeastOneOf(['rule_input_1', 'rule_input_2'], RULE_INPUT)
+    ).toBe(true);
+    expect(
+      isirs.ContainsAtLeastOneOf(['rule_input_3', 'rule_input_1'], RULE_INPUT)
+    ).toBe(true);
     expect(isirs.ContainsAtLeastOneOf(['rule_input_1'], RULE_INPUT)).toBe(true);
-    expect(isirs.ContainsAtLeastOneOf(
-      ['rule_input_4'], RULE_INPUT)).toBe(false);
+    expect(isirs.ContainsAtLeastOneOf(['rule_input_4'], RULE_INPUT)).toBe(
+      false
+    );
     expect(isirs.ContainsAtLeastOneOf([], RULE_INPUT)).toBe(false);
 
     RULE_INPUT = {
-      x: ['rule_input_1', 'rule_input_2']
+      x: ['rule_input_1', 'rule_input_2'],
     };
-    expect(isirs.ContainsAtLeastOneOf(
-      ['rule_input_1', 'rule_input_2', 'rule_input_3'], RULE_INPUT)).toBe(true);
-    expect(isirs.ContainsAtLeastOneOf(
-      ['rule_input_1', 'rule_input_4'], RULE_INPUT)).toBe(true);
+    expect(
+      isirs.ContainsAtLeastOneOf(
+        ['rule_input_1', 'rule_input_2', 'rule_input_3'],
+        RULE_INPUT
+      )
+    ).toBe(true);
+    expect(
+      isirs.ContainsAtLeastOneOf(['rule_input_1', 'rule_input_4'], RULE_INPUT)
+    ).toBe(true);
     expect(isirs.ContainsAtLeastOneOf(['rule_input_1'], RULE_INPUT)).toBe(true);
-    expect(isirs.ContainsAtLeastOneOf(
-      ['rule_input_5'], RULE_INPUT)).toBe(false);
+    expect(isirs.ContainsAtLeastOneOf(['rule_input_5'], RULE_INPUT)).toBe(
+      false
+    );
   });
 
-  it('should have a correct \'does not contain at least one of\' rule', () => {
+  it("should have a correct 'does not contain at least one of' rule", () => {
     var RULE_INPUT: {x: string[]} = {
-      x: ['rule_input_1', 'rule_input_2', 'rule_input_3']
+      x: ['rule_input_1', 'rule_input_2', 'rule_input_3'],
     };
-    expect(isirs.DoesNotContainAtLeastOneOf(
-      ['rule_input_4'], RULE_INPUT)).toBe(true);
+    expect(isirs.DoesNotContainAtLeastOneOf(['rule_input_4'], RULE_INPUT)).toBe(
+      true
+    );
     expect(isirs.DoesNotContainAtLeastOneOf([], RULE_INPUT)).toBe(true);
     expect(
       isirs.DoesNotContainAtLeastOneOf(
-        ['rule_input_1', 'rule_input_2'], RULE_INPUT)).toBe(true);
-    expect(isirs.DoesNotContainAtLeastOneOf(
-      ['rule_input_1'], RULE_INPUT)).toBe(true);
-    expect(isirs.DoesNotContainAtLeastOneOf(
-      ['rule_input_1', 'rule_input_2', 'rule_input_3'],
-      RULE_INPUT)).toBe(false);
-    expect(isirs.DoesNotContainAtLeastOneOf(
-      ['rule_input_1', 'rule_input_2', 'rule_input_3', 'rule_input_4'],
-      RULE_INPUT)).toBe(false);
+        ['rule_input_1', 'rule_input_2'],
+        RULE_INPUT
+      )
+    ).toBe(true);
+    expect(isirs.DoesNotContainAtLeastOneOf(['rule_input_1'], RULE_INPUT)).toBe(
+      true
+    );
+    expect(
+      isirs.DoesNotContainAtLeastOneOf(
+        ['rule_input_1', 'rule_input_2', 'rule_input_3'],
+        RULE_INPUT
+      )
+    ).toBe(false);
+    expect(
+      isirs.DoesNotContainAtLeastOneOf(
+        ['rule_input_1', 'rule_input_2', 'rule_input_3', 'rule_input_4'],
+        RULE_INPUT
+      )
+    ).toBe(false);
   });
 
-  it('should have a correct \'is a proper subset of\' rule', () => {
+  it("should have a correct 'is a proper subset of' rule", () => {
     var RULE_INPUT: {x: string[]} = {
-      x: ['rule_input_1', 'rule_input_2', 'rule_input_3']
+      x: ['rule_input_1', 'rule_input_2', 'rule_input_3'],
     };
     expect(isirs.IsProperSubsetOf([], RULE_INPUT)).toBe(true);
     expect(isirs.IsProperSubsetOf(['rule_input_1'], RULE_INPUT)).toBe(true);
-    expect(isirs.IsProperSubsetOf(
-      ['rule_input_1', 'rule_input_2'], RULE_INPUT)).toBe(true);
-    expect(isirs.IsProperSubsetOf(
-      ['rule_input_1', 'rule_input_2', 'rule_input_3'],
-      RULE_INPUT)).toBe(false);
-    expect(isirs.IsProperSubsetOf(
-      ['rule_input_4', 'rule_input_5'], RULE_INPUT)).toBe(false);
-    expect(isirs.IsProperSubsetOf(
-      ['rule_input_1', 'rule_input_2', 'rule_input_3', 'rule_input_4'],
-      RULE_INPUT)).toBe(false);
-    expect(isirs.IsProperSubsetOf(
-      ['rule_input_2', 'rule_input_3', 'rule_input_4', 'rule_input_5'],
-      RULE_INPUT)).toBe(false);
+    expect(
+      isirs.IsProperSubsetOf(['rule_input_1', 'rule_input_2'], RULE_INPUT)
+    ).toBe(true);
+    expect(
+      isirs.IsProperSubsetOf(
+        ['rule_input_1', 'rule_input_2', 'rule_input_3'],
+        RULE_INPUT
+      )
+    ).toBe(false);
+    expect(
+      isirs.IsProperSubsetOf(['rule_input_4', 'rule_input_5'], RULE_INPUT)
+    ).toBe(false);
+    expect(
+      isirs.IsProperSubsetOf(
+        ['rule_input_1', 'rule_input_2', 'rule_input_3', 'rule_input_4'],
+        RULE_INPUT
+      )
+    ).toBe(false);
+    expect(
+      isirs.IsProperSubsetOf(
+        ['rule_input_2', 'rule_input_3', 'rule_input_4', 'rule_input_5'],
+        RULE_INPUT
+      )
+    ).toBe(false);
   });
 });

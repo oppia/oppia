@@ -16,49 +16,46 @@
  * @fileoverview Tests for StateTopAnswerStatsObjectFactory.
  */
 
-import { AnswerStats } from
-  'domain/exploration/answer-stats.model';
-import { StateTopAnswersStatsObjectFactory } from
-  'domain/statistics/state-top-answers-stats-object.factory';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {StateTopAnswersStatsObjectFactory} from 'domain/statistics/state-top-answers-stats-object.factory';
 
 describe('State top answers stats object factory', () => {
   var stasof = new StateTopAnswersStatsObjectFactory();
 
-  it('should create a state top answers stats object from a backend dict',
-    () => {
-      var backendDict = {
-        answers: {
-          Hola: [
-            {
-              answer: 'hola',
-              frequency: 7
-            },
-            {
-              answer: 'adios',
-              frequency: 4
-            },
-            {
-              answer: 'que?',
-              frequency: 2
-            },
-          ]
-        },
-        interaction_ids: {
-          Hola: 'TextInput'
-        }
-      };
+  it('should create a state top answers stats object from a backend dict', () => {
+    var backendDict = {
+      answers: {
+        Hola: [
+          {
+            answer: 'hola',
+            frequency: 7,
+          },
+          {
+            answer: 'adios',
+            frequency: 4,
+          },
+          {
+            answer: 'que?',
+            frequency: 2,
+          },
+        ],
+      },
+      interaction_ids: {
+        Hola: 'TextInput',
+      },
+    };
 
-      var stateAnswers = {
-        Hola: backendDict.answers.Hola.map(
-          dict => AnswerStats.createFromBackendDict(
-            dict))
-      };
+    var stateAnswers = {
+      Hola: backendDict.answers.Hola.map(dict =>
+        AnswerStats.createFromBackendDict(dict)
+      ),
+    };
 
-      var stateTopAnswerStats = (
-        stasof.createFromBackendDict(backendDict));
+    var stateTopAnswerStats = stasof.createFromBackendDict(backendDict);
 
-      expect(stateTopAnswerStats.answers).toEqual(stateAnswers);
-      expect(stateTopAnswerStats.interactionIds).toEqual(
-        backendDict.interaction_ids);
-    });
+    expect(stateTopAnswerStats.answers).toEqual(stateAnswers);
+    expect(stateTopAnswerStats.interactionIds).toEqual(
+      backendDict.interaction_ids
+    );
+  });
 });

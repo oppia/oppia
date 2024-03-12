@@ -16,15 +16,15 @@
  * @fileoverview Service to check for the network & Internet connection.
  */
 
-import { EventEmitter, Injectable, NgZone } from '@angular/core';
-import { Subscription, timer, throwError } from 'rxjs';
-import { delay, retryWhen, switchMap, tap } from 'rxjs/operators';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ServerConnectionBackendApiService } from './server-connection-backend-api.service';
+import {EventEmitter, Injectable, NgZone} from '@angular/core';
+import {Subscription, timer, throwError} from 'rxjs';
+import {delay, retryWhen, switchMap, tap} from 'rxjs/operators';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ServerConnectionBackendApiService} from './server-connection-backend-api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class InternetConnectivityService {
   private INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS: number = 3500;
@@ -32,17 +32,15 @@ export class InternetConnectivityService {
   private _internetAccessible: boolean = true;
   private _connectedToNetwork: boolean;
 
-  private _connectionStateChangeEventEmitter = (
-    new EventEmitter<boolean>());
+  private _connectionStateChangeEventEmitter = new EventEmitter<boolean>();
 
   private httpSubscription: Subscription;
 
-
   constructor(
-      private windowRef: WindowRef,
-      private _serverConnectionBackendApiService: (
-        ServerConnectionBackendApiService),
-      private ngZone: NgZone) {
+    private windowRef: WindowRef,
+    private _serverConnectionBackendApiService: ServerConnectionBackendApiService,
+    private ngZone: NgZone
+  ) {
     this.httpSubscription = new Subscription();
     this._connectedToNetwork = this.windowRef.nativeWindow.navigator.onLine;
   }
@@ -53,40 +51,43 @@ export class InternetConnectivityService {
     // browser has Internet access and emits the current state of the
     // connection.
     this.ngZone.runOutsideAngular(() => {
-      this.httpSubscription.add(timer(
-        0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
-        .pipe(
-          switchMap(() => {
-            if (this._connectedToNetwork) {
-              return (
-                this._serverConnectionBackendApiService
-                  .fetchConnectionCheckResultAsync());
-            } else {
-              return throwError('No Internet');
-            }
-          }),
-          retryWhen(errors => errors.pipe(
-            tap(val => {
-              if (this._internetAccessible) {
-                this._internetAccessible = false;
-                this.ngZone.run(() => {
-                  this._connectionStateChangeEventEmitter.emit(
-                    this._internetAccessible);
-                });
+      this.httpSubscription.add(
+        timer(0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
+          .pipe(
+            switchMap(() => {
+              if (this._connectedToNetwork) {
+                return this._serverConnectionBackendApiService.fetchConnectionCheckResultAsync();
+              } else {
+                return throwError('No Internet');
               }
             }),
-            delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
+            retryWhen(errors =>
+              errors.pipe(
+                tap(val => {
+                  if (this._internetAccessible) {
+                    this._internetAccessible = false;
+                    this.ngZone.run(() => {
+                      this._connectionStateChangeEventEmitter.emit(
+                        this._internetAccessible
+                      );
+                    });
+                  }
+                }),
+                delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
+              )
+            )
           )
-          )
-        ).subscribe(result => {
-          if (!this._internetAccessible) {
-            this._internetAccessible = true;
-            this.ngZone.run(() => {
-              this._connectionStateChangeEventEmitter.emit(
-                this._internetAccessible);
-            });
-          }
-        }));
+          .subscribe(result => {
+            if (!this._internetAccessible) {
+              this._internetAccessible = true;
+              this.ngZone.run(() => {
+                this._connectionStateChangeEventEmitter.emit(
+                  this._internetAccessible
+                );
+              });
+            }
+          })
+      );
     });
   }
 
@@ -101,8 +102,7 @@ export class InternetConnectivityService {
     this.windowRef.nativeWindow.onoffline = () => {
       this._connectedToNetwork = false;
       this._internetAccessible = false;
-      this._connectionStateChangeEventEmitter.emit(
-        this._internetAccessible);
+      this._connectionStateChangeEventEmitter.emit(this._internetAccessible);
     };
   }
 
@@ -124,6 +124,9 @@ export class InternetConnectivityService {
   }
 }
 
-angular.module('oppia').factory(
-  'InternetConnectivityService',
-  downgradeInjectable(InternetConnectivityService));
+angular
+  .module('oppia')
+  .factory(
+    'InternetConnectivityService',
+    downgradeInjectable(InternetConnectivityService)
+  );

@@ -16,42 +16,79 @@
  * @fileoverview Unit tests python program tokenizer.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { LoggerService } from 'services/contextual/logger.service';
-import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import {LoggerService} from 'services/contextual/logger.service';
+import {PythonProgramTokenizer} from 'classifiers/python-program.tokenizer';
 
 describe('Python program tokenizer', () => {
   describe('Test python program tokenizer', () => {
     let tokenizer: PythonProgramTokenizer;
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [LoggerService, PythonProgramTokenizer]
+        providers: [LoggerService, PythonProgramTokenizer],
       });
       tokenizer = TestBed.get(PythonProgramTokenizer);
     });
 
     it('should generate correct tokens for a program', () => {
-      const program = (
-        '# In Python, the code\n#\n#     for letter in [\'a\', \'b\']:\n#    ' +
+      const program =
+        "# In Python, the code\n#\n#     for letter in ['a', 'b']:\n#    " +
         '     print letter\n#\n# prints:\n#\n#     a\n#     b\ns = 0;\nfor ' +
         'num in range(1000):\n  if num%7 == 0 or num%5 == 0:\n\ts +=x\n' +
-        'print s');
+        'print s';
 
       const expectedTokens = [
-        ['COMMENT', '# In Python, the code'], ['NL', ''], ['COMMENT', '#'],
-        ['NL', ''], ['COMMENT', '#     for letter in [\'a\', \'b\']:'],
-        ['NL', ''], ['COMMENT', '#         print letter'], ['NL', ''],
-        ['COMMENT', '#'], ['NL', ''], ['COMMENT', '# prints:'], ['NL', ''],
-        ['COMMENT', '#'], ['NL', ''], ['COMMENT', '#     a'], ['NL', ''],
-        ['COMMENT', '#     b'], ['NL', ''], ['NAME', 's'], ['OP', '='],
-        ['NUMBER', '0'], ['OP', ';'], ['NAME', 'for'], ['NAME', 'num'],
-        ['NAME', 'in'], ['NAME', 'range'], ['OP', '('], ['NUMBER', '1000'],
-        ['OP', ')'], ['OP', ':'], ['NAME', 'if'], ['NAME', 'num'], ['OP', '%'],
-        ['NUMBER', '7'], ['OP', '=='], ['NUMBER', '0'], ['NAME', 'or'],
-        ['NAME', 'num'], ['OP', '%'], ['NUMBER', '5'], ['OP', '=='],
-        ['NUMBER', '0'], ['OP', ':'], ['NAME', 's'], ['OP', '+='],
-        ['NAME', 'x'], ['NAME', 'print'], ['NAME', 's'], ['ENDMARKER', '']];
+        ['COMMENT', '# In Python, the code'],
+        ['NL', ''],
+        ['COMMENT', '#'],
+        ['NL', ''],
+        ['COMMENT', "#     for letter in ['a', 'b']:"],
+        ['NL', ''],
+        ['COMMENT', '#         print letter'],
+        ['NL', ''],
+        ['COMMENT', '#'],
+        ['NL', ''],
+        ['COMMENT', '# prints:'],
+        ['NL', ''],
+        ['COMMENT', '#'],
+        ['NL', ''],
+        ['COMMENT', '#     a'],
+        ['NL', ''],
+        ['COMMENT', '#     b'],
+        ['NL', ''],
+        ['NAME', 's'],
+        ['OP', '='],
+        ['NUMBER', '0'],
+        ['OP', ';'],
+        ['NAME', 'for'],
+        ['NAME', 'num'],
+        ['NAME', 'in'],
+        ['NAME', 'range'],
+        ['OP', '('],
+        ['NUMBER', '1000'],
+        ['OP', ')'],
+        ['OP', ':'],
+        ['NAME', 'if'],
+        ['NAME', 'num'],
+        ['OP', '%'],
+        ['NUMBER', '7'],
+        ['OP', '=='],
+        ['NUMBER', '0'],
+        ['NAME', 'or'],
+        ['NAME', 'num'],
+        ['OP', '%'],
+        ['NUMBER', '5'],
+        ['OP', '=='],
+        ['NUMBER', '0'],
+        ['OP', ':'],
+        ['NAME', 's'],
+        ['OP', '+='],
+        ['NAME', 'x'],
+        ['NAME', 'print'],
+        ['NAME', 's'],
+        ['ENDMARKER', ''],
+      ];
 
       const tokens = tokenizer.generateTokens(program.split('\n'));
       expect(tokens.length).toEqual(expectedTokens.length);

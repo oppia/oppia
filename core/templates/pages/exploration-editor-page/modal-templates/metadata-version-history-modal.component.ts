@@ -16,15 +16,15 @@
  * @fileoverview Component for state changes modal.
  */
 
-import { Input, OnInit } from '@angular/core';
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { ContextService } from 'services/context.service';
-import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
-import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
-import { VersionHistoryService } from '../services/version-history.service';
+import {Input, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ContextService} from 'services/context.service';
+import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
+import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
+import {VersionHistoryService} from '../services/version-history.service';
 
 interface HeadersAndYamlStrs {
   previousVersionMetadataYaml: string;
@@ -43,7 +43,9 @@ interface MergeviewOptions {
   templateUrl: './metadata-version-history-modal.component.html',
 })
 export class MetadataVersionHistoryModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   @Input() committerUsername!: string;
   @Input() oldVersion: number | null = null;
   @Input() newMetadata!: ExplorationMetadata;
@@ -58,15 +60,15 @@ export class MetadataVersionHistoryModalComponent
     lineNumbers: true,
     readOnly: true,
     mode: 'yaml',
-    viewportMargin: 100
+    viewportMargin: 100,
   };
 
   constructor(
-      private ngbActiveModal: NgbActiveModal,
-      private contextService: ContextService,
-      private versionHistoryService: VersionHistoryService,
-      private versionHistoryBackendApiService: VersionHistoryBackendApiService,
-      private historyTabYamlConversionService: HistoryTabYamlConversionService
+    private ngbActiveModal: NgbActiveModal,
+    private contextService: ContextService,
+    private versionHistoryService: VersionHistoryService,
+    private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+    private historyTabYamlConversionService: HistoryTabYamlConversionService
   ) {
     super(ngbActiveModal);
   }
@@ -80,10 +82,8 @@ export class MetadataVersionHistoryModalComponent
   }
 
   getLastEditedVersionNumber(): number {
-    const lastEditedVersionNumber = this
-      .versionHistoryService
-      .getBackwardMetadataDiffData()
-      .oldVersionNumber;
+    const lastEditedVersionNumber =
+      this.versionHistoryService.getBackwardMetadataDiffData().oldVersionNumber;
     if (lastEditedVersionNumber === null) {
       // A null value for lastEditedVersionNumber marks the end of the version
       // history for the exploration metadata. This is impossible here because
@@ -96,26 +96,19 @@ export class MetadataVersionHistoryModalComponent
   }
 
   getLastEditedCommitterUsername(): string {
-    return (
-      this
-        .versionHistoryService
-        .getBackwardMetadataDiffData()
-        .committerUsername
-    );
+    return this.versionHistoryService.getBackwardMetadataDiffData()
+      .committerUsername;
   }
 
   getLastEditedVersionNumberInCaseOfError(): number {
-    return (
-      this.versionHistoryService.fetchedMetadataVersionNumbers[
-        this.versionHistoryService
-          .getCurrentPositionInMetadataVersionHistoryList()] as number);
+    return this.versionHistoryService.fetchedMetadataVersionNumbers[
+      this.versionHistoryService.getCurrentPositionInMetadataVersionHistoryList()
+    ] as number;
   }
 
   getNextEditedVersionNumber(): number {
-    const nextEditedVersionNumber = this
-      .versionHistoryService
-      .getForwardMetadataDiffData()
-      .oldVersionNumber;
+    const nextEditedVersionNumber =
+      this.versionHistoryService.getForwardMetadataDiffData().oldVersionNumber;
     if (nextEditedVersionNumber === null) {
       // A null value for nextEditedVersionNumber marks the end of the version
       // history for the exploration metadata. This is impossible here because
@@ -128,12 +121,8 @@ export class MetadataVersionHistoryModalComponent
   }
 
   getNextEditedCommitterUsername(): string {
-    return (
-      this
-        .versionHistoryService
-        .getForwardMetadataDiffData()
-        .committerUsername
-    );
+    return this.versionHistoryService.getForwardMetadataDiffData()
+      .committerUsername;
   }
 
   onClickExploreForwardVersionHistory(): void {
@@ -157,8 +146,7 @@ export class MetadataVersionHistoryModalComponent
 
     this.validationErrorIsShown = false;
 
-    this.versionHistoryService
-      .decrementCurrentPositionInMetadataVersionHistoryList();
+    this.versionHistoryService.decrementCurrentPositionInMetadataVersionHistoryList();
   }
 
   onClickExploreBackwardVersionHistory(): void {
@@ -191,36 +179,36 @@ export class MetadataVersionHistoryModalComponent
 
   fetchPreviousVersionHistory(): void {
     if (!this.versionHistoryService.shouldFetchNewMetadataVersionHistory()) {
-      this.versionHistoryService
-        .incrementCurrentPositionInMetadataVersionHistoryList();
+      this.versionHistoryService.incrementCurrentPositionInMetadataVersionHistoryList();
       return;
     }
     const diffData = this.versionHistoryService.getBackwardMetadataDiffData();
     if (diffData.oldVersionNumber !== null) {
-      this.versionHistoryBackendApiService.fetchMetadataVersionHistoryAsync(
-        this.contextService.getExplorationId(), diffData.oldVersionNumber
-      ).then((response) => {
-        if (response !== null) {
-          this.versionHistoryService.insertMetadataVersionHistoryData(
-            response.lastEditedVersionNumber,
-            response.metadataInPreviousVersion,
-            response.lastEditedCommitterUsername
-          );
-          this.versionHistoryService
-            .incrementCurrentPositionInMetadataVersionHistoryList();
-        } else {
-          this.validationErrorIsShown = true;
-          this.versionHistoryService
-            .incrementCurrentPositionInMetadataVersionHistoryList();
-        }
-      });
+      this.versionHistoryBackendApiService
+        .fetchMetadataVersionHistoryAsync(
+          this.contextService.getExplorationId(),
+          diffData.oldVersionNumber
+        )
+        .then(response => {
+          if (response !== null) {
+            this.versionHistoryService.insertMetadataVersionHistoryData(
+              response.lastEditedVersionNumber,
+              response.metadataInPreviousVersion,
+              response.lastEditedCommitterUsername
+            );
+            this.versionHistoryService.incrementCurrentPositionInMetadataVersionHistoryList();
+          } else {
+            this.validationErrorIsShown = true;
+            this.versionHistoryService.incrementCurrentPositionInMetadataVersionHistoryList();
+          }
+        });
     }
   }
 
   updateLeftPane(): void {
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.oldMetadata)
-      .then((result) => {
+      .then(result => {
         this.yamlStrs.previousVersionMetadataYaml = result;
       });
   }
@@ -228,7 +216,7 @@ export class MetadataVersionHistoryModalComponent
   updateRightPane(): void {
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.newMetadata)
-      .then((result) => {
+      .then(result => {
         this.yamlStrs.currentVersionMetadataYaml = result;
       });
   }

@@ -16,22 +16,21 @@
  * @fileoverview Root Component for Android page.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-android-page-root',
-  templateUrl: './android-page-root.component.html'
+  templateUrl: './android-page-root.component.html',
 })
 export class AndroidPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService,
-  ) {}
+  constructor(private pageHeadService: PageHeadService) {}
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META
+    );
   }
 }

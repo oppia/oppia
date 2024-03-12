@@ -16,25 +16,25 @@
  * @fileoverview Component for the learner group view of assigned syllabus.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { UrlService } from 'services/contextual/url.service';
-import { LearnerGroupSubtopicSummary } from 'domain/learner_group/learner-group-subtopic-summary.model';
-import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
-import { PracticeSessionPageConstants } from 'pages/practice-session-page/practice-session-page.constants';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {UrlService} from 'services/contextual/url.service';
+import {LearnerGroupSubtopicSummary} from 'domain/learner_group/learner-group-subtopic-summary.model';
+import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 
 import './learner-group-view-assigned-syllabus.component.css';
 
 @Component({
   selector: 'oppia-learner-group-view-assigned-syllabus',
-  templateUrl: './learner-group-view-assigned-syllabus.component.html'
+  templateUrl: './learner-group-view-assigned-syllabus.component.html',
 })
 export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
@@ -47,15 +47,14 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService
+    private learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService
   ) {}
 
   ngOnInit(): void {
     if (this.learnerGroup) {
       this.learnerGroupSyllabusBackendApiService
-        .fetchLearnerSpecificProgressInAssignedSyllabus(
-          this.learnerGroup.id).then(groupSyllabus => {
+        .fetchLearnerSpecificProgressInAssignedSyllabus(this.learnerGroup.id)
+        .then(groupSyllabus => {
           this.subtopicSummaries = groupSyllabus.subtopicsProgress;
           this.storySummaries = groupSyllabus.storiesProgress;
           this.setDisplayOrderOfSyllabusItems();
@@ -103,15 +102,14 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   }
 
   getSubtopicThumbnailUrl(
-      subtopicSummary: LearnerGroupSubtopicSummary
+    subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
     let thumbnailUrl = '';
     if (subtopicSummary.thumbnailFilename) {
-      thumbnailUrl = (
-        this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.TOPIC, subtopicSummary.parentTopicId,
-          subtopicSummary.thumbnailFilename
-        )
+      thumbnailUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
+        AppConstants.ENTITY_TYPE.TOPIC,
+        subtopicSummary.parentTopicId,
+        subtopicSummary.thumbnailFilename
       );
     }
     return thumbnailUrl;
@@ -120,37 +118,37 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   getStoryThumbnailUrl(storySummary: StorySummary): string {
     let thumbnailUrl = '';
     if (storySummary.getThumbnailFilename()) {
-      thumbnailUrl = (
-        this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY, storySummary.getId(),
-          storySummary.getThumbnailFilename()
-        )
+      thumbnailUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
+        AppConstants.ENTITY_TYPE.STORY,
+        storySummary.getId(),
+        storySummary.getThumbnailFilename()
       );
     }
     return thumbnailUrl;
   }
 
   calculateCircularProgressCss(progress: number): string {
-    let degree = (90 + (360 * progress / 100));
-    let cssStyle = (
+    let degree = 90 + (360 * progress) / 100;
+    let cssStyle =
       `linear-gradient(${degree}deg, transparent 50%, #CCCCCC 50%)` +
-      ', linear-gradient(90deg, #CCCCCC 50%, transparent 50%)');
+      ', linear-gradient(90deg, #CCCCCC 50%, transparent 50%)';
     if (progress > 50) {
       degree = 3.6 * (progress - 50) - 90;
-      cssStyle = (
+      cssStyle =
         'linear-gradient(270deg, #00645C 50%, transparent 50%), ' +
-        `linear-gradient(${degree}deg, #00645C 50%, #CCCCCC 50%)`);
+        `linear-gradient(${degree}deg, #00645C 50%, #CCCCCC 50%)`;
     }
     return cssStyle;
   }
 
   getProgressOfStory(storySummary: StorySummary): number {
-    return Math.round(
-      (
-        100 * storySummary.getCompletedNodeTitles().length /
-        storySummary.getNodeTitles().length
-      ) * 10
-    ) / 10;
+    return (
+      Math.round(
+        ((100 * storySummary.getCompletedNodeTitles().length) /
+          storySummary.getNodeTitles().length) *
+          10
+      ) / 10
+    );
   }
 
   getStoryLink(storySummary: StorySummary): string {
@@ -160,11 +158,13 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
       return '#';
     }
     let storyLink = this.urlInterpolationService.interpolateUrl(
-      TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE, {
+      TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE,
+      {
         classroom_url_fragment: classroomUrlFragment,
         story_url_fragment: storySummary.getUrlFragment(),
-        topic_url_fragment: topicUrlFragment
-      });
+        topic_url_fragment: topicUrlFragment,
+      }
+    );
     return storyLink;
   }
 
@@ -180,42 +180,59 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
       storyNodeToDisplay = storySummary.getAllNodes()[0];
     }
     const explorationId = storyNodeToDisplay.getExplorationId();
-    if (classroomUrlFragment === undefined || topicUrlFragment === undefined ||
-      explorationId === null) {
+    if (
+      classroomUrlFragment === undefined ||
+      topicUrlFragment === undefined ||
+      explorationId === null
+    ) {
       return '#';
     }
     let storyNodeLink = this.urlInterpolationService.interpolateUrl(
-      '/explore/<exp_id>', { exp_id: explorationId });
+      '/explore/<exp_id>',
+      {exp_id: explorationId}
+    );
     storyNodeLink = this.urlService.addField(
-      storyNodeLink, 'topic_url_fragment', topicUrlFragment);
+      storyNodeLink,
+      'topic_url_fragment',
+      topicUrlFragment
+    );
     storyNodeLink = this.urlService.addField(
-      storyNodeLink, 'classroom_url_fragment', classroomUrlFragment);
+      storyNodeLink,
+      'classroom_url_fragment',
+      classroomUrlFragment
+    );
     storyNodeLink = this.urlService.addField(
-      storyNodeLink, 'story_url_fragment', storySummary.getUrlFragment());
+      storyNodeLink,
+      'story_url_fragment',
+      storySummary.getUrlFragment()
+    );
     storyNodeLink = this.urlService.addField(
-      storyNodeLink, 'node_id', storyNodeToDisplay.getId());
+      storyNodeLink,
+      'node_id',
+      storyNodeToDisplay.getId()
+    );
     return storyNodeLink;
   }
 
-  getPracticeSessionLink(
-      subtopicSummary: LearnerGroupSubtopicSummary
-  ): string {
+  getPracticeSessionLink(subtopicSummary: LearnerGroupSubtopicSummary): string {
     const classroomUrlFragment = subtopicSummary.classroomUrlFragment;
     const topicUrlFragment = subtopicSummary.parentTopicUrlFragment;
     if (classroomUrlFragment === undefined || topicUrlFragment === undefined) {
       return '#';
     }
     let practiceSessionsLink = this.urlInterpolationService.interpolateUrl(
-      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL, {
+      PracticeSessionPageConstants.PRACTICE_SESSIONS_URL,
+      {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
-        stringified_subtopic_ids: JSON.stringify([subtopicSummary.subtopicId])
-      });
+        stringified_subtopic_ids: JSON.stringify([subtopicSummary.subtopicId]),
+      }
+    );
     return practiceSessionsLink;
   }
 
   getSubtopicMasteryLevel(
-      subtopicSummary: LearnerGroupSubtopicSummary
+    subtopicSummary: LearnerGroupSubtopicSummary
   ): string {
     let masteryLevel = 'I18N_LEARNER_GROUP_SYLLABUS_ITEM_NOT_STARTED_YET';
     const subtopicMastery = subtopicSummary.subtopicMastery;
@@ -235,6 +252,9 @@ export class LearnerGroupViewAssignedSyllabusComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaLearnerViewAssignedGroupSyllabus',
-  downgradeComponent({component: LearnerGroupViewAssignedSyllabusComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaLearnerViewAssignedGroupSyllabus',
+    downgradeComponent({component: LearnerGroupViewAssignedSyllabusComponent})
+  );

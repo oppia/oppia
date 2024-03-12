@@ -18,10 +18,16 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-import {Directive, ElementRef, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  Input,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 
 @Directive({
-  selector: '[oppiaMathJax]'
+  selector: '[oppiaMathJax]',
 })
 export class MathJaxDirective implements OnChanges {
   // This property is initialized using Angular lifecycle hooks
@@ -32,9 +38,10 @@ export class MathJaxDirective implements OnChanges {
   constructor(private el: ElementRef) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.texExpression &&
-      changes.texExpression.currentValue !==
-      changes.texExpression.previousValue) {
+    if (
+      changes.texExpression &&
+      changes.texExpression.currentValue !== changes.texExpression.previousValue
+    ) {
       let s = document.createElement('script');
       s.type = 'math/tex';
       s.text = this.texExpression === undefined ? '' : this.texExpression;

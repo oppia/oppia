@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for threadTableComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ThreadStatusDisplayService } from '../services/thread-status-display.service';
-import { ThreadTableComponent } from './thread-table.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {ThreadStatusDisplayService} from '../services/thread-status-display.service';
+import {ThreadTableComponent} from './thread-table.component';
 
 export class MockDateTimeFormatService {
   getLocaleAbbreviatedDatetimeString(): string {
@@ -38,15 +38,15 @@ describe('Thread table component', () => {
       providers: [
         {
           provide: DateTimeFormatService,
-          useClass: MockDateTimeFormatService
+          useClass: MockDateTimeFormatService,
         },
-        ThreadStatusDisplayService
-      ]}).compileComponents();
+        ThreadStatusDisplayService,
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture =
-      TestBed.createComponent(ThreadTableComponent);
+    fixture = TestBed.createComponent(ThreadTableComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -65,21 +65,23 @@ describe('Thread table component', () => {
     expect(component.getHumanReadableStatus('open')).toBe('Open');
     expect(component.getHumanReadableStatus('compliment')).toBe('Compliment');
     expect(component.getHumanReadableStatus('not_actionable')).toBe(
-      'Not Actionable');
+      'Not Actionable'
+    );
   });
 
-  it('should get formatted date string from the timestamp in milliseconds',
-    () => {
-      let NOW_MILLIS = 1416563100000;
-      expect(component.getLocaleAbbreviatedDateTimeString(NOW_MILLIS)).toBe(
-        '11/21/2014');
-    });
+  it('should get formatted date string from the timestamp in milliseconds', () => {
+    let NOW_MILLIS = 1416563100000;
+    expect(component.getLocaleAbbreviatedDateTimeString(NOW_MILLIS)).toBe(
+      '11/21/2014'
+    );
+  });
 
   it('should emit rowClick event when onRowClick is called', () => {
     spyOn(fixture.componentInstance.rowClick, 'emit');
     let threadId = 'testId';
     component.onRowClick(threadId);
-    expect(fixture.componentInstance.rowClick.emit)
-      .toHaveBeenCalledWith(threadId);
+    expect(fixture.componentInstance.rowClick.emit).toHaveBeenCalledWith(
+      threadId
+    );
   });
 });

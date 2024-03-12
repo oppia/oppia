@@ -17,8 +17,8 @@
  */
 
 export interface SkillRightsBackendDict {
-  'can_edit_skill_description': boolean;
-  'skill_id': string;
+  can_edit_skill_description: boolean;
+  skill_id: string;
 }
 
 export class SkillRights {
@@ -31,10 +31,12 @@ export class SkillRights {
   }
 
   static createFromBackendDict(
-      skillRightsBackendDict: SkillRightsBackendDict): SkillRights {
+    skillRightsBackendDict: SkillRightsBackendDict
+  ): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
-      skillRightsBackendDict.can_edit_skill_description);
+      skillRightsBackendDict.can_edit_skill_description
+    );
   }
 
   getSkillId(): string {
@@ -47,7 +49,6 @@ export class SkillRights {
 
   copyFromSkillRights(otherSkillRights: SkillRights): void {
     this._skillId = otherSkillRights.getSkillId();
-    this._canEditSkillDescription =
-      otherSkillRights.canEditSkillDescription();
+    this._canEditSkillDescription = otherSkillRights.canEditSkillDescription();
   }
 }

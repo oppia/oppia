@@ -16,32 +16,34 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { ImageClickInputCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ImageClickInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance:
-      baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: ImageClickInputCustomizationArgs): Warning[] {
+    customizationArgs: ImageClickInputCustomizationArgs
+  ): Warning[] {
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
-      customizationArgs, ['imageAndRegions']);
+      customizationArgs,
+      ['imageAndRegions']
+    );
 
     var warningsList = [];
 
@@ -49,7 +51,7 @@ export class ImageClickInputValidationService {
     if (!imgAndRegionArgValue.imagePath) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please add an image for the learner to click on.'
+        message: 'Please add an image for the learner to click on.',
       });
       // If there is no image specified, further warnings don't really
       // apply.
@@ -63,13 +65,12 @@ export class ImageClickInputValidationService {
     if (imgAndRegionArgValue.labeledRegions.length === 0) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'Please specify at least one region in the image.'
+        message: 'Please specify at least one region in the image.',
       });
     }
 
     for (var i = 0; i < imgAndRegionArgValue.labeledRegions.length; i++) {
-      var regionLabel = (
-        imgAndRegionArgValue.labeledRegions[i].label);
+      var regionLabel = imgAndRegionArgValue.labeledRegions[i].label;
 
       var ALPHANUMERIC_REGEX = /^[A-Za-z0-9]+$/;
       if (regionLabel.trim().length === 0) {
@@ -86,42 +87,49 @@ export class ImageClickInputValidationService {
     if (areAnyRegionStringsEmpty) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the region labels are nonempty.'
+        message: 'Please ensure the region labels are nonempty.',
       });
     }
     if (areAnyRegionStringsNonAlphaNumeric) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: (
-          'The region labels should consist of alphanumeric characters.')
+        message: 'The region labels should consist of alphanumeric characters.',
       });
     }
     if (areAnyRegionStringsDuplicated) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the region labels are unique.'
+        message: 'Please ensure the region labels are unique.',
       });
     }
     return warningsList;
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: ImageClickInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
+    stateName: string,
+    customizationArgs: ImageClickInputCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome | null
+  ): Warning[] {
     var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
-        answerGroups, stateName));
+        answerGroups,
+        stateName
+      )
+    );
 
     var imgAndRegionArgValue = customizationArgs.imageAndRegions.value;
     var seenRegionStrings = imgAndRegionArgValue.labeledRegions.map(
-      function(region) {
+      function (region) {
         return region.label;
-      });
+      }
+    );
 
     // Check that each rule refers to a valid region string.
     for (var i = 0; i < answerGroups.length; i++) {
@@ -132,10 +140,14 @@ export class ImageClickInputValidationService {
           if (seenRegionStrings.indexOf(label) === -1) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: (
-                'The region label \'' + label + '\' in learner answer ' +
-                String(j + 1) + ' in Oppia response ' + String(i + 1) +
-                ' is invalid.')
+              message:
+                "The region label '" +
+                label +
+                "' in learner answer " +
+                String(j + 1) +
+                ' in Oppia response ' +
+                String(i + 1) +
+                ' is invalid.',
             });
           }
         }
@@ -145,9 +157,9 @@ export class ImageClickInputValidationService {
     if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: (
+        message:
           'Please add a learner answer to cover what should ' +
-          'happen if none of the given regions are clicked.')
+          'happen if none of the given regions are clicked.',
       });
     }
 
@@ -155,6 +167,9 @@ export class ImageClickInputValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'ImageClickInputValidationService',
-  downgradeInjectable(ImageClickInputValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'ImageClickInputValidationService',
+    downgradeInjectable(ImageClickInputValidationService)
+  );

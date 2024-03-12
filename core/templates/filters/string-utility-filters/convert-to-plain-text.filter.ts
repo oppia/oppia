@@ -16,17 +16,19 @@
  * @fileoverview ConvertToPlainText filter for Oppia.
  */
 
-angular.module('oppia').filter('convertToPlainText', [function() {
-  return function(input: string) {
-    var strippedText = input.replace(/(<([^>]+)>)/ig, '');
-    strippedText = strippedText.replace(/&nbsp;/ig, ' ');
-    strippedText = strippedText.replace(/&quot;/ig, '');
+angular.module('oppia').filter('convertToPlainText', [
+  function () {
+    return function (input: string) {
+      var strippedText = input.replace(/(<([^>]+)>)/gi, '');
+      strippedText = strippedText.replace(/&nbsp;/gi, ' ');
+      strippedText = strippedText.replace(/&quot;/gi, '');
 
-    var trimmedText = strippedText.trim();
-    if (trimmedText.length === 0) {
-      return strippedText;
-    } else {
-      return trimmedText;
-    }
-  };
-}]);
+      var trimmedText = strippedText.trim();
+      if (trimmedText.length === 0) {
+        return strippedText;
+      } else {
+        return trimmedText;
+      }
+    };
+  },
+]);

@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for the translatable html content id editor.
  */
 
-
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslatableHtmlContentIdEditorComponent } from './translatable-html-content-id.component';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslatableHtmlContentIdEditorComponent} from './translatable-html-content-id.component';
 
 describe('TranslatableSetOfUnicodeStringEditor', () => {
   let component: TranslatableHtmlContentIdEditorComponent;
@@ -29,7 +28,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TranslatableHtmlContentIdEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -38,7 +37,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     component = fixture.componentInstance;
 
     component.initArgs = {
-      choices: choices
+      choices: choices,
     };
   });
 
@@ -54,8 +53,10 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     spyOn(component.valueChanged, 'emit');
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     component.value = '';
 
     component.updateLocalValue('random val');
@@ -69,8 +70,10 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
     spyOn(component.valueChanged, 'emit');
     const changeDetectorRef =
       fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     component.value = 'random val';
 
     component.updateLocalValue('random val');

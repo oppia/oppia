@@ -16,15 +16,15 @@
  * @fileoverview Unit test for Solution Editor Component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { SolutionEditor } from './solution-editor.component';
-import { EditabilityService } from 'services/editability.service';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {SolutionEditor} from './solution-editor.component';
+import {EditabilityService} from 'services/editability.service';
+import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 
 class MockStateCustomizationArgsService {
   savedMemento = 'data3';
@@ -36,7 +36,7 @@ class MockStateInteractionIdService {
 
 class MockStateSolutionService {
   savedMemento = {
-    correctAnswer: 'data1'
+    correctAnswer: 'data1',
   };
 }
 
@@ -61,33 +61,31 @@ describe('Solution editor component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        SolutionEditor
-      ],
+      declarations: [SolutionEditor],
       providers: [
         SolutionObjectFactory,
         {
           provide: EditabilityService,
-          useClass: MockEditabilityService
+          useClass: MockEditabilityService,
         },
         {
           provide: ExplorationHtmlFormatterService,
-          useClass: MockExplorationHtmlFormatterService
+          useClass: MockExplorationHtmlFormatterService,
         },
         {
           provide: StateSolutionService,
-          useClass: MockStateSolutionService
+          useClass: MockStateSolutionService,
         },
         {
           provide: StateInteractionIdService,
-          useClass: MockStateInteractionIdService
+          useClass: MockStateInteractionIdService,
         },
         {
           provide: StateCustomizationArgsService,
-          useClass: MockStateCustomizationArgsService
-        }
+          useClass: MockStateCustomizationArgsService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -100,7 +98,10 @@ describe('Solution editor component', () => {
     stateSolutionService = TestBed.inject(StateSolutionService);
 
     stateSolutionService.savedMemento = solutionObjectFactory.createNew(
-      true, 'correct_answer', '<p> Hint Index 0 </p>', '0'
+      true,
+      'correct_answer',
+      '<p> Hint Index 0 </p>',
+      '0'
     );
     fixture.detectChanges();
   });
@@ -111,12 +112,10 @@ describe('Solution editor component', () => {
     component.ngOnInit();
 
     expect(editabilityService.isEditable).toHaveBeenCalled();
-    expect(component.EXPLANATION_FORM_SCHEMA).toEqual(
-      {
-        type: 'html',
-        ui_config: {}
-      }
-    );
+    expect(component.EXPLANATION_FORM_SCHEMA).toEqual({
+      type: 'html',
+      ui_config: {},
+    });
   });
 
   it('should open editor modal', () => {
@@ -129,7 +128,11 @@ describe('Solution editor component', () => {
 
   it('should save new solution', () => {
     let solution = solutionObjectFactory.createNew(
-      true, 'answer', 'Html', 'XyzID');
+      true,
+      'answer',
+      'Html',
+      'XyzID'
+    );
     spyOn(component.saveSolution, 'emit').and.stub();
 
     component.updateNewSolution(solution);
@@ -145,12 +148,11 @@ describe('Solution editor component', () => {
     expect(component.getAnswerHtml).toHaveBeenCalled();
   });
 
-  it('should throw error during get answer html if solution is not saved yet',
-    () => {
-      stateSolutionService.savedMemento = null;
+  it('should throw error during get answer html if solution is not saved yet', () => {
+    stateSolutionService.savedMemento = null;
 
-      expect(() => {
-        component.getAnswerHtml();
-      }).toThrowError('Expected solution to be defined');
-    });
+    expect(() => {
+      component.getAnswerHtml();
+    }).toThrowError('Expected solution to be defined');
+  });
 });

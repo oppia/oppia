@@ -19,10 +19,8 @@
 export const QuestionDomainConstants = {
   EDITABLE_QUESTION_DATA_URL_TEMPLATE:
     '/question_editor_handler/data/<question_id>',
-  QUESTION_CREATION_URL:
-    '/question_editor_handler/create_new',
-  QUESTION_SKILL_LINK_URL_TEMPLATE:
-    '/manage_question_skill_link/<question_id>',
+  QUESTION_CREATION_URL: '/question_editor_handler/create_new',
+  QUESTION_SKILL_LINK_URL_TEMPLATE: '/manage_question_skill_link/<question_id>',
 
   PRETEST_QUESTIONS_URL_TEMPLATE:
     '/pretest_handler/<exploration_id>?story_url_fragment=<story_url_fragment>',
@@ -39,8 +37,8 @@ export const QuestionDomainConstants = {
 
   QUESTION_PROPERTY_LANGUAGE_CODE: 'language_code',
   QUESTION_PROPERTY_QUESTION_STATE_DATA: 'question_state_data',
-  QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS: (
-    'inapplicable_skill_misconception_ids'),
+  QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS:
+    'inapplicable_skill_misconception_ids',
   QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX: 'next_content_id_index',
 
   CMD_UPDATE_QUESTION_PROPERTY: 'update_question_property',

@@ -16,17 +16,17 @@
  * @fileoverview Component for the navbar breadcrumb of the topic editor.
  */
 
-import { Component } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Topic } from 'domain/topic/topic-object.model';
-import { TopicEditorRoutingService } from '../services/topic-editor-routing.service';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { TopicRights } from 'domain/topic/topic-rights.model';
+import {Component} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Topic} from 'domain/topic/topic-object.model';
+import {TopicEditorRoutingService} from '../services/topic-editor-routing.service';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {TopicRights} from 'domain/topic/topic-rights.model';
 
 @Component({
   selector: 'oppia-topic-editor-navbar-breadcrumb',
-  templateUrl: './topic-editor-navbar-breadcrumb.component.html'
+  templateUrl: './topic-editor-navbar-breadcrumb.component.html',
 })
 export class TopicEditorNavbarBreadcrumbComponent {
   // This property is initialized using Angular lifecycle hooks
@@ -46,7 +46,8 @@ export class TopicEditorNavbarBreadcrumbComponent {
     const activeTab = this.topicEditorRoutingService.getActiveTabName();
     return (
       activeTab.startsWith('subtopic') ||
-      this.topicEditorRoutingService.getLastTabVisited() === 'subtopic');
+      this.topicEditorRoutingService.getLastTabVisited() === 'subtopic'
+    );
   }
 
   navigateToMainTab(): void {
@@ -55,23 +56,23 @@ export class TopicEditorNavbarBreadcrumbComponent {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicInitialized.subscribe(
-        () => {
-          this.topic = this.topicEditorStateService.getTopic();
-        }
-      ));
+      this.topicEditorStateService.onTopicInitialized.subscribe(() => {
+        this.topic = this.topicEditorStateService.getTopic();
+      })
+    );
     this.directiveSubscriptions.add(
-      this.topicEditorStateService.onTopicReinitialized.subscribe(
-        () => {
-          this.topic = this.topicEditorStateService.getTopic();
-        }
-      ));
+      this.topicEditorStateService.onTopicReinitialized.subscribe(() => {
+        this.topic = this.topicEditorStateService.getTopic();
+      })
+    );
     this.topic = this.topicEditorStateService.getTopic();
     this.topicRights = this.topicEditorStateService.getTopicRights();
   }
 }
 
-angular.module('oppia').directive('oppiaTopicEditorNavbarBreadcrumb',
+angular.module('oppia').directive(
+  'oppiaTopicEditorNavbarBreadcrumb',
   downgradeComponent({
-    component: TopicEditorNavbarBreadcrumbComponent
-  }) as angular.IDirectiveFactory);
+    component: TopicEditorNavbarBreadcrumbComponent,
+  }) as angular.IDirectiveFactory
+);

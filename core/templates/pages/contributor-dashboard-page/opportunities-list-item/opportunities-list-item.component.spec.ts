@@ -16,16 +16,19 @@
  * @fileoverview Unit tests for opportunitiesListItem.
  */
 
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
-import { LazyLoadingComponent } from 'components/common-layout-directives/common-elements/lazy-loading.component';
-import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { of } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import {LazyLoadingComponent} from 'components/common-layout-directives/common-elements/lazy-loading.component';
+import {NgbTooltipModule} from '@ng-bootstrap/ng-bootstrap';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {of} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
-import { ExplorationOpportunity, OpportunitiesListItemComponent } from './opportunities-list-item.component';
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
-import { MatIconModule } from '@angular/material/icon';
+import {
+  ExplorationOpportunity,
+  OpportunitiesListItemComponent,
+} from './opportunities-list-item.component';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import {MatIconModule} from '@angular/material/icon';
 
 class MockWindowDimensionsService {
   getResizeEvent() {
@@ -45,26 +48,24 @@ describe('Opportunities List Item Component', () => {
 
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NgbTooltipModule,
-        MatIconModule
-      ],
+      imports: [NgbTooltipModule, MatIconModule],
       declarations: [
         OpportunitiesListItemComponent,
         LazyLoadingComponent,
-        WrapTextWithEllipsisPipe
+        WrapTextWithEllipsisPipe,
       ],
       providers: [
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
-        }
+          useClass: MockWindowDimensionsService,
+        },
       ],
-    }).compileComponents().then(() => {
-      fixture = TestBed.createComponent(
-        OpportunitiesListItemComponent);
-      component = fixture.componentInstance;
-    });
+    })
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(OpportunitiesListItemComponent);
+        component = fixture.componentInstance;
+      });
   }));
 
   describe('when opportunity is provided', () => {
@@ -77,10 +78,10 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 0,
-        topicName: 'Topic 1'
+        topicName: 'Topic 1',
       };
-      component.clickActionButton.emit =
-        () => jasmine.createSpy('click', () => {});
+      component.clickActionButton.emit = () =>
+        jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = 35;
@@ -89,46 +90,47 @@ describe('Opportunities List Item Component', () => {
       component.ngOnInit();
     });
 
-    it('should initialize $scope properties after controller is initialized',
+    it('should initialize $scope properties after controller is initialized', () => {
+      const windowResizeSpy = spyOn(
+        windowDimensionsService,
+        'getResizeEvent'
+      ).and.callThrough();
+
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      expect(component.opportunityDataIsLoading).toBe(false);
+      expect(component.labelText).toBe('Label text');
+      expect(component.labelStyle).toEqual({
+        'background-color': '#fff',
+      });
+      expect(component.opportunityHeadingTruncationLength).toBe(35);
+      expect(component.progressPercentage).toBe('50%');
+      expect(component.progressBarStyle).toEqual({
+        width: '50%',
+      });
+      expect(component.correspondingOpportunityDeleted).toBe(false);
+      expect(windowResizeSpy).toHaveBeenCalled();
+      expect(component.resizeSubscription).not.toBe(undefined);
+      expect(component.onMobile).toBeTrue();
+    });
+
+    describe(
+      'when opportunity subheading corresponds to deleted ' + 'opportunity',
       () => {
-        const windowResizeSpy = spyOn(
-          windowDimensionsService, 'getResizeEvent').and.callThrough();
-
-        component.ngOnInit();
-        fixture.detectChanges();
-
-        expect(component.opportunityDataIsLoading).toBe(false);
-        expect(component.labelText).toBe('Label text');
-        expect(component.labelStyle).toEqual({
-          'background-color': '#fff'
+        beforeEach(() => {
+          let opportunity = component.opportunity as ExplorationOpportunity;
+          opportunity.subheading =
+            ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
+          fixture.detectChanges();
+          component.ngOnInit();
         });
-        expect(component.opportunityHeadingTruncationLength).toBe(35);
-        expect(component.progressPercentage).toBe('50%');
-        expect(component.progressBarStyle).toEqual({
-          width: '50%'
-        });
-        expect(component.correspondingOpportunityDeleted).toBe(false);
-        expect(windowResizeSpy).toHaveBeenCalled();
-        expect(component.resizeSubscription).not.toBe(undefined);
-        expect(component.onMobile).toBeTrue();
-      });
 
-    describe('when opportunity subheading corresponds to deleted ' +
-      'opportunity', () => {
-      beforeEach(() => {
-        let opportunity = component.opportunity as ExplorationOpportunity;
-        opportunity.subheading = (
-          ContributorDashboardConstants
-            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
-        fixture.detectChanges();
-        component.ngOnInit();
-      });
-
-      it('should initialize correspondingOpportunityDeleted to true',
-        () => {
+        it('should initialize correspondingOpportunityDeleted to true', () => {
           expect(component.correspondingOpportunityDeleted).toBe(true);
         });
-    });
+      }
+    );
   });
 
   describe('when a translation opportunity is provided', () => {
@@ -141,11 +143,11 @@ describe('Opportunities List Item Component', () => {
         inReviewCount: 20,
         totalCount: 50,
         translationsCount: 25,
-        topicName: 'Topic 1'
+        topicName: 'Topic 1',
       };
       component.opportunityType = 'translation';
-      component.clickActionButton.emit =
-        () => jasmine.createSpy('click', () => {});
+      component.clickActionButton.emit = () =>
+        jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = 35;
@@ -153,43 +155,42 @@ describe('Opportunities List Item Component', () => {
       component.ngOnInit();
     });
 
-    it('should initialize $scope properties after controller is initialized',
+    it('should initialize $scope properties after controller is initialized', () => {
+      expect(component.opportunityDataIsLoading).toBe(false);
+      expect(component.labelText).toBe('Label text');
+      expect(component.labelStyle).toEqual({
+        'background-color': '#fff',
+      });
+      expect(component.opportunityHeadingTruncationLength).toBe(35);
+      expect(component.progressPercentage).toBe('50%');
+      expect(component.correspondingOpportunityDeleted).toBe(false);
+      expect(component.translationProgressBar).toBe(true);
+      expect(component.cardsAvailable).toEqual(5);
+    });
+
+    describe(
+      'when opportunity subheading corresponds to deleted ' + 'opportunity',
       () => {
-        expect(component.opportunityDataIsLoading).toBe(false);
-        expect(component.labelText).toBe('Label text');
-        expect(component.labelStyle).toEqual({
-          'background-color': '#fff'
+        beforeEach(() => {
+          let opportunity = component.opportunity as ExplorationOpportunity;
+          opportunity.subheading =
+            ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT;
+          fixture.detectChanges();
+          component.ngOnInit();
         });
-        expect(component.opportunityHeadingTruncationLength).toBe(35);
-        expect(component.progressPercentage).toBe('50%');
-        expect(component.correspondingOpportunityDeleted).toBe(false);
-        expect(component.translationProgressBar).toBe(true);
-        expect(component.cardsAvailable).toEqual(5);
-      });
 
-    describe('when opportunity subheading corresponds to deleted ' +
-      'opportunity', () => {
-      beforeEach(() => {
-        let opportunity = component.opportunity as ExplorationOpportunity;
-        opportunity.subheading = (
-          ContributorDashboardConstants
-            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT);
-        fixture.detectChanges();
-        component.ngOnInit();
-      });
-
-      it('should initialize correspondingOpportunityDeleted to true',
-        () => {
+        it('should initialize correspondingOpportunityDeleted to true', () => {
           expect(component.correspondingOpportunityDeleted).toBe(true);
         });
-    });
+      }
+    );
   });
 
   describe('when opportunity is not provided', () => {
     beforeEach(() => {
       component.opportunityType = '';
-      component.clickActionButton.emit =
-        () => jasmine.createSpy('click', () => {});
+      component.clickActionButton.emit = () =>
+        jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.progressBarRequired = true;
       component.opportunityHeadingTruncationLength = 0;
@@ -198,14 +199,13 @@ describe('Opportunities List Item Component', () => {
       component.ngOnInit();
     });
 
-    it('should initialize $scope properties after controller is initialized',
-      () => {
-        expect(component.opportunityDataIsLoading).toBeTrue();
-        expect(component.labelText).toBeUndefined();
-        expect(component.labelStyle).toBeUndefined();
-        expect(component.opportunityHeadingTruncationLength).toBe(40);
-        expect(component.correspondingOpportunityDeleted).toBeFalse();
-      });
+    it('should initialize $scope properties after controller is initialized', () => {
+      expect(component.opportunityDataIsLoading).toBeTrue();
+      expect(component.labelText).toBeUndefined();
+      expect(component.labelStyle).toBeUndefined();
+      expect(component.opportunityHeadingTruncationLength).toBe(40);
+      expect(component.correspondingOpportunityDeleted).toBeFalse();
+    });
   });
 
   describe('when reviewable translation suggestions are provided', () => {
@@ -219,45 +219,54 @@ describe('Opportunities List Item Component', () => {
         totalCount: 50,
         translationsCount: 25,
         translationWordCount: 13,
-        topicName: 'Topic 1'
+        topicName: 'Topic 1',
       };
       component.opportunityType = 'translation';
-      component.clickActionButton.emit =
-        () => jasmine.createSpy('click', () => {});
+      component.clickActionButton.emit = () =>
+        jasmine.createSpy('click', () => {});
       component.labelRequired = true;
       component.opportunityHeadingTruncationLength = 35;
       fixture.detectChanges();
       component.ngOnInit();
     });
 
-    it('should show short label for translation suggestions with' +
-      ' word count less than 20', () => {
-      const bannerElement: HTMLElement = fixture.nativeElement;
-      const translationLengthLabel = bannerElement.querySelector(
-        '.oppia-translation-length-label');
+    it(
+      'should show short label for translation suggestions with' +
+        ' word count less than 20',
+      () => {
+        const bannerElement: HTMLElement = fixture.nativeElement;
+        const translationLengthLabel = bannerElement.querySelector(
+          '.oppia-translation-length-label'
+        );
 
-      expect(translationLengthLabel).toBeTruthy();
-      expect(translationLengthLabel?.textContent).toContain(
-        'Short Translation');
-    });
+        expect(translationLengthLabel).toBeTruthy();
+        expect(translationLengthLabel?.textContent).toContain(
+          'Short Translation'
+        );
+      }
+    );
 
-    it('should not show length label for translation suggestions with word' +
-      ' count more than 20', () => {
-      component.opportunity.translationWordCount = 25;
-      fixture.detectChanges();
+    it(
+      'should not show length label for translation suggestions with word' +
+        ' count more than 20',
+      () => {
+        component.opportunity.translationWordCount = 25;
+        fixture.detectChanges();
 
-      const bannerElement: HTMLElement = fixture.nativeElement;
-      const translationLengthLabel = bannerElement.querySelector(
-        '.oppia-translation-length-label');
+        const bannerElement: HTMLElement = fixture.nativeElement;
+        const translationLengthLabel = bannerElement.querySelector(
+          '.oppia-translation-length-label'
+        );
 
-      expect(translationLengthLabel).toBeNull();
-    });
+        expect(translationLengthLabel).toBeNull();
+      }
+    );
 
     it('should emit a pin event with the correct properties', () => {
       const spy = spyOn(component.clickPinButton, 'emit');
       const expectedPayload = {
         topic_name: 'Topic 1',
-        exploration_id: '1'
+        exploration_id: '1',
       };
 
       component.opportunity = {
@@ -269,7 +278,7 @@ describe('Opportunities List Item Component', () => {
         totalCount: 50,
         translationsCount: 25,
         translationWordCount: 13,
-        topicName: 'Topic 1'
+        topicName: 'Topic 1',
       };
       component.pinOpportunity();
 
@@ -289,13 +298,13 @@ describe('Opportunities List Item Component', () => {
         totalCount: 50,
         translationsCount: 25,
         translationWordCount: 13,
-        topicName: 'Topic 1'
+        topicName: 'Topic 1',
       };
       component.unpinOpportunity();
 
       expect(spy).toHaveBeenCalledWith({
         topic_name: expectedTopicName,
-        exploration_id: '1'
+        exploration_id: '1',
       });
     });
   });

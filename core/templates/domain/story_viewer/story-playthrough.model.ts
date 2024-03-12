@@ -18,16 +18,16 @@
 
 import {
   ReadOnlyStoryNode,
-  StoryNodeBackendDict
+  StoryNodeBackendDict,
 } from 'domain/story_viewer/read-only-story-node.model';
 
 export interface StoryPlaythroughBackendDict {
-  'story_id': string;
-  'story_nodes': StoryNodeBackendDict[];
-  'story_title': string;
-  'story_description': string;
-  'topic_name': string;
-  'meta_tag_content': string;
+  story_id: string;
+  story_nodes: StoryNodeBackendDict[];
+  story_title: string;
+  story_description: string;
+  topic_name: string;
+  meta_tag_content: string;
 }
 
 export class StoryPlaythrough {
@@ -39,12 +39,13 @@ export class StoryPlaythrough {
   metaTagContent: string;
 
   constructor(
-      id: string,
-      nodes: ReadOnlyStoryNode[],
-      title: string,
-      description: string,
-      topicName: string,
-      metaTagContent: string) {
+    id: string,
+    nodes: ReadOnlyStoryNode[],
+    title: string,
+    description: string,
+    topicName: string,
+    metaTagContent: string
+  ) {
     this.id = id;
     this.nodes = nodes;
     this.title = title;
@@ -54,10 +55,11 @@ export class StoryPlaythrough {
   }
 
   static createFromBackendDict(
-      storyPlaythroughBackendDict:
-      StoryPlaythroughBackendDict): StoryPlaythrough {
+    storyPlaythroughBackendDict: StoryPlaythroughBackendDict
+  ): StoryPlaythrough {
     var nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
-      storyNodeDict => ReadOnlyStoryNode.createFromBackendDict(storyNodeDict));
+      storyNodeDict => ReadOnlyStoryNode.createFromBackendDict(storyNodeDict)
+    );
 
     return new StoryPlaythrough(
       storyPlaythroughBackendDict.story_id,
@@ -65,7 +67,8 @@ export class StoryPlaythrough {
       storyPlaythroughBackendDict.story_title,
       storyPlaythroughBackendDict.story_description,
       storyPlaythroughBackendDict.topic_name,
-      storyPlaythroughBackendDict.meta_tag_content);
+      storyPlaythroughBackendDict.meta_tag_content
+    );
   }
 
   getInitialNode(): ReadOnlyStoryNode {

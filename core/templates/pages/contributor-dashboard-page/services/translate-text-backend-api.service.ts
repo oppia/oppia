@@ -16,23 +16,29 @@
  * @fileoverview Service for handling user contributed translations.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { TranslatableTexts, TranslatableTextsBackendDict } from 'domain/opportunity/translatable-texts.model';
-import { ImageLocalStorageService, ImagesData } from 'services/image-local-storage.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {
+  TranslatableTexts,
+  TranslatableTextsBackendDict,
+} from 'domain/opportunity/translatable-texts.model';
+import {
+  ImageLocalStorageService,
+  ImagesData,
+} from 'services/image-local-storage.service';
 
 interface Data {
-  'suggestion_type': string;
-  'target_type': string;
+  suggestion_type: string;
+  target_type: string;
   description: string;
-  'target_id': string;
-  'target_version_at_submission': string;
+  target_id: string;
+  target_version_at_submission: string;
   change_cmd: object;
   files?: Record<string, string>;
 }
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TranslateTextBackendApiService {
   constructor(
@@ -40,24 +46,33 @@ export class TranslateTextBackendApiService {
     private imageLocalStorageService: ImageLocalStorageService
   ) {}
 
-  async getTranslatableTextsAsync(expId: string, languageCode: string):
-    Promise<TranslatableTexts> {
-    return this.http.get<TranslatableTextsBackendDict>(
-      '/gettranslatabletexthandler', {
+  async getTranslatableTextsAsync(
+    expId: string,
+    languageCode: string
+  ): Promise<TranslatableTexts> {
+    return this.http
+      .get<TranslatableTextsBackendDict>('/gettranslatabletexthandler', {
         params: {
           exp_id: expId,
-          language_code: languageCode
-        }
-      }).toPromise().then((backendDict: TranslatableTextsBackendDict) => {
-      return TranslatableTexts.createFromBackendDict(backendDict);
-    });
+          language_code: languageCode,
+        },
+      })
+      .toPromise()
+      .then((backendDict: TranslatableTextsBackendDict) => {
+        return TranslatableTexts.createFromBackendDict(backendDict);
+      });
   }
 
   async suggestTranslatedTextAsync(
-      expId: string, expVersion: string, contentId: string, stateName: string,
-      languageCode: string, contentHtml: string | string[],
-      translationHtml: string | string[], imagesData: ImagesData[],
-      dataFormat: string
+    expId: string,
+    expVersion: string,
+    contentId: string,
+    stateName: string,
+    languageCode: string,
+    contentHtml: string | string[],
+    translationHtml: string | string[],
+    imagesData: ImagesData[],
+    dataFormat: string
   ): Promise<void> {
     const postData: Data = {
       suggestion_type: 'translate_content',
@@ -72,18 +87,22 @@ export class TranslateTextBackendApiService {
         language_code: languageCode,
         content_html: contentHtml,
         translation_html: translationHtml,
-        data_format: dataFormat
+        data_format: dataFormat,
       },
-      files: (
+      files:
         await this.imageLocalStorageService.getFilenameToBase64MappingAsync(
-          imagesData))
+          imagesData
+        ),
     };
     const body = new FormData();
     body.append('payload', JSON.stringify(postData));
-    return this.http.post<void>(
-      '/suggestionhandler/', body).toPromise();
+    return this.http.post<void>('/suggestionhandler/', body).toPromise();
   }
 }
 
-angular.module('oppia').factory('TranslateTextBackendApiService',
-  downgradeInjectable(TranslateTextBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'TranslateTextBackendApiService',
+    downgradeInjectable(TranslateTextBackendApiService)
+  );

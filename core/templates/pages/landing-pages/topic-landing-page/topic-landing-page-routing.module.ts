@@ -16,24 +16,19 @@
  * @fileoverview Routing module for topic landing page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { TopicLandingPageRootComponent } from './topic-landing-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {TopicLandingPageRootComponent} from './topic-landing-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: TopicLandingPageRootComponent
-  }
+    component: TopicLandingPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class TopicLandingPageRoutingModule {}

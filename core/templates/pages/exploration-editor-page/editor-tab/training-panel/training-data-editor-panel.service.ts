@@ -17,15 +17,15 @@
  * the training data editor of an answer group.
  */
 
-import { TrainingDataEditorPanelComponent } from './training-data-editor-panel-modal.component';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsService } from 'services/alerts.service';
-import { ExternalSaveService } from 'services/external-save.service';
+import {TrainingDataEditorPanelComponent} from './training-data-editor-panel-modal.component';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {AlertsService} from 'services/alerts.service';
+import {ExternalSaveService} from 'services/external-save.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TrainingDataEditorPanelService {
   constructor(
@@ -40,14 +40,23 @@ export class TrainingDataEditorPanelService {
   openTrainingDataEditor(): void {
     this.alertsService.clearWarnings();
 
-    this.ngbModal.open(TrainingDataEditorPanelComponent, {
-      backdrop: 'static',
-    }).result.then(() => {}, () => {});
+    this.ngbModal
+      .open(TrainingDataEditorPanelComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        () => {},
+        () => {}
+      );
 
     // Save the modified training data externally in state content.
     this.externalSaveService.onExternalSave.emit();
   }
 }
 
-angular.module('oppia').factory('TrainingDataEditorPanelService',
-  downgradeInjectable(TrainingDataEditorPanelService));
+angular
+  .module('oppia')
+  .factory(
+    'TrainingDataEditorPanelService',
+    downgradeInjectable(TrainingDataEditorPanelService)
+  );

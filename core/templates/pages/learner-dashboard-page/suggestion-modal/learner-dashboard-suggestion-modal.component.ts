@@ -16,18 +16,17 @@
  * @fileoverview Component for learner dashboard suggestion modal.
  */
 
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-learner-dashboard-suggestion-modal',
   templateUrl: './learner-dashboard-suggestion-modal.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-export class LearnerDashboardSuggestionModalComponent
-  extends ConfirmOrCancelModal {
+export class LearnerDashboardSuggestionModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -35,9 +34,7 @@ export class LearnerDashboardSuggestionModalComponent
   @Input() oldContent!: string;
   @Input() description!: string;
 
-  constructor(
-    private activeModal: NgbActiveModal,
-  ) {
+  constructor(private activeModal: NgbActiveModal) {
     super(activeModal);
   }
 

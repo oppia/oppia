@@ -16,12 +16,11 @@
  * @fileoverview Service to check the status of dummy handler in backend.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { FeatureFlagDomainConstants } from
-  'domain/feature-flag/feature-flag-domain.constants';
+import {FeatureFlagDomainConstants} from 'domain/feature-flag/feature-flag-domain.constants';
 
 interface Response {
   is_enabled: boolean;
@@ -34,12 +33,10 @@ interface Response {
  * end-to-end feature gating flow.
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FeatureFlagDummyBackendApiService {
-  constructor(
-    private http: HttpClient,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   /**
    * Checks if the dummy handler gated by dummy_feature_flag_for_e2e_tests
@@ -49,12 +46,16 @@ export class FeatureFlagDummyBackendApiService {
    * to the dummy handler succeeded without error.
    */
   async isHandlerEnabled(): Promise<boolean> {
-    const response = await this.http.get(
-      FeatureFlagDomainConstants.DUMMY_HANDLER_URL).toPromise() as Response;
+    const response = (await this.http
+      .get(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
+      .toPromise()) as Response;
     return response.is_enabled === true;
   }
 }
 
-angular.module('oppia').factory(
-  'FeatureFlagDummyBackendApiService',
-  downgradeInjectable(FeatureFlagDummyBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'FeatureFlagDummyBackendApiService',
+    downgradeInjectable(FeatureFlagDummyBackendApiService)
+  );

@@ -16,15 +16,15 @@
  * @fileoverview Directive for creating image links to a user's profile page.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { UserService } from 'services/user.service';
+import {Component, OnInit, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'profile-link-image',
   templateUrl: './profile-link-image.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ProfileLinkImageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -33,30 +33,34 @@ export class ProfileLinkImageComponent implements OnInit {
   @Input() username!: string;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
-  profileUrl = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
-      ':username_fragment', this.username
-    )
-  );
+  profileUrl =
+    '/' +
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+      ':username_fragment',
+      this.username
+    );
 
-  constructor(
-    private userService: UserService
-  ) {}
+  constructor(private userService: UserService) {}
 
   isUsernameLinkable(username: string): boolean {
     return ['admin', 'OppiaMigrationBot'].indexOf(username) === -1;
   }
 
   ngOnInit(): void {
-    this.profileUrl = (
-      '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
-        ':username_fragment', this.username
-      )
-    );
-    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-      this.userService.getProfileImageDataUrl(this.username));
+    this.profileUrl =
+      '/' +
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+        ':username_fragment',
+        this.username
+      );
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
+      this.userService.getProfileImageDataUrl(this.username);
   }
 }
 
-angular.module('oppia').directive('profileLinkImage', downgradeComponent(
-  {component: ProfileLinkImageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'profileLinkImage',
+    downgradeComponent({component: ProfileLinkImageComponent})
+  );

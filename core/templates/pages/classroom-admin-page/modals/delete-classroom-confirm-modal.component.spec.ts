@@ -16,10 +16,9 @@
  * @fileoverview Tests for delete classroom confirmation modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteClassroomConfirmModalComponent } from './delete-classroom-confirm-modal.component';
-
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteClassroomConfirmModalComponent} from './delete-classroom-confirm-modal.component';
 
 describe('Delete Classroom Confirmation Modal', () => {
   let fixture: ComponentFixture<DeleteClassroomConfirmModalComponent>;
@@ -29,12 +28,8 @@ describe('Delete Classroom Confirmation Modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteClassroomConfirmModalComponent
-      ],
-      providers: [
-        NgbActiveModal,
-      ]
+      declarations: [DeleteClassroomConfirmModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

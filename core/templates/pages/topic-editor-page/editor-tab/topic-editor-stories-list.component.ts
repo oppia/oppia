@@ -16,25 +16,25 @@
  * @fileoverview Component for the stories list viewer.
  */
 
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SavePendingChangesModalComponent } from 'components/save-pending-changes/save-pending-changes-modal.component';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { Topic } from 'domain/topic/topic-object.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { DeleteStoryModalComponent } from '../modal-templates/delete-story-modal.component';
-import { TopicRights } from 'domain/topic/topic-rights.model';
-import { TopicEditorStateService } from '../services/topic-editor-state.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {TopicUpdateService} from 'domain/topic/topic-update.service';
+import {Topic} from 'domain/topic/topic-object.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {DeleteStoryModalComponent} from '../modal-templates/delete-story-modal.component';
+import {TopicRights} from 'domain/topic/topic-rights.model';
+import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-topic-editor-stories-list',
-  templateUrl: './topic-editor-stories-list.component.html'
+  templateUrl: './topic-editor-stories-list.component.html',
 })
 export class TopicEditorStoriesListComponent implements OnInit {
   @Input() storySummaries: StorySummary[];
@@ -58,84 +58,109 @@ export class TopicEditorStoriesListComponent implements OnInit {
   drop(event: CdkDragDrop<StorySummary[]>): void {
     moveItemInArray(
       this.storySummaries,
-      event.previousIndex, event.currentIndex);
+      event.previousIndex,
+      event.currentIndex
+    );
 
     this.topicUpdateService.rearrangeCanonicalStory(
-      this.topic, event.previousIndex, event.currentIndex);
+      this.topic,
+      event.previousIndex,
+      event.currentIndex
+    );
   }
 
   openStoryEditor(storyId: string): void {
     if (this.undoRedoService.getChangeCount() > 0) {
-      const modalRef = this.ngbModal.open(
-        SavePendingChangesModalComponent, {
-          backdrop: true
-        });
-
-      modalRef.componentInstance.body = (
-        'Please save all pending changes ' +
-        'before exiting the topic editor.');
-
-      modalRef.result.then(() => {}, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
+      const modalRef = this.ngbModal.open(SavePendingChangesModalComponent, {
+        backdrop: true,
       });
+
+      modalRef.componentInstance.body =
+        'Please save all pending changes ' + 'before exiting the topic editor.';
+
+      modalRef.result.then(
+        () => {},
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
     } else {
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
-          this.STORY_EDITOR_URL_TEMPLATE, {
-            story_id: storyId
-          }), '_self');
+          this.STORY_EDITOR_URL_TEMPLATE,
+          {
+            story_id: storyId,
+          }
+        ),
+        '_self'
+      );
     }
   }
 
   deleteCanonicalStory(storyId: string): void {
-    this.ngbModal.open(DeleteStoryModalComponent, {
-      backdrop: true
-    }).result.then(() => {
-      this.topicUpdateService.removeCanonicalStory(
-        this.topic, storyId);
-      for (let i = 0; i < this.storySummaries.length; i++) {
-        if (this.storySummaries[i].getId() === storyId) {
-          this.storySummaries.splice(i, 1);
+    this.ngbModal
+      .open(DeleteStoryModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {
+          this.topicUpdateService.removeCanonicalStory(this.topic, storyId);
+          for (let i = 0; i < this.storySummaries.length; i++) {
+            if (this.storySummaries[i].getId() === storyId) {
+              this.storySummaries.splice(i, 1);
+            }
+          }
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         }
-      }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+      );
   }
 
   isSerialChapterLaunchFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.
-      SerialChapterLaunchCurriculumAdminView.isEnabled;
+    return this.platformFeatureService.status
+      .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
   areChaptersAwaitingPublication(summary: StorySummary): boolean {
     return (
-      summary.getTotalChaptersCount() !== summary.getPublishedChaptersCount());
+      summary.getTotalChaptersCount() !== summary.getPublishedChaptersCount()
+    );
   }
 
   isChapterNotificationsEmpty(summary: StorySummary): boolean {
     return (
       summary.getUpcomingChaptersCount() === 0 &&
-      summary.getOverdueChaptersCount() === 0);
+      summary.getOverdueChaptersCount() === 0
+    );
   }
 
   ngOnInit(): void {
     if (this.isSerialChapterLaunchFeatureEnabled()) {
       this.STORY_TABLE_COLUMN_HEADINGS = [
-        'title', 'publication_status', 'node_count', 'notifications'];
+        'title',
+        'publication_status',
+        'node_count',
+        'notifications',
+      ];
     } else {
       this.STORY_TABLE_COLUMN_HEADINGS = [
-        'title', 'node_count', 'publication_status'];
+        'title',
+        'node_count',
+        'publication_status',
+      ];
     }
     this.topicRights = this.topicEditorStateService.getTopicRights();
   }
 }
 
-angular.module('oppia').directive('oppiaTopicEditorStoriesList',
+angular.module('oppia').directive(
+  'oppiaTopicEditorStoriesList',
   downgradeComponent({
-    component: TopicEditorStoriesListComponent
-  }) as angular.IDirectiveFactory);
+    component: TopicEditorStoriesListComponent,
+  }) as angular.IDirectiveFactory
+);

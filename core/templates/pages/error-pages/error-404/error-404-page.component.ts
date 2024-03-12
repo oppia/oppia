@@ -16,18 +16,17 @@
  * @fileoverview Component for the error 404 page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { PageTitleService } from 'services/page-title.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {PageTitleService} from 'services/page-title.service';
 
 @Component({
   selector: 'oppia-error-404-page',
   templateUrl: './error-404-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class Error404PageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -47,7 +46,8 @@ export class Error404PageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_ERROR_PAGE_TITLE_404');
+      'I18N_ERROR_PAGE_TITLE_404'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 

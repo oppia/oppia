@@ -16,8 +16,7 @@
  * @fileoverview Tests for CamelCaseToHyphens pipe for Oppia.
  */
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 describe('Testing CamelCaseToHyphensPipe', () => {
   let pipe: CamelCaseToHyphensPipe;

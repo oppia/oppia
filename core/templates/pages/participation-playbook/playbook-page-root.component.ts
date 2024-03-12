@@ -16,16 +16,16 @@
  * @fileoverview Root component for Playbook Page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-playbook-page-root',
-  templateUrl: './playbook-page-root.component.html'
+  templateUrl: './playbook-page-root.component.html',
 })
 export class PlaybookPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -36,10 +36,12 @@ export class PlaybookPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.META
+    );
   }
 
   ngOnInit(): void {

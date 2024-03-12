@@ -19,10 +19,10 @@
 import 'midi/build/MIDI.js';
 window.Base64Binary = require('midi/inc/shim/Base64binary.js');
 
-$(document).ready(function() {
+$(document).ready(function () {
   MIDI.loadPlugin({
     soundfontUrl: '/dist/oppia-angular/midi/examples/soundfont/',
     instrument: 'acoustic_grand_piano',
-    callback: function() {}
+    callback: function () {},
   });
 });

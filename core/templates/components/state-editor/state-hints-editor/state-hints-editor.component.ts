@@ -17,26 +17,26 @@
  * editor.
  */
 
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Hint } from 'domain/exploration/hint-object.model';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Hint} from 'domain/exploration/hint-object.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { AlertsService } from 'services/alerts.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { AddHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
-import { DeleteHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
-import { DeleteLastHintModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
+import {AlertsService} from 'services/alerts.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {AddHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
+import {DeleteHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
+import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface DeleteValueResponse {
   index: number;
@@ -49,7 +49,7 @@ interface AddHintModalResponse {
 
 @Component({
   selector: 'oppia-state-hints-editor',
-  templateUrl: './state-hints-editor.component.html'
+  templateUrl: './state-hints-editor.component.html',
 })
 export class StateHintsEditorComponent implements OnInit {
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
@@ -70,13 +70,15 @@ export class StateHintsEditorComponent implements OnInit {
     private stateHintsService: StateHintsService,
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService,
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   drop(event: CdkDragSortEvent<Hint[]>): void {
     moveItemInArray(
-      this.stateHintsService.displayed, event.previousIndex,
-      event.currentIndex);
+      this.stateHintsService.displayed,
+      event.previousIndex,
+      event.currentIndex
+    );
     this.stateHintsService.saveDisplayedValue();
     this.onSaveHints.emit(this.stateHintsService.displayed);
   }
@@ -97,11 +99,14 @@ export class StateHintsEditorComponent implements OnInit {
 
   changeActiveHintIndex(newIndex: number): void {
     const currentActiveIndex = this.stateHintsService.getActiveHintIndex();
-    if (currentActiveIndex !== null && (
-      !this.stateHintsService.displayed[currentActiveIndex]
-        .hintContent.html)) {
-      if (this.stateSolutionService.savedMemento &&
-        this.stateHintsService.displayed.length === 1) {
+    if (
+      currentActiveIndex !== null &&
+      !this.stateHintsService.displayed[currentActiveIndex].hintContent.html
+    ) {
+      if (
+        this.stateSolutionService.savedMemento &&
+        this.stateHintsService.displayed.length === 1
+      ) {
         this.openDeleteLastHintModal();
         return;
       } else {
@@ -135,37 +140,47 @@ export class StateHintsEditorComponent implements OnInit {
     this.alertsService.clearWarnings();
     this.externalSaveService.onExternalSave.emit();
 
-    this.ngbModal.open(AddHintModalComponent, {
-      backdrop: 'static',
-      windowClass: 'add-hint-modal'
-    }).result.then((result: AddHintModalResponse): void => {
-      this.stateHintsService.displayed.push(result.hint);
-      this.stateHintsService.saveDisplayedValue();
-      this.onSaveHints.emit(this.stateHintsService.displayed);
-      this.onSaveNextContentIdIndex.emit();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(AddHintModalComponent, {
+        backdrop: 'static',
+        windowClass: 'add-hint-modal',
+      })
+      .result.then(
+        (result: AddHintModalResponse): void => {
+          this.stateHintsService.displayed.push(result.hint);
+          this.stateHintsService.saveDisplayedValue();
+          this.onSaveHints.emit(this.stateHintsService.displayed);
+          this.onSaveNextContentIdIndex.emit();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   openDeleteLastHintModal = (): void => {
     this.alertsService.clearWarnings();
 
-    this.ngbModal.open(DeleteLastHintModalComponent, {
-      backdrop: true,
-    }).result.then((): void => {
-      this.stateSolutionService.displayed = null;
-      this.stateSolutionService.saveDisplayedValue();
-      this.onSaveSolution.emit(this.stateSolutionService.displayed);
+    this.ngbModal
+      .open(DeleteLastHintModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        (): void => {
+          this.stateSolutionService.displayed = null;
+          this.stateSolutionService.saveDisplayedValue();
+          this.onSaveSolution.emit(this.stateSolutionService.displayed);
 
-      this.stateHintsService.displayed = [];
-      this.stateHintsService.saveDisplayedValue();
-      this.onSaveHints.emit(this.stateHintsService.displayed);
-    }, (): void => {
-      this.alertsService.clearWarnings();
-    });
+          this.stateHintsService.displayed = [];
+          this.stateHintsService.saveDisplayedValue();
+          this.onSaveHints.emit(this.stateHintsService.displayed);
+        },
+        (): void => {
+          this.alertsService.clearWarnings();
+        }
+      );
   };
 
   deleteHint(value: DeleteValueResponse): void {
@@ -174,24 +189,31 @@ export class StateHintsEditorComponent implements OnInit {
     value.evt.stopPropagation();
 
     this.alertsService.clearWarnings();
-    this.ngbModal.open(DeleteHintModalComponent, {
-      backdrop: true,
-    }).result.then((): void => {
-      if (this.stateSolutionService.savedMemento &&
-        this.stateHintsService.savedMemento.length === 1) {
-        this.openDeleteLastHintModal();
-      } else {
-        this.stateHintsService.displayed.splice(value.index, 1);
-        this.stateHintsService.saveDisplayedValue();
-        this.onSaveHints.emit(this.stateHintsService.displayed);
-      }
+    this.ngbModal
+      .open(DeleteHintModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        (): void => {
+          if (
+            this.stateSolutionService.savedMemento &&
+            this.stateHintsService.savedMemento.length === 1
+          ) {
+            this.openDeleteLastHintModal();
+          } else {
+            this.stateHintsService.displayed.splice(value.index, 1);
+            this.stateHintsService.saveDisplayedValue();
+            this.onSaveHints.emit(this.stateHintsService.displayed);
+          }
 
-      if (value.index === this.stateHintsService.getActiveHintIndex()) {
-        this.stateHintsService.setActiveHintIndex(null);
-      }
-    }, (): void => {
-      this.alertsService.clearWarnings();
-    });
+          if (value.index === this.stateHintsService.getActiveHintIndex()) {
+            this.stateHintsService.setActiveHintIndex(null);
+          }
+        },
+        (): void => {
+          this.alertsService.clearWarnings();
+        }
+      );
   }
 
   onSaveInlineHint(): void {
@@ -219,7 +241,9 @@ export class StateHintsEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaStateHintsEditor',
-downgradeComponent({
-  component: StateHintsEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaStateHintsEditor',
+  downgradeComponent({
+    component: StateHintsEditorComponent,
+  }) as angular.IDirectiveFactory
+);

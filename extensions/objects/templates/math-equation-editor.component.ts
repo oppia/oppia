@@ -19,16 +19,23 @@
 // Every editor component should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { AppConstants } from 'app.constants';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyConfigurationService } from 'services/guppy-configuration.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { TranslateService } from '@ngx-translate/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {AppConstants} from 'app.constants';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {GuppyConfigurationService} from 'services/guppy-configuration.service';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {TranslateService} from '@ngx-translate/core';
 
 export interface FocusObj {
   focused: boolean;
@@ -37,9 +44,8 @@ export interface FocusObj {
 @Component({
   selector: 'math-equation-editor',
   templateUrl: './math-equation-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-
 export class MathEquationEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -74,13 +80,17 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     this.currentValue = this.value;
     this.guppyConfigurationService.init();
     let translatedPlaceholder = this.translateService.instant(
-      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput
+    );
     this.guppyInitializationService.init(
-      'guppy-div-creator', translatedPlaceholder, this.value);
+      'guppy-div-creator',
+      translatedPlaceholder,
+      this.value
+    );
 
     Guppy.event('change', (focusObj: FocusObj) => {
-      const activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
+      const activeGuppyObject =
+        this.guppyInitializationService.findActiveGuppyObject();
       if (activeGuppyObject !== undefined) {
         this.hasBeenTouched = true;
         this.currentValue = activeGuppyObject.guppyInstance.asciimath();
@@ -97,7 +107,6 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     });
   }
 
-
   isCurrentAnswerValid(): boolean {
     if (this.currentValue === undefined) {
       this.currentValue = '';
@@ -105,12 +114,13 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
     // is not compatible with nerdamer or with the backend validations.
     this.currentValue = this.mathInteractionsService.replaceAbsSymbolWithText(
-      this.currentValue);
+      this.currentValue
+    );
     var answerIsValid = this.mathInteractionsService.validateEquation(
       this.currentValue,
-      this.guppyInitializationService.getAllowedVariables());
-    if (
-      this.guppyInitializationService.findActiveGuppyObject() === undefined) {
+      this.guppyInitializationService.getAllowedVariables()
+    );
+    if (this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive
       // focus, i.e., the user is done typing.
       this.warningText = this.mathInteractionsService.getWarningText();
@@ -119,12 +129,12 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     }
     if (answerIsValid) {
       let splitByEquals = this.currentValue.split('=');
-      splitByEquals[0] = (
-        this.mathInteractionsService.insertMultiplicationSigns(
-          splitByEquals[0]));
-      splitByEquals[1] = (
-        this.mathInteractionsService.insertMultiplicationSigns(
-          splitByEquals[1]));
+      splitByEquals[0] = this.mathInteractionsService.insertMultiplicationSigns(
+        splitByEquals[0]
+      );
+      splitByEquals[1] = this.mathInteractionsService.insertMultiplicationSigns(
+        splitByEquals[1]
+      );
       this.currentValue = splitByEquals.join('=');
       this.value = this.currentValue;
       this.valueChanged.emit(this.value);
@@ -132,10 +142,12 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
     if (!this.hasBeenTouched) {
       this.warningText = '';
     }
-    this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-      modalId: this.modalId,
-      value: !answerIsValid
-    }));
+    this.eventBusGroup.emit(
+      new ObjectFormValidityChangeEvent({
+        modalId: this.modalId,
+        value: !answerIsValid,
+      })
+    );
     return answerIsValid;
   }
 
@@ -149,6 +161,9 @@ export class MathEquationEditorComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('mathEquationEditor', downgradeComponent({
-  component: MathEquationEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'mathEquationEditor',
+  downgradeComponent({
+    component: MathEquationEditorComponent,
+  }) as angular.IDirectiveFactory
+);

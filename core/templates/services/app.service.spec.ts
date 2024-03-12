@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the app service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AppConstants } from 'app.constants';
-import { AppService } from 'services/app.service';
+import {AppConstants} from 'app.constants';
+import {AppService} from 'services/app.service';
 
 describe('App Service', () => {
   let appService: AppService;
@@ -40,26 +40,24 @@ describe('App Service', () => {
       AppConstants.ENABLE_ML_CLASSIFIERS = initialValue;
     });
 
-    it('should return true if AppConstants.ENABLE_ML_CLASSIFIERS is true',
-      () => {
-        // This throws "Cannot assign to 'ENABLE_ML_CLASSIFIERS' because it
-        // is a read-only property.". We need to suppress this error because
-        // we need to change the value of 'ENABLE_ML_CLASSIFIERS' for testing
-        // purposes.
-        // @ts-expect-error
-        AppConstants.ENABLE_ML_CLASSIFIERS = true;
-        expect(appService.isMachineLearningClassificationEnabled()).toBeTrue();
-      });
+    it('should return true if AppConstants.ENABLE_ML_CLASSIFIERS is true', () => {
+      // This throws "Cannot assign to 'ENABLE_ML_CLASSIFIERS' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'ENABLE_ML_CLASSIFIERS' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.ENABLE_ML_CLASSIFIERS = true;
+      expect(appService.isMachineLearningClassificationEnabled()).toBeTrue();
+    });
 
-    it('should return false if AppConstants.ENABLE_ML_CLASSIFIERS is false',
-      () => {
-        // This throws "Cannot assign to 'ENABLE_ML_CLASSIFIERS' because it
-        // is a read-only property.". We need to suppress this error because
-        // we need to change the value of 'ENABLE_ML_CLASSIFIERS' for testing
-        // purposes.
-        // @ts-expect-error
-        AppConstants.ENABLE_ML_CLASSIFIERS = false;
-        expect(appService.isMachineLearningClassificationEnabled()).toBeFalse();
-      });
+    it('should return false if AppConstants.ENABLE_ML_CLASSIFIERS is false', () => {
+      // This throws "Cannot assign to 'ENABLE_ML_CLASSIFIERS' because it
+      // is a read-only property.". We need to suppress this error because
+      // we need to change the value of 'ENABLE_ML_CLASSIFIERS' for testing
+      // purposes.
+      // @ts-expect-error
+      AppConstants.ENABLE_ML_CLASSIFIERS = false;
+      expect(appService.isMachineLearningClassificationEnabled()).toBeFalse();
+    });
   });
 });

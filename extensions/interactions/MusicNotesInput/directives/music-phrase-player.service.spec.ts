@@ -16,8 +16,8 @@
  * @fileoverview Unit tests service for the interaction.
  */
 
-import { MusicPhrasePlayerService } from 'interactions/MusicNotesInput/directives/music-phrase-player.service';
-import { fakeAsync, flush, TestBed } from '@angular/core/testing';
+import {MusicPhrasePlayerService} from 'interactions/MusicNotesInput/directives/music-phrase-player.service';
+import {fakeAsync, flush, TestBed} from '@angular/core/testing';
 
 describe('MusicPhrasePlayerService', () => {
   let musicPhrasePlayerService: MusicPhrasePlayerService;
@@ -32,10 +32,10 @@ describe('MusicPhrasePlayerService', () => {
       // functions given below for testing.
       // @ts-expect-error
       Player: {
-        stop: function() {}
+        stop: function () {},
       },
-      chordOn: function() {},
-      chordOff: function() {}
+      chordOn: function () {},
+      chordOff: function () {},
     };
   });
 
@@ -43,15 +43,18 @@ describe('MusicPhrasePlayerService', () => {
     spyOn(window.MIDI.Player, 'stop').and.stub();
     let chordOn = spyOn(window.MIDI, 'chordOn').and.stub();
     let chordOff = spyOn(window.MIDI, 'chordOff').and.stub();
-    let notes = [{
-      midiValue: 69,
-      duration: 1,
-      start: 0
-    }, {
-      midiValue: 71,
-      duration: 1,
-      start: 1
-    }];
+    let notes = [
+      {
+        midiValue: 69,
+        duration: 1,
+        start: 0,
+      },
+      {
+        midiValue: 71,
+        duration: 1,
+        start: 1,
+      },
+    ];
 
     musicPhrasePlayerService.playMusicPhrase(notes);
     flush();

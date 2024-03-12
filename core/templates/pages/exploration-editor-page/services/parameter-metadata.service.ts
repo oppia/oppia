@@ -16,16 +16,16 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ParamMetadata } from 'domain/exploration/param-metadata.model';
-import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
-import { ExplorationParamChangesService } from 'pages/exploration-editor-page/services/exploration-param-changes.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import { State } from 'domain/state/StateObjectFactory';
-import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ParamMetadata} from 'domain/exploration/param-metadata.model';
+import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {ExplorationParamChangesService} from 'pages/exploration-editor-page/services/exploration-param-changes.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import {State} from 'domain/state/StateObjectFactory';
+import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 import cloneDeep from 'lodash/cloneDeep';
 
 interface GetUnsetParametersInfoResult {
@@ -34,15 +34,15 @@ interface GetUnsetParametersInfoResult {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParameterMetadataService {
   constructor(
     private expressionInterpolationService: ExpressionInterpolationService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationStatesService: ExplorationStatesService,
-    private graphDataService: GraphDataService,
-  ) { }
+    private graphDataService: GraphDataService
+  ) {}
 
   PARAM_SOURCE_ANSWER = 'answer';
   PARAM_SOURCE_CONTENT = 'content';
@@ -55,28 +55,48 @@ export class ParameterMetadataService {
       let pc = paramChanges[i];
       if (pc.generatorId === 'Copier') {
         if (!pc.customizationArgs.parse_with_jinja) {
-          result.push(ParamMetadata.createWithSetAction(
-            pc.name, this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
+          result.push(
+            ParamMetadata.createWithSetAction(
+              pc.name,
+              this.PARAM_SOURCE_PARAM_CHANGES,
+              String(i)
+            )
+          );
         } else {
           const customizationArgsValue = pc.customizationArgs.value;
           if (customizationArgsValue) {
-            let paramsReferenced = (
+            let paramsReferenced =
               this.expressionInterpolationService.getParamsFromString(
-                customizationArgsValue));
+                customizationArgsValue
+              );
             for (let j = 0; j < paramsReferenced.length; j++) {
-              result.push(ParamMetadata.createWithGetAction(
-                paramsReferenced[j],
-                this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
+              result.push(
+                ParamMetadata.createWithGetAction(
+                  paramsReferenced[j],
+                  this.PARAM_SOURCE_PARAM_CHANGES,
+                  String(i)
+                )
+              );
             }
-            result.push(ParamMetadata.createWithSetAction(
-              pc.name, this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
+            result.push(
+              ParamMetadata.createWithSetAction(
+                pc.name,
+                this.PARAM_SOURCE_PARAM_CHANGES,
+                String(i)
+              )
+            );
           }
         }
       } else {
         // RandomSelector. Elements in the list of possibilities are treated
         // as raw unicode strings, not expressions.
-        result.push(ParamMetadata.createWithSetAction(
-          pc.name, this.PARAM_SOURCE_PARAM_CHANGES, String(i)));
+        result.push(
+          ParamMetadata.createWithSetAction(
+            pc.name,
+            this.PARAM_SOURCE_PARAM_CHANGES,
+            String(i)
+          )
+        );
       }
     }
 
@@ -93,23 +113,36 @@ export class ParameterMetadataService {
     let result = this.getMetadataFromParamChanges(state.paramChanges);
 
     // Next, the content is evaluated.
-    this.expressionInterpolationService.getParamsFromString(
-      state.content.html).forEach((paramName, index) => {
-      result.push(ParamMetadata.createWithGetAction(
-        paramName, this.PARAM_SOURCE_CONTENT, '0'));
-    });
+    this.expressionInterpolationService
+      .getParamsFromString(state.content.html)
+      .forEach((paramName, index) => {
+        result.push(
+          ParamMetadata.createWithGetAction(
+            paramName,
+            this.PARAM_SOURCE_CONTENT,
+            '0'
+          )
+        );
+      });
 
     // Next, the answer is received.
-    result.push(ParamMetadata.createWithSetAction(
-      'answer', this.PARAM_SOURCE_ANSWER, '0'));
+    result.push(
+      ParamMetadata.createWithSetAction('answer', this.PARAM_SOURCE_ANSWER, '0')
+    );
 
     // Finally, the rule feedback strings are evaluated.
-    state.interaction.answerGroups.forEach((group) => {
-      this.expressionInterpolationService.getParamsFromString(
-        group.outcome.feedback.html).forEach((paramName, index) => {
-        result.push(ParamMetadata.createWithGetAction(
-          paramName, this.PARAM_SOURCE_FEEDBACK, String(index)));
-      });
+    state.interaction.answerGroups.forEach(group => {
+      this.expressionInterpolationService
+        .getParamsFromString(group.outcome.feedback.html)
+        .forEach((paramName, index) => {
+          result.push(
+            ParamMetadata.createWithGetAction(
+              paramName,
+              this.PARAM_SOURCE_FEEDBACK,
+              String(index)
+            )
+          );
+        });
     });
 
     return result;
@@ -119,7 +152,9 @@ export class ParameterMetadataService {
   // whether this parameter is not used at all in this state, or
   // whether its first occurrence is a 'set' or 'get'.
   getParamStatus(
-      stateParamMetadata: ParamMetadata[], paramName: string): null | string {
+    stateParamMetadata: ParamMetadata[],
+    paramName: string
+  ): null | string {
     for (let i = 0; i < stateParamMetadata.length; i++) {
       if (stateParamMetadata[i].paramName === paramName) {
         return stateParamMetadata[i].action;
@@ -138,7 +173,8 @@ export class ParameterMetadataService {
   //     (e.g. one parameter may be set based on the value assigned to
   //     another parameter).
   getUnsetParametersInfo(
-      initNodeIds: string[]): GetUnsetParametersInfoResult[] {
+    initNodeIds: string[]
+  ): GetUnsetParametersInfoResult[] {
     let graphData = this.graphDataService.getGraphData();
 
     let states = this.explorationStatesService.getStates();
@@ -146,18 +182,20 @@ export class ParameterMetadataService {
     // Determine all parameter names that are used within this exploration.
     let allParamNames: string[] = [];
     let expParamChangesMetadata = this.getMetadataFromParamChanges(
-      this.explorationParamChangesService.savedMemento as ParamChange[]);
+      this.explorationParamChangesService.savedMemento as ParamChange[]
+    );
     let stateParamMetadatas: Record<string, ParamMetadata[]> = {};
 
-    expParamChangesMetadata.forEach((expParamMetadataItem) => {
+    expParamChangesMetadata.forEach(expParamMetadataItem => {
       if (allParamNames.indexOf(expParamMetadataItem.paramName) === -1) {
         allParamNames.push(expParamMetadataItem.paramName);
       }
     });
 
-    states.getStateNames().forEach((stateName) => {
+    states.getStateNames().forEach(stateName => {
       stateParamMetadatas[stateName] = this.getStateParamMetadata(
-        states.getState(stateName));
+        states.getState(stateName)
+      );
       for (let i = 0; i < stateParamMetadatas[stateName].length; i++) {
         let pName = stateParamMetadatas[stateName][i].paramName;
         if (allParamNames.indexOf(pName) === -1) {
@@ -176,16 +214,20 @@ export class ParameterMetadataService {
       let tmpUnsetParameter = null;
 
       let paramStatusAtOutset = this.getParamStatus(
-        expParamChangesMetadata, paramName);
-      if (paramStatusAtOutset ===
-        ExplorationEditorPageConstants.PARAM_ACTION_GET) {
+        expParamChangesMetadata,
+        paramName
+      );
+      if (
+        paramStatusAtOutset === ExplorationEditorPageConstants.PARAM_ACTION_GET
+      ) {
         unsetParametersInfo.push({
           paramName: paramName,
-          stateName: null
+          stateName: null,
         });
         continue;
-      } else if (paramStatusAtOutset ===
-        ExplorationEditorPageConstants.PARAM_ACTION_SET) {
+      } else if (
+        paramStatusAtOutset === ExplorationEditorPageConstants.PARAM_ACTION_SET
+      ) {
         // This parameter will remain set for the entirety of the
         // exploration.
         continue;
@@ -196,12 +238,13 @@ export class ParameterMetadataService {
       for (let i = 0; i < initNodeIds.length; i++) {
         seen[initNodeIds[i]] = true;
         let paramStatus = this.getParamStatus(
-          stateParamMetadatas[initNodeIds[i]], paramName);
-        if (paramStatus ===
-          ExplorationEditorPageConstants.PARAM_ACTION_GET) {
+          stateParamMetadatas[initNodeIds[i]],
+          paramName
+        );
+        if (paramStatus === ExplorationEditorPageConstants.PARAM_ACTION_GET) {
           tmpUnsetParameter = {
             paramName: paramName,
-            stateName: initNodeIds[i]
+            stateName: initNodeIds[i],
           };
           break;
         } else if (!paramStatus) {
@@ -218,16 +261,18 @@ export class ParameterMetadataService {
         let currNodeId = queue.shift();
         for (let edgeInd = 0; edgeInd < graphData.links.length; edgeInd++) {
           let edge = graphData.links[edgeInd];
-          if (edge.source === currNodeId &&
-            !seen.hasOwnProperty(edge.target)) {
+          if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
             seen[edge.target] = true;
             let paramStatus = this.getParamStatus(
-              stateParamMetadatas[edge.target], paramName);
-            if (paramStatus ===
-              ExplorationEditorPageConstants.PARAM_ACTION_GET) {
+              stateParamMetadatas[edge.target],
+              paramName
+            );
+            if (
+              paramStatus === ExplorationEditorPageConstants.PARAM_ACTION_GET
+            ) {
               tmpUnsetParameter = {
                 paramName: paramName,
-                stateName: edge.target
+                stateName: edge.target,
               };
               break;
             } else if (!paramStatus) {
@@ -246,6 +291,9 @@ export class ParameterMetadataService {
   }
 }
 
-angular.module('oppia').factory(
-  'ParameterMetadataService',
-  downgradeInjectable(ParameterMetadataService));
+angular
+  .module('oppia')
+  .factory(
+    'ParameterMetadataService',
+    downgradeInjectable(ParameterMetadataService)
+  );

@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for edit profile picture modal.
  */
 
-import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import Cropper from 'cropperjs';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { EditProfilePictureModalComponent } from './edit-profile-picture-modal.component';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { of } from 'rxjs';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {EditProfilePictureModalComponent} from './edit-profile-picture-modal.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {of} from 'rxjs';
 
 describe('Edit Profile Picture Modal Component', () => {
   let fixture: ComponentFixture<EditProfilePictureModalComponent>;
@@ -38,26 +38,23 @@ describe('Edit Profile Picture Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        EditProfilePictureModalComponent,
-        MockTranslatePipe
-      ],
+      declarations: [EditProfilePictureModalComponent, MockTranslatePipe],
       providers: [
         NgbActiveModal,
         SvgSanitizerService,
         {
           provide: ChangeDetectorRef,
-          useClass: MockChangeDetectorRef
+          useClass: MockChangeDetectorRef,
         },
         {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
-          }
+            getResizeEvent: () => of(resizeEvent),
+          },
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -72,11 +69,11 @@ describe('Edit Profile Picture Modal Component', () => {
   });
 
   it('should initialize cropper when window is not narrow', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(false);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     fixture.detectChanges();
-    componentInstance.croppableImageRef = (
-      new ElementRef(document.createElement('img')));
+    componentInstance.croppableImageRef = new ElementRef(
+      document.createElement('img')
+    );
 
     componentInstance.initializeCropper();
 
@@ -84,11 +81,11 @@ describe('Edit Profile Picture Modal Component', () => {
   });
 
   it('should initialize cropper when window is narrow', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(true);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     fixture.detectChanges();
-    componentInstance.croppableImageRef = (
-      new ElementRef(document.createElement('img')));
+    componentInstance.croppableImageRef = new ElementRef(
+      document.createElement('img')
+    );
 
     componentInstance.initializeCropper();
 
@@ -105,15 +102,16 @@ describe('Edit Profile Picture Modal Component', () => {
     spyOn(componentInstance, 'initializeCropper');
     // This is just a mock base 64 in order to test the FileReader event.
     let dataBase64Mock = 'VEhJUyBJUyBUSEUgQU5TV0VSCg==';
-    const arrayBuffer = Uint8Array.from(
-      window.atob(dataBase64Mock), c => c.charCodeAt(0));
+    const arrayBuffer = Uint8Array.from(window.atob(dataBase64Mock), c =>
+      c.charCodeAt(0)
+    );
     let file = new File([arrayBuffer], 'filename.mp3');
     componentInstance.onFileChanged(file);
     expect(componentInstance.invalidImageWarningIsShown).toBeFalse();
   });
 
-  it('should remove invalid tags and attributes', ()=> {
-    const svgString = (
+  it('should remove invalid tags and attributes', () => {
+    const svgString =
       '<svg xmlns="http://www.w3.org/2000/svg" width="1.33ex" height="1.4' +
       '29ex" viewBox="0 -511.5 572.5 615.4" focusable="false" style="verti' +
       'cal-align: -0.241ex;"><g stroke="currentColor" fill="currentColor" ' +
@@ -121,8 +119,7 @@ describe('Edit Profile Picture Modal Component', () => {
       'h="1" d="M52289Q59 331 106 386T222 442Q257 442 2864Q412 404 406 402' +
       'Q368 386 350 336Q290 115 290 78Q290 50 306 38T341 26Q378 26 414 59T' +
       '463 140Q466 150 469 151T485 153H489Q504 153 504 145284 52 289Z" ' +
-      'data-name="dataName"/></g><circel></circel></svg>'
-    );
+      'data-name="dataName"/></g><circel></circel></svg>';
     let file = new File([svgString], 'test.svg', {type: 'image/svg+xml'});
     componentInstance.invalidImageWarningIsShown = false;
 
@@ -142,9 +139,9 @@ describe('Edit Profile Picture Modal Component', () => {
     componentInstance.cropper = {
       getCroppedCanvas(options) {
         return {
-          toDataURL: () => pictureDataUrl
+          toDataURL: () => pictureDataUrl,
         };
-      }
+      },
     } as Cropper;
     componentInstance.confirm();
     expect(componentInstance.cropppedImageDataUrl).toEqual(pictureDataUrl);

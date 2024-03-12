@@ -16,7 +16,7 @@
  * @fileoverview Tests for StoryNode model.
  */
 
-import { StoryNode, StoryNodeBackendDict } from 'domain/story/story-node.model';
+import {StoryNode, StoryNodeBackendDict} from 'domain/story/story-node.model';
 
 describe('Story node model', () => {
   let _sampleStoryNode: StoryNode;
@@ -38,15 +38,15 @@ describe('Story node model', () => {
       planned_publication_date_msecs: 10,
       last_modified_msecs: 10,
       first_publication_date_msecs: 20,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
     _sampleStoryNode = StoryNode.createFromBackendDict(
-      sampleStoryNodeBackendDict);
+      sampleStoryNodeBackendDict
+    );
   });
 
   it('should correctly create a node from node id alone', () => {
-    const storyNode = StoryNode.createFromIdAndTitle(
-      'node_1', 'Title 1');
+    const storyNode = StoryNode.createFromIdAndTitle('node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
     expect(storyNode.getThumbnailFilename()).toEqual(null);
     expect(storyNode.getTitle()).toEqual('Title 1');
@@ -64,11 +64,11 @@ describe('Story node model', () => {
   });
 
   it('should throw error when validating node with invalid id', () => {
-    const invalidStoryNode = StoryNode.createFromIdAndTitle(
-      '1', 'Title 1');
+    const invalidStoryNode = StoryNode.createFromIdAndTitle('1', 'Title 1');
 
     expect(() => invalidStoryNode.validate()).toThrowError(
-      'The node id 1 is invalid.');
+      'The node id 1 is invalid.'
+    );
 
     // This throws "TS2345". We need to suppress this error because
     // we are testing that _checkValidNodeId return false when
@@ -78,154 +78,171 @@ describe('Story node model', () => {
     const invalidStoryNode2 = StoryNode.createFromIdAndTitle({}, '');
 
     expect(() => invalidStoryNode2.validate()).toThrowError(
-      'The node id [object Object] is invalid.');
+      'The node id [object Object] is invalid.'
+    );
   });
 
-  it('should raise issue when validating node with duplicated ' +
-      'prerequisite skill id', () => {
-    const testBackendDict = {
-      id: 'node_1',
-      thumbnail_filename: 'image.png',
-      title: 'Title 1',
-      description: 'Description 1',
-      prerequisite_skill_ids: ['skill_1', 'skill_1'],
-      acquired_skill_ids: ['skill_2'],
-      destination_node_ids: ['node_2'],
-      outline: 'Outline',
-      exploration_id: null,
-      outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40',
-      status: 'Published',
-      planned_publication_date_msecs: 100,
-      last_modified_msecs: 100,
-      first_publication_date_msecs: 200,
-      unpublishing_reason: null
-    };
-    const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
-    const expectedErrorMessage = (
-      'The prerequisite skill with id skill_1 is duplicated in' +
-          ' node with id node_1');
+  it(
+    'should raise issue when validating node with duplicated ' +
+      'prerequisite skill id',
+    () => {
+      const testBackendDict = {
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1', 'skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null,
+      };
+      const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
+      const expectedErrorMessage =
+        'The prerequisite skill with id skill_1 is duplicated in' +
+        ' node with id node_1';
 
-    expect(testStoryNode.validate()).toContain(expectedErrorMessage);
-  });
+      expect(testStoryNode.validate()).toContain(expectedErrorMessage);
+    }
+  );
 
-  it('should raise issue when validating node with duplicated ' +
-      'acquired skill id', () => {
-    const testBackendDict = {
-      id: 'node_1',
-      thumbnail_filename: 'image.png',
-      title: 'Title 1',
-      description: 'Description 1',
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_2', 'skill_2'],
-      destination_node_ids: ['node_2'],
-      outline: 'Outline',
-      exploration_id: null,
-      outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40',
-      status: 'Published',
-      planned_publication_date_msecs: 100,
-      last_modified_msecs: 100,
-      first_publication_date_msecs: 200,
-      unpublishing_reason: null
-    };
-    const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
-    const expectedErrorMessage = (
-      'The acquired skill with id skill_2 is duplicated in' +
-          ' node with id node_1');
+  it(
+    'should raise issue when validating node with duplicated ' +
+      'acquired skill id',
+    () => {
+      const testBackendDict = {
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2', 'skill_2'],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null,
+      };
+      const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
+      const expectedErrorMessage =
+        'The acquired skill with id skill_2 is duplicated in' +
+        ' node with id node_1';
 
-    expect(testStoryNode.validate()).toContain(expectedErrorMessage);
-  });
+      expect(testStoryNode.validate()).toContain(expectedErrorMessage);
+    }
+  );
 
-  it('should raise issue when validating node having common ' +
+  it(
+    'should raise issue when validating node having common ' +
       'skill id in both acquired and prerequisite skill id lists',
-  () => {
-    const testBackendDict = {
-      id: 'node_1',
-      thumbnail_filename: 'image.png',
-      title: 'Title 1',
-      description: 'Description 1',
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_1'],
-      destination_node_ids: ['node_2'],
-      outline: 'Outline',
-      exploration_id: null,
-      outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40',
-      status: 'Published',
-      planned_publication_date_msecs: 100,
-      last_modified_msecs: 100,
-      first_publication_date_msecs: 200,
-      unpublishing_reason: null
-    };
-    const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
-    const expectedErrorMessage = (
-      'The skill with id skill_1 is common ' +
+    () => {
+      const testBackendDict = {
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_1'],
+        destination_node_ids: ['node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null,
+      };
+      const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
+      const expectedErrorMessage =
+        'The skill with id skill_1 is common ' +
         'to both the acquired and prerequisite skill id list in node with' +
-          ' id node_1');
+        ' id node_1';
 
-    expect(testStoryNode.validate()).toContain(expectedErrorMessage);
-  });
+      expect(testStoryNode.validate()).toContain(expectedErrorMessage);
+    }
+  );
 
-  it('should throw error when validating node with ' +
-      'with invalid id in destination node id list', () => {
-    const testBackendDict = {
-      id: 'node_1',
-      thumbnail_filename: 'image.png',
-      title: 'Title 1',
-      description: 'Description 1',
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_1'],
-      destination_node_ids: ['1'],
-      outline: 'Outline',
-      exploration_id: null,
-      outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40',
-      status: 'Published',
-      planned_publication_date_msecs: 100,
-      last_modified_msecs: 100,
-      first_publication_date_msecs: 200,
-      unpublishing_reason: null
-    };
-    const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
+  it(
+    'should throw error when validating node with ' +
+      'with invalid id in destination node id list',
+    () => {
+      const testBackendDict = {
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_1'],
+        destination_node_ids: ['1'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null,
+      };
+      const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
 
-    expect(() => testStoryNode.validate()).toThrowError(
-      'The destination node id 1 is invalid in node with id node_1');
-  });
+      expect(() => testStoryNode.validate()).toThrowError(
+        'The destination node id 1 is invalid in node with id node_1'
+      );
+    }
+  );
 
-  it('should raise issue when validating node with duplicated ' +
-      'destination node id', () => {
-    const testBackendDict = {
-      id: 'node_1',
-      thumbnail_filename: 'image.png',
-      title: 'Title 1',
-      description: 'Description 1',
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_2'],
-      destination_node_ids: ['node_2', 'node_2'],
-      outline: 'Outline',
-      exploration_id: null,
-      outline_is_finalized: false,
-      thumbnail_bg_color: '#a33f40',
-      status: 'Published',
-      planned_publication_date_msecs: 100,
-      last_modified_msecs: 100,
-      first_publication_date_msecs: 200,
-      unpublishing_reason: null
-    };
-    const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
-    const expectedErrorMessage = (
-      'The destination node with id node_2 is duplicated in' +
-          ' node with id node_1');
+  it(
+    'should raise issue when validating node with duplicated ' +
+      'destination node id',
+    () => {
+      const testBackendDict = {
+        id: 'node_1',
+        thumbnail_filename: 'image.png',
+        title: 'Title 1',
+        description: 'Description 1',
+        prerequisite_skill_ids: ['skill_1'],
+        acquired_skill_ids: ['skill_2'],
+        destination_node_ids: ['node_2', 'node_2'],
+        outline: 'Outline',
+        exploration_id: null,
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Published',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: 200,
+        unpublishing_reason: null,
+      };
+      const testStoryNode = StoryNode.createFromBackendDict(testBackendDict);
+      const expectedErrorMessage =
+        'The destination node with id node_2 is duplicated in' +
+        ' node with id node_1';
 
-    expect(testStoryNode.validate()).toContain(expectedErrorMessage);
-  });
+      expect(testStoryNode.validate()).toContain(expectedErrorMessage);
+    }
+  );
 
   it('should correctly perform prepublish validation for a story node', () => {
     expect(_sampleStoryNode.prepublishValidate()).toEqual([]);
     _sampleStoryNode.setThumbnailFilename('');
     expect(_sampleStoryNode.prepublishValidate()).toEqual([
-      'Chapter Title 1 should have a thumbnail.']);
+      'Chapter Title 1 should have a thumbnail.',
+    ]);
   });
 
   it('should correctly validate story nodes', () => {
@@ -235,72 +252,69 @@ describe('Story node model', () => {
 
     expect(_sampleStoryNode.validate()).toEqual([
       'The skill with id skill_1 is common to both the acquired and' +
-      ' prerequisite skill id list in node with id node_1',
-      'The destination node id of node with id node_1 points to itself.'
+        ' prerequisite skill id list in node with id node_1',
+      'The destination node id of node with id node_1 points to itself.',
     ]);
   });
 
-  it('should correctly throw error when duplicate values are added to arrays',
-    () => {
-      expect(() => {
-        _sampleStoryNode.addDestinationNodeId('node_2');
-      }).toThrowError('The given node is already a destination node.');
-      expect(() => {
-        _sampleStoryNode.addPrerequisiteSkillId('skill_1');
-      }).toThrowError('The given skill id is already a prerequisite skill.');
-      expect(() => {
-        _sampleStoryNode.addAcquiredSkillId('skill_2');
-      }).toThrowError('The given skill is already an acquired skill.');
-    });
+  it('should correctly throw error when duplicate values are added to arrays', () => {
+    expect(() => {
+      _sampleStoryNode.addDestinationNodeId('node_2');
+    }).toThrowError('The given node is already a destination node.');
+    expect(() => {
+      _sampleStoryNode.addPrerequisiteSkillId('skill_1');
+    }).toThrowError('The given skill id is already a prerequisite skill.');
+    expect(() => {
+      _sampleStoryNode.addAcquiredSkillId('skill_2');
+    }).toThrowError('The given skill is already an acquired skill.');
+  });
 
-  it('should correctly throw error when invalid values are deleted from arrays',
-    () => {
-      expect(() => {
-        _sampleStoryNode.removeDestinationNodeId('node_5');
-      }).toThrowError('The given node is not a destination node.');
-      expect(() => {
-        _sampleStoryNode.removePrerequisiteSkillId('skill_4');
-      }).toThrowError('The given skill id is not a prerequisite skill.');
-      expect(() => {
-        _sampleStoryNode.removeAcquiredSkillId('skill_4');
-      }).toThrowError('The given skill is not an acquired skill.');
-    });
+  it('should correctly throw error when invalid values are deleted from arrays', () => {
+    expect(() => {
+      _sampleStoryNode.removeDestinationNodeId('node_5');
+    }).toThrowError('The given node is not a destination node.');
+    expect(() => {
+      _sampleStoryNode.removePrerequisiteSkillId('skill_4');
+    }).toThrowError('The given skill id is not a prerequisite skill.');
+    expect(() => {
+      _sampleStoryNode.removeAcquiredSkillId('skill_4');
+    }).toThrowError('The given skill is not an acquired skill.');
+  });
 
-  it('should be able to delete a particular destination node id properly',
-    () => {
-      expect(
-        _sampleStoryNode.getDestinationNodeIds().indexOf('node_2')
-      ).toEqual(0);
+  it('should be able to delete a particular destination node id properly', () => {
+    expect(_sampleStoryNode.getDestinationNodeIds().indexOf('node_2')).toEqual(
+      0
+    );
 
-      _sampleStoryNode.removeDestinationNodeId('node_2');
+    _sampleStoryNode.removeDestinationNodeId('node_2');
 
-      expect(
-        _sampleStoryNode.getDestinationNodeIds().indexOf('node_2')
-      ).toEqual(-1);
-    });
+    expect(_sampleStoryNode.getDestinationNodeIds().indexOf('node_2')).toEqual(
+      -1
+    );
+  });
 
   it('should be able to add acquired skill id', () => {
-    expect(
-      _sampleStoryNode.getAcquiredSkillIds().indexOf('skill_3')
-    ).toEqual(-1);
+    expect(_sampleStoryNode.getAcquiredSkillIds().indexOf('skill_3')).toEqual(
+      -1
+    );
 
     _sampleStoryNode.addAcquiredSkillId('skill_3');
 
-    expect(
-      _sampleStoryNode.getAcquiredSkillIds().indexOf('skill_3')
-    ).toEqual(1);
+    expect(_sampleStoryNode.getAcquiredSkillIds().indexOf('skill_3')).toEqual(
+      1
+    );
   });
 
   it('should be able to remove an acquired skill id', () => {
-    expect(
-      _sampleStoryNode.getAcquiredSkillIds().indexOf('skill_2')
-    ).toEqual(0);
+    expect(_sampleStoryNode.getAcquiredSkillIds().indexOf('skill_2')).toEqual(
+      0
+    );
 
     _sampleStoryNode.removeAcquiredSkillId('skill_2');
 
-    expect(
-      _sampleStoryNode.getAcquiredSkillIds().indexOf('skill_3')
-    ).toEqual(-1);
+    expect(_sampleStoryNode.getAcquiredSkillIds().indexOf('skill_3')).toEqual(
+      -1
+    );
   });
 
   it('should be able to remove a prerequisite skill id', () => {

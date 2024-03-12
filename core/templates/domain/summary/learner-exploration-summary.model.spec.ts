@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for ExplorationSummaryModel.
  */
 
-import { LearnerExplorationSummary } from
-  'domain/summary/learner-exploration-summary.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Exploration summary model', () => {
   it('should correctly convert backend dict to exp summary object', () => {
@@ -37,17 +36,17 @@ describe('Exploration summary model', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
 
-    let expSummaryObject = LearnerExplorationSummary.createFromBackendDict(
-      backendDict);
+    let expSummaryObject =
+      LearnerExplorationSummary.createFromBackendDict(backendDict);
 
     expect(expSummaryObject.lastUpdatedMsec).toEqual(1591296737470.528);
     expect(expSummaryObject.communityOwned).toEqual(false);
@@ -64,7 +63,7 @@ describe('Exploration summary model', () => {
       2: 0,
       3: 0,
       4: 0,
-      5: 0
+      5: 0,
     });
     expect(expSummaryObject.status).toEqual('public');
     expect(expSummaryObject.tags).toEqual([]);

@@ -16,17 +16,17 @@
  * @fileoverview Service to handle navigation in story editor page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, EventEmitter } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable, EventEmitter} from '@angular/core';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 const STORY_EDITOR = 'story_editor';
 const CHAPTER_EDITOR = 'chapter_editor';
 const STORY_PREVIEW = 'story_preview';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StoryEditorNavigationService {
   activeTab: string = 'story_editor';
@@ -34,8 +34,8 @@ export class StoryEditorNavigationService {
   // 'chapterIndex' is null when we are navigating to a chapter with its ID.
   chapterIndex: number | null = null;
 
-  private _activeTabIsSwitchedEventEmitter: EventEmitter<string> = (
-    new EventEmitter<string>());
+  private _activeTabIsSwitchedEventEmitter: EventEmitter<string> =
+    new EventEmitter<string>();
 
   constructor(private windowRef: WindowRef) {}
 
@@ -75,7 +75,8 @@ export class StoryEditorNavigationService {
   checkIfPresentInStoryPreviewTab(): boolean {
     return (
       this.windowRef.nativeWindow.location.hash.split('/')[1] ===
-        'story_preview');
+      'story_preview'
+    );
   }
 
   navigateToChapterEditor(): void {
@@ -98,6 +99,9 @@ export class StoryEditorNavigationService {
   }
 }
 
-angular.module('oppia').factory(
-  'StoryEditorNavigationService',
-  downgradeInjectable(StoryEditorNavigationService));
+angular
+  .module('oppia')
+  .factory(
+    'StoryEditorNavigationService',
+    downgradeInjectable(StoryEditorNavigationService)
+  );

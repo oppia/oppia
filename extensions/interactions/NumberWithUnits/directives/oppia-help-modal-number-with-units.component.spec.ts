@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Number With Units Help Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { HelpModalNumberWithUnitsComponent } from './oppia-help-modal-number-with-units.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {HelpModalNumberWithUnitsComponent} from './oppia-help-modal-number-with-units.component';
 
 describe('Number With Units Help Modal Component', () => {
   let fixture: ComponentFixture<HelpModalNumberWithUnitsComponent>;
@@ -26,12 +26,8 @@ describe('Number With Units Help Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        HelpModalNumberWithUnitsComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [HelpModalNumberWithUnitsComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

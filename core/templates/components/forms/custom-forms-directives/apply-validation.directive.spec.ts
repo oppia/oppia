@@ -16,16 +16,16 @@
  * @fileoverview Tests for Directive for applying validation.
  */
 
-import { Component } from '@angular/core';
-import { By } from '@angular/platform-browser';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormControl } from '@angular/forms';
-import { ApplyValidationDirective } from './apply-validation.directive';
-import { Validator } from 'interactions/TextInput/directives/text-input-validation.service';
+import {Component} from '@angular/core';
+import {By} from '@angular/platform-browser';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormControl} from '@angular/forms';
+import {ApplyValidationDirective} from './apply-validation.directive';
+import {Validator} from 'interactions/TextInput/directives/text-input-validation.service';
 
 @Component({
   selector: 'mock-comp-a',
-  template: '<div applyValidation></div>'
+  template: '<div applyValidation></div>',
 })
 class MockCompA {}
 
@@ -35,14 +35,15 @@ describe('Apply validation directive', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MockCompA, ApplyValidationDirective]
+      declarations: [MockCompA, ApplyValidationDirective],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MockCompA);
     fixture.detectChanges();
 
     const directiveEl = fixture.debugElement.query(
-      By.directive(ApplyValidationDirective));
+      By.directive(ApplyValidationDirective)
+    );
     expect(directiveEl).not.toBeNull();
     directiveInstance = directiveEl.injector.get(ApplyValidationDirective);
   }));
@@ -54,18 +55,20 @@ describe('Apply validation directive', () => {
   });
 
   it('should validate value', () => {
-    directiveInstance.validators = [{
-      id: 'isAtLeast',
-      minValue: -2.5
-    }] as unknown as Validator[];
+    directiveInstance.validators = [
+      {
+        id: 'isAtLeast',
+        minValue: -2.5,
+      },
+    ] as unknown as Validator[];
 
     expect(directiveInstance.validate(new FormControl(2))).toBeNull();
 
     expect(directiveInstance.validate(new FormControl(null))).toEqual({
       isAtLeast: {
         minValue: -2.5,
-        actual: null
-      }
+        actual: null,
+      },
     });
   });
 });

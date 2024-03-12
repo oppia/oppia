@@ -16,19 +16,35 @@
  * @fileoverview Unit tests for QuestionSuggestionReviewModalcomponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NgbActiveModal, NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { FetchSkillResponse, SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { QuestionSuggestionReviewModalComponent } from './question-suggestion-review-modal.component';
-import { ThreadDataBackendApiService, ThreadMessages } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {
+  NgbActiveModal,
+  NgbModal,
+  NgbModalRef,
+} from '@ng-bootstrap/ng-bootstrap';
+import {
+  FetchSkillResponse,
+  SkillBackendApiService,
+} from 'domain/skill/skill-backend-api.service';
+import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SuggestionModalService} from 'services/suggestion-modal.service';
+import {QuestionSuggestionReviewModalComponent} from './question-suggestion-review-modal.component';
+import {
+  ThreadDataBackendApiService,
+  ThreadMessages,
+} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {Question} from 'domain/question/QuestionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
 import cloneDeep from 'lodash/cloneDeep';
 
 class MockActiveModal {
@@ -44,7 +60,7 @@ class MockActiveModal {
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -77,10 +93,12 @@ describe('Question Suggestion Review Modal component', () => {
         topic_name: null,
         question_count: 1,
         skill_description: questionHeader,
-        skill_rubrics: [{
-          explanations: ['explanation'],
-          difficulty: 'Easy'
-        }]
+        skill_rubrics: [
+          {
+            explanations: ['explanation'],
+            difficulty: 'Easy',
+          },
+        ],
       },
       suggestion: {
         suggestion_type: null,
@@ -112,72 +130,76 @@ describe('Question Suggestion Review Modal component', () => {
             question_state_data: {
               content: {
                 html: contentHtml,
-                content_id: 'content_1'
+                content_id: 'content_1',
               },
               interaction: {
-                answer_groups: [{
-                  outcome: {
-                    dest: 'outcome 1',
-                    dest_if_really_stuck: null,
-                    feedback: {
-                      content_id: 'content_5',
-                      html: ''
+                answer_groups: [
+                  {
+                    outcome: {
+                      dest: 'outcome 1',
+                      dest_if_really_stuck: null,
+                      feedback: {
+                        content_id: 'content_5',
+                        html: '',
+                      },
+                      labelled_as_correct: true,
+                      param_changes: [],
+                      refresher_exploration_id: null,
                     },
-                    labelled_as_correct: true,
-                    param_changes: [],
-                    refresher_exploration_id: null
+                    rule_specs: [],
                   },
-                  rule_specs: [],
-                }],
+                ],
                 confirmed_unclassified_answers: [],
                 customization_args: {
                   placeholder: {
                     value: {
                       content_id: 'ca_placeholder_0',
-                      unicode_str: ''
-                    }
+                      unicode_str: '',
+                    },
                   },
-                  rows: { value: 1 },
+                  rows: {value: 1},
                   catchMisspellings: {
-                    value: false
-                  }
+                    value: false,
+                  },
                 },
                 default_outcome: {
                   dest: null,
                   dest_if_really_stuck: null,
                   feedback: {
                     html: 'Correct Answer',
-                    content_id: 'content_2'
+                    content_id: 'content_2',
                   },
                   param_changes: [],
-                  labelled_as_correct: true
+                  labelled_as_correct: true,
                 },
-                hints: [{
-                  hint_content: {
-                    html: 'Hint 1',
-                    content_id: 'content_3'
-                  }
-                }],
+                hints: [
+                  {
+                    hint_content: {
+                      html: 'Hint 1',
+                      content_id: 'content_3',
+                    },
+                  },
+                ],
                 solution: {
                   correct_answer: 'This is the correct answer',
                   answer_is_exclusive: false,
                   explanation: {
                     html: 'Solution explanation',
-                    content_id: 'content_4'
-                  }
+                    content_id: 'content_4',
+                  },
                 },
-                id: 'TextInput'
+                id: 'TextInput',
               },
               param_changes: [],
               recorded_voiceovers: {
-                voiceovers_mapping: {}
-              }
+                voiceovers_mapping: {},
+              },
             },
           },
           skill_difficulty: skillDifficulty,
-          skill_id: 'skill_1'
-        }
-      }
+          skill_id: 'skill_1',
+        },
+      },
     },
     2: {
       details: {
@@ -187,10 +209,12 @@ describe('Question Suggestion Review Modal component', () => {
         story_title: null,
         question_count: 1,
         skill_description: questionHeader,
-        skill_rubrics: [{
-          explanations: ['explanation'],
-          difficulty: 'Easy'
-        }]
+        skill_rubrics: [
+          {
+            explanations: ['explanation'],
+            difficulty: 'Easy',
+          },
+        ],
       },
       suggestion: {
         suggestion_id: null,
@@ -222,97 +246,98 @@ describe('Question Suggestion Review Modal component', () => {
             question_state_data: {
               content: {
                 html: 'Question 1',
-                content_id: 'content_1'
+                content_id: 'content_1',
               },
               interaction: {
-                answer_groups: [{
-                  outcome: {
-                    dest: 'outcome 1',
-                    dest_if_really_stuck: null,
-                    feedback: {
-                      content_id: 'content_5',
-                      html: ''
+                answer_groups: [
+                  {
+                    outcome: {
+                      dest: 'outcome 1',
+                      dest_if_really_stuck: null,
+                      feedback: {
+                        content_id: 'content_5',
+                        html: '',
+                      },
+                      labelled_as_correct: true,
+                      param_changes: [],
+                      refresher_exploration_id: null,
                     },
-                    labelled_as_correct: true,
-                    param_changes: [],
-                    refresher_exploration_id: null
+                    rule_specs: [],
                   },
-                  rule_specs: [],
-                }],
+                ],
                 confirmed_unclassified_answers: [],
                 customization_args: {
                   placeholder: {
                     value: {
                       content_id: 'ca_placeholder_0',
-                      unicode_str: ''
-                    }
+                      unicode_str: '',
+                    },
                   },
-                  rows: { value: 1 },
+                  rows: {value: 1},
                   catchMisspellings: {
-                    value: false
-                  }
+                    value: false,
+                  },
                 },
                 default_outcome: {
                   dest: null,
                   dest_if_really_stuck: null,
                   feedback: {
                     html: 'Correct Answer',
-                    content_id: 'content_2'
+                    content_id: 'content_2',
                   },
                   param_changes: [],
-                  labelled_as_correct: true
+                  labelled_as_correct: true,
                 },
-                hints: [{
-                  hint_content: {
-                    html: 'Hint 1',
-                    content_id: 'content_3'
-                  }
-                }],
+                hints: [
+                  {
+                    hint_content: {
+                      html: 'Hint 1',
+                      content_id: 'content_3',
+                    },
+                  },
+                ],
                 solution: {
                   correct_answer: 'component is the correct answer',
                   answer_is_exclusive: false,
                   explanation: {
                     html: 'Solution explanation',
-                    content_id: 'content_4'
-                  }
+                    content_id: 'content_4',
+                  },
                 },
-                id: 'TextInput'
+                id: 'TextInput',
               },
               param_changes: [],
               recorded_voiceovers: {
-                voiceovers_mapping: {}
-              }
+                voiceovers_mapping: {},
+              },
             },
           },
           skill_difficulty: skillDifficulty,
-          skill_id: 'skill_1'
-        }
-      }
+          skill_id: 'skill_1',
+        },
+      },
     },
   };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        QuestionSuggestionReviewModalComponent
-      ],
+      declarations: [QuestionSuggestionReviewModalComponent],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         ThreadDataBackendApiService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
-        ContextService
+        ContextService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
-
 
   beforeEach(() => {
     fixture = TestBed.createComponent(QuestionSuggestionReviewModalComponent);
@@ -334,30 +359,33 @@ describe('Question Suggestion Review Modal component', () => {
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    threadDataBackendApiService = TestBed.inject(
-      ThreadDataBackendApiService);
-    contextService = TestBed.inject(
-      ContextService);
+    threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
+    contextService = TestBed.inject(ContextService);
     spyOn(
       siteAnalyticsService,
-      'registerContributorDashboardViewSuggestionForReview');
+      'registerContributorDashboardViewSuggestionForReview'
+    );
 
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
         skill: skillObjectFactory.createFromBackendDict({
           id: 'skill1',
           description: 'test description 1',
-          misconceptions: [{
-            id: 2,
-            name: 'test name',
-            notes: 'test notes',
-            feedback: 'test feedback',
-            must_be_addressed: true
-          }],
-          rubrics: [{
-            difficulty: 'Easy',
-            explanations: ['explanation']
-          }],
+          misconceptions: [
+            {
+              id: 2,
+              name: 'test name',
+              notes: 'test notes',
+              feedback: 'test feedback',
+              must_be_addressed: true,
+            },
+          ],
+          rubrics: [
+            {
+              difficulty: 'Easy',
+              explanations: ['explanation'],
+            },
+          ],
           skill_contents: {
             explanation: {
               html: 'test explanation',
@@ -365,61 +393,66 @@ describe('Question Suggestion Review Modal component', () => {
             },
             worked_examples: [],
             recorded_voiceovers: {
-              voiceovers_mapping: {}
-            }
+              voiceovers_mapping: {},
+            },
           },
           language_code: 'en',
           version: 3,
           prerequisite_skill_ids: ['skill_1'],
           all_questions_merged: false,
           next_misconception_id: 0,
-          superseding_skill_id: ''
-        })
-      } as FetchSkillResponse));
+          superseding_skill_id: '',
+        }),
+      } as FetchSkillResponse)
+    );
 
-    component.skillRubrics = [{
-      explanations: ['explanation'],
-      difficulty: 'Easy'
-    }];
+    component.skillRubrics = [
+      {
+        explanations: ['explanation'],
+        difficulty: 'Easy',
+      },
+    ];
 
     component.ngOnInit();
   });
 
-
   describe('when skill rubrics is specified', () => {
-    it('should open edit question modal when clicking on' +
-      ' edit button', fakeAsync(() => {
-      class MockNgbModalRef {
-        componentInstance = {
-          suggestionId: suggestionId,
-          question: question,
-          questionId: '',
-          questionStateData: question.getStateData(),
-          skill: null,
-          skillDifficulty: 0.3
-        };
-      }
+    it(
+      'should open edit question modal when clicking on' + ' edit button',
+      fakeAsync(() => {
+        class MockNgbModalRef {
+          componentInstance = {
+            suggestionId: suggestionId,
+            question: question,
+            questionId: '',
+            questionStateData: question.getStateData(),
+            skill: null,
+            skillDifficulty: 0.3,
+          };
+        }
 
-      const questionDict = cloneDeep(
-        component.suggestionIdToContribution[suggestionId]
-          .suggestion.change_cmd.question_dict
-      );
+        const questionDict = cloneDeep(
+          component.suggestionIdToContribution[suggestionId].suggestion
+            .change_cmd.question_dict
+        );
 
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-            { componentInstance: MockNgbModalRef,
-              result: Promise.resolve(
-                {questionDict: questionDict, skillDifficulty: 0.3}
-              )
-            }) as NgbModalRef;
-      });
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve({
+              questionDict: questionDict,
+              skillDifficulty: 0.3,
+            }),
+          } as NgbModalRef;
+        });
 
-      component.suggestion.change_cmd.skill_id = 'skill_1';
-      component.edit();
-      tick();
+        component.suggestion.change_cmd.skill_id = 'skill_1';
+        component.edit();
+        tick();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-    }));
+        expect(ngbModal.open).toHaveBeenCalled();
+      })
+    );
 
     it('should throw error edit if skill id is null', fakeAsync(() => {
       class MockNgbModalRef {
@@ -429,15 +462,15 @@ describe('Question Suggestion Review Modal component', () => {
           questionId: '',
           questionStateData: question.getStateData(),
           skill: null,
-          skillDifficulty: 0.3
+          skillDifficulty: 0.3,
         };
       }
 
       spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-            { componentInstance: MockNgbModalRef,
-              result: Promise.resolve()
-            }) as NgbModalRef;
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
       });
 
       component.suggestion.change_cmd.skill_id = undefined;
@@ -447,189 +480,210 @@ describe('Question Suggestion Review Modal component', () => {
       }).toThrowError();
     }));
 
-    it('should open edit question modal when clicking on' +
-      ' edit button', fakeAsync(() => {
-      spyOn(contextService, 'resetImageSaveDestination').and.stub();
-      class MockNgbModalRef {
-        componentInstance = {
-          suggestionId: suggestionId,
-          question: question,
-          questionId: '',
-          questionStateData: question.getStateData(),
-          skill: null,
-          skillDifficulty: 0.3
-        };
-      }
+    it(
+      'should open edit question modal when clicking on' + ' edit button',
+      fakeAsync(() => {
+        spyOn(contextService, 'resetImageSaveDestination').and.stub();
+        class MockNgbModalRef {
+          componentInstance = {
+            suggestionId: suggestionId,
+            question: question,
+            questionId: '',
+            questionStateData: question.getStateData(),
+            skill: null,
+            skillDifficulty: 0.3,
+          };
+        }
 
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-            { componentInstance: MockNgbModalRef,
-              result: Promise.reject()
-            }) as NgbModalRef;
-      });
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.reject(),
+          } as NgbModalRef;
+        });
 
-      component.suggestion.change_cmd.skill_id = 'skill_1';
-      component.edit();
-      tick();
+        component.suggestion.change_cmd.skill_id = 'skill_1';
+        component.edit();
+        tick();
 
-      expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
-      expect(ngbModal.open).toHaveBeenCalled();
-    }));
+        expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
+        expect(ngbModal.open).toHaveBeenCalled();
+      })
+    );
 
-    it('should update review question modal when edit question modal is' +
-      ' resolved', fakeAsync(() => {
-      class MockNgbModalRef {
-        componentInstance = {
-          suggestionId: suggestionId,
-          question: question,
-          questionId: '',
-          questionStateData: question.getStateData(),
-          skill: null,
-          skillDifficulty: 0.3
-        };
-      }
+    it(
+      'should update review question modal when edit question modal is' +
+        ' resolved',
+      fakeAsync(() => {
+        class MockNgbModalRef {
+          componentInstance = {
+            suggestionId: suggestionId,
+            question: question,
+            questionId: '',
+            questionStateData: question.getStateData(),
+            skill: null,
+            skillDifficulty: 0.3,
+          };
+        }
 
-      const newContentHtml = 'new html';
-      const newSkillDifficulty = 1;
+        const newContentHtml = 'new html';
+        const newSkillDifficulty = 1;
 
-      const suggestionChange = (
-        component.suggestionIdToContribution[suggestionId].suggestion.
-          change_cmd);
-      const newQuestionDict = cloneDeep(suggestionChange.question_dict);
-      newQuestionDict.question_state_data.content.html = newContentHtml;
+        const suggestionChange =
+          component.suggestionIdToContribution[suggestionId].suggestion
+            .change_cmd;
+        const newQuestionDict = cloneDeep(suggestionChange.question_dict);
+        newQuestionDict.question_state_data.content.html = newContentHtml;
 
-      expect(
-        component.question.getStateData().content.html
-      ).toEqual(contentHtml);
-      expect(
-        suggestionChange.question_dict.question_state_data.content.html
-      ).toEqual(contentHtml);
-      expect(component.skillDifficulty).toBe(skillDifficulty);
-      expect(suggestionChange.skill_difficulty).toEqual(skillDifficulty);
+        expect(component.question.getStateData().content.html).toEqual(
+          contentHtml
+        );
+        expect(
+          suggestionChange.question_dict.question_state_data.content.html
+        ).toEqual(contentHtml);
+        expect(component.skillDifficulty).toBe(skillDifficulty);
+        expect(suggestionChange.skill_difficulty).toEqual(skillDifficulty);
 
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-            { componentInstance: MockNgbModalRef,
-              result: Promise.resolve({
-                questionDict: newQuestionDict,
-                skillDifficulty: newSkillDifficulty
-              })
-            }) as NgbModalRef;
-      });
+        spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return {
+            componentInstance: MockNgbModalRef,
+            result: Promise.resolve({
+              questionDict: newQuestionDict,
+              skillDifficulty: newSkillDifficulty,
+            }),
+          } as NgbModalRef;
+        });
 
-      component.suggestion.change_cmd.skill_id = 'skill_1';
-      component.edit();
-      tick();
+        component.suggestion.change_cmd.skill_id = 'skill_1';
+        component.edit();
+        tick();
 
-      expect(ngbModal.open).toHaveBeenCalled();
-      expect(
-        component.question.getStateData().content.html
-      ).toEqual(newContentHtml);
-      expect(
-        suggestionChange.question_dict.question_state_data.content.html
-      ).toEqual(newContentHtml);
-      expect(component.skillDifficulty).toBe(newSkillDifficulty);
-      expect(suggestionChange.skill_difficulty).toEqual(newSkillDifficulty);
+        expect(ngbModal.open).toHaveBeenCalled();
+        expect(component.question.getStateData().content.html).toEqual(
+          newContentHtml
+        );
+        expect(
+          suggestionChange.question_dict.question_state_data.content.html
+        ).toEqual(newContentHtml);
+        expect(component.skillDifficulty).toBe(newSkillDifficulty);
+        expect(suggestionChange.skill_difficulty).toEqual(newSkillDifficulty);
 
-      suggestionChange.question_dict.question_state_data.content.html = (
-        contentHtml);
-      suggestionChange.skill_difficulty = skillDifficulty;
-    }));
+        suggestionChange.question_dict.question_state_data.content.html =
+          contentHtml;
+        suggestionChange.skill_difficulty = skillDifficulty;
+      })
+    );
 
-    it('should initialize properties after component is initialized',
-      () => {
-        expect(component.authorName).toBe(authorName);
-        expect(component.contentHtml).toBe(contentHtml);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-        expect(component.questionHeader).toBe(questionHeader);
-        expect(component.canEditQuestion).toBe(false);
-        expect(component.skillDifficultyLabel).toBe('Easy');
-        expect(component.skillRubricExplanations).toEqual(['explanation']);
-      });
-
-    it('should register Contributor Dashboard view suggestion for review' +
-      ' event after component is initialized', () => {
-      expect(
-        siteAnalyticsService
-          .registerContributorDashboardViewSuggestionForReview)
-        .toHaveBeenCalledWith('Question');
+    it('should initialize properties after component is initialized', () => {
+      expect(component.authorName).toBe(authorName);
+      expect(component.contentHtml).toBe(contentHtml);
+      expect(component.reviewable).toBe(reviewable);
+      expect(component.reviewMessage).toBe('');
+      expect(component.questionHeader).toBe(questionHeader);
+      expect(component.canEditQuestion).toBe(false);
+      expect(component.skillDifficultyLabel).toBe('Easy');
+      expect(component.skillRubricExplanations).toEqual(['explanation']);
     });
 
-    it('should reset validation error message when user updates question',
+    it(
+      'should register Contributor Dashboard view suggestion for review' +
+        ' event after component is initialized',
       () => {
-        component.validationError = 'component is an error message';
-        component.questionChanged();
-        expect(component.validationError).toBeNull();
-      });
+        expect(
+          siteAnalyticsService.registerContributorDashboardViewSuggestionForReview
+        ).toHaveBeenCalledWith('Question');
+      }
+    );
 
-    it('should accept suggestion in suggestion modal when clicking accept' +
-      ' suggestion', fakeAsync(() => {
-      spyOn(
-        siteAnalyticsService,
-        'registerContributorDashboardAcceptSuggestion');
-      component.reviewMessage = 'Review message example';
-
-      component.accept();
-      tick();
-
-      expect(
-        siteAnalyticsService.registerContributorDashboardAcceptSuggestion)
-        .toHaveBeenCalledWith('Question');
-    }));
-
-    it('should reject suggestion in suggestion modal when clicking reject' +
-    ' suggestion button', fakeAsync(() => {
-      spyOn(
-        siteAnalyticsService,
-        'registerContributorDashboardRejectSuggestion');
-      component.reviewMessage = 'Review message example';
-
-      component.reject();
-      tick();
-
-      expect(
-        siteAnalyticsService.registerContributorDashboardRejectSuggestion)
-        .toHaveBeenCalledWith('Question');
-    }));
-
-    it('should cancel suggestion in suggestion modal when clicking cancel' +
-    ' suggestion button', () => {
-      component.cancel();
-
-      expect(cancelSuggestionSpy).toHaveBeenCalled();
+    it('should reset validation error message when user updates question', () => {
+      component.validationError = 'component is an error message';
+      component.questionChanged();
+      expect(component.validationError).toBeNull();
     });
+
+    it(
+      'should accept suggestion in suggestion modal when clicking accept' +
+        ' suggestion',
+      fakeAsync(() => {
+        spyOn(
+          siteAnalyticsService,
+          'registerContributorDashboardAcceptSuggestion'
+        );
+        component.reviewMessage = 'Review message example';
+
+        component.accept();
+        tick();
+
+        expect(
+          siteAnalyticsService.registerContributorDashboardAcceptSuggestion
+        ).toHaveBeenCalledWith('Question');
+      })
+    );
+
+    it(
+      'should reject suggestion in suggestion modal when clicking reject' +
+        ' suggestion button',
+      fakeAsync(() => {
+        spyOn(
+          siteAnalyticsService,
+          'registerContributorDashboardRejectSuggestion'
+        );
+        component.reviewMessage = 'Review message example';
+
+        component.reject();
+        tick();
+
+        expect(
+          siteAnalyticsService.registerContributorDashboardRejectSuggestion
+        ).toHaveBeenCalledWith('Question');
+      })
+    );
+
+    it(
+      'should cancel suggestion in suggestion modal when clicking cancel' +
+        ' suggestion button',
+      () => {
+        component.cancel();
+
+        expect(cancelSuggestionSpy).toHaveBeenCalled();
+      }
+    );
   });
 
-  it('should initialize properties after component is initialized',
-    () => {
-      component.skillRubrics = [];
+  it('should initialize properties after component is initialized', () => {
+    component.skillRubrics = [];
 
-      expect(component.getRubricExplanation('nothing')).toBe(
-        'This rubric has not yet been specified.');
-    });
+    expect(component.getRubricExplanation('nothing')).toBe(
+      'This rubric has not yet been specified.'
+    );
+  });
 
   it('should fetch the rejection message', fakeAsync(() => {
     component.currentSuggestionId = '2';
 
-    component.skillRubrics = [{
-      explanations: ['explanation'],
-      difficulty: 'Easy'
-    }];
+    component.skillRubrics = [
+      {
+        explanations: ['explanation'],
+        difficulty: 'Easy',
+      },
+    ];
 
     const messages = [
-      { text: 'Question submitted.', author_username: 'Contributor' },
-      { text: 'This is a rejection.', author_username: 'Reviewer' }
+      {text: 'Question submitted.', author_username: 'Contributor'},
+      {text: 'This is a rejection.', author_username: 'Reviewer'},
     ];
     component.reviewable = false;
     component.suggestionIsRejected = true;
 
     spyOn(component, '_getThreadMessagesAsync').and.callThrough();
     const fetchMessagesAsyncSpy = spyOn(
-      threadDataBackendApiService, 'fetchMessagesAsync')
-      .and.returnValue(Promise.resolve({
-        messages: messages
-      } as ThreadMessages));
+      threadDataBackendApiService,
+      'fetchMessagesAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        messages: messages,
+      } as ThreadMessages)
+    );
 
     component.refreshContributionState();
     tick(1000);
@@ -640,7 +694,7 @@ describe('Question Suggestion Review Modal component', () => {
     expect(component.reviewer).toBe('Reviewer');
   }));
 
-  it('should allow users to navigate between suggestions', fakeAsync(()=>{
+  it('should allow users to navigate between suggestions', fakeAsync(() => {
     spyOn(component, 'refreshActiveContributionState').and.callThrough();
 
     expect(component.currentSuggestionId).toEqual('1');
@@ -703,33 +757,32 @@ describe('Question Suggestion Review Modal component', () => {
     }).toThrowError();
   }));
 
-  it('should not navigate if the corresponding opportunity is deleted',
-    function() {
-      spyOn(component, 'cancel');
-      let details1 = component.allContributions['1'].details;
-      let details2 = component.allContributions['2'].details;
-      // This throws "Type 'null' is not assignable to type
-      // 'ActiveContributionDetailsDict'." We need to suppress this error
-      // because of the need to test validations. This error is thrown
-      // because the details are null.
-      // @ts-ignore
-      component.allContributions['2'].details = null;
+  it('should not navigate if the corresponding opportunity is deleted', function () {
+    spyOn(component, 'cancel');
+    let details1 = component.allContributions['1'].details;
+    let details2 = component.allContributions['2'].details;
+    // This throws "Type 'null' is not assignable to type
+    // 'ActiveContributionDetailsDict'." We need to suppress this error
+    // because of the need to test validations. This error is thrown
+    // because the details are null.
+    // @ts-ignore
+    component.allContributions['2'].details = null;
 
-      component.goToNextItem();
-      expect(component.cancel).toHaveBeenCalled();
-      component.allContributions['2'].details = details2;
-      component.goToNextItem();
-      // This throws "Type 'null' is not assignable to type
-      // 'ActiveContributionDetailsDict'." We need to suppress this error
-      // because of the need to test validations. This error is thrown
-      // because the details are null.
-      // @ts-ignore
-      component.allContributions['1'].details = null;
+    component.goToNextItem();
+    expect(component.cancel).toHaveBeenCalled();
+    component.allContributions['2'].details = details2;
+    component.goToNextItem();
+    // This throws "Type 'null' is not assignable to type
+    // 'ActiveContributionDetailsDict'." We need to suppress this error
+    // because of the need to test validations. This error is thrown
+    // because the details are null.
+    // @ts-ignore
+    component.allContributions['1'].details = null;
 
-      component.goToPreviousItem();
-      expect(component.cancel).toHaveBeenCalledWith();
+    component.goToPreviousItem();
+    expect(component.cancel).toHaveBeenCalledWith();
 
-      component.allContributions['1'].details = details1;
-      component.allContributions['2'].details = details2;
-    });
+    component.allContributions['1'].details = details1;
+    component.allContributions['2'].details = details2;
+  });
 });

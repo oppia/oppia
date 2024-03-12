@@ -20,24 +20,27 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { MultipleChoiceInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { AudioTranslationManagerService } from 'pages/exploration-player-page/services/audio-translation-manager.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { MultipleChoiceInputRulesService } from './multiple-choice-input-rules.service';
-import { MultipleChoiceInputOrderedChoicesService, ChoiceWithIndex } from './multiple-choice-input-ordered-choices-service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {AudioTranslationManagerService} from 'pages/exploration-player-page/services/audio-translation-manager.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {MultipleChoiceInputRulesService} from './multiple-choice-input-rules.service';
+import {
+  MultipleChoiceInputOrderedChoicesService,
+  ChoiceWithIndex,
+} from './multiple-choice-input-ordered-choices-service';
 
 import '../static/multiple_choice_input.css';
 
 @Component({
   selector: 'oppia-interactive-multiple-choice-input',
-  templateUrl: './multiple-choice-input-interaction.component.html'
+  templateUrl: './multiple-choice-input-interaction.component.html',
 })
 export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
@@ -51,21 +54,19 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService,
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private multipleChoiceInputRulesService: MultipleChoiceInputRulesService,
     private audioTranslationManagerService: AudioTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-    private multipleChoiceInputOrderedChoicesService:
-      MultipleChoiceInputOrderedChoicesService
-  ) { }
+    private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService
+  ) {}
 
   private getAttrs() {
     return {
       choicesWithValue: this.choicesWithValue,
-      showChoicesInShuffledOrderWithValue: (
-        this.showChoicesInShuffledOrderWithValue)
+      showChoicesInShuffledOrderWithValue:
+        this.showChoicesInShuffledOrderWithValue,
     };
   }
 
@@ -93,23 +94,21 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
       return this.multipleChoiceInputOrderedChoicesService.get();
     }
 
-    const {
-      showChoicesInShuffledOrder,
-      choices
-    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'MultipleChoiceInput',
-      this.getAttrs()
-    ) as MultipleChoiceInputCustomizationArgs;
+    const {showChoicesInShuffledOrder, choices} =
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        'MultipleChoiceInput',
+        this.getAttrs()
+      ) as MultipleChoiceInputCustomizationArgs;
 
-    const choicesWithIndex = choices.value.map(
-      (value, originalIndex) => ({originalIndex, choice: value})
-    );
+    const choicesWithIndex = choices.value.map((value, originalIndex) => ({
+      originalIndex,
+      choice: value,
+    }));
 
     if (showChoicesInShuffledOrder.value) {
       this.shuffleChoices(choicesWithIndex);
     } else {
-      choicesWithIndex.sort(
-        (c1, c2) => c1.originalIndex - c2.originalIndex);
+      choicesWithIndex.sort((c1, c2) => c1.originalIndex - c2.originalIndex);
     }
     this.multipleChoiceInputOrderedChoicesService.store(choicesWithIndex);
     return choicesWithIndex;
@@ -119,27 +118,34 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     this.choices = this.getOrderedChoices();
     // Setup voiceover.
     this.displayedCard = this.playerTranscriptService.getCard(
-      this.playerPositionService.getDisplayedCardIndex());
+      this.playerPositionService.getDisplayedCardIndex()
+    );
     if (this.displayedCard) {
       this.recordedVoiceovers = this.displayedCard.getRecordedVoiceovers();
 
       // Combine labels for voiceover.
       let combinedChoiceLabels = '';
       for (const choice of this.choices) {
-        combinedChoiceLabels += this.audioTranslationManagerService
-          .cleanUpHTMLforVoiceover(choice.choice.html);
+        combinedChoiceLabels +=
+          this.audioTranslationManagerService.cleanUpHTMLforVoiceover(
+            choice.choice.html
+          );
       }
       // Say the choices aloud if autoplay is enabled.
       this.audioTranslationManagerService.setSequentialAudioTranslations(
         this.recordedVoiceovers.getBindableVoiceovers(
-          this.choices[0].choice.contentId),
-        combinedChoiceLabels, this.COMPONENT_NAME_RULE_INPUT
+          this.choices[0].choice.contentId
+        ),
+        combinedChoiceLabels,
+        this.COMPONENT_NAME_RULE_INPUT
       );
     }
 
     this.answer = null;
     this.currentInteractionService.registerCurrentInteraction(
-      () => this.submitAnswer(), () => this.validate());
+      () => this.submitAnswer(),
+      () => this.validate()
+    );
   }
 
   selectAnswer(event: MouseEvent, answer: string): void {
@@ -149,9 +155,9 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     }
     this.errorMessageI18nKey = '';
     // Deselect previously selected option.
-    var selectedElement = (
-      document.querySelector(
-        'button.multiple-choice-option.selected'));
+    var selectedElement = document.querySelector(
+      'button.multiple-choice-option.selected'
+    );
     if (selectedElement) {
       selectedElement.classList.remove('selected');
     }
@@ -165,18 +171,20 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     if (this.answer === null) {
       if (this.currentInteractionService.showNoResponseError()) {
         this.errorMessageI18nKey =
-        'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE';
+          'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE';
       }
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.answer, this.multipleChoiceInputRulesService);
+      this.answer,
+      this.multipleChoiceInputRulesService
+    );
   }
 }
 
 angular.module('oppia').directive(
   'oppiaInteractiveMultipleChoiceInput',
   downgradeComponent({
-    component: InteractiveMultipleChoiceInputComponent
+    component: InteractiveMultipleChoiceInputComponent,
   })
 );

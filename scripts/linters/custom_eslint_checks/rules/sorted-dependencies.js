@@ -23,27 +23,26 @@ module.exports = {
   meta: {
     type: 'suggestion',
     docs: {
-      description: (
-        'Lint check to ensure that the dependencies are in sorted order'),
+      description:
+        'Lint check to ensure that the dependencies are in sorted order',
       category: 'Stylistic Issues',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      unsortedDependencies: (
+      unsortedDependencies:
         'Please ensure that the injected dependencies should be in the' +
         ' following manner: dollar imports, local imports and' +
-        ' constant imports, all in sorted-order.')
+        ' constant imports, all in sorted-order.',
     },
   },
 
-  create: function(context) {
-    var selector = (
-      'CallExpression[callee.property.name=/(controller|directive|factory)/]'
-    );
+  create: function (context) {
+    var selector =
+      'CallExpression[callee.property.name=/(controller|directive|factory)/]';
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         var args = node.arguments;
         // In angular JS, components function take 2 arguments and type of last
         // arguments is an ArrayExpression, if arguments doesn't follow this
@@ -58,7 +57,7 @@ module.exports = {
           localInjections = [],
           constantInjections = [];
 
-        dependenciesLiteralNodes.forEach(function(node) {
+        dependenciesLiteralNodes.forEach(function (node) {
           var literalNodeValue = node.value;
           dependenciesLiterals.push(literalNodeValue);
 
@@ -71,19 +70,22 @@ module.exports = {
           }
         });
 
-        var sortedLiterals = (
-          [...dollarInjections, ...localInjections, ...constantInjections]);
+        var sortedLiterals = [
+          ...dollarInjections,
+          ...localInjections,
+          ...constantInjections,
+        ];
 
         for (var i = 0; i < sortedLiterals.length; i++) {
           if (dependenciesLiterals[i] !== sortedLiterals[i]) {
             context.report({
               node: args[1],
-              messageId: 'unsortedDependencies'
+              messageId: 'unsortedDependencies',
             });
             return;
           }
         }
-      }
+      },
     };
-  }
+  },
 };

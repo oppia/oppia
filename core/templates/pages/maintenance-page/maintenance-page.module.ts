@@ -16,23 +16,24 @@
  * @fileoverview Module for the maintenance page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { APP_BASE_HREF } from '@angular/common';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
+import {APP_BASE_HREF} from '@angular/common';
+import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
+import {RouterModule} from '@angular/router';
 
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { MaintenancePageComponent } from
-  'pages/maintenance-page/maintenance-page.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {MaintenancePageComponent} from 'pages/maintenance-page/maintenance-page.component';
+import {RequestInterceptor} from 'services/request-interceptor.service';
+import {
+  platformFeatureInitFactory,
+  PlatformFeatureService,
+} from 'services/platform-feature.service';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ToastrModule} from 'ngx-toastr';
+import {MyHammerConfig, toastrConfig} from 'pages/oppia-root/app.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -44,36 +45,32 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
-  declarations: [
-    MaintenancePageComponent
-  ],
-  entryComponents: [
-    MaintenancePageComponent
-  ],
+  declarations: [MaintenancePageComponent],
+  entryComponents: [MaintenancePageComponent],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
+      multi: true,
     },
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
+      useClass: MyHammerConfig,
     },
     AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
-      useValue: '/'
-    }
+      useValue: '/',
+    },
   ],
-  bootstrap: [MaintenancePageComponent]
+  bootstrap: [MaintenancePageComponent],
 })
 export class MaintenancePageModule {}

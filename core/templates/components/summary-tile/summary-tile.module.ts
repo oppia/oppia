@@ -18,27 +18,16 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
-import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
-import { TopicSummaryTileComponent } from './topic-summary-tile.component';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {TranslateModule} from '@ngx-translate/core';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
+import {TopicSummaryTileComponent} from './topic-summary-tile.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    StringUtilityPipesModule,
-    TranslateModule,
-  ],
-  declarations: [
-    TopicSummaryTileComponent
-  ],
-  entryComponents: [
-    TopicSummaryTileComponent
-  ],
-  exports: [
-    TopicSummaryTileComponent
-  ],
+  imports: [CommonModule, StringUtilityPipesModule, TranslateModule],
+  declarations: [TopicSummaryTileComponent],
+  entryComponents: [TopicSummaryTileComponent],
+  exports: [TopicSummaryTileComponent],
 })
-
-export class SummaryTilesModule { }
+export class SummaryTilesModule {}

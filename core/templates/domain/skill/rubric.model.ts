@@ -36,7 +36,7 @@ export class Rubric {
   toBackendDict(): RubricBackendDict {
     return {
       difficulty: this._difficulty,
-      explanations: this._explanations
+      explanations: this._explanations,
     };
   }
 
@@ -55,7 +55,8 @@ export class Rubric {
   static createFromBackendDict(rubricBackendDict: RubricBackendDict): Rubric {
     return new Rubric(
       rubricBackendDict.difficulty,
-      rubricBackendDict.explanations);
+      rubricBackendDict.explanations
+    );
   }
 
   static create(difficulty: string, explanations: string[]): Rubric {

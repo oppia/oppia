@@ -16,16 +16,20 @@
  * @fileoverview Unit tests for the teach page.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from
-  '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
 
-import { PlaybookPageComponent } from './playbook.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {PlaybookPageComponent} from './playbook.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 // Mocking window object here because changing location.href causes the
 // full page to reload. Page reloads raise an error in karma.
@@ -35,7 +39,7 @@ class MockWindowRef {
       hash: '',
       hashChange: null,
       href: '',
-      reload: (val: string) => val
+      reload: (val: string) => val,
     },
     get onhashchange() {
       return this.location.hashChange;
@@ -44,7 +48,7 @@ class MockWindowRef {
     set onhashchange(val) {
       this.location.hashChange = val;
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -71,15 +75,15 @@ describe('Playbook Page', () => {
       providers: [
         {
           provide: SiteAnalyticsService,
-          useClass: MockSiteAnalyticsService
+          useClass: MockSiteAnalyticsService,
         },
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: windowRef
-        }
+          useValue: windowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   }));
@@ -92,13 +96,15 @@ describe('Playbook Page', () => {
 
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image');
+      '/assets/images/path/to/image'
+    );
   });
 
   it('should apply to teach with oppia', fakeAsync(() => {
     const applyToTeachWithOppiaEventSpy = spyOn(
-      siteAnalyticsService, 'registerApplyToTeachWithOppiaEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerApplyToTeachWithOppiaEvent'
+    ).and.callThrough();
 
     component.ngOnInit();
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
@@ -115,7 +121,8 @@ describe('Playbook Page', () => {
     tick(150);
     fixture.detectChanges();
     expect(windowRef.nativeWindow.location.href).toBe(
-      'https://goo.gl/forms/0p3Axuw5tLjTfiri1');
+      'https://goo.gl/forms/0p3Axuw5tLjTfiri1'
+    );
     expect(applyToTeachWithOppiaEventSpy).toHaveBeenCalled();
   }));
 });

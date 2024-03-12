@@ -19,14 +19,14 @@
 import {
   PlatformParameterFilter,
   PlatformParameterFilterBackendDict,
-  PlatformParameterFilterType
+  PlatformParameterFilterType,
 } from 'domain/platform-parameter/platform-parameter-filter.model';
 
 describe('PlatformParameterFilterModel', () => {
   it('should create an instance from a backend dict.', () => {
     const filter = PlatformParameterFilter.createFromBackendDict({
       type: PlatformParameterFilterType.PlatformType,
-      conditions: [['=', 'Web']]
+      conditions: [['=', 'Web']],
     });
 
     expect(filter.type).toEqual(PlatformParameterFilterType.PlatformType);
@@ -36,7 +36,7 @@ describe('PlatformParameterFilterModel', () => {
   it('should convert an instance back to a dict.', () => {
     const backendDict: PlatformParameterFilterBackendDict = {
       type: PlatformParameterFilterType.PlatformType,
-      conditions: [['=', 'Web']]
+      conditions: [['=', 'Web']],
     };
 
     const instance = PlatformParameterFilter.createFromBackendDict(backendDict);

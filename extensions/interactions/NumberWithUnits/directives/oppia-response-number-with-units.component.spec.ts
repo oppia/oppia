@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the NumberWithUnits response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseNumberWithUnitsComponent } from './oppia-response-number-with-units.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseNumberWithUnitsComponent} from './oppia-response-number-with-units.component';
 
 describe('ShortResponseRatioExpressionInput', () => {
   let component: ResponseNumberWithUnitsComponent;
@@ -37,36 +37,36 @@ describe('ShortResponseRatioExpressionInput', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: MockHtmlEscaperService
+          useClass: MockHtmlEscaperService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = (
-      TestBed.createComponent(ResponseNumberWithUnitsComponent));
+    fixture = TestBed.createComponent(ResponseNumberWithUnitsComponent);
     component = fixture.componentInstance;
   });
 
   it('should initialise component when user submits answer', () => {
-    component.answer = '{' +
+    component.answer =
+      '{' +
       '"type": "real", ' +
       '"real": 24, ' +
       '"fraction": {' +
-        '"isNegative": false, ' +
-        '"wholeNumber": 0, ' +
-        '"numerator": 0, ' +
-        '"denominator": 1' +
+      '"isNegative": false, ' +
+      '"wholeNumber": 0, ' +
+      '"numerator": 0, ' +
+      '"denominator": 1' +
       '}, ' +
       '"units": [' +
-        '{' +
-          '"unit": "km", ' +
-          '"exponent": 1' +
-        '}' +
+      '{' +
+      '"unit": "km", ' +
+      '"exponent": 1' +
+      '}' +
       ']' +
-    '}';
+      '}';
 
     component.ngOnInit();
 

@@ -16,25 +16,26 @@
  * @fileoverview Unit tests for the set of algebraic identifier component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { SetOfAlgebraicIdentifierEditorComponent } from './set-of-algebraic-identifier-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {SetOfAlgebraicIdentifierEditorComponent} from './set-of-algebraic-identifier-editor.component';
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-describe('SetOfAlgebraicIdentifier', function() {
+describe('SetOfAlgebraicIdentifier', function () {
   let component: SetOfAlgebraicIdentifierEditorComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [SetOfAlgebraicIdentifierEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
     component = TestBed.createComponent(
-      SetOfAlgebraicIdentifierEditorComponent).componentInstance;
+      SetOfAlgebraicIdentifierEditorComponent
+    ).componentInstance;
   }));
 
   it('should initialize the value with an empty array', () => {

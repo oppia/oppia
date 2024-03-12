@@ -16,13 +16,13 @@
  * @fileoverview Component for the exploration objective/goal field in forms.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
 
 @Component({
   selector: 'oppia-exploration-objective-editor',
-  templateUrl: './exploration-objective-editor.component.html'
+  templateUrl: './exploration-objective-editor.component.html',
 })
 export class ExplorationObjectiveEditorComponent {
   // These properties below are initialized using Angular lifecycle hooks
@@ -43,6 +43,8 @@ export class ExplorationObjectiveEditorComponent {
 }
 
 angular.module('oppia').directive(
-  'oppiaExplorationObjectiveEditor', downgradeComponent({
-    component: ExplorationObjectiveEditorComponent
-  }));
+  'oppiaExplorationObjectiveEditor',
+  downgradeComponent({
+    component: ExplorationObjectiveEditorComponent,
+  })
+);

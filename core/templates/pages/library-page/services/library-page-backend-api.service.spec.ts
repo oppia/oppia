@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for LibraryPageBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { LibraryPageBackendApiService } from './library-page-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {LibraryPageBackendApiService} from './library-page-backend-api.service';
 
 describe('Library page backend api service', () => {
   let lpbas: LibraryPageBackendApiService;
@@ -27,7 +29,7 @@ describe('Library page backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     lpbas = TestBed.inject(LibraryPageBackendApiService);
@@ -43,7 +45,7 @@ describe('Library page backend api service', () => {
     let failHandler = jasmine.createSpy('fail');
     const resp = {
       activity_summary_dicts_by_category: [],
-      preferred_language_codes: ['en', 'es']
+      preferred_language_codes: ['en', 'es'],
     };
 
     lpbas.fetchLibraryIndexDataAsync().then(successHandler, failHandler);
@@ -63,7 +65,7 @@ describe('Library page backend api service', () => {
     let failHandler = jasmine.createSpy('fail');
     const resp = {
       explorations_list: [],
-      collections_list: []
+      collections_list: [],
     };
 
     lpbas.fetchCreatorDashboardDataAsync().then(successHandler, failHandler);
@@ -84,13 +86,14 @@ describe('Library page backend api service', () => {
     const resp = {
       activity_list: [],
       header_i18n_id: 'I18N_TEST_ID',
-      preferred_language_codes: ['en', 'es']
+      preferred_language_codes: ['en', 'es'],
     };
 
     lpbas.fetchLibraryGroupDataAsync('g1').then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/librarygrouphandler?group_name=g1');
+      '/librarygrouphandler?group_name=g1'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(resp);
 

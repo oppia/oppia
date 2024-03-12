@@ -26,21 +26,23 @@ export const TopicLandingPageConstants = {
         topicTitle: 'Fractions',
         topicTagline: 'Add, Subtract, Multiply and Divide',
         collectionId: '4UgTQUc1tala',
-        chapters: ['The meaning of equal parts', 'Comparing fractions']
+        chapters: ['The meaning of equal parts', 'Comparing fractions'],
       },
       'negative-numbers': {
         topicTitle: 'Negative Numbers',
         topicTagline: 'Add, Subtract, Multiply and Divide',
         collectionId: 'GdYIgsfRZwG7',
         chapters: [
-          'The meaning of the number line', 'Calculating with negative numbers']
+          'The meaning of the number line',
+          'Calculating with negative numbers',
+        ],
       },
       ratios: {
         topicTitle: 'Ratios',
         topicTagline: 'Equivalent Ratios, Combining Ratios',
         collectionId: '53gXGLIR044l',
-        chapters: ['The meaning of equivalent ratios', 'Combining Ratios']
-      }
-    }
-  }
+        chapters: ['The meaning of equivalent ratios', 'Combining Ratios'],
+      },
+    },
+  },
 } as const;

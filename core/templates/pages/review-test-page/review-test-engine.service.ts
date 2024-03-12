@@ -16,11 +16,11 @@
  * @fileoverview Utility service for the review tests.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReviewTestEngineService {
   getReviewTestQuestionCount(numOfSkills: number): number {
@@ -37,5 +37,9 @@ export class ReviewTestEngineService {
   }
 }
 
-angular.module('oppia').factory(
-  'ReviewTestEngineService', downgradeInjectable(ReviewTestEngineService));
+angular
+  .module('oppia')
+  .factory(
+    'ReviewTestEngineService',
+    downgradeInjectable(ReviewTestEngineService)
+  );

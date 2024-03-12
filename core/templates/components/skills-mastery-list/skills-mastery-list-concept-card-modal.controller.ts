@@ -18,18 +18,22 @@
 
 require(
   'components/common-layout-directives/common-elements/' +
-  'confirm-or-cancel-modal.controller.ts');
+    'confirm-or-cancel-modal.controller.ts'
+);
 
 angular.module('oppia').controller('SkillsMasteryListConceptCardModal', [
-  '$controller', '$scope', '$uibModalInstance', 'skillDescription', 'skillId',
-  function(
-      $controller, $scope, $uibModalInstance, skillDescription, skillId) {
+  '$controller',
+  '$scope',
+  '$uibModalInstance',
+  'skillDescription',
+  'skillId',
+  function ($controller, $scope, $uibModalInstance, skillDescription, skillId) {
     $controller('ConfirmOrCancelModalController', {
       $scope: $scope,
-      $uibModalInstance: $uibModalInstance
+      $uibModalInstance: $uibModalInstance,
     });
     $scope.skillIds = [skillId];
     $scope.index = 0;
     $scope.modalHeader = skillDescription;
-  }
+  },
 ]);

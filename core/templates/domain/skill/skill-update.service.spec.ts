@@ -16,20 +16,26 @@
  * @fileoverview Unit tests for SkillUpdateService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCardBackendDict } from './concept-card.model';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { SkillContentsWorkedExamplesChange } from 'domain/editor/undo_redo/change.model';
-import { SkillBackendDict, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { WorkedExample, WorkedExampleBackendDict } from 'domain/skill/worked-example.model';
-import { LocalStorageService } from 'services/local-storage.service';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { EventEmitter } from '@angular/core';
+import {ConceptCardBackendDict} from './concept-card.model';
+import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {SkillContentsWorkedExamplesChange} from 'domain/editor/undo_redo/change.model';
+import {
+  SkillBackendDict,
+  SkillObjectFactory,
+} from 'domain/skill/SkillObjectFactory';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {
+  WorkedExample,
+  WorkedExampleBackendDict,
+} from 'domain/skill/worked-example.model';
+import {LocalStorageService} from 'services/local-storage.service';
+import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import {EventEmitter} from '@angular/core';
 
 describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService;
@@ -49,7 +55,7 @@ describe('Skill update service', () => {
         SkillUpdateService,
         UndoRedoService,
         MisconceptionObjectFactory,
-        SkillObjectFactory
+        SkillObjectFactory,
       ],
     });
 
@@ -179,10 +185,7 @@ describe('Skill update service', () => {
 
     undoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getExplanation()).toEqual(
-      SubtitledHtml.createDefault(
-        'test explanation',
-        'explanation'
-      )
+      SubtitledHtml.createDefault('test explanation', 'explanation')
     );
   });
 
@@ -244,8 +247,9 @@ describe('Skill update service', () => {
     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
 
     let mockPrerequisiteSkillChangeEventEmitter = new EventEmitter();
-    expect(skillUpdateService.onPrerequisiteSkillChange)
-      .toEqual(mockPrerequisiteSkillChangeEventEmitter);
+    expect(skillUpdateService.onPrerequisiteSkillChange).toEqual(
+      mockPrerequisiteSkillChangeEventEmitter
+    );
   });
 
   it('should delete a prerequisite skill', () => {
@@ -298,10 +302,8 @@ describe('Skill update service', () => {
     expect(() => {
       skillUpdateService.updateRubricForDifficulty(
         skill,
-        nonExistentSkillDifficulty, [
-          'new explanation 1',
-          'new explanation 2',
-        ]
+        nonExistentSkillDifficulty,
+        ['new explanation 1', 'new explanation 2']
       );
     }).toThrowError('Invalid difficulty value passed');
   });
@@ -460,9 +462,9 @@ describe('Skill update service', () => {
       new_value: [skillContentsDict.worked_examples[1]],
     };
 
-    expect(undoRedoService.getCommittableChangeList()).toEqual(
-      [workedExamplesObject]
-    );
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      workedExamplesObject,
+    ]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       WorkedExample.createFromBackendDict(example2),
     ]);
@@ -502,9 +504,9 @@ describe('Skill update service', () => {
       new_value: [modifiedExample1, example2],
     };
 
-    expect(undoRedoService.getCommittableChangeList()).toEqual(
-      [workedExamplesObject]
-    );
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      workedExamplesObject,
+    ]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       WorkedExample.createFromBackendDict(modifiedExample1),
       WorkedExample.createFromBackendDict(example2),
@@ -524,34 +526,27 @@ describe('Skill update service', () => {
       skill.getConceptCard().getWorkedExamples()
     );
     const newWorkedExamples = oldWorkedExamples.map((workedExample, index) => {
-      workedExample
-        .getQuestion()
-        .html = `new question ${index + 1}`;
-      workedExample
-        .getExplanation()
-        .html = `new explanation ${index + 1}`;
+      workedExample.getQuestion().html = `new question ${index + 1}`;
+      workedExample.getExplanation().html = `new explanation ${index + 1}`;
       return workedExample;
     });
 
-    skillUpdateService.updateWorkedExamples(
-      skill,
-      newWorkedExamples
-    );
+    skillUpdateService.updateWorkedExamples(skill, newWorkedExamples);
 
     const workedExamplesObject: SkillContentsWorkedExamplesChange = {
       cmd: 'update_skill_contents_property',
       property_name: 'worked_examples',
       old_value: skillContentsDict.worked_examples,
-      new_value: newWorkedExamples.map((workedExample) => {
+      new_value: newWorkedExamples.map(workedExample => {
         return workedExample.toBackendDict();
       }),
     };
 
-    expect(undoRedoService.getCommittableChangeList()).toEqual(
-      [workedExamplesObject]
-    );
+    expect(undoRedoService.getCommittableChangeList()).toEqual([
+      workedExamplesObject,
+    ]);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual(
-      newWorkedExamples.map((workedExample) => {
+      newWorkedExamples.map(workedExample => {
         return WorkedExample.createFromBackendDict(
           workedExample.toBackendDict()
         );
@@ -568,12 +563,19 @@ describe('Skill update service', () => {
 
   it('should update skill editor browser tabs unsaved changes status', () => {
     let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'skill', 'skill_id', 2, 1, false);
+      'skill',
+      'skill_id',
+      2,
+      1,
+      false
+    );
     spyOn(
-      localStorageService, 'getEntityEditorBrowserTabsInfo'
+      localStorageService,
+      'getEntityEditorBrowserTabsInfo'
     ).and.returnValue(skillEditorBrowserTabsInfo);
     spyOn(
-      localStorageService, 'updateEntityEditorBrowserTabsInfo'
+      localStorageService,
+      'updateEntityEditorBrowserTabsInfo'
     ).and.callFake(() => {});
 
     expect(

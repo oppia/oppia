@@ -18,23 +18,24 @@
 
 // Rules Service for DragAndDropSortInput interaction.
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { DragAndDropAnswer } from 'interactions/answer-defs';
+import {DragAndDropAnswer} from 'interactions/answer-defs';
 import {
   DragAndDropCheckEqualityRuleInputs,
   DragAndDropHasElementXAtPositionYRuleInputs,
-  DragAndDropHasElementXBeforeElementYRuleInputs
+  DragAndDropHasElementXBeforeElementYRuleInputs,
 } from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DragAndDropSortInputRulesService {
   static checkEquality(
-      answer: DragAndDropAnswer,
-      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
+    answer: DragAndDropAnswer,
+    inputs: DragAndDropCheckEqualityRuleInputs
+  ): boolean {
     for (var i: number = 0; i < answer.length; i++) {
       if (answer[i].length === inputs.x[i].length) {
         for (var j: number = 0; j < answer[i].length; j++) {
@@ -50,13 +51,16 @@ export class DragAndDropSortInputRulesService {
   }
 
   static checkEqualityWithIncorrectPositions(
-      answer: DragAndDropAnswer,
-      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
+    answer: DragAndDropAnswer,
+    inputs: DragAndDropCheckEqualityRuleInputs
+  ): boolean {
     var noOfMismatches: number = 0;
     for (var i: number = 0; i < Math.min(inputs.x.length, answer.length); i++) {
       for (
-        var j: number = 0; j < Math.max(answer[i].length,
-          inputs.x[i].length); j++) {
+        var j: number = 0;
+        j < Math.max(answer[i].length, inputs.x[i].length);
+        j++
+      ) {
         if (inputs.x[i].length > answer[i].length) {
           if (answer[i].indexOf(inputs.x[i][j]) === -1) {
             noOfMismatches += 1;
@@ -72,35 +76,42 @@ export class DragAndDropSortInputRulesService {
   }
 
   IsEqualToOrdering(
-      answer: DragAndDropAnswer,
-      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
-    return answer.length === inputs.x.length && (
-      DragAndDropSortInputRulesService.checkEquality(
-        answer, inputs));
+    answer: DragAndDropAnswer,
+    inputs: DragAndDropCheckEqualityRuleInputs
+  ): boolean {
+    return (
+      answer.length === inputs.x.length &&
+      DragAndDropSortInputRulesService.checkEquality(answer, inputs)
+    );
   }
 
   IsEqualToOrderingWithOneItemAtIncorrectPosition(
-      answer: DragAndDropAnswer,
-      inputs: DragAndDropCheckEqualityRuleInputs): boolean {
+    answer: DragAndDropAnswer,
+    inputs: DragAndDropCheckEqualityRuleInputs
+  ): boolean {
     return DragAndDropSortInputRulesService.checkEqualityWithIncorrectPositions(
-      answer, inputs);
+      answer,
+      inputs
+    );
   }
 
   HasElementXAtPositionY(
-      answer: DragAndDropAnswer,
-      inputs: DragAndDropHasElementXAtPositionYRuleInputs): boolean {
+    answer: DragAndDropAnswer,
+    inputs: DragAndDropHasElementXAtPositionYRuleInputs
+  ): boolean {
     for (var i: number = 0; i < answer.length; i++) {
       var index = answer[i].indexOf(inputs.x);
       if (index !== -1) {
-        return ((i + 1) === inputs.y);
+        return i + 1 === inputs.y;
       }
     }
     return false;
   }
 
   HasElementXBeforeElementY(
-      answer: DragAndDropAnswer,
-      inputs: DragAndDropHasElementXBeforeElementYRuleInputs): boolean {
+    answer: DragAndDropAnswer,
+    inputs: DragAndDropHasElementXBeforeElementYRuleInputs
+  ): boolean {
     var indX = -1;
     var indY = -1;
     for (var i: number = 0; i < answer.length; i++) {
@@ -117,7 +128,9 @@ export class DragAndDropSortInputRulesService {
   }
 }
 
-
-angular.module('oppia').factory(
-  'DragAndDropSortInputRulesService',
-  downgradeInjectable(DragAndDropSortInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'DragAndDropSortInputRulesService',
+    downgradeInjectable(DragAndDropSortInputRulesService)
+  );

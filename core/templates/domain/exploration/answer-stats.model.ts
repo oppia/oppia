@@ -19,8 +19,7 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { InteractionAnswer } from
-  'interactions/answer-defs';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 export interface AnswerStatsBackendDict {
   answer: InteractionAnswer;
@@ -42,8 +41,11 @@ export class AnswerStats {
    *    associated state's answer groups.
    */
   constructor(
-      answer: InteractionAnswer, answerHtml: string, frequency: number,
-      isAddressed: boolean) {
+    answer: InteractionAnswer,
+    answerHtml: string,
+    frequency: number,
+    isAddressed: boolean
+  ) {
     /** @type {*} */
     this.answer = cloneDeep(answer);
     /** @type {string} */
@@ -78,7 +80,7 @@ export class AnswerStats {
   toBackendDict(): AnswerStatsBackendDict {
     return {
       answer: cloneDeep(this.answer),
-      frequency: this.frequency
+      frequency: this.frequency,
     };
   }
 
@@ -92,12 +94,19 @@ export class AnswerStats {
    * @returns {AnswerStats}
    */
   static createFromBackendDict(
-      backendDict: AnswerStatsBackendDict): AnswerStats {
-  // TODO(brianrodri): Use a proper service which takes the state's
-  // interaction type into account for generating the answer's HTML.
-    var answerHtml = (typeof backendDict.answer === 'string') ?
-    backendDict.answer : JSON.stringify(backendDict.answer);
+    backendDict: AnswerStatsBackendDict
+  ): AnswerStats {
+    // TODO(brianrodri): Use a proper service which takes the state's
+    // interaction type into account for generating the answer's HTML.
+    var answerHtml =
+      typeof backendDict.answer === 'string'
+        ? backendDict.answer
+        : JSON.stringify(backendDict.answer);
     return new AnswerStats(
-      backendDict.answer, answerHtml, backendDict.frequency, false);
+      backendDict.answer,
+      answerHtml,
+      backendDict.frequency,
+      false
+    );
   }
 }

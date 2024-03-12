@@ -19,23 +19,14 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { CkEditor4RteComponent } from './ck-editor-4-rte.component';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CkEditor4RteComponent} from './ck-editor-4-rte.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-  ],
-  declarations: [
-    CkEditor4RteComponent
-  ],
-  entryComponents: [
-    CkEditor4RteComponent
-  ],
-  exports: [
-    CkEditor4RteComponent
-  ],
+  imports: [CommonModule],
+  declarations: [CkEditor4RteComponent],
+  entryComponents: [CkEditor4RteComponent],
+  exports: [CkEditor4RteComponent],
 })
-
-export class OppiaCkEditor4Module { }
+export class OppiaCkEditor4Module {}

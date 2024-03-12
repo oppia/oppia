@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for blog post action confirmation component.
  */
 
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { BlogPostActionConfirmationModalComponent } from './blog-post-action-confirmation.component';
-import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {BlogPostActionConfirmationModalComponent} from './blog-post-action-confirmation.component';
+import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 class MockActiveModal {
   dismiss(): void {
@@ -35,27 +35,22 @@ class MockActiveModal {
 describe('Blog Post Action Confirmation Modal Component', () => {
   let component: BlogPostActionConfirmationModalComponent;
   let blogDashboardPageService: BlogDashboardPageService;
-  let fixture: ComponentFixture<
-  BlogPostActionConfirmationModalComponent>;
+  let fixture: ComponentFixture<BlogPostActionConfirmationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModalModule,
-      ],
+      imports: [HttpClientTestingModule, NgbModalModule],
       declarations: [BlogPostActionConfirmationModalComponent],
       providers: [
         BlogDashboardPageService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
+          useClass: MockActiveModal,
+        },
+      ],
     }).compileComponents();
-    fixture = TestBed.createComponent(
-      BlogPostActionConfirmationModalComponent);
+    fixture = TestBed.createComponent(BlogPostActionConfirmationModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);

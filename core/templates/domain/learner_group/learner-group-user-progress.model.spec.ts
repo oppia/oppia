@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { LearnerGroupUserProgress } from './learner-group-user-progress.model';
+import {LearnerGroupUserProgress} from './learner-group-user-progress.model';
 
 /**
  * @fileoverview Tests for learner group user progress model.
@@ -27,7 +27,7 @@ describe('Learner Group User Progress', () => {
       parent_topic_name: 'parentTopicName',
       thumbnail_filename: 'thumbnailFilename',
       thumbnail_bg_color: 'red',
-      subtopic_mastery: 0.5
+      subtopic_mastery: 0.5,
     };
 
     let nodeDict = {
@@ -46,7 +46,7 @@ describe('Learner Group User Progress', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
 
     const sampleStorySummaryBackendDict = {
@@ -62,20 +62,20 @@ describe('Learner Group User Progress', () => {
       all_node_dicts: [nodeDict],
       topic_name: 'Topic one',
       topic_url_fragment: 'topic-one',
-      classroom_url_fragment: 'math'
+      classroom_url_fragment: 'math',
     };
 
     let sampleLearnerGroupUserProgDict = {
       username: 'user1',
       progress_sharing_is_turned_on: true,
       stories_progress: [sampleStorySummaryBackendDict],
-      subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
+      subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict],
     };
 
-    let sampleLearnerGroupUserProg = (
+    let sampleLearnerGroupUserProg =
       LearnerGroupUserProgress.createFromBackendDict(
-        sampleLearnerGroupUserProgDict)
-    );
+        sampleLearnerGroupUserProgDict
+      );
 
     expect(sampleLearnerGroupUserProg.username).toEqual('user1');
     expect(sampleLearnerGroupUserProg.isProgressSharingTurnedOn).toEqual(true);

@@ -20,14 +20,14 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-response-algebraic-expression-input',
   templateUrl: './algebraic-expression-input-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseAlgebraicExpressionInputComponent implements OnInit {
   @Input() answer: string = '';
@@ -36,13 +36,16 @@ export class ResponseAlgebraicExpressionInputComponent implements OnInit {
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    this.escapedAnswer = (
-      this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
+    this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as string;
   }
 }
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive(
-  'oppiaResponseAlgebraicExpressionInput', downgradeComponent({
-    component: ResponseAlgebraicExpressionInputComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaResponseAlgebraicExpressionInput',
+  downgradeComponent({
+    component: ResponseAlgebraicExpressionInputComponent,
+  }) as angular.IDirectiveFactory
+);

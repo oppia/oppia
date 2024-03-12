@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for Moderator Page Root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-import { ModeratorPageRootComponent } from './moderator-page-root.component';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {ModeratorPageRootComponent} from './moderator-page-root.component';
 
 describe('AdminPageRootComponent', () => {
   let fixture: ComponentFixture<ModeratorPageRootComponent>;
@@ -43,8 +43,10 @@ describe('AdminPageRootComponent', () => {
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.TITLE
+    );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.META
+    );
   });
 });

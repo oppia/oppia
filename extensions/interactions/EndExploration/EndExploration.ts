@@ -17,17 +17,21 @@
  */
 
 require(
-  'interactions/EndExploration/directives/' +
-  'end-exploration-rules.service.ts');
+  'interactions/EndExploration/directives/' + 'end-exploration-rules.service.ts'
+);
 require(
   'interactions/EndExploration/directives/' +
-  'end-exploration-validation.service.ts');
+    'end-exploration-validation.service.ts'
+);
 require(
   'interactions/EndExploration/directives/' +
-  'oppia-interactive-end-exploration.component.ts');
+    'oppia-interactive-end-exploration.component.ts'
+);
 require(
   'interactions/EndExploration/directives/' +
-  'oppia-response-end-exploration.component.ts');
+    'oppia-response-end-exploration.component.ts'
+);
 require(
   'interactions/EndExploration/directives/' +
-  'oppia-short-response-end-exploration.component.ts');
+    'oppia-short-response-end-exploration.component.ts'
+);

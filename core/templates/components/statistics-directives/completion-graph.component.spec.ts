@@ -17,12 +17,12 @@
  * the improvements tab.
  */
 
-import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CompletionGraphComponent } from './completion-graph.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {CompletionGraphComponent} from './completion-graph.component';
 
 describe('Completion Graph Component', () => {
   let fixture: ComponentFixture<CompletionGraphComponent>;
@@ -30,14 +30,10 @@ describe('Completion Graph Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        CompletionGraphComponent,
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [CompletionGraphComponent],
       providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -51,9 +47,11 @@ describe('Completion Graph Component', () => {
     component.ngOnInit();
 
     expect(component.completionBarStyle['stroke-dasharray']).toBeCloseTo(
-      ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH);
+      ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH
+    );
     expect(component.completionBarStyle['stroke-dashoffset']).toBeCloseTo(
       ImprovementsConstants.COMPLETION_BAR_ARC_LENGTH *
-       (1 - component.completionRate));
+        (1 - component.completionRate)
+    );
   });
 });

@@ -16,17 +16,28 @@
  * @fileoverview Wrapper angular component for code mirror.
  */
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, NgZone, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Input,
+  NgZone,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-codemirror-mergeview',
   template: '',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodemirrorMergeviewComponent implements
-  AfterViewInit, OnInit, OnChanges {
+export class CodemirrorMergeviewComponent
+  implements AfterViewInit, OnInit, OnChanges
+{
   @Input() options = {};
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -38,7 +49,8 @@ export class CodemirrorMergeviewComponent implements
   constructor(
     private elementRef: ElementRef,
     private ngZone: NgZone,
-    private windowRef: WindowRef) { }
+    private windowRef: WindowRef
+  ) {}
 
   ngOnInit(): void {
     // Require CodeMirror.
@@ -53,49 +65,53 @@ export class CodemirrorMergeviewComponent implements
     // 'value', 'orig' are initial values of left and right
     // pane respectively.
     this.ngZone.runOutsideAngular(() => {
-      this.codeMirrorInstance =
-        (this.windowRef.nativeWindow as typeof window).CodeMirror.MergeView(
-          this.elementRef.nativeElement,
-          {
-            value: this.leftValue !== undefined ? this.leftValue : ' ',
-            orig: this.rightValue !== undefined ? this.rightValue : ' ',
-            ...this.options
-          }
-        );
+      this.codeMirrorInstance = (
+        this.windowRef.nativeWindow as typeof window
+      ).CodeMirror.MergeView(this.elementRef.nativeElement, {
+        value: this.leftValue !== undefined ? this.leftValue : ' ',
+        orig: this.rightValue !== undefined ? this.rightValue : ' ',
+        ...this.options,
+      });
     });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     // Watch for changes and set value in left pane.
-    if (changes.leftValue &&
-      changes.leftValue.currentValue !==
-      changes.leftValue.previousValue &&
-      this.codeMirrorInstance) {
+    if (
+      changes.leftValue &&
+      changes.leftValue.currentValue !== changes.leftValue.previousValue &&
+      this.codeMirrorInstance
+    ) {
       if (this.leftValue === undefined) {
         throw new Error('Left pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.codeMirrorInstance.editor().setValue(
-          changes.leftValue.currentValue);
+        this.codeMirrorInstance
+          .editor()
+          .setValue(changes.leftValue.currentValue);
       });
     }
     // Watch for changes and set value in right pane.
-    if (changes.rightValue &&
-      changes.rightValue.currentValue !==
-      changes.rightValue.previousValue &&
-      this.codeMirrorInstance) {
+    if (
+      changes.rightValue &&
+      changes.rightValue.currentValue !== changes.rightValue.previousValue &&
+      this.codeMirrorInstance
+    ) {
       if (this.rightValue === undefined) {
         throw new Error('Right pane value is not defined.');
       }
       this.ngZone.runOutsideAngular(() => {
-        this.codeMirrorInstance.rightOriginal().setValue(
-          changes.rightValue.currentValue);
+        this.codeMirrorInstance
+          .rightOriginal()
+          .setValue(changes.rightValue.currentValue);
       });
     }
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaCodemirrorMergeview', downgradeComponent({
-    component: CodemirrorMergeviewComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaCodemirrorMergeview',
+  downgradeComponent({
+    component: CodemirrorMergeviewComponent,
+  }) as angular.IDirectiveFactory
+);

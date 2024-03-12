@@ -20,37 +20,44 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var DiagnosticTestPage = function() {
+var DiagnosticTestPage = function () {
   var startDiagnosticTestButton = $('.e2e-test-start-diagnostic-test');
   var addNewClassroomButton = $('.e2e-test-add-new-classroom-config');
   var newClassrooomNameInput = $('.e2e-test-new-classroom-name');
   var newClassroomUrlFragmentInput = $('.e2e-test-new-classroom-url-fragment');
   var createNewClassroomButton = $('.e2e-test-create-new-classroom');
   var recommendedTopicSummaryTile = $(
-    '.e2e-test-recommended-topic-summary-tile');
-  var recommendedTopicSummaryTilesSelector = function() {
+    '.e2e-test-recommended-topic-summary-tile'
+  );
+  var recommendedTopicSummaryTilesSelector = function () {
     return $$('.e2e-test-recommended-topic-summary-tile');
   };
-  var recommendedTopicSummaryTilesLocator = (
-    '.e2e-test-recommended-topic-summary-tile');
+  var recommendedTopicSummaryTilesLocator =
+    '.e2e-test-recommended-topic-summary-tile';
   var classroomTileSelector = $('.e2e-test-classroom-tile');
   var editClassroomConfigButton = $('.e2e-test-edit-classroom-config-button');
   var addTopicToClassroomButton = $('.e2e-test-add-topic-to-classroom-button');
   var addTopicToClassroomInput = $('.e2e-test-add-topic-to-classroom-input');
   var submitTopicIdToClassroomButton = $(
-    '.e2e-test-submit-topic-id-to-classroom-button');
+    '.e2e-test-submit-topic-id-to-classroom-button'
+  );
   var saveClassroomConfigButton = $('.e2e-test-save-classroom-config-button');
 
-  this.startDiagnosticTest = async function() {
+  this.startDiagnosticTest = async function () {
     await action.click(
-      'Start diagnostic test button', startDiagnosticTestButton);
+      'Start diagnostic test button',
+      startDiagnosticTestButton
+    );
   };
 
-  this.createNewClassroomConfig = async function(
-      classroomName, classroomUrlFragment
+  this.createNewClassroomConfig = async function (
+    classroomName,
+    classroomUrlFragment
   ) {
     await action.click(
-      'Add new classroom config button', addNewClassroomButton);
+      'Add new classroom config button',
+      addNewClassroomButton
+    );
 
     await waitFor.modalPopupToAppear();
 
@@ -67,18 +74,23 @@ var DiagnosticTestPage = function() {
     );
 
     await action.click(
-      'Create new classroom config button', createNewClassroomButton);
+      'Create new classroom config button',
+      createNewClassroomButton
+    );
   };
 
-  this.addTopicIdToClassroomConfig = async function(topicId, index) {
-    await action.click(
-      'Classroom config tile selector', classroomTileSelector);
+  this.addTopicIdToClassroomConfig = async function (topicId, index) {
+    await action.click('Classroom config tile selector', classroomTileSelector);
 
     await action.click(
-      'Edit classroom config button', editClassroomConfigButton);
+      'Edit classroom config button',
+      editClassroomConfigButton
+    );
 
     await action.click(
-      'Add topic to classroom button', addTopicToClassroomButton);
+      'Add topic to classroom button',
+      addTopicToClassroomButton
+    );
 
     await action.setValue(
       'Add topic ID to classroom input',
@@ -92,12 +104,14 @@ var DiagnosticTestPage = function() {
     );
 
     await action.click(
-      'Save classroom config button', saveClassroomConfigButton);
+      'Save classroom config button',
+      saveClassroomConfigButton
+    );
   };
 
-  this.expectNumberOfRecommendedTopicsToBe = async function(count) {
-    var recommendedTopicSummaryTiles = (
-      await recommendedTopicSummaryTilesSelector());
+  this.expectNumberOfRecommendedTopicsToBe = async function (count) {
+    var recommendedTopicSummaryTiles =
+      await recommendedTopicSummaryTilesSelector();
     if (count > 0) {
       await waitFor.visibilityOf(
         recommendedTopicSummaryTile,
@@ -105,7 +119,9 @@ var DiagnosticTestPage = function() {
       );
       await waitFor.numberOfElementsToBe(
         recommendedTopicSummaryTilesLocator,
-        'Recommended topic summary tile', count);
+        'Recommended topic summary tile',
+        count
+      );
     } else {
       expect(recommendedTopicSummaryTiles.length).toEqual(0);
     }

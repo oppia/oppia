@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { LearnerGroupData } from './learner-group.model';
+import {LearnerGroupData} from './learner-group.model';
 
 /**
  * @fileoverview Tests for learner group model.
@@ -30,10 +30,11 @@ describe('Learner Group Object', () => {
       learner_usernames: [],
       invited_learner_usernames: ['sampleUsername'],
       subtopic_page_ids: ['sampleSubtopicPageId'],
-      story_ids: []
+      story_ids: [],
     };
     sampleLearnerGroupData = LearnerGroupData.createFromBackendDict(
-      sampleLearnerGroupDataDict);
+      sampleLearnerGroupDataDict
+    );
   });
 
   it('should not find issues with a valid learner group', () => {
@@ -50,7 +51,7 @@ describe('Learner Group Object', () => {
       'Learner Group title should not be empty.',
       'Learner Group description should not be empty.',
       'Learner Group should have at least one facilitator.',
-      'Learners can not be invited to join the same group again.'
+      'Learners can not be invited to join the same group again.',
     ]);
   });
 
@@ -58,22 +59,24 @@ describe('Learner Group Object', () => {
     expect(sampleLearnerGroupData.validate(true)).toEqual([]);
   });
 
-  it('should raise correct validation issues for pre creation' +
-    ' validation', () => {
-    sampleLearnerGroupData.title = '';
-    sampleLearnerGroupData.description = '';
-    sampleLearnerGroupData.removeFacilitator('username1');
-    sampleLearnerGroupData.addLearner('sampleUsername2');
-    sampleLearnerGroupData.removeSubtopicPageId('sampleSubtopicPageId');
+  it(
+    'should raise correct validation issues for pre creation' + ' validation',
+    () => {
+      sampleLearnerGroupData.title = '';
+      sampleLearnerGroupData.description = '';
+      sampleLearnerGroupData.removeFacilitator('username1');
+      sampleLearnerGroupData.addLearner('sampleUsername2');
+      sampleLearnerGroupData.removeSubtopicPageId('sampleSubtopicPageId');
 
-    expect(sampleLearnerGroupData.validate(true)).toEqual([
-      'Learner Group title should not be empty.',
-      'Learner Group description should not be empty.',
-      'Learner Group should have at least one facilitator.',
-      'Learner Group should have at least one syllabus item.',
-      'Learner Group cannot have any learners while creation.'
-    ]);
-  });
+      expect(sampleLearnerGroupData.validate(true)).toEqual([
+        'Learner Group title should not be empty.',
+        'Learner Group description should not be empty.',
+        'Learner Group should have at least one facilitator.',
+        'Learner Group should have at least one syllabus item.',
+        'Learner Group cannot have any learners while creation.',
+      ]);
+    }
+  );
 
   it('should correctly update properties', () => {
     sampleLearnerGroupData.title = 'title1';
@@ -95,10 +98,10 @@ describe('Learner Group Object', () => {
     expect(sampleLearnerGroupData.description).toEqual('description1');
     expect(sampleLearnerGroupData.facilitatorUsernames).toEqual(['username2']);
     expect(sampleLearnerGroupData.learnerUsernames).toEqual(['username3']);
-    expect(sampleLearnerGroupData.invitedLearnerUsernames).toEqual(
-      ['username4']);
-    expect(sampleLearnerGroupData.subtopicPageIds).toEqual(
-      ['subtopicPageId1']);
+    expect(sampleLearnerGroupData.invitedLearnerUsernames).toEqual([
+      'username4',
+    ]);
+    expect(sampleLearnerGroupData.subtopicPageIds).toEqual(['subtopicPageId1']);
     expect(sampleLearnerGroupData.storyIds).toEqual(['storyId2']);
   });
 });

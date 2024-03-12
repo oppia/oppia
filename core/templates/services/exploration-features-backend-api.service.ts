@@ -17,17 +17,16 @@
  * configured to support.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { ServicesConstants } from 'services/services.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {ServicesConstants} from 'services/services.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface ExplorationFeaturesBackendDict {
-  'exploration_is_curated': boolean;
-  'always_ask_learners_for_answer_details': boolean;
+  exploration_is_curated: boolean;
+  always_ask_learners_for_answer_details: boolean;
 }
 
 export interface ExplorationFeatures {
@@ -36,30 +35,41 @@ export interface ExplorationFeatures {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationFeaturesBackendApiService {
   constructor(
-      private http: HttpClient,
-      private urlInterpolationService: UrlInterpolationService) {}
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async fetchExplorationFeaturesAsync(
-      explorationId: string): Promise<ExplorationFeatures> {
-    return this.http.get<ExplorationFeaturesBackendDict>(
-      this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.EXPLORATION_FEATURES_URL,
-        {exploration_id: explorationId}
-      ) as string
-    ).toPromise().then(response => ({
-      explorationIsCurated: response.exploration_is_curated,
-      alwaysAskLearnersForAnswerDetails: (
-        response.always_ask_learners_for_answer_details),
-    }), errorResponse => {
-      throw new Error(errorResponse.error.error);
-    });
+    explorationId: string
+  ): Promise<ExplorationFeatures> {
+    return this.http
+      .get<ExplorationFeaturesBackendDict>(
+        this.urlInterpolationService.interpolateUrl(
+          ServicesConstants.EXPLORATION_FEATURES_URL,
+          {exploration_id: explorationId}
+        ) as string
+      )
+      .toPromise()
+      .then(
+        response => ({
+          explorationIsCurated: response.exploration_is_curated,
+          alwaysAskLearnersForAnswerDetails:
+            response.always_ask_learners_for_answer_details,
+        }),
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationFeaturesBackendApiService',
-  downgradeInjectable(ExplorationFeaturesBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationFeaturesBackendApiService',
+    downgradeInjectable(ExplorationFeaturesBackendApiService)
+  );

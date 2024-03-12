@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for the algebraic expression editor.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
-import { AlgebraicExpressionEditorComponent } from './algebraic-expression-editor.component';
-import { TranslateService } from '@ngx-translate/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  GuppyInitializationService,
+  GuppyObject,
+} from 'services/guppy-initialization.service';
+import {AlgebraicExpressionEditorComponent} from './algebraic-expression-editor.component';
+import {TranslateService} from '@ngx-translate/core';
 
 class MockTranslateService {
   instant(key: string): string {
@@ -41,8 +44,8 @@ describe('AlgebraicExpressionEditor', () => {
     guppyInstance: {
       asciimath: () => {
         return 'Dummy value';
-      }
-    }
+      },
+    },
   };
 
   class MockGuppy {
@@ -59,13 +62,13 @@ describe('AlgebraicExpressionEditor', () => {
     }
 
     static configure(name: string, val: Object): void {}
-    static 'remove_global_symbol'(symbol: string): void {}
-    static 'add_global_symbol'(name: string, symbol: Object): void {}
+    static remove_global_symbol(symbol: string): void {}
+    static add_global_symbol(name: string, symbol: Object): void {}
   }
 
   class MockWindowRef {
     _window = {
-      Guppy: MockGuppy
+      Guppy: MockGuppy,
     };
 
     get nativeWindow() {
@@ -74,42 +77,42 @@ describe('AlgebraicExpressionEditor', () => {
   }
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        imports: [HttpClientTestingModule],
-        declarations: [AlgebraicExpressionEditorComponent],
-        providers: [
-          {
-            provide: windowRef,
-            useClass: MockWindowRef
-          }, {
-            provide: TranslateService,
-            useClass: MockTranslateService
-          }
-        ]
-      }
-    ).compileComponents();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [AlgebraicExpressionEditorComponent],
+      providers: [
+        {
+          provide: windowRef,
+          useClass: MockWindowRef,
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
+      ],
+    }).compileComponents();
   }));
   beforeEach(() => {
     windowRef = TestBed.inject(WindowRef);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
-    fixture = TestBed.createComponent(
-      AlgebraicExpressionEditorComponent);
+    fixture = TestBed.createComponent(AlgebraicExpressionEditorComponent);
     component = fixture.componentInstance;
     windowRef.nativeWindow.Guppy = MockGuppy as unknown as Guppy;
   });
 
   it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject as GuppyObject);
+      mockGuppyObject as GuppyObject
+    );
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
 
   it('should not show warnings if the editor is active', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject as GuppyObject);
+      mockGuppyObject as GuppyObject
+    );
     component.warningText = '';
     component.isCurrentAnswerValid();
     expect(component.warningText).toBe('');
@@ -117,7 +120,8 @@ describe('AlgebraicExpressionEditor', () => {
 
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject as GuppyObject);
+      mockGuppyObject as GuppyObject
+    );
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
@@ -131,12 +135,14 @@ describe('AlgebraicExpressionEditor', () => {
     component.hasBeenTouched = true;
     // This should be validated as false if the editor has been touched.
     expect(component.isCurrentAnswerValid()).toBeFalse();
-    expect(
-      component.warningText).toBe('Please enter an answer before submitting.');
+    expect(component.warningText).toBe(
+      'Please enter an answer before submitting.'
+    );
 
     component.currentValue = 'x/2';
-    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue(
-      ['x']);
+    spyOn(guppyInitializationService, 'getAllowedVariables').and.returnValue([
+      'x',
+    ]);
     expect(component.isCurrentAnswerValid()).toBeTrue();
     expect(component.warningText).toBe('');
   });
@@ -149,7 +155,8 @@ describe('AlgebraicExpressionEditor', () => {
     component.showOSK();
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject as GuppyObject);
+      mockGuppyObject as GuppyObject
+    );
     MockGuppy.focused = false;
     component.ngOnInit();
   });

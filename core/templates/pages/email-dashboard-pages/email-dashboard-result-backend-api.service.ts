@@ -16,13 +16,13 @@
  * @fileoverview Backend api service for email dashboard page.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { EmailData } from './email-dashboard-result.component';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {EmailData} from './email-dashboard-result.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EmailDashboardResultBackendApiService {
   RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
@@ -36,33 +36,45 @@ export class EmailDashboardResultBackendApiService {
 
   async submitEmailAsync(data: EmailData, queryId: string): Promise<Object> {
     let resultHandlerUrl = this.urlInterpolationService.interpolateUrl(
-      this.RESULT_HANDLER_URL, {
-        query_id: queryId
-      });
-    return this.http.post(resultHandlerUrl, {
-      data
-    }).toPromise();
+      this.RESULT_HANDLER_URL,
+      {
+        query_id: queryId,
+      }
+    );
+    return this.http
+      .post(resultHandlerUrl, {
+        data,
+      })
+      .toPromise();
   }
 
   async cancelEmailAsync(queryId: string): Promise<Object> {
     let cancelUrlHandler = this.urlInterpolationService.interpolateUrl(
-      this.CANCEL_EMAIL_HANDLER_URL, {
-        query_id: queryId
-      });
+      this.CANCEL_EMAIL_HANDLER_URL,
+      {
+        query_id: queryId,
+      }
+    );
     return this.http.post(cancelUrlHandler, {}).toPromise();
   }
 
   async sendTestEmailAsync(
-      emailSubject: string, emailBody: string, queryId: string
+    emailSubject: string,
+    emailBody: string,
+    queryId: string
   ): Promise<Object> {
     let testEmailHandlerUrl = this.urlInterpolationService.interpolateUrl(
-      this.TEST_BULK_EMAIL_URL, {
-        query_id: queryId
-      });
+      this.TEST_BULK_EMAIL_URL,
+      {
+        query_id: queryId,
+      }
+    );
 
-    return this.http.post(testEmailHandlerUrl, {
-      email_subject: emailSubject,
-      email_body: emailBody
-    }).toPromise();
+    return this.http
+      .post(testEmailHandlerUrl, {
+        email_subject: emailSubject,
+        email_body: emailBody,
+      })
+      .toPromise();
   }
 }

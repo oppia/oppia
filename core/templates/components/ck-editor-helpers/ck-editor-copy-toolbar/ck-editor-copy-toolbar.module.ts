@@ -19,23 +19,14 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { CkEditorCopyToolbarComponent } from './ck-editor-copy-toolbar.component';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {CkEditorCopyToolbarComponent} from './ck-editor-copy-toolbar.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-  ],
-  declarations: [
-    CkEditorCopyToolbarComponent
-  ],
-  entryComponents: [
-    CkEditorCopyToolbarComponent
-  ],
-  exports: [
-    CkEditorCopyToolbarComponent
-  ],
+  imports: [CommonModule],
+  declarations: [CkEditorCopyToolbarComponent],
+  entryComponents: [CkEditorCopyToolbarComponent],
+  exports: [CkEditorCopyToolbarComponent],
 })
-
-export class OppiaCkEditorCopyToolBarModule { }
+export class OppiaCkEditorCopyToolBarModule {}

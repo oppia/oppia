@@ -16,18 +16,20 @@
  * @fileoverview Component for the new lesson player footer
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import './player-footer.component.css';
 
 @Component({
   selector: 'oppia-new-lesson-player-footer',
   templateUrl: './player-footer.component.html',
-  styleUrls: ['./player-footer.component.css']
+  styleUrls: ['./player-footer.component.css'],
 })
-export class PlayerFooterComponent { }
+export class PlayerFooterComponent {}
 
-angular.module('oppia').directive('oppiaPlayerFooter',
+angular.module('oppia').directive(
+  'oppiaPlayerFooter',
   downgradeComponent({
-    component: PlayerFooterComponent
-  }) as angular.IDirectiveFactory);
+    component: PlayerFooterComponent,
+  }) as angular.IDirectiveFactory
+);

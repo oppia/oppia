@@ -16,22 +16,21 @@
  * @fileoverview Root Component for about foundation page.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-about-foundation-page-root',
-  templateUrl: './about-foundation-page-root.component.html'
+  templateUrl: './about-foundation-page-root.component.html',
 })
 export class AboutFoundationPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
+  constructor(private pageHeadService: PageHeadService) {}
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.META
+    );
   }
 }

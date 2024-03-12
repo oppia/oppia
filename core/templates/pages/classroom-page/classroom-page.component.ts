@@ -16,31 +16,31 @@
  * @fileoverview Component for the classroom page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {AppConstants} from 'app.constants';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import './classroom-page.component.css';
 
 @Component({
   selector: 'oppia-classroom-page',
   templateUrl: './classroom-page.component.html',
-  styleUrls: ['./classroom-page.component.css']
+  styleUrls: ['./classroom-page.component.css'],
 })
 export class ClassroomPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -57,8 +57,7 @@ export class ClassroomPageComponent implements OnDestroy {
   firstTopicUrl: string = '';
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private alertsService: AlertsService,
     private capitalizePipe: CapitalizePipe,
     private classroomBackendApiService: ClassroomBackendApiService,
@@ -74,59 +73,79 @@ export class ClassroomPageComponent implements OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromUrl());
-    this.bannerImageFileUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/splash/books.svg');
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromUrl();
+    this.bannerImageFileUrl =
+      this.urlInterpolationService.getStaticImageUrl('/splash/books.svg');
 
     this.loaderService.showLoadingScreen('Loading');
     this.isDiagnosticTestFeatureFlagEnabled();
 
-    this.accessValidationBackendApiService.validateAccessToClassroomPage(
-      this.classroomUrlFragment).then(() => {
-      this.classroomBackendApiService.fetchClassroomDataAsync(
-        this.classroomUrlFragment).then((classroomData) => {
-        this.classroomData = classroomData;
-        this.classroomDisplayName = this.capitalizePipe.transform(
-          classroomData.getName());
-        this.classroomNameTranslationKey = this.i18nLanguageCodeService.
-          getClassroomTranslationKey(this.classroomDisplayName);
-        this.setPageTitle();
-        this.subscribeToOnLangChange();
-        this.loaderService.hideLoadingScreen();
-        this.classroomBackendApiService.onInitializeTranslation.emit();
-        this.siteAnalyticsService.registerClassroomPageViewed();
-        if (classroomData && classroomData.getTopicSummaries().length > 0) {
-          let firstTopic = classroomData.getTopicSummaries()[0].name;
-          this.firstTopicUrl = '/learn/math/' + (
-            classroomData.getTopicSummaries()[0].urlFragment);
+    this.accessValidationBackendApiService
+      .validateAccessToClassroomPage(this.classroomUrlFragment)
+      .then(
+        () => {
+          this.classroomBackendApiService
+            .fetchClassroomDataAsync(this.classroomUrlFragment)
+            .then(
+              classroomData => {
+                this.classroomData = classroomData;
+                this.classroomDisplayName = this.capitalizePipe.transform(
+                  classroomData.getName()
+                );
+                this.classroomNameTranslationKey =
+                  this.i18nLanguageCodeService.getClassroomTranslationKey(
+                    this.classroomDisplayName
+                  );
+                this.setPageTitle();
+                this.subscribeToOnLangChange();
+                this.loaderService.hideLoadingScreen();
+                this.classroomBackendApiService.onInitializeTranslation.emit();
+                this.siteAnalyticsService.registerClassroomPageViewed();
+                if (
+                  classroomData &&
+                  classroomData.getTopicSummaries().length > 0
+                ) {
+                  let firstTopic = classroomData.getTopicSummaries()[0].name;
+                  this.firstTopicUrl =
+                    '/learn/math/' +
+                    classroomData.getTopicSummaries()[0].urlFragment;
 
-          this.beginWithFirstTopicButtonText = this.translateService.instant(
-            'I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON', {
-              firstTopic: firstTopic
-            }
-          );
+                  this.beginWithFirstTopicButtonText =
+                    this.translateService.instant(
+                      'I18N_CLASSROOM_PAGE_BEGIN_WITH_FIRST_TOPIC_BUTTON',
+                      {
+                        firstTopic: firstTopic,
+                      }
+                    );
 
-          this.begineWithFirstTopicDescriptionText = (
-            this.translateService.instant(
-              'I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT', {
-                firstTopic: firstTopic
+                  this.begineWithFirstTopicDescriptionText =
+                    this.translateService.instant(
+                      'I18N_CLASSROOM_PAGE_NEW_TO_MATH_TEXT',
+                      {
+                        firstTopic: firstTopic,
+                      }
+                    );
+                }
+              },
+              errorResponse => {
+                if (
+                  AppConstants.FATAL_ERROR_CODES.indexOf(
+                    errorResponse.status
+                  ) !== -1
+                ) {
+                  this.alertsService.addWarning('Failed to get dashboard data');
+                }
               }
-            )
-          );
+            );
+        },
+        err => {
+          // Note to developers:
+          // This callback is triggered when the provided classroom does not exist,
+          // this will raise page not found exception.
+          // No further action is needed.
         }
-      }, (errorResponse) => {
-        if (AppConstants.FATAL_ERROR_CODES.indexOf(
-          errorResponse.status) !== -1) {
-          this.alertsService.addWarning('Failed to get dashboard data');
-        }
-      });
-    }, (err) => {
-      // Note to developers:
-      // This callback is triggered when the provided classroom does not exist,
-      // this will raise page not found exception.
-      // No further action is needed.
-    });
+      );
   }
 
   subscribeToOnLangChange(): void {
@@ -139,9 +158,11 @@ export class ClassroomPageComponent implements OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_CLASSROOM_PAGE_TITLE', {
-        classroomName: this.classroomDisplayName
-      });
+      'I18N_CLASSROOM_PAGE_TITLE',
+      {
+        classroomName: this.classroomDisplayName,
+      }
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -168,7 +189,9 @@ export class ClassroomPageComponent implements OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaClassroomPage',
+angular.module('oppia').directive(
+  'oppiaClassroomPage',
   downgradeComponent({
-    component: ClassroomPageComponent
-  }) as angular.IDirectiveFactory);
+    component: ClassroomPageComponent,
+  }) as angular.IDirectiveFactory
+);

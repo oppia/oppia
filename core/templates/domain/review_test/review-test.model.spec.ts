@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for ReviewTest.
  */
 
-import { ReviewTest } from 'domain/review_test/review-test.model';
+import {ReviewTest} from 'domain/review_test/review-test.model';
 
 describe('Review Test Model', () => {
   it('should correctly convert backend dict to Review Test Object.', () => {
     let backendDict = {
       story_name: 'Story Name',
-      skill_descriptions: {}
+      skill_descriptions: {},
     };
 
     let reviewTest = ReviewTest.createFromBackendDict(backendDict);

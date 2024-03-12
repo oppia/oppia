@@ -14,33 +14,49 @@
 
 /**
  * @fileoverview Unit tests for TranslationModalComponent.
-*/
+ */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {ChangeDetectorRef, ElementRef, NO_ERRORS_SCHEMA} from '@angular/core';
 
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { TranslationModalComponent, TranslationOpportunity } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { ContextService } from 'services/context.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { ImageLocalStorageService, ImagesData } from 'services/image-local-storage.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
-import { TranslateTextService } from '../services/translate-text.service';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {
+  TranslationModalComponent,
+  TranslationOpportunity,
+} from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {ContextService} from 'services/context.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {
+  ImageLocalStorageService,
+  ImagesData,
+} from 'services/image-local-storage.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
+import {TranslateTextService} from '../services/translate-text.service';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
-import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
+import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 
 enum ExpansionTabType {
   CONTENT,
-  TRANSLATION
+  TRANSLATION,
 }
 
 class MockChangeDetectorRef {
@@ -70,7 +86,7 @@ describe('Translation Modal Component', () => {
     actionButtonTitle: 'Action Button',
     inReviewCount: 12,
     totalCount: 50,
-    translationsCount: 20
+    translationsCount: 20,
   };
   const getContentTranslatableItemWithText = (text: string) => {
     return {
@@ -78,27 +94,22 @@ describe('Translation Modal Component', () => {
       content_value: text,
       content_type: 'content',
       interaction_id: null,
-      rule_type: null
+      rule_type: null,
     };
   };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        TranslationModalComponent,
-        WrapTextWithEllipsisPipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [TranslationModalComponent, WrapTextWithEllipsisPipe],
       providers: [
         NgbActiveModal,
         {
           provide: ChangeDetectorRef,
-          useValue: changeDetectorRef
-        }
+          useValue: changeDetectorRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
     contextService = OppiaAngularRootComponent.contextService;
@@ -126,17 +137,23 @@ describe('Translation Modal Component', () => {
       // the need to test validations. This is because the component is not
       // strictly typed yet.
       // @ts-ignore
-      null, null, new ElementRef({offsetHeight: 200}), null);
+      null,
+      null,
+      new ElementRef({offsetHeight: 200}),
+      null
+    );
     getUserContributionRightsDataAsyncSpy = spyOn(
-      userService, 'getUserContributionRightsDataAsync');
-    getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve(
-      {
+      userService,
+      'getUserContributionRightsDataAsync'
+    );
+    getUserContributionRightsDataAsyncSpy.and.returnValue(
+      Promise.resolve({
         can_suggest_questions: false,
         can_review_translation_for_language_codes: ['ar'],
         can_review_voiceover_for_language_codes: [],
-        can_review_questions: false
-      }
-    ));
+        can_review_questions: false,
+      })
+    );
   });
 
   it('should invoke change detection when html is updated', () => {
@@ -154,7 +171,7 @@ describe('Translation Modal Component', () => {
     expect(changeDetectorRef.detectChanges).toHaveBeenCalledTimes(0);
   });
 
-  it('should return the ExoansionTabType enum', ()=>{
+  it('should return the ExoansionTabType enum', () => {
     let enumVariable = component.expansionTabType;
     expect(typeof enumVariable === typeof ExpansionTabType);
   });
@@ -205,59 +222,57 @@ describe('Translation Modal Component', () => {
     expect(component.isTranslationExpanded).toBeTrue();
   });
 
-  it('should correctly determine whether the content data is overflowing',
-    fakeAsync(() => {
-      // Pre-check.
-      // The default values for the overflow states are false.
-      expect(component.isContentOverflowing).toBeFalse();
+  it('should correctly determine whether the content data is overflowing', fakeAsync(() => {
+    // Pre-check.
+    // The default values for the overflow states are false.
+    expect(component.isContentOverflowing).toBeFalse();
 
-      // Setup.
-      component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
-      component.contentContainer.nativeElement.offsetHeight = 150;
+    // Setup.
+    component.contentPanel.elementRef.nativeElement.offsetHeight = 100;
+    component.contentContainer.nativeElement.offsetHeight = 150;
 
-      // Action.
-      component.computePanelOverflowState();
-      tick(501);
+    // Action.
+    component.computePanelOverflowState();
+    tick(501);
 
-      // Expectations.
-      expect(component.isContentOverflowing).toBeFalse();
-      // Change panel height to simulate changing of the modal data.
-      component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
+    // Expectations.
+    expect(component.isContentOverflowing).toBeFalse();
+    // Change panel height to simulate changing of the modal data.
+    component.contentPanel.elementRef.nativeElement.offsetHeight = 300;
 
-      // Action.
-      component.computePanelOverflowState();
-      tick(501);
+    // Action.
+    component.computePanelOverflowState();
+    tick(501);
 
-      // Expectations.
-      expect(component.isContentOverflowing).toBeTrue();
-    }));
+    // Expectations.
+    expect(component.isContentOverflowing).toBeTrue();
+  }));
 
-  it('should correctly determine whether the editor is overflowing',
-    fakeAsync(() => {
-      // Pre-check.
-      // The default values for the overflow states are false.
-      expect(component.isTranslationOverflowing).toBeFalse();
+  it('should correctly determine whether the editor is overflowing', fakeAsync(() => {
+    // Pre-check.
+    // The default values for the overflow states are false.
+    expect(component.isTranslationOverflowing).toBeFalse();
 
-      // Setup.
-      spyOn(wds, 'getHeight').and.returnValue(100);
-      component.translationContainer.nativeElement.offsetHeight = 25;
+    // Setup.
+    spyOn(wds, 'getHeight').and.returnValue(100);
+    component.translationContainer.nativeElement.offsetHeight = 25;
 
-      // Action.
-      component.computeTranslationEditorOverflowState();
-      tick(501);
+    // Action.
+    component.computeTranslationEditorOverflowState();
+    tick(501);
 
-      // Expectations.
-      expect(component.isTranslationOverflowing).toBeFalse();
-      // Change panel height to simulate changing of the modal data.
-      component.translationContainer.nativeElement.offsetHeight = 300;
+    // Expectations.
+    expect(component.isTranslationOverflowing).toBeFalse();
+    // Change panel height to simulate changing of the modal data.
+    component.translationContainer.nativeElement.offsetHeight = 300;
 
-      // Action.
-      component.computeTranslationEditorOverflowState();
-      tick(501);
+    // Action.
+    component.computeTranslationEditorOverflowState();
+    tick(501);
 
-      // Expectations.
-      expect(component.isTranslationOverflowing).toBeTrue();
-    }));
+    // Expectations.
+    expect(component.isTranslationOverflowing).toBeTrue();
+  }));
 
   afterEach(() => {
     httpTestingController.verify();
@@ -274,13 +289,15 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('ar');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback());
+          (expId, languageCode, successCallback) => successCallback()
+        );
         component.ngOnInit();
       }));
 
       it('should set the schema constant correctly', () => {
-        expect(component.getHtmlSchema().ui_config.languageDirection)
-          .toBe('rtl');
+        expect(component.getHtmlSchema().ui_config.languageDirection).toBe(
+          'rtl'
+        );
       });
     });
 
@@ -288,37 +305,42 @@ describe('Translation Modal Component', () => {
       beforeEach(fakeAsync(() => {
         translationLanguageService.setActiveLanguageCode('es');
         spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback());
+          (expId, languageCode, successCallback) => successCallback()
+        );
         component.ngOnInit();
       }));
 
       it('should set the schema constant correctly', () => {
-        expect(component.getHtmlSchema().ui_config.languageDirection)
-          .toBe('ltr');
+        expect(component.getHtmlSchema().ui_config.languageDirection).toBe(
+          'ltr'
+        );
       });
 
-      it('should throw error if contribution rights is null', fakeAsync(
-        () => {
-          getUserContributionRightsDataAsyncSpy.and.returnValue(Promise.resolve(
-            null));
-          expect(() => {
-            component.ngOnInit();
-            tick();
-          }).toThrowError();
-        }));
+      it('should throw error if contribution rights is null', fakeAsync(() => {
+        getUserContributionRightsDataAsyncSpy.and.returnValue(
+          Promise.resolve(null)
+        );
+        expect(() => {
+          component.ngOnInit();
+          tick();
+        }).toThrowError();
+      }));
     });
 
     it('should set context correctly', fakeAsync(() => {
       contextService.removeCustomEntityContext();
       contextService.resetImageSaveDestination();
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback());
+        (expId, languageCode, successCallback) => successCallback()
+      );
       component.ngOnInit();
       expect(contextService.getEntityType()).toBe(
-        AppConstants.ENTITY_TYPE.EXPLORATION);
+        AppConstants.ENTITY_TYPE.EXPLORATION
+      );
       expect(contextService.getEntityId()).toBe('1');
       expect(contextService.getImageSaveDestination()).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      );
     }));
 
     it('should compute panel overflow after the view has initialized', () => {
@@ -334,30 +356,34 @@ describe('Translation Modal Component', () => {
 
       component.ngAfterContentChecked();
 
-      expect(component.computeTranslationEditorOverflowState)
-        .toHaveBeenCalled();
+      expect(
+        component.computeTranslationEditorOverflowState
+      ).toHaveBeenCalled();
     });
 
     it('should initialize translateTextService', fakeAsync(() => {
       spyOn(translateTextService, 'init').and.callThrough();
       spyOn(translateTextService, 'getTextToTranslate').and.callThrough();
-      spyOn(translateTextService, 'getPreviousTextToTranslate')
-        .and.callThrough();
+      spyOn(
+        translateTextService,
+        'getPreviousTextToTranslate'
+      ).and.callThrough();
       component.ngOnInit();
       expect(component.loadingData).toBeTrue();
       expect(translateTextService.init).toHaveBeenCalled();
 
       const sampleStateWiseContentMapping = {
         stateName1: {contentId1: getContentTranslatableItemWithText('text1')},
-        stateName2: {contentId2: getContentTranslatableItemWithText('text2')}
+        stateName2: {contentId2: getContentTranslatableItemWithText('text2')},
       };
 
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=es');
+        '/gettranslatabletexthandler?exp_id=1&language_code=es'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush({
         state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1
+        version: 1,
       });
       flushMicrotasks();
       expect(component.loadingData).toBeFalse();
@@ -367,8 +393,9 @@ describe('Translation Modal Component', () => {
       expect(component.moreAvailable).toBeTrue();
       component.skipActiveTranslation();
       component.returnToPreviousTranslation();
-      expect(translateTextService.getPreviousTextToTranslate)
-        .toHaveBeenCalled();
+      expect(
+        translateTextService.getPreviousTextToTranslate
+      ).toHaveBeenCalled();
       expect(component.textToTranslate).toBe('text1');
       // The value of moreAvailable will be set to true when the operation
       // is viewing a previous translation. If the value is false, the
@@ -377,52 +404,53 @@ describe('Translation Modal Component', () => {
       expect(component.moreAvailable).toBeTrue();
     }));
 
-    it('should set the schema constant based on the active language', fakeAsync(
-      () => {
-        translationLanguageService.setActiveLanguageCode('ar');
-        spyOn(translateTextService, 'init').and.callFake(
-          (expId, languageCode, successCallback) => successCallback());
-        component.ngOnInit();
-        expect(component.getHtmlSchema().ui_config.language)
-          .toBe('ar');
-      }));
+    it('should set the schema constant based on the active language', fakeAsync(() => {
+      translationLanguageService.setActiveLanguageCode('ar');
+      spyOn(translateTextService, 'init').and.callFake(
+        (expId, languageCode, successCallback) => successCallback()
+      );
+      component.ngOnInit();
+      expect(component.getHtmlSchema().ui_config.language).toBe('ar');
+    }));
 
     it('should get the unicode schema', () => {
       expect(component.getUnicodeSchema()).toEqual({type: 'unicode'});
     });
 
     it('should get the set of strings schema', () => {
-      expect(component.getSetOfStringsSchema()).toEqual(
-        {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          }
-        }
-      );
+      expect(component.getSetOfStringsSchema()).toEqual({
+        type: 'list',
+        items: {
+          type: 'unicode',
+        },
+      });
     });
   });
 
   describe('when clicking on the translatable content', () => {
     const nonParagraphTarget: HTMLElement = document.createElement('div');
     const mathTarget: HTMLElement = document.createElement(
-      'oppia-noninteractive-math');
+      'oppia-noninteractive-math'
+    );
     let paragraphTarget: HTMLElement;
     let broadcastSpy: jasmine.Spy<(target: HTMLElement) => void>;
     let propagationSpy: jasmine.Spy<() => void>;
     beforeEach(fakeAsync(() => {
       paragraphTarget = document.createElement('p');
       spyOn(translateTextService, 'init').and.callFake(
-        (expId, languageCode, successCallback) => successCallback());
+        (expId, languageCode, successCallback) => successCallback()
+      );
       broadcastSpy = spyOn(
-        ckEditorCopyContentService, 'broadcastCopy').and.stub();
+        ckEditorCopyContentService,
+        'broadcastCopy'
+      ).and.stub();
 
       component.ngOnInit();
-      nonParagraphTarget.onclick = function(this, ev) {
+      nonParagraphTarget.onclick = function (this, ev) {
         propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
         component.onContentClick(ev);
       };
-      paragraphTarget.onclick = function(this, ev) {
+      paragraphTarget.onclick = function (this, ev) {
         propagationSpy = spyOn(ev, 'stopPropagation').and.stub();
         component.onContentClick(ev);
       };
@@ -470,20 +498,20 @@ describe('Translation Modal Component', () => {
 
         const sampleStateWiseContentMapping = {
           stateName1: {contentId1: getContentTranslatableItemWithText('text1')},
-          stateName2: {contentId2: getContentTranslatableItemWithText('text2')}
+          stateName2: {contentId2: getContentTranslatableItemWithText('text2')},
         };
 
         const req = httpTestingController.expectOne(
-          '/gettranslatabletexthandler?exp_id=1&language_code=es');
+          '/gettranslatabletexthandler?exp_id=1&language_code=es'
+        );
         expect(req.request.method).toEqual('GET');
         req.flush({
           state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-          version: 1
+          version: 1,
         });
         flushMicrotasks();
         component.skipActiveTranslation();
       }));
-
 
       it('should retrieve remaining text and availability', () => {
         expect(component.textToTranslate).toBe('text2');
@@ -509,9 +537,9 @@ describe('Translation Modal Component', () => {
           language_code: 'es',
           content_html: 'text1',
           translation_html: 'texto1',
-          data_format: 'html'
+          data_format: 'html',
         },
-        files: {}
+        files: {},
       };
       component.ngOnInit();
       tick();
@@ -524,31 +552,32 @@ describe('Translation Modal Component', () => {
             content_value: 'input',
             content_type: 'interaction',
             interaction_id: 'TextInput',
-            rule_type: null
+            rule_type: null,
           },
           contentId3: {
             content_format: 'unicode',
             content_value: 'Continue',
             content_type: 'ca',
             interaction_id: 'Continue',
-            rule_type: null
+            rule_type: null,
           },
           contentId4: {
             content_format: 'set_of_normalized_string',
             content_value: ['answer1', 'answer2', 'answer3'],
             content_type: 'rule',
             interaction_id: 'TextInput',
-            rule_type: 'Contains'
-          }
-        }
+            rule_type: 'Contains',
+          },
+        },
       };
 
       const req = httpTestingController.expectOne(
-        '/gettranslatabletexthandler?exp_id=1&language_code=es');
+        '/gettranslatabletexthandler?exp_id=1&language_code=es'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush({
         state_names_to_content_id_mapping: sampleStateWiseContentMapping,
-        version: 1
+        version: 1,
       });
       flushMicrotasks();
       component.activeWrittenTranslation = 'texto1';
@@ -560,12 +589,12 @@ describe('Translation Modal Component', () => {
       component.suggestTranslatedText();
 
       flushMicrotasks();
-      const req = httpTestingController.expectOne(
-        '/suggestionhandler/');
+      const req = httpTestingController.expectOne('/suggestionhandler/');
       expect(component.hadCopyParagraphError).toEqual(false);
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.getAll('payload')[0]).toEqual(
-        JSON.stringify(expectedPayload));
+        JSON.stringify(expectedPayload)
+      );
       req.flush({});
       flushMicrotasks();
     }));
@@ -574,11 +603,11 @@ describe('Translation Modal Component', () => {
       component.suggestTranslatedText();
 
       flushMicrotasks();
-      const req = httpTestingController.expectOne(
-        '/suggestionhandler/');
+      const req = httpTestingController.expectOne('/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.getAll('payload')[0]).toEqual(
-        JSON.stringify(expectedPayload));
+        JSON.stringify(expectedPayload)
+      );
       req.flush({});
       flushMicrotasks();
     }));
@@ -588,23 +617,24 @@ describe('Translation Modal Component', () => {
         spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
         spyOn(
           imageLocalStorageService,
-          'getFilenameToBase64MappingAsync').and.returnValue(
-          Promise.resolve({}));
+          'getFilenameToBase64MappingAsync'
+        ).and.returnValue(Promise.resolve({}));
 
         component.suggestTranslatedText();
         component.suggestTranslatedText();
         tick();
 
-        const req = httpTestingController.expectOne(
-          '/suggestionhandler/');
+        const req = httpTestingController.expectOne('/suggestionhandler/');
         expect(req.request.method).toEqual('POST');
         expect(req.request.body.getAll('payload')[0]).toEqual(
-          JSON.stringify(expectedPayload));
+          JSON.stringify(expectedPayload)
+        );
         req.flush({});
         flushMicrotasks();
         // Prevention of concurrent suggestions also confirmed by "expectOne".
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(1);
+        expect(
+          translateTextService.suggestTranslatedText
+        ).toHaveBeenCalledTimes(1);
       }));
     });
 
@@ -615,19 +645,22 @@ describe('Translation Modal Component', () => {
 
         component.suggestTranslatedText();
 
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
+        expect(
+          translateTextService.suggestTranslatedText
+        ).toHaveBeenCalledTimes(0);
       });
     });
 
     describe('when alt text is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+        component.textToTranslate =
+          '<oppia-noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
           '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
           ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
           '></oppia-noninteractive-image>';
-        component.activeWrittenTranslation = '<oppia-noninteractive-' +
+        component.activeWrittenTranslation =
+          '<oppia-noninteractive-' +
           'image alt-with-value="&amp;quot;Image description&amp;quot;' +
           '" caption-with-value="&amp;quot;New caption&amp;quot;"' +
           ' filepath-with-value="&amp;quot;img_20210129_210552_zbv0mdty94' +
@@ -636,19 +669,22 @@ describe('Translation Modal Component', () => {
 
         component.suggestTranslatedText();
 
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
+        expect(
+          translateTextService.suggestTranslatedText
+        ).toHaveBeenCalledTimes(0);
       });
     });
 
     describe('when caption is not changed in copied images', () => {
       it('should not submit the translation', () => {
-        component.textToTranslate = '<oppia-noninteractive-image alt-with-' +
+        component.textToTranslate =
+          '<oppia-noninteractive-image alt-with-' +
           'value="&amp;quot;Image description&amp;quot;" caption-with-value=' +
           '"&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot' +
           ';img_20210129_210552_zbv0mdty94_height_54_width_490.png&amp;quot;"' +
           '></oppia-noninteractive-image>';
-        component.activeWrittenTranslation = '<oppia-noninteractive' +
+        component.activeWrittenTranslation =
+          '<oppia-noninteractive' +
           '-image alt-with-value="&amp;quot;New description&amp;quot;"' +
           ' caption-with-value="&amp;quot;Image caption&amp;quot;"' +
           ' filepath-with-value="&amp;quot:img_20210129_210552_zbv0mdty9' +
@@ -657,31 +693,39 @@ describe('Translation Modal Component', () => {
 
         component.suggestTranslatedText();
 
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
+        expect(
+          translateTextService.suggestTranslatedText
+        ).toHaveBeenCalledTimes(0);
       });
     });
 
-    describe('when translation elements are not matching with the elements ' +
-        'of the text to translate', () => {
-      it('should not submit the translation', () => {
-        // Original text contains math and skillreview custom tags.
-        component.textToTranslate = (
-          '<p>First para</p><p>Second para</p><oppia-noninteractive-math>' +
-          '</oppia-noninteractive-math><oppia-noninteractive-skillreview>' +
-          '</oppia-noninteractive-skillreview>');
-        // Translated text contains only math custom tag.
-        component.activeWrittenTranslation = (
-          '<p>First para</p>' +
-          '<p><oppia-noninteractive-math></oppia-noninteractive-math></p>');
-        spyOn(translateTextService, 'suggestTranslatedText').and.callThrough();
+    describe(
+      'when translation elements are not matching with the elements ' +
+        'of the text to translate',
+      () => {
+        it('should not submit the translation', () => {
+          // Original text contains math and skillreview custom tags.
+          component.textToTranslate =
+            '<p>First para</p><p>Second para</p><oppia-noninteractive-math>' +
+            '</oppia-noninteractive-math><oppia-noninteractive-skillreview>' +
+            '</oppia-noninteractive-skillreview>';
+          // Translated text contains only math custom tag.
+          component.activeWrittenTranslation =
+            '<p>First para</p>' +
+            '<p><oppia-noninteractive-math></oppia-noninteractive-math></p>';
+          spyOn(
+            translateTextService,
+            'suggestTranslatedText'
+          ).and.callThrough();
 
-        component.suggestTranslatedText();
+          component.suggestTranslatedText();
 
-        expect(translateTextService.suggestTranslatedText)
-          .toHaveBeenCalledTimes(0);
-      });
-    });
+          expect(
+            translateTextService.suggestTranslatedText
+          ).toHaveBeenCalledTimes(0);
+        });
+      }
+    );
 
     describe('when skipping translations', () => {
       it('should update activeContentType', () => {
@@ -709,115 +753,125 @@ describe('Translation Modal Component', () => {
             language_code: 'es',
             content_html: ['answer1', 'answer2', 'answer3'],
             translation_html: ['answero1', 'answero2', 'answero3'],
-            data_format: 'set_of_normalized_string'
+            data_format: 'set_of_normalized_string',
           },
-          files: {}
+          files: {},
         };
         component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.skipActiveTranslation();
         component.activeWrittenTranslation = [
-          'answero1', 'answero2', 'answero3'];
+          'answero1',
+          'answero2',
+          'answero3',
+        ];
       });
 
       it('should close the modal', fakeAsync(() => {
         spyOn(component, 'close');
         spyOn(
           imageLocalStorageService,
-          'getFilenameToBase64MappingAsync').and.returnValue(
-          Promise.resolve({}));
+          'getFilenameToBase64MappingAsync'
+        ).and.returnValue(Promise.resolve({}));
         component.suggestTranslatedText();
         tick();
 
-        const req = httpTestingController.expectOne(
-          '/suggestionhandler/');
+        const req = httpTestingController.expectOne('/suggestionhandler/');
         expect(req.request.method).toEqual('POST');
         expect(req.request.body.getAll('payload')[0]).toEqual(
-          JSON.stringify(expectedPayload));
+          JSON.stringify(expectedPayload)
+        );
         req.flush({});
         flushMicrotasks();
         expect(component.close).toHaveBeenCalled();
       }));
     });
 
-    it('should register a contributor dashboard submit suggestion event',
-      () => {
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardSubmitSuggestionEvent'
-        );
-        spyOn(translateTextService, 'suggestTranslatedText').and.stub();
-        component.suggestTranslatedText();
-      });
+    it('should register a contributor dashboard submit suggestion event', () => {
+      spyOn(
+        siteAnalyticsService,
+        'registerContributorDashboardSubmitSuggestionEvent'
+      );
+      spyOn(translateTextService, 'suggestTranslatedText').and.stub();
+      component.suggestTranslatedText();
+    });
 
-    it('should flush stored image data',
-      fakeAsync(() => {
-        imagesData = [{
+    it('should flush stored image data', fakeAsync(() => {
+      imagesData = [
+        {
           filename: 'imageFilename1',
-          imageBlob: new Blob(['imageBlob1'])
-        }, {
+          imageBlob: new Blob(['imageBlob1']),
+        },
+        {
           filename: 'imageFilename2',
-          imageBlob: new Blob(['imageBlob2'])
-        }];
-        const imageToBase64Mapping = {
-          imageFilename1: 'img1Base64',
-          imageFilename2: 'img2Base64'
-        };
-        spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
-          imagesData
-        );
-        spyOn(
-          imageLocalStorageService,
-          'getFilenameToBase64MappingAsync').and.returnValue(
-          Promise.resolve(imageToBase64Mapping));
-        component.suggestTranslatedText();
-        tick();
-        flushMicrotasks();
-        const req = httpTestingController.expectOne(
-          '/suggestionhandler/');
-        const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
-        expect(req.request.method).toEqual('POST');
-        expect(files.imageFilename1).toContain('img1Base64');
-        expect(files.imageFilename2).toContain('img2Base64');
-        req.flush({});
-        flushMicrotasks();
-      }));
+          imageBlob: new Blob(['imageBlob2']),
+        },
+      ];
+      const imageToBase64Mapping = {
+        imageFilename1: 'img1Base64',
+        imageFilename2: 'img2Base64',
+      };
+      spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue(
+        imagesData
+      );
+      spyOn(
+        imageLocalStorageService,
+        'getFilenameToBase64MappingAsync'
+      ).and.returnValue(Promise.resolve(imageToBase64Mapping));
+      component.suggestTranslatedText();
+      tick();
+      flushMicrotasks();
+      const req = httpTestingController.expectOne('/suggestionhandler/');
+      const files = JSON.parse(req.request.body.getAll('payload')[0]).files;
+      expect(req.request.method).toEqual('POST');
+      expect(files.imageFilename1).toContain('img1Base64');
+      expect(files.imageFilename2).toContain('img2Base64');
+      req.flush({});
+      flushMicrotasks();
+    }));
 
     it('should not reset the image save destination', fakeAsync(() => {
       spyOn(translateTextService, 'suggestTranslatedText').and.stub();
       spyOn(
         imageLocalStorageService,
-        'getFilenameToBase64MappingAsync').and.returnValue(
-        Promise.resolve({}));
+        'getFilenameToBase64MappingAsync'
+      ).and.returnValue(Promise.resolve({}));
       expect(contextService.getImageSaveDestination()).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      );
       component.suggestTranslatedText();
       tick();
       expect(contextService.getImageSaveDestination()).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      );
     }));
 
     it('should reset the image save destination', fakeAsync(() => {
       spyOn(
         imageLocalStorageService,
-        'getFilenameToBase64MappingAsync').and.returnValue(
-        Promise.resolve({}));
+        'getFilenameToBase64MappingAsync'
+      ).and.returnValue(Promise.resolve({}));
       component.suggestTranslatedText();
       tick();
-      const req = httpTestingController.expectOne(
-        '/suggestionhandler/');
+      const req = httpTestingController.expectOne('/suggestionhandler/');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body.getAll('payload')[0]).toEqual(
-        JSON.stringify(expectedPayload));
-      req.flush({
-        error: 'Error'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+        JSON.stringify(expectedPayload)
+      );
+      req.flush(
+        {
+          error: 'Error',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
       flushMicrotasks();
       component.suggestTranslatedText();
       expect(contextService.getImageSaveDestination()).toBe(
-        AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
     }));
   });
 });

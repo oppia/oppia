@@ -16,31 +16,34 @@
  * @fileoverview Service containing all i18n logic.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
-import { TranslateCacheService } from 'ngx-translate-cache';
-import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { I18nLanguageCodeService, LanguageInfo } from 'services/i18n-language-code.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserBackendApiService } from 'services/user-backend-api.service';
-import { CookieService } from 'ngx-cookie';
-import { UserService } from 'services/user.service';
+import {EventEmitter, Injectable} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
+import {TranslateCacheService} from 'ngx-translate-cache';
+import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  I18nLanguageCodeService,
+  LanguageInfo,
+} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserBackendApiService} from 'services/user-backend-api.service';
+import {CookieService} from 'ngx-cookie';
+import {UserService} from 'services/user.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class I18nService {
-  private _directionChangeEventEmitter: EventEmitter<string> = (
-    new EventEmitter<string>());
+  private _directionChangeEventEmitter: EventEmitter<string> =
+    new EventEmitter<string>();
 
   COOKIE_NAME_COOKIES_ACKNOWLEDGED = 'OPPIA_COOKIES_ACKNOWLEDGED';
   url!: URL;
   // Check that local storage exists and works as expected.
   // If it does storage stores the localStorage object,
   // else storage is undefined or false.
-  localStorage = (function() {
+  localStorage = (function () {
     let test = 'test';
     let result;
     try {
@@ -49,21 +52,19 @@ export class I18nService {
       localStorage.removeItem(test);
       return result && localStorage;
     } catch (exception) {}
-  }());
+  })();
 
   supportedSiteLanguageCodes = Object.assign(
     {},
     ...AppConstants.SUPPORTED_SITE_LANGUAGES.map(
-      (languageInfo: LanguageInfo) => (
-        {[languageInfo.id]: languageInfo.direction}
-      )
+      (languageInfo: LanguageInfo) => ({
+        [languageInfo.id]: languageInfo.direction,
+      })
     )
   );
 
-
   constructor(
-    private documentAttributeCustomizationService:
-    DocumentAttributeCustomizationService,
+    private documentAttributeCustomizationService: DocumentAttributeCustomizationService,
     private cookieService: CookieService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userBackendApiService: UserBackendApiService,
@@ -78,53 +79,50 @@ export class I18nService {
     if (this.localStorage) {
       this.localStorage.setItem('lang', langCode);
       this.localStorage.setItem(
-        'direction', this.supportedSiteLanguageCodes[langCode]
+        'direction',
+        this.supportedSiteLanguageCodes[langCode]
       );
     }
   }
 
   initialize(): void {
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-      (code) => {
-        const cookieSetDateMsecs = this.cookieService.get(
-          this.COOKIE_NAME_COOKIES_ACKNOWLEDGED);
-        const langDirection = (
-          this.i18nLanguageCodeService.isLanguageRTL(code) ? 'rtl' : 'ltr');
-        let prevLangDirection = (
-          this.i18nLanguageCodeService.isLanguageRTL(
-            I18nLanguageCodeService.prevLangCode
-          ) ? 'rtl' : 'ltr');
-        this.translateService.use(code);
-        this.documentAttributeCustomizationService.addAttribute('lang', code);
-        if (!!cookieSetDateMsecs &&
-          +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
-        ) {
-          prevLangDirection = (
-            this.cookieService.get('dir') || prevLangDirection
-          );
-          this.cookieService.put(
-            'dir',
-            langDirection
-          );
-          this.cookieService.put('lang', code);
-          if (prevLangDirection !== langDirection) {
-            this.windowRef.nativeWindow.location.reload();
-          }
-        } else {
-          const parser = new URL(this.windowRef.nativeWindow.location.href);
-          let urlParamDir = parser.searchParams.get('dir');
-          if (urlParamDir === null) {
-            urlParamDir = 'ltr';
-          }
-          if (urlParamDir === langDirection) {
-            return;
-          }
-          parser.searchParams.set('dir', langDirection);
-          this.windowRef.nativeWindow.location.href = (
-            parser.href);
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(code => {
+      const cookieSetDateMsecs = this.cookieService.get(
+        this.COOKIE_NAME_COOKIES_ACKNOWLEDGED
+      );
+      const langDirection = this.i18nLanguageCodeService.isLanguageRTL(code)
+        ? 'rtl'
+        : 'ltr';
+      let prevLangDirection = this.i18nLanguageCodeService.isLanguageRTL(
+        I18nLanguageCodeService.prevLangCode
+      )
+        ? 'rtl'
+        : 'ltr';
+      this.translateService.use(code);
+      this.documentAttributeCustomizationService.addAttribute('lang', code);
+      if (
+        !!cookieSetDateMsecs &&
+        +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+      ) {
+        prevLangDirection = this.cookieService.get('dir') || prevLangDirection;
+        this.cookieService.put('dir', langDirection);
+        this.cookieService.put('lang', code);
+        if (prevLangDirection !== langDirection) {
+          this.windowRef.nativeWindow.location.reload();
         }
+      } else {
+        const parser = new URL(this.windowRef.nativeWindow.location.href);
+        let urlParamDir = parser.searchParams.get('dir');
+        if (urlParamDir === null) {
+          urlParamDir = 'ltr';
+        }
+        if (urlParamDir === langDirection) {
+          return;
+        }
+        parser.searchParams.set('dir', langDirection);
+        this.windowRef.nativeWindow.location.href = parser.href;
       }
-    );
+    });
 
     // Loads site language according to the language parameter in URL
     // if present.
@@ -143,7 +141,8 @@ export class I18nService {
         // cache, and avoids race conditions.
         this.setLocalStorageKeys(siteLanguageCode);
         this._updateDirection(
-          this.supportedSiteLanguageCodes[siteLanguageCode]);
+          this.supportedSiteLanguageCodes[siteLanguageCode]
+        );
       } else {
         // In the case where the URL contains an invalid language code, we
         // load the site using last cached language code and remove the language
@@ -158,12 +157,12 @@ export class I18nService {
     // and the language code stored in the local storage.
     this.translateCacheService.init();
 
-    const cachedLanguageCode = (
-      this.translateCacheService.getCachedLanguage());
+    const cachedLanguageCode = this.translateCacheService.getCachedLanguage();
     if (cachedLanguageCode) {
       this.i18nLanguageCodeService.setI18nLanguageCode(cachedLanguageCode);
       this._updateDirection(
-        this.supportedSiteLanguageCodes[cachedLanguageCode]);
+        this.supportedSiteLanguageCodes[cachedLanguageCode]
+      );
     }
   }
 
@@ -171,25 +170,26 @@ export class I18nService {
     if (this.url.searchParams.has('lang')) {
       this.url.searchParams.delete('lang');
       this.windowRef.nativeWindow.history.pushState(
-        {}, '', this.url.toString());
+        {},
+        '',
+        this.url.toString()
+      );
     }
   }
-
 
   updateUserPreferredLanguage(newLangCode: string): void {
     this.siteAnalyticsService.registerSiteLanguageChangeEvent(newLangCode);
     this.setLocalStorageKeys(newLangCode);
 
-
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       // If user is logged in first save the language and then reload,
       // otherwise just reload.
       if (userInfo.isLoggedIn()) {
-        this.userBackendApiService.updatePreferredSiteLanguageAsync(
-          newLangCode
-        ).then(() => {
-          this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
-        });
+        this.userBackendApiService
+          .updatePreferredSiteLanguageAsync(newLangCode)
+          .then(() => {
+            this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
+          });
       } else {
         this.i18nLanguageCodeService.setI18nLanguageCode(newLangCode);
       }
@@ -202,7 +202,7 @@ export class I18nService {
   }
 
   updateViewToUserPreferredSiteLanguage(): void {
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       let preferredLangCode = userInfo.getPreferredSiteLanguageCode() || '';
 
       if (preferredLangCode) {

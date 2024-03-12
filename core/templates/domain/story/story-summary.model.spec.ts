@@ -16,8 +16,8 @@
  * @fileoverview Tests for StorySummary model.
  */
 
-import { StoryNode } from './story-node.model';
-import { StorySummary } from 'domain/story/story-summary.model';
+import {StoryNode} from './story-node.model';
+import {StorySummary} from 'domain/story/story-summary.model';
 
 describe('Story summary model', () => {
   let _sampleStorySummary: StorySummary;
@@ -39,7 +39,7 @@ describe('Story summary model', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
 
     const sampleStorySummaryBackendDict = {
@@ -61,7 +61,7 @@ describe('Story summary model', () => {
       upcoming_chapters_count: 1,
       upcoming_chapters_expected_days: [3],
       overdue_chapters_count: 1,
-      visited_chapter_titles: ['Chapter 2']
+      visited_chapter_titles: ['Chapter 2'],
     };
     _sampleStorySummary = StorySummary.createFromBackendDict(
       sampleStorySummaryBackendDict
@@ -73,7 +73,9 @@ describe('Story summary model', () => {
     expect(_sampleStorySummary.getTitle()).toEqual('Story title');
     expect(_sampleStorySummary.getUrlFragment()).toEqual('story-url-fragment');
     expect(_sampleStorySummary.getNodeTitles()).toEqual([
-      'Chapter 1', 'Chapter 2']);
+      'Chapter 1',
+      'Chapter 2',
+    ]);
     expect(_sampleStorySummary.getThumbnailFilename()).toEqual('image.svg');
     expect(_sampleStorySummary.getThumbnailBgColor()).toEqual('#F8BF74');
     expect(_sampleStorySummary.getDescription()).toEqual('Description');
@@ -97,8 +99,8 @@ describe('Story summary model', () => {
         planned_publication_date_msecs: 100,
         last_modified_msecs: 100,
         first_publication_date_msecs: 200,
-        unpublishing_reason: null
-      })
+        unpublishing_reason: null,
+      }),
     ]);
     expect(_sampleStorySummary.getCompletedNodeTitles()).toEqual(['Chapter 1']);
     expect(_sampleStorySummary.getTopicName()).toEqual('Topic one');
@@ -109,7 +111,8 @@ describe('Story summary model', () => {
     expect(_sampleStorySummary.getUpcomingChaptersCount()).toEqual(1);
     expect(_sampleStorySummary.getUpcomingChaptersExpectedDays()).toEqual([3]);
     expect(_sampleStorySummary.getOverdueChaptersCount()).toEqual(1);
-    expect(_sampleStorySummary.getVisitedChapterTitles()).toEqual(
-      ['Chapter 2']);
+    expect(_sampleStorySummary.getVisitedChapterTitles()).toEqual([
+      'Chapter 2',
+    ]);
   });
 });

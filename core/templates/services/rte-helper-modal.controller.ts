@@ -16,20 +16,20 @@
  * @fileoverview Component for RteHelperModal.
  */
 
-import { Component, Input, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
+import {Component, Input, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { ExternalRteSaveService } from 'services/external-rte-save.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { ServicesConstants } from 'services/services.constants';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {ServicesConstants} from 'services/services.constants';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {FormBuilder, FormGroup} from '@angular/forms';
 
 const typedCloneDeep = <T>(obj: T): T => cloneDeep(obj);
 
@@ -42,10 +42,10 @@ type ComponentSpecsType = typeof ServicesConstants.RTE_COMPONENT_SPECS;
 type ConvertStringLiteralsToString<T> = T extends string
   ? string // If T is a string, return the string type.
   : T extends object
-  ? // // If T is an object, map each key K of T to a new object with the same
-    // key but a value of ConvertStringLiteralsToString<T[K]>.
-    { [K in keyof T]: ConvertStringLiteralsToString<T[K]> }
-  : T; // If T is not a string or an object, return T unchanged.
+    ? // // If T is an object, map each key K of T to a new object with the same
+      // key but a value of ConvertStringLiteralsToString<T[K]>.
+      {[K in keyof T]: ConvertStringLiteralsToString<T[K]>}
+    : T; // If T is not a string or an object, return T unchanged.
 
 // CustomizationArgsSpecsType extracts the customization_arg_specs array from
 // each component in ComponentSpecsType.
@@ -53,8 +53,7 @@ type ConvertStringLiteralsToString<T> = T extends string
 // then indexes into the object using [number] to represent any index in the
 // array.
 export type CustomizationArgsSpecsType = {
-  [K in keyof ComponentSpecsType]:
-  ComponentSpecsType[K]['customization_arg_specs'][number][];
+  [K in keyof ComponentSpecsType]: ComponentSpecsType[K]['customization_arg_specs'][number][];
   // Finally, use [keyof ComponentSpecsType] to create a union of all the array
   // types.
 }[keyof ComponentSpecsType];
@@ -62,12 +61,11 @@ export type CustomizationArgsSpecsType = {
 // object with keys as 'name' and values as the 'default_value'.
 // It uses mapped types and Extract to achieve this.
 export type CustomizationArgsForRteType = {
-  [K in CustomizationArgsSpecsType[number]['name']]:
-  ConvertStringLiteralsToString<
+  [K in CustomizationArgsSpecsType[number]['name']]: ConvertStringLiteralsToString<
     // Extract is used to find the correct customization_arg_specs object that
     // has the 'name' property equal to K.
-    Extract<CustomizationArgsSpecsType[number], { name: K }>['default_value']
-  >
+    Extract<CustomizationArgsSpecsType[number], {name: K}>['default_value']
+  >;
 };
 
 // CustomizationArgsNameAndValueArray creates an array of objects with 'name'
@@ -78,23 +76,20 @@ type CustomizationArgsNameAndValueArray = {
   [K in keyof ComponentSpecsType]: {
     // Extract the 'name' property from the customization_arg_specs array.
     name: ComponentSpecsType[K]['customization_arg_specs'][number]['name'];
-    value: (
-      // Check if the 'name' property is equal to 'math_content' using a
-      // conditional type.
-      ComponentSpecsType[K][
-        'customization_arg_specs'][number]['name'] extends 'math_content' ?
-      ConvertStringLiteralsToString<
-        ComponentSpecsType[K][
-          'customization_arg_specs'][number]['default_value']
-      > & {
-      svgFile: string | null;
-      mathExpressionSvgIsBeingProcessed: boolean;
-    } :
-    // If the 'name' property is not equal to 'math_content', create a type with
-    // the 'default_value' converted to a string.
-    ConvertStringLiteralsToString<
-      ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
-    >);
+    value: // Check if the 'name' property is equal to 'math_content' using a
+    // conditional type.
+    ComponentSpecsType[K]['customization_arg_specs'][number]['name'] extends 'math_content'
+      ? ConvertStringLiteralsToString<
+          ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
+        > & {
+          svgFile: string | null;
+          mathExpressionSvgIsBeingProcessed: boolean;
+        }
+      : // If the 'name' property is not equal to 'math_content', create a type with
+        // the 'default_value' converted to a string.
+        ConvertStringLiteralsToString<
+          ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
+        >;
   }[];
   // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
@@ -142,12 +137,12 @@ export class RteHelperModalComponent {
         // the correct type.
         const mathValueDict = {
           name: caName,
-          value: this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-            typedCloneDeep(this.attrsCustomizationArgsDict[caName]) :
-            this.customizationArgSpecs[i].default_value,
+          value: this.attrsCustomizationArgsDict.hasOwnProperty(caName)
+            ? typedCloneDeep(this.attrsCustomizationArgsDict[caName])
+            : this.customizationArgSpecs[i].default_value,
         } as Extract<
           CustomizationArgsNameAndValueArray[number],
-          { name: typeof caName }
+          {name: typeof caName}
         >;
         // If the component being created or edited is math rich text component,
         // we need to pass this extra attribute svgFile to the math RTE editor.
@@ -159,7 +154,7 @@ export class RteHelperModalComponent {
         (
           this.tmpCustomizationArgs as Extract<
             CustomizationArgsNameAndValueArray[number],
-            { name: typeof caName }
+            {name: typeof caName}
           >[]
         ).push(mathValueDict);
       } else {
@@ -169,17 +164,17 @@ export class RteHelperModalComponent {
         // the correct type.
         const tmpCustomizationArg = {
           name: caName,
-          value: this.attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-            angular.copy(this.attrsCustomizationArgsDict[caName]) :
-            this.customizationArgSpecs[i].default_value,
+          value: this.attrsCustomizationArgsDict.hasOwnProperty(caName)
+            ? angular.copy(this.attrsCustomizationArgsDict[caName])
+            : this.customizationArgSpecs[i].default_value,
         } as Extract<
           CustomizationArgsNameAndValueArray[number],
-          { name: typeof caName }
+          {name: typeof caName}
         >;
         (
           this.tmpCustomizationArgs as Extract<
             CustomizationArgsNameAndValueArray[number],
-            { name: typeof caName }
+            {name: typeof caName}
           >[]
         ).push(tmpCustomizationArg);
       }
@@ -189,8 +184,8 @@ export class RteHelperModalComponent {
     // TODO(#18219): Remove the typecast once Typescript is able to infer
     // the correct type..
     const customizationArgNames = (
-      this.customizationArgSpecs as { name: string }[]
-    ).map((x) => x.name);
+      this.customizationArgSpecs as {name: string}[]
+    ).map(x => x.name);
     if (
       customizationArgNames.includes('url') &&
       customizationArgNames.includes('text')
@@ -232,9 +227,9 @@ export class RteHelperModalComponent {
     } else {
       // We know that this is a math rich text component. Hence we can make the
       // the type more specific.
-      const { value } = this.tmpCustomizationArgs[0] as Extract<
+      const {value} = this.tmpCustomizationArgs[0] as Extract<
         CustomizationArgsNameAndValueArray[number],
-        { name: 'math_content' }
+        {name: 'math_content'}
       >;
       return value.mathExpressionSvgIsBeingProcessed || value.raw_latex === '';
     }
@@ -252,7 +247,7 @@ export class RteHelperModalComponent {
     // the type more specific.
     const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
       CustomizationArgsNameAndValueArray[number],
-      { name: 'url' | 'text' }
+      {name: 'url' | 'text'}
     >[];
     let url: string = tmpCustomizationArgs[0].value;
     let text: string = tmpCustomizationArgs[1].value;
@@ -286,14 +281,13 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      this.tmpCustomizationArgs[index].value = (
-        this.customizationArgsForm.value[index]);
+      this.tmpCustomizationArgs[index].value =
+        this.customizationArgsForm.value[index];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
 
     const customizationArgsDict: {
-      [Prop in keyof CustomizationArgsForRteType]?:
-      CustomizationArgsForRteType[Prop]
+      [Prop in keyof CustomizationArgsForRteType]?: CustomizationArgsForRteType[Prop];
     } = {};
     // For the case of the math rich text components, we need to handle the
     // saving of the generated SVG file here because the process of saving
@@ -309,7 +303,7 @@ export class RteHelperModalComponent {
       // the type more specific.
       const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
         CustomizationArgsNameAndValueArray[number],
-        { name: 'math_content' }
+        {name: 'math_content'}
       >[];
       const svgFile = tmpCustomizationArgs[0].value.svgFile;
       const svgFileName = tmpCustomizationArgs[0].value.svg_filename;
@@ -369,7 +363,7 @@ export class RteHelperModalComponent {
           this.contextService.getEntityId()
         )
         .then(
-          (response) => {
+          response => {
             const mathContentDict = {
               raw_latex: tmpCustomizationArgs[0].value.raw_latex,
               svg_filename: response.filename,
@@ -378,7 +372,7 @@ export class RteHelperModalComponent {
             customizationArgsDict[caName] = mathContentDict;
             this.ngbActiveModal.close(customizationArgsDict);
           },
-          (errorResponse) => {
+          errorResponse => {
             this.alertsService.addWarning(
               errorResponse.error || 'Error communicating with server.'
             );
@@ -397,8 +391,7 @@ export class RteHelperModalComponent {
           // Set the link `text` to the link `url` if the `text` is empty.
           (
             customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-                CustomizationArgsNameAndValueArray[number]['value'];
+              [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
             }
           )[caName] =
             this.tmpCustomizationArgs[i].value ||
@@ -406,8 +399,7 @@ export class RteHelperModalComponent {
         } else {
           (
             customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]:
-                CustomizationArgsNameAndValueArray[number]['value'];
+              [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
             }
           )[caName] = this.tmpCustomizationArgs[i].value;
         }
@@ -418,8 +410,8 @@ export class RteHelperModalComponent {
 
   extractVideoIdFromVideoUrl(url: string): string {
     const videoUrl = url.split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-    return videoUrl[2] !== undefined ?
-      videoUrl[2].split(/[^0-9a-z_\-]/i)[0] :
-      videoUrl[0];
+    return videoUrl[2] !== undefined
+      ? videoUrl[2].split(/[^0-9a-z_\-]/i)[0]
+      : videoUrl[0];
   }
 }

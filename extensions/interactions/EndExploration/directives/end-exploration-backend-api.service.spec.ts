@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for EndExplorationBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { EndExplorationBackendApiService } from './end-exploration-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {EndExplorationBackendApiService} from './end-exploration-backend-api.service';
 
 describe('End Exploration Backend Api Service', () => {
   let service: EndExplorationBackendApiService;
@@ -29,7 +32,7 @@ describe('End Exploration Backend Api Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EndExplorationBackendApiService]
+      providers: [EndExplorationBackendApiService],
     });
     httpTestingController = TestBed.get(HttpTestingController);
     service = TestBed.get(EndExplorationBackendApiService);
@@ -39,23 +42,24 @@ describe('End Exploration Backend Api Service', () => {
     httpTestingController.verify();
   });
 
-  it('should get data when getRecommendExplorationsData function called',
-    fakeAsync(() => {
-      const explorationIds = ['0'];
-      const requestUrl = '/explorationsummarieshandler/data?' +
-      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds));
+  it('should get data when getRecommendExplorationsData function called', fakeAsync(() => {
+    const explorationIds = ['0'];
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds));
 
-      service.getRecommendExplorationsData(
-        explorationIds).then(successHandler, failHandler);
+    service
+      .getRecommendExplorationsData(explorationIds)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush([]);
+    let req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

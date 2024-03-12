@@ -16,15 +16,23 @@
  * @fileoverview Preferred languages component.
  */
 
-import { ENTER } from '@angular/cdk/keycodes';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatChipList } from '@angular/material/chips';
-import { LanguageIdAndText } from 'domain/utilities/language-util.service';
+import {ENTER} from '@angular/cdk/keycodes';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {MatChipList} from '@angular/material/chips';
+import {LanguageIdAndText} from 'domain/utilities/language-util.service';
 
 @Component({
   selector: 'oppia-preferred-languages',
-  templateUrl: './preferred-languages.component.html'
+  templateUrl: './preferred-languages.component.html',
 })
 export class PreferredLanguagesComponent implements AfterViewInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -34,8 +42,8 @@ export class PreferredLanguagesComponent implements AfterViewInit {
   @ViewChild('languageInput') languageInput!: ElementRef<HTMLInputElement>;
   @Input() preferredLanguages!: string[];
   @Input() choices!: LanguageIdAndText[];
-  @Output() preferredLanguagesChange: EventEmitter<string[]> = (
-    new EventEmitter());
+  @Output() preferredLanguagesChange: EventEmitter<string[]> =
+    new EventEmitter();
 
   selectable = true;
   removable = true;
@@ -67,11 +75,12 @@ export class PreferredLanguagesComponent implements AfterViewInit {
         break;
       }
     }
-    return availableLanguage &&
-      this.preferredLanguages.indexOf(value) < 0 ? true : false;
+    return availableLanguage && this.preferredLanguages.indexOf(value) < 0
+      ? true
+      : false;
   }
 
-  add(event: { value: string }): void {
+  add(event: {value: string}): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -94,7 +103,7 @@ export class PreferredLanguagesComponent implements AfterViewInit {
     }
   }
 
-  selected(event: { option: { value: string } }): void {
+  selected(event: {option: {value: string}}): void {
     if (this.preferredLanguages.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -107,8 +116,8 @@ export class PreferredLanguagesComponent implements AfterViewInit {
       this.filteredChoices = this.choices.filter(choice => {
         const lowerSearchQuery = this.searchQuery.toLowerCase();
         return (
-          (choice.text.toLowerCase().includes(lowerSearchQuery)) ||
-          (choice.id.toLowerCase().includes(lowerSearchQuery))
+          choice.text.toLowerCase().includes(lowerSearchQuery) ||
+          choice.id.toLowerCase().includes(lowerSearchQuery)
         );
       });
     } else {

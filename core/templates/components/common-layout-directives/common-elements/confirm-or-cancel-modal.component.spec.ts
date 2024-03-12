@@ -16,9 +16,8 @@
  * @fileoverview Unit tests for ConfirmOrCancelModalController.
  */
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from './confirm-or-cancel-modal.component';
-
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from './confirm-or-cancel-modal.component';
 
 describe('Confirm Or Cancel Modal Component', () => {
   let confirmOrCancelModal: ConfirmOrCancelModal;
@@ -34,18 +33,18 @@ describe('Confirm Or Cancel Modal Component', () => {
     closeSpy = spyOn(modalInstance, 'close').and.callThrough();
   });
 
-  it('should close modal with the correct value', function() {
+  it('should close modal with the correct value', function () {
     const message = 'closing';
     confirmOrCancelModal.confirm<string>(message);
     expect(closeSpy).toHaveBeenCalledWith(message);
   });
 
-  it('should dismiss modal', function() {
+  it('should dismiss modal', function () {
     confirmOrCancelModal.cancel<string>();
     expect(dismissSpy).toHaveBeenCalledWith('cancel');
   });
 
-  it('should dismiss modal with the correct value', function() {
+  it('should dismiss modal with the correct value', function () {
     const message = 'canceling';
     confirmOrCancelModal.cancel<string>(message);
     expect(dismissSpy).toHaveBeenCalledWith(message);

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MathJaxDirective } from './mathjax.directive';
+import {Component} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MathJaxDirective} from './mathjax.directive';
 
 /**
  * @fileoverview Unit tests for mathjax directive
@@ -22,7 +22,7 @@ import { MathJaxDirective } from './mathjax.directive';
 
 @Component({
   selector: 'mock-comp-a',
-  template: '  <span [oppiaMathJax]="expr"></span>'
+  template: '  <span [oppiaMathJax]="expr"></span>',
 })
 class MockCompA {
   expr: string = '/frac{x}{y}';
@@ -30,10 +30,10 @@ class MockCompA {
 const mockMathJaxHub = {
   Queue: () => {
     return;
-  }
+  },
 };
 const mockMathJs = {
-  Hub: mockMathJaxHub
+  Hub: mockMathJaxHub,
 };
 
 describe('MathJax directive', () => {
@@ -42,7 +42,7 @@ describe('MathJax directive', () => {
   const originalMathJax = window.MathJax;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MockCompA, MathJaxDirective]
+      declarations: [MockCompA, MathJaxDirective],
     }).compileComponents();
   }));
 

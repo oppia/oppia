@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for QuestionsListService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { Subscription } from 'rxjs';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {Subscription} from 'rxjs';
 
-import { QuestionsListService } from 'services/questions-list.service';
+import {QuestionsListService} from 'services/questions-list.service';
 
 describe('Questions List Service', () => {
   let qls: QuestionsListService;
@@ -29,22 +31,24 @@ describe('Questions List Service', () => {
   let quesionSummariesInitializedSpy: jasmine.Spy;
   let testSubscriptions: Subscription;
   let sampleResponse = {
-    question_summary_dicts: [{
-      skill_descriptions: [],
-      summary: {
-        creator_id: '1',
-        created_on_msec: 0,
-        last_updated_msec: 0,
-        id: '0',
-        question_content: ''
-      }
-    }],
-    more: false
+    question_summary_dicts: [
+      {
+        skill_descriptions: [],
+        summary: {
+          creator_id: '1',
+          created_on_msec: 0,
+          last_updated_msec: 0,
+          id: '0',
+          question_content: '',
+        },
+      },
+    ],
+    more: false,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     qls = TestBed.get(QuestionsListService);
     httpTestingController = TestBed.get(HttpTestingController);
@@ -52,11 +56,14 @@ describe('Questions List Service', () => {
 
   beforeEach(() => {
     quesionSummariesInitializedSpy = jasmine.createSpy(
-      'questionSummariesInitialized');
+      'questionSummariesInitialized'
+    );
     testSubscriptions = new Subscription();
-    testSubscriptions.add(qls.onQuestionSummariesInitialized.subscribe(
-      quesionSummariesInitializedSpy
-    ));
+    testSubscriptions.add(
+      qls.onQuestionSummariesInitialized.subscribe(
+        quesionSummariesInitializedSpy
+      )
+    );
   });
 
   afterEach(() => {
@@ -76,19 +83,41 @@ describe('Questions List Service', () => {
     expect(qls.getCurrentPageNumber()).toBe(0);
   }));
 
-  it('should not get question summaries when no skill id is provided',
-    fakeAsync(() => {
-      httpTestingController.expectNone('/questions_list_handler/?offset=');
-      qls.getQuestionSummariesAsync('', false, false);
-      flushMicrotasks();
-    })
-  );
+  it('should not get question summaries when no skill id is provided', fakeAsync(() => {
+    httpTestingController.expectNone('/questions_list_handler/?offset=');
+    qls.getQuestionSummariesAsync('', false, false);
+    flushMicrotasks();
+  }));
 
-  it('should get question summaries twice with history reset',
+  it('should get question summaries twice with history reset', fakeAsync(() => {
+    qls.getQuestionSummariesAsync('1', true, true);
+    let req = httpTestingController.expectOne(
+      '/questions_list_handler/1?offset=0'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponse);
+    flushMicrotasks();
+
+    expect(qls.getCurrentPageNumber()).toBe(0);
+    expect(qls.isLastQuestionBatch()).toBe(true);
+
+    qls.getQuestionSummariesAsync('1', true, true);
+    req = httpTestingController.expectOne('/questions_list_handler/1?offset=0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResponse);
+    flushMicrotasks();
+
+    expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(2);
+  }));
+
+  it(
+    "should not get question summaries twice when page number doesn't" +
+      ' increase',
     fakeAsync(() => {
-      qls.getQuestionSummariesAsync('1', true, true);
+      qls.getQuestionSummariesAsync('1', true, false);
       let req = httpTestingController.expectOne(
-        '/questions_list_handler/1?offset=0');
+        '/questions_list_handler/1?offset=0'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
       flushMicrotasks();
@@ -96,9 +125,23 @@ describe('Questions List Service', () => {
       expect(qls.getCurrentPageNumber()).toBe(0);
       expect(qls.isLastQuestionBatch()).toBe(true);
 
+      // Try to get questions again before incresing pagenumber.
       qls.getQuestionSummariesAsync('1', true, true);
       req = httpTestingController.expectOne(
-        '/questions_list_handler/1?offset=0');
+        '/questions_list_handler/1?offset=0'
+      );
+      flushMicrotasks();
+      httpTestingController.verify();
+
+      // Increase page number.
+      qls.incrementPageNumber();
+      expect(qls.getCurrentPageNumber()).toBe(1);
+      expect(qls.isLastQuestionBatch()).toBe(false);
+
+      qls.getQuestionSummariesAsync('1', true, false);
+      req = httpTestingController.expectOne(
+        '/questions_list_handler/1?offset=0'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush(sampleResponse);
       flushMicrotasks();
@@ -107,44 +150,11 @@ describe('Questions List Service', () => {
     })
   );
 
-  it('should not get question summaries twice when page number doesn\'t' +
-    ' increase', fakeAsync(() => {
-    qls.getQuestionSummariesAsync('1', true, false);
-    let req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=0');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleResponse);
-    flushMicrotasks();
-
-    expect(qls.getCurrentPageNumber()).toBe(0);
-    expect(qls.isLastQuestionBatch()).toBe(true);
-
-    // Try to get questions again before incresing pagenumber.
-    qls.getQuestionSummariesAsync('1', true, true);
-    req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=0');
-    flushMicrotasks();
-    httpTestingController.verify();
-
-    // Increase page number.
-    qls.incrementPageNumber();
-    expect(qls.getCurrentPageNumber()).toBe(1);
-    expect(qls.isLastQuestionBatch()).toBe(false);
-
-    qls.getQuestionSummariesAsync('1', true, false);
-    req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=0');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleResponse);
-    flushMicrotasks();
-
-    expect(quesionSummariesInitializedSpy).toHaveBeenCalledTimes(2);
-  }));
-
   it('should get cached question summaries', fakeAsync(() => {
     qls.getQuestionSummariesAsync('1', true, true);
     const req = httpTestingController.expectOne(
-      '/questions_list_handler/1?offset=0');
+      '/questions_list_handler/1?offset=0'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(sampleResponse);
     flushMicrotasks();

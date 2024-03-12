@@ -16,20 +16,21 @@
  * @fileoverview Unit tests for collection editor routing service.
  */
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CollectionEditorRoutingService } from './collection-editor-routing.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {CollectionEditorRoutingService} from './collection-editor-routing.service';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
-      hash: '#edit'
-    }
+      hash: '#edit',
+    },
   };
 }
 
 describe('Collection editor routing service', () => {
   let cers = new CollectionEditorRoutingService(
-    new MockWindowRef() as WindowRef);
+    new MockWindowRef() as WindowRef
+  );
 
   it('should create', () => {
     expect(cers).toBeDefined();

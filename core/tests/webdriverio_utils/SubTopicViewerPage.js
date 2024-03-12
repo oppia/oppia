@@ -20,65 +20,72 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var SubTopicViewerPage = function() {
+var SubTopicViewerPage = function () {
   var conceptCardExplanation = $('.e2e-test-concept-card-explanation');
   var conceptCardListItem = $('.e2e-test-concept-card-link');
-  var conceptCardListSelector = function() {
+  var conceptCardListSelector = function () {
     return $$('.e2e-test-concept-card-link');
   };
   var subTopicTileListItem = $('.e2e-test-subtopic-tile');
-  var subTopicTileListSelector = function() {
+  var subTopicTileListSelector = function () {
     return $$('.e2e-test-subtopic-tile');
   };
 
-  this.get = async function(subTopicName) {
+  this.get = async function (subTopicName) {
     await waitFor.pageToFullyLoad();
     var subTopicTile = $(`.e2e-test-subtopic-tile=${subTopicName}`);
     await waitFor.presenceOf(
-      subTopicTile, 'Sub topic ' + subTopicName + ' card is not present,');
+      subTopicTile,
+      'Sub topic ' + subTopicName + ' card is not present,'
+    );
     await action.click(subTopicName, subTopicTile);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectRevisionCardCountToBe = async function(count) {
+  this.expectRevisionCardCountToBe = async function (count) {
     var subTopicTileList = await subTopicTileListSelector();
     if (count === 0) {
       expect(subTopicTileList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
         subTopicTileListItem,
-        'Revisions cards take too long to be visible.');
+        'Revisions cards take too long to be visible.'
+      );
       var subTopicTileList = await subTopicTileListSelector();
       expect(subTopicTileList.length).toEqual(count);
     }
   };
 
-  this.expectConceptCardCountToBe = async function(count) {
+  this.expectConceptCardCountToBe = async function (count) {
     var conceptCardList = await conceptCardListSelector();
     if (count === 0) {
       expect(conceptCardList.length).toEqual(0);
     } else {
       await waitFor.visibilityOf(
         conceptCardListItem,
-        'Concept cards take too long to be visible.');
+        'Concept cards take too long to be visible.'
+      );
       var conceptCardList = await conceptCardListSelector();
       expect(conceptCardList.length).toEqual(count);
     }
   };
 
-  this.getConceptCard = async function() {
+  this.getConceptCard = async function () {
     var conceptCardList = await conceptCardListSelector();
     var conceptCardElement = conceptCardList[0];
     await action.click('Concept card link', conceptCardElement);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectConceptCardInformationToBe = async function(description) {
+  this.expectConceptCardInformationToBe = async function (description) {
     await waitFor.visibilityOf(
       conceptCardExplanation,
-      'Concept card explanation takes too long to be visible.');
+      'Concept card explanation takes too long to be visible.'
+    );
     var text = await action.getText(
-      'Concept Card Explanation', conceptCardExplanation);
+      'Concept Card Explanation',
+      conceptCardExplanation
+    );
     expect(text).toEqual(description);
   };
 };

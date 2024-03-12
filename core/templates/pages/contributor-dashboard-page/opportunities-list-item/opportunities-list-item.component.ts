@@ -16,14 +16,13 @@
  * @fileoverview Component for the item view of an opportunity.
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { ContributorDashboardConstants } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
-import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-
+import {AppConstants} from 'app.constants';
+import {ContributorDashboardConstants} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import {Subscription} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 export interface ExplorationOpportunity {
   id: string;
@@ -44,12 +43,10 @@ export interface ExplorationOpportunity {
 @Component({
   selector: 'oppia-opportunities-list-item',
   templateUrl: './opportunities-list-item.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class OpportunitiesListItemComponent {
-  constructor(
-    private windowDimensionsService: WindowDimensionsService
-  ) {}
+  constructor(private windowDimensionsService: WindowDimensionsService) {}
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -63,45 +60,42 @@ export class OpportunitiesListItemComponent {
   @Input() showPinUnpinButton: boolean = false;
 
   labelText!: string;
-  labelStyle!: { 'background-color': string };
+  labelStyle!: {'background-color': string};
   progressPercentage!: string;
-  progressBarStyle!: { width: string };
-  translatedProgressStyle!: { width: string };
-  inReviewProgressStyle!: { width: string };
-  untranslatedProgressStyle!: { width: string };
+  progressBarStyle!: {width: string};
+  translatedProgressStyle!: {width: string};
+  inReviewProgressStyle!: {width: string};
+  untranslatedProgressStyle!: {width: string};
   targetNumQuestionsPerSkill: number = AppConstants.MAX_QUESTIONS_PER_SKILL;
   cardsAvailable: number = 0;
   onMobile!: boolean;
   resizeSubscription!: Subscription;
-  mobileBreakpoint: number = (
-    AppConstants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT);
+  mobileBreakpoint: number =
+    AppConstants.OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT;
 
-  @Output() clickActionButton: EventEmitter<string> = (
-    new EventEmitter());
+  @Output() clickActionButton: EventEmitter<string> = new EventEmitter();
 
   @Output() clickPinButton: EventEmitter<{
-    'topic_name': string;
-    'exploration_id': string;
-  }> = (
-      new EventEmitter());
+    topic_name: string;
+    exploration_id: string;
+  }> = new EventEmitter();
 
   @Output() clickUnpinButton: EventEmitter<{
-    'topic_name': string;
-    'exploration_id': string;
-  }> = (
-      new EventEmitter());
+    topic_name: string;
+    exploration_id: string;
+  }> = new EventEmitter();
 
   pinOpportunity(): void {
     this.clickPinButton.emit({
       topic_name: this.opportunity.topicName,
-      exploration_id: this.opportunity.id
+      exploration_id: this.opportunity.id,
     });
   }
 
   unpinOpportunity(): void {
     this.clickUnpinButton.emit({
       topic_name: this.opportunity.topicName,
-      exploration_id: this.opportunity.id
+      exploration_id: this.opportunity.id,
     });
   }
 
@@ -111,18 +105,19 @@ export class OpportunitiesListItemComponent {
   opportunityButtonDisabled: boolean = false;
 
   ngOnInit(): void {
-    this.onMobile = (
-      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
-    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+    this.onMobile =
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint;
+    this.resizeSubscription = this.windowDimensionsService
+      .getResizeEvent()
       .subscribe(event => {
-        this.onMobile = (
-          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+        this.onMobile =
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint;
       });
 
     if (this.opportunity && this.labelRequired) {
       this.labelText = this.opportunity.labelText;
       this.labelStyle = {
-        'background-color': this.opportunity.labelColor
+        'background-color': this.opportunity.labelColor,
       };
     }
 
@@ -131,48 +126,45 @@ export class OpportunitiesListItemComponent {
     }
     if (this.opportunity) {
       if (this.opportunity.progressPercentage) {
-        this.progressPercentage =
-          `${Math.floor(this.opportunity.progressPercentage)}%`;
+        this.progressPercentage = `${Math.floor(this.opportunity.progressPercentage)}%`;
         if (
-          this.opportunityType ===
-          AppConstants.OPPORTUNITY_TYPE_TRANSLATION
+          this.opportunityType === AppConstants.OPPORTUNITY_TYPE_TRANSLATION
         ) {
           this.translationProgressBar = true;
-          const translatedPercentage = (
-            this.opportunity.translationsCount / this.opportunity.totalCount
-          ) * 100;
-          const inReviewTranslationsPercentage = (
-            this.opportunity.inReviewCount / this.opportunity.totalCount
-          ) * 100;
-          const untranslatedPercentage = (
-            100 - (translatedPercentage + inReviewTranslationsPercentage));
+          const translatedPercentage =
+            (this.opportunity.translationsCount / this.opportunity.totalCount) *
+            100;
+          const inReviewTranslationsPercentage =
+            (this.opportunity.inReviewCount / this.opportunity.totalCount) *
+            100;
+          const untranslatedPercentage =
+            100 - (translatedPercentage + inReviewTranslationsPercentage);
 
-          this.cardsAvailable = (
+          this.cardsAvailable =
             this.opportunity.totalCount -
-              (
-                this.opportunity.translationsCount +
-                this.opportunity.inReviewCount
-              )
-          );
+            (this.opportunity.translationsCount +
+              this.opportunity.inReviewCount);
 
-          this.translatedProgressStyle = { width: translatedPercentage + '%' };
+          this.translatedProgressStyle = {width: translatedPercentage + '%'};
           this.untranslatedProgressStyle = {
-            width: untranslatedPercentage + '%'
+            width: untranslatedPercentage + '%',
           };
           this.inReviewProgressStyle = {
-            width: inReviewTranslationsPercentage + '%'
+            width: inReviewTranslationsPercentage + '%',
           };
-          this.opportunityButtonDisabled = (
+          this.opportunityButtonDisabled =
             this.opportunity.translationsCount +
-            this.opportunity.inReviewCount === this.opportunity.totalCount);
+              this.opportunity.inReviewCount ===
+            this.opportunity.totalCount;
         } else {
-          this.progressBarStyle = { width: this.progressPercentage };
+          this.progressBarStyle = {width: this.progressPercentage};
         }
       }
       this.opportunityDataIsLoading = false;
-      if (this.opportunity.subheading ===
-          ContributorDashboardConstants
-            .CORRESPONDING_DELETED_OPPORTUNITY_TEXT) {
+      if (
+        this.opportunity.subheading ===
+        ContributorDashboardConstants.CORRESPONDING_DELETED_OPPORTUNITY_TEXT
+      ) {
         this.correspondingOpportunityDeleted = true;
       }
     } else {
@@ -187,6 +179,9 @@ export class OpportunitiesListItemComponent {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaOpportunitiesListItem', downgradeComponent(
-    { component: OpportunitiesListItemComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaOpportunitiesListItem',
+    downgradeComponent({component: OpportunitiesListItemComponent})
+  );

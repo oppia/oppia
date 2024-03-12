@@ -16,7 +16,7 @@
  * @fileoverview Tests for FormatTime pipe for Oppia.
  */
 
-import { FormatTimePipe } from './format-timer.pipe';
+import {FormatTimePipe} from './format-timer.pipe';
 
 describe('Testing FormatTimePipe', () => {
   let pipe: FormatTimePipe;
@@ -28,7 +28,7 @@ describe('Testing FormatTimePipe', () => {
     expect(pipe).not.toEqual(null);
   });
 
-  it('should correctly format time', () =>{
+  it('should correctly format time', () => {
     expect(pipe.transform(200)).toEqual('03:20');
     expect(pipe.transform(474)).toEqual('07:54');
     expect(pipe.transform(556)).toEqual('09:16');

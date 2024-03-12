@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the ExplorationInitSateNameService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationInitStateNameService } from './exploration-init-state-name.service';
+import {TestBed} from '@angular/core/testing';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ExplorationInitStateNameService} from './exploration-init-state-name.service';
 
 describe('Exploration Init State Name Service', () => {
   let eisns: ExplorationInitStateNameService;
@@ -27,9 +27,7 @@ describe('Exploration Init State Name Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        ExplorationPropertyService
-      ]
+      providers: [ExplorationPropertyService],
     });
 
     eisns = TestBed.inject(ExplorationInitStateNameService);

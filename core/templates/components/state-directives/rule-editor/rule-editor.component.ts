@@ -16,19 +16,28 @@
  * @fileoverview Component for the rule editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnDestroy, OnInit, Output, AfterViewChecked } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  AfterViewChecked,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { PopulateRuleContentIdsService } from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
-import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
+import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
 import DEFAULT_OBJECT_VALUES from 'objects/object_defaults.json';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Rule } from 'domain/exploration/rule.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {Rule} from 'domain/exploration/rule.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 interface SelectItem {
   type: string;
@@ -48,10 +57,11 @@ export interface RuleDescriptionFragment {
 
 @Component({
   selector: 'oppia-rule-editor',
-  templateUrl: './rule-editor.component.html'
+  templateUrl: './rule-editor.component.html',
 })
 export class RuleEditorComponent
-  implements OnInit, OnDestroy, AfterViewChecked {
+  implements OnInit, OnDestroy, AfterViewChecked
+{
   @Input() isEditable: boolean;
   @Input() isEditingRuleInline: boolean;
   @Output() onCancelRuleEdit = new EventEmitter<void>();
@@ -67,11 +77,11 @@ export class RuleEditorComponent
   editRuleForm: object;
 
   constructor(
-     private eventBusService: EventBusService,
-     private stateInteractionIdService: StateInteractionIdService,
-     private responsesService: ResponsesService,
-     private populateRuleContentIdsService: PopulateRuleContentIdsService,
-     private readonly changeDetectorRef: ChangeDetectorRef,
+    private eventBusService: EventBusService,
+    private stateInteractionIdService: StateInteractionIdService,
+    private responsesService: ResponsesService,
+    private populateRuleContentIdsService: PopulateRuleContentIdsService,
+    private readonly changeDetectorRef: ChangeDetectorRef
   ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
@@ -82,10 +92,10 @@ export class RuleEditorComponent
       return '';
     }
 
-    let ruleDescription = (
-      INTERACTION_SPECS[
-        this.currentInteractionId
-      ].rule_descriptions[this.rule.type]);
+    let ruleDescription =
+      INTERACTION_SPECS[this.currentInteractionId].rule_descriptions[
+        this.rule.type
+      ];
 
     let PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
     let finalInputArray = ruleDescription.split(PATTERN);
@@ -95,7 +105,7 @@ export class RuleEditorComponent
       result.push({
         // Omit the leading noneditable string.
         text: i !== 0 ? finalInputArray[i] : '',
-        type: 'noneditable'
+        type: 'noneditable',
       });
       if (i === finalInputArray.length - 1) {
         break;
@@ -108,90 +118,75 @@ export class RuleEditorComponent
         // selection interaction.
         // TODO(sll): Remove the need for this special case.
         if (answerChoices.length > 0) {
-          if (
-            finalInputArray[2] === 'SetOfTranslatableHtmlContentIds'
-          ) {
-            this.ruleDescriptionChoices = answerChoices.map(
-              choice => ({
-                id: choice.label,
-                val: choice.val
-              })
-            );
+          if (finalInputArray[2] === 'SetOfTranslatableHtmlContentIds') {
+            this.ruleDescriptionChoices = answerChoices.map(choice => ({
+              id: choice.label,
+              val: choice.val,
+            }));
             result.push({
               type: 'checkboxes',
-              varName: finalInputArray[i + 1]
+              varName: finalInputArray[i + 1],
             });
           } else if (
-            finalInputArray[2] ===
-             'ListOfSetsOfTranslatableHtmlContentIds'
+            finalInputArray[2] === 'ListOfSetsOfTranslatableHtmlContentIds'
           ) {
-            this.ruleDescriptionChoices = answerChoices.map(
-              choice => ({
-                id: choice.label,
-                val: choice.val
-              })
-            );
+            this.ruleDescriptionChoices = answerChoices.map(choice => ({
+              id: choice.label,
+              val: choice.val,
+            }));
             result.push({
               type: 'dropdown',
-              varName: finalInputArray[i + 1]
+              varName: finalInputArray[i + 1],
             });
-          } else if (
-            finalInputArray[i + 2] === 'TranslatableHtmlContentId') {
-            this.ruleDescriptionChoices = answerChoices.map(
-              function(choice) {
-                return {
-                  id: choice.label,
-                  val: choice.val
-                };
-              }
-            );
+          } else if (finalInputArray[i + 2] === 'TranslatableHtmlContentId') {
+            this.ruleDescriptionChoices = answerChoices.map(function (choice) {
+              return {
+                id: choice.label,
+                val: choice.val,
+              };
+            });
             result.push({
               type: 'dragAndDropHtmlStringSelect',
-              varName: finalInputArray[i + 1]
+              varName: finalInputArray[i + 1],
             });
-          } else if (
-            finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
-            this.ruleDescriptionChoices = answerChoices.map(
-              function(choice) {
-                return {
-                  id: choice.label,
-                  val: choice.val
-                };
-              }
-            );
+          } else if (finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
+            this.ruleDescriptionChoices = answerChoices.map(function (choice) {
+              return {
+                id: choice.label,
+                val: choice.val,
+              };
+            });
             result.push({
               type: 'dragAndDropPositiveIntSelect',
-              varName: finalInputArray[i + 1]
+              varName: finalInputArray[i + 1],
             });
           } else {
-            this.ruleDescriptionChoices = answerChoices.map(
-              function(choice) {
-                return {
-                  id: choice.val as string,
-                  val: choice.label
-                };
-              }
-            );
+            this.ruleDescriptionChoices = answerChoices.map(function (choice) {
+              return {
+                id: choice.val as string,
+                val: choice.label,
+              };
+            });
             result.push({
               type: 'select',
-              varName: finalInputArray[i + 1]
+              varName: finalInputArray[i + 1],
             });
             if (!this.rule.inputs[finalInputArray[i + 1]]) {
-              this.rule.inputs[finalInputArray[i + 1]] = (
-                this.ruleDescriptionChoices[0].id);
+              this.rule.inputs[finalInputArray[i + 1]] =
+                this.ruleDescriptionChoices[0].id;
             }
           }
         } else {
           this.ruleDescriptionChoices = [];
           result.push({
             text: ' [Error: No choices available] ',
-            type: 'noneditable'
+            type: 'noneditable',
           });
         }
       } else {
         result.push({
           type: finalInputArray[i + 2],
-          varName: finalInputArray[i + 1]
+          varName: finalInputArray[i + 1],
         });
       }
     }
@@ -249,19 +244,19 @@ export class RuleEditorComponent
       if (isEqual(DEFAULT_OBJECT_VALUES[varType], [])) {
         this.rule.inputs[varName] = [];
       } else if (answerChoices && answerChoices.length > 0) {
-        this.rule.inputs[varName] = cloneDeep(
-          answerChoices[0].val);
+        this.rule.inputs[varName] = cloneDeep(answerChoices[0].val);
       } else {
-        this.rule.inputs[varName] = cloneDeep(
-          DEFAULT_OBJECT_VALUES[varType]);
+        this.rule.inputs[varName] = cloneDeep(DEFAULT_OBJECT_VALUES[varType]);
       }
 
       tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
     }
 
     for (let key in this.rule.inputs) {
-      if (oldRuleInputs.hasOwnProperty(key) &&
-       oldRuleInputTypes[key] === this.rule.inputTypes[key]) {
+      if (
+        oldRuleInputs.hasOwnProperty(key) &&
+        oldRuleInputTypes[key] === this.rule.inputTypes[key]
+      ) {
         this.rule.inputs[key] = oldRuleInputs[key];
       }
     }
@@ -282,23 +277,21 @@ export class RuleEditorComponent
   ngOnInit(): void {
     this.isInvalid = false;
     /**
-       * Rule editors are usually used in two ways. Inline or in a modal.
-       * When in a modal, the save button is in the modal html and when
-       * inline it is in the rule editors template. When listening to the
-       * object validity change event, we need to know which button to
-       * disable. If we are inline, we disable the button in the
-       * rule-editor template. Which is why we using the if condition
-       * below.
-       */
+     * Rule editors are usually used in two ways. Inline or in a modal.
+     * When in a modal, the save button is in the modal html and when
+     * inline it is in the rule editors template. When listening to the
+     * object validity change event, we need to know which button to
+     * disable. If we are inline, we disable the button in the
+     * rule-editor template. Which is why we using the if condition
+     * below.
+     */
     if (this.isEditingRuleInline) {
       this.modalId = Symbol();
-      this.eventBusGroup.on(
-        ObjectFormValidityChangeEvent,
-        event => {
-          if (event.message.modalId === this.modalId) {
-            this.isInvalid = event.message.value;
-          }
-        });
+      this.eventBusGroup.on(ObjectFormValidityChangeEvent, event => {
+        if (event.message.modalId === this.modalId) {
+          this.isInvalid = event.message.value;
+        }
+      });
     }
     this.currentInteractionId = this.stateInteractionIdService.savedMemento;
     this.editRuleForm = {};
@@ -311,10 +304,12 @@ export class RuleEditorComponent
     // List-of-sets-of-translatable-html-content-ids-editor
     // could not able to assign this.rule.inputTypes.x default values.
     if (this.rule.inputTypes.x === 'ListOfSetsOfTranslatableHtmlContentIds') {
-      if (this.rule.inputs.x[0] === undefined ||
-          this.rule.inputs.x[0]?.length === 0) {
+      if (
+        this.rule.inputs.x[0] === undefined ||
+        this.rule.inputs.x[0]?.length === 0
+      ) {
         let box = [];
-        (this.ruleDescriptionChoices).map(choice => {
+        this.ruleDescriptionChoices.map(choice => {
           box.push([choice.val]);
         });
         this.rule.inputs.x = box;
@@ -337,7 +332,9 @@ export class RuleEditorComponent
   }
 }
 
-angular.module('oppia').directive('oppiaRuleEditor',
- downgradeComponent({
-   component: RuleEditorComponent
- }) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaRuleEditor',
+  downgradeComponent({
+    component: RuleEditorComponent,
+  }) as angular.IDirectiveFactory
+);

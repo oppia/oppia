@@ -16,21 +16,29 @@
  * @fileoverview Unit tests for SaveVersionMismatchModalComponent.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
+import {Component, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SaveVersionMismatchModalComponent } from './save-version-mismatch-modal.component';
-import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationDataService } from '../services/exploration-data.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SaveVersionMismatchModalComponent} from './save-version-mismatch-modal.component';
+import {
+  LostChange,
+  LostChangeObjectFactory,
+} from 'domain/exploration/LostChangeObjectFactory';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationDataService} from '../services/exploration-data.service';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
-  template: ''
+  template: '',
 })
-class ChangesInHumanReadableFormComponentStub {
-}
+class ChangesInHumanReadableFormComponentStub {}
 
 class MockActiveModal {
   close(): void {
@@ -58,7 +66,7 @@ class MockWindowRef {
           return;
         }
       },
-      reload: (val: string) => val
+      reload: (val: string) => val,
     },
     get onhashchange() {
       return this.location._hashChange;
@@ -66,7 +74,7 @@ class MockWindowRef {
 
     set onhashchange(val) {
       this.location._hashChange = val;
-    }
+    },
   };
 
   get nativeWindow() {
@@ -83,12 +91,14 @@ class MockExplorationDataService {
 }
 
 describe('Save Version Mismatch Modal Component', () => {
-  const lostChanges = [{
-    cmd: 'add_state',
-    state_name: 'State name',
-    content_id_for_state_content: 'content_0',
-    content_id_for_default_outcome: 'default_outcome_1'
-  } as unknown as LostChange];
+  const lostChanges = [
+    {
+      cmd: 'add_state',
+      state_name: 'State name',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1',
+    } as unknown as LostChange,
+  ];
 
   let component: SaveVersionMismatchModalComponent;
   let fixture: ComponentFixture<SaveVersionMismatchModalComponent>;
@@ -102,23 +112,21 @@ describe('Save Version Mismatch Modal Component', () => {
     TestBed.configureTestingModule({
       declarations: [
         SaveVersionMismatchModalComponent,
-        ChangesInHumanReadableFormComponentStub
+        ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
         LostChangeObjectFactory,
         {
           provide: ExplorationDataService,
-          useValue: explorationDataService
+          useValue: explorationDataService,
         },
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
-        { provide: WindowRef,
-          useValue: windowRef
-        }
+        {provide: WindowRef, useValue: windowRef},
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -130,69 +138,74 @@ describe('Save Version Mismatch Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should remove exploration draft from local storage when modal is closed',
-    fakeAsync(() => {
-      const reloadSpy = jasmine.createSpy('reload');
-      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-        location: {
-          _hash: '',
-          _hashChange: null,
-          hash: '',
-          reload: reloadSpy,
-        },
-        onhashchange: null,
-      });
+  it('should remove exploration draft from local storage when modal is closed', fakeAsync(() => {
+    const reloadSpy = jasmine.createSpy('reload');
+    spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+      location: {
+        _hash: '',
+        _hashChange: null,
+        hash: '',
+        reload: reloadSpy,
+      },
+      onhashchange: null,
+    });
 
-      component.discardChanges();
-      tick(component.MSECS_TO_REFRESH);
-      fixture.detectChanges();
+    component.discardChanges();
+    tick(component.MSECS_TO_REFRESH);
+    fixture.detectChanges();
 
-      waitForAsync(() => {
-        expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
-        expect(reloadSpy).toHaveBeenCalled();
-      });
-    }));
+    waitForAsync(() => {
+      expect(explorationDataService.discardDraftAsync).toHaveBeenCalled();
+      expect(reloadSpy).toHaveBeenCalled();
+    });
+  }));
 
   it('should contain correct modal header', () => {
     const modalHeader =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-header').innerText;
+      fixture.debugElement.nativeElement.querySelector(
+        '.modal-header'
+      ).innerText;
 
     expect(modalHeader).toBe('Error Saving Exploration');
   });
 
   it('should contain correct modal body', () => {
     const modalBody =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-body').children[0].innerText;
+      fixture.debugElement.nativeElement.querySelector('.modal-body')
+        .children[0].innerText;
 
     expect(modalBody).toBe(
       'Sorry! Someone else has saved a new version of this exploration, so ' +
-      'your pending changes cannot be saved.');
+        'your pending changes cannot be saved.'
+    );
   });
 
-  it('should contain description on lost changes' +
-    'only if they exists in modal body', () => {
-    const modalBody =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-body').children[1].innerText;
+  it(
+    'should contain description on lost changes' +
+      'only if they exists in modal body',
+    () => {
+      const modalBody =
+        fixture.debugElement.nativeElement.querySelector('.modal-body')
+          .children[1].innerText;
 
-    component.hasLostChanges = true;
-    fixture.detectChanges();
+      component.hasLostChanges = true;
+      fixture.detectChanges();
 
-    expect(modalBody).toBe(
-      'The lost changes are displayed below. You may want to export or ' +
-      'copy and paste these changes before discarding them.');
-  });
+      expect(modalBody).toBe(
+        'The lost changes are displayed below. You may want to export or ' +
+          'copy and paste these changes before discarding them.'
+      );
+    }
+  );
 
   it('should export the lost changes and close the modal', () => {
-    spyOn(
-      fixture.elementRef.nativeElement, 'getElementsByClassName'
-    ).withArgs('oppia-lost-changes').and.returnValue([
-      {
-        innerText: 'Dummy Inner Text'
-      }
-    ]);
+    spyOn(fixture.elementRef.nativeElement, 'getElementsByClassName')
+      .withArgs('oppia-lost-changes')
+      .and.returnValue([
+        {
+          innerText: 'Dummy Inner Text',
+        },
+      ]);
     const spyObj = jasmine.createSpyObj('a', ['click']);
     const reloadSpy = jasmine.createSpy('reload');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({

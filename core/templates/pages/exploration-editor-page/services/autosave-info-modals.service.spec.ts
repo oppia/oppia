@@ -16,18 +16,17 @@
  * @fileoverview Unit tests for autosaveInfoModalsService.
  */
 
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { HttpClientModule } from '@angular/common/http';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {HttpClientModule} from '@angular/common/http';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
-import { AutosaveInfoModalsService } from './autosave-info-modals.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
-import { LocalStorageService } from 'services/local-storage.service';
+import {AutosaveInfoModalsService} from './autosave-info-modals.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {LocalStorageService} from 'services/local-storage.service';
 
 class showNonStrictValidationFailModalRef {
-  componentInstance!: {
-  };
+  componentInstance!: {};
 }
 
 class showVersionMismatchModalRef {
@@ -53,11 +52,7 @@ describe('AutosaveInfoModalsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientModule],
-      providers: [
-        AutosaveInfoModalsService,
-        LocalStorageService,
-        NgbModal
-      ]
+      providers: [AutosaveInfoModalsService, LocalStorageService, NgbModal],
     });
   });
 
@@ -68,85 +63,88 @@ describe('AutosaveInfoModalsService', () => {
     csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         resolve('sample-csrf-token');
       });
     });
   });
 
-  it('should call ngbModal open when opening non strict validation fail' +
-    ' modal', fakeAsync(() => {
+  it(
+    'should call ngbModal open when opening non strict validation fail' +
+      ' modal',
+    fakeAsync(() => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: showNonStrictValidationFailModalRef,
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      });
+
+      autosaveInfoModalsService.showNonStrictValidationFailModal();
+
+      expect(modalSpy).toHaveBeenCalled();
+    })
+  );
+
+  it('should close non strict validation fail modal successfully', fakeAsync(() => {
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: showNonStrictValidationFailModalRef,
-          result: Promise.resolve('success')
-        } as NgbModalRef);
+      return {
+        componentInstance: showNonStrictValidationFailModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
     });
 
     autosaveInfoModalsService.showNonStrictValidationFailModal();
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
 
+    flushMicrotasks();
+
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     expect(modalSpy).toHaveBeenCalled();
   }));
 
-  it('should close non strict validation fail modal successfully',
-    fakeAsync(() => {
-      expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: showNonStrictValidationFailModalRef,
-            result: Promise.resolve('success')
-          } as NgbModalRef);
-      });
-
-      autosaveInfoModalsService.showNonStrictValidationFailModal();
-      expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-
-      flushMicrotasks();
-
-      expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-      expect(modalSpy).toHaveBeenCalled();
-    }));
-
-  it('should handle rejects when closing non strict validation fail modal',
-    fakeAsync(() => {
-      expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: showNonStrictValidationFailModalRef,
-            result: Promise.reject('fail')
-          } as NgbModalRef);
-      });
-
-      autosaveInfoModalsService.showNonStrictValidationFailModal();
-      expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-
-      flushMicrotasks();
-
-      expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-      expect(modalSpy).toHaveBeenCalled();
-    }));
-
-  it('should call ngbModal open when opening version mismatch' +
-    ' modal', fakeAsync(() => {
+  it('should handle rejects when closing non strict validation fail modal', fakeAsync(() => {
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: showLostChangesModalRef,
-          result: Promise.resolve('success')
-        } as NgbModalRef);
+      return {
+        componentInstance: showNonStrictValidationFailModalRef,
+        result: Promise.reject('fail'),
+      } as NgbModalRef;
     });
 
-    autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
+    autosaveInfoModalsService.showNonStrictValidationFailModal();
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
 
+    flushMicrotasks();
+
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     expect(modalSpy).toHaveBeenCalled();
   }));
+
+  it(
+    'should call ngbModal open when opening version mismatch' + ' modal',
+    fakeAsync(() => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: showLostChangesModalRef,
+          result: Promise.resolve('success'),
+        } as NgbModalRef;
+      });
+
+      autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
+
+      expect(modalSpy).toHaveBeenCalled();
+    })
+  );
 
   it('should close version mismatch modal successfully', fakeAsync(() => {
     expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: showLostChangesModalRef,
-          result: Promise.resolve('success')
-        } as NgbModalRef);
+      return {
+        componentInstance: showLostChangesModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
     });
 
     autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
@@ -158,77 +156,81 @@ describe('AutosaveInfoModalsService', () => {
     expect(modalSpy).toHaveBeenCalled();
   }));
 
-  it('should handle rejects when dismissing save version mismatch modal',
+  it('should handle rejects when dismissing save version mismatch modal', fakeAsync(() => {
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: showVersionMismatchModalRef,
+        result: Promise.reject('fail'),
+      } as NgbModalRef;
+    });
+
+    autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
+
+    flushMicrotasks();
+
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
+    expect(modalSpy).toHaveBeenCalled();
+  }));
+
+  it('should call ngbModal open when opening show lost changes modal', fakeAsync(() => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: showLostChangesModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
+
+    autosaveInfoModalsService.showLostChangesModal(lostChanges, explorationId);
+
+    expect(modalSpy).toHaveBeenCalled();
+  }));
+
+  it('should close show lost changes modal successfully', fakeAsync(() => {
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: showLostChangesModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
+    autosaveInfoModalsService.showLostChangesModal(lostChanges, explorationId);
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
+
+    flushMicrotasks();
+
+    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
+    expect(modalSpy).toHaveBeenCalled();
+  }));
+
+  it(
+    'should handle reject when dismissing show' + 'lost changes modal',
     fakeAsync(() => {
       expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
+
+      const localStorageSpy = spyOn(
+        localStorageService,
+        'removeExplorationDraft'
+      ).and.callThrough();
       const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: showVersionMismatchModalRef,
-            result: Promise.reject('fail')
-          } as NgbModalRef);
+        return {
+          componentInstance: showLostChangesModalRef,
+          result: Promise.reject('fail'),
+        } as NgbModalRef;
       });
 
-      autosaveInfoModalsService.showVersionMismatchModal(lostChanges);
+      autosaveInfoModalsService.showLostChangesModal(
+        lostChanges,
+        explorationId
+      );
       expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
 
       flushMicrotasks();
 
       expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
+      expect(localStorageSpy).toHaveBeenCalled();
       expect(modalSpy).toHaveBeenCalled();
-    }));
-
-  it('should call ngbModal open when opening show lost changes modal',
-    fakeAsync(() => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: showLostChangesModalRef,
-            result: Promise.resolve('success')
-          } as NgbModalRef);
-      });
-
-      autosaveInfoModalsService.showLostChangesModal(
-        lostChanges, explorationId);
-
-      expect(modalSpy).toHaveBeenCalled();
-    }));
-
-  it('should close show lost changes modal successfully', fakeAsync(() => {
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: showLostChangesModalRef,
-          result: Promise.resolve('success')
-        } as NgbModalRef);
-    });
-    autosaveInfoModalsService.showLostChangesModal(lostChanges, explorationId);
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-
-    flushMicrotasks();
-
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-    expect(modalSpy).toHaveBeenCalled();
-  }));
-
-  it('should handle reject when dismissing show' +
-    'lost changes modal', fakeAsync(() => {
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-
-    const localStorageSpy = spyOn(localStorageService, 'removeExplorationDraft')
-      .and.callThrough();
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: showLostChangesModalRef,
-          result: Promise.reject('fail')
-        } as NgbModalRef);
-    });
-
-    autosaveInfoModalsService.showLostChangesModal(lostChanges, explorationId);
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(true);
-
-    flushMicrotasks();
-
-    expect(autosaveInfoModalsService.isModalOpen()).toBe(false);
-    expect(localStorageSpy).toHaveBeenCalled();
-    expect(modalSpy).toHaveBeenCalled();
-  }));
+    })
+  );
 });

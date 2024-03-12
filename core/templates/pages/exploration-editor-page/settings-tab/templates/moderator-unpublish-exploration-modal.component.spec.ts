@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for ModeratorUnpublishExplorationModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ModeratorUnpublishExplorationModalComponent } from './moderator-unpublish-exploration-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ModeratorUnpublishExplorationModalComponent} from './moderator-unpublish-exploration-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -31,7 +31,7 @@ class MockActiveModal {
   }
 }
 
-describe('Moderator Unpublish Exploration Modal', function() {
+describe('Moderator Unpublish Exploration Modal', function () {
   let component: ModeratorUnpublishExplorationModalComponent;
   let fixture: ComponentFixture<ModeratorUnpublishExplorationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -39,20 +39,21 @@ describe('Moderator Unpublish Exploration Modal', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ModeratorUnpublishExplorationModalComponent
+      declarations: [ModeratorUnpublishExplorationModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      ModeratorUnpublishExplorationModalComponent);
+      ModeratorUnpublishExplorationModalComponent
+    );
     component = fixture.componentInstance;
     component.draftEmailBody = draftEmailBody;
 
@@ -62,28 +63,26 @@ describe('Moderator Unpublish Exploration Modal', function() {
     spyOn(ngbActiveModal, 'close');
   });
 
-  it('should initialize properties when component is initialized',
-    () => {
-      expect(component).toBeDefined();
-      expect(component.willEmailBeSent).toBe(true);
-      expect(component.emailBody).toBe(draftEmailBody);
-      expect(component.getSchema()).toEqual({
-        type: 'unicode',
-        ui_config: {
-          rows: 20
-        }
-      });
-
-      let newValue = 'update this value in emailbody';
-      component.updateValue(newValue);
-      expect(component.emailBody).toBe(newValue);
+  it('should initialize properties when component is initialized', () => {
+    expect(component).toBeDefined();
+    expect(component.willEmailBeSent).toBe(true);
+    expect(component.emailBody).toBe(draftEmailBody);
+    expect(component.getSchema()).toEqual({
+      type: 'unicode',
+      ui_config: {
+        rows: 20,
+      },
     });
 
-  it('should close modal when \"Unpublish Exploration\" button is clicked',
-    () => {
-      component.emailBody = 'nothing';
-      component.confirm(component.emailBody);
+    let newValue = 'update this value in emailbody';
+    component.updateValue(newValue);
+    expect(component.emailBody).toBe(newValue);
+  });
 
-      expect(ngbActiveModal.close).toHaveBeenCalledWith(component.emailBody);
-    });
+  it('should close modal when "Unpublish Exploration" button is clicked', () => {
+    component.emailBody = 'nothing';
+    component.confirm(component.emailBody);
+
+    expect(ngbActiveModal.close).toHaveBeenCalledWith(component.emailBody);
+  });
 });

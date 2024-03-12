@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the view learner group invitation
  * modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ViewLearnerGroupInvitationModalComponent } from
-  './view-learner-group-invitation-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ShortLearnerGroupSummary} from 'domain/learner_group/short-learner-group-summary.model';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ViewLearnerGroupInvitationModalComponent} from './view-learner-group-invitation-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -36,33 +34,38 @@ class MockActiveModal {
   }
 }
 
-describe('View Learner Group Invitation Modal Component', function() {
+describe('View Learner Group Invitation Modal Component', function () {
   let component: ViewLearnerGroupInvitationModalComponent;
   let fixture: ComponentFixture<ViewLearnerGroupInvitationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   const shortLearnerGroup = new ShortLearnerGroupSummary(
-    'sampleId2', 'sampleTitle 2', 'sampleDescription 2', ['username1'], 7
+    'sampleId2',
+    'sampleTitle 2',
+    'sampleDescription 2',
+    ['username1'],
+    7
   );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         ViewLearnerGroupInvitationModalComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    fixture = TestBed.createComponent(
-      ViewLearnerGroupInvitationModalComponent);
+    fixture = TestBed.createComponent(ViewLearnerGroupInvitationModalComponent);
     component = fixture.componentInstance;
     component.learnerGroup = shortLearnerGroup;
 
@@ -79,7 +82,7 @@ describe('View Learner Group Invitation Modal Component', function() {
     component.confirm();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      progressSharingPermission: component.progressSharingPermission
+      progressSharingPermission: component.progressSharingPermission,
     });
   });
 

@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the preferred site language component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from 'modules/material.module';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { PreferredSiteLanguageSelectorComponent } from './preferred-language-selector.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MaterialModule} from 'modules/material.module';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PreferredSiteLanguageSelectorComponent} from './preferred-language-selector.component';
 
 describe('Preferred Site Language Selector Component', () => {
   let componentInstance: PreferredSiteLanguageSelectorComponent;
@@ -29,15 +29,8 @@ describe('Preferred Site Language Selector Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
-        MaterialModule,
-        FormsModule,
-      ],
-      declarations: [
-        MockTranslatePipe,
-        PreferredSiteLanguageSelectorComponent
-      ]
+      imports: [BrowserAnimationsModule, MaterialModule, FormsModule],
+      declarations: [MockTranslatePipe, PreferredSiteLanguageSelectorComponent],
     }).compileComponents();
   }));
 
@@ -51,25 +44,31 @@ describe('Preferred Site Language Selector Component', () => {
   });
 
   it('should initialize', () => {
-    componentInstance.choices = [{
-      id: 'en',
-      text: 'english',
-      dir: 'ltr'
-    }];
+    componentInstance.choices = [
+      {
+        id: 'en',
+        text: 'english',
+        dir: 'ltr',
+      },
+    ];
     componentInstance.ngOnInit();
     expect(componentInstance.filteredChoices).toEqual(
-      componentInstance.choices);
+      componentInstance.choices
+    );
   });
 
   it('should filter choices', () => {
-    componentInstance.choices = [{
-      id: 'en',
-      text: 'english',
-      dir: 'ltr'
-    }];
+    componentInstance.choices = [
+      {
+        id: 'en',
+        text: 'english',
+        dir: 'ltr',
+      },
+    ];
     componentInstance.filterChoices('eng');
     expect(componentInstance.filteredChoices).toEqual(
-      componentInstance.choices);
+      componentInstance.choices
+    );
   });
 
   it('should update preferred language', () => {

@@ -16,32 +16,35 @@
  * @fileoverview Unit tests for SkillsMasteryListConceptCardModal.
  */
 
-describe('Skills Mastery List Concept Card Modal Controller', function() {
+describe('Skills Mastery List Concept Card Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
   var skillDescription = 'This is a skill description';
   var skillId = '1';
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+  beforeEach(
+    angular.mock.inject(function ($injector, $controller) {
+      var $rootScope = $injector.get('$rootScope');
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+      $uibModalInstance = jasmine.createSpyObj('$uibModalInstance', [
+        'close',
+        'dismiss',
+      ]);
 
-    $scope = $rootScope.$new();
-    $controller('SkillsMasteryListConceptCardModal', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-      skillDescription: skillDescription,
-      skillId: skillId
-    });
-  }));
+      $scope = $rootScope.$new();
+      $controller('SkillsMasteryListConceptCardModal', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+        skillDescription: skillDescription,
+        skillId: skillId,
+      });
+    })
+  );
 
-  it('should initialize $scope properties after controller is initialized',
-    function() {
-      expect($scope.skillIds).toEqual([skillId]);
-      expect($scope.index).toEqual(0);
-      expect($scope.modalHeader).toEqual(skillDescription);
-    });
+  it('should initialize $scope properties after controller is initialized', function () {
+    expect($scope.skillIds).toEqual([skillId]);
+    expect($scope.index).toEqual(0);
+    expect($scope.modalHeader).toEqual(skillDescription);
+  });
 });

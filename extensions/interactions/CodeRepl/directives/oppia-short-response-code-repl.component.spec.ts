@@ -16,12 +16,11 @@
  * @fileoverview Unit tests for the CodeRepl short response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseCodeRepl } from './oppia-short-response-code-repl.component';
-import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
-
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseCodeRepl} from './oppia-short-response-code-repl.component';
+import {TruncateAtFirstLinePipe} from 'filters/string-utility-filters/truncate-at-first-line.pipe';
 
 describe('ShortResponseCodeRepl', () => {
   let component: ShortResponseCodeRepl;
@@ -39,10 +38,10 @@ describe('ShortResponseCodeRepl', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
+          useClass: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -52,7 +51,8 @@ describe('ShortResponseCodeRepl', () => {
   });
 
   it('should response when user submits answer', () => {
-    component.answerWithValue = '{' +
+    component.answerWithValue =
+      '{' +
       '  "code": "# Type your code here.\\nprint(\'hello\')",' +
       '  "error": "",' +
       '  "evaluation": "",' +
@@ -71,7 +71,7 @@ describe('ShortResponseCodeRepl', () => {
       code: "# Type your code here.\nprint('hello')",
       error: '',
       evaluation: '',
-      output: 'hello\n'
+      output: 'hello\n',
     } as string);
   });
 });

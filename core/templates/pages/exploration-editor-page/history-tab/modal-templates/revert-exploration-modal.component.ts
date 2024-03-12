@@ -16,17 +16,16 @@
  * @fileoverview Component for revert exploration modal.
  */
 
-import { Component, Input, ViewChild, ElementRef } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Input, ViewChild, ElementRef} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 
 @Component({
   selector: 'oppia-revert-exploration-modal',
-  templateUrl: './revert-exploration-modal.component.html'
+  templateUrl: './revert-exploration-modal.component.html',
 })
-
 export class RevertExplorationModalComponent extends ConfirmOrCancelModal {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -43,8 +42,7 @@ export class RevertExplorationModalComponent extends ConfirmOrCancelModal {
 
   getExplorationUrl(version: string): string {
     return (
-      '/explore/' + this.explorationDataService.explorationId +
-      '?v=' + version
+      '/explore/' + this.explorationDataService.explorationId + '?v=' + version
     );
   }
 

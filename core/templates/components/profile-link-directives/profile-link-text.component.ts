@@ -16,14 +16,14 @@
  * @fileoverview Component for creating text links to a user's profile page.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'profile-link-text',
   templateUrl: './profile-link-text.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ProfileLinkTextComponent {
   // This property is initialized using Angular lifecycle hooks
@@ -34,11 +34,12 @@ export class ProfileLinkTextComponent {
 
   @Input() set username(username: string) {
     this._username = username;
-    this._profileUrl = (
-      '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
-        ':username_fragment', username
-      )
-    );
+    this._profileUrl =
+      '/' +
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+        ':username_fragment',
+        username
+      );
   }
 
   get username(): string {
@@ -55,6 +56,9 @@ export class ProfileLinkTextComponent {
   }
 }
 
-angular.module('oppia').directive(
-  'profileLinkText', downgradeComponent(
-    {component: ProfileLinkTextComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'profileLinkText',
+    downgradeComponent({component: ProfileLinkTextComponent})
+  );

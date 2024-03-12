@@ -16,17 +16,17 @@
  * @fileoverview Utility service for Hints in the learner's view.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { Hint } from 'domain/exploration/hint-object.model';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HintsAndSolutionManagerService {
   solutionForLatestCard: Solution | null = null;
@@ -74,13 +74,11 @@ export class HintsAndSolutionManagerService {
 
   constructor(private playerPositionService: PlayerPositionService) {
     // TODO(#10904): Refactor to move subscriptions into components.
-    playerPositionService.onNewCardAvailable.subscribe(
-      () => {
-        this.correctAnswerSubmitted = true;
-        this.tooltipIsOpen = false;
-        this.solutionTooltipIsOpen = false;
-      }
-    );
+    playerPositionService.onNewCardAvailable.subscribe(() => {
+      this.correctAnswerSubmitted = true;
+      this.tooltipIsOpen = false;
+      this.solutionTooltipIsOpen = false;
+    });
   }
 
   // This replaces any timeouts that are already queued.
@@ -109,7 +107,9 @@ export class HintsAndSolutionManagerService {
       this.numHintsReleased++;
       if (!this.hintsDiscovered && !this.tooltipTimeout) {
         this.tooltipTimeout = setTimeout(
-          this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+          this.showTooltip.bind(this),
+          this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC
+        );
       }
     }
     this._timeoutElapsedEventEmitter.emit();
@@ -122,7 +122,8 @@ export class HintsAndSolutionManagerService {
     if (!this.solutionDiscovered && !this.solutionTooltipTimeout) {
       this.solutionTooltipTimeout = setTimeout(
         this.showSolutionTooltip.bind(this),
-        this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+        this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC
+      );
     }
     this._timeoutElapsedEventEmitter.emit();
   }
@@ -159,7 +160,8 @@ export class HintsAndSolutionManagerService {
     if (funcToEnqueue) {
       this.enqueueTimeout(
         funcToEnqueue,
-        ExplorationPlayerConstants.WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
+        ExplorationPlayerConstants.WAIT_FOR_SUBSEQUENT_HINTS_MSEC
+      );
     }
   }
 
@@ -189,7 +191,8 @@ export class HintsAndSolutionManagerService {
     if (this.hintsForLatestCard.length > 0) {
       this.enqueueTimeout(
         this.releaseHint,
-        ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC);
+        ExplorationPlayerConstants.WAIT_FOR_FIRST_HINT_MSEC
+      );
     }
   }
 
@@ -197,8 +200,10 @@ export class HintsAndSolutionManagerService {
   // pending hint that's being viewed, it starts the timer for the next
   // hint.
   displayHint(index: number): SubtitledHtml | null {
-    if (index === this.numHintsConsumed &&
-      this.numHintsConsumed < this.numHintsReleased) {
+    if (
+      index === this.numHintsConsumed &&
+      this.numHintsConsumed < this.numHintsReleased
+    ) {
       // The latest hint has been consumed. Start the timer.
       this.consumeHint();
     }
@@ -259,11 +264,13 @@ export class HintsAndSolutionManagerService {
     if (!this.areAllHintsExhausted()) {
       if (
         this.numHintsReleased === 0 &&
-        this.wrongAnswersSinceLastHintConsumed >= 2) {
+        this.wrongAnswersSinceLastHintConsumed >= 2
+      ) {
         this.accelerateHintRelease();
       } else if (
         this.numHintsReleased > 0 &&
-        this.wrongAnswersSinceLastHintConsumed >= 1) {
+        this.wrongAnswersSinceLastHintConsumed >= 1
+      ) {
         this.accelerateHintRelease();
       }
     } else if (this.getNumHints()) {
@@ -291,6 +298,9 @@ export class HintsAndSolutionManagerService {
   }
 }
 
-angular.module('oppia').factory(
-  'HintsAndSolutionManagerService',
-  downgradeInjectable(HintsAndSolutionManagerService));
+angular
+  .module('oppia')
+  .factory(
+    'HintsAndSolutionManagerService',
+    downgradeInjectable(HintsAndSolutionManagerService)
+  );

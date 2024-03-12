@@ -17,7 +17,7 @@
  * dismiss.
  */
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 export class ConfirmOrCancelModal {
   constructor(protected modalInstance: NgbActiveModal) {}

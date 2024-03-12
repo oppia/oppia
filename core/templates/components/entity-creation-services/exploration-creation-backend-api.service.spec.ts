@@ -15,26 +15,27 @@
  * @fileoverview Unit test for ExplorationCreationBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { ExplorationCreationBackendApiService } from 'components/entity-creation-services/exploration-creation-backend-api.service';
-
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {ExplorationCreationBackendApiService} from 'components/entity-creation-services/exploration-creation-backend-api.service';
 
 describe('ExplorationCreationBackendApiService', () => {
-  let explorationCreationBackendApiService:
-    ExplorationCreationBackendApiService;
+  let explorationCreationBackendApiService: ExplorationCreationBackendApiService;
   let httpTestingController: HttpTestingController;
   let SAMPLE_EXPLORATION_ID = 'hyuy4GUlvTqJ';
   let ERROR_STATUS_CODE = 500;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     explorationCreationBackendApiService = TestBed.inject(
-      ExplorationCreationBackendApiService);
+      ExplorationCreationBackendApiService
+    );
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -42,80 +43,73 @@ describe('ExplorationCreationBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  it(
-    'should successfully create new exploration and obtain the exploration ID',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should successfully create new exploration and obtain the exploration ID', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      explorationCreationBackendApiService.registerNewExplorationAsync({}).then(
-        successHandler, failHandler);
+    explorationCreationBackendApiService
+      .registerNewExplorationAsync({})
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/contributehandler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
+    let req = httpTestingController.expectOne('/contributehandler/create_new');
+    expect(req.request.method).toEqual('POST');
+    req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should fail to create a new exploration and call the fail handler',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should fail to create a new exploration and call the fail handler', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      explorationCreationBackendApiService.registerNewExplorationAsync({}).then(
-        successHandler, failHandler);
+    explorationCreationBackendApiService
+      .registerNewExplorationAsync({})
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/contributehandler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({
-        error: 'Error creating a new exploration.'
-      }, {
+    let req = httpTestingController.expectOne('/contributehandler/create_new');
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'Error creating a new exploration.',
+      },
+      {
         status: ERROR_STATUS_CODE,
-        statusText: 'Error creating a new exploration.'
-      });
+        statusText: 'Error creating a new exploration.',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Error creating a new exploration.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error creating a new exploration.'
+    );
+  }));
 
-  it(
-    'should successfully upload new exploration and obtain the exploration ID',
-    fakeAsync(() => {
-      expectAsync(
-        explorationCreationBackendApiService.uploadExploration('yaml')
-      ).toBeResolvedTo({explorationId: SAMPLE_EXPLORATION_ID});
+  it('should successfully upload new exploration and obtain the exploration ID', fakeAsync(() => {
+    expectAsync(
+      explorationCreationBackendApiService.uploadExploration('yaml')
+    ).toBeResolvedTo({explorationId: SAMPLE_EXPLORATION_ID});
 
-      let req = httpTestingController.expectOne('contributehandler/upload');
-      expect(req.request.method).toEqual('POST');
-      req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
+    let req = httpTestingController.expectOne('contributehandler/upload');
+    expect(req.request.method).toEqual('POST');
+    req.flush({exploration_id: SAMPLE_EXPLORATION_ID});
 
-      flushMicrotasks();
-    })
-  );
+    flushMicrotasks();
+  }));
 
-  it(
-    'should fail to upload new exploration and reject the promise',
-    fakeAsync(() => {
-      expectAsync(
-        explorationCreationBackendApiService.uploadExploration('yaml')
-      ).toBeRejected();
+  it('should fail to upload new exploration and reject the promise', fakeAsync(() => {
+    expectAsync(
+      explorationCreationBackendApiService.uploadExploration('yaml')
+    ).toBeRejected();
 
-      let req = httpTestingController.expectOne('contributehandler/upload');
-      expect(req.request.method).toEqual('POST');
-      req.error(new ErrorEvent('Error creating a new exploration.'));
+    let req = httpTestingController.expectOne('contributehandler/upload');
+    expect(req.request.method).toEqual('POST');
+    req.error(new ErrorEvent('Error creating a new exploration.'));
 
-      flushMicrotasks();
-    })
-  );
+    flushMicrotasks();
+  }));
 });

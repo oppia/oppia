@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for StateTutorialFirstTimeBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { TutorialEventsBackendApiService } from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
+import {TutorialEventsBackendApiService} from 'pages/exploration-editor-page/services/tutorial-events-backend-api.service';
 
 describe('Tutorial events backend service', () => {
   let tutorialEventsBackendApiService: TutorialEventsBackendApiService;
@@ -27,11 +30,12 @@ describe('Tutorial events backend service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     tutorialEventsBackendApiService = TestBed.inject(
-      TutorialEventsBackendApiService);
+      TutorialEventsBackendApiService
+    );
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
@@ -45,11 +49,13 @@ describe('Tutorial events backend service', () => {
 
     let expId = 'abc';
 
-    tutorialEventsBackendApiService.recordStartedEditorTutorialEventAsync(expId)
+    tutorialEventsBackendApiService
+      .recordStartedEditorTutorialEventAsync(expId)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/createhandler/started_tutorial_event/' + expId);
+      '/createhandler/started_tutorial_event/' + expId
+    );
     expect(req.request.method).toEqual('POST');
     req.flush('Success');
 
@@ -59,28 +65,30 @@ describe('Tutorial events backend service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use rejection handler if startEditorTutorial fails',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should use rejection handler if startEditorTutorial fails', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      let expId = 'abc';
+    let expId = 'abc';
 
-      tutorialEventsBackendApiService.recordStartedEditorTutorialEventAsync(
-        expId).then(successHandler, failHandler);
+    tutorialEventsBackendApiService
+      .recordStartedEditorTutorialEventAsync(expId)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/createhandler/started_tutorial_event/' + expId);
-      expect(req.request.method).toEqual('POST');
-      req.flush('Error', {
-        status: 500, statusText: 'Invalid Request'
-      });
+    let req = httpTestingController.expectOne(
+      '/createhandler/started_tutorial_event/' + expId
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush('Error', {
+      status: 500,
+      statusText: 'Invalid Request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should successfully call startTranslationTutorial', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -88,11 +96,13 @@ describe('Tutorial events backend service', () => {
 
     let expId = 'abc';
 
-    tutorialEventsBackendApiService.recordStartedTranslationTutorialEventAsync(
-      expId).then(successHandler, failHandler);
+    tutorialEventsBackendApiService
+      .recordStartedTranslationTutorialEventAsync(expId)
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/createhandler/started_translation_tutorial_event/' + expId);
+      '/createhandler/started_translation_tutorial_event/' + expId
+    );
     expect(req.request.method).toEqual('POST');
     req.flush('Success');
 
@@ -102,27 +112,28 @@ describe('Tutorial events backend service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use rejection handler for startTranslationTutorial',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should use rejection handler for startTranslationTutorial', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      let expId = 'abc';
+    let expId = 'abc';
 
-      tutorialEventsBackendApiService
-        .recordStartedTranslationTutorialEventAsync(expId)
-        .then(successHandler, failHandler);
+    tutorialEventsBackendApiService
+      .recordStartedTranslationTutorialEventAsync(expId)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/createhandler/started_translation_tutorial_event/' + expId);
-      expect(req.request.method).toEqual('POST');
-      req.flush('Error', {
-        status: 500, statusText: 'Invalid Request'
-      });
+    let req = httpTestingController.expectOne(
+      '/createhandler/started_translation_tutorial_event/' + expId
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush('Error', {
+      status: 500,
+      statusText: 'Invalid Request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

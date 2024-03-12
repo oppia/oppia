@@ -16,16 +16,19 @@
  * @fileoverview Component for the license page.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-license-page',
   templateUrl: './license-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-export class LicensePageComponent {
-}
+export class LicensePageComponent {}
 
-angular.module('oppia').directive('oppiaLicensePage',
-  downgradeComponent({component: LicensePageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaLicensePage',
+    downgradeComponent({component: LicensePageComponent})
+  );

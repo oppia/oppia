@@ -16,15 +16,15 @@
  * @fileoverview Component for state changes modal.
  */
 
-import { Input, OnInit } from '@angular/core';
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { State } from 'domain/state/StateObjectFactory';
-import { ContextService } from 'services/context.service';
-import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
-import { VersionHistoryBackendApiService } from '../services/version-history-backend-api.service';
-import { VersionHistoryService } from '../services/version-history.service';
+import {Input, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {State} from 'domain/state/StateObjectFactory';
+import {ContextService} from 'services/context.service';
+import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
+import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
+import {VersionHistoryService} from '../services/version-history.service';
 
 interface HeadersAndYamlStrs {
   previousVersionStateYaml: string;
@@ -43,7 +43,9 @@ interface MergeviewOptions {
   templateUrl: './state-version-history-modal.component.html',
 })
 export class StateVersionHistoryModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   @Input() committerUsername!: string;
   @Input() oldVersion: number | null = null;
   @Input() newState!: State;
@@ -60,15 +62,15 @@ export class StateVersionHistoryModalComponent
     lineNumbers: true,
     readOnly: true,
     mode: 'yaml',
-    viewportMargin: 100
+    viewportMargin: 100,
   };
 
   constructor(
-      private ngbActiveModal: NgbActiveModal,
-      private contextService: ContextService,
-      private versionHistoryService: VersionHistoryService,
-      private versionHistoryBackendApiService: VersionHistoryBackendApiService,
-      private historyTabYamlConversionService: HistoryTabYamlConversionService
+    private ngbActiveModal: NgbActiveModal,
+    private contextService: ContextService,
+    private versionHistoryService: VersionHistoryService,
+    private versionHistoryBackendApiService: VersionHistoryBackendApiService,
+    private historyTabYamlConversionService: HistoryTabYamlConversionService
   ) {
     super(ngbActiveModal);
   }
@@ -96,15 +98,14 @@ export class StateVersionHistoryModalComponent
   }
 
   getLastEditedVersionNumberInCaseOfError(): number {
-    return (
-      this.versionHistoryService.fetchedStateVersionNumbers[
-        this.versionHistoryService
-          .getCurrentPositionInStateVersionHistoryList()] as number);
+    return this.versionHistoryService.fetchedStateVersionNumbers[
+      this.versionHistoryService.getCurrentPositionInStateVersionHistoryList()
+    ] as number;
   }
 
   getLastEditedCommitterUsername(): string {
-    return (
-      this.versionHistoryService.getBackwardStateDiffData().committerUsername);
+    return this.versionHistoryService.getBackwardStateDiffData()
+      .committerUsername;
   }
 
   getNextEditedVersionNumber(): number {
@@ -122,8 +123,8 @@ export class StateVersionHistoryModalComponent
   }
 
   getNextEditedCommitterUsername(): string {
-    return (
-      this.versionHistoryService.getForwardStateDiffData().committerUsername);
+    return this.versionHistoryService.getForwardStateDiffData()
+      .committerUsername;
   }
 
   onClickExploreForwardVersionHistory(): void {
@@ -165,9 +166,7 @@ export class StateVersionHistoryModalComponent
 
     this.validationErrorIsShown = false;
 
-    this
-      .versionHistoryService
-      .decrementCurrentPositionInStateVersionHistoryList();
+    this.versionHistoryService.decrementCurrentPositionInStateVersionHistoryList();
   }
 
   onClickExploreBackwardVersionHistory(): void {
@@ -218,8 +217,7 @@ export class StateVersionHistoryModalComponent
 
   fetchPreviousVersionHistory(): void {
     if (!this.versionHistoryService.shouldFetchNewStateVersionHistory()) {
-      this.versionHistoryService
-        .incrementCurrentPositionInStateVersionHistoryList();
+      this.versionHistoryService.incrementCurrentPositionInStateVersionHistoryList();
       return;
     }
     const diffData = this.versionHistoryService.getBackwardStateDiffData();
@@ -244,31 +242,32 @@ export class StateVersionHistoryModalComponent
       );
     }
     if (diffData.oldVersionNumber !== null) {
-      this.versionHistoryBackendApiService.fetchStateVersionHistoryAsync(
-        this.contextService.getExplorationId(),
-        diffData.oldState.name, diffData.oldVersionNumber
-      ).then((response) => {
-        if (response !== null) {
-          this.versionHistoryService.insertStateVersionHistoryData(
-            response.lastEditedVersionNumber,
-            response.stateInPreviousVersion,
-            response.lastEditedCommitterUsername
-          );
-          this.versionHistoryService
-            .incrementCurrentPositionInStateVersionHistoryList();
-        } else {
-          this.validationErrorIsShown = true;
-          this.versionHistoryService
-            .incrementCurrentPositionInStateVersionHistoryList();
-        }
-      });
+      this.versionHistoryBackendApiService
+        .fetchStateVersionHistoryAsync(
+          this.contextService.getExplorationId(),
+          diffData.oldState.name,
+          diffData.oldVersionNumber
+        )
+        .then(response => {
+          if (response !== null) {
+            this.versionHistoryService.insertStateVersionHistoryData(
+              response.lastEditedVersionNumber,
+              response.stateInPreviousVersion,
+              response.lastEditedCommitterUsername
+            );
+            this.versionHistoryService.incrementCurrentPositionInStateVersionHistoryList();
+          } else {
+            this.validationErrorIsShown = true;
+            this.versionHistoryService.incrementCurrentPositionInStateVersionHistoryList();
+          }
+        });
     }
   }
 
   updateLeftPane(): void {
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.oldState)
-      .then((result) => {
+      .then(result => {
         this.yamlStrs.previousVersionStateYaml = result;
       });
   }
@@ -276,7 +275,7 @@ export class StateVersionHistoryModalComponent
   updateRightPane(): void {
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.newState)
-      .then((result) => {
+      .then(result => {
         this.yamlStrs.currentVersionStateYaml = result;
       });
   }

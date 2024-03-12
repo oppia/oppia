@@ -16,20 +16,19 @@
  * @fileoverview Production environment config file for Webpack.
  */
 
-var { merge } = require('webpack-merge');
+var {merge} = require('webpack-merge');
 var common = require('./webpack.common.config.ts');
 var path = require('path');
 var webpack = require('webpack');
 var analyticsConstants = require('./assets/analytics-constants.json');
 const TerserPlugin = require('terser-webpack-plugin');
 
-
 module.exports = merge(common, {
   mode: 'production',
   output: {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles'),
-    publicPath: '/build/webpack_bundles/'
+    publicPath: '/build/webpack_bundles/',
   },
   plugins: [
     // This plugin performs a direct text replacement, so the value given to it
@@ -40,7 +39,7 @@ module.exports = merge(common, {
       SITE_NAME_FOR_ANALYTICS: JSON.stringify(
         analyticsConstants.SITE_NAME_FOR_ANALYTICS
       ),
-    })
+    }),
   ],
   optimization: {
     ...common.optimization,
@@ -51,5 +50,5 @@ module.exports = merge(common, {
         sourceMap: true,
       }),
     ],
-  }
+  },
 });

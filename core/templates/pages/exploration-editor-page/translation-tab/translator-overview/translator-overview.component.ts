@@ -17,35 +17,35 @@
  * translation language.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { TranslationLanguageService } from '../services/translation-language.service';
-import { TranslationStatusService } from '../services/translation-status.service';
-import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
-import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import { ContextService } from 'services/context.service';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { LoaderService } from 'services/loader.service';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
-import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {TranslationLanguageService} from '../services/translation-language.service';
+import {TranslationStatusService} from '../services/translation-status.service';
+import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
+import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import {ContextService} from 'services/context.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {LoaderService} from 'services/loader.service';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {
   ExplorationChangeEditTranslation,
   ExplorationChangeMarkTranslationsNeedsUpdate,
   ExplorationChangeRemoveTranslations,
-  ExplorationTranslationChange
+  ExplorationTranslationChange,
 } from 'domain/exploration/exploration-draft.model';
 
 @Component({
   selector: 'oppia-translator-overview',
-  templateUrl: './translator-overview.component.html'
+  templateUrl: './translator-overview.component.html',
 })
 export class TranslatorOverviewComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -62,14 +62,13 @@ export class TranslatorOverviewComponent implements OnInit {
   TRANSLATION_MODE!: string;
   allAudioLanguageCodes!: string[];
   LAST_SELECTED_TRANSLATION_LANGUAGE!: string;
-  languageCodesAndDescriptions!: { id: string; description: string}[];
+  languageCodesAndDescriptions!: {id: string; description: string}[];
 
   constructor(
     private contextService: ContextService,
     private entityTranslationsService: EntityTranslationsService,
     private changeListService: ChangeListService,
-    private explorationLanguageCodeService:
-      ExplorationLanguageCodeService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private focusManagerService: FocusManagerService,
     private graphDataService: GraphDataService,
     private languageUtilService: LanguageUtilService,
@@ -80,38 +79,41 @@ export class TranslatorOverviewComponent implements OnInit {
     private translationStatusService: TranslationStatusService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private windowRef: WindowRef
-  ) { }
+  ) {}
 
   canShowTabModeSwitcher(): boolean {
-    return this.contextService.isExplorationLinkedToStory() && (
-      this.languageCode !== this.explorationLanguageCodeService.displayed);
+    return (
+      this.contextService.isExplorationLinkedToStory() &&
+      this.languageCode !== this.explorationLanguageCodeService.displayed
+    );
   }
 
   refreshDirectiveScope(): void {
-    this.inTranslationMode = (
-      this.translationTabActiveModeService.isTranslationModeActive());
-    this.inVoiceoverMode = (
-      this.translationTabActiveModeService.isVoiceoverModeActive());
-    this.allAudioLanguageCodes = (
-      this.languageUtilService.getAllVoiceoverLanguageCodes());
+    this.inTranslationMode =
+      this.translationTabActiveModeService.isTranslationModeActive();
+    this.inVoiceoverMode =
+      this.translationTabActiveModeService.isVoiceoverModeActive();
+    this.allAudioLanguageCodes =
+      this.languageUtilService.getAllVoiceoverLanguageCodes();
 
     if (this.inTranslationMode) {
       let index = this.allAudioLanguageCodes.indexOf(
-        this.explorationLanguageCodeService.displayed as string);
+        this.explorationLanguageCodeService.displayed as string
+      );
       if (index !== -1) {
         this.allAudioLanguageCodes.splice(index, 1);
       }
     }
 
-    this.languageCodesAndDescriptions = (
-      this.allAudioLanguageCodes.map((languageCode) => {
+    this.languageCodesAndDescriptions = this.allAudioLanguageCodes.map(
+      languageCode => {
         return {
           id: languageCode,
-          description: (
-            this.languageUtilService.getAudioLanguageDescription(
-              languageCode))
+          description:
+            this.languageUtilService.getAudioLanguageDescription(languageCode),
         };
-      }));
+      }
+    );
   }
 
   changeActiveMode(modeName: string): void {
@@ -131,65 +133,71 @@ export class TranslatorOverviewComponent implements OnInit {
   getTranslationProgressStyle(): {
     width: string;
     height: string;
-    } {
-    this.numberOfRequiredAudio = this.translationStatusService
-      .getExplorationContentRequiredCount();
-    this.numberOfAudioNotAvailable = this.translationStatusService
-      .getExplorationContentNotAvailableCount();
+  } {
+    this.numberOfRequiredAudio =
+      this.translationStatusService.getExplorationContentRequiredCount();
+    this.numberOfAudioNotAvailable =
+      this.translationStatusService.getExplorationContentNotAvailableCount();
 
-    let progressPercent = (
-      100 - (
-        this.numberOfAudioNotAvailable /
-        this.numberOfRequiredAudio) * 100);
+    let progressPercent =
+      100 - (this.numberOfAudioNotAvailable / this.numberOfRequiredAudio) * 100;
 
-    return { width: progressPercent + '%', height: '100%' };
+    return {width: progressPercent + '%', height: '100%'};
   }
 
   changeTranslationLanguage(): void {
     if (this.isTranslationTabBusy) {
-      let lastSelectedTranslationLanguage = (
+      let lastSelectedTranslationLanguage =
         this.windowRef.nativeWindow.localStorage.getItem(
-          this.LAST_SELECTED_TRANSLATION_LANGUAGE));
-      this.languageCode = lastSelectedTranslationLanguage ? (
-        lastSelectedTranslationLanguage) : (
-          ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE
+        );
+      this.languageCode = lastSelectedTranslationLanguage
+        ? lastSelectedTranslationLanguage
+        : ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE;
       this.stateEditorService.onShowTranslationTabBusyModal.emit();
       return;
     }
 
     this.loaderService.showLoadingScreen('Loading');
-    this.entityTranslationsService.getEntityTranslationsAsync(
-      this.languageCode
-    ).then((entityTranslations) => {
-      this.updateTranslationWithChangeList(entityTranslations);
-      this.translationLanguageService.setActiveLanguageCode(
-        this.languageCode);
-      this.translationStatusService.refresh();
-      this.windowRef.nativeWindow.localStorage.setItem(
-        this.LAST_SELECTED_TRANSLATION_LANGUAGE, this.languageCode);
-      this.routerService.onCenterGraph.emit();
-      this.loaderService.hideLoadingScreen();
-    });
+    this.entityTranslationsService
+      .getEntityTranslationsAsync(this.languageCode)
+      .then(entityTranslations => {
+        this.updateTranslationWithChangeList(entityTranslations);
+        this.translationLanguageService.setActiveLanguageCode(
+          this.languageCode
+        );
+        this.translationStatusService.refresh();
+        this.windowRef.nativeWindow.localStorage.setItem(
+          this.LAST_SELECTED_TRANSLATION_LANGUAGE,
+          this.languageCode
+        );
+        this.routerService.onCenterGraph.emit();
+        this.loaderService.hideLoadingScreen();
+      });
   }
 
   getTranslationProgressAriaLabel(): string {
-    if (this.numberOfRequiredAudio -
-      this.numberOfAudioNotAvailable === 1) {
+    if (this.numberOfRequiredAudio - this.numberOfAudioNotAvailable === 1) {
       return (
         this.numberOfRequiredAudio -
-        this.numberOfAudioNotAvailable + ' item translated out of ' +
-        this.numberOfRequiredAudio + ' items');
+        this.numberOfAudioNotAvailable +
+        ' item translated out of ' +
+        this.numberOfRequiredAudio +
+        ' items'
+      );
     } else {
       return (
         this.numberOfRequiredAudio -
         this.numberOfAudioNotAvailable +
         ' items translated out of ' +
-        this.numberOfRequiredAudio + ' items');
+        this.numberOfRequiredAudio +
+        ' items'
+      );
     }
   }
 
   updateTranslationWithChangeList(entityTranslation: EntityTranslation): void {
-    this.changeListService.getTranslationChangeList().forEach((changeDict) => {
+    this.changeListService.getTranslationChangeList().forEach(changeDict => {
       changeDict = changeDict as ExplorationTranslationChange;
       switch (changeDict.cmd) {
         case 'edit_translation':
@@ -206,8 +214,8 @@ export class TranslatorOverviewComponent implements OnInit {
           entityTranslation.removeTranslation(changeDict.content_id);
           break;
         case 'mark_translations_needs_update':
-          changeDict = (
-            changeDict as ExplorationChangeMarkTranslationsNeedsUpdate);
+          changeDict =
+            changeDict as ExplorationChangeMarkTranslationsNeedsUpdate;
           entityTranslation.markTranslationAsNeedingUpdate(
             changeDict.content_id
           );
@@ -217,16 +225,16 @@ export class TranslatorOverviewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.LAST_SELECTED_TRANSLATION_LANGUAGE = (
-      'last_selected_translation_lang');
-    let lastSelectedTranslationLanguage = (
+    this.LAST_SELECTED_TRANSLATION_LANGUAGE = 'last_selected_translation_lang';
+    let lastSelectedTranslationLanguage =
       this.windowRef.nativeWindow.localStorage.getItem(
-        this.LAST_SELECTED_TRANSLATION_LANGUAGE));
-    let prevLanguageCode = lastSelectedTranslationLanguage ? (
-      lastSelectedTranslationLanguage) : (
-        ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
-    let allAudioLanguageCodes = this.languageUtilService
-      .getAllVoiceoverLanguageCodes();
+        this.LAST_SELECTED_TRANSLATION_LANGUAGE
+      );
+    let prevLanguageCode = lastSelectedTranslationLanguage
+      ? lastSelectedTranslationLanguage
+      : ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE;
+    let allAudioLanguageCodes =
+      this.languageUtilService.getAllVoiceoverLanguageCodes();
 
     if (this.routerService.getActiveTabName() === 'translation') {
       this.focusManagerService.setFocus('audioTranslationLanguageCodeField');
@@ -237,29 +245,33 @@ export class TranslatorOverviewComponent implements OnInit {
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
     if (!this.languageCode) {
       this.languageCode =
-      allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
-        prevLanguageCode : (
-          ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
+        allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1
+          ? prevLanguageCode
+          : ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE;
     }
 
-    this.entityTranslationsService.getEntityTranslationsAsync(
-      this.languageCode
-    ).then((entityTranslation) => {
-      this.updateTranslationWithChangeList(entityTranslation);
-      this.translationLanguageService.setActiveLanguageCode(this.languageCode);
-      // We need to refresh the status service once the active language is
-      // set.
-      this.translationStatusService.refresh();
-      this.routerService.onCenterGraph.emit();
+    this.entityTranslationsService
+      .getEntityTranslationsAsync(this.languageCode)
+      .then(entityTranslation => {
+        this.updateTranslationWithChangeList(entityTranslation);
+        this.translationLanguageService.setActiveLanguageCode(
+          this.languageCode
+        );
+        // We need to refresh the status service once the active language is
+        // set.
+        this.translationStatusService.refresh();
+        this.routerService.onCenterGraph.emit();
 
-      this.inTranslationMode = false;
-      this.inVoiceoverMode = false;
-      this.refreshDirectiveScope();
-    });
+        this.inTranslationMode = false;
+        this.inVoiceoverMode = false;
+        this.refreshDirectiveScope();
+      });
   }
 }
 
-angular.module('oppia').directive('oppiaTranslatorOverview',
+angular.module('oppia').directive(
+  'oppiaTranslatorOverview',
   downgradeComponent({
-    component: TranslatorOverviewComponent
-  }) as angular.IDirectiveFactory);
+    component: TranslatorOverviewComponent,
+  }) as angular.IDirectiveFactory
+);

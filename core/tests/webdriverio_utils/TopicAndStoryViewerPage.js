@@ -20,99 +20,119 @@
 var action = require('../webdriverio_utils/action.js');
 var waitFor = require('./waitFor.js');
 
-var TopicAndStoryViewerPage = function() {
+var TopicAndStoryViewerPage = function () {
   var lessonTrack = $('.e2e-test-lesson-track');
   var nextChapterButton = $('.e2e-test-recommended-next-chapter-button');
   var startPracticeButton = $(
-    '.e2e-test-start-practice-from-recommendations-button');
+    '.e2e-test-start-practice-from-recommendations-button'
+  );
   var endChapterSignUpSection = $('.e2e-test-end-chapter-sign-up-section');
   var conversationSkinCardsContainer = $(
-    '.e2e-test-conversation-skin-cards-container');
+    '.e2e-test-conversation-skin-cards-container'
+  );
   var dismissSignUpSectionButton = $(
-    '.e2e-test-dismiss-sign-up-section-button');
+    '.e2e-test-dismiss-sign-up-section-button'
+  );
   var practicetabContainer = $('.e2e-test-practice-tab-container');
   var practiceSessionContainer = $('.e2e-test-practice-session-container');
   var chapterTitleItem = $('.e2e-test-chapter-title');
-  var chapterTitleListSelector = function() {
+  var chapterTitleListSelector = function () {
     return $$('.e2e-test-chapter-title');
   };
-  var lessonCompletedIconsSelector = function() {
+  var lessonCompletedIconsSelector = function () {
     return $$('.e2e-test-lesson-icon-completed');
   };
-  var lessonUncompletedIconsSelector = function() {
+  var lessonUncompletedIconsSelector = function () {
     return $$('.e2e-test-lesson-icon-uncompleted');
   };
 
-  this.get = async function(
-      classroomUrlFragment, topicUrlFragment, storyUrlFragment) {
+  this.get = async function (
+    classroomUrlFragment,
+    topicUrlFragment,
+    storyUrlFragment
+  ) {
     await browser.url(
       `/learn/${classroomUrlFragment}/${topicUrlFragment}` +
-      `/story/${storyUrlFragment}`);
+        `/story/${storyUrlFragment}`
+    );
     await waitFor.pageToFullyLoad();
   };
 
-  this.goToChapterIndex = async function(index) {
+  this.goToChapterIndex = async function (index) {
     await waitFor.visibilityOf(
-      chapterTitleItem, 'Chapters take too long to be visible.');
+      chapterTitleItem,
+      'Chapters take too long to be visible.'
+    );
     var chapterTitleList = await chapterTitleListSelector();
     var chapter = chapterTitleList[index];
     await action.click('Chapter title', chapter);
     await waitFor.pageToFullyLoad();
   };
 
-  this.goToNextChapterFromRecommendations = async function() {
+  this.goToNextChapterFromRecommendations = async function () {
     await action.click('Next chapter button', nextChapterButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.goToPracticeSessionFromRecommendations = async function() {
+  this.goToPracticeSessionFromRecommendations = async function () {
     await action.click('Start practice button', startPracticeButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.dismissSignUpSection = async function() {
+  this.dismissSignUpSection = async function () {
     await action.click(
-      'Don\'t show me again button', dismissSignUpSectionButton);
+      "Don't show me again button",
+      dismissSignUpSectionButton
+    );
   };
 
-  this.expectCompletedLessonCountToBe = async function(count) {
+  this.expectCompletedLessonCountToBe = async function (count) {
     await waitFor.visibilityOf(
-      lessonTrack, 'Lesson track takes too long to be visible.');
+      lessonTrack,
+      'Lesson track takes too long to be visible.'
+    );
     var lessonCompletedIcons = await lessonCompletedIconsSelector();
     expect(lessonCompletedIcons.length).toEqual(count);
   };
 
-  this.expectUncompletedLessonCountToBe = async function(count) {
+  this.expectUncompletedLessonCountToBe = async function (count) {
     await waitFor.visibilityOf(
-      lessonTrack, 'Lesson track takes too long to be visible.');
+      lessonTrack,
+      'Lesson track takes too long to be visible.'
+    );
     var lessonUncompletedIcons = await lessonUncompletedIconsSelector();
     expect(lessonUncompletedIcons.length).toEqual(count);
   };
 
-  this.waitForConversationSkinCardsContainer = async function() {
+  this.waitForConversationSkinCardsContainer = async function () {
     await waitFor.visibilityOf(
       conversationSkinCardsContainer,
-      'Conversation skin cards container takes too long to be visible.');
+      'Conversation skin cards container takes too long to be visible.'
+    );
   };
 
-  this.waitForSignUpSection = async function() {
+  this.waitForSignUpSection = async function () {
     await waitFor.visibilityOf(
-      endChapterSignUpSection, 'Sign up section takes too long to be visible.');
+      endChapterSignUpSection,
+      'Sign up section takes too long to be visible.'
+    );
   };
 
-  this.waitForSignUpSectionToDisappear = async function() {
+  this.waitForSignUpSectionToDisappear = async function () {
     await waitFor.invisibilityOf(
       endChapterSignUpSection,
-      'Sign up section takes too long to disappear.');
+      'Sign up section takes too long to disappear.'
+    );
   };
 
-  this.waitForPracticeTabContainer = async function() {
+  this.waitForPracticeTabContainer = async function () {
     await waitFor.visibilityOf(
       practicetabContainer,
-      'Practice tab container takes too long to be visible.');
+      'Practice tab container takes too long to be visible.'
+    );
   };
 
-  this.waitForPracticeSessionContainer = async function() {
+  this.waitForPracticeSessionContainer = async function () {
     await waitFor.presenceOf(practiceSessionContainer);
   };
 };

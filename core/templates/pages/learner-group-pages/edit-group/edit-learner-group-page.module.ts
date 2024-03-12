@@ -16,37 +16,28 @@
  * @fileoverview Module for the edit learner group page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
 
-import { EditLearnerGroupPageAuthGuard } from './edit-learner-group-page-auth.guard';
-import { EditLearnerGroupPageRootComponent } from './edit-learner-group-page-root.component';
-import { EditLearnerGroupPageComponent } from
-  './edit-learner-group-page.component';
-import { LearnerGroupSyllabusComponent } from
-  './learner-group-syllabus.component';
+import {EditLearnerGroupPageAuthGuard} from './edit-learner-group-page-auth.guard';
+import {EditLearnerGroupPageRootComponent} from './edit-learner-group-page-root.component';
+import {EditLearnerGroupPageComponent} from './edit-learner-group-page.component';
+import {LearnerGroupSyllabusComponent} from './learner-group-syllabus.component';
 
-import { RemoveItemModalComponent } from
-  '../templates/remove-item-modal.component';
-import { SyllabusAdditionSuccessModalComponent } from
-  '../templates/syllabus-addition-success-modal.component';
-import { LearnerGroupPreferencesComponent } from
-  './learner-group-preferences.component';
+import {RemoveItemModalComponent} from '../templates/remove-item-modal.component';
+import {SyllabusAdditionSuccessModalComponent} from '../templates/syllabus-addition-success-modal.component';
+import {LearnerGroupPreferencesComponent} from './learner-group-preferences.component';
 
-import { InviteLearnersModalComponent } from
-  '../templates/invite-learners-modal.component';
+import {InviteLearnersModalComponent} from '../templates/invite-learners-modal.component';
 
-import { LearnerGroupLearnersProgressComponent } from
-  './learner-group-learners-progress.component';
-import { InviteSuccessfulModalComponent } from
-  '../templates/invite-successful-modal.component';
-import { DeleteLearnerGroupModalComponent } from
-  '../templates/delete-learner-group-modal.component';
-import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/shared-learner-group-component.module';
+import {LearnerGroupLearnersProgressComponent} from './learner-group-learners-progress.component';
+import {InviteSuccessfulModalComponent} from '../templates/invite-successful-modal.component';
+import {DeleteLearnerGroupModalComponent} from '../templates/delete-learner-group-modal.component';
+import {SharedLearnerGroupComponentsModule} from 'pages/learner-group-pages/shared-learner-group-component.module';
 
 @NgModule({
   imports: [
@@ -72,7 +63,7 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
     InviteSuccessfulModalComponent,
-    DeleteLearnerGroupModalComponent
+    DeleteLearnerGroupModalComponent,
   ],
   entryComponents: [
     EditLearnerGroupPageComponent,
@@ -83,8 +74,7 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
     SyllabusAdditionSuccessModalComponent,
     InviteLearnersModalComponent,
     InviteSuccessfulModalComponent,
-    DeleteLearnerGroupModalComponent
+    DeleteLearnerGroupModalComponent,
   ],
 })
-
 export class EditLearnerGroupPageModule {}

@@ -16,9 +16,9 @@
  * @fileoverview Service to persist multiple choices order between submissions.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 export interface ChoiceWithIndex {
   originalIndex: number;
@@ -26,7 +26,7 @@ export interface ChoiceWithIndex {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MultipleChoiceInputOrderedChoicesService {
   private choices: ChoiceWithIndex[] = [];
@@ -39,6 +39,9 @@ export class MultipleChoiceInputOrderedChoicesService {
   }
 }
 
-angular.module('oppia').factory(
-  'MultipleChoiceInputOrderedChoicesService',
-  downgradeInjectable(MultipleChoiceInputOrderedChoicesService));
+angular
+  .module('oppia')
+  .factory(
+    'MultipleChoiceInputOrderedChoicesService',
+    downgradeInjectable(MultipleChoiceInputOrderedChoicesService)
+  );

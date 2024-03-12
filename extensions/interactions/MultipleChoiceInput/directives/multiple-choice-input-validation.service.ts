@@ -16,46 +16,48 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { MultipleChoiceInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {MultipleChoiceInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MultipleChoiceInputValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: MultipleChoiceInputCustomizationArgs): Warning[] {
+    customizationArgs: MultipleChoiceInputCustomizationArgs
+  ): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
-      customizationArgs, ['choices']);
+      customizationArgs,
+      ['choices']
+    );
 
     var areAnyChoicesEmpty = false;
     var areAnyChoicesDuplicated = false;
     var seenChoices = [];
     var numChoices = customizationArgs.choices.value.length;
 
-    const minChoices = (
-      AppConstants.MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP);
+    const minChoices =
+      AppConstants.MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP;
     if (numChoices < minChoices) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: `Please enter at least ${minChoices} choices.`
+        message: `Please enter at least ${minChoices} choices.`,
       });
     }
 
@@ -73,26 +75,29 @@ export class MultipleChoiceInputValidationService {
     if (areAnyChoicesEmpty) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the choices are nonempty.'
+        message: 'Please ensure the choices are nonempty.',
       });
     }
     if (areAnyChoicesDuplicated) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the choices are unique.'
+        message: 'Please ensure the choices are unique.',
       });
     }
     return warningsList;
   }
 
   getAllWarnings(
-      stateName: string,
-      customizationArgs: MultipleChoiceInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome | null): Warning[] {
+    stateName: string,
+    customizationArgs: MultipleChoiceInputCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome | null
+  ): Warning[] {
     var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     var numChoices = customizationArgs.choices.value.length;
     var selectedEqualsChoices = [];
@@ -100,24 +105,31 @@ export class MultipleChoiceInputValidationService {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
         if (rules[j].type === 'Equals') {
-          var choicePreviouslySelected = (
-            selectedEqualsChoices.indexOf(rules[j].inputs.x) !== -1);
+          var choicePreviouslySelected =
+            selectedEqualsChoices.indexOf(rules[j].inputs.x) !== -1;
           if (!choicePreviouslySelected) {
             selectedEqualsChoices.push(rules[j].inputs.x);
           } else {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: 'Please ensure learner answer ' + String(j + 1) +
-              ' in Oppia response ' + String(i + 1) + ' is not equaling ' +
-              'the same multiple choice option as another learner answer.'
+              message:
+                'Please ensure learner answer ' +
+                String(j + 1) +
+                ' in Oppia response ' +
+                String(i + 1) +
+                ' is not equaling ' +
+                'the same multiple choice option as another learner answer.',
             });
           }
           if (rules[j].inputs.x >= numChoices) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: 'Please ensure learner answer ' + String(j + 1) +
-              ' in Oppia response ' + String(i + 1) +
-              ' refers to a valid choice.'
+              message:
+                'Please ensure learner answer ' +
+                String(j + 1) +
+                ' in Oppia response ' +
+                String(i + 1) +
+                ' refers to a valid choice.',
             });
           }
         }
@@ -126,7 +138,10 @@ export class MultipleChoiceInputValidationService {
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAnswerGroupWarnings(
-        answerGroups, stateName));
+        answerGroups,
+        stateName
+      )
+    );
 
     // Only require a default rule if some choices have not been taken care
     // of by rules.
@@ -134,8 +149,9 @@ export class MultipleChoiceInputValidationService {
       if (!defaultOutcome || defaultOutcome.isConfusing(stateName)) {
         warningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: 'Please add something for Oppia to say in the ' +
-            '\"All other answers\" response.'
+          message:
+            'Please add something for Oppia to say in the ' +
+            '"All other answers" response.',
         });
       }
     }
@@ -143,6 +159,9 @@ export class MultipleChoiceInputValidationService {
     return warningsList;
   }
 }
-angular.module('oppia').factory(
-  'MultipleChoiceInputValidationService',
-  downgradeInjectable(MultipleChoiceInputValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'MultipleChoiceInputValidationService',
+    downgradeInjectable(MultipleChoiceInputValidationService)
+  );

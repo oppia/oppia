@@ -16,13 +16,14 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContinueRulesService {}
 
-angular.module('oppia').factory(
-  'ContinueRulesService', downgradeInjectable(ContinueRulesService));
+angular
+  .module('oppia')
+  .factory('ContinueRulesService', downgradeInjectable(ContinueRulesService));

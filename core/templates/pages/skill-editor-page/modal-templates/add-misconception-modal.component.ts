@@ -16,26 +16,28 @@
  * @fileoverview Component for add misconception modal.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
 
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from '../services/skill-editor-state.service';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
 
 interface MisconceptionFormSchema {
   type: 'html';
-  'ui_config': object;
+  ui_config: object;
 }
 
 @Component({
   selector: 'oppia-add-misconception-modal',
-  templateUrl: './add-misconception-modal.component.html'
+  templateUrl: './add-misconception-modal.component.html',
 })
 export class AddMisconceptionModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -46,21 +48,23 @@ export class AddMisconceptionModalComponent
   misconceptionNameIsDuplicate!: boolean;
   misconceptionNotes!: string;
   skill!: Skill;
-  MAX_CHARS_IN_MISCONCEPTION_NAME: number = (
-    AppConstants.MAX_CHARS_IN_MISCONCEPTION_NAME);
+  MAX_CHARS_IN_MISCONCEPTION_NAME: number =
+    AppConstants.MAX_CHARS_IN_MISCONCEPTION_NAME;
 
   MISCONCEPTION_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
-      startupFocusEnabled: false
-    }};
+      startupFocusEnabled: false,
+    },
+  };
 
   MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
       hide_complex_extensions: true,
-      startupFocusEnabled: false
-    }};
+      startupFocusEnabled: false,
+    },
+  };
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -78,9 +82,9 @@ export class AddMisconceptionModalComponent
     this.misconceptionMustBeAddressed = true;
     this.misconceptionNameIsDuplicate = false;
     this.skill = this.skillEditorStateService.getSkill();
-    this.existingMisconceptionNames = this.skill.getMisconceptions().map(
-      misconception => misconception.getName()
-    );
+    this.existingMisconceptionNames = this.skill
+      .getMisconceptions()
+      .map(misconception => misconception.getName());
   }
 
   getSchemaForm(): MisconceptionFormSchema {
@@ -116,13 +120,13 @@ export class AddMisconceptionModalComponent
         this.misconceptionName,
         this.misconceptionNotes,
         this.misconceptionFeedback,
-        this.misconceptionMustBeAddressed)
+        this.misconceptionMustBeAddressed
+      ),
     });
   }
 
   checkIfMisconceptionNameIsDuplicate(): void {
-    this.misconceptionNameIsDuplicate = (
-      this.existingMisconceptionNames.includes(this.misconceptionName)
-    );
+    this.misconceptionNameIsDuplicate =
+      this.existingMisconceptionNames.includes(this.misconceptionName);
   }
 }

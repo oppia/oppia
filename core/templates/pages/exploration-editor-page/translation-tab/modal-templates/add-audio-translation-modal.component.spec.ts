@@ -16,13 +16,19 @@
  * @fileoverview Unit tests for AddAudioTranslationModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { AddAudioTranslationModalComponent } from './add-audio-translation-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {AddAudioTranslationModalComponent} from './add-audio-translation-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -49,16 +55,14 @@ describe('Add Audio Translation Modal component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        AddAudioTranslationModalComponent
-      ],
+      declarations: [AddAudioTranslationModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -81,17 +85,16 @@ describe('Add Audio Translation Modal component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after component is initialized',
-    () => {
-      expect(component.saveButtonText).toBe('Save');
-      expect(component.saveInProgress).toBe(false);
-      expect(component.isAudioAvailable).toBe(isAudioAvailable);
-      expect(component.droppedFile).toBe(audioFile);
-    });
+  it('should initialize component properties after component is initialized', () => {
+    expect(component.saveButtonText).toBe('Save');
+    expect(component.saveInProgress).toBe(false);
+    expect(component.isAudioAvailable).toBe(isAudioAvailable);
+    expect(component.droppedFile).toBe(audioFile);
+  });
 
   it('should save audio successfully then close the modal', fakeAsync(() => {
     let file = {
-      size: 1000
+      size: 1000,
     };
     component.updateUploadedFile(file as Blob);
 
@@ -99,11 +102,12 @@ describe('Add Audio Translation Modal component', () => {
 
     let response = {
       filename: 'filename',
-      duration_secs: 10
+      duration_secs: 10,
     };
 
     spyOn(assetsBackendApiService, 'saveAudio').and.returnValue(
-      Promise.resolve(response));
+      Promise.resolve(response)
+    );
 
     component.confirm();
     tick();
@@ -114,35 +118,36 @@ describe('Add Audio Translation Modal component', () => {
       languageCode: languageCode,
       filename: generatedFilename,
       fileSizeBytes: file.size,
-      durationSecs: response.duration_secs
+      durationSecs: response.duration_secs,
     });
   }));
 
-  it('should use reject handler when trying to save audio fails',
-    fakeAsync(() => {
-      let file = {
-        size: 1000
-      };
-      component.updateUploadedFile(file as Blob);
+  it('should use reject handler when trying to save audio fails', fakeAsync(() => {
+    let file = {
+      size: 1000,
+    };
+    component.updateUploadedFile(file as Blob);
 
-      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-      spyOn(assetsBackendApiService, 'saveAudio')
-        .and.returnValue(Promise.reject({}));
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(assetsBackendApiService, 'saveAudio').and.returnValue(
+      Promise.reject({})
+    );
 
-      component.confirm();
+    component.confirm();
 
-      expect(component.saveButtonText).toBe('Saving...');
-      expect(component.saveInProgress).toBe(true);
+    expect(component.saveButtonText).toBe('Saving...');
+    expect(component.saveInProgress).toBe(true);
 
-      tick();
+    tick();
 
-      expect(component.errorMessage).toBe(
-        'There was an error uploading the audio file.');
-      expect(component.saveButtonText).toBe('Save');
-      expect(component.saveInProgress).toBe(false);
-      expect(ngbActiveModal.close).not.toHaveBeenCalled();
+    expect(component.errorMessage).toBe(
+      'There was an error uploading the audio file.'
+    );
+    expect(component.saveButtonText).toBe('Save');
+    expect(component.saveInProgress).toBe(false);
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
 
-      component.clearUploadedFile();
-      expect(component.errorMessage).toBeNull();
-    }));
+    component.clearUploadedFile();
+    expect(component.errorMessage).toBeNull();
+  }));
 });

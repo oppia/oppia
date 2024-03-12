@@ -16,55 +16,56 @@
  * @fileoverview Unit tests for CdAdminTranslationRoleEditorModal.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, async, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MaterialModule } from 'modules/material.module';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  async,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {MaterialModule} from 'modules/material.module';
 
-import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
+import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
-import { CdAdminTranslationRoleEditorModal } from './cd-admin-translation-role-editor-modal.component';
+import {CdAdminTranslationRoleEditorModal} from './cd-admin-translation-role-editor-modal.component';
 
 describe('CdAdminTranslationRoleEditorModal', () => {
   let component: CdAdminTranslationRoleEditorModal;
   let fixture: ComponentFixture<CdAdminTranslationRoleEditorModal>;
   let ngbActiveModal: NgbActiveModal;
-  let contributorDashboardAdminBackendApiService:
-    ContributorDashboardAdminBackendApiService;
+  let contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService;
   let alertsService: AlertsService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        MaterialModule,
-        HttpClientTestingModule
-      ],
+      imports: [FormsModule, MaterialModule, HttpClientTestingModule],
       declarations: [CdAdminTranslationRoleEditorModal],
       providers: [
         NgbActiveModal,
         ContributorDashboardAdminBackendApiService,
-        AlertsService
-      ]
+        AlertsService,
+      ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      CdAdminTranslationRoleEditorModal);
+    fixture = TestBed.createComponent(CdAdminTranslationRoleEditorModal);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
     contributorDashboardAdminBackendApiService = TestBed.inject(
-      ContributorDashboardAdminBackendApiService);
+      ContributorDashboardAdminBackendApiService
+    );
     alertsService = TestBed.inject(AlertsService);
     component.assignedLanguageIds = ['en', 'hi', 'ak'];
     component.languageIdToName = {
       en: 'English',
       hi: 'Hindi',
       ak: 'Ákán (Akan)',
-      sk: 'shqip (Albanian)'
+      sk: 'shqip (Albanian)',
     };
     fixture.detectChanges();
     component.ngOnInit();
@@ -102,8 +103,8 @@ describe('CdAdminTranslationRoleEditorModal', () => {
     it('should alert warning if request fails', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
-        'addContributionReviewerAsync').and.returnValue(
-        Promise.reject());
+        'addContributionReviewerAsync'
+      ).and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning').and.callThrough();
 
       component.selectedLanguageId = 'en';
@@ -131,21 +132,23 @@ describe('CdAdminTranslationRoleEditorModal', () => {
     it('should make request to remove language', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
-        'removeContributionReviewerAsync').and.resolveTo();
+        'removeContributionReviewerAsync'
+      ).and.resolveTo();
 
       component.removeLanguageId('hi');
       expect(component.languageIdInUpdate).toEqual('hi');
       tick();
 
       expect(
-        contributorDashboardAdminBackendApiService
-          .removeContributionReviewerAsync).toHaveBeenCalled();
+        contributorDashboardAdminBackendApiService.removeContributionReviewerAsync
+      ).toHaveBeenCalled();
     }));
 
     it('should alert warning if request fails', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminBackendApiService,
-        'removeContributionReviewerAsync').and.returnValue(Promise.reject());
+        'removeContributionReviewerAsync'
+      ).and.returnValue(Promise.reject());
       spyOn(alertsService, 'addWarning').and.callThrough();
 
       component.removeLanguageId('hi');

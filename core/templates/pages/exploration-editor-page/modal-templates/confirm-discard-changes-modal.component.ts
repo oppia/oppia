@@ -16,20 +16,16 @@
  * @fileoverview Component for discarding exploration changes.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-confirm-discard-changes-modal',
-  templateUrl: './confirm-discard-changes-modal.component.html'
+  templateUrl: './confirm-discard-changes-modal.component.html',
 })
-
-export class ConfirmDiscardChangesModalComponent
-  extends ConfirmOrCancelModal {
-  constructor(
-     private ngbActiveModal: NgbActiveModal
-  ) {
+export class ConfirmDiscardChangesModalComponent extends ConfirmOrCancelModal {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

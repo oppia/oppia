@@ -16,19 +16,17 @@
  * @fileoverview Unit Tests for Blog Post Page service.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, waitForAsync} from '@angular/core/testing';
-import { BlogPostPageService } from 'pages/blog-post-page/services/blog-post-page.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {BlogPostPageService} from 'pages/blog-post-page/services/blog-post-page.service';
 
 describe('Blog Post Page service', () => {
   let blogPostPageService: BlogPostPageService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      providers: []
+      imports: [HttpClientTestingModule],
+      providers: [],
     }).compileComponents();
   }));
 

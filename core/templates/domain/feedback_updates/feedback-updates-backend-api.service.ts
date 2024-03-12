@@ -17,20 +17,19 @@
  * backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 import {
   FeedbackThreadSummary,
-  FeedbackThreadSummaryBackendDict
+  FeedbackThreadSummaryBackendDict,
 } from 'domain/feedback_thread/feedback-thread-summary.model';
-import { FeedbackMessageSummaryBackendDict } from 'domain/feedback_message/feedback-message-summary.model';
-
+import {FeedbackMessageSummaryBackendDict} from 'domain/feedback_message/feedback-message-summary.model';
 
 interface FeedbackUpdatesDataBackendDict {
-  'number_of_unread_threads': number;
-  'thread_summaries': FeedbackThreadSummaryBackendDict[];
-  'paginated_threads_list': FeedbackThreadSummaryBackendDict[][];
+  number_of_unread_threads: number;
+  thread_summaries: FeedbackThreadSummaryBackendDict[];
+  paginated_threads_list: FeedbackThreadSummaryBackendDict[][];
 }
 
 interface FeedbackUpdatesData {
@@ -40,85 +39,99 @@ interface FeedbackUpdatesData {
 }
 
 export interface AddMessagePayload {
-  'updated_status': boolean;
+  updated_status: boolean;
   // Subject for frontend instances of thread message domain objects
   // are null and are only required to be supplied if the message is first
   // message of the thread. Otherwise, these properties are only non-null
   // when the subject changes.
-  'updated_subject': string | null;
-  'text': string;
+  updated_subject: string | null;
+  text: string;
 }
 
-
 interface MessageSummaryList {
-  'message_summary_list': FeedbackMessageSummaryBackendDict[];
+  message_summary_list: FeedbackMessageSummaryBackendDict[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FeedbackUpdatesBackendApiService {
-  constructor(
-    private http: HttpClient) {}
+  constructor(private http: HttpClient) {}
 
   async _fetchFeedbackUpdatesDataAsync(
-      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][]
-  ):
-  Promise<FeedbackUpdatesData> {
+    paginatedThreadsList: FeedbackThreadSummaryBackendDict[][]
+  ): Promise<FeedbackUpdatesData> {
     return new Promise((resolve, reject) => {
-      this.http.post<FeedbackUpdatesDataBackendDict>(
-        '/feedbackupdateshandler/data',
-        {
-          paginated_threads_list: paginatedThreadsList
-        }).toPromise().then(
-        dashboardData => {
-          resolve({
-            numberOfUnreadThreads: dashboardData.number_of_unread_threads,
-            threadSummaries: (
-              dashboardData.thread_summaries.map(
-                threadSummary => FeedbackThreadSummary
-                  .createFromBackendDict(threadSummary))),
-            paginatedThreadsList: dashboardData.paginated_threads_list
-          });
-        }, errorResponse => {
-          reject(errorResponse.status);
-        });
+      this.http
+        .post<FeedbackUpdatesDataBackendDict>('/feedbackupdateshandler/data', {
+          paginated_threads_list: paginatedThreadsList,
+        })
+        .toPromise()
+        .then(
+          dashboardData => {
+            resolve({
+              numberOfUnreadThreads: dashboardData.number_of_unread_threads,
+              threadSummaries: dashboardData.thread_summaries.map(
+                threadSummary =>
+                  FeedbackThreadSummary.createFromBackendDict(threadSummary)
+              ),
+              paginatedThreadsList: dashboardData.paginated_threads_list,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse.status);
+          }
+        );
     });
   }
 
   async fetchFeedbackUpdatesDataAsync(
-      paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = []
-  ):
-  Promise<FeedbackUpdatesData> {
-    return this._fetchFeedbackUpdatesDataAsync(
-      paginatedThreadsList);
+    paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = []
+  ): Promise<FeedbackUpdatesData> {
+    return this._fetchFeedbackUpdatesDataAsync(paginatedThreadsList);
   }
 
   async addNewMessageAsync(
-      url: string, payload: AddMessagePayload): Promise<void> {
+    url: string,
+    payload: AddMessagePayload
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(url, payload).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResonse => {
-          reject(errorResonse.error.error);
-        });
+      this.http
+        .post<void>(url, payload)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResonse => {
+            reject(errorResonse.error.error);
+          }
+        );
     });
   }
 
   async onClickThreadAsync(
-      threadDataUrl: string): Promise<FeedbackMessageSummaryBackendDict[]> {
+    threadDataUrl: string
+  ): Promise<FeedbackMessageSummaryBackendDict[]> {
     return new Promise((resolve, reject) => {
-      this.http.get<MessageSummaryList>(
-        threadDataUrl).toPromise().then(response => {
-        resolve(response.message_summary_list);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<MessageSummaryList>(threadDataUrl)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.message_summary_list);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'FeedbackUpdatesBackendApiService',
-  downgradeInjectable(FeedbackUpdatesBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'FeedbackUpdatesBackendApiService',
+    downgradeInjectable(FeedbackUpdatesBackendApiService)
+  );

@@ -16,13 +16,13 @@
  * @fileoverview Backend api service for exploration-recommendations.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import {
   LearnerExplorationSummary,
-  LearnerExplorationSummaryBackendDict
+  LearnerExplorationSummaryBackendDict,
 } from 'domain/summary/learner-exploration-summary.model';
 
 // Eslint disable is added because we need to use 'type' instead of 'interface'
@@ -38,11 +38,11 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 type RecommendationsUrlParams = {
-  'author_recommended_ids': string;
-  'collection_id'?: string;
-  'story_id'?: string;
-  'current_node_id'?: string;
-  'include_system_recommendations': string;
+  author_recommended_ids: string;
+  collection_id?: string;
+  story_id?: string;
+  current_node_id?: string;
+  include_system_recommendations: string;
 };
 
 export interface RecommendedExplorationSummariesBackendDict {
@@ -50,25 +50,23 @@ export interface RecommendedExplorationSummariesBackendDict {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationRecommendationsBackendApiService {
-  constructor(
-    private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   async getRecommendedSummaryDictsAsync(
-      authorRecommendedExpIds: string[],
-      includeSystemRecommendations: string,
-      // 'collectionId', 'storyId' and 'currentNodeId' can be null
-      // since they may not be present in the URL.
-      collectionId: string | null,
-      storyId: string | null,
-      currentNodeId: string | null,
-      explorationId: string
+    authorRecommendedExpIds: string[],
+    includeSystemRecommendations: string,
+    // 'collectionId', 'storyId' and 'currentNodeId' can be null
+    // since they may not be present in the URL.
+    collectionId: string | null,
+    storyId: string | null,
+    currentNodeId: string | null,
+    explorationId: string
   ): Promise<LearnerExplorationSummary[]> {
     let recommendationsUrlParams: RecommendationsUrlParams = {
-      author_recommended_ids: JSON.stringify(
-        authorRecommendedExpIds),
+      author_recommended_ids: JSON.stringify(authorRecommendedExpIds),
       include_system_recommendations: includeSystemRecommendations,
     };
 
@@ -82,15 +80,25 @@ export class ExplorationRecommendationsBackendApiService {
       recommendationsUrlParams.current_node_id = currentNodeId;
     }
 
-    return this.http.get<RecommendedExplorationSummariesBackendDict>(
-      '/explorehandler/recommendations/' + explorationId, {
-        params: recommendationsUrlParams
-      } as Object).toPromise().then(backendDict => backendDict.summaries.map(
-      summaryDict => LearnerExplorationSummary.createFromBackendDict(
-        summaryDict)));
+    return this.http
+      .get<RecommendedExplorationSummariesBackendDict>(
+        '/explorehandler/recommendations/' + explorationId,
+        {
+          params: recommendationsUrlParams,
+        } as Object
+      )
+      .toPromise()
+      .then(backendDict =>
+        backendDict.summaries.map(summaryDict =>
+          LearnerExplorationSummary.createFromBackendDict(summaryDict)
+        )
+      );
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationRecommendationsBackendApiService',
-  downgradeInjectable(ExplorationRecommendationsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationRecommendationsBackendApiService',
+    downgradeInjectable(ExplorationRecommendationsBackendApiService)
+  );

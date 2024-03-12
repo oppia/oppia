@@ -16,80 +16,95 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { GraphInputCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
-import { GraphAnswer } from 'interactions/answer-defs';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {GraphInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {GraphAnswer} from 'interactions/answer-defs';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GraphInputValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   VERTICES_LIMIT = 50;
 
   getCustomizationArgsWarnings(
-      customizationArgs: GraphInputCustomizationArgs): Warning[] {
+    customizationArgs: GraphInputCustomizationArgs
+  ): Warning[] {
     var warningsList = [];
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
       customizationArgs,
-      ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']);
+      ['graph', 'canEditEdgeWeight', 'canEditVertexLabel']
+    );
 
     if (customizationArgs.graph.value.vertices.length > this.VERTICES_LIMIT) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: (
+        message:
           'The graph used in customization exceeds supported ' +
-          'maximum number of vertices of ' + this.VERTICES_LIMIT + '.')
+          'maximum number of vertices of ' +
+          this.VERTICES_LIMIT +
+          '.',
       });
     }
 
-    if (!customizationArgs.graph.value.isWeighted &&
-        customizationArgs.canEditEdgeWeight.value) {
+    if (
+      !customizationArgs.graph.value.isWeighted &&
+      customizationArgs.canEditEdgeWeight.value
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: (
-          'The learner cannot edit edge weights for an unweighted graph.')
+        message:
+          'The learner cannot edit edge weights for an unweighted graph.',
       });
     }
 
-    if (!customizationArgs.graph.value.isLabeled &&
-        customizationArgs.canEditVertexLabel.value) {
+    if (
+      !customizationArgs.graph.value.isLabeled &&
+      customizationArgs.canEditVertexLabel.value
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: (
-          'The learner cannot edit vertex labels for an unlabeled graph.')
+        message:
+          'The learner cannot edit vertex labels for an unlabeled graph.',
       });
     }
     return warningsList;
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: GraphInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    stateName: string,
+    customizationArgs: GraphInputCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome
+  ): Warning[] {
     var ISOMORPHISM_VERTICES_LIMIT = 10;
 
     var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+        answerGroups,
+        defaultOutcome,
+        stateName
+      )
+    );
 
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
@@ -99,32 +114,45 @@ export class GraphInputValidationService {
         try {
           if (rule.type === 'HasGraphProperty') {
             continue;
-          } else if (rule.type === 'IsIsomorphicTo' &&
-              gInputs.vertices.length > ISOMORPHISM_VERTICES_LIMIT) {
+          } else if (
+            rule.type === 'IsIsomorphicTo' &&
+            gInputs.vertices.length > ISOMORPHISM_VERTICES_LIMIT
+          ) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: (
-                'The graph used in the learner answer ' + (j + 1) +
-                ' in Oppia response ' + (i + 1) +
-                ' exceeds supported maximum number of vertices ' + 'of ' +
-                ISOMORPHISM_VERTICES_LIMIT + ' for isomorphism check.')
+              message:
+                'The graph used in the learner answer ' +
+                (j + 1) +
+                ' in Oppia response ' +
+                (i + 1) +
+                ' exceeds supported maximum number of vertices ' +
+                'of ' +
+                ISOMORPHISM_VERTICES_LIMIT +
+                ' for isomorphism check.',
             });
           } else if (gInputs.vertices.length > this.VERTICES_LIMIT) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: (
-                'The graph used in the learner answer ' + (j + 1) +
-                ' in Oppia response ' + (i + 1) +
+              message:
+                'The graph used in the learner answer ' +
+                (j + 1) +
+                ' in Oppia response ' +
+                (i + 1) +
                 ' exceeds supported maximum number of vertices ' +
-                'of ' + this.VERTICES_LIMIT + '.')
+                'of ' +
+                this.VERTICES_LIMIT +
+                '.',
             });
           }
         } catch (e) {
           warningsList.push({
             type: AppConstants.WARNING_TYPES.CRITICAL,
-            message: (
-              'Learner answer ' + (j + 1) + ' in Oppia response ' + (i + 1) +
-              ' is invalid.')
+            message:
+              'Learner answer ' +
+              (j + 1) +
+              ' in Oppia response ' +
+              (i + 1) +
+              ' is invalid.',
           });
         }
       }
@@ -133,6 +161,9 @@ export class GraphInputValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'GraphInputValidationService',
-  downgradeInjectable(GraphInputValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'GraphInputValidationService',
+    downgradeInjectable(GraphInputValidationService)
+  );

@@ -16,12 +16,12 @@
  * @fileoverview Contributor dashboard admin page component.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { UserService } from 'services/user.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { ContributorDashboardAdminBackendApiService } from './services/contributor-dashboard-admin-backend-api.service';
-import { AppConstants } from 'app.constants';
+import {Component, OnInit} from '@angular/core';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
+import {AppConstants} from 'app.constants';
 
 interface ViewContributionReviewers {
   filterCriterion: string;
@@ -106,11 +106,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   constructor(
     private userService: UserService,
     private platformFeatureService: PlatformFeatureService,
-    private contributorDashboardAdminBackendApiService:
-     ContributorDashboardAdminBackendApiService,
-    private languageUtilService: LanguageUtilService,
-  ) { }
-
+    private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
+    private languageUtilService: LanguageUtilService
+  ) {}
 
   refreshFormData(): void {
     this.formData = {
@@ -120,24 +118,32 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         category: null,
         languageCode: null,
         isValid: () => {
-          if (this.formData.viewContributionReviewers.filterCriterion ===
-             AppConstants.USER_FILTER_CRITERION_ROLE) {
+          if (
+            this.formData.viewContributionReviewers.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_ROLE
+          ) {
             if (this.formData.viewContributionReviewers.category === null) {
               return false;
             }
-            if (this.isLanguageSpecificReviewCategory(
-              this.formData.viewContributionReviewers.category)) {
+            if (
+              this.isLanguageSpecificReviewCategory(
+                this.formData.viewContributionReviewers.category
+              )
+            ) {
               return Boolean(
-                this.formData.viewContributionReviewers.languageCode);
+                this.formData.viewContributionReviewers.languageCode
+              );
             }
             return true;
           }
 
-          if (this.formData.viewContributionReviewers.filterCriterion ===
-             AppConstants.USER_FILTER_CRITERION_USERNAME) {
+          if (
+            this.formData.viewContributionReviewers.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_USERNAME
+          ) {
             return Boolean(this.formData.viewContributionReviewers.username);
           }
-        }
+        },
       },
       addContributionReviewer: {
         username: '',
@@ -150,30 +156,39 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           if (this.formData.addContributionReviewer.category === null) {
             return false;
           }
-          if (this.isLanguageSpecificReviewCategory(
-            this.formData.addContributionReviewer.category)) {
+          if (
+            this.isLanguageSpecificReviewCategory(
+              this.formData.addContributionReviewer.category
+            )
+          ) {
             return Boolean(this.formData.addContributionReviewer.languageCode);
           }
           return true;
-        }
+        },
       },
       removeContributionReviewer: {
         username: '',
         category: null,
         languageCode: null,
         isValid: () => {
-          if (this.formData.removeContributionReviewer.username === '' ||
-            this.formData.removeContributionReviewer.category === null) {
+          if (
+            this.formData.removeContributionReviewer.username === '' ||
+            this.formData.removeContributionReviewer.category === null
+          ) {
             return false;
           }
-          if (this.isLanguageSpecificReviewCategory(
-            this.formData.removeContributionReviewer.category)) {
+          if (
+            this.isLanguageSpecificReviewCategory(
+              this.formData.removeContributionReviewer.category
+            )
+          ) {
             return Boolean(
-              this.formData.removeContributionReviewer.languageCode);
+              this.formData.removeContributionReviewer.languageCode
+            );
           }
           return true;
         },
-        method: ''
+        method: '',
       },
       viewTranslationContributionStats: {
         username: '',
@@ -182,41 +197,39 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
             return false;
           }
           return true;
-        }
-      }
+        },
+      },
     };
   }
 
   ngOnInit(): void {
-    this.isNewUiEnabled = (
-      this.platformFeatureService.status.CdAdminDashboardNewUi.isEnabled);
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.isNewUiEnabled =
+      this.platformFeatureService.status.CdAdminDashboardNewUi.isEnabled;
+    this.userService.getUserInfoAsync().then(userInfo => {
       let translationCategories = {};
       let questionCategories = {};
       if (userInfo.isTranslationAdmin()) {
         this.UserIsTranslationAdmin = true;
         translationCategories = {
-          REVIEW_TRANSLATION: (
-            AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION)
+          REVIEW_TRANSLATION:
+            AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         };
       }
-      if (userInfo.isQuestionAdmin() ||
-        userInfo.isQuestionCoordinator()) {
+      if (userInfo.isQuestionAdmin() || userInfo.isQuestionCoordinator()) {
         questionCategories = {
           REVIEW_QUESTION: AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-          SUBMIT_QUESTION: AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+          SUBMIT_QUESTION: AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
         };
       }
       this.CD_USER_RIGHTS_CATEGORIES = {
         ...translationCategories,
-        ...questionCategories
+        ...questionCategories,
       };
     });
 
     this.USER_FILTER_CRITERION_USERNAME =
-     AppConstants.USER_FILTER_CRITERION_USERNAME;
-    this.USER_FILTER_CRITERION_ROLE =
-     AppConstants.USER_FILTER_CRITERION_ROLE;
+      AppConstants.USER_FILTER_CRITERION_USERNAME;
+    this.USER_FILTER_CRITERION_ROLE = AppConstants.USER_FILTER_CRITERION_ROLE;
 
     this.refreshFormData();
     this.contributionReviewersDataFetched = false;
@@ -225,31 +238,31 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     this.translationContributionStatsResults = [];
     this.statusMessage = '';
 
-    this.languageCodesAndDescriptions =
-     this.languageUtilService.getAllVoiceoverLanguageCodes().map(
-       (languageCode) => {
-         return {
-           id: languageCode,
-           description:
-            this.languageUtilService.getAudioLanguageDescription(languageCode)
-         };
-       }
-     );
+    this.languageCodesAndDescriptions = this.languageUtilService
+      .getAllVoiceoverLanguageCodes()
+      .map(languageCode => {
+        return {
+          id: languageCode,
+          description:
+            this.languageUtilService.getAudioLanguageDescription(languageCode),
+        };
+      });
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
     const languageDescriptions: string[] = [];
-    languageCodes.forEach((languageCode) => {
+    languageCodes.forEach(languageCode => {
       languageDescriptions.push(
-        this.languageUtilService.getAudioLanguageDescription(languageCode));
+        this.languageUtilService.getAudioLanguageDescription(languageCode)
+      );
     });
     return languageDescriptions;
   }
 
   isLanguageSpecificReviewCategory(reviewCategory: string): boolean {
     return (
-      reviewCategory ===
-       AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION);
+      reviewCategory === AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+    );
   }
 
   submitAddContributionRightsForm(formResponse: AddContributionReviewer): void {
@@ -261,18 +274,25 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
-        formResponse.category, formResponse.username, formResponse.languageCode
-      ).then(() => {
-        this.statusMessage = 'Success.';
-        this.refreshFormData();
-      }, errorResponse => {
-        this.statusMessage = 'Server error: ' + errorResponse;
-      });
+        formResponse.category,
+        formResponse.username,
+        formResponse.languageCode
+      )
+      .then(
+        () => {
+          this.statusMessage = 'Success.';
+          this.refreshFormData();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
     this.taskRunningInBackground = false;
   }
 
   submitViewContributorUsersForm(
-      formResponse: ViewContributionReviewers): void {
+    formResponse: ViewContributionReviewers
+  ): void {
     if (this.taskRunningInBackground) {
       return;
     }
@@ -280,12 +300,15 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     this.taskRunningInBackground = true;
     this.contributionReviewersResult = {};
 
-    if (formResponse.filterCriterion ===
-       AppConstants.USER_FILTER_CRITERION_ROLE) {
+    if (
+      formResponse.filterCriterion === AppConstants.USER_FILTER_CRITERION_ROLE
+    ) {
       this.contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(
-          formResponse.category, formResponse.languageCode
-        ).then((usersObject) => {
+          formResponse.category,
+          formResponse.languageCode
+        )
+        .then(usersObject => {
           this.contributionReviewersResult.usernames = usersObject.usernames;
           this.contributionReviewersDataFetched = true;
           this.statusMessage = 'Success.';
@@ -295,37 +318,46 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
         });
     } else {
       this.contributorDashboardAdminBackendApiService
-        .contributionReviewerRightsAsync(
-          formResponse.username
-        ).then((contributionRights) => {
-          if (this.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
-            'REVIEW_TRANSLATION')) {
-            this.contributionReviewersResult = {
-              REVIEW_TRANSLATION: this.getLanguageDescriptions(
-                contributionRights.can_review_translation_for_language_codes)
-            };
+        .contributionReviewerRightsAsync(formResponse.username)
+        .then(
+          contributionRights => {
+            if (
+              this.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
+                'REVIEW_TRANSLATION'
+              )
+            ) {
+              this.contributionReviewersResult = {
+                REVIEW_TRANSLATION: this.getLanguageDescriptions(
+                  contributionRights.can_review_translation_for_language_codes
+                ),
+              };
+            }
+            if (
+              this.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty('REVIEW_QUESTION')
+            ) {
+              this.contributionReviewersResult.REVIEW_QUESTION =
+                contributionRights.can_review_questions;
+              this.contributionReviewersResult.SUBMIT_QUESTION =
+                contributionRights.can_submit_questions;
+            }
+            this.contributionReviewersDataFetched = true;
+            this.statusMessage = 'Success.';
+            const temp =
+              this.formData.viewContributionReviewers.filterCriterion;
+            this.refreshFormData();
+            this.formData.viewContributionReviewers.filterCriterion = temp;
+          },
+          errorResponse => {
+            this.statusMessage = 'Server error: ' + errorResponse;
           }
-          if (this.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
-            'REVIEW_QUESTION')) {
-            this.contributionReviewersResult.REVIEW_QUESTION =
-              contributionRights.can_review_questions;
-            this.contributionReviewersResult.SUBMIT_QUESTION =
-              contributionRights.can_submit_questions;
-          }
-          this.contributionReviewersDataFetched = true;
-          this.statusMessage = 'Success.';
-          const temp = this.formData.viewContributionReviewers.filterCriterion;
-          this.refreshFormData();
-          this.formData.viewContributionReviewers.filterCriterion = temp;
-        }, errorResponse => {
-          this.statusMessage = 'Server error: ' + errorResponse;
-        });
+        );
     }
     this.taskRunningInBackground = false;
   }
 
   submitRemoveContributionRightsForm(
-      formResponse: RemoveContributionReviewer): void {
+    formResponse: RemoveContributionReviewer
+  ): void {
     if (this.taskRunningInBackground) {
       return;
     }
@@ -334,19 +366,26 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        formResponse.username, formResponse.category, formResponse.languageCode
-      ).then(() => {
-        this.statusMessage = 'Success.';
-        this.refreshFormData();
-      }, errorResponse => {
-        this.statusMessage = 'Server error: ' + errorResponse;
-      });
+        formResponse.username,
+        formResponse.category,
+        formResponse.languageCode
+      )
+      .then(
+        () => {
+          this.statusMessage = 'Success.';
+          this.refreshFormData();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
 
     this.taskRunningInBackground = false;
   }
 
   submitViewTranslationContributionStatsForm(
-      formResponse: ViewTranslationContributionStats): void {
+    formResponse: ViewTranslationContributionStats
+  ): void {
     if (this.taskRunningInBackground) {
       return;
     }
@@ -354,17 +393,19 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     this.taskRunningInBackground = true;
 
     this.contributorDashboardAdminBackendApiService
-      .viewTranslationContributionStatsAsync(
-        formResponse.username
-      ).then(response => {
-        this.translationContributionStatsResults =
-          response.translation_contribution_stats;
-        this.translationContributionStatsFetched = true;
-        this.statusMessage = 'Success.';
-        this.refreshFormData();
-      }, errorResponse => {
-        this.statusMessage = 'Server error: ' + errorResponse;
-      });
+      .viewTranslationContributionStatsAsync(formResponse.username)
+      .then(
+        response => {
+          this.translationContributionStatsResults =
+            response.translation_contribution_stats;
+          this.translationContributionStatsFetched = true;
+          this.statusMessage = 'Success.';
+          this.refreshFormData();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
 
     this.taskRunningInBackground = false;
   }

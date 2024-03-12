@@ -17,27 +17,31 @@
  * for connectivity.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 export interface ConnectionCheckResponse {
-    isInternetConnected: boolean;
-  }
+  isInternetConnected: boolean;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ServerConnectionBackendApiService {
   private checkConnectionUrl: string = '/internetconnectivityhandler';
   constructor(private http: HttpClient) {}
 
   async fetchConnectionCheckResultAsync(): Promise<ConnectionCheckResponse> {
-    return this.http.get<ConnectionCheckResponse>(
-      this.checkConnectionUrl).toPromise();
+    return this.http
+      .get<ConnectionCheckResponse>(this.checkConnectionUrl)
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'ServerConnectionBackendApiService',
-  downgradeInjectable(ServerConnectionBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ServerConnectionBackendApiService',
+    downgradeInjectable(ServerConnectionBackendApiService)
+  );

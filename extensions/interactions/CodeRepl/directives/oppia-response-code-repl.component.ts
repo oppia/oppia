@@ -19,10 +19,10 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
 export interface Answer {
   error: string;
@@ -34,7 +34,7 @@ export interface Answer {
 @Component({
   selector: 'oppiaResponseCodeRepl',
   templateUrl: './code-repl-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseCodeReplComponent implements OnInit {
   @Input() answer!: string;
@@ -46,11 +46,12 @@ export class ResponseCodeReplComponent implements OnInit {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private focusManagerService: FocusManagerService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as Answer;
+      this.answer
+    ) as Answer;
     if (this.escapedAnswer.error) {
       this.errorFocusLabel = this.focusManagerService.generateFocusLabel();
       this.focusManagerService.setFocus(this.errorFocusLabel);
@@ -58,6 +59,9 @@ export class ResponseCodeReplComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaResponseCodeRepl', downgradeComponent({
-  component: ResponseCodeReplComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaResponseCodeRepl',
+  downgradeComponent({
+    component: ResponseCodeReplComponent,
+  }) as angular.IDirectiveFactory
+);

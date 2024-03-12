@@ -16,16 +16,14 @@
  * @fileoverview Unit tests for the ExplorationStatsService.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ExplorationStatsBackendApiService } from
-  'services/exploration-stats-backend-api.service';
-import { ExplorationStats } from
-  'domain/statistics/exploration-stats.model';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
+import {ExplorationStatsBackendApiService} from 'services/exploration-stats-backend-api.service';
+import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
+import {ExplorationStatsService} from 'services/exploration-stats.service';
 
-describe('Exploration stats service', function() {
+describe('Exploration stats service', function () {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
   let explorationStatsService: ExplorationStatsService;
   let explorationStats: ExplorationStats;
@@ -33,31 +31,34 @@ describe('Exploration stats service', function() {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    explorationStatsBackendApiService = (
-      TestBed.inject(ExplorationStatsBackendApiService));
+    explorationStatsBackendApiService = TestBed.inject(
+      ExplorationStatsBackendApiService
+    );
     explorationStatsService = TestBed.inject(ExplorationStatsService);
   });
 
   beforeEach(() => {
-    explorationStats = (
-      ExplorationStats.createFromBackendDict({
-        exp_id: 'eid',
-        exp_version: 1,
-        num_starts: 2,
-        num_actual_starts: 20,
-        num_completions: 200,
-        state_stats_mapping: {},
-      }));
+    explorationStats = ExplorationStats.createFromBackendDict({
+      exp_id: 'eid',
+      exp_version: 1,
+      num_starts: 2,
+      num_actual_starts: 20,
+      num_completions: 200,
+      state_stats_mapping: {},
+    });
   });
 
   it('should callout to backend api service for stats', fakeAsync(() => {
-    spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
-      .and.returnValue(Promise.resolve(explorationStats));
+    spyOn(
+      explorationStatsBackendApiService,
+      'fetchExplorationStatsAsync'
+    ).and.returnValue(Promise.resolve(explorationStats));
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsService.getExplorationStatsAsync('eid')
+    explorationStatsService
+      .getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
@@ -66,18 +67,22 @@ describe('Exploration stats service', function() {
   }));
 
   it('should cache results after the first call', fakeAsync(() => {
-    const backendApiSpy = (
-      spyOn(explorationStatsBackendApiService, 'fetchExplorationStatsAsync')
-        .and.returnValue(Promise.resolve(explorationStats)));
+    const backendApiSpy = spyOn(
+      explorationStatsBackendApiService,
+      'fetchExplorationStatsAsync'
+    ).and.returnValue(Promise.resolve(explorationStats));
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsService.getExplorationStatsAsync('eid')
+    explorationStatsService
+      .getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
-    explorationStatsService.getExplorationStatsAsync('eid')
+    explorationStatsService
+      .getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
-    explorationStatsService.getExplorationStatsAsync('eid')
+    explorationStatsService
+      .getExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
     flushMicrotasks();
 

@@ -16,19 +16,17 @@
  * @fileoverview Component for topic editor send mail modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-topic-editor-send-mail-modal',
-  templateUrl: './topic-editor-send-mail-modal.component.html'
+  templateUrl: './topic-editor-send-mail-modal.component.html',
 })
 export class TopicEditorSendMailComponent extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

@@ -16,16 +16,18 @@
  * @fileoverview Unit test for SkillCreationBackendApiService.
  */
 
-import { HttpErrorResponse } from '@angular/common/http';
-import { HttpClientTestingModule, HttpTestingController }
-  from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {HttpErrorResponse} from '@angular/common/http';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {
   RubricBackendDict,
-  SkillCreationBackendApiService
+  SkillCreationBackendApiService,
 } from 'domain/skill/skill-creation-backend-api.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
 describe('Skill creation backend api service', () => {
   let httpTestingController: HttpTestingController;
@@ -35,97 +37,114 @@ describe('Skill creation backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
     skillCreationBackendApiService = TestBed.inject(
-      SkillCreationBackendApiService);
+      SkillCreationBackendApiService
+    );
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
 
     rubricDict = {
       explanations: ['test-explanation'],
-      difficulty: 'test-difficulty'
+      difficulty: 'test-difficulty',
     };
   });
 
-  afterEach(()=> {
+  afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully create a new skill and obtain the skill ID',
-    fakeAsync(() => {
-      spyOn(
-        imageLocalStorageService, 'getFilenameToBase64MappingAsync'
-      ).and.returnValue(Promise.resolve({
-        'image.png': 'base64String'
-      }));
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let imageBlob = new Blob(
-        ['data:image/png;base64,xyz'], {type: 'image/png'});
-      let imageData = {
-        filename: 'image.png',
-        imageBlob: imageBlob
-      };
-      let postData = {
-        description: 'test-description',
-        linked_topic_ids: ['test_id'],
-        explanation_dict: 'test_dictionary',
-        rubrics: rubricDict,
-        files: {
-          'image.png': 'base64String'
-        }
-      };
+  it('should successfully create a new skill and obtain the skill ID', fakeAsync(() => {
+    spyOn(
+      imageLocalStorageService,
+      'getFilenameToBase64MappingAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        'image.png': 'base64String',
+      })
+    );
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let imageBlob = new Blob(['data:image/png;base64,xyz'], {
+      type: 'image/png',
+    });
+    let imageData = {
+      filename: 'image.png',
+      imageBlob: imageBlob,
+    };
+    let postData = {
+      description: 'test-description',
+      linked_topic_ids: ['test_id'],
+      explanation_dict: 'test_dictionary',
+      rubrics: rubricDict,
+      files: {
+        'image.png': 'base64String',
+      },
+    };
 
-      skillCreationBackendApiService.createSkillAsync(
-        'test-description', rubricDict, 'test_dictionary', ['test_id'],
+    skillCreationBackendApiService
+      .createSkillAsync(
+        'test-description',
+        rubricDict,
+        'test_dictionary',
+        ['test_id'],
         [imageData]
-      ).then(successHandler, failHandler);
-      flushMicrotasks();
+      )
+      .then(successHandler, failHandler);
+    flushMicrotasks();
 
-      let req = httpTestingController.expectOne(
-        '/skill_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
-      req.flush(postData);
-      flushMicrotasks();
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    let req = httpTestingController.expectOne(
+      '/skill_editor_handler/create_new'
+    );
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
+    req.flush(postData);
+    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should fail to create a new skill and call the fail handler',
-    fakeAsync(() => {
-      spyOn(
-        imageLocalStorageService, 'getFilenameToBase64MappingAsync'
-      ).and.returnValue(Promise.resolve({}));
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should fail to create a new skill and call the fail handler', fakeAsync(() => {
+    spyOn(
+      imageLocalStorageService,
+      'getFilenameToBase64MappingAsync'
+    ).and.returnValue(Promise.resolve({}));
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      let postData = {
-        description: 'test-description',
-        linked_topic_ids: ['test_id'],
-        explanation_dict: 'test_dictionary',
-        rubrics: rubricDict,
-        files: {}
-      };
-      skillCreationBackendApiService.createSkillAsync(
-        'test-description', rubricDict, 'test_dictionary', ['test_id'], []
-      ).then(successHandler, failHandler);
-      flushMicrotasks();
-      let errorResponse = new HttpErrorResponse({
-        error: 'test 404 error',
-        status: 404,
-        statusText: 'Not Found'
-      });
-      let req = httpTestingController.expectOne(
-        '/skill_editor_handler/create_new');
-      req.error(new ErrorEvent('Error'), errorResponse);
+    let postData = {
+      description: 'test-description',
+      linked_topic_ids: ['test_id'],
+      explanation_dict: 'test_dictionary',
+      rubrics: rubricDict,
+      files: {},
+    };
+    skillCreationBackendApiService
+      .createSkillAsync(
+        'test-description',
+        rubricDict,
+        'test_dictionary',
+        ['test_id'],
+        []
+      )
+      .then(successHandler, failHandler);
+    flushMicrotasks();
+    let errorResponse = new HttpErrorResponse({
+      error: 'test 404 error',
+      status: 404,
+      statusText: 'Not Found',
+    });
+    let req = httpTestingController.expectOne(
+      '/skill_editor_handler/create_new'
+    );
+    req.error(new ErrorEvent('Error'), errorResponse);
 
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
-      flushMicrotasks();
-      expect(failHandler).toHaveBeenCalled();
-      expect(successHandler).not.toHaveBeenCalled();
-    }));
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body.get('payload')).toEqual(JSON.stringify(postData));
+    flushMicrotasks();
+    expect(failHandler).toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+  }));
 });

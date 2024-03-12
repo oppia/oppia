@@ -26,10 +26,7 @@ export class ChapterProgressSummary {
   _totalCheckpointsCount: number;
   _visitedCheckpointsCount: number;
 
-  constructor(
-      totalCheckpointsCount: number,
-      visitedCheckpointsCount: number
-  ) {
+  constructor(totalCheckpointsCount: number, visitedCheckpointsCount: number) {
     this._totalCheckpointsCount = totalCheckpointsCount;
     this._visitedCheckpointsCount = visitedCheckpointsCount;
   }
@@ -43,10 +40,11 @@ export class ChapterProgressSummary {
   }
 
   static createFromBackendDict(
-      chapterProgressSummaryBackendDict: ChapterProgressSummaryBackendDict
+    chapterProgressSummaryBackendDict: ChapterProgressSummaryBackendDict
   ): ChapterProgressSummary {
     return new ChapterProgressSummary(
       chapterProgressSummaryBackendDict.total_checkpoints_count,
-      chapterProgressSummaryBackendDict.visited_checkpoints_count);
+      chapterProgressSummaryBackendDict.visited_checkpoints_count
+    );
   }
 }

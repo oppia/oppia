@@ -17,66 +17,78 @@
  * Interaction in webdriverio.
  */
 
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 
-var customizeInteraction = async function(
-    elem, placeholderText, minNumberOfTerms) {
-  await objects.UnicodeStringEditor(
-    elem.$('<schema-based-unicode-editor>')
-  ).setValue(placeholderText);
-  await objects.IntEditor(
-    elem.$('<schema-based-int-editor>')
-  ).setValue(minNumberOfTerms);
+var customizeInteraction = async function (
+  elem,
+  placeholderText,
+  minNumberOfTerms
+) {
+  await objects
+    .UnicodeStringEditor(elem.$('<schema-based-unicode-editor>'))
+    .setValue(placeholderText);
+  await objects
+    .IntEditor(elem.$('<schema-based-int-editor>'))
+    .setValue(minNumberOfTerms);
 };
 
-var expectInteractionDetailsToMatch = async function(elem, placeholderText) {
+var expectInteractionDetailsToMatch = async function (elem, placeholderText) {
   const ratioExpressionInputInteraction = $(
-    'oppia-interactive-ratio-expression-input');
+    'oppia-interactive-ratio-expression-input'
+  );
   // We use presenceOf here instead of visibilityOf because the container
   // has a height and width of 0.
   await waitFor.presenceOf(
     ratioExpressionInputInteraction,
-    'Ratio Expression Input interaction taking too long to appear');
+    'Ratio Expression Input interaction taking too long to appear'
+  );
   if (placeholderText) {
     placeholderValue = await ratioExpressionInputInteraction.getAttribute(
-      'placeholder-with-value');
+      'placeholder-with-value'
+    );
     placeholderValueUnicode = JSON.parse(
       placeholderValue.replace(/&quot;/g, '"')
     ).unicode_str;
     expect(placeholderValueUnicode).toEqual(placeholderText);
   }
   expect(
-    await elem.$(
-      '<oppia-interactive-ratio-expression-input>').isExisting()
+    await elem.$('<oppia-interactive-ratio-expression-input>').isExisting()
   ).toBe(true);
 };
 
-var submitAnswer = async function(elem, answer) {
-  var ratioExpressInput = elem.$('<oppia-interactive-ratio-expression-input>').
-    $('<input>');
+var submitAnswer = async function (elem, answer) {
+  var ratioExpressInput = elem
+    .$('<oppia-interactive-ratio-expression-input>')
+    .$('<input>');
   await action.setValue(
-    'Ratio Express Input', ratioExpressInput, answer + '\n');
+    'Ratio Express Input',
+    ratioExpressInput,
+    answer + '\n'
+  );
 };
 
 var answerObjectType = 'RatioExpression';
 
-var testSuite = [{
-  interactionArguments: ['placeholder', 0],
-  ruleArguments: ['IsEquivalent', '1:2'],
-  expectedInteractionDetails: ['placeholder'],
-  wrongAnswers: ['2:5'],
-  correctAnswers: ['2:4']
-}, {
-  interactionArguments: ['placeholder', 0],
-  ruleArguments: ['HasSpecificTermEqualTo', 3, 2],
-  expectedInteractionDetails: ['placeholder'],
-  wrongAnswers: ['10:10:1'],
-  correctAnswers: ['10:10:2']
-}];
+var testSuite = [
+  {
+    interactionArguments: ['placeholder', 0],
+    ruleArguments: ['IsEquivalent', '1:2'],
+    expectedInteractionDetails: ['placeholder'],
+    wrongAnswers: ['2:5'],
+    correctAnswers: ['2:4'],
+  },
+  {
+    interactionArguments: ['placeholder', 0],
+    ruleArguments: ['HasSpecificTermEqualTo', 3, 2],
+    expectedInteractionDetails: ['placeholder'],
+    wrongAnswers: ['10:10:1'],
+    correctAnswers: ['10:10:2'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

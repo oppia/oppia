@@ -16,19 +16,19 @@
  * @fileoverview Unit tests for the Concept Card Manager service.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { ConceptCardManagerService } from './concept-card-manager.service';
-import { ExplorationEngineService } from './exploration-engine.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { AudioTranslationLanguageService } from './audio-translation-language.service';
+import {EventEmitter} from '@angular/core';
+import {TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {ConceptCardManagerService} from './concept-card-manager.service';
+import {ExplorationEngineService} from './exploration-engine.service';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {AudioTranslationLanguageService} from './audio-translation-language.service';
 
 describe('ConceptCardManager service', () => {
   let ccms: ConceptCardManagerService;
@@ -51,26 +51,29 @@ describe('ConceptCardManager service', () => {
       providers: [
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
-      ]
+          useClass: MockTranslateService,
+        },
+      ],
     });
     pps = TestBed.inject(PlayerPositionService);
     ees = TestBed.inject(ExplorationEngineService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     spyOn(pps, 'onNewCardAvailable').and.returnValue(
-      mockNewCardAvailableEmitter);
-    spyOn(pps, 'onNewCardOpened').and.returnValue(
-      mockNewCardOpenedEmitter);
+      mockNewCardAvailableEmitter
+    );
+    spyOn(pps, 'onNewCardOpened').and.returnValue(mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService);
+      AudioTranslationLanguageService
+    );
   }));
 
   beforeEach(() => {
     stateCard = StateCard.createNewCard(
-      'State 2', '<p>Content</p>', '<interaction></interaction>',
+      'State 2',
+      '<p>Content</p>',
+      '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [
@@ -111,7 +114,7 @@ describe('ConceptCardManager service', () => {
           },
           placeholder: {
             value: 1,
-          }
+          },
         },
         hints: [],
         solution: {
@@ -121,10 +124,12 @@ describe('ConceptCardManager service', () => {
             content_id: '2',
             html: 'test_explanation1',
           },
-        }
+        },
       }),
       RecordedVoiceovers.createEmpty(),
-      'content', audioTranslationLanguageService);
+      'content',
+      audioTranslationLanguageService
+    );
   });
 
   it('should show concept card icon at the right time', fakeAsync(() => {
@@ -167,73 +172,73 @@ describe('ConceptCardManager service', () => {
     expect(ccms.isConceptCardConsumed()).toBe(false);
   }));
 
-  it('should reset the service when timeouts was called before',
-    fakeAsync(() => {
-      // Initialize the service with two hints and a solution.
-      spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
-      ccms.reset(stateCard);
+  it('should reset the service when timeouts was called before', fakeAsync(() => {
+    // Initialize the service with two hints and a solution.
+    spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
+    ccms.reset(stateCard);
 
-      // Set timeout.
-      tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-      // Set tooltipTimeout.
-      tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+    // Set timeout.
+    tick(WAIT_FOR_CONCEPT_CARD_MSEC);
+    // Set tooltipTimeout.
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
-      // Reset service to 0 solutions so releaseHint timeout won't be called.
-      ccms.reset(stateCard);
+    // Reset service to 0 solutions so releaseHint timeout won't be called.
+    ccms.reset(stateCard);
 
-      // There is no timeout to flush. timeout and tooltipTimeout variables
-      // were cleaned.
-      expect(flush()).toBe(60000);
-    }));
+    // There is no timeout to flush. timeout and tooltipTimeout variables
+    // were cleaned.
+    expect(flush()).toBe(60000);
+  }));
 
-  it('should return if concept card for the state with the new name exists',
-    fakeAsync(() => {
-      const endState = {
-        classifier_model_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {}
-          }
+  it('should return if concept card for the state with the new name exists', fakeAsync(() => {
+    const endState = {
+      classifier_model_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
         },
-        solicit_answer_details: false,
-        interaction: {
-          solution: null,
-          confirmed_unclassified_answers: [],
-          id: 'EndExploration',
-          hints: [],
-          customization_args: {
-            recommendedExplorationIds: {
-              value: ['recommendedExplorationId']
-            }
+      },
+      solicit_answer_details: false,
+      interaction: {
+        solution: null,
+        confirmed_unclassified_answers: [],
+        id: 'EndExploration',
+        hints: [],
+        customization_args: {
+          recommendedExplorationIds: {
+            value: ['recommendedExplorationId'],
           },
-          answer_groups: [],
-          default_outcome: null
         },
-        param_changes: [],
-        next_content_id_index: 0,
-        card_is_checkpoint: false,
-        linked_skill_id: 'Id',
-        content: {
-          content_id: 'content',
-          html: 'Congratulations, you have finished!'
-        }
-      };
-      spyOn(ees, 'getStateFromStateName').withArgs('State 2')
-        .and.returnValue(
-          stateObjectFactory.createFromBackendDict('End', endState));
+        answer_groups: [],
+        default_outcome: null,
+      },
+      param_changes: [],
+      next_content_id_index: 0,
+      card_is_checkpoint: false,
+      linked_skill_id: 'Id',
+      content: {
+        content_id: 'content',
+        html: 'Congratulations, you have finished!',
+      },
+    };
+    spyOn(ees, 'getStateFromStateName')
+      .withArgs('State 2')
+      .and.returnValue(
+        stateObjectFactory.createFromBackendDict('End', endState)
+      );
 
-      ccms.hintsAvailable = 0;
-      ccms.reset(stateCard);
+    ccms.hintsAvailable = 0;
+    ccms.reset(stateCard);
 
-      // Time delay before concept card is released.
-      tick(WAIT_FOR_CONCEPT_CARD_MSEC);
-      // Time delay before tooltip for the concept card is shown.
-      tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+    // Time delay before concept card is released.
+    tick(WAIT_FOR_CONCEPT_CARD_MSEC);
+    // Time delay before tooltip for the concept card is shown.
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
 
-      expect(ccms.isConceptCardTooltipOpen()).toBe(true);
-      expect(ccms.isConceptCardViewable()).toBe(true);
-      expect(ccms.isConceptCardConsumed()).toBe(false);
-    }));
+    expect(ccms.isConceptCardTooltipOpen()).toBe(true);
+    expect(ccms.isConceptCardViewable()).toBe(true);
+    expect(ccms.isConceptCardConsumed()).toBe(false);
+  }));
 
   it('should set the number of hints available', fakeAsync(() => {
     spyOn(pps.onNewCardOpened, 'subscribe');

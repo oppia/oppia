@@ -16,27 +16,27 @@
  * @fileoverview Tests for SkillRightsModel.
  */
 
-import { SkillRights } from
-  'domain/skill/skill-rights.model';
+import {SkillRights} from 'domain/skill/skill-rights.model';
 
 describe('Skill rights model', () => {
   it('should make a copy from another skill rights object', () => {
     const sampleSkillRightsObject1 = {
       skill_id: '1',
-      can_edit_skill_description: true
+      can_edit_skill_description: true,
     };
 
     const sampleSkillRightsObject2 = {
       skill_id: '2',
-      can_edit_skill_description: false
+      can_edit_skill_description: false,
     };
 
-
     const sampleSkillRights1 = SkillRights.createFromBackendDict(
-      sampleSkillRightsObject1);
+      sampleSkillRightsObject1
+    );
 
     const sampleSkillRights2 = SkillRights.createFromBackendDict(
-      sampleSkillRightsObject2);
+      sampleSkillRightsObject2
+    );
 
     sampleSkillRights2.copyFromSkillRights(sampleSkillRights1);
     expect(sampleSkillRights2.getSkillId()).toEqual('1');

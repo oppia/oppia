@@ -16,14 +16,19 @@
  * @fileoverview Tests for BlogDashboardPageAuthGuard
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot,
+  NavigationExtras,
+} from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { UserInfo, UserRoles } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { BlogDashboardPageAuthGuard } from './blog-dashboard-page-auth.guard';
+import {AppConstants} from 'app.constants';
+import {UserInfo, UserRoles} from 'domain/user/user-info.model';
+import {UserService} from 'services/user.service';
+import {BlogDashboardPageAuthGuard} from './blog-dashboard-page-auth.guard';
 
 class MockRouter {
   navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
@@ -39,7 +44,7 @@ describe('BlogDashboardPageAuthGuard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [UserService, { provide: Router, useClass: MockRouter }],
+      providers: [UserService, {provide: Router, useClass: MockRouter}],
     }).compileComponents();
 
     guard = TestBed.inject(BlogDashboardPageAuthGuard);
@@ -47,36 +52,50 @@ describe('BlogDashboardPageAuthGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 401 page if user is not blog admin', (done) => {
+  it('should redirect user to 401 page if user is not blog admin', done => {
     const getUserInfoAsyncSpy = spyOn(
-      userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(UserInfo.createDefault())
-    );
+      userService,
+      'getUserInfoAsync'
+    ).and.returnValue(Promise.resolve(UserInfo.createDefault()));
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-    guard.canActivate(
-      new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
-      (canActivate) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(canActivate => {
         expect(canActivate).toBeFalse();
         expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
         expect(navigateSpy).toHaveBeenCalledWith([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]);
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+        ]);
         done();
       });
   });
 
-  it('should not redirect user to 401 page if user is blog admin', (done) => {
+  it('should not redirect user to 401 page if user is blog admin', done => {
     const getUserInfoAsyncSpy = spyOn(
-      userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(new UserInfo(
-        [UserRoles.BLOG_ADMIN],
-        false, true, false, false, false, '', '', '', true))
+      userService,
+      'getUserInfoAsync'
+    ).and.returnValue(
+      Promise.resolve(
+        new UserInfo(
+          [UserRoles.BLOG_ADMIN],
+          false,
+          true,
+          false,
+          false,
+          false,
+          '',
+          '',
+          '',
+          true
+        )
+      )
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-    guard.canActivate(
-      new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
-      (canActivate) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(canActivate => {
         expect(canActivate).toBeTrue();
         expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
         expect(navigateSpy).not.toHaveBeenCalled();

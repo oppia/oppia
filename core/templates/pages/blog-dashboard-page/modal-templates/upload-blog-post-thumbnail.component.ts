@@ -16,18 +16,26 @@
  * @fileoverview Component for uploading thumbnail image.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, Output, ViewChild, EventEmitter, OnInit } from '@angular/core';
-import { SafeResourceUrl } from '@angular/platform-browser';
-import { AppConstants } from 'app.constants';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Output,
+  ViewChild,
+  EventEmitter,
+  OnInit,
+} from '@angular/core';
+import {SafeResourceUrl} from '@angular/platform-browser';
+import {AppConstants} from 'app.constants';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 import Cropper from 'cropperjs';
 require('cropperjs/dist/cropper.min.css');
 
 @Component({
   selector: 'oppia-upload-blog-post-thumbnail',
-  templateUrl: './upload-blog-post-thumbnail.component.html'
+  templateUrl: './upload-blog-post-thumbnail.component.html',
 })
 export class UploadBlogPostThumbnailComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -36,7 +44,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   croppedFilename!: string;
   cropper!: Cropper;
   @ViewChild('croppableImage') croppableImageRef!: ElementRef;
-  invalidTagsAndAttributes!: { tags: string[]; attrs: string[] };
+  invalidTagsAndAttributes!: {tags: string[]; attrs: string[]};
   // This property will be null when the SVG uploaded is not valid or when
   // the image is not yet uploaded.
   uploadedImage: SafeResourceUrl | null = null;
@@ -50,8 +58,8 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     private changeDetectorRef: ChangeDetectorRef,
     private imageLocalStorageService: ImageLocalStorageService,
     private svgSanitizerService: SvgSanitizerService,
-    private windowDimensionService: WindowDimensionsService,
-  ) { }
+    private windowDimensionService: WindowDimensionsService
+  ) {}
 
   initializeCropper(): void {
     let thumbnail = this.croppableImageRef.nativeElement;
@@ -59,13 +67,13 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
       this.cropper = new Cropper(thumbnail, {
         minContainerWidth: 500,
         minContainerHeight: 350,
-        aspectRatio: 4
+        aspectRatio: 4,
       });
     } else {
       this.cropper = new Cropper(thumbnail, {
         minContainerWidth: 200,
         minContainerHeight: 200,
-        aspectRatio: 4
+        aspectRatio: 4,
       });
     }
   }
@@ -74,28 +82,29 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     let originalFilename = file.name;
     // The cropper always returns a jpeg file, thus the extension should be
     // changed to jpeg for the final image type to match the extension.
-    this.croppedFilename = (
-      originalFilename
-        .replace(/\.([^.]*?)(?=\?|#|$)/, '.jpeg')
-        .replace(/ /g, '_')
-    );
+    this.croppedFilename = originalFilename
+      .replace(/\.([^.]*?)(?=\?|#|$)/, '.jpeg')
+      .replace(/ /g, '_');
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       this.invalidTagsAndAttributes = {
         tags: [],
-        attrs: []
+        attrs: [],
       };
       let imageData = (e.target as FileReader).result as string;
       if (this.svgSanitizerService.isBase64Svg(imageData)) {
-        this.invalidTagsAndAttributes = this.svgSanitizerService
-          .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
-        this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-          imageData);
+        this.invalidTagsAndAttributes =
+          this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+            imageData
+          );
+        this.uploadedImage =
+          this.svgSanitizerService.getTrustedSvgResourceUrl(imageData);
       }
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
-          (e.target as FileReader).result as string);
+          (e.target as FileReader).result as string
+        );
       }
       try {
         this.changeDetectorRef.detectChanges();
@@ -115,7 +124,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.cropppedImageDataUrl = '';
     this.invalidTagsAndAttributes = {
       tags: [],
-      attrs: []
+      attrs: [],
     };
   }
 
@@ -125,14 +134,17 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   }
 
   save(): void {
-    this.cropppedImageDataUrl = (
-      this.cropper.getCroppedCanvas({
+    this.cropppedImageDataUrl = this.cropper
+      .getCroppedCanvas({
         height: 200,
         width: 800,
         fillColor: '#fff',
-      }).toDataURL('image/jpeg'));
+      })
+      .toDataURL('image/jpeg');
     this.imageLocalStorageService.saveImage(
-      this.croppedFilename, this.cropppedImageDataUrl);
+      this.croppedFilename,
+      this.cropppedImageDataUrl
+    );
     this.imageLocallySaved.emit(this.cropppedImageDataUrl);
     this.uploadedImage = null;
   }
@@ -141,7 +153,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
     this.uploadedImage = null;
     this.invalidTagsAndAttributes = {
       tags: [],
-      attrs: []
+      attrs: [],
     };
     this.cancelThumbnailUpload.emit();
   }
@@ -149,7 +161,7 @@ export class UploadBlogPostThumbnailComponent implements OnInit {
   ngOnInit(): void {
     this.invalidTagsAndAttributes = {
       tags: [],
-      attrs: []
+      attrs: [],
     };
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
 

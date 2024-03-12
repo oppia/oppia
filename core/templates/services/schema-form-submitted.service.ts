@@ -17,11 +17,11 @@
  * submission of different schema forms
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable, EventEmitter} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SchemaFormSubmittedService {
   private _submittedSchemaBasedFormEventEmitter = new EventEmitter<void>();
@@ -31,5 +31,9 @@ export class SchemaFormSubmittedService {
   }
 }
 
-angular.module('oppia').factory('SchemaFormSubmittedService',
-  downgradeInjectable(SchemaFormSubmittedService));
+angular
+  .module('oppia')
+  .factory(
+    'SchemaFormSubmittedService',
+    downgradeInjectable(SchemaFormSubmittedService)
+  );

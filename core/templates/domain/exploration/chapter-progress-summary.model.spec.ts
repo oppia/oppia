@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ChapterProgressSummary } from './chapter-progress-summary.model';
+import {ChapterProgressSummary} from './chapter-progress-summary.model';
 
 /**
  * @fileoverview Tests for chapter progress summary model.
@@ -22,12 +22,11 @@ describe('Chapter Progress Summary', () => {
   it('should correctly convert backend dict to object', () => {
     const chapterProgressSummaryDict = {
       total_checkpoints_count: 6,
-      visited_checkpoints_count: 4
+      visited_checkpoints_count: 4,
     };
 
-    let chapterProgressSummary = (
-      ChapterProgressSummary.createFromBackendDict(
-        chapterProgressSummaryDict)
+    let chapterProgressSummary = ChapterProgressSummary.createFromBackendDict(
+      chapterProgressSummaryDict
     );
 
     expect(chapterProgressSummary.totalCheckpoints).toEqual(6);

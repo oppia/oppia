@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for PlatformParameterRuleModel.
  */
 
-import { PlatformParameterFilterType } from
-  'domain/platform-parameter/platform-parameter-filter.model';
+import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-parameter-filter.model';
 import {
   PlatformParameterRule,
   PlatformParameterRuleBackendDict,
@@ -29,14 +28,14 @@ describe('PlatformParameterRuleModel', () => {
       filters: [
         {
           type: PlatformParameterFilterType.PlatformType,
-          conditions: [['=', 'Web']]
+          conditions: [['=', 'Web']],
         },
         {
           type: PlatformParameterFilterType.AppVersion,
-          conditions: [['=', '1.0.0']]
-        }
+          conditions: [['=', '1.0.0']],
+        },
       ],
-      value_when_matched: true
+      value_when_matched: true,
     });
 
     expect(rule.valueWhenMatched).toBeTrue();
@@ -48,14 +47,14 @@ describe('PlatformParameterRuleModel', () => {
       filters: [
         {
           type: PlatformParameterFilterType.PlatformType,
-          conditions: [['=', 'Web']]
+          conditions: [['=', 'Web']],
         },
         {
           type: PlatformParameterFilterType.AppVersion,
-          conditions: [['=', '1.0.0']]
-        }
+          conditions: [['=', '1.0.0']],
+        },
       ],
-      value_when_matched: true
+      value_when_matched: true,
     };
 
     const instance = PlatformParameterRule.createFromBackendDict(backendDict);

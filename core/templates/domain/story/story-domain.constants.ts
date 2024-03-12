@@ -17,17 +17,14 @@
  */
 
 export const StoryDomainConstants = {
-  EDITABLE_STORY_DATA_URL_TEMPLATE:
-    '/story_editor_handler/data/<story_id>',
+  EDITABLE_STORY_DATA_URL_TEMPLATE: '/story_editor_handler/data/<story_id>',
 
-  STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE: (
-    '/story_url_fragment_handler/<story_url_fragment>'),
+  STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE:
+    '/story_url_fragment_handler/<story_url_fragment>',
 
-  STORY_PUBLISH_URL_TEMPLATE:
-    '/story_publish_handler/<story_id>',
+  STORY_PUBLISH_URL_TEMPLATE: '/story_publish_handler/<story_id>',
 
-  VALIDATE_EXPLORATIONS_URL_TEMPLATE:
-    '/validate_story_explorations/<story_id>',
+  VALIDATE_EXPLORATIONS_URL_TEMPLATE: '/validate_story_explorations/<story_id>',
 
   // These should match the constants defined in core.domain.story_domain.
   CMD_ADD_STORY_NODE: 'add_story_node',
@@ -62,9 +59,8 @@ export const StoryDomainConstants = {
   STORY_NODE_PROPERTY_STATUS: 'status',
   STORY_NODE_PROPERTY_PLANNED_PUBLICATION_DATE_MSECS:
     'planned_publication_date_msecs',
-  STORY_NODE_PROPERTY_LAST_MODIFIED_MSECS:
-    'last_modified_msecs',
+  STORY_NODE_PROPERTY_LAST_MODIFIED_MSECS: 'last_modified_msecs',
   STORY_NODE_PROPERTY_FIRST_PUBLICATION_DATE_MSECS:
     'first_publication_date_msecs',
-  STORY_NODE_PROPERTY_UNPUBLISHING_REASON: 'unpublishing_reason'
+  STORY_NODE_PROPERTY_UNPUBLISHING_REASON: 'unpublishing_reason',
 } as const;

@@ -16,11 +16,11 @@
  * @fileoverview Base root component for all pages.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { PageHeadService } from 'services/page-head.service';
+import {PageHeadService} from 'services/page-head.service';
 
 export interface MetaTagData {
   readonly PROPERTY_TYPE: string;
@@ -29,7 +29,7 @@ export interface MetaTagData {
 }
 
 @Component({
-  template: ''
+  template: '',
 })
 export abstract class BaseRootComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -38,8 +38,8 @@ export abstract class BaseRootComponent implements OnInit, OnDestroy {
 
   constructor(
     protected pageHeadService: PageHeadService,
-    protected translateService: TranslateService,
-  ) { }
+    protected translateService: TranslateService
+  ) {}
 
   get titleInterpolationParams(): Object {
     return {};
@@ -48,10 +48,9 @@ export abstract class BaseRootComponent implements OnInit, OnDestroy {
   setPageTitleAndMetaTags(): void {
     const translatedTitle = this.translateService.instant(
       this.title,
-      this.titleInterpolationParams);
-    this.pageHeadService.updateTitleAndMetaTags(
-      translatedTitle,
-      this.meta);
+      this.titleInterpolationParams
+    );
+    this.pageHeadService.updateTitleAndMetaTags(translatedTitle, this.meta);
   }
 
   ngOnInit(): void {

@@ -16,19 +16,13 @@
  * @fileoverview Module for the background banner component.
  */
 
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 
-import { BackgroundBannerComponent } from 'components/common-layout-directives/common-elements/background-banner.component';
+import {BackgroundBannerComponent} from 'components/common-layout-directives/common-elements/background-banner.component';
 
 @NgModule({
-  declarations: [
-    BackgroundBannerComponent
-  ],
-  entryComponents: [
-    BackgroundBannerComponent
-  ],
-  exports: [
-    BackgroundBannerComponent
-  ]
+  declarations: [BackgroundBannerComponent],
+  entryComponents: [BackgroundBannerComponent],
+  exports: [BackgroundBannerComponent],
 })
 export class BackgroundBannerModule {}

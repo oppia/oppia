@@ -16,27 +16,33 @@
  * @fileoverview A data service that stores the current list of
  * state parameter changes.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
-import { StatePropertyService } from
+import {AlertsService} from 'services/alerts.service';
+import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {
+  StatePropertyService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
-import { UtilsService } from 'services/utils.service';
+} from 'components/state-editor/state-editor-properties-services/state-property.service';
+import {UtilsService} from 'services/utils.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 // TODO(sll): Add validation.
-export class StateParamChangesService extends
-  StatePropertyService<ParamChange[]> {
+export class StateParamChangesService extends StatePropertyService<
+  ParamChange[]
+> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveStateParamChanges';
   }
 }
 
-angular.module('oppia').factory(
-  'StateParamChangesService', downgradeInjectable(StateParamChangesService));
+angular
+  .module('oppia')
+  .factory(
+    'StateParamChangesService',
+    downgradeInjectable(StateParamChangesService)
+  );

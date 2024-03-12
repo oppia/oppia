@@ -16,10 +16,10 @@
  * @fileoverview Component for editing blog author details.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-blog-author-details-editor',
@@ -34,9 +34,7 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   authorName!: string;
   authorBio!: string;
   prevAuthorBio!: string;
-  constructor(
-      ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
@@ -48,43 +46,38 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
 
   validateAuthorDetails(): string[] {
     let issues: string[] = [];
-    const validAuthorNameRegex = (
-      new RegExp(AppConstants.VALID_AUTHOR_NAME_REGEX)
+    const validAuthorNameRegex = new RegExp(
+      AppConstants.VALID_AUTHOR_NAME_REGEX
     );
     if (this.authorName.trim().length === 0) {
-      issues.push(
-        'Author Name should not be empty.');
-    } else if (
-      this.authorName.length < AppConstants.MIN_AUTHOR_NAME_LENGTH) {
+      issues.push('Author Name should not be empty.');
+    } else if (this.authorName.length < AppConstants.MIN_AUTHOR_NAME_LENGTH) {
       issues.push(
         'Author Name should not be less than ' +
-        `${AppConstants.MIN_AUTHOR_NAME_LENGTH} characters.`
+          `${AppConstants.MIN_AUTHOR_NAME_LENGTH} characters.`
       );
-    } else if (
-      this.authorName.length > AppConstants.MAX_AUTHOR_NAME_LENGTH) {
+    } else if (this.authorName.length > AppConstants.MAX_AUTHOR_NAME_LENGTH) {
       issues.push(
         'Author Name should not be more than ' +
-        `${AppConstants.MAX_AUTHOR_NAME_LENGTH} characters.`
+          `${AppConstants.MAX_AUTHOR_NAME_LENGTH} characters.`
       );
-    } else if (
-      !validAuthorNameRegex.test(this.authorName)
-    ) {
+    } else if (!validAuthorNameRegex.test(this.authorName)) {
       issues.push(
-        'Author Name can only have alphanumeric characters and spaces.');
+        'Author Name can only have alphanumeric characters and spaces.'
+      );
     }
 
     if (this.authorBio.trim().length === 0) {
-      issues.push(
-        'Author Bio should not be empty.');
+      issues.push('Author Bio should not be empty.');
     } else if (this.authorBio.length < AppConstants.MIN_CHARS_IN_AUTHOR_BIO) {
       issues.push(
         'Author Bio should not be less than ' +
-        `${AppConstants.MIN_CHARS_IN_AUTHOR_BIO} characters.`
+          `${AppConstants.MIN_CHARS_IN_AUTHOR_BIO} characters.`
       );
     } else if (this.authorBio.length > AppConstants.MAX_CHARS_IN_AUTHOR_BIO) {
       issues.push(
         'Author Bio should not be more than ' +
-        `${AppConstants.MAX_CHARS_IN_AUTHOR_BIO} characters.`
+          `${AppConstants.MAX_CHARS_IN_AUTHOR_BIO} characters.`
       );
     }
     return issues;
@@ -93,7 +86,7 @@ export class BlogAuthorDetailsEditorComponent extends ConfirmOrCancelModal {
   save(): void {
     let authorDetails = {
       authorName: this.authorName,
-      authorBio: this.authorBio
+      authorBio: this.authorBio,
     };
     if (this.validateAuthorDetails().length === 0) {
       super.confirm(authorDetails);

@@ -16,24 +16,23 @@
  * @fileoverview Root component for error page.
  */
 
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
+import {Component} from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
 
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PageHeadService } from 'services/page-head.service';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-error-page-root',
-  templateUrl: './error-page-root.component.html'
+  templateUrl: './error-page-root.component.html',
 })
 export class ErrorPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.TITLE;
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR
+    .META as unknown as Readonly<MetaTagData>[];
 
   statusCode: string | null = null;
   validStatusCodes: string[] = ['400', '401', '404', '500'];
@@ -41,10 +40,10 @@ export class ErrorPageRootComponent extends BaseRootComponent {
   activatedRoute: ActivatedRoute;
 
   constructor(
-      pageHeadService: PageHeadService,
-      translateService: TranslateService,
-      windowRef: WindowRef,
-      activatedRoute: ActivatedRoute
+    pageHeadService: PageHeadService,
+    translateService: TranslateService,
+    windowRef: WindowRef,
+    activatedRoute: ActivatedRoute
   ) {
     super(pageHeadService, translateService);
     this.windowRef = windowRef;
@@ -54,13 +53,15 @@ export class ErrorPageRootComponent extends BaseRootComponent {
   ngOnInit(): void {
     this.statusCode = this.activatedRoute.snapshot.paramMap.get('status_code');
     if (this.statusCode === null) {
-      const bodyTag = (
-        this.windowRef.nativeWindow.document.getElementsByTagName('body'));
+      const bodyTag =
+        this.windowRef.nativeWindow.document.getElementsByTagName('body');
       this.statusCode = bodyTag[0].getAttribute('errorCode');
     }
 
-    if (!this.validStatusCodes.includes(String(this.statusCode)) ||
-          this.activatedRoute.snapshot.url.length > 0) {
+    if (
+      !this.validStatusCodes.includes(String(this.statusCode)) ||
+      this.activatedRoute.snapshot.url.length > 0
+    ) {
       this.statusCode = '404';
     }
 
@@ -68,6 +69,6 @@ export class ErrorPageRootComponent extends BaseRootComponent {
   }
 
   get titleInterpolationParams(): Object {
-    return { statusCode: this.statusCode };
+    return {statusCode: this.statusCode};
   }
 }

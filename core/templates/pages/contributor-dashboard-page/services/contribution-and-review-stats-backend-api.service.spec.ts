@@ -17,11 +17,12 @@
  * service.
  */
 
-import { HttpClientTestingModule, HttpTestingController }
-  from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { ContributionAndReviewStatsBackendApiService }
-  from './contribution-and-review-stats-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {ContributionAndReviewStatsBackendApiService} from './contribution-and-review-stats-backend-api.service';
 
 describe('Contribution and review stats backend API service', () => {
   let carbas: ContributionAndReviewStatsBackendApiService;
@@ -38,7 +39,7 @@ describe('Contribution and review stats backend API service', () => {
     rejected_translations_count: 0,
     rejected_translation_word_count: 0,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
   const translationReviewStat = {
     language_code: 'es',
@@ -49,7 +50,7 @@ describe('Contribution and review stats backend API service', () => {
     accepted_translations_with_reviewer_edits_count: 0,
     accepted_translation_word_count: 1,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
   const questionContributionStat = {
     topic_name: 'published_topic_name',
@@ -57,7 +58,7 @@ describe('Contribution and review stats backend API service', () => {
     accepted_questions_count: 1,
     accepted_questions_without_reviewer_edits_count: 0,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
   const questionReviewStat = {
     topic_name: 'published_topic_name',
@@ -65,31 +66,31 @@ describe('Contribution and review stats backend API service', () => {
     accepted_questions_count: 1,
     accepted_questions_with_reviewer_edits_count: 1,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
 
   const fetchTranslationContributionStatResponse = {
-    translation_contribution_stats: [translationContributionStat]
+    translation_contribution_stats: [translationContributionStat],
   };
   const fetchTranslationReviewStatResponse = {
-    translation_review_stats: [translationReviewStat]
+    translation_review_stats: [translationReviewStat],
   };
   const fetchQuestionContributionStatResponse = {
-    question_contribution_stats: [questionContributionStat]
+    question_contribution_stats: [questionContributionStat],
   };
   const fetchQuestionReviewStatResponse = {
-    question_review_stats: [questionReviewStat]
+    question_review_stats: [questionReviewStat],
   };
   const fetchAllStatsResponse = {
     translation_contribution_stats: [translationContributionStat],
     translation_review_stats: [translationReviewStat],
     question_contribution_stats: [questionContributionStat],
-    question_review_stats: [questionReviewStat]
+    question_review_stats: [questionReviewStat],
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     carbas = TestBed.inject(ContributionAndReviewStatsBackendApiService);
     http = TestBed.inject(HttpTestingController);
@@ -110,112 +111,128 @@ describe('Contribution and review stats backend API service', () => {
 
     it('should fetch translation contribution stats', fakeAsync(() => {
       spyOn(carbas, 'fetchContributionAndReviewStatsAsync').and.callThrough();
-      const url = (
-        '/contributorstatssummaries/translation/' +
-        'submission/translator');
+      const url =
+        '/contributorstatssummaries/translation/' + 'submission/translator';
 
-      carbas.fetchContributionAndReviewStatsAsync(
-        'translation',
-        'submission',
-        'translator'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchContributionAndReviewStatsAsync(
+          'translation',
+          'submission',
+          'translator'
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(fetchTranslationContributionStatResponse);
       flushMicrotasks();
 
-      expect(carbas.fetchContributionAndReviewStatsAsync)
-        .toHaveBeenCalledWith(
-          'translation', 'submission', 'translator');
+      expect(carbas.fetchContributionAndReviewStatsAsync).toHaveBeenCalledWith(
+        'translation',
+        'submission',
+        'translator'
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch translation review stats', fakeAsync(() => {
       spyOn(carbas, 'fetchContributionAndReviewStatsAsync').and.callThrough();
-      const url = (
+      const url =
         '/contributorstatssummaries/translation/' +
-        'review/translation_reviewer');
+        'review/translation_reviewer';
 
-      carbas.fetchContributionAndReviewStatsAsync(
-        'translation',
-        'review',
-        'translation_reviewer'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchContributionAndReviewStatsAsync(
+          'translation',
+          'review',
+          'translation_reviewer'
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(fetchTranslationReviewStatResponse);
       flushMicrotasks();
 
-      expect(carbas.fetchContributionAndReviewStatsAsync)
-        .toHaveBeenCalledWith(
-          'translation', 'review', 'translation_reviewer');
+      expect(carbas.fetchContributionAndReviewStatsAsync).toHaveBeenCalledWith(
+        'translation',
+        'review',
+        'translation_reviewer'
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch question contribution stats', fakeAsync(() => {
       spyOn(carbas, 'fetchContributionAndReviewStatsAsync').and.callThrough();
-      const url = (
+      const url =
         '/contributorstatssummaries/question/' +
-        'submission/question_submitter');
+        'submission/question_submitter';
 
-      carbas.fetchContributionAndReviewStatsAsync(
-        'question',
-        'submission',
-        'question_submitter'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchContributionAndReviewStatsAsync(
+          'question',
+          'submission',
+          'question_submitter'
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(fetchQuestionContributionStatResponse);
       flushMicrotasks();
 
-      expect(carbas.fetchContributionAndReviewStatsAsync)
-        .toHaveBeenCalledWith(
-          'question', 'submission', 'question_submitter');
+      expect(carbas.fetchContributionAndReviewStatsAsync).toHaveBeenCalledWith(
+        'question',
+        'submission',
+        'question_submitter'
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch question review stats', fakeAsync(() => {
       spyOn(carbas, 'fetchContributionAndReviewStatsAsync').and.callThrough();
-      const url = (
-        '/contributorstatssummaries/question/' +
-        'review/question_reviewer');
+      const url =
+        '/contributorstatssummaries/question/' + 'review/question_reviewer';
 
-      carbas.fetchContributionAndReviewStatsAsync(
-        'question',
-        'review',
-        'question_reviewer'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchContributionAndReviewStatsAsync(
+          'question',
+          'review',
+          'question_reviewer'
+        )
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(fetchQuestionReviewStatResponse);
       flushMicrotasks();
 
-      expect(carbas.fetchContributionAndReviewStatsAsync)
-        .toHaveBeenCalledWith(
-          'question', 'review', 'question_reviewer');
+      expect(carbas.fetchContributionAndReviewStatsAsync).toHaveBeenCalledWith(
+        'question',
+        'review',
+        'question_reviewer'
+      );
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));
 
     it('should fetch all stats', fakeAsync(() => {
       spyOn(
-        carbas, 'fetchAllContributionAndReviewStatsAsync').and.callThrough();
-      const url = (
-        '/contributorallstatssummaries/user');
+        carbas,
+        'fetchAllContributionAndReviewStatsAsync'
+      ).and.callThrough();
+      const url = '/contributorallstatssummaries/user';
 
-      carbas.fetchAllContributionAndReviewStatsAsync(
-        'user'
-      ).then(successHandler, failureHandler);
+      carbas
+        .fetchAllContributionAndReviewStatsAsync('user')
+        .then(successHandler, failureHandler);
       const req = http.expectOne(url);
       expect(req.request.method).toEqual('GET');
       req.flush(fetchAllStatsResponse);
       flushMicrotasks();
 
-      expect(carbas.fetchAllContributionAndReviewStatsAsync)
-        .toHaveBeenCalledWith('user');
+      expect(
+        carbas.fetchAllContributionAndReviewStatsAsync
+      ).toHaveBeenCalledWith('user');
       expect(successHandler).toHaveBeenCalled();
       expect(failureHandler).not.toHaveBeenCalled();
     }));

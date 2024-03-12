@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Frontend Model for Feature Flag.
-*/
+ */
 
 export enum FeatureStage {
   DEV = 'dev',
@@ -23,13 +23,13 @@ export enum FeatureStage {
 }
 
 export interface FeatureFlagBackendDict {
-  'name': string;
-  'description': string;
-  'feature_stage': FeatureStage;
-  'force_enable_for_all_users': boolean;
-  'rollout_percentage': number;
-  'user_group_ids': string[];
-  'last_updated': string | null;
+  name: string;
+  description: string;
+  feature_stage: FeatureStage;
+  force_enable_for_all_users: boolean;
+  rollout_percentage: number;
+  user_group_ids: string[];
+  last_updated: string | null;
 }
 
 /**
@@ -48,9 +48,14 @@ export class FeatureFlag {
   lastUpdated: string | null;
 
   constructor(
-      name: string, description: string, featureStage: FeatureStage,
-      forceEnableForAllUsers: boolean, rolloutPercentage: number,
-      userGroupIds: string[], lastUpdated: string | null) {
+    name: string,
+    description: string,
+    featureStage: FeatureStage,
+    forceEnableForAllUsers: boolean,
+    rolloutPercentage: number,
+    userGroupIds: string[],
+    lastUpdated: string | null
+  ) {
     this.name = name;
     this.description = description;
     this.featureStage = featureStage;
@@ -61,7 +66,8 @@ export class FeatureFlag {
   }
 
   static createFromBackendDict(
-      backendDict: FeatureFlagBackendDict): FeatureFlag {
+    backendDict: FeatureFlagBackendDict
+  ): FeatureFlag {
     return new FeatureFlag(
       backendDict.name,
       backendDict.description,

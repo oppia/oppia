@@ -16,19 +16,22 @@
  * @fileoverview Component for the training panel in the state editor.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { ResponsesService } from '../services/responses.service';
-import { TrainingDataService } from './training-data.service';
-import { AppConstants } from 'app.constants';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {ResponsesService} from '../services/responses.service';
+import {TrainingDataService} from './training-data.service';
+import {AppConstants} from 'app.constants';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 interface ClassificationInterface {
   answerGroupIndex: number;
@@ -37,10 +40,9 @@ interface ClassificationInterface {
 
 @Component({
   selector: 'oppia-training-panel',
-  templateUrl: './training-panel.component.html'
+  templateUrl: './training-panel.component.html',
 })
-export class TrainingPanelComponent
-  implements OnInit {
+export class TrainingPanelComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -71,14 +73,15 @@ export class TrainingPanelComponent
     private explorationStatesService: ExplorationStatesService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private generateContentIdService: GenerateContentIdService,
-    private outcomeObjectFactory: OutcomeObjectFactory,
-  ) { }
+    private outcomeObjectFactory: OutcomeObjectFactory
+  ) {}
 
   _updateAnswerTemplate(): void {
-    this.answerTemplate = (
-      this.explorationHtmlFormatterService.getAnswerHtml(
-        this.answer, this.stateInteractionIdService.savedMemento,
-        this.stateCustomizationArgsService.savedMemento));
+    this.answerTemplate = this.explorationHtmlFormatterService.getAnswerHtml(
+      this.answer,
+      this.stateInteractionIdService.savedMemento,
+      this.stateCustomizationArgsService.savedMemento
+    );
   }
 
   getCurrentStateName(): string | null {
@@ -87,11 +90,16 @@ export class TrainingPanelComponent
 
   beginAddingNewResponse(): void {
     let contentId = this.generateContentIdService.getNextStateId(
-      AppConstants.COMPONENT_NAME_FEEDBACK);
+      AppConstants.COMPONENT_NAME_FEEDBACK
+    );
     let currentStateName = this.stateEditorService.getActiveStateName();
     if (currentStateName) {
       this.classification.newOutcome = this.outcomeObjectFactory.createNew(
-        currentStateName, contentId, '', []);
+        currentStateName,
+        contentId,
+        '',
+        []
+      );
     }
     this.addingNewResponse = true;
   }
@@ -124,17 +132,18 @@ export class TrainingPanelComponent
     let _stateName = this.stateEditorService.getActiveStateName();
     if (_stateName) {
       let _state = this.explorationStatesService.getState(_stateName);
-      this.allOutcomes = this.trainingDataService.getAllPotentialOutcomes(
-        _state);
+      this.allOutcomes =
+        this.trainingDataService.getAllPotentialOutcomes(_state);
     }
 
     this._updateAnswerTemplate();
-    this.selectedAnswerGroupIndex = (
-      this.classification.answerGroupIndex);
+    this.selectedAnswerGroupIndex = this.classification.answerGroupIndex;
   }
 }
 
-angular.module('oppia').directive('oppiaTrainingPanel',
+angular.module('oppia').directive(
+  'oppiaTrainingPanel',
   downgradeComponent({
-    component: TrainingPanelComponent
-  }) as angular.IDirectiveFactory);
+    component: TrainingPanelComponent,
+  }) as angular.IDirectiveFactory
+);

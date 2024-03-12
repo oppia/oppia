@@ -17,12 +17,9 @@
  */
 
 var action = require('../webdriverio_utils/action.js');
-var CollectionEditorPage =
-  require('../webdriverio_utils/CollectionEditorPage.js');
-var CreatorDashboardPage =
-  require('../webdriverio_utils/CreatorDashboardPage.js');
-var ExplorationEditorPage = require(
-  '../webdriverio_utils/ExplorationEditorPage.js');
+var CollectionEditorPage = require('../webdriverio_utils/CollectionEditorPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var ModeratorPage = require('../webdriverio_utils/ModeratorPage.js');
 var PreferencesPage = require('../webdriverio_utils/PreferencesPage.js');
@@ -32,7 +29,7 @@ var users = require('../webdriverio_utils/users.js');
 var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-var _selectLanguage = async function(language) {
+var _selectLanguage = async function (language) {
   var languageDropdown = $('.e2e-test-language-dropdown');
   await action.click('Language Dropdown', languageDropdown);
   var languageOption = $('.e2e-test-i18n-language-' + language);
@@ -41,20 +38,21 @@ var _selectLanguage = async function(language) {
   await waitFor.pageToFullyLoad();
 };
 
-
-describe('Basic user journeys', function() {
-  describe('Account creation', function() {
+describe('Basic user journeys', function () {
+  describe('Account creation', function () {
     var libraryPage = null;
     var moderatorPage = null;
 
-    beforeAll(function() {
+    beforeAll(function () {
       libraryPage = new LibraryPage.LibraryPage();
       moderatorPage = new ModeratorPage.ModeratorPage();
     });
 
-    it('should create users', async function() {
+    it('should create users', async function () {
       await users.createUser(
-        'ordinaryuser@userManagement.com', 'ordinaryUserManagement');
+        'ordinaryuser@userManagement.com',
+        'ordinaryUserManagement'
+      );
 
       await users.login('ordinaryuser@userManagement.com');
       await libraryPage.get();
@@ -63,16 +61,20 @@ describe('Basic user journeys', function() {
       await moderatorPage.get();
       await general.expectErrorPage(401);
       await general.checkForConsoleErrors([
-        'Failed to load resource: the server responded with a status of 401']);
+        'Failed to load resource: the server responded with a status of 401',
+      ]);
       await users.logout();
     });
 
-    it('should create moderators', async function() {
+    it('should create moderators', async function () {
       await users.createModerator(
-        'mod@userManagement.com', 'moderatorUserManagement');
+        'mod@userManagement.com',
+        'moderatorUserManagement'
+      );
       await users.login('mod@userManagement.com');
       await general.checkForConsoleErrors([
-        'Failed to load resource: the server responded with a status of 401']);
+        'Failed to load resource: the server responded with a status of 401',
+      ]);
       await moderatorPage.get();
       await moderatorPage.expectModeratorPageToBeVisible();
       await general.openProfileDropdown();
@@ -81,15 +83,17 @@ describe('Basic user journeys', function() {
     });
 
     // Usernames containing "admin" are not permitted.
-    it('should create admins', async function() {
+    it('should create admins', async function () {
       await users.createAdmin(
-        'admin@userManagement.com', 'adm1nUserManagement');
+        'admin@userManagement.com',
+        'adm1nUserManagement'
+      );
       await general.checkForConsoleErrors([]);
     });
   });
 });
 
-describe('Site language', function() {
+describe('Site language', function () {
   var collectionId = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
@@ -100,7 +104,7 @@ describe('Site language', function() {
   var libraryPage = null;
   var preferencesPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -119,17 +123,26 @@ describe('Site language', function() {
     await workflow.createExploration(true);
     firstExplorationId = await general.getExplorationIdFromEditor();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Language Test'), true);
+      await forms.toRichText('Language Test'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('NumericInput');
     await explorationEditorMainTab.addResponse(
-      'NumericInput', await forms.toRichText('Nice!!'),
-      'END', true, 'IsLessThanOrEqualTo', 0);
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+      'NumericInput',
+      await forms.toRichText('Nice!!'),
+      'END',
+      true,
+      'IsLessThanOrEqualTo',
+      0
+    );
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setFeedback(await forms.toRichText('Ok!!'));
     await explorationEditorMainTab.moveToState('END');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('END'), true);
+      await forms.toRichText('END'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('EndExploration');
 
     // Save changes.
@@ -166,28 +179,30 @@ describe('Site language', function() {
     await users.logout();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     // Starting language is English.
     await browser.url('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('en');
     await libraryPage.get();
     await libraryPage.expectMainHeaderTextToBe(
-      'Imagine what you could learn today...');
+      'Imagine what you could learn today...'
+    );
   });
 
-  it('should change after selecting a different language', async function() {
+  it('should change after selecting a different language', async function () {
     await browser.url('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('es');
 
     await libraryPage.get();
     await libraryPage.expectMainHeaderTextToBe(
-      'Imagina lo que podrías aprender hoy...');
+      'Imagina lo que podrías aprender hoy...'
+    );
     await general.ensurePageHasNoTranslationIds();
   });
 
-  it('should use language selected in the Preferences page.', async function() {
+  it('should use language selected in the Preferences page.', async function () {
     await users.createUser('varda@example.com', 'Varda');
     await users.login('varda@example.com');
     await preferencesPage.get();
@@ -197,41 +212,39 @@ describe('Site language', function() {
     await users.logout();
   });
 
-  it('should set preferred audio language selected in the Preferences page.',
-    async function() {
-      await users.createUser('audioPlayer@example.com', 'audioPlayer');
-      await users.login('audioPlayer@example.com');
-      await preferencesPage.get();
-      await preferencesPage.expectPreferredAudioLanguageNotToBe('中文 (Chinese)');
-      await preferencesPage.selectPreferredAudioLanguage('中文 (Chinese)');
-      // TODO(DubeySandeep): Add the test to check preferred audio language
-      // choice gets reflected to the exploration player. This can be done once
-      // we will finalize a way to upload an audio file in e2e test.
-      await preferencesPage.expectPreferredAudioLanguageToBe('中文 (Chinese)');
-      await general.ensurePageHasNoTranslationIds();
-      await users.logout();
-    });
+  it('should set preferred audio language selected in the Preferences page.', async function () {
+    await users.createUser('audioPlayer@example.com', 'audioPlayer');
+    await users.login('audioPlayer@example.com');
+    await preferencesPage.get();
+    await preferencesPage.expectPreferredAudioLanguageNotToBe('中文 (Chinese)');
+    await preferencesPage.selectPreferredAudioLanguage('中文 (Chinese)');
+    // TODO(DubeySandeep): Add the test to check preferred audio language
+    // choice gets reflected to the exploration player. This can be done once
+    // we will finalize a way to upload an audio file in e2e test.
+    await preferencesPage.expectPreferredAudioLanguageToBe('中文 (Chinese)');
+    await general.ensurePageHasNoTranslationIds();
+    await users.logout();
+  });
 
-  it('should save the language selected in the footer into the preferences.',
-    async function() {
-      await users.createUser('feanor@example.com', 'Feanor');
-      await users.login('feanor@example.com');
-      await browser.url('/about');
-      await waitFor.pageToFullyLoad();
-      await _selectLanguage('es');
-      await libraryPage.get();
-      await libraryPage.expectMainHeaderTextToBe(
-        'Imagina lo que podrías aprender hoy...');
+  it('should save the language selected in the footer into the preferences.', async function () {
+    await users.createUser('feanor@example.com', 'Feanor');
+    await users.login('feanor@example.com');
+    await browser.url('/about');
+    await waitFor.pageToFullyLoad();
+    await _selectLanguage('es');
+    await libraryPage.get();
+    await libraryPage.expectMainHeaderTextToBe(
+      'Imagina lo que podrías aprender hoy...'
+    );
 
-      // The preference page shows the last selected language.
-      await preferencesPage.get();
-      await preferencesPage.expectPreferredSiteLanguageToBe('Español');
-      await general.ensurePageHasNoTranslationIds();
-      await users.logout();
-    }
-  );
+    // The preference page shows the last selected language.
+    await preferencesPage.get();
+    await preferencesPage.expectPreferredSiteLanguageToBe('Español');
+    await general.ensurePageHasNoTranslationIds();
+    await users.logout();
+  });
 
-  it('should not change in an exploration', async function() {
+  it('should not change in an exploration', async function () {
     await users.login('langCreator@explorations.com');
     await browser.url('/about');
     await waitFor.pageToFullyLoad();
@@ -241,51 +254,53 @@ describe('Site language', function() {
     // Spanish is still selected.
     var placeholderElement = $('.e2e-test-float-form-input');
     await waitFor.visibilityOf(
-      placeholderElement, 'Placeholder Element taking too long to appear');
+      placeholderElement,
+      'Placeholder Element taking too long to appear'
+    );
     await waitFor.elementAttributeToBe(
-      placeholderElement, 'placeholder', 'Ingresa un número',
-      'Placeholder text taking too long to change from English to Spanish');
+      placeholderElement,
+      'placeholder',
+      'Ingresa un número',
+      'Placeholder text taking too long to change from English to Spanish'
+    );
     await general.ensurePageHasNoTranslationIds();
     await users.logout();
   });
 
-  it('should not change in exploration and collection player for guest users',
-    async function() {
-      await browser.url('/about');
-      await waitFor.pageToFullyLoad();
-      await _selectLanguage('es');
+  it('should not change in exploration and collection player for guest users', async function () {
+    await browser.url('/about');
+    await waitFor.pageToFullyLoad();
+    await _selectLanguage('es');
 
-      // Checking collection player page.
-      await browser.url('/collection/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      expect(await $('.e2e-test-share-collection-footer').getText())
-        .toEqual('COMPARTIR ESTA COLECCIÓN');
-      await general.ensurePageHasNoTranslationIds();
-    }
-  );
+    // Checking collection player page.
+    await browser.url('/collection/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    expect(await $('.e2e-test-share-collection-footer').getText()).toEqual(
+      'COMPARTIR ESTA COLECCIÓN'
+    );
+    await general.ensurePageHasNoTranslationIds();
+  });
 
-  it('should show version details in the about page footer',
-    async function() {
-      var footerVersionInfoComponent = $('.e2e-test-footer-version-info');
-      await browser.url('/learn');
-      await waitFor.pageToFullyLoad();
-      var footerVersionInfoInLearnPage = (
-        await footerVersionInfoComponent.isExisting());
-      expect(footerVersionInfoInLearnPage).toBe(false);
+  it('should show version details in the about page footer', async function () {
+    var footerVersionInfoComponent = $('.e2e-test-footer-version-info');
+    await browser.url('/learn');
+    await waitFor.pageToFullyLoad();
+    var footerVersionInfoInLearnPage =
+      await footerVersionInfoComponent.isExisting();
+    expect(footerVersionInfoInLearnPage).toBe(false);
 
-      await browser.url('/about');
-      await waitFor.pageToFullyLoad();
-      await waitFor.visibilityOf(
-        footerVersionInfoComponent,
-        'Footer version info component taking too long to appear');
-      var footerVersionInfoText = (
-        await footerVersionInfoComponent.getText());
-      var footerVersionTextRegex = /Version: [^\s]+ \(\w+\)/;
-      expect(footerVersionTextRegex.test(footerVersionInfoText)).toBe(true);
-    }
-  );
+    await browser.url('/about');
+    await waitFor.pageToFullyLoad();
+    await waitFor.visibilityOf(
+      footerVersionInfoComponent,
+      'Footer version info component taking too long to appear'
+    );
+    var footerVersionInfoText = await footerVersionInfoComponent.getText();
+    var footerVersionTextRegex = /Version: [^\s]+ \(\w+\)/;
+    expect(footerVersionTextRegex.test(footerVersionInfoText)).toBe(true);
+  });
 
-  afterEach(async function() {
+  afterEach(async function () {
     // Reset language back to English.
     await browser.url('/about');
     await waitFor.pageToFullyLoad();

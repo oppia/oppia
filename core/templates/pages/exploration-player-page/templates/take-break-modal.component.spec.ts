@@ -16,13 +16,11 @@
  * @fileoverview Unit tests for TakeBreakModalComponent.
  */
 
-import { async, ComponentFixture, TestBed } from
-  '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { TakeBreakModalComponent } from
-  './take-break-modal.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {TakeBreakModalComponent} from './take-break-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {
@@ -34,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('TakeBreakModalComponent', function() {
+describe('TakeBreakModalComponent', function () {
   let component: TakeBreakModalComponent;
   let fixture: ComponentFixture<TakeBreakModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -45,9 +43,9 @@ describe('TakeBreakModalComponent', function() {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
+          useClass: MockActiveModal,
+        },
+      ],
     }).compileComponents();
   }));
 

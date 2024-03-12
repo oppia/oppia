@@ -16,18 +16,18 @@
  * @fileoverview Component for the navbar breadcrumb of the collection editor.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-navbar-breadcrumb',
-  templateUrl: './topics-and-skills-dashboard-navbar-breadcrumb.component.html'
+  templateUrl: './topics-and-skills-dashboard-navbar-breadcrumb.component.html',
 })
-export class TopicsAndSkillsDashboardNavbarBreadcrumbComponent { }
+export class TopicsAndSkillsDashboardNavbarBreadcrumbComponent {}
 
-angular.module('oppia')
-  .directive(
-    'oppiaTopicsAndSkillsDashboardNavbarBreadcrumb',
-    downgradeComponent({
-      component: TopicsAndSkillsDashboardNavbarBreadcrumbComponent
-    }));
+angular.module('oppia').directive(
+  'oppiaTopicsAndSkillsDashboardNavbarBreadcrumb',
+  downgradeComponent({
+    component: TopicsAndSkillsDashboardNavbarBreadcrumbComponent,
+  })
+);

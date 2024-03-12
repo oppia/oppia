@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for number with units editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { NumberWithUnitsEditorComponent } from './number-with-units-editor.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {NumberWithUnitsEditorComponent} from './number-with-units-editor.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('NumberWithUnitsEditorComponent', () => {
   let component: NumberWithUnitsEditorComponent;
@@ -28,7 +28,7 @@ describe('NumberWithUnitsEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MockTranslatePipe, NumberWithUnitsEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -42,38 +42,45 @@ describe('NumberWithUnitsEditorComponent', () => {
         isNegative: false,
         wholeNumber: 0,
         numerator: 0,
-        denominator: 1
+        denominator: 1,
       },
       units: [
         {
           unit: 'm',
-          exponent: 1
-        }
-      ]
+          exponent: 1,
+        },
+      ],
     };
   });
 
-  it('should initialise component when \'Number with units\' interaction is' +
-  ' selected', () => {
-    spyOn(component.valueChanged, 'emit');
+  it(
+    "should initialise component when 'Number with units' interaction is" +
+      ' selected',
+    () => {
+      spyOn(component.valueChanged, 'emit');
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.numberWithUnitsString).toBe('23 m');
-    expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
-  });
+      expect(component.numberWithUnitsString).toBe('23 m');
+      expect(component.valueChanged.emit).toHaveBeenCalledWith(component.value);
+    }
+  );
 
-  it('should not set \'numberWithUnitsString\' value if use has not input any' +
-  'value', () => {
-    spyOn(component.valueChanged, 'emit');
-    component.value = null;
+  it(
+    "should not set 'numberWithUnitsString' value if use has not input any" +
+      'value',
+    () => {
+      spyOn(component.valueChanged, 'emit');
+      component.value = null;
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.numberWithUnitsString).toBeUndefined();
-    expect(component.valueChanged.emit).not
-      .toHaveBeenCalledWith(component.value);
-  });
+      expect(component.numberWithUnitsString).toBeUndefined();
+      expect(component.valueChanged.emit).not.toHaveBeenCalledWith(
+        component.value
+      );
+    }
+  );
 
   it('should update value when the user types in the text input field', () => {
     spyOn(component.valueChanged, 'emit');
@@ -85,14 +92,14 @@ describe('NumberWithUnitsEditorComponent', () => {
         isNegative: false,
         wholeNumber: 0,
         numerator: 0,
-        denominator: 1
+        denominator: 1,
       },
       units: [
         {
           unit: 'm',
-          exponent: 1
-        }
-      ]
+          exponent: 1,
+        },
+      ],
     });
 
     component.updateValue('24kg');

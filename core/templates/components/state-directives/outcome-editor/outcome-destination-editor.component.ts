@@ -16,17 +16,17 @@
  * @fileoverview Component for the outcome destination editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
-import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { UserService } from 'services/user.service';
-import { AppConstants } from 'app.constants';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {UserService} from 'services/user.service';
+import {AppConstants} from 'app.constants';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 interface DestinationChoice {
   id: string;
@@ -39,7 +39,7 @@ interface DestValidation {
 }
 @Component({
   selector: 'oppia-outcome-destination-editor',
-  templateUrl: './outcome-destination-editor.component.html'
+  templateUrl: './outcome-destination-editor.component.html',
 })
 export class OutcomeDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
@@ -58,24 +58,21 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   directiveSubscriptions: Subscription = new Subscription();
   canAddPrerequisiteSkill: boolean = false;
   canEditRefresherExplorationId: boolean = false;
-  ENABLE_PREREQUISITE_SKILLS: boolean = (
-    AppConstants.ENABLE_PREREQUISITE_SKILLS);
+  ENABLE_PREREQUISITE_SKILLS: boolean = AppConstants.ENABLE_PREREQUISITE_SKILLS;
 
-  EXPLORATION_AND_SKILL_ID_PATTERN: RegExp = (
-    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN);
+  EXPLORATION_AND_SKILL_ID_PATTERN: RegExp =
+    AppConstants.EXPLORATION_AND_SKILL_ID_PATTERN;
 
-  MAX_STATE_NAME_LENGTH: number = (
-    AppConstants.MAX_STATE_NAME_LENGTH);
+  MAX_STATE_NAME_LENGTH: number = AppConstants.MAX_STATE_NAME_LENGTH;
 
-  PLACEHOLDER_OUTCOME_DEST: string = (
-    AppConstants.PLACEHOLDER_OUTCOME_DEST);
+  PLACEHOLDER_OUTCOME_DEST: string = AppConstants.PLACEHOLDER_OUTCOME_DEST;
 
   constructor(
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
     private focusManagerService: FocusManagerService,
     private stateEditorService: StateEditorService,
     private stateGraphLayoutService: StateGraphLayoutService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   isSelfLoop(): boolean {
@@ -89,7 +86,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
     let validation = {
       isCreatingNewState: this.isCreatingNewState(),
-      value: $event
+      value: $event,
     };
     this.getChanges.emit(validation);
   }
@@ -101,7 +98,7 @@ export class OutcomeDestinationEditorComponent implements OnInit {
 
     let validation = {
       isCreatingNewState: this.isCreatingNewState(),
-      value: this.outcomeNewStateName
+      value: this.outcomeNewStateName,
     };
     this.getChanges.emit(validation);
   }
@@ -122,15 +119,17 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       // This is a list of objects, each with an ID and name. These
       // represent all states, as well as an option to create a
       // new state.
-      this.destinationChoices = [{
-        id: this.currentStateName,
-        text: '(try again)'
-      }];
+      this.destinationChoices = [
+        {
+          id: this.currentStateName,
+          text: '(try again)',
+        },
+      ];
 
       // Arrange the remaining states based on their order in the state
       // graph.
-      let lastComputedArrangement = (
-        this.stateGraphLayoutService.getLastComputedArrangement());
+      let lastComputedArrangement =
+        this.stateGraphLayoutService.getLastComputedArrangement();
       let allStateNames = this.stateEditorService.getStateNames();
 
       // It is possible that lastComputedArrangement is null if the
@@ -143,9 +142,13 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         let maxOffset = 0;
         for (let stateName in lastComputedArrangement) {
           maxDepth = Math.max(
-            maxDepth, lastComputedArrangement[stateName].depth);
+            maxDepth,
+            lastComputedArrangement[stateName].depth
+          );
           maxOffset = Math.max(
-            maxOffset, lastComputedArrangement[stateName].offset);
+            maxOffset,
+            lastComputedArrangement[stateName].offset
+          );
         }
 
         // Higher scores come later.
@@ -154,16 +157,15 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         for (let i = 0; i < allStateNames.length; i++) {
           stateName = allStateNames[i];
           if (lastComputedArrangement.hasOwnProperty(stateName)) {
-            allStateScores[stateName] = (
-              lastComputedArrangement[stateName].depth *
-              (maxOffset + 1) +
-              lastComputedArrangement[stateName].offset);
+            allStateScores[stateName] =
+              lastComputedArrangement[stateName].depth * (maxOffset + 1) +
+              lastComputedArrangement[stateName].offset;
           } else {
             // States that have just been added in the rule 'create new'
             // modal are not yet included as part of
             // lastComputedArrangement so we account for them here.
-            allStateScores[stateName] = (
-              (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+            allStateScores[stateName] =
+              (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount;
             unarrangedStateCount++;
           }
         }
@@ -177,16 +179,16 @@ export class OutcomeDestinationEditorComponent implements OnInit {
         if (stateNames[i] !== this.currentStateName) {
           this.destinationChoices.push({
             id: stateNames[i],
-            text: stateNames[i]
+            text: stateNames[i],
           });
         }
       }
 
       this.destinationChoices.push({
         id: this.PLACEHOLDER_OUTCOME_DEST,
-        text: 'A New Card Called...'
+        text: 'A New Card Called...',
       });
-    // This value of 10ms is arbitrary, it has no significance.
+      // This value of 10ms is arbitrary, it has no significance.
     }, 10);
   }
 
@@ -195,33 +197,33 @@ export class OutcomeDestinationEditorComponent implements OnInit {
       this.stateEditorService.onSaveOutcomeDestDetails.subscribe(() => {
         // Create new state if specified.
         if (this.outcome.dest === this.PLACEHOLDER_OUTCOME_DEST) {
-          this.editorFirstTimeEventsService
-            .registerFirstCreateSecondStateEvent();
+          this.editorFirstTimeEventsService.registerFirstCreateSecondStateEvent();
 
           let newStateName = this.outcomeNewStateName.trim();
           this.outcome.dest = newStateName;
           this.addState.emit(newStateName);
         }
-      }));
+      })
+    );
     this.updateOptionNames();
     this.directiveSubscriptions.add(
       this.stateEditorService.onStateNamesChanged.subscribe(() => {
         this.updateOptionNames();
-      }));
-    this.canAddPrerequisiteSkill = (
+      })
+    );
+    this.canAddPrerequisiteSkill =
       this.ENABLE_PREREQUISITE_SKILLS &&
-      this.stateEditorService.isExplorationCurated());
+      this.stateEditorService.isExplorationCurated();
     this.canEditRefresherExplorationId = false;
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       // We restrict editing of refresher exploration IDs to
       // admins/moderators for now, since the feature is still in
       // development.
-      this.canEditRefresherExplorationId = (
-        userInfo.isCurriculumAdmin() || userInfo.isModerator());
+      this.canEditRefresherExplorationId =
+        userInfo.isCurriculumAdmin() || userInfo.isModerator();
     });
 
-    this.explorationAndSkillIdPattern = (
-      this.EXPLORATION_AND_SKILL_ID_PATTERN);
+    this.explorationAndSkillIdPattern = this.EXPLORATION_AND_SKILL_ID_PATTERN;
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
     this.destinationChoices = [];
   }
@@ -231,7 +233,9 @@ export class OutcomeDestinationEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaOutcomeDestinationEditor',
+angular.module('oppia').directive(
+  'oppiaOutcomeDestinationEditor',
   downgradeComponent({
-    component: OutcomeDestinationEditorComponent
-  }) as angular.IDirectiveFactory);
+    component: OutcomeDestinationEditorComponent,
+  }) as angular.IDirectiveFactory
+);

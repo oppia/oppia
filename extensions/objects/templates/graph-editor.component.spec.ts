@@ -16,9 +16,15 @@
  * @fileoverview Unit test for graph editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { GraphEditorComponent } from './graph-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {GraphEditorComponent} from './graph-editor.component';
 
 describe('GraphEditorComponent', () => {
   let component: GraphEditorComponent;
@@ -27,7 +33,7 @@ describe('GraphEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [GraphEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -48,38 +54,38 @@ describe('GraphEditorComponent', () => {
         {
           src: 0,
           dst: 1,
-          weight: 1
+          weight: 1,
         },
         {
           src: 1,
           dst: 2,
-          weight: 1
-        }
+          weight: 1,
+        },
       ],
       isDirected: false,
       vertices: [
         {
           x: 150,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 200,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 150,
           y: 100,
-          label: ''
+          label: '',
         },
         {
           x: 199.5625,
           y: 121.625,
-          label: ''
-        }
+          label: '',
+        },
       ],
-      isLabeled: false
+      isLabeled: false,
     };
 
     expect(component.value).toBeUndefined();

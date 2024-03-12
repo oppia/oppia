@@ -18,10 +18,10 @@
  */
 
 export interface NonExistentTopicsAndStoriesBackendDict {
-  'partially_learnt_topics': number;
-  'completed_stories': number;
-  'learnt_topics': number;
-  'topics_to_learn': number;
+  partially_learnt_topics: number;
+  completed_stories: number;
+  learnt_topics: number;
+  topics_to_learn: number;
 }
 
 export class NonExistentTopicsAndStories {
@@ -30,15 +30,16 @@ export class NonExistentTopicsAndStories {
     public completedStories: number,
     public learntTopics: number,
     public topicsToLearn: number
-  ) { }
+  ) {}
 
   static createFromBackendDict(
-      backendDict: NonExistentTopicsAndStoriesBackendDict):
-      NonExistentTopicsAndStories {
+    backendDict: NonExistentTopicsAndStoriesBackendDict
+  ): NonExistentTopicsAndStories {
     return new NonExistentTopicsAndStories(
       backendDict.partially_learnt_topics,
       backendDict.completed_stories,
       backendDict.learnt_topics,
-      backendDict.topics_to_learn);
+      backendDict.topics_to_learn
+    );
   }
 }

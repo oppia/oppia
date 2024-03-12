@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the Android page root component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { AndroidPageRootComponent } from './android-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {AndroidPageRootComponent} from './android-page-root.component';
 
 describe('Android Page Root', () => {
   let fixture: ComponentFixture<AndroidPageRootComponent>;
@@ -32,15 +32,10 @@ describe('Android Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AndroidPageRootComponent,
-        MockTranslatePipe
-      ],
+      declarations: [AndroidPageRootComponent, MockTranslatePipe],
       imports: [HttpClientTestingModule],
-      providers: [
-        PageHeadService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [PageHeadService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -56,14 +51,15 @@ describe('Android Page Root', () => {
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
-    const componentInstance = (
-      TestBed.createComponent(AndroidPageRootComponent).componentInstance
-    );
+    const componentInstance = TestBed.createComponent(
+      AndroidPageRootComponent
+    ).componentInstance;
 
     componentInstance.ngOnInit();
 
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.META
+    );
   });
 });

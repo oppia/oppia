@@ -16,20 +16,21 @@
  * @fileoverview Component for the navbar breadcrumb of the topic viewer.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { ReadOnlyTopic } from
-  'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerBackendApiService } from
-  'domain/topic_viewer/topic-viewer-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'topic-viewer-navbar-breadcrumb',
   templateUrl: './topic-viewer-navbar-breadcrumb.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
   topicName: string = '';
@@ -41,17 +42,18 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.topicViewerBackendApiService.fetchTopicDataAsync(
-      this.urlService.getTopicUrlFragmentFromLearnerUrl(),
-      this.urlService.getClassroomUrlFragmentFromLearnerUrl()).then(
-      (readOnlyTopic: ReadOnlyTopic) => {
+    this.topicViewerBackendApiService
+      .fetchTopicDataAsync(
+        this.urlService.getTopicUrlFragmentFromLearnerUrl(),
+        this.urlService.getClassroomUrlFragmentFromLearnerUrl()
+      )
+      .then((readOnlyTopic: ReadOnlyTopic) => {
         this.topicName = readOnlyTopic.getTopicName();
-        this.topicNameTranslationKey = (
+        this.topicNameTranslationKey =
           this.i18nLanguageCodeService.getTopicTranslationKey(
             readOnlyTopic.getTopicId(),
             TranslationKeyType.TITLE
-          )
-        );
+          );
       });
   }
 
@@ -67,6 +69,9 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
-angular.module('oppia').directive(
-  'topicViewerNavbarBreadcrumb', downgradeComponent(
-    {component: TopicViewerNavbarBreadcrumbComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'topicViewerNavbarBreadcrumb',
+    downgradeComponent({component: TopicViewerNavbarBreadcrumbComponent})
+  );

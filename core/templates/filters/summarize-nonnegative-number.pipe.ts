@@ -15,7 +15,7 @@
 /**
  * @fileoverview SummarizeNonnegativeNumber pipe for Oppia.
  */
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 
 // Filter that summarizes a large number to a decimal followed by
 // the appropriate metric prefix (K, M or B). For example, 167656
@@ -28,10 +28,12 @@ export class SummarizeNonnegativeNumberPipe implements PipeTransform {
     // Six zeros for millions (e.g. 146008788 --> 146.0M).
     // Three zeros for thousands (e.g. 146008 --> 146.0K).
     // No change for small numbers (e.g. 12 --> 12).
-    return (
-      input >= 1.0e+9 ? (input / 1.0e+9).toFixed(1) + 'B' :
-      input >= 1.0e+6 ? (input / 1.0e+6).toFixed(1) + 'M' :
-      input >= 1.0e+3 ? (input / 1.0e+3).toFixed(1) + 'K' :
-      input);
+    return input >= 1.0e9
+      ? (input / 1.0e9).toFixed(1) + 'B'
+      : input >= 1.0e6
+        ? (input / 1.0e6).toFixed(1) + 'M'
+        : input >= 1.0e3
+          ? (input / 1.0e3).toFixed(1) + 'K'
+          : input;
   }
 }

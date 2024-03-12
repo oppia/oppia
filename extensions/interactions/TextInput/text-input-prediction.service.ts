@@ -21,36 +21,38 @@
  * function on Oppia-ml.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
-import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-import { TextClassifierFrozenModel } from 'classifiers/proto/text_classifier';
-import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { PredictionResult } from 'domain/classifier/prediction-result.model';
+import {CountVectorizerService} from 'classifiers/count-vectorizer.service';
+import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
+import {SVMPredictionService} from 'classifiers/svm-prediction.service';
+import {TextClassifierFrozenModel} from 'classifiers/proto/text_classifier';
+import {TextInputTokenizer} from 'classifiers/text-input.tokenizer';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {PredictionResult} from 'domain/classifier/prediction-result.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TextInputPredictionService {
-  private TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD = (
-    InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD);
+  private TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD =
+    InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD;
 
   constructor(
     private countVectorizerService: CountVectorizerService,
     private svmPredictionService: SVMPredictionService,
-    private textInputTokenizer: TextInputTokenizer) {
-  }
+    private textInputTokenizer: TextInputTokenizer
+  ) {}
 
   predict(classifierBuffer: ArrayBuffer, textInput: InteractionAnswer): number {
     // The model_json attribute in TextClassifierFrozenModel class can't be
     // changed to camelcase since the class definition is automatically compiled
     // with the help of protoc.
-    const classifierData = JSON.parse(TextClassifierFrozenModel.deserialize(
-      new Uint8Array(classifierBuffer)).model_json) as TextInputClassifierData;
+    const classifierData = JSON.parse(
+      TextClassifierFrozenModel.deserialize(new Uint8Array(classifierBuffer))
+        .model_json
+    ) as TextInputClassifierData;
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 
@@ -63,9 +65,13 @@ export class TextInputPredictionService {
       textInputTokens = this.textInputTokenizer.generateTokens(textInput);
       if (textInputTokens) {
         textVector = this.countVectorizerService.vectorize(
-          textInputTokens, cvVocabulary);
+          textInputTokens,
+          cvVocabulary
+        );
         predictionResult = this.svmPredictionService.predict(
-          svmData, textVector);
+          svmData,
+          textVector
+        );
         if (
           predictionResult.predictionConfidence >
           this.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD
@@ -78,6 +84,9 @@ export class TextInputPredictionService {
   }
 }
 
-angular.module('oppia').factory(
-  'TextInputPredictionService', downgradeInjectable(
-    TextInputPredictionService));
+angular
+  .module('oppia')
+  .factory(
+    'TextInputPredictionService',
+    downgradeInjectable(TextInputPredictionService)
+  );

@@ -16,11 +16,13 @@
  * @fileoverview Unit tests for the on screen keyboard component.
  */
 
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyInitializationService, GuppyObject } from
-  'services/guppy-initialization.service';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { OnScreenKeyboardComponent } from './on-screen-keyboard.component';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {
+  GuppyInitializationService,
+  GuppyObject,
+} from 'services/guppy-initialization.service';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {OnScreenKeyboardComponent} from './on-screen-keyboard.component';
 
 describe('On Screen Keyboard', () => {
   let guppyInitializationService: GuppyInitializationService;
@@ -28,7 +30,7 @@ describe('On Screen Keyboard', () => {
   let fixture: ComponentFixture<OnScreenKeyboardComponent>;
   let componentInstance: OnScreenKeyboardComponent;
   let guppy: {isActive: boolean} = {
-    isActive: false
+    isActive: false,
   };
 
   class MockGuppy implements Guppy {
@@ -71,9 +73,7 @@ describe('On Screen Keyboard', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        OnScreenKeyboardComponent
-      ]
+      declarations: [OnScreenKeyboardComponent],
     });
   }));
 
@@ -99,80 +99,82 @@ describe('On Screen Keyboard', () => {
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      undefined);
+      undefined
+    );
     expect(componentInstance.showOSK()).toBeFalse();
   });
 
   it('should set showOSK value to false upon hiding the OSK', () => {
     spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
     spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
-    spyOn(guppyInitializationService, 'findActiveGuppyObject').and
-      .returnValue(new GuppyObject('divId', new MockGuppy()));
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      new GuppyObject('divId', new MockGuppy())
+    );
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     componentInstance.hideOSK();
     expect(guppyInitializationService.getShowOSK()).toBeFalse();
   });
 
-  it('should activate the instance upon each key press function call',
-    () => {
-      spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
-      spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
-      spyOn(guppyInitializationService, 'findActiveGuppyObject')
-        .and.returnValue(new GuppyObject('divId', new MockGuppy()));
-      expect(componentInstance.showOSK()).toBeTrue();
+  it('should activate the instance upon each key press function call', () => {
+    spyOn(deviceInfoService, 'isMobileUserAgent').and.returnValue(true);
+    spyOn(deviceInfoService, 'hasTouchEvents').and.returnValue(true);
+    spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
+      new GuppyObject('divId', new MockGuppy())
+    );
+    expect(componentInstance.showOSK()).toBeTrue();
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.activateGuppy();
-      expect(guppy.isActive).toBeTrue();
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.activateGuppy();
+    expect(guppy.isActive).toBeTrue();
 
-      guppy.isActive = false;
+    guppy.isActive = false;
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.changeTab('newTab');
-      expect(guppy.isActive).toBeTrue();
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.changeTab('newTab');
+    expect(guppy.isActive).toBeTrue();
 
-      guppy.isActive = false;
+    guppy.isActive = false;
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.insertString('x');
-      componentInstance.insertString('α');
-      expect(guppy.isActive).toBeTrue();
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.insertString('x');
+    componentInstance.insertString('α');
+    expect(guppy.isActive).toBeTrue();
 
-      guppy.isActive = false;
+    guppy.isActive = false;
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.insertSymbol('x');
-      expect(guppy.isActive).toBeTrue();
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.insertSymbol('x');
+    expect(guppy.isActive).toBeTrue();
 
-      guppy.isActive = false;
+    guppy.isActive = false;
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.backspace();
-      expect(guppy.isActive).toBeTrue();
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.backspace();
+    expect(guppy.isActive).toBeTrue();
 
-      guppy.isActive = false;
+    guppy.isActive = false;
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.left();
-      expect(guppy.isActive).toBeTrue();
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.left();
+    expect(guppy.isActive).toBeTrue();
 
-      guppy.isActive = false;
+    guppy.isActive = false;
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.right();
-      expect(guppy.isActive).toBeTrue();
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.right();
+    expect(guppy.isActive).toBeTrue();
 
-      guppy.isActive = false;
+    guppy.isActive = false;
 
-      expect(guppy.isActive).toBeFalse();
-      componentInstance.exponent('2');
-      expect(guppy.isActive).toBeTrue();
-    }
-  );
+    expect(guppy.isActive).toBeFalse();
+    componentInstance.exponent('2');
+    expect(guppy.isActive).toBeTrue();
+  });
 
   it('should get static image url', () => {
     let imagePath = '/path/to/image.png';
     expect(componentInstance.getStaticImageUrl(imagePath)).toBe(
-      '/assets/images/path/to/image.png');
+      '/assets/images/path/to/image.png'
+    );
   });
 });

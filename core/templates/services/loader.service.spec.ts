@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for loader service.
  */
 
-import { LoaderService } from 'services/loader.service';
-import { Subscription } from 'rxjs';
+import {LoaderService} from 'services/loader.service';
+import {Subscription} from 'rxjs';
 
 describe('Loader Service', () => {
   const loaderService = new LoaderService();
@@ -25,9 +25,11 @@ describe('Loader Service', () => {
   let subscriptions: Subscription;
   beforeEach(() => {
     subscriptions = new Subscription();
-    subscriptions.add(loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => loadingMessage = message
-    ));
+    subscriptions.add(
+      loaderService.onLoadingMessageChange.subscribe(
+        (message: string) => (loadingMessage = message)
+      )
+    );
   });
 
   afterEach(() => {

@@ -18,8 +18,8 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { StoryEditorPageConstants } from
-  'pages/story-editor-page/story-editor-page.constants';
+import {StoryEditorPageConstants} from 'pages/story-editor-page/story-editor-page.constants';
 
-angular.module('oppia').constant(
-  'NODE_ID_PREFIX', StoryEditorPageConstants.NODE_ID_PREFIX);
+angular
+  .module('oppia')
+  .constant('NODE_ID_PREFIX', StoryEditorPageConstants.NODE_ID_PREFIX);

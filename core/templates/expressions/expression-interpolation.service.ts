@@ -16,19 +16,17 @@
  * @fileoverview Service for interpolating expressions.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { convertHtmlToUnicode } from 'filters/convert-html-to-unicode.filter';
-import { ExpressionEvaluatorService } from
-  'expressions/expression-evaluator.service';
-import { ExpressionParserService } from 'expressions/expression-parser.service';
-import { ExpressionSyntaxTreeService } from
-  'expressions/expression-syntax-tree.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {convertHtmlToUnicode} from 'filters/convert-html-to-unicode.filter';
+import {ExpressionEvaluatorService} from 'expressions/expression-evaluator.service';
+import {ExpressionParserService} from 'expressions/expression-parser.service';
+import {ExpressionSyntaxTreeService} from 'expressions/expression-syntax-tree.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExpressionInterpolationService {
   constructor(
@@ -39,19 +37,24 @@ export class ExpressionInterpolationService {
   ) {}
 
   processHtml(sourceHtml: string, envs: Record<string, string>[]): string {
-    return sourceHtml.replace(/{{([^}]*)}}/g, (match, p1)=> {
+    return sourceHtml.replace(/{{([^}]*)}}/g, (match, p1) => {
       try {
         // TODO(sll): Remove the call to $filter once we have a
         // custom UI for entering expressions. It is only needed because
         // expressions are currently input inline via the RTE.
         return this.htmlEscaperService.unescapedStrToEscapedStr(
           this.expressionEvaluatorService.evaluateExpression(
-            convertHtmlToUnicode(p1), envs) as string);
+            convertHtmlToUnicode(p1),
+            envs
+          ) as string
+        );
       } catch (e) {
-        const EXPRESSION_ERROR_TAG = (
-          '<oppia-expression-error-tag></oppia-expression-error-tag>');
-        if ((e instanceof this.expressionParserService.SyntaxError) ||
-            (e instanceof this.expressionSyntaxTreeService.ExpressionError)) {
+        const EXPRESSION_ERROR_TAG =
+          '<oppia-expression-error-tag></oppia-expression-error-tag>';
+        if (
+          e instanceof this.expressionParserService.SyntaxError ||
+          e instanceof this.expressionSyntaxTreeService.ExpressionError
+        ) {
           return EXPRESSION_ERROR_TAG;
         }
         throw e;
@@ -61,18 +64,24 @@ export class ExpressionInterpolationService {
 
   // Function returns null if there is some error in the expression or syntax.
   processUnicode(
-      sourceUnicode: string, envs: Record<string, string>[]): string | null {
+    sourceUnicode: string,
+    envs: Record<string, string>[]
+  ): string | null {
     try {
-      return sourceUnicode.replace(/{{([^}]*)}}/g, (match, p1)=> {
+      return sourceUnicode.replace(/{{([^}]*)}}/g, (match, p1) => {
         // TODO(sll): Remove the call to $filter once we have a
         // custom UI for entering expressions. It is only needed because
         // expressions are currently input inline via the RTE.
         return this.expressionEvaluatorService.evaluateExpression(
-          convertHtmlToUnicode(p1), envs) as string;
+          convertHtmlToUnicode(p1),
+          envs
+        ) as string;
       });
     } catch (e) {
-      if ((e instanceof this.expressionParserService.SyntaxError) ||
-          (e instanceof this.expressionSyntaxTreeService.ExpressionError)) {
+      if (
+        e instanceof this.expressionParserService.SyntaxError ||
+        e instanceof this.expressionSyntaxTreeService.ExpressionError
+      ) {
         return null;
       }
       throw e;
@@ -88,7 +97,8 @@ export class ExpressionInterpolationService {
       matches[i] = matches[i].substring(2, matches[i].length - 2);
 
       let params = this.expressionSyntaxTreeService.getParamsUsedInExpression(
-        convertHtmlToUnicode(matches[i]));
+        convertHtmlToUnicode(matches[i])
+      );
 
       for (let j = 0; j < params.length; j++) {
         if (allParams.indexOf(params[j]) === -1) {
@@ -101,6 +111,9 @@ export class ExpressionInterpolationService {
   }
 }
 
-angular.module('oppia').factory(
-  'ExpressionInterpolationService',
-  downgradeInjectable(ExpressionInterpolationService));
+angular
+  .module('oppia')
+  .factory(
+    'ExpressionInterpolationService',
+    downgradeInjectable(ExpressionInterpolationService)
+  );

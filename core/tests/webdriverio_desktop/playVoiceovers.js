@@ -21,13 +21,11 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-var ExplorationEditorPage = require(
-  '../webdriverio_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage = require(
-  '../webdriverio_utils/ExplorationPlayerPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
-describe('Voiceover player', function() {
+describe('Voiceover player', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorTranslationTab = null;
@@ -35,40 +33,48 @@ describe('Voiceover player', function() {
   var explorationPlayerPage = null;
   var libraryPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
-    explorationEditorTranslationTab = (
-      explorationEditorPage.getTranslationTab());
+    explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
 
     await users.createAndLoginUser(
-      'testVoiceovers@voiceovers.com', 'testVoiceovers');
+      'testVoiceovers@voiceovers.com',
+      'testVoiceovers'
+    );
     await workflow.createExploration(true);
     await explorationEditorMainTab.setStateName('First');
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'This is the first card.'), true);
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('This is the first card.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
     await explorationEditorTranslationTab.exitTutorial();
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
-      'हिन्दी (Hindi)', '../data/cafe.mp3');
+      'हिन्दी (Hindi)',
+      '../data/cafe.mp3'
+    );
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
-      'العربية (Arabic)', '../data/ambient-noise.mp3');
+      'العربية (Arabic)',
+      '../data/ambient-noise.mp3'
+    );
     await explorationEditorPage.saveChanges('Added voiceovers');
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle('voiceoverPlayerTest');
     await explorationEditorSettingsTab.setCategory('Languages');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(
-      'Testing if voiceovers work');
+      'Testing if voiceovers work'
+    );
     await explorationEditorPage.saveChanges('Done.');
     await workflow.publishExploration();
   });
 
-  it('should play voiceovers for multiple languages', async function() {
+  it('should play voiceovers for multiple languages', async function () {
     await libraryPage.get();
     await libraryPage.playExploration('voiceoverPlayerTest');
     await explorationPlayerPage.expandAudioBar();
@@ -81,7 +87,7 @@ describe('Voiceover player', function() {
     await explorationPlayerPage.expectAudioToBePlaying();
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await general.checkForConsoleErrors(['The play()']);
     await users.logout();
   });

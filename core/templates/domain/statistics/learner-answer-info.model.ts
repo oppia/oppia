@@ -17,10 +17,10 @@
  */
 
 export interface LearnerAnswerInfoBackendDict {
-  'id': string;
-  'answer': string;
-  'answer_details': string;
-  'created_on': number;
+  id: string;
+  answer: string;
+  answer_details: string;
+  created_on: number;
 }
 
 export class LearnerAnswerInfo {
@@ -30,8 +30,11 @@ export class LearnerAnswerInfo {
   _createdOn: number;
 
   constructor(
-      learnerAnswerInfoId: string, answer: string, answerDetails: string,
-      createdOn: number) {
+    learnerAnswerInfoId: string,
+    answer: string,
+    answerDetails: string,
+    createdOn: number
+  ) {
     this._id = learnerAnswerInfoId;
     this._answer = answer;
     this._answerDetails = answerDetails;
@@ -39,13 +42,15 @@ export class LearnerAnswerInfo {
   }
 
   static createDefaultLearnerAnswerInfo(
-      answer: string, answerDetails: string): LearnerAnswerInfo {
-    return new LearnerAnswerInfo(
-      null, answer, answerDetails, null);
+    answer: string,
+    answerDetails: string
+  ): LearnerAnswerInfo {
+    return new LearnerAnswerInfo(null, answer, answerDetails, null);
   }
 
   static createFromBackendDict(
-      learnerAnswerInfoDict: LearnerAnswerInfoBackendDict): LearnerAnswerInfo {
+    learnerAnswerInfoDict: LearnerAnswerInfoBackendDict
+  ): LearnerAnswerInfo {
     return new LearnerAnswerInfo(
       learnerAnswerInfoDict.id,
       learnerAnswerInfoDict.answer,

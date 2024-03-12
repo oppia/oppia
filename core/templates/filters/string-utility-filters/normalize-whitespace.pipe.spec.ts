@@ -16,15 +16,14 @@
  * @fileoverview Tests for NormalizeWhitespace pipe for Oppia.
  */
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { TestBed } from '@angular/core/testing';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {TestBed} from '@angular/core/testing';
 
 describe('Testing NormalizeWhitespacePipe', () => {
   let nwp: NormalizeWhitespacePipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [NormalizeWhitespacePipe]
+      providers: [NormalizeWhitespacePipe],
     });
     nwp = TestBed.inject(NormalizeWhitespacePipe);
   });

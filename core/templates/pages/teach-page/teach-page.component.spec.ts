@@ -15,22 +15,20 @@
 /**
  * @fileoverview Unit tests for the teach page.
  */
-import { EventEmitter } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TeachPageComponent } from './teach-page.component';
-import { LoaderService } from 'services/loader.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { of } from 'rxjs';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {EventEmitter} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {TeachPageComponent} from './teach-page.component';
+import {LoaderService} from 'services/loader.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {UserService} from 'services/user.service';
+import {of} from 'rxjs';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 class MockWindowRef {
   _window = {
     location: {
@@ -41,13 +39,13 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val: string) => {}
+      replace: (val: string) => {},
     },
     sessionStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {}
+      removeItem: (name: string) => {},
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -73,36 +71,36 @@ describe('Teach Page', () => {
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: MockWindowRef;
   let resizeEvent = new Event('resize');
-  beforeEach(async() => {
+  beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [TeachPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
+          useClass: MockI18nLanguageCodeService,
         },
         {
           provide: WindowRef,
-          useValue: windowRef
+          useValue: windowRef,
         },
         {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
-          }
+            getResizeEvent: () => of(resizeEvent),
+          },
         },
         SiteAnalyticsService,
         UrlInterpolationService,
-      ]
+      ],
     }).compileComponents();
   });
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     loaderService = TestBed.get(LoaderService);
     userService = TestBed.get(UserService);
@@ -116,13 +114,13 @@ describe('Teach Page', () => {
     component = teachPageComponent.componentInstance;
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component from beforeEach block', () => {
+    expect(component).toBeDefined();
+  });
   it('should get static image url', () => {
     expect(component.getStaticImageUrl('/path/to/image')).toBe(
-      '/assets/images/path/to/image');
+      '/assets/images/path/to/image'
+    );
   });
 
   it('should set component properties when ngOnInit() is called', () => {
@@ -139,8 +137,7 @@ describe('Teach Page', () => {
     fakeAsync(() => {
       component.ngOnInit();
       spyOn(loaderService, 'showLoadingScreen').and.callThrough();
-      expect(loaderService.showLoadingScreen)
-        .toHaveBeenCalledWith('Loading');
+      expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
     }));
 
   it('should check if user is logged in or not', fakeAsync(() => {
@@ -154,10 +151,10 @@ describe('Teach Page', () => {
       preferred_site_language_code: null,
       username: 'tester',
       email: 'test@test.com',
-      user_is_logged_in: true
+      user_is_logged_in: true,
     };
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject))
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(UserInfo.createFromBackendDict(UserInfoObject))
     );
     component.ngOnInit();
     flushMicrotasks();
@@ -166,77 +163,83 @@ describe('Teach Page', () => {
 
   it('should record analytics when Start Learning is clicked', () => {
     spyOn(
-      siteAnalyticsService, 'registerClickStartLearningButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickStartLearningButtonEvent'
+    ).and.callThrough();
     component.onClickStartLearningButton();
-    expect(siteAnalyticsService.registerClickStartLearningButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickStartLearningButtonEvent
+    ).toHaveBeenCalled();
   });
 
   it('should record analytics when Visit Classroom is clicked', () => {
     spyOn(
-      siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickVisitClassroomButtonEvent'
+    ).and.callThrough();
     component.onClickVisitClassroomButton();
-    expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickVisitClassroomButtonEvent
+    ).toHaveBeenCalled();
   });
 
-  it('should redirect to library page when Browse Library is clicked',
-    () => {
-      component.onClickBrowseLibraryButton();
-      expect(windowRef.nativeWindow.location.href).toBe('/community-library');
-    }
-  );
+  it('should redirect to library page when Browse Library is clicked', () => {
+    component.onClickBrowseLibraryButton();
+    expect(windowRef.nativeWindow.location.href).toBe('/community-library');
+  });
 
   it('should record analytics when Browse Library is clicked', () => {
     spyOn(
-      siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickBrowseLibraryButtonEvent'
+    ).and.callThrough();
     component.onClickBrowseLibraryButton();
-    expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
+    ).toHaveBeenCalled();
   });
 
-  it('should redirect to teach page when Guide For Parents is clicked',
-    () => {
-      component.onClickGuideParentsButton();
-      expect(windowRef.nativeWindow.location.href).toBe('/teach');
-    }
-  );
+  it('should redirect to teach page when Guide For Parents is clicked', () => {
+    component.onClickGuideParentsButton();
+    expect(windowRef.nativeWindow.location.href).toBe('/teach');
+  });
 
   it('should record analytics when Guide For Parents is clicked', () => {
     spyOn(
-      siteAnalyticsService, 'registerClickGuideParentsButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickGuideParentsButtonEvent'
+    ).and.callThrough();
     component.onClickGuideParentsButton();
-    expect(siteAnalyticsService.registerClickGuideParentsButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickGuideParentsButtonEvent
+    ).toHaveBeenCalled();
   });
 
-  it('should redirect to teach page when Tips For Parents is clicked',
-    () => {
-      component.onClickTipforParentsButton();
-      expect(windowRef.nativeWindow.location.href).toBe('/teach');
-    }
-  );
+  it('should redirect to teach page when Tips For Parents is clicked', () => {
+    component.onClickTipforParentsButton();
+    expect(windowRef.nativeWindow.location.href).toBe('/teach');
+  });
 
   it('should record analytics when Tips For Parents is clicked', () => {
     spyOn(
-      siteAnalyticsService, 'registerClickTipforParentsButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickTipforParentsButtonEvent'
+    ).and.callThrough();
     component.onClickTipforParentsButton();
-    expect(siteAnalyticsService.registerClickTipforParentsButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickTipforParentsButtonEvent
+    ).toHaveBeenCalled();
   });
 
   it('should record analytics when Explore Lessons is clicked', () => {
     spyOn(
-      siteAnalyticsService, 'registerClickExploreLessonsButtonEvent')
-      .and.callThrough();
+      siteAnalyticsService,
+      'registerClickExploreLessonsButtonEvent'
+    ).and.callThrough();
     component.onClickExploreLessonsButton();
-    expect(siteAnalyticsService.registerClickExploreLessonsButtonEvent)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerClickExploreLessonsButtonEvent
+    ).toHaveBeenCalled();
   });
 
   it('should increment and decrement testimonial IDs correctly', () => {
@@ -261,7 +264,7 @@ describe('Teach Page', () => {
     expect(component.getTestimonials().length).toBe(component.testimonialCount);
   });
 
-  it('should direct users to the android page on click', function() {
+  it('should direct users to the android page on click', function () {
     expect(windowRef.nativeWindow.location.href).not.toEqual('/android');
 
     component.onClickAccessAndroidButton();

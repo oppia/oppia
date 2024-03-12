@@ -18,30 +18,39 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { CreatorDashboardConstants } from
-  'pages/creator-dashboard-page/creator-dashboard-page.constants';
+import {CreatorDashboardConstants} from 'pages/creator-dashboard-page/creator-dashboard-page.constants';
 
-angular.module('oppia').constant(
-  'EXPLORATION_DROPDOWN_STATS',
-  CreatorDashboardConstants.EXPLORATION_DROPDOWN_STATS
-);
+angular
+  .module('oppia')
+  .constant(
+    'EXPLORATION_DROPDOWN_STATS',
+    CreatorDashboardConstants.EXPLORATION_DROPDOWN_STATS
+  );
 
-angular.module('oppia').constant(
-  'EXPLORATIONS_SORT_BY_KEYS',
-  CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS
-);
+angular
+  .module('oppia')
+  .constant(
+    'EXPLORATIONS_SORT_BY_KEYS',
+    CreatorDashboardConstants.EXPLORATIONS_SORT_BY_KEYS
+  );
 
-angular.module('oppia').constant(
-  'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
-  CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS
-);
+angular
+  .module('oppia')
+  .constant(
+    'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS',
+    CreatorDashboardConstants.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS
+  );
 
-angular.module('oppia').constant(
-  'SUBSCRIPTION_SORT_BY_KEYS',
-  CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS
-);
+angular
+  .module('oppia')
+  .constant(
+    'SUBSCRIPTION_SORT_BY_KEYS',
+    CreatorDashboardConstants.SUBSCRIPTION_SORT_BY_KEYS
+  );
 
-angular.module('oppia').constant(
-  'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
-  CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS
-);
+angular
+  .module('oppia')
+  .constant(
+    'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
+    CreatorDashboardConstants.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS
+  );

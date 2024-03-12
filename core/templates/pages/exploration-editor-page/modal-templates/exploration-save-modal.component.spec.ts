@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for ExplorationSaveModalcomponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationSaveModalComponent } from './exploration-save-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationSaveModalComponent} from './exploration-save-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -38,16 +38,14 @@ describe('Exploration Save Modal component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ExplorationSaveModalComponent
-      ],
+      declarations: [ExplorationSaveModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -66,21 +64,23 @@ describe('Exploration Save Modal component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after component is initialized',
+  it('should initialize component properties after component is initialized', () => {
+    expect(component.showDiff).toBe(false);
+    expect(component.diffData).toBe(null);
+    expect(component.isExplorationPrivate).toBe(isExplorationPrivate);
+    expect(component.earlierVersionHeader).toBe('Last saved');
+    expect(component.laterVersionHeader).toBe('New changes');
+  });
+
+  it(
+    'should toggle exploration diff visibility when clicking on toggle diff' +
+      ' button',
     () => {
       expect(component.showDiff).toBe(false);
-      expect(component.diffData).toBe(null);
-      expect(component.isExplorationPrivate).toBe(isExplorationPrivate);
-      expect(component.earlierVersionHeader).toBe('Last saved');
-      expect(component.laterVersionHeader).toBe('New changes');
-    });
-
-  it('should toggle exploration diff visibility when clicking on toggle diff' +
-    ' button', () => {
-    expect(component.showDiff).toBe(false);
-    component.onClickToggleDiffButton();
-    expect(component.showDiff).toBe(true);
-    component.onClickToggleDiffButton();
-    expect(component.showDiff).toBe(false);
-  });
+      component.onClickToggleDiffButton();
+      expect(component.showDiff).toBe(true);
+      component.onClickToggleDiffButton();
+      expect(component.showDiff).toBe(false);
+    }
+  );
 });

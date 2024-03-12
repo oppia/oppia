@@ -37,31 +37,33 @@ export const ContributorDashboardConstants = {
       tabName: 'My Contributions',
       description: '',
       customizationOptions: [],
-      enabled: true
+      enabled: true,
     },
     submitQuestionTab: {
       ariaLabel: 'See opportunities for adding new questions.',
       tabName: 'Submit Question',
-      description: 'Submit a question for students to answer while ' +
+      description:
+        'Submit a question for students to answer while ' +
         'practicing that skill.',
       customizationOptions: ['sort'],
-      enabled: false
+      enabled: false,
     },
     translateTextTab: {
       ariaLabel: 'See opportunities for translation.',
       tabName: 'Translate Text',
-      description: 'Translate the lesson text to help non-English speakers ' +
+      description:
+        'Translate the lesson text to help non-English speakers ' +
         'follow the lessons.',
       customizationOptions: ['language', 'topic', 'sort'],
-      enabled: true
-    }
+      enabled: true,
+    },
   },
 
   // The text to display for a submitted suggestion if its corresponding
   // opportunity was deleted.
-  CORRESPONDING_DELETED_OPPORTUNITY_TEXT: '[The corresponding opportunity ' +
-    'has been deleted.]',
+  CORRESPONDING_DELETED_OPPORTUNITY_TEXT:
+    '[The corresponding opportunity ' + 'has been deleted.]',
 
   DEFAULT_OPPORTUNITY_LANGUAGE_CODE: 'hi',
-  DEFAULT_OPPORTUNITY_TOPIC_NAME: 'All'
+  DEFAULT_OPPORTUNITY_TOPIC_NAME: 'All',
 } as const;

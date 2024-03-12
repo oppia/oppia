@@ -16,21 +16,23 @@
  * @fileoverview Component for add worked example modal.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 interface HtmlFormSchema {
   type: 'html';
-  'ui_config': object;
+  ui_config: object;
 }
 
 @Component({
   selector: 'oppia-add-worked-example-modal',
-  templateUrl: './add-worked-example.component.html'
+  templateUrl: './add-worked-example.component.html',
 })
 export class AddWorkedExampleModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -38,7 +40,7 @@ export class AddWorkedExampleModalComponent
   tmpWorkedExampleQuestionHtml!: string;
   WORKED_EXAMPLE_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
-    ui_config: {}
+    ui_config: {},
   };
 
   constructor(
@@ -73,10 +75,8 @@ export class AddWorkedExampleModalComponent
 
   saveWorkedExample(): void {
     this.ngbActiveModal.close({
-      workedExampleQuestionHtml:
-        this.tmpWorkedExampleQuestionHtml,
-      workedExampleExplanationHtml:
-        this.tmpWorkedExampleExplanationHtml
+      workedExampleQuestionHtml: this.tmpWorkedExampleQuestionHtml,
+      workedExampleExplanationHtml: this.tmpWorkedExampleExplanationHtml,
     });
   }
 }

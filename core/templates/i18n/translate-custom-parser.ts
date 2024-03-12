@@ -16,15 +16,13 @@
  * @fileoverview Custom parser for translations.
  */
 
-import { TranslateDefaultParser, TranslateParser } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
+import {TranslateDefaultParser, TranslateParser} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
 import MessageFormat from 'messageformat';
 
 export class TranslateCustomParser extends TranslateParser {
   private _messageFormat: MessageFormat;
-  constructor(
-    private translateDefaultParser: TranslateDefaultParser
-  ) {
+  constructor(private translateDefaultParser: TranslateDefaultParser) {
     super();
     /**
      * The default parser expects {{}} as delimiters.
@@ -36,10 +34,13 @@ export class TranslateCustomParser extends TranslateParser {
   }
 
   interpolate(
-      expr: string | Function,
-      params?: { [key: string]: number | string | boolean }): string {
+    expr: string | Function,
+    params?: {[key: string]: number | string | boolean}
+  ): string {
     let interpolatedValue = this.translateDefaultParser.interpolate(
-      expr, params);
+      expr,
+      params
+    );
 
     if (!(params && interpolatedValue !== undefined)) {
       return interpolatedValue;

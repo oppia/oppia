@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatRadioChange, _MatRadioButtonBase } from '@angular/material/radio';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { QuestionDifficultySelectorComponent } from './question-difficulty-selector.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatRadioChange, _MatRadioButtonBase} from '@angular/material/radio';
+import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
+import {QuestionDifficultySelectorComponent} from './question-difficulty-selector.component';
 
 /**
  * @fileoverview Unit tests for QuestionDifficultySelectorComponent
@@ -29,7 +29,7 @@ describe('QuestionDifficultySelectorComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [QuestionDifficultySelectorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -46,12 +46,12 @@ describe('QuestionDifficultySelectorComponent', () => {
     expect(component.availableDifficultyValues).toEqual([0.3, 0.6, 0.9]);
   });
 
-  it('should update skill\'s difficulty', () => {
+  it("should update skill's difficulty", () => {
     component.skillWithDifficulty = new SkillDifficulty('id', '', 0.6);
     spyOn(component.skillWithDifficultyChange, 'emit');
     let mockMatRadioChange: MatRadioChange = {
       source: {} as _MatRadioButtonBase,
-      value: 0.9
+      value: 0.9,
     };
 
     expect(component.skillWithDifficulty.getDifficulty()).toBe(0.6);

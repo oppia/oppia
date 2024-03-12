@@ -50,8 +50,7 @@ ruleTester.run('no-to-throw', rule, {
 
   invalid: [
     {
-      code:
-        `describe('Url Service', function() {
+      code: `describe('Url Service', function() {
           it('should correctly retrieve topic id from url', function() {
             mockLocation.pathname = '/topic_editor/abcdefgij';
             expect(function() {
@@ -62,9 +61,11 @@ ruleTester.run('no-to-throw', rule, {
             );
           });
         });`,
-      errors: [{
-        message: 'Please use “toThrowError”  instead of “toThrow”.'
-      }]
-    }
-  ]
+      errors: [
+        {
+          message: 'Please use “toThrowError”  instead of “toThrow”.',
+        },
+      ],
+    },
+  ],
 });

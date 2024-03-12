@@ -16,28 +16,28 @@
  * @fileoverview Utils service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { GraphAnswer } from 'interactions/answer-defs';
+import {GraphAnswer} from 'interactions/answer-defs';
 
 // 'null' indicates that the pairs of vertices are not adjacent in the graph.
 export type AdjacencyMatrix = (number | null)[][];
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GraphUtilsService {
   GRAPH_ADJACENCY_MODE = {
     DIRECTED: 'directed',
     INVERTED: 'inverted',
-    UNDIRECTED: 'undirected'
+    UNDIRECTED: 'undirected',
   };
 
   DFS_STATUS = {
     VISITED: 'visited',
     UNVISITED: 'unvisited',
-    STILL_VISITING: 'still visiting'
+    STILL_VISITING: 'still visiting',
   };
 
   /**
@@ -50,7 +50,9 @@ export class GraphUtilsService {
    *   (undirected)
    */
   constructAdjacencyLists(
-      graph: GraphAnswer, adjacencyListMode: string): number[][] {
+    graph: GraphAnswer,
+    adjacencyListMode: string
+  ): number[][] {
     var adjacencyLists: number[][] = [];
     for (var i = 0; i < graph.vertices.length; i++) {
       adjacencyLists.push([]);
@@ -62,13 +64,16 @@ export class GraphUtilsService {
     }
     for (var i = 0; i < graph.edges.length; i++) {
       var edge = graph.edges[i];
-      if (adjacencyListMode === this.GRAPH_ADJACENCY_MODE.DIRECTED ||
-          adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED) {
+      if (
+        adjacencyListMode === this.GRAPH_ADJACENCY_MODE.DIRECTED ||
+        adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED
+      ) {
         adjacencyLists[edge.src].push(edge.dst);
       }
-      if (adjacencyListMode === (
-        this.GRAPH_ADJACENCY_MODE.INVERTED) || adjacencyListMode === (
-        this.GRAPH_ADJACENCY_MODE.UNDIRECTED)) {
+      if (
+        adjacencyListMode === this.GRAPH_ADJACENCY_MODE.INVERTED ||
+        adjacencyListMode === this.GRAPH_ADJACENCY_MODE.UNDIRECTED
+      ) {
         adjacencyLists[edge.dst].push(edge.src);
       }
     }
@@ -84,8 +89,10 @@ export class GraphUtilsService {
    * the indices of the vertices reachable from the starting vertex to true.
    */
   markAccessible(
-      startVertex: number, adjacencyLists: number[][],
-      isVisited: boolean[]): void {
+    startVertex: number,
+    adjacencyLists: number[][],
+    isVisited: boolean[]
+  ): void {
     isVisited[startVertex] = true;
     for (var i = 0; i < adjacencyLists[startVertex].length; i++) {
       var nextVertex = adjacencyLists[startVertex][i];
@@ -96,23 +103,31 @@ export class GraphUtilsService {
   }
 
   findCycle(
-      currentVertex: number, previousVertex: number,
-      adjacencyLists: number[][], nodeStatus: string[],
-      isDirected: boolean): boolean {
+    currentVertex: number,
+    previousVertex: number,
+    adjacencyLists: number[][],
+    nodeStatus: string[],
+    isDirected: boolean
+  ): boolean {
     nodeStatus[currentVertex] = this.DFS_STATUS.STILL_VISITING;
     for (var i = 0; i < adjacencyLists[currentVertex].length; i++) {
       var nextVertex = adjacencyLists[currentVertex][i];
       if (nextVertex === previousVertex && !isDirected) {
         continue;
       }
-      if (nodeStatus[nextVertex] === (
-        this.DFS_STATUS.STILL_VISITING)) {
+      if (nodeStatus[nextVertex] === this.DFS_STATUS.STILL_VISITING) {
         return true;
       }
-      if (nodeStatus[nextVertex] === this.DFS_STATUS.UNVISITED &&
-          this.findCycle(
-            nextVertex, currentVertex, adjacencyLists, nodeStatus,
-            isDirected)) {
+      if (
+        nodeStatus[nextVertex] === this.DFS_STATUS.UNVISITED &&
+        this.findCycle(
+          nextVertex,
+          currentVertex,
+          adjacencyLists,
+          nodeStatus,
+          isDirected
+        )
+      ) {
         return true;
       }
     }
@@ -147,16 +162,17 @@ export class GraphUtilsService {
     // Find the pivot to longest decreasing suffix and successor.
     var pivot: number | null = null;
     var successor: number | null = null;
-    permutation.reduce((
-        previousValue: number, currentValue: number, currentIndex: number) => {
-      if (previousValue < currentValue) {
-        pivot = currentIndex - 1;
+    permutation.reduce(
+      (previousValue: number, currentValue: number, currentIndex: number) => {
+        if (previousValue < currentValue) {
+          pivot = currentIndex - 1;
+        }
+        if (pivot !== null && currentValue > permutation[pivot]) {
+          successor = currentIndex;
+        }
+        return currentValue;
       }
-      if (pivot !== null && currentValue > permutation[pivot]) {
-        successor = currentIndex;
-      }
-      return currentValue;
-    });
+    );
 
     if (pivot === null || successor === null) {
       return null;
@@ -171,9 +187,10 @@ export class GraphUtilsService {
   }
 
   areAdjacencyMatricesEqualWithPermutation(
-      adj1: AdjacencyMatrix,
-      adj2: AdjacencyMatrix,
-      permutation: number[]): boolean {
+    adj1: AdjacencyMatrix,
+    adj2: AdjacencyMatrix,
+    permutation: number[]
+  ): boolean {
     var numVertices = adj1.length;
     for (var i = 0; i < numVertices; i++) {
       for (var j = 0; j < numVertices; j++) {
@@ -186,5 +203,6 @@ export class GraphUtilsService {
   }
 }
 
-angular.module('oppia').factory(
-  'GraphUtilsService', downgradeInjectable(GraphUtilsService));
+angular
+  .module('oppia')
+  .factory('GraphUtilsService', downgradeInjectable(GraphUtilsService));

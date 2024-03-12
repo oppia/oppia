@@ -16,20 +16,18 @@
  * @fileoverview Validator service for the fraction interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { FractionAnswer } from 'interactions/answer-defs';
-import { Fraction } from 'domain/objects/fraction.model';
-import { baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { AppConstants } from 'app.constants';
-import { Warning } from 'services/alerts.service';
-import { FractionInputCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule.model';
+import {FractionAnswer} from 'interactions/answer-defs';
+import {Fraction} from 'domain/objects/fraction.model';
+import {baseInteractionValidationService} from 'interactions/base-interaction-validation.service';
+import {AppConstants} from 'app.constants';
+import {Warning} from 'services/alerts.service';
+import {FractionInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Rule} from 'domain/exploration/rule.model';
 
 interface FractionWarning {
   type: string;
@@ -46,41 +44,45 @@ interface Range {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FractionInputValidationService {
-  constructor(
-    private bivs: baseInteractionValidationService) {}
+  constructor(private bivs: baseInteractionValidationService) {}
 
   getNonIntegerInputWarning(i: number, j: number): FractionWarning {
     return {
       type: AppConstants.WARNING_TYPES.ERROR,
-      message: (
-        'Learner answer ' + (j + 1) + ' from Oppia response ' +
-        (i + 1) + ' is invalid: input should be an ' +
-        'integer.')
+      message:
+        'Learner answer ' +
+        (j + 1) +
+        ' from Oppia response ' +
+        (i + 1) +
+        ' is invalid: input should be an ' +
+        'integer.',
     };
   }
 
   getCustomizationArgsWarnings(
-      customizationArgs: FractionInputCustomizationArgs): Warning[] {
+    customizationArgs: FractionInputCustomizationArgs
+  ): Warning[] {
     return [];
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: FractionInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome
+    stateName: string,
+    customizationArgs: FractionInputCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome
   ): (Warning | FractionWarning)[] {
     var warningsList: (Warning | FractionWarning)[] = [];
-    var shouldBeInSimplestForm =
-      customizationArgs.requireSimplestForm.value;
-    var allowImproperFraction =
-        customizationArgs.allowImproperFraction.value;
+    var shouldBeInSimplestForm = customizationArgs.requireSimplestForm.value;
+    var allowImproperFraction = customizationArgs.allowImproperFraction.value;
     var allowNonzeroIntegerPart =
       customizationArgs.allowNonzeroIntegerPart.value;
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     var toFloat = (fraction: FractionAnswer) => {
       return Fraction.fromDict(fraction).toFloat();
@@ -96,35 +98,44 @@ export class FractionInputValidationService {
      * }
      */
     var setLowerAndUpperBounds = (
-        range: Range, lb: number, ub: number, lbi: boolean, ubi: boolean) => {
+      range: Range,
+      lb: number,
+      ub: number,
+      lbi: boolean,
+      ubi: boolean
+    ) => {
       range.lb = lb;
       range.ub = ub;
       range.lbi = lbi;
       range.ubi = ubi;
     };
     var isEnclosedBy = (ra: Range, rb: Range) => {
-      if (ra.lb === null || ra.ub === null ||
-        rb.lb === null || rb.ub === null) {
+      if (
+        ra.lb === null ||
+        ra.ub === null ||
+        rb.lb === null ||
+        rb.ub === null
+      ) {
         return false;
       }
 
       // Checks if range ra is enclosed by range rb.
       var lowerBoundConditionIsSatisfied =
-        (rb.lb < ra.lb) || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
+        rb.lb < ra.lb || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
       var upperBoundConditionIsSatisfied =
-        (rb.ub > ra.ub) || (rb.ub === ra.ub && (!ra.ubi || rb.ubi));
-      return lowerBoundConditionIsSatisfied &&
-        upperBoundConditionIsSatisfied;
+        rb.ub > ra.ub || (rb.ub === ra.ub && (!ra.ubi || rb.ubi));
+      return lowerBoundConditionIsSatisfied && upperBoundConditionIsSatisfied;
     };
 
     var shouldCheckRangeCriteria = (earlierRule: Rule, laterRule: Rule) => {
       if (
         (earlierRule.type === 'IsExactlyEqualTo' &&
-        laterRule.type === 'IsExactlyEqualTo') ||
+          laterRule.type === 'IsExactlyEqualTo') ||
         (earlierRule.type === 'IsExactlyEqualTo' &&
-        laterRule.type === 'IsEquivalentTo') ||
+          laterRule.type === 'IsEquivalentTo') ||
         (earlierRule.type === 'IsExactlyEqualTo' &&
-        laterRule.type === 'IsEquivalentToAndInSimplestForm')) {
+          laterRule.type === 'IsEquivalentToAndInSimplestForm')
+      ) {
         return false;
       }
       return true;
@@ -156,44 +167,52 @@ export class FractionInputValidationService {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
-              var fractionInSimplestForm = Fraction.fromDict(
-                fractionDict).convertToSimplestForm();
+              var fractionInSimplestForm =
+                Fraction.fromDict(fractionDict).convertToSimplestForm();
               if (!angular.equals(fractionDict, fractionInSimplestForm)) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
-                  message: (
-                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is not ' +
-                    'in simplest form.')
+                    'in simplest form.',
                 });
               }
             }
             if (!allowImproperFraction) {
               var fraction: Fraction = Fraction.fromDict(
-                rule.inputs.f as FractionAnswer);
+                rule.inputs.f as FractionAnswer
+              );
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
-                  message: (
-                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it is an ' +
-                    'improper fraction')
+                    'improper fraction',
                 });
               }
             }
             if (!allowNonzeroIntegerPart) {
               var fraction: Fraction = Fraction.fromDict(
-                rule.inputs.f as FractionAnswer);
+                rule.inputs.f as FractionAnswer
+              );
               if (fraction.hasNonzeroIntegerPart()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
-                  message: (
-                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
                     (i + 1) +
                     ' will never be matched because it has a ' +
-                    'non zero integer part')
+                    'non zero integer part',
                 });
               }
             }
@@ -222,11 +241,13 @@ export class FractionInputValidationService {
             if (!allowNonzeroIntegerPart && rule.inputs.x !== 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' from Oppia response ' +
                   (i + 1) +
                   ' will never be matched because integer part ' +
-                  'has to be zero')
+                  'has to be zero',
               });
             }
             if (!Number.isInteger(rule.inputs.x)) {
@@ -240,10 +261,13 @@ export class FractionInputValidationService {
             if (rule.inputs.x === 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
-                  (i + 1) + ' is invalid: denominator ' +
-                  'should be greater than zero.')
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' from Oppia response ' +
+                  (i + 1) +
+                  ' is invalid: denominator ' +
+                  'should be greater than zero.',
               });
             }
             matchedDenominator.denominator = rule.inputs.x as number;
@@ -252,31 +276,38 @@ export class FractionInputValidationService {
             if ((rule.inputs.f as FractionAnswer).wholeNumber !== 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' from Oppia response ' +
                   (i + 1) +
-                  ' is invalid as integer part should be zero')
+                  ' is invalid as integer part should be zero',
               });
             }
             if ((rule.inputs.f as FractionAnswer).isNegative) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' from Oppia response ' +
                   (i + 1) +
-                  ' is invalid as sign should be positive')
+                  ' is invalid as sign should be positive',
               });
             }
             if (!allowImproperFraction) {
               var fraction: Fraction = Fraction.fromDict(
-                rule.inputs.f as FractionAnswer);
+                rule.inputs.f as FractionAnswer
+              );
               if (fraction.isImproperFraction()) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
-                  message: (
-                    'Learner answer ' + (j + 1) + ' from Oppia response ' +
+                  message:
+                    'Learner answer ' +
+                    (j + 1) +
+                    ' from Oppia response ' +
                     (i + 1) +
-                    ' is invalid as improper fractions are not allowed')
+                    ' is invalid as improper fractions are not allowed',
                 });
               }
             }
@@ -286,36 +317,51 @@ export class FractionInputValidationService {
         }
         for (var k = 0; k < ranges.length; k++) {
           if (isEnclosedBy(range, ranges[k])) {
-            var earlierRule = answerGroups[ranges[k].answerGroupIndex]
-              .rules[ranges[k].ruleIndex];
+            var earlierRule =
+              answerGroups[ranges[k].answerGroupIndex].rules[
+                ranges[k].ruleIndex
+              ];
             if (shouldCheckRangeCriteria(earlierRule, rule)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
-                  (i + 1) + ' will never be matched because it ' +
-                  'is made redundant by answer ' + (ranges[k].ruleIndex + 1) +
-                  ' from Oppia response ' + (ranges[k].answerGroupIndex + 1) +
-                  '.')
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' from Oppia response ' +
+                  (i + 1) +
+                  ' will never be matched because it ' +
+                  'is made redundant by answer ' +
+                  (ranges[k].ruleIndex + 1) +
+                  ' from Oppia response ' +
+                  (ranges[k].answerGroupIndex + 1) +
+                  '.',
               });
             }
           }
         }
 
         for (var k = 0; k < matchedDenominators.length; k++) {
-          if (matchedDenominators[k].denominator !== null &&
-            rule.type === 'HasFractionalPartExactlyEqualTo') {
-            if (matchedDenominators[k].denominator ===
-              (rule.inputs.f as FractionAnswer).denominator) {
+          if (
+            matchedDenominators[k].denominator !== null &&
+            rule.type === 'HasFractionalPartExactlyEqualTo'
+          ) {
+            if (
+              matchedDenominators[k].denominator ===
+              (rule.inputs.f as FractionAnswer).denominator
+            ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
-                  (i + 1) + ' will never be matched because it ' +
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' from Oppia response ' +
+                  (i + 1) +
+                  ' will never be matched because it ' +
                   'is made redundant by answer ' +
                   (matchedDenominators[k].ruleIndex + 1) +
                   ' from Oppia response ' +
-                  (matchedDenominators[k].answerGroupIndex + 1) + '.')
+                  (matchedDenominators[k].answerGroupIndex + 1) +
+                  '.',
               });
             }
           }
@@ -327,13 +373,16 @@ export class FractionInputValidationService {
     }
 
     warningsList = warningsList.concat(
-      this.bivs.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+      this.bivs.getAllOutcomeWarnings(answerGroups, defaultOutcome, stateName)
+    );
 
     return warningsList;
   }
 }
 
-angular.module('oppia').factory(
-  'FractionInputValidationService', downgradeInjectable(
-    FractionInputValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'FractionInputValidationService',
+    downgradeInjectable(FractionInputValidationService)
+  );

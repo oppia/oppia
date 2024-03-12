@@ -16,19 +16,18 @@
  * @fileoverview Unit tests for for HomeTabComponent.
  */
 
-import { async, ComponentFixture, TestBed } from
-  '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HomeTabComponent } from './home-tab.component';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HomeTabComponent} from './home-tab.component';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -41,15 +40,8 @@ describe('Home tab Component', () => {
   beforeEach(async(() => {
     mockResizeEmitter = new EventEmitter();
     TestBed.configureTestingModule({
-      imports: [
-        MaterialModule,
-        FormsModule,
-        HttpClientTestingModule
-      ],
-      declarations: [
-        MockTranslatePipe,
-        HomeTabComponent
-      ],
+      imports: [MaterialModule, FormsModule, HttpClientTestingModule],
+      declarations: [MockTranslatePipe, HomeTabComponent],
       providers: [
         UrlInterpolationService,
         {
@@ -57,10 +49,10 @@ describe('Home tab Component', () => {
           useValue: {
             isWindowNarrow: () => true,
             getResizeEvent: () => mockResizeEmitter,
-          }
-        }
+          },
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -72,14 +64,15 @@ describe('Home tab Component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
       title: 'subtopic_name',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#F8BF74',
-      url_fragment: 'subtopic-name'
+      url_fragment: 'subtopic-name',
     };
 
     let nodeDict = {
@@ -98,7 +91,7 @@ describe('Home tab Component', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
     const learnerTopicSummaryBackendDict1 = {
       id: 'sample_topic_id',
@@ -112,33 +105,41 @@ describe('Home tab Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [nodeDict],
+        },
+      ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
-    component.currentGoals = [LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1)];
-    component.goalTopics = [LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1)];
+    component.currentGoals = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1
+      ),
+    ];
+    component.goalTopics = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1
+      ),
+    ];
     component.partiallyLearntTopicsList = [];
     component.untrackedTopics = {};
     component.username = 'username';
@@ -165,8 +166,9 @@ describe('Home tab Component', () => {
     baseTime.setHours(11);
     jasmine.clock().mockDate(baseTime);
 
-    expect(component.getTimeOfDay())
-      .toEqual('I18N_LEARNER_DASHBOARD_MORNING_GREETING');
+    expect(component.getTimeOfDay()).toEqual(
+      'I18N_LEARNER_DASHBOARD_MORNING_GREETING'
+    );
   });
 
   it('should get time of day as afternoon', () => {
@@ -174,8 +176,9 @@ describe('Home tab Component', () => {
     baseTime.setHours(15);
     jasmine.clock().mockDate(baseTime);
 
-    expect(component.getTimeOfDay())
-      .toEqual('I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING');
+    expect(component.getTimeOfDay()).toEqual(
+      'I18N_LEARNER_DASHBOARD_AFTERNOON_GREETING'
+    );
   });
 
   it('should get time of day as evening', () => {
@@ -183,8 +186,9 @@ describe('Home tab Component', () => {
     baseTime.setHours(20);
     jasmine.clock().mockDate(baseTime);
 
-    expect(component.getTimeOfDay())
-      .toEqual('I18N_LEARNER_DASHBOARD_EVENING_GREETING');
+    expect(component.getTimeOfDay()).toEqual(
+      'I18N_LEARNER_DASHBOARD_EVENING_GREETING'
+    );
   });
 
   it('should switch the tab to Goals', () => {
@@ -193,22 +197,25 @@ describe('Home tab Component', () => {
     expect(setActiveSection).toHaveBeenCalled();
   });
 
-  it('should check whether an object is non empty when calling ' +
-    '\'isNonemptyObject\'', () => {
-    let result = component.isNonemptyObject({});
-    expect(result).toBe(false);
+  it(
+    'should check whether an object is non empty when calling ' +
+      "'isNonemptyObject'",
+    () => {
+      let result = component.isNonemptyObject({});
+      expect(result).toBe(false);
 
-    result = component.isNonemptyObject({description: 'description'});
-    expect(result).toBe(true);
-  });
+      result = component.isNonemptyObject({description: 'description'});
+      expect(result).toBe(true);
+    }
+  );
 
   it('should get the classroom link', () => {
     component.classroomUrlFragment = 'math';
     const urlSpy = spyOn(
-      urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('/learn/math');
-    expect(component.getClassroomLink('math')).toEqual(
-      '/learn/math');
+      urlInterpolationService,
+      'interpolateUrl'
+    ).and.returnValue('/learn/math');
+    expect(component.getClassroomLink('math')).toEqual('/learn/math');
     expect(urlSpy).toHaveBeenCalled();
   });
 
@@ -217,29 +224,38 @@ describe('Home tab Component', () => {
     expect(component.getWidth(3)).toEqual(662);
   });
 
-  it('should show empty learn something new tab' +
-    '\'when goal selection limit is reached\'', () => {
-    component.currentGoalsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
+  it(
+    'should show empty learn something new tab' +
+      "'when goal selection limit is reached'",
+    () => {
+      component.currentGoalsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
 
-    expect(component.isGoalLimitReached()).toBeTrue();
+      expect(component.isGoalLimitReached()).toBeTrue();
 
-    component.currentGoalsLength = 2;
-    component.goalTopicsLength = 2;
-    expect(component.isGoalLimitReached()).toBeTrue();
-  });
+      component.currentGoalsLength = 2;
+      component.goalTopicsLength = 2;
+      expect(component.isGoalLimitReached()).toBeTrue();
+    }
+  );
 
-  it('should not show empty learn something new tab' +
-    '\'when goal selection limit is not reached\'', () => {
-    component.goalTopicsLength = 0;
-    expect(component.isGoalLimitReached()).toBeFalse();
-  });
+  it(
+    'should not show empty learn something new tab' +
+      "'when goal selection limit is not reached'",
+    () => {
+      component.goalTopicsLength = 0;
+      expect(component.isGoalLimitReached()).toBeFalse();
+    }
+  );
 
-  it('should not show empty learn something new tab' +
-    '\'when goal selection limit is reached and goal selection limit' +
-    ' is not reached\'', () => {
-    component.goalTopicsLength = 2;
-    component.currentGoalsLength = 0;
-    component.goalTopicsLength = 3;
-    expect(component.isGoalLimitReached()).toBeFalse();
-  });
+  it(
+    'should not show empty learn something new tab' +
+      "'when goal selection limit is reached and goal selection limit" +
+      " is not reached'",
+    () => {
+      component.goalTopicsLength = 2;
+      component.currentGoalsLength = 0;
+      component.goalTopicsLength = 3;
+      expect(component.isGoalLimitReached()).toBeFalse();
+    }
+  );
 });

@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for FacilitatorDashboardBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { FacilitatorDashboardBackendApiService } from
-  './facilitator-dashboard-backend-api.service';
+import {FacilitatorDashboardBackendApiService} from './facilitator-dashboard-backend-api.service';
 
 describe('Teacher Dashboard Backend API Service', () => {
-  var facilitatorDashboardBackendApiService:
-    FacilitatorDashboardBackendApiService;
+  var facilitatorDashboardBackendApiService: FacilitatorDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   var sampleShortLearnerGroupData = {
@@ -33,7 +33,7 @@ describe('Teacher Dashboard Backend API Service', () => {
     title: 'title',
     description: 'description',
     facilitator_usernames: ['facilitator1'],
-    learners_count: 5
+    learners_count: 5,
   };
 
   const FACILITATOR_DASHBOARD_URL = '/facilitator_dashboard_handler';
@@ -41,10 +41,11 @@ describe('Teacher Dashboard Backend API Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [FacilitatorDashboardBackendApiService]
+      providers: [FacilitatorDashboardBackendApiService],
     });
     facilitatorDashboardBackendApiService = TestBed.inject(
-      FacilitatorDashboardBackendApiService);
+      FacilitatorDashboardBackendApiService
+    );
 
     httpTestingController = TestBed.inject(HttpTestingController);
   });
@@ -53,25 +54,23 @@ describe('Teacher Dashboard Backend API Service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch learner groups data to be shown',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch learner groups data to be shown', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      facilitatorDashboardBackendApiService
-        .fetchTeacherDashboardLearnerGroupsAsync()
-        .then(successHandler, failHandler);
+    facilitatorDashboardBackendApiService
+      .fetchTeacherDashboardLearnerGroupsAsync()
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(FACILITATOR_DASHBOARD_URL);
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        learner_groups_list: [sampleShortLearnerGroupData]
-      });
+    var req = httpTestingController.expectOne(FACILITATOR_DASHBOARD_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      learner_groups_list: [sampleShortLearnerGroupData],
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

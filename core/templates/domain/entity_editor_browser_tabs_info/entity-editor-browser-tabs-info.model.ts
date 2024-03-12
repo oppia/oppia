@@ -38,10 +38,10 @@ export interface EntityEditorBrowserTabsInfoLocalStorageDict {
 
 export class EntityEditorBrowserTabsInfo {
   /**
-    * The type of the entity for a particular opened entity editor tab.
-    * It can have values: 'topic', 'story', 'skill' and 'exploration'.
-    * For example, if an editor tab with url '/topic_editor/topic_1' is opened,
-    * then the value of '_entityType' will be 'topic'.
+   * The type of the entity for a particular opened entity editor tab.
+   * It can have values: 'topic', 'story', 'skill' and 'exploration'.
+   * For example, if an editor tab with url '/topic_editor/topic_1' is opened,
+   * then the value of '_entityType' will be 'topic'.
    */
   _entityType: string;
   /**
@@ -74,8 +74,11 @@ export class EntityEditorBrowserTabsInfo {
   _someTabHasUnsavedChanges: boolean;
 
   constructor(
-      entityType: string, id: string, latestVersion: number,
-      numberOfOpenedTabs: number, someTabHasUnsavedChanges: boolean
+    entityType: string,
+    id: string,
+    latestVersion: number,
+    numberOfOpenedTabs: number,
+    someTabHasUnsavedChanges: boolean
   ) {
     this._entityType = entityType;
     this._id = id;
@@ -85,19 +88,24 @@ export class EntityEditorBrowserTabsInfo {
   }
 
   static create(
-      entityType: string, id: string, latestVersion: number,
-      numberOfOpenedTabs: number, someTabHasUnsavedChanges: boolean
+    entityType: string,
+    id: string,
+    latestVersion: number,
+    numberOfOpenedTabs: number,
+    someTabHasUnsavedChanges: boolean
   ): EntityEditorBrowserTabsInfo {
     return new EntityEditorBrowserTabsInfo(
-      entityType, id, latestVersion,
-      numberOfOpenedTabs, someTabHasUnsavedChanges
+      entityType,
+      id,
+      latestVersion,
+      numberOfOpenedTabs,
+      someTabHasUnsavedChanges
     );
   }
 
   static fromLocalStorageDict(
-      entityEditorBrowserTabsInfoLocalStorageDict:
-        EntityEditorBrowserTabsInfoLocalStorageDict,
-      entityId: string
+    entityEditorBrowserTabsInfoLocalStorageDict: EntityEditorBrowserTabsInfoLocalStorageDict,
+    entityId: string
   ): EntityEditorBrowserTabsInfo {
     return new EntityEditorBrowserTabsInfo(
       entityEditorBrowserTabsInfoLocalStorageDict.entityType,
@@ -113,8 +121,7 @@ export class EntityEditorBrowserTabsInfo {
       entityType: this.getEntityType(),
       latestVersion: this.getLatestVersion(),
       numberOfOpenedTabs: this.getNumberOfOpenedTabs(),
-      someTabHasUnsavedChanges: (
-        this.doesSomeTabHaveUnsavedChanges())
+      someTabHasUnsavedChanges: this.doesSomeTabHaveUnsavedChanges(),
     };
   }
 

@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for HTML Select Component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HtmlSelectComponent } from './html-select.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HtmlSelectComponent} from './html-select.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 describe('HTML Select Component', () => {
   let fixture: ComponentFixture<HtmlSelectComponent>;
@@ -32,31 +32,34 @@ describe('HTML Select Component', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      HtmlSelectComponent);
+    fixture = TestBed.createComponent(HtmlSelectComponent);
     component = fixture.componentInstance;
 
     component.options = [
-      { id: '12', val: 'string' },
-      { id: '21', val: 'string' }];
+      {id: '12', val: 'string'},
+      {id: '21', val: 'string'},
+    ];
   });
 
   it('should initialize Selection with selectionId', () => {
     component.selectionId = '21';
     component.ngOnInit();
-    expect(component.selection).toEqual({ id: '21', val: 'string' });
+    expect(component.selection).toEqual({id: '21', val: 'string'});
   });
 
-  it('should initialize Selection with the first option when selectionId' +
-  ' not in options', () => {
-    component.selectionId = '13';
-    component.ngOnInit();
-    expect(component.selection).toEqual({ id: '12', val: 'string' });
-  });
+  it(
+    'should initialize Selection with the first option when selectionId' +
+      ' not in options',
+    () => {
+      component.selectionId = '13';
+      component.ngOnInit();
+      expect(component.selection).toEqual({id: '12', val: 'string'});
+    }
+  );
 
   it('should update Selection', () => {
     component.ngOnInit();
-    component.selection = { id: '1', val: 'string' };
+    component.selection = {id: '1', val: 'string'};
     spyOn(component.onSelectionChange, 'emit');
 
     component.updatedSelection();

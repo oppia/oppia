@@ -15,9 +15,9 @@
 /**
  * @fileoverview Unit tests for WindowDimensionsService.
  */
-import { TestBed } from '@angular/core/testing';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {TestBed} from '@angular/core/testing';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Window Dimensions Service', () => {
   let wds: WindowDimensionsService;
@@ -35,10 +35,10 @@ describe('Window Dimensions Service', () => {
     // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty(wr.nativeWindow, 'innerWidth', {
-      get: () => undefined
+      get: () => undefined,
     });
     Object.defineProperty(wr.nativeWindow, 'innerHeight', {
-      get: () => undefined
+      get: () => undefined,
     });
   });
 
@@ -50,17 +50,23 @@ describe('Window Dimensions Service', () => {
 
     it('should get window width by clientWidth', () => {
       spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(0);
-      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
-        .and.returnValue(1000);
+      spyOnProperty(
+        wr.nativeWindow.document.documentElement,
+        'clientWidth'
+      ).and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
 
     it('should get window width by document clientWidth', () => {
       spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(0);
-      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
-        .and.returnValue(0);
-      spyOnProperty(wr.nativeWindow.document.body, 'clientWidth')
-        .and.returnValue(1000);
+      spyOnProperty(
+        wr.nativeWindow.document.documentElement,
+        'clientWidth'
+      ).and.returnValue(0);
+      spyOnProperty(
+        wr.nativeWindow.document.body,
+        'clientWidth'
+      ).and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
   });
@@ -73,17 +79,23 @@ describe('Window Dimensions Service', () => {
 
     it('should get window Height by clientHeight', () => {
       spyOnProperty(wr.nativeWindow, 'innerHeight').and.returnValue(0);
-      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientHeight')
-        .and.returnValue(1000);
+      spyOnProperty(
+        wr.nativeWindow.document.documentElement,
+        'clientHeight'
+      ).and.returnValue(1000);
       expect(wds.getHeight()).toEqual(1000);
     });
 
     it('should get window Height by document clientHeight', () => {
       spyOnProperty(wr.nativeWindow, 'innerHeight').and.returnValue(0);
-      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientHeight')
-        .and.returnValue(0);
-      spyOnProperty(wr.nativeWindow.document.body, 'clientHeight')
-        .and.returnValue(1000);
+      spyOnProperty(
+        wr.nativeWindow.document.documentElement,
+        'clientHeight'
+      ).and.returnValue(0);
+      spyOnProperty(
+        wr.nativeWindow.document.body,
+        'clientHeight'
+      ).and.returnValue(1000);
       expect(wds.getHeight()).toEqual(1000);
     });
   });

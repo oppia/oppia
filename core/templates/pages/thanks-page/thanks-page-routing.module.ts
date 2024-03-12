@@ -16,24 +16,19 @@
  * @fileoverview Routing module for thanks page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { ThanksPageRootComponent } from './thanks-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {ThanksPageRootComponent} from './thanks-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: ThanksPageRootComponent
-  }
+    component: ThanksPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class ThanksPageRoutingModule {}

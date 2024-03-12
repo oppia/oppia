@@ -18,26 +18,43 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
+import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 
-angular.module('oppia').constant(
-  'ADMIN_ROLE_HANDLER_URL', AdminPageConstants.ADMIN_ROLE_HANDLER_URL);
+angular
+  .module('oppia')
+  .constant(
+    'ADMIN_ROLE_HANDLER_URL',
+    AdminPageConstants.ADMIN_ROLE_HANDLER_URL
+  );
 
-angular.module('oppia').constant(
-  'ADMIN_HANDLER_URL', AdminPageConstants.ADMIN_HANDLER_URL);
-angular.module('oppia').constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
-  AdminPageConstants.ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL);
+angular
+  .module('oppia')
+  .constant('ADMIN_HANDLER_URL', AdminPageConstants.ADMIN_HANDLER_URL);
+angular
+  .module('oppia')
+  .constant(
+    'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
+    AdminPageConstants.ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL
+  );
 
-angular.module('oppia').constant(
-  'ADMIN_BANNED_USERS_HANDLER', AdminPageConstants.ADMIN_BANNED_USERS_HANDLER);
+angular
+  .module('oppia')
+  .constant(
+    'ADMIN_BANNED_USERS_HANDLER',
+    AdminPageConstants.ADMIN_BANNED_USERS_HANDLER
+  );
 
-angular.module('oppia').constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
-  AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
+    AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE
+  );
 
-angular.module('oppia').constant(
-  'ADMIN_TAB_URLS', AdminPageConstants.ADMIN_TAB_URLS);
+angular
+  .module('oppia')
+  .constant('ADMIN_TAB_URLS', AdminPageConstants.ADMIN_TAB_URLS);
 
-angular.module('oppia').constant(
-  'PROFILE_URL_TEMPLATE', AdminPageConstants.PROFILE_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant('PROFILE_URL_TEMPLATE', AdminPageConstants.PROFILE_URL_TEMPLATE);

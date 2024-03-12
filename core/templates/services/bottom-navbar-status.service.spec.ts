@@ -16,25 +16,25 @@
  * @fileoverview Tests for BottomNavbarStatusService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { BottomNavbarStatusService } from
-  'services/bottom-navbar-status.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 describe('BottomNavbarStatusService', () => {
   let bss: BottomNavbarStatusService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [{
-        provide: WindowDimensionsService,
-        useValue: {
-          isWindowNarrow: () => true,
-          getWidth: () => 800
-        }
-      }]
+      providers: [
+        {
+          provide: WindowDimensionsService,
+          useValue: {
+            isWindowNarrow: () => true,
+            getWidth: () => 800,
+          },
+        },
+      ],
     });
 
     bss = TestBed.get(BottomNavbarStatusService);

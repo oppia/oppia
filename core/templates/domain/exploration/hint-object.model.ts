@@ -19,12 +19,12 @@
 
 import {
   SubtitledHtml,
-  SubtitledHtmlBackendDict
+  SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
+import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
 export interface HintBackendDict {
-  'hint_content': SubtitledHtmlBackendDict;
+  hint_content: SubtitledHtmlBackendDict;
 }
 
 export class Hint extends BaseTranslatableObject {
@@ -40,19 +40,17 @@ export class Hint extends BaseTranslatableObject {
 
   toBackendDict(): HintBackendDict {
     return {
-      hint_content: this.hintContent.toBackendDict()
+      hint_content: this.hintContent.toBackendDict(),
     };
   }
 
   static createFromBackendDict(hintBackendDict: HintBackendDict): Hint {
     return new Hint(
-      SubtitledHtml.createFromBackendDict(
-        hintBackendDict.hint_content));
+      SubtitledHtml.createFromBackendDict(hintBackendDict.hint_content)
+    );
   }
 
   static createNew(hintContentId: string, hintContent: string): Hint {
-    return new Hint(
-      SubtitledHtml.createDefault(
-        hintContent, hintContentId));
+    return new Hint(SubtitledHtml.createDefault(hintContent, hintContentId));
   }
 }

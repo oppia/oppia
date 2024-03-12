@@ -43,18 +43,18 @@ export const AppConstants = {
 
   /* Called when the learner moves to a new card that they haven't seen
      before. */
-  EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE: (
-    '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>'),
-  EDITABLE_EXPLORATION_DATA_URL_TEMPLATE: (
-    '/createhandler/data/<exploration_id>'),
+  EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE:
+    '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>',
+  EDITABLE_EXPLORATION_DATA_URL_TEMPLATE:
+    '/createhandler/data/<exploration_id>',
   EXPLORATION_DATA_URL_TEMPLATE: '/explorehandler/init/<exploration_id>',
-  EXPLORATION_VERSION_DATA_URL_TEMPLATE: (
-    '/explorehandler/init/<exploration_id>?v=<version>'),
-  ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE: (
+  EXPLORATION_VERSION_DATA_URL_TEMPLATE:
+    '/explorehandler/init/<exploration_id>?v=<version>',
+  ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE:
     '/entity_translations_handler/<entity_type>/<entity_id>/<entity_version>/' +
-    '<language_code>'),
-  EXPLORATION_PROGRESS_PID_URL_TEMPLATE: (
-    '/explorehandler/init/<exploration_id>?pid=<pid>'),
+    '<language_code>',
+  EXPLORATION_PROGRESS_PID_URL_TEMPLATE:
+    '/explorehandler/init/<exploration_id>?pid=<pid>',
 
   WARNING_TYPES: {
     // These must be fixed before the exploration can be saved.
@@ -74,8 +74,9 @@ export const AppConstants = {
     INCORRECT_SOLUTION: 'The current solution does not lead to another card.',
     UNRESOLVED_ANSWER:
       'There is an answer among the top 10 which has no explicit feedback.',
-    INVALID_REDIRECTION: 'Learner should not be directed back by more than' +
-      ' 3 cards in the lesson.'
+    INVALID_REDIRECTION:
+      'Learner should not be directed back by more than' +
+      ' 3 cards in the lesson.',
   },
 
   CHECKPOINT_ERROR_MESSAGES: {
@@ -84,7 +85,7 @@ export const AppConstants = {
       'Checkpoints are not allowed on the last card of the lesson.',
     CHECKPOINT_COUNT: 'Only a maximum of 8 checkpoints are allowed per lesson.',
     BYPASSABLE_CARD:
-      'Checkpoints must not be assigned to cards that can be bypassed.'
+      'Checkpoints must not be assigned to cards that can be bypassed.',
   },
 
   EXPLORATION_SUMMARY_DATA_URL_TEMPLATE: '/explorationsummarieshandler/data',
@@ -101,8 +102,8 @@ export const AppConstants = {
   // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
   ENABLE_ML_CLASSIFIERS: false,
   // Feature still in development.
-  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION: (
-    'The current solution does not lead to another card.'),
+  INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION:
+    'The current solution does not lead to another card.',
   PARAMETER_TYPES: {
     REAL: 'Real',
     UNICODE_STRING: 'UnicodeString',
@@ -113,7 +114,7 @@ export const AppConstants = {
   DEST_IF_REALLY_STUCK_FEAT_ENABLED: false,
 
   INTERACTION_NAMES: {
-    TEXT_INPUT: 'TextInput'
+    TEXT_INPUT: 'TextInput',
   },
 
   // The maximum number of nodes to show in a row of the state graph.
@@ -172,12 +173,11 @@ export const AppConstants = {
 
   // TODO(vojtechjelinek): Move these to separate file later, after we establish
   // process to follow for Angular constants (#6731).
-  SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE: (
-    '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>'),
+  SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE:
+    '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>',
   // This should be synchronized with SUBTOPIC_MASTERY_DATA_URL
   // in feconf.
-  SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: (
-    '/subtopic_mastery_handler/data'),
+  SUBTOPIC_MASTERY_DATA_URL_TEMPLATE: '/subtopic_mastery_handler/data',
   EDITABLE_TOPIC_DATA_URL_TEMPLATE: '/topic_editor_handler/data/<topic_id>',
 
   LABEL_FOR_CLEARING_FOCUS: 'labelForClearingFocus',
@@ -196,20 +196,19 @@ export const AppConstants = {
   },
 
   AUDIO_UPLOAD_URL_TEMPLATE: '/createhandler/audioupload/<exploration_id>',
-  IMAGE_UPLOAD_URL_TEMPLATE: (
-    '/createhandler/imageupload/<entity_type>/<entity_id>'),
+  IMAGE_UPLOAD_URL_TEMPLATE:
+    '/createhandler/imageupload/<entity_type>/<entity_id>',
 
   MAX_NUM_AUDIO_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,
   MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY: 3,
 
   IMAGE_CONTEXT: {
     EXPLORATION_SUGGESTIONS: 'exploration_suggestions',
-    QUESTION_SUGGESTIONS: 'question_suggestions'
+    QUESTION_SUGGESTIONS: 'question_suggestions',
   },
 
   IMAGE_SAVE_DESTINATION_SERVER: 'imageSaveDestinationServer',
-  IMAGE_SAVE_DESTINATION_LOCAL_STORAGE:
-    'imageSaveDestinationLocalStorage',
+  IMAGE_SAVE_DESTINATION_LOCAL_STORAGE: 'imageSaveDestinationLocalStorage',
   SVG_MIME_TYPE: 'data:image/svg+xml',
 
   CONTRIBUTION_STATS_TYPE_TRANSLATION: 'translation',
@@ -220,20 +219,20 @@ export const AppConstants = {
   CONTRIBUTION_STATS_TYPES: {
     TRANSLATION_CONTRIBUTION: {
       NAME: 'translationContribution',
-      DISPLAY_NAME: 'Translation Contributions'
+      DISPLAY_NAME: 'Translation Contributions',
     },
     TRANSLATION_REVIEW: {
       NAME: 'translationReview',
-      DISPLAY_NAME: 'Translation Reviews'
+      DISPLAY_NAME: 'Translation Reviews',
     },
     QUESTION_CONTRIBUTION: {
       NAME: 'questionContribution',
-      DISPLAY_NAME: 'Question Contributions'
+      DISPLAY_NAME: 'Question Contributions',
     },
     QUESTION_REVIEW: {
       NAME: 'questionReview',
-      DISPLAY_NAME: 'Question Reviews'
-    }
+      DISPLAY_NAME: 'Question Reviews',
+    },
   },
   CONTRIBUTOR_BADGE_INITIAL_LEVELS: [1, 10, 20, 50, 100, 200, 300, 400, 500],
   CONTRIBUTOR_CERTIFICATE_LOGO:

@@ -16,7 +16,7 @@
  * @fileoverview Component for the end chapter celebration check mark component.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-end-chapter-check-mark',

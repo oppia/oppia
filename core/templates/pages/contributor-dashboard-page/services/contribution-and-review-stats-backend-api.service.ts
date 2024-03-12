@@ -17,21 +17,21 @@
  * and review stats.
  */
 
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContributorStatsSummaryBackendDict } from './contribution-and-review-stats.service';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContributorStatsSummaryBackendDict} from './contribution-and-review-stats.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContributionAndReviewStatsBackendApiService {
-  private CONTRIBUTOR_STATS_SUMMARIES_URL = (
+  private CONTRIBUTOR_STATS_SUMMARIES_URL =
     '/contributorstatssummaries/<contribution_type>/<contribution_subtype>' +
-    '/<username>');
+    '/<username>';
 
-  private CONTRIBUTOR_ALL_STATS_SUMMARIES_URL = (
-    '/contributorallstatssummaries/<username>');
+  private CONTRIBUTOR_ALL_STATS_SUMMARIES_URL =
+    '/contributorallstatssummaries/<username>';
 
   constructor(
     private http: HttpClient,
@@ -39,24 +39,28 @@ export class ContributionAndReviewStatsBackendApiService {
   ) {}
 
   async fetchContributionAndReviewStatsAsync(
-      contributionType: string,
-      contributionSubtype: string,
-      username: string): Promise<ContributorStatsSummaryBackendDict> {
+    contributionType: string,
+    contributionSubtype: string,
+    username: string
+  ): Promise<ContributorStatsSummaryBackendDict> {
     const url = this.urlInterpolationService.interpolateUrl(
-      this.CONTRIBUTOR_STATS_SUMMARIES_URL, {
+      this.CONTRIBUTOR_STATS_SUMMARIES_URL,
+      {
         contribution_type: contributionType,
         contribution_subtype: contributionSubtype,
-        username: username
+        username: username,
       }
     );
     return this.http.get<ContributorStatsSummaryBackendDict>(url).toPromise();
   }
 
   async fetchAllContributionAndReviewStatsAsync(
-      username: string): Promise<ContributorStatsSummaryBackendDict> {
+    username: string
+  ): Promise<ContributorStatsSummaryBackendDict> {
     const url = this.urlInterpolationService.interpolateUrl(
-      this.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL, {
-        username: username
+      this.CONTRIBUTOR_ALL_STATS_SUMMARIES_URL,
+      {
+        username: username,
       }
     );
     return this.http.get<ContributorStatsSummaryBackendDict>(url).toPromise();

@@ -18,17 +18,17 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { GraphVizComponent } from './directives/graph-viz.component';
-import { InteractiveGraphInput } from './directives/oppia-interactive-graph-input.component';
-import { ResponseGraphInput } from './directives/oppia-response-graph-input.component';
-import { ShortResponseGraphInput } from './directives/oppia-short-response-graph-input.component';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { TranslateModule } from '@ngx-translate/core';
-import { MaterialModule } from 'modules/material.module';
-import { DirectivesModule } from 'directives/directives.module';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {GraphVizComponent} from './directives/graph-viz.component';
+import {InteractiveGraphInput} from './directives/oppia-interactive-graph-input.component';
+import {ResponseGraphInput} from './directives/oppia-response-graph-input.component';
+import {ShortResponseGraphInput} from './directives/oppia-short-response-graph-input.component';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {MaterialModule} from 'modules/material.module';
+import {DirectivesModule} from 'directives/directives.module';
 
 @NgModule({
   imports: [
@@ -37,26 +37,25 @@ import { DirectivesModule } from 'directives/directives.module';
     MaterialModule,
     DirectivesModule,
     SharedPipesModule,
-    TranslateModule
+    TranslateModule,
   ],
   declarations: [
     InteractiveGraphInput,
     GraphVizComponent,
     ResponseGraphInput,
-    ShortResponseGraphInput
+    ShortResponseGraphInput,
   ],
   entryComponents: [
     InteractiveGraphInput,
     GraphVizComponent,
     ResponseGraphInput,
-    ShortResponseGraphInput
+    ShortResponseGraphInput,
   ],
   exports: [
     InteractiveGraphInput,
     GraphVizComponent,
     ResponseGraphInput,
-    ShortResponseGraphInput
+    ShortResponseGraphInput,
   ],
 })
-
-export class GraphInputInteractionModule { }
+export class GraphInputInteractionModule {}

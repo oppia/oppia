@@ -19,18 +19,18 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillRights } from 'domain/skill/skill-rights.model';
-import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
-import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { AlertsService } from 'services/alerts.service';
-import { QuestionsListService } from 'services/questions-list.service';
-import { LoaderService } from 'services/loader.service';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {SkillRights} from 'domain/skill/skill-rights.model';
+import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
+import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {AlertsService} from 'services/alerts.service';
+import {QuestionsListService} from 'services/questions-list.service';
+import {LoaderService} from 'services/loader.service';
 
 export interface AssignedSkillTopicData {
   [topicName: string]: string;
@@ -47,7 +47,7 @@ export interface GroupedSkillSummaries {
   others: SkillSummaryBackendDict[];
 }
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkillEditorStateService {
   constructor(
@@ -56,7 +56,7 @@ export class SkillEditorStateService {
     private skillBackendApiService: SkillBackendApiService,
     private skillRightsBackendApiService: SkillRightsBackendApiService,
     private loaderService: LoaderService,
-    private undoRedoService: UndoRedoService,
+    private undoRedoService: UndoRedoService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -70,7 +70,7 @@ export class SkillEditorStateService {
   private _skillIsBeingSaved: boolean = false;
   private _groupedSkillSummaries: GroupedSkillSummaries = {
     current: [],
-    others: []
+    others: [],
   };
 
   private _skillChangedEventEmitter = new EventEmitter();
@@ -94,7 +94,7 @@ export class SkillEditorStateService {
   };
 
   private _updateGroupedSkillSummaries = (
-      groupedSkillSummaries: GroupedSkillSummaryDictionaries
+    groupedSkillSummaries: GroupedSkillSummaryDictionaries
   ) => {
     let topicName = null;
     this._groupedSkillSummaries.current = [];
@@ -115,7 +115,8 @@ export class SkillEditorStateService {
     if (topicName !== null) {
       for (let idx in groupedSkillSummaries[topicName]) {
         this._groupedSkillSummaries.current.push(
-          groupedSkillSummaries[topicName][idx]);
+          groupedSkillSummaries[topicName][idx]
+        );
       }
     }
     for (let name in groupedSkillSummaries) {
@@ -154,25 +155,30 @@ export class SkillEditorStateService {
     this._skillIsBeingLoaded = true;
     this.loaderService.showLoadingScreen('Loading Skill Editor');
     let skillDataPromise = this.skillBackendApiService.fetchSkillAsync(skillId);
-    let skillRightsPromise = (
-      this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId));
+    let skillRightsPromise =
+      this.skillRightsBackendApiService.fetchSkillRightsAsync(skillId);
     Promise.all([skillDataPromise, skillRightsPromise]).then(
       ([newBackendSkillObject, newSkillRightsObject]) => {
         this._updateSkillRights(newSkillRightsObject);
-        this._assignedSkillTopicData = (
-          newBackendSkillObject.assignedSkillTopicData);
+        this._assignedSkillTopicData =
+          newBackendSkillObject.assignedSkillTopicData;
         this._updateSkill(newBackendSkillObject.skill);
         this._updateGroupedSkillSummaries(
-          newBackendSkillObject.groupedSkillSummaries);
+          newBackendSkillObject.groupedSkillSummaries
+        );
         this.questionsListService.getQuestionSummariesAsync(
-          skillId, true, false
+          skillId,
+          true,
+          false
         );
         this._skillIsBeingLoaded = false;
         this.loaderService.hideLoadingScreen();
-      }, (error) => {
+      },
+      error => {
         this.alertsService.addWarning(error);
         this._skillIsBeingLoaded = false;
-      });
+      }
+    );
   }
 
   /**
@@ -194,9 +200,9 @@ export class SkillEditorStateService {
   }
 
   /**
-     * Returns whether a skill has yet been loaded using either
-     * loadSkill().
-     */
+   * Returns whether a skill has yet been loaded using either
+   * loadSkill().
+   */
   hasLoadedSkill(): boolean {
     return this._skillIsInitialized;
   }
@@ -222,11 +228,13 @@ export class SkillEditorStateService {
    * shares behavior with setSkill(), when it succeeds.
    */
   saveSkill(
-      commitMessage: string,
-      successCallback: (value?: Object) => void): boolean {
+    commitMessage: string,
+    successCallback: (value?: Object) => void
+  ): boolean {
     if (!this._skillIsInitialized) {
       this.alertsService.fatalWarning(
-        'Cannot save a skill before one is loaded.');
+        'Cannot save a skill before one is loaded.'
+      );
     }
     // Don't attempt to save the skill if there are no changes pending.
     if (!this.undoRedoService.hasChanges()) {
@@ -234,21 +242,29 @@ export class SkillEditorStateService {
     }
     this._skillIsBeingSaved = true;
 
-    this.skillBackendApiService.updateSkillAsync(
-      this._skill.getId(), this._skill.getVersion(), commitMessage,
-      this.undoRedoService.getCommittableChangeList()).then(
-      (skill) => {
-        this._updateSkill(skill);
-        this.undoRedoService.clearChanges();
-        this._skillIsBeingSaved = false;
-        if (successCallback) {
-          successCallback();
+    this.skillBackendApiService
+      .updateSkillAsync(
+        this._skill.getId(),
+        this._skill.getVersion(),
+        commitMessage,
+        this.undoRedoService.getCommittableChangeList()
+      )
+      .then(
+        skill => {
+          this._updateSkill(skill);
+          this.undoRedoService.clearChanges();
+          this._skillIsBeingSaved = false;
+          if (successCallback) {
+            successCallback();
+          }
+        },
+        error => {
+          this.alertsService.addWarning(
+            error || 'There was an error when saving the skill'
+          );
+          this._skillIsBeingSaved = false;
         }
-      }, (error) => {
-        this.alertsService.addWarning(
-          error || 'There was an error when saving the skill');
-        this._skillIsBeingSaved = false;
-      });
+      );
     return true;
   }
 
@@ -266,18 +282,23 @@ export class SkillEditorStateService {
    * for that variable.
    */
   updateExistenceOfSkillDescription(
-      description: string,
-      successCallback: (skillDescriptionExists: boolean) => void): void {
-    this.skillBackendApiService.doesSkillWithDescriptionExistAsync(
-      description).then(
-      (skillDescriptionExists) => {
-        successCallback(skillDescriptionExists);
-      }, (error) => {
-        this.alertsService.addWarning(
-          error ||
-          'There was an error when checking if the skill description ' +
-          'exists for another skill.');
-      });
+    description: string,
+    successCallback: (skillDescriptionExists: boolean) => void
+  ): void {
+    this.skillBackendApiService
+      .doesSkillWithDescriptionExistAsync(description)
+      .then(
+        skillDescriptionExists => {
+          successCallback(skillDescriptionExists);
+        },
+        error => {
+          this.alertsService.addWarning(
+            error ||
+              'There was an error when checking if the skill description ' +
+                'exists for another skill.'
+          );
+        }
+      );
   }
 
   get onSkillChange(): EventEmitter<string> {
@@ -297,5 +318,9 @@ export class SkillEditorStateService {
   }
 }
 
-angular.module('oppia').factory('SkillEditorStateService',
-  downgradeInjectable(SkillEditorStateService));
+angular
+  .module('oppia')
+  .factory(
+    'SkillEditorStateService',
+    downgradeInjectable(SkillEditorStateService)
+  );

@@ -17,11 +17,11 @@
  *               ck editor
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, EventEmitter } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable, EventEmitter} from '@angular/core';
 
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { Subscription } from 'rxjs';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {Subscription} from 'rxjs';
 
 interface CkEditorCopyEvent {
   rootElement?: HTMLElement;
@@ -29,7 +29,7 @@ interface CkEditorCopyEvent {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CkEditorCopyContentService {
   private readonly OUTPUT_VIEW_TAG_NAME = 'ANGULAR-HTML-BIND';
@@ -42,7 +42,7 @@ export class CkEditorCopyContentService {
     'oppia-noninteractive-math',
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-video',
-    'oppia-noninteractive-skillreview'
+    'oppia-noninteractive-skillreview',
   ]);
 
   private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
@@ -98,16 +98,18 @@ export class CkEditorCopyContentService {
 
       descendants = [
         ...descendants,
-        ...Array.from(currentDescendant.childNodes)
+        ...Array.from(currentDescendant.childNodes),
       ];
     }
 
-    if (containedWidgetTagName &&
-        !this.ALLOWLISTED_WIDGETS.has(containedWidgetTagName)) {
+    if (
+      containedWidgetTagName &&
+      !this.ALLOWLISTED_WIDGETS.has(containedWidgetTagName)
+    ) {
       return {};
     }
 
-    return { rootElement: currentElement, containedWidgetTagName };
+    return {rootElement: currentElement, containedWidgetTagName};
   }
 
   /**
@@ -120,12 +122,12 @@ export class CkEditorCopyContentService {
    *  in which element contains, if present.
    */
   private _handlePaste(
-      editor: CKEDITOR.editor,
-      element: HTMLElement,
-      containedWidgetTagName: string | undefined
+    editor: CKEDITOR.editor,
+    element: HTMLElement,
+    containedWidgetTagName: string | undefined
   ) {
-    let elementTagName = (
-      containedWidgetTagName || element.tagName.toLowerCase());
+    let elementTagName =
+      containedWidgetTagName || element.tagName.toLowerCase();
     let html = element.outerHTML;
     html = html.replace(/<!--[^>]*-->/g, '').trim();
     if (!containedWidgetTagName) {
@@ -162,11 +164,12 @@ export class CkEditorCopyContentService {
         const value = match[3].replace(/&amp;/g, '&');
 
         startupData[key] = JSON.parse(
-          this.htmlEscaperService.escapedStrToUnescapedStr(value));
+          this.htmlEscaperService.escapedStrToUnescapedStr(value)
+        );
       }
       startupData.isCopied = true;
 
-      editor.execCommand(widgetName, { startupData });
+      editor.execCommand(widgetName, {startupData});
     }
   }
 
@@ -183,9 +186,7 @@ export class CkEditorCopyContentService {
       return;
     }
 
-    this.copyEventEmitter.emit(
-      this._handleCopy(target)
-    );
+    this.copyEventEmitter.emit(this._handleCopy(target));
   }
 
   /**
@@ -203,14 +204,15 @@ export class CkEditorCopyContentService {
           delete this.ckEditorIdToSubscription[editor.id];
           return;
         }
-        this._handlePaste(
-          editor, rootElement, containedWidgetTagName);
+        this._handlePaste(editor, rootElement, containedWidgetTagName);
       }
     );
   }
 }
 
-angular.module('oppia').factory(
-  'CkEditorCopyContentService',
-  downgradeInjectable(CkEditorCopyContentService)
-);
+angular
+  .module('oppia')
+  .factory(
+    'CkEditorCopyContentService',
+    downgradeInjectable(CkEditorCopyContentService)
+  );

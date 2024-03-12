@@ -23,31 +23,34 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'Lint check to ensure that all directives have an explicit Scope: {}' +
-        ' and scope should not be set to true'),
+        ' and scope should not be set to true',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      incorrectScopeType: (
-        'Please ensure that directive in file has a scope: {}.'),
-      trueScope: (
-        'Please ensure that directive in file does not have scope set to true.')
+      incorrectScopeType:
+        'Please ensure that directive in file has a scope: {}.',
+      trueScope:
+        'Please ensure that directive in file does not have scope set to true.',
     },
   },
 
-  create: function(context) {
-    var selector = 'CallExpression[callee.object.callee.object.name=angular]' +
-    '[callee.object.callee.property.name=module]' +
-    '[callee.property.name=directive]';
+  create: function (context) {
+    var selector =
+      'CallExpression[callee.object.callee.object.name=angular]' +
+      '[callee.object.callee.property.name=module]' +
+      '[callee.property.name=directive]';
 
     return {
-      [selector]: function(node) {
-        if (node.arguments.length !== 2 ||
-          node.arguments[1].type !== 'ArrayExpression') {
+      [selector]: function (node) {
+        if (
+          node.arguments.length !== 2 ||
+          node.arguments[1].type !== 'ArrayExpression'
+        ) {
           return;
         }
         var controllerFunctionNode = node.arguments[1].elements.slice(-1)[0];
@@ -57,32 +60,34 @@ module.exports = {
         if (controllerFunctionNode.body.body[0].type !== 'ReturnStatement') {
           return;
         }
-        if (controllerFunctionNode.body.body[0].argument.type !== (
-          'ObjectExpression')) {
+        if (
+          controllerFunctionNode.body.body[0].argument.type !==
+          'ObjectExpression'
+        ) {
           return;
         }
-        var returnDictProperties = (
-          controllerFunctionNode.body.body[0].argument.properties);
+        var returnDictProperties =
+          controllerFunctionNode.body.body[0].argument.properties;
 
-        returnDictProperties.forEach(function(property) {
+        returnDictProperties.forEach(function (property) {
           if (property.key.name !== 'scope') {
             return;
           }
           if (property.value.raw === 'true') {
             context.report({
               node: node,
-              messageId: 'trueScope'
+              messageId: 'trueScope',
             });
             return;
           }
           if (property.value.type !== 'ObjectExpression') {
             context.report({
               node: node,
-              messageId: 'incorrectScopeType'
+              messageId: 'incorrectScopeType',
             });
           }
         });
-      }
+      },
     };
-  }
+  },
 };

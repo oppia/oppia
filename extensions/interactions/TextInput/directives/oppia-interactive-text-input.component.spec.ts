@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the TextInput interaction.
  */
 
-import { NO_ERRORS_SCHEMA, ChangeDetectorRef } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
-import { InteractionAnswer, TextInputAnswer } from 'interactions/answer-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { InteractiveTextInputComponent } from './oppia-interactive-text-input.component';
+import {NO_ERRORS_SCHEMA, ChangeDetectorRef} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
+import {InteractionAnswer, TextInputAnswer} from 'interactions/answer-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {InteractiveTextInputComponent} from './oppia-interactive-text-input.component';
 
 describe('InteractiveTextInputComponent', () => {
   let component: InteractiveTextInputComponent;
@@ -32,34 +32,39 @@ describe('InteractiveTextInputComponent', () => {
 
   class mockInteractionAttributesExtractorService {
     getValuesFromAttributes(
-        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+      interactionId: InteractionSpecsKey,
+      attributes: Record<string, string>
     ) {
       return {
         placeholder: {
           value: {
-            unicode: attributes.placeholderWithValue
-          }
+            unicode: attributes.placeholderWithValue,
+          },
         },
         rows: {
-          value: attributes.rowsWithValue
+          value: attributes.rowsWithValue,
         },
         catchMisspellings: {
-          value: attributes.catchMisspellingsWithValue
-        }
+          value: attributes.catchMisspellingsWithValue,
+        },
       };
     }
   }
 
   let mockCurrentInteractionService = {
     onSubmit: (
-        answer: TextInputAnswer, rulesService: CurrentInteractionService) => {},
+      answer: TextInputAnswer,
+      rulesService: CurrentInteractionService
+    ) => {},
     updateCurrentAnswer: (answer: InteractionAnswer): void => {},
     showNoResponseError: (): boolean => false,
     registerCurrentInteraction: (
-        submitAnswer: Function, validateExpressionFn: Function) => {
+      submitAnswer: Function,
+      validateExpressionFn: Function
+    ) => {
       submitAnswer();
       validateExpressionFn();
-    }
+    },
   };
 
   beforeEach(async(() => {
@@ -70,20 +75,20 @@ describe('InteractiveTextInputComponent', () => {
           useDefaultLang: true,
           isolate: false,
           extend: false,
-          defaultLanguage: 'en'
-        })
+          defaultLanguage: 'en',
+        }),
       ],
       providers: [
         {
           provide: InteractionAttributesExtractorService,
-          useClass: mockInteractionAttributesExtractorService
+          useClass: mockInteractionAttributesExtractorService,
         },
         {
           provide: CurrentInteractionService,
-          useValue: mockCurrentInteractionService
-        }
+          useValue: mockCurrentInteractionService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -98,8 +103,10 @@ describe('InteractiveTextInputComponent', () => {
   });
 
   it('should initialise when the user saves the interaction', () => {
-    spyOn(currentInteractionService, 'registerCurrentInteraction')
-      .and.callThrough();
+    spyOn(
+      currentInteractionService,
+      'registerCurrentInteraction'
+    ).and.callThrough();
     component.labelForFocusTarget = 'label';
 
     component.ngOnInit();
@@ -114,23 +121,23 @@ describe('InteractiveTextInputComponent', () => {
       ui_config: {
         rows: '2',
         placeholder: 'Placeholder text',
-        catchMisspellings: 'false'
-      }
+        catchMisspellings: 'false',
+      },
     });
     // We cannot test what functions are exactly passed since anonymous
     // functions are passed as arguments in registerCurrentInteraction.
-    expect(currentInteractionService.registerCurrentInteraction)
-      .toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function));
+    expect(
+      currentInteractionService.registerCurrentInteraction
+    ).toHaveBeenCalledWith(jasmine.any(Function), jasmine.any(Function));
   });
 
-  it('should save solution when user saves solution for the interaction',
-    () => {
-      component.savedSolution = 'saved solution';
+  it('should save solution when user saves solution for the interaction', () => {
+    component.savedSolution = 'saved solution';
 
-      component.ngOnInit();
+    component.ngOnInit();
 
-      expect(component.answer).toBe('saved solution');
-    });
+    expect(component.answer).toBe('saved solution');
+  });
 
   it('should return schema when called', () => {
     component.schema = {
@@ -138,8 +145,8 @@ describe('InteractiveTextInputComponent', () => {
       ui_config: {
         rows: 2,
         placeholder: 'Placeholder text',
-        catchMisspellings: false
-      }
+        catchMisspellings: false,
+      },
     };
 
     expect(component.getSchema()).toEqual({
@@ -147,8 +154,8 @@ describe('InteractiveTextInputComponent', () => {
       ui_config: {
         rows: 2,
         placeholder: 'Placeholder text',
-        catchMisspellings: false
-      }
+        catchMisspellings: false,
+      },
     });
   });
 
@@ -168,8 +175,9 @@ describe('InteractiveTextInputComponent', () => {
 
   it('should not submit answer when user does not submit any answer', () => {
     spyOn(currentInteractionService, 'onSubmit');
-    spyOn(
-      currentInteractionService, 'showNoResponseError').and.returnValue(false);
+    spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
+      false
+    );
 
     component.submitAnswer('');
 
@@ -179,21 +187,25 @@ describe('InteractiveTextInputComponent', () => {
 
   it('should not submit answer and display error when answer is empty', () => {
     spyOn(currentInteractionService, 'onSubmit');
-    spyOn(
-      currentInteractionService, 'showNoResponseError').and.returnValue(true);
+    spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
+      true
+    );
 
     component.submitAnswer('');
 
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
     expect(component.errorMessageI18nKey).toEqual(
-      'I18N_INTERACTIONS_INPUT_NO_RESPONSE');
+      'I18N_INTERACTIONS_INPUT_NO_RESPONSE'
+    );
   });
 
   it('should update answer and reset error when user types answer', () => {
     const changeDetectorRef =
-    fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     spyOn(currentInteractionService, 'updateCurrentAnswer');
     component.answer = '';
     component.errorMessageI18nKey = 'Some error';
@@ -203,16 +215,18 @@ describe('InteractiveTextInputComponent', () => {
     expect(component.answer).toBe('answers');
     expect(detectChangesSpy).toHaveBeenCalled();
     expect(
-      currentInteractionService.updateCurrentAnswer).toHaveBeenCalledOnceWith(
-      'answers');
+      currentInteractionService.updateCurrentAnswer
+    ).toHaveBeenCalledOnceWith('answers');
     expect(component.errorMessageI18nKey).toEqual('');
   });
 
   it('should not update answer if the users answer does not change', () => {
     const changeDetectorRef =
-    fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     component.answer = 'answers';
 
     component.updateAnswer('answers');

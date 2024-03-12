@@ -16,13 +16,19 @@
  * @fileoverview Unit tests for QuestionPlayerConceptCardModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { QuestionPlayerConceptCardModalComponent } from './question-player-concept-card-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {QuestionPlayerConceptCardModalComponent} from './question-player-concept-card-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -52,33 +58,31 @@ describe('Question Player Concept Card Modal component', () => {
   let mockWindow = {
     nativeWindow: {
       location: {
-        replace: jasmine.createSpy('replace')
-      }
-    }
+        replace: jasmine.createSpy('replace'),
+      },
+    },
   };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        QuestionPlayerConceptCardModalComponent
-      ],
+      declarations: [QuestionPlayerConceptCardModalComponent],
       providers: [
         SkillObjectFactory,
         UrlService,
         {
           provide: UrlService,
-          useClass: MockUrlService
+          useClass: MockUrlService,
         },
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: WindowRef,
-          useValue: mockWindow
-        }
+          useValue: mockWindow,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -91,30 +95,32 @@ describe('Question Player Concept Card Modal component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after controller is initialized',
-    () => {
-      component.skills = ['name1', 'name2'];
-      component.ngOnInit();
-
-      expect(component.index).toBe(0);
-      expect(component.modalHeader).toEqual('name1');
-    });
-
-  it('should go to next concept card, and identify when it is the last' +
-    ' concept card.', fakeAsync(() => {
-    component.index = 1;
+  it('should initialize component properties after controller is initialized', () => {
     component.skills = ['name1', 'name2'];
+    component.ngOnInit();
 
-    component.goToNextConceptCard();
-    tick();
+    expect(component.index).toBe(0);
+    expect(component.modalHeader).toEqual('name1');
+  });
 
-    expect(component.index).toEqual(2);
-    expect(component.isLastConceptCard()).toBe(false);
-  }));
+  it(
+    'should go to next concept card, and identify when it is the last' +
+      ' concept card.',
+    fakeAsync(() => {
+      component.index = 1;
+      component.skills = ['name1', 'name2'];
+
+      component.goToNextConceptCard();
+      tick();
+
+      expect(component.index).toEqual(2);
+      expect(component.isLastConceptCard()).toBe(false);
+    })
+  );
 
   it('should refresh page when retrying a practice test', () => {
     spyOn(urlService, 'getUrlParams').and.returnValue({
-      selected_subtopic_ids: 'selected_subtopic_ids'
+      selected_subtopic_ids: 'selected_subtopic_ids',
     });
     spyOn(urlService, 'getPathname').and.returnValue('pathName');
 

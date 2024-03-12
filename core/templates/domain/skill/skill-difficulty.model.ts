@@ -34,7 +34,10 @@ export class SkillDifficulty {
   }
 
   static create(
-      id: string, description: string, difficulty: number): SkillDifficulty {
+    id: string,
+    description: string,
+    difficulty: number
+  ): SkillDifficulty {
     return new SkillDifficulty(id, description, difficulty);
   }
 

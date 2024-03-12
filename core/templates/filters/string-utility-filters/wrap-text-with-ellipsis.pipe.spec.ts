@@ -16,18 +16,16 @@
  * @fileoverview Tests for the WrapTextWithEllipsisPipe for Oppia.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { WrapTextWithEllipsisPipe } from
-  'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let wrapTextWithEllipsis: WrapTextWithEllipsisPipe;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [WrapTextWithEllipsisPipe, NormalizeWhitespacePipe]
+      providers: [WrapTextWithEllipsisPipe, NormalizeWhitespacePipe],
     });
 
     wrapTextWithEllipsis = TestBed.get(WrapTextWithEllipsisPipe);
@@ -40,17 +38,20 @@ describe('Testing filters', function() {
     expect(wrapTextWithEllipsis.transform('testing', 3)).toEqual('...');
     expect(wrapTextWithEllipsis.transform('testing', 4)).toEqual('t...');
     expect(wrapTextWithEllipsis.transform('testing', 7)).toEqual('testing');
-    expect(wrapTextWithEllipsis.transform(
-      'Long sentence which goes on and on.', 80)).toEqual(
-      'Long sentence which goes on and on.');
-    expect(wrapTextWithEllipsis.transform(
-      'Long sentence which goes on and on.', 20)).toEqual(
-      'Long sentence whi...');
-    expect(wrapTextWithEllipsis.transform(
-      'Sentence     with     long     spacing.', 20)).toEqual(
-      'Sentence with lon...');
-    expect(wrapTextWithEllipsis.transform(
-      'With space before ellipsis.', 21)).toEqual(
-      'With space before...');
+    expect(
+      wrapTextWithEllipsis.transform('Long sentence which goes on and on.', 80)
+    ).toEqual('Long sentence which goes on and on.');
+    expect(
+      wrapTextWithEllipsis.transform('Long sentence which goes on and on.', 20)
+    ).toEqual('Long sentence whi...');
+    expect(
+      wrapTextWithEllipsis.transform(
+        'Sentence     with     long     spacing.',
+        20
+      )
+    ).toEqual('Sentence with lon...');
+    expect(
+      wrapTextWithEllipsis.transform('With space before ellipsis.', 21)
+    ).toEqual('With space before...');
   });
 });

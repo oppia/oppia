@@ -16,16 +16,20 @@
  * @fileoverview Unit tests for blog admin navbar component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {RouterModule} from '@angular/router';
+import {APP_BASE_HREF} from '@angular/common';
 
-import { UserService } from 'services/user.service';
-import { BlogAdminNavbarComponent } from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { UserInfo } from 'domain/user/user-info.model';
-
+import {UserService} from 'services/user.service';
+import {BlogAdminNavbarComponent} from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {UserInfo} from 'domain/user/user-info.model';
 
 describe('Blog Admin navbar component', () => {
   let component: BlogAdminNavbarComponent;
@@ -34,7 +38,7 @@ describe('Blog Admin navbar component', () => {
   let userProfileWebpImage = 'path-to-webp-profile-pic';
   let userInfo = {
     getUsername: () => 'username1',
-    isSuperAdmin: () => true
+    isSuperAdmin: () => true,
   };
   let profileUrl = '/profile/username1';
   let fixture: ComponentFixture<BlogAdminNavbarComponent>;
@@ -45,13 +49,15 @@ describe('Blog Admin navbar component', () => {
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
         SmartRouterModule,
-        RouterModule.forRoot([])
+        RouterModule.forRoot([]),
       ],
       declarations: [BlogAdminNavbarComponent],
-      providers: [{
-        provide: APP_BASE_HREF,
-        useValue: '/'
-      }]
+      providers: [
+        {
+          provide: APP_BASE_HREF,
+          useValue: '/',
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BlogAdminNavbarComponent);
@@ -59,13 +65,14 @@ describe('Blog Admin navbar component', () => {
     userService = TestBed.inject(UserService);
     fixture.detectChanges();
 
-    spyOn(userService, 'getProfileImageDataUrl')
-      .and.returnValue([userProfilePngImage, userProfileWebpImage]);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      userProfilePngImage,
+      userProfileWebpImage,
+    ]);
   }));
 
   it('should initialize component properties correctly', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -79,10 +86,9 @@ describe('Blog Admin navbar component', () => {
   it('should throw error if username is invalid', fakeAsync(() => {
     let userInfo = {
       getUsername: () => null,
-      isSuperAdmin: () => true
+      isSuperAdmin: () => true,
     };
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     expect(() => {
       component.ngOnInit();
@@ -91,8 +97,7 @@ describe('Blog Admin navbar component', () => {
   }));
 
   it('should set profileDropdownIsActive to true', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -105,8 +110,7 @@ describe('Blog Admin navbar component', () => {
   }));
 
   it('should set profileDropdownIsActive to false', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();

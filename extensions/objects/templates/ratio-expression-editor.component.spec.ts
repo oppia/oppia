@@ -15,10 +15,10 @@
 /**
  * @fileoverview Unit tests for the ratio expression component.
  */
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { RatioExpressionEditorComponent } from './ratio-expression-editor.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {RatioExpressionEditorComponent} from './ratio-expression-editor.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('RatioExpression', () => {
   let component: RatioExpressionEditorComponent;
@@ -26,13 +26,14 @@ describe('RatioExpression', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MockTranslatePipe, RatioExpressionEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
     component = TestBed.createComponent(
-      RatioExpressionEditorComponent).componentInstance;
+      RatioExpressionEditorComponent
+    ).componentInstance;
   }));
 
   it('should initialize @Input() value with a default value', () => {
@@ -46,45 +47,51 @@ describe('RatioExpression', () => {
 
     component.ngOnInit();
     expect(component.value).toEqual([1, 1]);
-    expect(component.localValue).toEqual({ label: '1:1' });
+    expect(component.localValue).toEqual({label: '1:1'});
   });
 
   it('should initialize warningText with non-integer ratio', () => {
     component.isValidRatio('1:1:2.3');
     // For this and other warning texts, the correct translated text is fetched
     // in HTML and so, the key itself is passed around in the ts files.
-    expect(component.warningTextI18nKey)
-      .toBe('I18N_INTERACTIONS_RATIO_NON_INTEGER_ELEMENTS');
+    expect(component.warningTextI18nKey).toBe(
+      'I18N_INTERACTIONS_RATIO_NON_INTEGER_ELEMENTS'
+    );
   });
 
   it('should initialize warningText with invalid ratio', () => {
     component.isValidRatio('1:2:3:');
-    expect(component.warningTextI18nKey)
-      .toBe('I18N_INTERACTIONS_RATIO_INVALID_FORMAT');
+    expect(component.warningTextI18nKey).toBe(
+      'I18N_INTERACTIONS_RATIO_INVALID_FORMAT'
+    );
   });
 
   it('should initialize warningText with invalid character', () => {
     component.isValidRatio('abc');
-    expect(component.warningTextI18nKey)
-      .toBe('I18N_INTERACTIONS_RATIO_INVALID_CHARS');
+    expect(component.warningTextI18nKey).toBe(
+      'I18N_INTERACTIONS_RATIO_INVALID_CHARS'
+    );
   });
 
   it('should initialize warningText with empty ratio', () => {
     component.isValidRatio('');
-    expect(component.warningTextI18nKey)
-      .toBe('I18N_INTERACTIONS_RATIO_EMPTY_STRING');
+    expect(component.warningTextI18nKey).toBe(
+      'I18N_INTERACTIONS_RATIO_EMPTY_STRING'
+    );
   });
 
   it('should initialize warningText with invalid colons', () => {
     component.isValidRatio('1:2::3');
-    expect(component.warningTextI18nKey)
-      .toBe('I18N_INTERACTIONS_RATIO_INVALID_COLONS');
+    expect(component.warningTextI18nKey).toBe(
+      'I18N_INTERACTIONS_RATIO_INVALID_COLONS'
+    );
   });
 
   it('should initialize warningText with invalid zero ratio', () => {
     component.isValidRatio('1:0');
-    expect(component.warningTextI18nKey)
-      .toBe('I18N_INTERACTIONS_RATIO_INCLUDES_ZERO');
+    expect(component.warningTextI18nKey).toBe(
+      'I18N_INTERACTIONS_RATIO_INCLUDES_ZERO'
+    );
   });
 
   it('should return true with a valid value of ratio', () => {

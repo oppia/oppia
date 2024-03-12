@@ -16,13 +16,15 @@
  * @fileoverview Tests for AudioBarStatusService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { AttributionService } from 'services/attribution.service';
-import { ContextService } from 'services/context.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import {AttributionService} from 'services/attribution.service';
+import {ContextService} from 'services/context.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('AttributionService', () => {
   let attributionService: AttributionService;
@@ -32,14 +34,14 @@ describe('AttributionService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     attributionService = TestBed.get(AttributionService);
     contextService = TestBed.get(ContextService);
     csrfService = TestBed.get(CsrfTokenService);
     httpTestingController = TestBed.get(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('simple-csrf-token');
     });
   });
@@ -48,105 +50,118 @@ describe('AttributionService', () => {
     httpTestingController.verify();
   });
 
-  it('should set authors and exploration title correctly',
-    fakeAsync(() => {
-      spyOn(contextService, 'getExplorationId').and.returnValue('0');
-      const explorationIds = ['0'];
-      const sampleResults = {
-        summaries: [{
+  it('should set authors and exploration title correctly', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('0');
+    const explorationIds = ['0'];
+    const sampleResults = {
+      summaries: [
+        {
           title: 'Title 1',
           category: 'Category 1',
           status: 'public',
           language_code: 'en',
           human_readable_contributors_summary: {
-            a: { num_commits: 2 },
-            b: { num_commits: 5 }
-          }
-        }]
-      };
+            a: {num_commits: 2},
+            b: {num_commits: 5},
+          },
+        },
+      ],
+    };
 
-      const requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=true';
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds)) +
+      '&' +
+      'include_private_explorations=true';
 
-      attributionService.init();
-      attributionService.showAttributionModal();
+    attributionService.init();
+    attributionService.showAttributionModal();
 
-      const req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleResults);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResults);
 
-      flushMicrotasks();
-      expect(attributionService.getAuthors()).toEqual(['b', 'a']);
-      expect(attributionService.getExplorationTitle()).toEqual('Title 1');
-      expect(attributionService.isAttributionModalShown()).toBeTrue();
-    }));
+    flushMicrotasks();
+    expect(attributionService.getAuthors()).toEqual(['b', 'a']);
+    expect(attributionService.getExplorationTitle()).toEqual('Title 1');
+    expect(attributionService.isAttributionModalShown()).toBeTrue();
+  }));
 
-  it('should show and hide modal correctly',
-    fakeAsync(() => {
-      spyOn(contextService, 'getExplorationId').and.returnValue('0');
-      const explorationIds = ['0'];
-      const sampleResults = {
-        summaries: [{
+  it('should show and hide modal correctly', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('0');
+    const explorationIds = ['0'];
+    const sampleResults = {
+      summaries: [
+        {
           title: 'Title 1',
           category: 'Category 1',
           status: 'public',
           language_code: 'en',
           human_readable_contributors_summary: {
-            a: { num_commits: 2 },
-            b: { num_commits: 5 }
-          }
-        }]
-      };
+            a: {num_commits: 2},
+            b: {num_commits: 5},
+          },
+        },
+      ],
+    };
 
-      const requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=true';
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds)) +
+      '&' +
+      'include_private_explorations=true';
 
-      attributionService.init();
-      attributionService.showAttributionModal();
+    attributionService.init();
+    attributionService.showAttributionModal();
 
-      const req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleResults);
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleResults);
 
-      flushMicrotasks();
-      expect(attributionService.getAuthors()).toEqual(['b', 'a']);
-      expect(attributionService.getExplorationTitle()).toEqual('Title 1');
-      expect(attributionService.isAttributionModalShown()).toBeTrue();
+    flushMicrotasks();
+    expect(attributionService.getAuthors()).toEqual(['b', 'a']);
+    expect(attributionService.getExplorationTitle()).toEqual('Title 1');
+    expect(attributionService.isAttributionModalShown()).toBeTrue();
 
-      attributionService.hideAttributionModal();
-      expect(attributionService.isAttributionModalShown()).toBeFalse();
+    attributionService.hideAttributionModal();
+    expect(attributionService.isAttributionModalShown()).toBeFalse();
 
-      attributionService.showAttributionModal();
-      expect(attributionService.isAttributionModalShown()).toBeTrue();
-    }));
+    attributionService.showAttributionModal();
+    expect(attributionService.isAttributionModalShown()).toBeTrue();
+  }));
 
-  it('should not initialise fields if backend call fails',
-    fakeAsync(() => {
-      spyOn(contextService, 'getExplorationId').and.returnValue('0');
-      const explorationIds = ['0'];
+  it('should not initialise fields if backend call fails', fakeAsync(() => {
+    spyOn(contextService, 'getExplorationId').and.returnValue('0');
+    const explorationIds = ['0'];
 
-      const requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
-        '&' + 'include_private_explorations=true';
+    const requestUrl =
+      '/explorationsummarieshandler/data?' +
+      'stringified_exp_ids=' +
+      encodeURI(JSON.stringify(explorationIds)) +
+      '&' +
+      'include_private_explorations=true';
 
-      attributionService.init();
+    attributionService.init();
 
-      const req = httpTestingController.expectOne(requestUrl);
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Error fetching data.'
-      }, {
+    const req = httpTestingController.expectOne(requestUrl);
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Error fetching data.',
+      },
+      {
         status: 500,
-        statusText: 'Error fetching data.'
-      });
+        statusText: 'Error fetching data.',
+      }
+    );
 
-      flushMicrotasks();
-      expect(attributionService.isAttributionModalShown()).toBeFalse();
-      expect(attributionService.getAuthors()).toEqual([]);
-      expect(attributionService.getExplorationTitle()).toEqual('');
-    }));
+    flushMicrotasks();
+    expect(attributionService.isAttributionModalShown()).toBeFalse();
+    expect(attributionService.getAuthors()).toEqual([]);
+    expect(attributionService.getExplorationTitle()).toEqual('');
+  }));
 
   it('should allow attribution generation in exp player page', () => {
     spyOn(contextService, 'isInExplorationPlayerPage').and.returnValue(true);

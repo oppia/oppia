@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for storyViewerPageRoot.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { StoryViewerPageRootComponent } from './story-viewer-page-root.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {StoryViewerPageRootComponent} from './story-viewer-page-root.component';
 
 describe('Story Viewer Page Root component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -30,7 +30,7 @@ describe('Story Viewer Page Root component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [StoryViewerPageRootComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(StoryViewerPageRootComponent);
@@ -40,7 +40,8 @@ describe('Story Viewer Page Root component', () => {
   beforeEach(() => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   it('should be defined', () => {

@@ -16,27 +16,33 @@
  * @fileoverview Unit tests for translationTab.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { LoaderService } from 'services/loader.service';
-import { ContextService } from 'services/context.service';
-import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationStatesService } from '../services/exploration-states.service';
-import { RouterService } from '../services/router.service';
-import { StateTutorialFirstTimeService } from '../services/state-tutorial-first-time.service';
-import { TranslationTabComponent } from './translation-tab.component';
-import { ExplorationPermissions } from 'domain/exploration/exploration-permissions.model';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {LoaderService} from 'services/loader.service';
+import {ContextService} from 'services/context.service';
+import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExplorationStatesService} from '../services/exploration-states.service';
+import {RouterService} from '../services/router.service';
+import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
+import {TranslationTabComponent} from './translation-tab.component';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {
   JoyrideDirective,
   JoyrideOptionsService,
   JoyrideService,
   JoyrideStepsContainerService,
-  JoyrideStepService
+  JoyrideStepService,
   // This throws "Object is possibly undefined." The type undefined
   // comes here from ngx joyride dependency. We need to suppress this
   // error because of strict type checking. This error is thrown because
@@ -47,7 +53,7 @@ import {
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -78,9 +84,9 @@ describe('Translation tab component', () => {
     startTour() {
       return {
         subscribe: (
-            value1: (arg0: { number: number }) => void,
-            value2: () => void,
-            value3: () => void
+          value1: (arg0: {number: number}) => void,
+          value2: () => void,
+          value3: () => void
         ) => {
           value1({number: 2});
           value1({number: 4});
@@ -88,7 +94,7 @@ describe('Translation tab component', () => {
           value1({number: 8});
           value2();
           value3();
-        }
+        },
       };
     }
 
@@ -98,26 +104,21 @@ describe('Translation tab component', () => {
   class MockUserExplorationPermissionsService {
     getPermissionsAsync() {
       return Promise.resolve({
-        canVoiceover: true
+        canVoiceover: true,
       } as ExplorationPermissions);
     }
 
     fetchPermissionsAsync() {
       return Promise.resolve({
-        canVoiceover: true
+        canVoiceover: true,
       } as ExplorationPermissions);
     }
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        TranslationTabComponent,
-        JoyrideDirective,
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [TranslationTabComponent, JoyrideDirective],
       providers: [
         JoyrideStepService,
         JoyrideOptionsService,
@@ -137,14 +138,14 @@ describe('Translation tab component', () => {
         },
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         {
           provide: ContextService,
-          useClass: MockContextservice
-        }
+          useClass: MockContextservice,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -156,106 +157,117 @@ describe('Translation tab component', () => {
     loaderService = TestBed.inject(LoaderService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     userExplorationPermissionsService = TestBed.inject(
-      UserExplorationPermissionsService);
+      UserExplorationPermissionsService
+    );
     editabilityService = TestBed.inject(EditabilityService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     routerService = TestBed.inject(RouterService);
     stateEditorService = TestBed.inject(StateEditorService);
     ngbModal = TestBed.inject(NgbModal);
     stateTutorialFirstTimeService = TestBed.inject(
-      StateTutorialFirstTimeService);
+      StateTutorialFirstTimeService
+    );
 
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-      'Introduction');
+      'Introduction'
+    );
     spyOnProperty(
-      stateTutorialFirstTimeService, 'onEnterTranslationForTheFirstTime')
-      .and.returnValue(enterTranslationForTheFirstTimeEmitter);
-    spyOnProperty(routerService, 'onRefreshTranslationTab')
-      .and.returnValue(refreshTranslationTabEmitter);
+      stateTutorialFirstTimeService,
+      'onEnterTranslationForTheFirstTime'
+    ).and.returnValue(enterTranslationForTheFirstTimeEmitter);
+    spyOnProperty(routerService, 'onRefreshTranslationTab').and.returnValue(
+      refreshTranslationTabEmitter
+    );
     let element = document.createElement('div');
-    spyOn(document, 'querySelector').and.returnValue((
-      element as HTMLElement));
+    spyOn(document, 'querySelector').and.returnValue(element as HTMLElement);
 
-    explorationStatesService.init({
-      Introduction: {
-        classifier_model_id: null,
-        card_is_checkpoint: false,
-        content: {
-          content_id: 'content',
-          html: 'Introduction Content'
-        },
-        interaction: {
-          confirmed_unclassified_answers: [],
-          id: 'TextInput',
-          customization_args: {
-            placeholder: {value: {
-              content_id: 'ca_placeholder',
-              unicode_str: ''
-            }},
-            rows: {value: 1},
-            catchMisspellings: {
-              value: false
-            }
+    explorationStatesService.init(
+      {
+        Introduction: {
+          classifier_model_id: null,
+          card_is_checkpoint: false,
+          content: {
+            content_id: 'content',
+            html: 'Introduction Content',
           },
-          answer_groups: [{
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: null,
-            outcome: {
+          interaction: {
+            confirmed_unclassified_answers: [],
+            id: 'TextInput',
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder',
+                  unicode_str: '',
+                },
+              },
+              rows: {value: 1},
+              catchMisspellings: {
+                value: false,
+              },
+            },
+            answer_groups: [
+              {
+                rule_specs: [],
+                training_data: [],
+                tagged_skill_misconception_id: null,
+                outcome: {
+                  missing_prerequisite_skill_id: null,
+                  dest: 'unused',
+                  dest_if_really_stuck: null,
+                  feedback: {
+                    content_id: 'feedback_1',
+                    html: '',
+                  },
+                  labelled_as_correct: false,
+                  param_changes: [],
+                  refresher_exploration_id: null,
+                },
+              },
+            ],
+            default_outcome: {
               missing_prerequisite_skill_id: null,
-              dest: 'unused',
+              dest: 'default',
               dest_if_really_stuck: null,
               feedback: {
-                content_id: 'feedback_1',
-                html: ''
+                content_id: 'default_outcome',
+                html: '',
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
-            }
-          }],
-          default_outcome: {
-            missing_prerequisite_skill_id: null,
-            dest: 'default',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
+              refresher_exploration_id: null,
             },
-            labelled_as_correct: false,
-            param_changes: [],
-            refresher_exploration_id: null
+            solution: {
+              correct_answer: 'This is the correct answer',
+              answer_is_exclusive: false,
+              explanation: {
+                html: 'Solution explanation',
+                content_id: 'content_4',
+              },
+            },
+            hints: [],
           },
-          solution: {
-            correct_answer: 'This is the correct answer',
-            answer_is_exclusive: false,
-            explanation: {
-              html: 'Solution explanation',
-              content_id: 'content_4'
-            }
+          linked_skill_id: null,
+          param_changes: [],
+          solicit_answer_details: false,
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {
+                en: {
+                  filename: 'myfile2.mp3',
+                  file_size_bytes: 120000,
+                  needs_update: false,
+                  duration_secs: 1.2,
+                },
+              },
+            },
           },
-          hints: []
         },
-        linked_skill_id: null,
-        param_changes: [],
-        solicit_answer_details: false,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {
-              en: {
-                filename: 'myfile2.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2
-              }
-            }
-          }
-        }
-      }
-    }, false);
+      },
+      false
+    );
     fixture.detectChanges();
   });
 
@@ -263,84 +275,109 @@ describe('Translation tab component', () => {
     component.ngOnDestroy();
   });
 
-  it('should initialize component properties after controller is initialized',
-    () => {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue(Promise.resolve({
-          canVoiceover: true
-        } as ExplorationPermissions));
-
-      component.ngOnInit();
-
-      expect(component.isTranslationTabBusy).toBe(false);
-      expect(component.showTranslationTabSubDirectives).toBe(false);
-      expect(component.tutorialInProgress).toBe(false);
-    });
-
-  it('should load translation tab data when translation tab page is' +
-    ' refreshed', fakeAsync(() => {
-    spyOn(loaderService, 'hideLoadingScreen');
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue(Promise.resolve({
-        canVoiceover: true
-      } as ExplorationPermissions));
+  it('should initialize component properties after controller is initialized', () => {
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        canVoiceover: true,
+      } as ExplorationPermissions)
+    );
 
     component.ngOnInit();
-    tick();
 
-    refreshTranslationTabEmitter.emit();
-    tick();
-
-    expect(component.showTranslationTabSubDirectives).toBe(true);
-    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-  }));
-
-  it('should start tutorial if in tutorial mode on page load with' +
-    ' permissions', fakeAsync(() => {
-    component.permissions = {
-      canVoiceover: true
-    };
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue(Promise.resolve({
-        canVoiceover: true
-      } as ExplorationPermissions));
-
-    spyOn(component, 'startTutorial').and.callThrough();
-
-    editabilityService.onStartTutorial();
-    component.ngOnInit();
-    component.initTranslationTab();
-    component.startTutorial();
-
-
-    expect(editabilityService.inTutorialMode()).toBe(false);
-    expect(component.startTutorial).toHaveBeenCalled();
-    expect(component.tutorialInProgress).toBe(false);
-  }));
-
-  it('should not start tutorial if in tutorial mode on page load but' +
-    ' no permissions', () => {
-    component.permissions = {
-      canVoiceover: true
-    };
-
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue(Promise.resolve({} as ExplorationPermissions));
-
-    editabilityService.onStartTutorial();
-    component.ngOnInit();
-
-    component.initTranslationTab();
-
-    expect(editabilityService.inTutorialMode()).toBe(false);
+    expect(component.isTranslationTabBusy).toBe(false);
+    expect(component.showTranslationTabSubDirectives).toBe(false);
     expect(component.tutorialInProgress).toBe(false);
   });
 
+  it(
+    'should load translation tab data when translation tab page is' +
+      ' refreshed',
+    fakeAsync(() => {
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(
+        userExplorationPermissionsService,
+        'getPermissionsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          canVoiceover: true,
+        } as ExplorationPermissions)
+      );
+
+      component.ngOnInit();
+      tick();
+
+      refreshTranslationTabEmitter.emit();
+      tick();
+
+      expect(component.showTranslationTabSubDirectives).toBe(true);
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should start tutorial if in tutorial mode on page load with' +
+      ' permissions',
+    fakeAsync(() => {
+      component.permissions = {
+        canVoiceover: true,
+      };
+      spyOn(
+        userExplorationPermissionsService,
+        'getPermissionsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          canVoiceover: true,
+        } as ExplorationPermissions)
+      );
+
+      spyOn(component, 'startTutorial').and.callThrough();
+
+      editabilityService.onStartTutorial();
+      component.ngOnInit();
+      component.initTranslationTab();
+      component.startTutorial();
+
+      expect(editabilityService.inTutorialMode()).toBe(false);
+      expect(component.startTutorial).toHaveBeenCalled();
+      expect(component.tutorialInProgress).toBe(false);
+    })
+  );
+
+  it(
+    'should not start tutorial if in tutorial mode on page load but' +
+      ' no permissions',
+    () => {
+      component.permissions = {
+        canVoiceover: true,
+      };
+
+      spyOn(
+        userExplorationPermissionsService,
+        'getPermissionsAsync'
+      ).and.returnValue(Promise.resolve({} as ExplorationPermissions));
+
+      editabilityService.onStartTutorial();
+      component.ngOnInit();
+
+      component.initTranslationTab();
+
+      expect(editabilityService.inTutorialMode()).toBe(false);
+      expect(component.tutorialInProgress).toBe(false);
+    }
+  );
+
   it('should not start tutorial if not in tutorial mode on page load', () => {
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue(Promise.resolve({
-        canVoiceover: true
-      } as ExplorationPermissions));
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        canVoiceover: true,
+      } as ExplorationPermissions)
+    );
 
     editabilityService.onEndTutorial();
     component.ngOnInit();
@@ -351,33 +388,20 @@ describe('Translation tab component', () => {
     expect(component.tutorialInProgress).toBe(false);
   });
 
-  it('should finish tutorial on clicking the end tutorial button when' +
-    ' it has already started', fakeAsync(() => {
-    spyOn(editabilityService, 'onEndTutorial');
-    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue(Promise.resolve({
-        canVoiceover: true
-      } as ExplorationPermissions));
-
-    component.ngOnInit();
-
-    editabilityService.onStartTutorial();
-    component.leaveTutorial();
-
-    expect(component.tutorialInProgress).toBe(false);
-    expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
-      .toHaveBeenCalled();
-  }));
-
-  it('should skip tutorial when the skip tutorial button is clicked',
+  it(
+    'should finish tutorial on clicking the end tutorial button when' +
+      ' it has already started',
     fakeAsync(() => {
       spyOn(editabilityService, 'onEndTutorial');
       spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue(Promise.resolve({
-          canVoiceover: true
-        } as ExplorationPermissions));
+      spyOn(
+        userExplorationPermissionsService,
+        'getPermissionsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          canVoiceover: true,
+        } as ExplorationPermissions)
+      );
 
       component.ngOnInit();
 
@@ -385,53 +409,95 @@ describe('Translation tab component', () => {
       component.leaveTutorial();
 
       expect(component.tutorialInProgress).toBe(false);
-      expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
-        .toHaveBeenCalled();
-    }));
+      expect(
+        stateTutorialFirstTimeService.markTranslationTutorialFinished
+      ).toHaveBeenCalled();
+    })
+  );
 
-  it('should start tutorial when welcome translation modal is closed',
-    fakeAsync(() => {
-      spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-        .returnValue(Promise.resolve({
-          canVoiceover: true
-        } as ExplorationPermissions));
+  it('should skip tutorial when the skip tutorial button is clicked', fakeAsync(() => {
+    spyOn(editabilityService, 'onEndTutorial');
+    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished');
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        canVoiceover: true,
+      } as ExplorationPermissions)
+    );
 
-      component.ngOnInit();
-
-      spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve('exp1')
-      } as NgbModalRef);
-      enterTranslationForTheFirstTimeEmitter.emit();
-      tick();
-
-      expect(siteAnalyticsService.registerAcceptTutorialModalEvent)
-        .toHaveBeenCalled();
-    }));
-
-  it('should finish translation tutorial when welcome translation modal is' +
-    ' dismissed', fakeAsync(() => {
-    spyOn(userExplorationPermissionsService, 'getPermissionsAsync').and
-      .returnValue(Promise.resolve({
-        canVoiceover: true
-      } as ExplorationPermissions));
     component.ngOnInit();
 
-    spyOn(stateTutorialFirstTimeService, 'markTranslationTutorialFinished')
-      .and.stub();
-    spyOn(siteAnalyticsService, 'registerDeclineTutorialModalEvent').and.stub();
+    editabilityService.onStartTutorial();
+    component.leaveTutorial();
+
+    expect(component.tutorialInProgress).toBe(false);
+    expect(
+      stateTutorialFirstTimeService.markTranslationTutorialFinished
+    ).toHaveBeenCalled();
+  }));
+
+  it('should start tutorial when welcome translation modal is closed', fakeAsync(() => {
+    spyOn(
+      userExplorationPermissionsService,
+      'getPermissionsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        canVoiceover: true,
+      } as ExplorationPermissions)
+    );
+
+    component.ngOnInit();
+
+    spyOn(siteAnalyticsService, 'registerAcceptTutorialModalEvent');
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.reject('exp1')
+      result: Promise.resolve('exp1'),
     } as NgbModalRef);
     enterTranslationForTheFirstTimeEmitter.emit();
     tick();
 
-
-    expect(siteAnalyticsService.registerDeclineTutorialModalEvent)
-      .toHaveBeenCalledWith('exp1');
-    expect(stateTutorialFirstTimeService.markTranslationTutorialFinished)
-      .toHaveBeenCalled();
+    expect(
+      siteAnalyticsService.registerAcceptTutorialModalEvent
+    ).toHaveBeenCalled();
   }));
+
+  it(
+    'should finish translation tutorial when welcome translation modal is' +
+      ' dismissed',
+    fakeAsync(() => {
+      spyOn(
+        userExplorationPermissionsService,
+        'getPermissionsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          canVoiceover: true,
+        } as ExplorationPermissions)
+      );
+      component.ngOnInit();
+
+      spyOn(
+        stateTutorialFirstTimeService,
+        'markTranslationTutorialFinished'
+      ).and.stub();
+      spyOn(
+        siteAnalyticsService,
+        'registerDeclineTutorialModalEvent'
+      ).and.stub();
+      spyOn(ngbModal, 'open').and.returnValue({
+        result: Promise.reject('exp1'),
+      } as NgbModalRef);
+      enterTranslationForTheFirstTimeEmitter.emit();
+      tick();
+
+      expect(
+        siteAnalyticsService.registerDeclineTutorialModalEvent
+      ).toHaveBeenCalledWith('exp1');
+      expect(
+        stateTutorialFirstTimeService.markTranslationTutorialFinished
+      ).toHaveBeenCalled();
+    })
+  );
 
   it('should not start tutorial', () => {
     component.tutorialInProgress = false;

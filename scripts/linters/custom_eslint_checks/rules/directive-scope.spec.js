@@ -23,9 +23,9 @@ var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
 ruleTester.run('directive-scope', rule, {
-  valid: [{
-    code:
-    `angular.module('oppia').directive('requireIsFloat', [
+  valid: [
+    {
+      code: `angular.module('oppia').directive('requireIsFloat', [
     '$filter', function($filter) {
       return {
         require: 'ngModel',
@@ -41,40 +41,36 @@ ruleTester.run('directive-scope', rule, {
           ctrl.$formatters.unshift(floatValidator);
         }
       };
-    }]);`
-  },
-  {
-    code:
-    `angular.module('oppia').directive('requireIsFloat', [
+    }]);`,
+    },
+    {
+      code: `angular.module('oppia').directive('requireIsFloat', [
     '$filter', function($filter) {
       'testing'
-    }])`
-  },
-  {
-    code:
-    `angular.module('oppia').directive('requireIsFloat', [
+    }])`,
+    },
+    {
+      code: `angular.module('oppia').directive('requireIsFloat', [
     '$filter', 'testing']);
-    `
-  },
-  {
-    code:
-    `angular.module('oppia').directive('requireIsFloat', 'testing',
+    `,
+    },
+    {
+      code: `angular.module('oppia').directive('requireIsFloat', 'testing',
     function($filter) {
       'testing'
-    })`
-  },
-  {
-    code:
-    `angular.module('oppia').directive('requireIsFloat', [
+    })`,
+    },
+    {
+      code: `angular.module('oppia').directive('requireIsFloat', [
     '$filter', function($filter) {
       return ('testing');
-    }]);`
-  }],
+    }]);`,
+    },
+  ],
 
   invalid: [
     {
-      code:
-      `angular.module('oppia').directive('requireIsFloat', [
+      code: `angular.module('oppia').directive('requireIsFloat', [
       '$filter', function($filter) {
         return {
           require: 'ngModel',
@@ -92,16 +88,17 @@ ruleTester.run('directive-scope', rule, {
         };
       }]);
       `,
-      errors: [{
-        message: (
-          'Please ensure that directive in file does not have scope set' +
-          ' to true.'),
-        type: 'CallExpression',
-      }],
+      errors: [
+        {
+          message:
+            'Please ensure that directive in file does not have scope set' +
+            ' to true.',
+          type: 'CallExpression',
+        },
+      ],
     },
     {
-      code:
-      `angular.module('oppia').directive('requireIsFloat', [
+      code: `angular.module('oppia').directive('requireIsFloat', [
       '$filter', function($filter) {
         return {
           require: 'ngModel',
@@ -119,9 +116,11 @@ ruleTester.run('directive-scope', rule, {
         };
       }]);
       `,
-      errors: [{
-        message: 'Please ensure that directive in file has a scope: {}.',
-      }],
+      errors: [
+        {
+          message: 'Please ensure that directive in file has a scope: {}.',
+        },
+      ],
     },
-  ]
+  ],
 });

@@ -16,10 +16,10 @@
  * @fileoverview Component for the ItemSelectionInput short response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseItemSelectionInputComponent } from './oppia-short-response-item-selection-input.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseItemSelectionInputComponent} from './oppia-short-response-item-selection-input.component';
 
 describe('ShortResponseItemSelectionInput', () => {
   let component: ShortResponseItemSelectionInputComponent;
@@ -37,10 +37,10 @@ describe('ShortResponseItemSelectionInput', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
+          useClass: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -48,16 +48,17 @@ describe('ShortResponseItemSelectionInput', () => {
     fixture = TestBed.createComponent(ShortResponseItemSelectionInputComponent);
     component = fixture.componentInstance;
     component.answer = '["ca_choices_1"]';
-    component.choices = '[{' +
+    component.choices =
+      '[{' +
       '"_html": "choice 1",' +
       '"_contentId": "ca_choices_1"' +
-    '}, {' +
+      '}, {' +
       '"_html": "choice 2",' +
       '"_contentId": "ca_choices_2"' +
-    '}, {' +
+      '}, {' +
       '"_html": "choice 3",' +
       '"_contentId": "ca_choices_3"' +
-    '}]';
+      '}]';
   });
 
   it('should initialise component when user submits answer', () => {

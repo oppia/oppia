@@ -16,24 +16,33 @@
  * @fileoverview Unit tests for the login page.
  */
 
-import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { UserInfo } from 'domain/user/user-info.model';
-import { AlertsService } from 'services/alerts.service';
-import { AuthService } from 'services/auth.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { LoginPageComponent } from './login-page.component';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  flushMicrotasks,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {UserInfo} from 'domain/user/user-info.model';
+import {AlertsService} from 'services/alerts.service';
+import {AuthService} from 'services/auth.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {LoginPageComponent} from './login-page.component';
 
 class MockWindowRef {
   constructor(
-    public location: string | null = null, public searchParams: string = '') {}
+    public location: string | null = null,
+    public searchParams: string = ''
+  ) {}
 
   get nativeWindow() {
     const that = this;
@@ -45,7 +54,7 @@ class MockWindowRef {
         assign: (url: string) => {
           that.location = url;
         },
-      }
+      },
     };
   }
 }
@@ -126,11 +135,11 @@ describe('Login Page', () => {
       ],
       declarations: [LoginPageComponent],
       providers: [
-        { provide: AlertsService, useValue: alertsService },
-        { provide: AuthService, useValue: authService },
-        { provide: LoaderService, useValue: loaderService },
-        { provide: UserService, useValue: userService },
-        { provide: WindowRef, useValue: windowRef },
+        {provide: AlertsService, useValue: alertsService},
+        {provide: AuthService, useValue: authService},
+        {provide: LoaderService, useValue: loaderService},
+        {provide: UserService, useValue: userService},
+        {provide: WindowRef, useValue: windowRef},
       ],
     }).compileComponents();
 
@@ -143,18 +152,20 @@ describe('Login Page', () => {
   });
 
   it('should redirect to home page when already logged in', fakeAsync(() => {
-    userService.getUserInfoAsync.and.resolveTo(UserInfo.createFromBackendDict({
-      roles: ['EXPLORATION_EDITOR'],
-      is_moderator: false,
-      is_curriculum_admin: false,
-      is_super_admin: false,
-      is_topic_manager: false,
-      can_create_collections: false,
-      preferred_site_language_code: null,
-      username: null,
-      email: null,
-      user_is_logged_in: true,
-    }));
+    userService.getUserInfoAsync.and.resolveTo(
+      UserInfo.createFromBackendDict({
+        roles: ['EXPLORATION_EDITOR'],
+        is_moderator: false,
+        is_curriculum_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: false,
+        preferred_site_language_code: null,
+        username: null,
+        email: null,
+        user_is_logged_in: true,
+      })
+    );
 
     expect(windowRef.location).toBeNull();
 
@@ -164,11 +175,14 @@ describe('Login Page', () => {
     expect(windowRef.location).toEqual('/');
   }));
 
-  describe('Emulator mode', function() {
+  describe('Emulator mode', function () {
     beforeEach(() => {
       email = 'a@a.com';
-      spyOnProperty(loginPageComponent, 'emulatorModeIsEnabled', 'get')
-        .and.returnValue(true);
+      spyOnProperty(
+        loginPageComponent,
+        'emulatorModeIsEnabled',
+        'get'
+      ).and.returnValue(true);
     });
 
     it('should not handle redirect results', fakeAsync(() => {
@@ -245,8 +259,11 @@ describe('Login Page', () => {
 
   describe('Production mode', () => {
     beforeEach(() => {
-      spyOnProperty(loginPageComponent, 'emulatorModeIsEnabled', 'get')
-        .and.returnValue(false);
+      spyOnProperty(
+        loginPageComponent,
+        'emulatorModeIsEnabled',
+        'get'
+      ).and.returnValue(false);
     });
 
     it('should redirect to sign-up after successful redirect', fakeAsync(() => {
@@ -329,33 +346,37 @@ describe('Login Page', () => {
       expect(windowRef.location).toEqual('/signup?return_url=/admin');
     }));
 
-    it('should redirect to home page when sign in with redirect fails',
-      fakeAsync(() => {
-        const signInWithRedirectAsyncPromise = spyOnSignInWithRedirectAsync();
+    it('should redirect to home page when sign in with redirect fails', fakeAsync(() => {
+      const signInWithRedirectAsyncPromise = spyOnSignInWithRedirectAsync();
 
-        loginPageComponent.ngOnInit();
-        flushMicrotasks();
-
-        expect(windowRef.location).toBeNull();
-
-        signInWithRedirectAsyncPromise.reject(
-          {code: 'auth/unknown-error', message: '?'});
-
-        flush();
-
-        expect(windowRef.location).toEqual('/');
-      }));
-
-    it('should redirect to home page when it cannot determine if user is ' +
-      'logged in', fakeAsync(() => {
-      userService.getUserInfoAsync.and.rejectWith(Error('uh-oh!'));
+      loginPageComponent.ngOnInit();
+      flushMicrotasks();
 
       expect(windowRef.location).toBeNull();
 
-      loginPageComponent.ngOnInit();
+      signInWithRedirectAsyncPromise.reject({
+        code: 'auth/unknown-error',
+        message: '?',
+      });
+
       flush();
 
       expect(windowRef.location).toEqual('/');
     }));
+
+    it(
+      'should redirect to home page when it cannot determine if user is ' +
+        'logged in',
+      fakeAsync(() => {
+        userService.getUserInfoAsync.and.rejectWith(Error('uh-oh!'));
+
+        expect(windowRef.location).toBeNull();
+
+        loginPageComponent.ngOnInit();
+        flush();
+
+        expect(windowRef.location).toEqual('/');
+      })
+    );
   });
 });

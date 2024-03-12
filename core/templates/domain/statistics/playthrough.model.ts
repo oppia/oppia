@@ -26,15 +26,15 @@ import {
   EarlyQuitCustomizationArgs,
   CyclicStateTransitionsCustomizationArgs,
   MultipleIncorrectSubmissionsCustomizationArgs,
-  PlaythroughIssueCustomizationArgs
+  PlaythroughIssueCustomizationArgs,
 } from 'domain/statistics/playthrough-issue.model';
 
 export interface PlaythroughBackendDict {
-  'issue_type': PlaythroughIssueType;
-  'issue_customization_args': PlaythroughIssueCustomizationArgs;
-  'exp_id': string;
-  'exp_version': number;
-  'actions': LearnerActionBackendDict[];
+  issue_type: PlaythroughIssueType;
+  issue_customization_args: PlaythroughIssueCustomizationArgs;
+  exp_id: string;
+  exp_version: number;
+  actions: LearnerActionBackendDict[];
 }
 
 export class Playthrough {
@@ -54,8 +54,7 @@ export class Playthrough {
       }
       case PlaythroughIssueType.MultipleIncorrectSubmissions: {
         const args = this
-          .issueCustomizationArgs as
-            MultipleIncorrectSubmissionsCustomizationArgs;
+          .issueCustomizationArgs as MultipleIncorrectSubmissionsCustomizationArgs;
         return args.state_name.value;
       }
       case PlaythroughIssueType.CyclicStateTransitions: {
@@ -75,15 +74,15 @@ export class Playthrough {
       exp_version: this.expVersion,
       issue_type: this.issueType,
       issue_customization_args: this.issueCustomizationArgs,
-      actions: this.actions.map((a) => a.toBackendDict()),
+      actions: this.actions.map(a => a.toBackendDict()),
     };
   }
 
   static createNewEarlyQuitPlaythrough(
-      expId: string,
-      expVersion: number,
-      issueCustomizationArgs: EarlyQuitCustomizationArgs,
-      actions: LearnerAction[]
+    expId: string,
+    expVersion: number,
+    issueCustomizationArgs: EarlyQuitCustomizationArgs,
+    actions: LearnerAction[]
   ): Playthrough {
     return new Playthrough(
       PlaythroughIssueType.EarlyQuit,
@@ -95,10 +94,10 @@ export class Playthrough {
   }
 
   static createNewMultipleIncorrectSubmissionsPlaythrough(
-      expId: string,
-      expVersion: number,
-      issueCustomizationArgs: MultipleIncorrectSubmissionsCustomizationArgs,
-      actions: LearnerAction[]
+    expId: string,
+    expVersion: number,
+    issueCustomizationArgs: MultipleIncorrectSubmissionsCustomizationArgs,
+    actions: LearnerAction[]
   ): Playthrough {
     return new Playthrough(
       PlaythroughIssueType.MultipleIncorrectSubmissions,
@@ -110,10 +109,10 @@ export class Playthrough {
   }
 
   static createNewCyclicStateTransitionsPlaythrough(
-      expId: string,
-      expVersion: number,
-      issueCustomizationArgs: CyclicStateTransitionsCustomizationArgs,
-      actions: LearnerAction[]
+    expId: string,
+    expVersion: number,
+    issueCustomizationArgs: CyclicStateTransitionsCustomizationArgs,
+    actions: LearnerAction[]
   ): Playthrough {
     return new Playthrough(
       PlaythroughIssueType.CyclicStateTransitions,
@@ -125,9 +124,11 @@ export class Playthrough {
   }
 
   static createFromBackendDict(
-      playthroughBackendDict: PlaythroughBackendDict): Playthrough {
+    playthroughBackendDict: PlaythroughBackendDict
+  ): Playthrough {
     const actions = playthroughBackendDict.actions.map(
-      LearnerAction.createFromBackendDict);
+      LearnerAction.createFromBackendDict
+    );
 
     switch (playthroughBackendDict.issue_type) {
       case PlaythroughIssueType.EarlyQuit:

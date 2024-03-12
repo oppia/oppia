@@ -25,8 +25,7 @@ var ruleTester = new RuleTester();
 ruleTester.run('check-element-selector-at-top', rule, {
   valid: [
     {
-      code:
-      `var LibraryPage = function() {
+      code: `var LibraryPage = function() {
         var lostChangesModal = element(
          by.css('.e2e-test-lost-changes-modal'));
         var allExplorationSummaryTile = element.all(
@@ -45,14 +44,13 @@ ruleTester.run('check-element-selector-at-top', rule, {
            by.cssContainingText('.e2e-test-collection-summary-tile'));
           return nodeElement.element(nodeBackgroundLocator);
         };
-      };`
-    }
+      };`,
+    },
   ],
 
   invalid: [
     {
-      code:
-      `var LibraryPage = function() {
+      code: `var LibraryPage = function() {
         var lostChangesModal = element(
          by.css('.e2e-test-lost-changes-modal'));
         var allExplorationSummaryTile = element.all(
@@ -71,15 +69,16 @@ ruleTester.run('check-element-selector-at-top', rule, {
            by.css('.e2e-test-collection-summary-tile'));
         };
       };`,
-      errors: [{
-        message: (
-          'Please declare element selector in the topmost scope of the' +
-          ' module function.')
-      }],
+      errors: [
+        {
+          message:
+            'Please declare element selector in the topmost scope of the' +
+            ' module function.',
+        },
+      ],
     },
     {
-      code:
-      `var LibraryPage = function() {
+      code: `var LibraryPage = function() {
         var lostChangesModal = element(
          by.css('.e2e-test-lost-changes-modal'));
         var allExplorationSummaryTile = element.all(
@@ -96,11 +95,13 @@ ruleTester.run('check-element-selector-at-top', rule, {
            by.css('.e2e-test-rte'));
         };
       };`,
-      errors: [{
-        message: (
-          'Please declare element locator in the topmost scope of the' +
-          ' module function.')
-      }],
+      errors: [
+        {
+          message:
+            'Please declare element locator in the topmost scope of the' +
+            ' module function.',
+        },
+      ],
     },
-  ]
+  ],
 });

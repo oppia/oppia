@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for ExplorationGraphModalComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationGraphModalComponent } from './exploration-graph-modal.component';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationGraphModalComponent} from './exploration-graph-modal.component';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 
 class MockActiveModal {
   close(): void {
@@ -37,7 +37,7 @@ class MockActiveModal {
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -54,22 +54,20 @@ describe('Exploration Graph Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ExplorationGraphModalComponent
-      ],
+      declarations: [ExplorationGraphModalComponent],
       providers: [
         GraphDataService,
         StateEditorService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -89,13 +87,11 @@ describe('Exploration Graph Modal Component', () => {
     component.ngOnInit();
   });
 
-
-  it('should initialize component properties after Component is initialized',
-    () => {
-      expect(component.currentStateName).toBe(stateName);
-      expect(component.graphData).toBeUndefined();
-      expect(component.isEditable).toBe(isEditable);
-    });
+  it('should initialize component properties after Component is initialized', () => {
+    expect(component.currentStateName).toBe(stateName);
+    expect(component.graphData).toBeUndefined();
+    expect(component.isEditable).toBe(isEditable);
+  });
 
   it('should delete state when closing the modal', () => {
     let stateName = 'State Name';

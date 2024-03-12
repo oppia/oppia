@@ -16,21 +16,22 @@
  * @fileoverview Unit tests for facilitator dashboard page.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from
-  '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerGroupPagesConstants } from
-  'pages/learner-group-pages/learner-group-pages.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { TranslateService } from '@ngx-translate/core';
-import { PageTitleService } from 'services/page-title.service';
-import { FacilitatorDashboardPageComponent } from
-  './facilitator-dashboard-page.component';
-import { FacilitatorDashboardBackendApiService } from 'domain/learner_group/facilitator-dashboard-backend-api.service';
-import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerGroupPagesConstants} from 'pages/learner-group-pages/learner-group-pages.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {TranslateService} from '@ngx-translate/core';
+import {PageTitleService} from 'services/page-title.service';
+import {FacilitatorDashboardPageComponent} from './facilitator-dashboard-page.component';
+import {FacilitatorDashboardBackendApiService} from 'domain/learner_group/facilitator-dashboard-backend-api.service';
+import {ShortLearnerGroupSummary} from 'domain/learner_group/short-learner-group-summary.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -45,8 +46,7 @@ describe('FacilitatorDashboardPageComponent', () => {
   let fixture: ComponentFixture<FacilitatorDashboardPageComponent>;
   let urlInterpolationService: UrlInterpolationService;
   let translateService: TranslateService;
-  let facilitatorDashboardBackendApiService:
-    FacilitatorDashboardBackendApiService;
+  let facilitatorDashboardBackendApiService: FacilitatorDashboardBackendApiService;
   let pageTitleService: PageTitleService;
 
   const shortSummaryBackendDict = {
@@ -54,26 +54,22 @@ describe('FacilitatorDashboardPageComponent', () => {
     title: 'group title',
     description: 'group description',
     facilitator_usernames: ['facilitator1'],
-    learners_count: 4
+    learners_count: 4,
   };
-  const shortLearnerGroupSummary = (
-    ShortLearnerGroupSummary.createFromBackendDict(
-      shortSummaryBackendDict));
+  const shortLearnerGroupSummary =
+    ShortLearnerGroupSummary.createFromBackendDict(shortSummaryBackendDict);
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        FacilitatorDashboardPageComponent,
-        MockTranslatePipe
-      ],
+      declarations: [FacilitatorDashboardPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -82,7 +78,8 @@ describe('FacilitatorDashboardPageComponent', () => {
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
     facilitatorDashboardBackendApiService = TestBed.inject(
-      FacilitatorDashboardBackendApiService);
+      FacilitatorDashboardBackendApiService
+    );
     fixture = TestBed.createComponent(FacilitatorDashboardPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -101,9 +98,11 @@ describe('FacilitatorDashboardPageComponent', () => {
 
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(component.createLearnerGroupPageUrl).toBe(
-      LearnerGroupPagesConstants.CREATE_LEARNER_GROUP_PAGE_URL);
-    expect(component.shortLearnerGroupSummaries).toEqual(
-      [shortLearnerGroupSummary]);
+      LearnerGroupPagesConstants.CREATE_LEARNER_GROUP_PAGE_URL
+    );
+    expect(component.shortLearnerGroupSummaries).toEqual([
+      shortLearnerGroupSummary,
+    ]);
   }));
 
   it('should call set page title whenever the language is changed', () => {
@@ -122,16 +121,20 @@ describe('FacilitatorDashboardPageComponent', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE');
+      'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE'
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE');
+      'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE'
+    );
   });
 
   it('should get learner group page url correctly', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
-      '/create-learner-group/groupId1');
+      '/create-learner-group/groupId1'
+    );
 
     expect(component.getLearnerGroupPageUrl('groupId1')).toBe(
-      '/create-learner-group/groupId1');
+      '/create-learner-group/groupId1'
+    );
   });
 });

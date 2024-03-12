@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for DeleteMisconceptionModalController.
  */
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { DeleteMisconceptionModalComponent } from './delete-misconception-modal.component';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { AppConstants } from 'app.constants';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {DeleteMisconceptionModalComponent} from './delete-misconception-modal.component';
+import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {AppConstants} from 'app.constants';
 
 class MockActiveModal {
   close(value: string): void {
@@ -51,13 +51,13 @@ describe('Delete Misconception Modal Component', () => {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: SkillEditorStateService,
-          useClass: MockSkillEditorStateService
-        }
-      ]
+          useClass: MockSkillEditorStateService,
+        },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(DeleteMisconceptionModalComponent);
     component = fixture.componentInstance;
@@ -72,12 +72,12 @@ describe('Delete Misconception Modal Component', () => {
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
-      must_be_addressed: true
+      must_be_addressed: true,
     };
 
     let rubricDict = {
       difficulty: AppConstants.SKILL_DIFFICULTIES[0],
-      explanations: ['explanation']
+      explanations: ['explanation'],
     };
 
     let skillContentsDict = {
@@ -87,8 +87,8 @@ describe('Delete Misconception Modal Component', () => {
       },
       worked_examples: [],
       recorded_voiceovers: {
-        voiceovers_mapping: {}
-      }
+        voiceovers_mapping: {},
+      },
     };
 
     skillObject = skillObjectFactory.createFromBackendDict({
@@ -102,23 +102,25 @@ describe('Delete Misconception Modal Component', () => {
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
       superseding_skill_id: 'skill0',
-      all_questions_merged: true
+      all_questions_merged: true,
     });
 
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(skillObject);
     component.ngOnInit();
   }));
 
-  it('should initialize properties after component is initialized',
-    () => {
-      expect(component.skill).toEqual(skillObject);
-    });
-
-  it('should close the modal with misconception id when clicking on save' +
-    ' button', () => {
-    component.confirm();
-    expect(closeSpy).toHaveBeenCalledWith({
-      id: 2
-    });
+  it('should initialize properties after component is initialized', () => {
+    expect(component.skill).toEqual(skillObject);
   });
+
+  it(
+    'should close the modal with misconception id when clicking on save' +
+      ' button',
+    () => {
+      component.confirm();
+      expect(closeSpy).toHaveBeenCalledWith({
+        id: 2,
+      });
+    }
+  );
 });

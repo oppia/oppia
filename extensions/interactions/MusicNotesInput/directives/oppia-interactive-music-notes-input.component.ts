@@ -20,18 +20,28 @@
  * followed by the name of the arg.
  */
 
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { InteractionAnswer, MusicNotesAnswer } from 'interactions/answer-defs';
-import { MusicNotesInputCustomizationArgs, ReadableMusicNote } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { MusicNotesInputRulesService } from './music-notes-input-rules.service';
-import { MusicPhrasePlayerService } from './music-phrase-player.service';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
+import {
+  MusicNotesInputCustomizationArgs,
+  ReadableMusicNote,
+} from 'interactions/customization-args-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {MusicNotesInputRulesService} from './music-notes-input-rules.service';
+import {MusicPhrasePlayerService} from './music-phrase-player.service';
 
 interface MusicNote {
   baseNoteMidiNumber: number;
@@ -53,10 +63,11 @@ interface Sequence {
 
 @Component({
   selector: 'oppia-interactive-music-notes-input',
-  templateUrl: './music-notes-input-interaction.component.html'
+  templateUrl: './music-notes-input-interaction.component.html',
 })
 export class MusicNotesInputComponent
- implements OnInit, OnDestroy, AfterViewInit {
+  implements OnInit, OnDestroy, AfterViewInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -87,14 +98,13 @@ export class MusicNotesInputComponent
   SOUNDFONT_URL = '/third_party/static/midi-js-c26ebb/examples/soundfont/';
   // Highest number of notes that can fit on the staff at any given time.
   MAXIMUM_NOTES_POSSIBLE = 8;
-  NOTE_NAMES_TO_MIDI_VALUES = (
-    InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES);
+  NOTE_NAMES_TO_MIDI_VALUES =
+    InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
   staffContainerElt: JQuery<HTMLElement>;
 
   constructor(
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService,
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private playerPositionService: PlayerPositionService,
     private currentInteractionService: CurrentInteractionService,
     private musicNotesInputRulesService: MusicNotesInputRulesService,
@@ -106,27 +116,27 @@ export class MusicNotesInputComponent
   private _getAttributes() {
     return {
       sequenceToGuessWithValue: this.sequenceToGuessWithValue,
-      initialSequenceWithValue: this.initialSequenceWithValue
+      initialSequenceWithValue: this.initialSequenceWithValue,
     };
   }
 
   ngOnInit(): void {
-    const {
-      sequenceToGuess,
-      initialSequence
-    } = (
+    const {sequenceToGuess, initialSequence} =
       this.interactionAttributesExtractorService.getValuesFromAttributes(
-        'MusicNotesInput', this._getAttributes()
-      ) as MusicNotesInputCustomizationArgs);
+        'MusicNotesInput',
+        this._getAttributes()
+      ) as MusicNotesInputCustomizationArgs;
 
     this.sequenceToGuess = sequenceToGuess;
     this.interactionIsActive = this.lastAnswer === null;
 
-    this.initialSequence = (
-      this.interactionIsActive ? initialSequence : this.lastAnswer);
+    this.initialSequence = this.interactionIsActive
+      ? initialSequence
+      : this.lastAnswer;
     // TODO(#14340): Remove some usages of jQuery from the codebase.
-    this.staffContainerElt = $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-staff'));
+    this.staffContainerElt = $(
+      this.elementRef.nativeElement.querySelectorAll('.oppia-music-input-staff')
+    );
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(() => {
@@ -137,7 +147,9 @@ export class MusicNotesInputComponent
     );
 
     this.currentInteractionService.registerCurrentInteraction(
-      () => this.submitAnswer(), null);
+      () => this.submitAnswer(),
+      null
+    );
     // Initialization code.
     this.initializeNoteSequence(this.initialSequence as Sequence);
     this.init();
@@ -166,7 +178,7 @@ export class MusicNotesInputComponent
    */
   _addNoteToNoteSequence(note: MusicNote): void {
     this.noteSequence.push({
-      note: note
+      note: note,
     });
   }
 
@@ -202,8 +214,7 @@ export class MusicNotesInputComponent
   reinitStaff(): void {
     $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
     setTimeout(() => {
-      $('.oppia-music-input-valid-note-area').css(
-        'visibility', 'visible');
+      $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
       this.init();
     }, 20);
   }
@@ -214,11 +225,11 @@ export class MusicNotesInputComponent
 
     // The grid rectangle dimensions defining the grid which the notes
     // fall on.
-    this.HORIZONTAL_GRID_SPACING = (
-      this.CONTAINER_WIDTH / (this.MAXIMUM_NOTES_POSSIBLE + 1));
+    this.HORIZONTAL_GRID_SPACING =
+      this.CONTAINER_WIDTH / (this.MAXIMUM_NOTES_POSSIBLE + 1);
 
-    this.VERTICAL_GRID_SPACING = (
-      this.CONTAINER_HEIGHT / this.verticalGridKeys.length);
+    this.VERTICAL_GRID_SPACING =
+      this.CONTAINER_HEIGHT / this.verticalGridKeys.length;
 
     this.clearNotesFromStaff();
     this.initPalette();
@@ -233,16 +244,17 @@ export class MusicNotesInputComponent
   // start of the exploration and can be removed by the learner.
   initializeNoteSequence(initialNotesToAdd: Sequence): void {
     for (let i = 0; i < initialNotesToAdd.value.length; i++) {
-      let { baseNoteMidiNumber, offset } = (
-        this._convertReadableNoteToNote(initialNotesToAdd.value[i]));
+      let {baseNoteMidiNumber, offset} = this._convertReadableNoteToNote(
+        initialNotesToAdd.value[i]
+      );
       let initialNote = {
         baseNoteMidiNumber: baseNoteMidiNumber,
         offset: offset,
         noteId: this.generateNoteId(),
         noteStart: {
           num: i,
-          den: 1
-        }
+          den: 1,
+        },
       };
       this._addNoteToNoteSequence(initialNote);
     }
@@ -251,15 +263,21 @@ export class MusicNotesInputComponent
   // Removes all notes from staff.
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearNotesFromStaff(): void {
-    $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-note-choices div')).remove();
+    $(
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-note-choices div'
+      )
+    ).remove();
   }
 
   // Removes all droppable staff lines.
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearDroppableStaff(): void {
-    $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-staff div')).remove();
+    $(
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-staff div'
+      )
+    ).remove();
   }
 
   // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
@@ -268,15 +286,16 @@ export class MusicNotesInputComponent
   getStaffLinePositions(): Object {
     let staffLinePositionsArray = [];
     let staffLinePositions = {};
-    let elements = $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-staff div.oppia-music-staff-position'));
-    elements.each(
-      (el, val) => {
-        staffLinePositionsArray.push($(val).position().top);
-      });
+    let elements = $(
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-staff div.oppia-music-staff-position'
+      )
+    );
+    elements.each((el, val) => {
+      staffLinePositionsArray.push($(val).position().top);
+    });
     for (let i = 0; i < staffLinePositionsArray.length; i++) {
-      staffLinePositions[this.verticalGridKeys[i]] = (
-        staffLinePositionsArray[i]);
+      staffLinePositions[this.verticalGridKeys[i]] = staffLinePositionsArray[i];
     }
     return staffLinePositions;
   }
@@ -284,17 +303,25 @@ export class MusicNotesInputComponent
   // Creates the notes and helper-clone notes for the noteChoices div.
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   initPalette(): void {
-    let noteChoicesDiv = $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-note-choices'));
-    let validNoteArea = $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-valid-note-area'));
+    let noteChoicesDiv = $(
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-note-choices'
+      )
+    );
+    let validNoteArea = $(
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-valid-note-area'
+      )
+    );
     for (let i = 0; i < this.NOTE_TYPES.length; i++) {
       var addedClass = null;
       if (this.NOTE_TYPES[i] === this.NOTE_TYPE_NATURAL) {
         addedClass = 'oppia-music-input-natural-note';
       }
-      var innerDiv = $(`<div class="${addedClass}"></div>`)
-        .data('noteType', this.NOTE_TYPES[i]);
+      var innerDiv = $(`<div class="${addedClass}"></div>`).data(
+        'noteType',
+        this.NOTE_TYPES[i]
+      );
       if (this.interactionIsActive) {
         innerDiv.draggable({
           // Keeps note from being placed on top of the clef.
@@ -307,14 +334,16 @@ export class MusicNotesInputComponent
             if (!this.isCloneOffStaff($(ui.helper))) {
               // This makes the helper clone a new draggable note.
               $(ui.helper)
-              // Retains original note type (e.g. natural, flat, sharp).
+                // Retains original note type (e.g. natural, flat, sharp).
                 .data('noteType', $(innerDiv).data('noteType'))
                 .draggable({
-                // The leftPosBeforeDrag helps with the sorting of user
-                // sequence.
+                  // The leftPosBeforeDrag helps with the sorting of user
+                  // sequence.
                   start: () => {
                     $(innerDiv).data(
-                      'leftPosBeforeDrag', $(innerDiv).position().left);
+                      'leftPosBeforeDrag',
+                      $(innerDiv).position().left
+                    );
                   },
                   containment: '.oppia-music-input-valid-note-area',
                   cursor: 'pointer',
@@ -329,14 +358,15 @@ export class MusicNotesInputComponent
                     // remove it.
                     if (this.isCloneOffStaff(draggableOptions)) {
                       this._removeNotesFromNoteSequenceWithId(
-                        draggableOptions.data('noteId'));
+                        draggableOptions.data('noteId')
+                      );
                       this._sortNoteSequence();
                       draggableOptions.remove();
                     }
-                  }
+                  },
                 });
             }
-          }
+          },
         });
       }
       noteChoicesDiv.append(innerDiv);
@@ -345,14 +375,21 @@ export class MusicNotesInputComponent
 
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   repaintNotes(): void {
-    let noteChoicesDiv = $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-note-choices'));
-    let validNoteArea = $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-valid-note-area'));
+    let noteChoicesDiv = $(
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-note-choices'
+      )
+    );
+    let validNoteArea = $(
+      this.elementRef.nativeElement.querySelectorAll(
+        '.oppia-music-input-valid-note-area'
+      )
+    );
     for (let i = 0; i < this.noteSequence.length; i++) {
       var innerDiv = $(
         '<div class="oppia-music-input-natural-note' +
-      ' oppia-music-input-on-staff"></div>')
+          ' oppia-music-input-on-staff"></div>'
+      )
         .data('noteType', this.NOTE_TYPE_NATURAL)
         .data('noteId', this.noteSequence[i].note.noteId)
         // Position notes horizontally by their noteStart positions and
@@ -360,12 +397,13 @@ export class MusicNotesInputComponent
         .css({
           top:
             this.getVerticalPosition(
-              this.noteSequence[i].note.baseNoteMidiNumber) -
+              this.noteSequence[i].note.baseNoteMidiNumber
+            ) -
             this.VERTICAL_GRID_SPACING / 2.0,
-          left:
-            this.getHorizontalPosition(this.getNoteStartAsFloat(
-              this.noteSequence[i].note)),
-          position: 'absolute'
+          left: this.getHorizontalPosition(
+            this.getNoteStartAsFloat(this.noteSequence[i].note)
+          ),
+          position: 'absolute',
         });
       if (this.interactionIsActive) {
         innerDiv.draggable({
@@ -382,11 +420,12 @@ export class MusicNotesInputComponent
             // If note is out of droppable or off staff, remove it.
             if (this.isCloneOffStaff(draggableOptions)) {
               this._removeNotesFromNoteSequenceWithId(
-                draggableOptions.data('noteId'));
+                draggableOptions.data('noteId')
+              );
               this._sortNoteSequence();
               draggableOptions.remove();
             }
-          }
+          },
         });
       }
       noteChoicesDiv.append(innerDiv);
@@ -399,8 +438,7 @@ export class MusicNotesInputComponent
   buildDroppableStaff(): void {
     let lineValues = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES);
     for (let i = 0; i < lineValues.length; i++) {
-      var staffLineDiv = $(
-        '<div class="oppia-music-staff-position"></div>')
+      var staffLineDiv = $('<div class="oppia-music-staff-position"></div>')
         .css('height', this.VERTICAL_GRID_SPACING)
         .data('lineValue', lineValues[i])
         .droppable({
@@ -461,7 +499,7 @@ export class MusicNotesInputComponent
               baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
               offset: parseInt(noteType, 10),
               noteId: noteId,
-              noteStart: null
+              noteStart: null,
             };
 
             // When a note is moved, its previous state must be removed
@@ -482,11 +520,15 @@ export class MusicNotesInputComponent
               }
               $(ui.helper).css({
                 top: topPos,
-                left: leftPos
+                left: leftPos,
               });
 
-              if (Math.floor(leftPos) > Math.floor(
-                this.getHorizontalPosition(this.MAXIMUM_NOTES_POSSIBLE - 1))) {
+              if (
+                Math.floor(leftPos) >
+                Math.floor(
+                  this.getHorizontalPosition(this.MAXIMUM_NOTES_POSSIBLE - 1)
+                )
+              ) {
                 $(ui.helper).remove();
                 this.repaintLedgerLines();
                 return;
@@ -497,13 +539,13 @@ export class MusicNotesInputComponent
             // calculating half of the VERTICAL_GRID_SPACING and
             // subtracting that from its current top Position.
             $(ui.helper).css({
-              top: topPos - (this.VERTICAL_GRID_SPACING / 2.0)
+              top: topPos - this.VERTICAL_GRID_SPACING / 2.0,
             });
 
             // Add noteStart property to note object.
             if (this.getNoteStartFromLeftPos(leftPos) !== undefined) {
               note.noteStart =
-               this.getNoteStartFromLeftPos(leftPos).note.noteStart;
+                this.getNoteStartFromLeftPos(leftPos).note.noteStart;
             } else {
               this.repaintLedgerLines();
               return;
@@ -517,10 +559,13 @@ export class MusicNotesInputComponent
             $(ui.helper).addClass('oppia-music-input-on-staff');
 
             this.repaintLedgerLines();
-          }
+          },
         });
-      $(this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-staff')).append(staffLineDiv);
+      $(
+        this.elementRef.nativeElement.querySelectorAll(
+          '.oppia-music-input-staff'
+        )
+      ).append(staffLineDiv);
 
       if (i === 0) {
         this.topPositionForCenterOfTopStaffLine =
@@ -546,12 +591,13 @@ export class MusicNotesInputComponent
   // When compareNoteStarts(a, b) returns 0, a is equal to b.
   // When compareNoteStarts(a, b) returns greater than 0, a is greater
   //   than b.
-  compareNoteStarts(a: { note: MusicNote }, b: { note: MusicNote }): number {
+  compareNoteStarts(a: {note: MusicNote}, b: {note: MusicNote}): number {
     if (a.note.noteStart && b.note.noteStart) {
       return (
-        a.note.noteStart.num * b.note.noteStart.den -
-        a.note.noteStart.den * b.note.noteStart.num) /
-        (a.note.noteStart.den * b.note.noteStart.den);
+        (a.note.noteStart.num * b.note.noteStart.den -
+          a.note.noteStart.den * b.note.noteStart.num) /
+        (a.note.noteStart.den * b.note.noteStart.den)
+      );
     }
   }
 
@@ -563,7 +609,9 @@ export class MusicNotesInputComponent
       if (newNoteToCheck.note.noteStart !== undefined) {
         for (let i = 0; i < this.noteSequence.length; i++) {
           let noteComparison = this.compareNoteStarts(
-            this.noteSequence[i], newNoteToCheck);
+            this.noteSequence[i],
+            newNoteToCheck
+          );
           if (noteComparison === 0) {
             return true;
           }
@@ -586,11 +634,11 @@ export class MusicNotesInputComponent
         let note = {
           noteStart: {
             num: i,
-            den: 1
-          }
+            den: 1,
+          },
         } as MusicNote;
         return {
-          note: note
+          note: note,
         };
       }
     }
@@ -628,18 +676,20 @@ export class MusicNotesInputComponent
   getHorizontalPosition(noteStartAsFloat: number): number {
     let lastHorizontalPositionOffset = $(
       this.elementRef.nativeElement.querySelector(
-        '.oppia-music-input-note-choices div:first-child')).position().left;
+        '.oppia-music-input-note-choices div:first-child'
+      )
+    ).position().left;
     let leftOffset =
-      lastHorizontalPositionOffset - (
-        (this.MAXIMUM_NOTES_POSSIBLE - 1) * this.HORIZONTAL_GRID_SPACING);
-    return leftOffset + (
-      noteStartAsFloat * this.HORIZONTAL_GRID_SPACING);
+      lastHorizontalPositionOffset -
+      (this.MAXIMUM_NOTES_POSSIBLE - 1) * this.HORIZONTAL_GRID_SPACING;
+    return leftOffset + noteStartAsFloat * this.HORIZONTAL_GRID_SPACING;
   }
 
   isCloneOffStaff(helperClone: JQLite | JQuery<this>): boolean {
-    return (!(
+    return !(
       helperClone.position().top > this.staffTop &&
-      helperClone.position().top < this.staffBottom));
+      helperClone.position().top < this.staffBottom
+    );
   }
 
   isLedgerLineNote(lineValue: string): boolean {
@@ -650,7 +700,8 @@ export class MusicNotesInputComponent
   drawLedgerLine(topPos: number, leftPos: number): void {
     var ledgerLineDiv = $(
       '<div class"oppia-music-input-ledger-line ' +
-    'oppia-music-input-natural-note"></div>')
+        'oppia-music-input-natural-note"></div>'
+    )
       .droppable({
         accept: '.oppia-music-input-note-choices div',
         // When a ledgerLine note is moved out of its droppable,
@@ -659,25 +710,25 @@ export class MusicNotesInputComponent
           $(ledgerLineDiv).hide();
         },
         hoverClass: 'oppia-music-input-hovered',
-        containment: '.oppia-music-input-valid-note-area'
+        containment: '.oppia-music-input-valid-note-area',
       })
       // Adjust ledger line to be centered with the note.
       .css({
         left: leftPos - 1,
         // 0.4 is a little less than half to allow for the height of the
         // ledger line when considering its placement.
-        top: topPos + this.VERTICAL_GRID_SPACING * 0.4
+        top: topPos + this.VERTICAL_GRID_SPACING * 0.4,
       });
 
-    $(this.elementRef.nativeElement.querySelectorAll(
-      '.oppia-music-input-staff')).append(ledgerLineDiv);
+    $(
+      this.elementRef.nativeElement.querySelectorAll('.oppia-music-input-staff')
+    ).append(ledgerLineDiv);
   }
 
   repaintLedgerLines(): void {
     for (let i = 0; i < this.noteSequence.length; i++) {
       let note = this.noteSequence[i].note;
-      let lineValue = (
-        this._getCorrespondingNoteName(note.baseNoteMidiNumber));
+      let lineValue = this._getCorrespondingNoteName(note.baseNoteMidiNumber);
       if (this.isLedgerLineNote(lineValue)) {
         this.drawLedgerLine(
           this.getVerticalPosition(note.baseNoteMidiNumber),
@@ -714,15 +765,15 @@ export class MusicNotesInputComponent
       console.error('Invalid note offset: ' + note.offset);
     }
 
-    let correspondingNoteName =
-      this._getCorrespondingNoteName(note.baseNoteMidiNumber);
+    let correspondingNoteName = this._getCorrespondingNoteName(
+      note.baseNoteMidiNumber
+    );
 
-    let accidental = (
-      note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b');
+    let accidental = note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b';
 
     return {
       readableNoteName:
-        correspondingNoteName[0] + accidental + correspondingNoteName[1]
+        correspondingNoteName[0] + accidental + correspondingNoteName[1],
     } as ReadableMusicNote;
   }
 
@@ -734,28 +785,34 @@ export class MusicNotesInputComponent
    * baseNoteMidiNumber for 'E', and -1 indicates a flat).
    */
   _convertReadableNoteToNote(readableNote: ReadableMusicNote): {
-     baseNoteMidiNumber: number;
-     offset: number;
-    } {
+    baseNoteMidiNumber: number;
+    offset: number;
+  } {
     let readableNoteName = readableNote.readableNoteName;
     if (readableNoteName.length === 2) {
       // This is a natural note.
       return {
         baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[readableNoteName],
-        offset: 0
+        offset: 0,
       };
     } else if (readableNoteName.length === 3) {
       // This is a note with an accidental.
-      let offset = (readableNoteName[1] === '#') ? 1 :
-        (readableNoteName[1] === 'b') ? -1 : null;
+      let offset =
+        readableNoteName[1] === '#'
+          ? 1
+          : readableNoteName[1] === 'b'
+            ? -1
+            : null;
       if (offset === null) {
         console.error('Invalid readable note: ' + readableNoteName);
       }
 
       return {
-        baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[
-          readableNoteName[0] + readableNoteName[2]],
-        offset: offset
+        baseNoteMidiNumber:
+          this.NOTE_NAMES_TO_MIDI_VALUES[
+            readableNoteName[0] + readableNoteName[2]
+          ],
+        offset: offset,
       };
     } else {
       // This is not a valid readableNote.
@@ -767,11 +824,12 @@ export class MusicNotesInputComponent
   // TODO(#15177): Add more features to Music-Notes-Input Interaction
   // Add more options for note durations.
   _makeAllNotesHaveDurationOne(
-      noteArray: ReadableMusicNote[]): ReadableMusicNote[] {
+    noteArray: ReadableMusicNote[]
+  ): ReadableMusicNote[] {
     for (let i = 0; i < noteArray.length; i++) {
       noteArray[i].noteDuration = {
         num: 1,
-        den: 1
+        den: 1,
       };
     }
     return noteArray;
@@ -781,13 +839,15 @@ export class MusicNotesInputComponent
     let readableSequence: MusicNotesAnswer[] = [];
     for (let i = 0; i < this.noteSequence.length; i++) {
       readableSequence.push(
-        this._convertNoteToReadableNote(this.noteSequence[i].note));
+        this._convertNoteToReadableNote(this.noteSequence[i].note)
+      );
     }
     readableSequence = this._makeAllNotesHaveDurationOne(readableSequence);
     if (readableSequence) {
       this.currentInteractionService.onSubmit(
         readableSequence as InteractionAnswer,
-        this.musicNotesInputRulesService);
+        this.musicNotesInputRulesService
+      );
     }
   }
 
@@ -799,16 +859,18 @@ export class MusicNotesInputComponent
     let noteSequenceToGuess = [];
     for (let i = 0; i < this.sequenceToGuess.value.length; i++) {
       noteSequenceToGuess.push(
-        this._convertReadableNoteToNote(
-          this.sequenceToGuess.value[i]));
+        this._convertReadableNoteToNote(this.sequenceToGuess.value[i])
+      );
     }
-    this.playSequence(this.convertSequenceToGuessToMidiSequence(
-      noteSequenceToGuess));
+    this.playSequence(
+      this.convertSequenceToGuessToMidiSequence(noteSequenceToGuess)
+    );
   }
 
   playCurrentSequence(): void {
     this.playSequence(
-      this.convertNoteSequenceToMidiSequence(this.noteSequence));
+      this.convertNoteSequenceToMidiSequence(this.noteSequence)
+    );
   }
 
   // Takes an input > 0, converts to a noteStart object and returns a
@@ -817,8 +879,8 @@ export class MusicNotesInputComponent
     return this.getNoteStartAsFloat({
       noteStart: {
         num: noteIndex,
-        den: 1
-      }
+        den: 1,
+      },
     } as MusicNote);
   }
 
@@ -836,7 +898,7 @@ export class MusicNotesInputComponent
           notes.push({
             midiValue: midiSequence[i][j],
             duration: 1.0,
-            start: this.getNoteStart(i)
+            start: this.getNoteStart(i),
           });
         }
       }
@@ -844,7 +906,8 @@ export class MusicNotesInputComponent
       this.musicPhrasePlayerService.playMusicPhrase(notes);
     } else {
       this.alertsService.addWarning(
-        'MIDI audio is not supported in your browser.');
+        'MIDI audio is not supported in your browser.'
+      );
     }
   }
 
@@ -890,6 +953,8 @@ export class MusicNotesInputComponent
 }
 
 angular.module('oppia').directive(
-  'oppiaInteractiveMusicNotesInput', downgradeComponent(
-    {component: MusicNotesInputComponent}
-  ) as angular.IDirectiveFactory);
+  'oppiaInteractiveMusicNotesInput',
+  downgradeComponent({
+    component: MusicNotesInputComponent,
+  }) as angular.IDirectiveFactory
+);

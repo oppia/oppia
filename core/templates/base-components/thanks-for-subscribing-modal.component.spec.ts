@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for thanks for subscribing modal component.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ThanksForSubscribingModalComponent } from './thanks-for-subscribing-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 
 class MockActiveModal {
   dismiss(): void {
@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('Thanks for subscribing modal component', function() {
+describe('Thanks for subscribing modal component', function () {
   let component: ThanksForSubscribingModalComponent;
   let fixture: ComponentFixture<ThanksForSubscribingModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -43,9 +43,9 @@ describe('Thanks for subscribing modal component', function() {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
+          useClass: MockActiveModal,
+        },
+      ],
     }).compileComponents();
   }));
 

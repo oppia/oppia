@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for fetching svg file.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { SvgFileFetcherBackendApiService } from './svg-file-fetcher-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, TestBed, waitForAsync} from '@angular/core/testing';
+import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.service';
 
 describe('SvgFileFetcherBackendApiService', () => {
   let svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService;
@@ -26,41 +29,41 @@ describe('SvgFileFetcherBackendApiService', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     svgFileFetcherBackendApiService = TestBed.inject(
-      SvgFileFetcherBackendApiService);
+      SvgFileFetcherBackendApiService
+    );
     httpTestingController = TestBed.inject(HttpTestingController);
   }));
 
-  it('should send request for svg files', waitForAsync(fakeAsync(() => {
-    let svg = '';
-    svgFileFetcherBackendApiService.fetchSvg('/abc').subscribe(
-      x => svg = x
-    );
-    let req = httpTestingController.expectOne('/abc');
-    expect(req.request.method).toBe('GET');
-    req.flush('<svg><svg>');
-    expect(svg).toBe('<svg><svg>');
-  })));
+  it('should send request for svg files', waitForAsync(
+    fakeAsync(() => {
+      let svg = '';
+      svgFileFetcherBackendApiService
+        .fetchSvg('/abc')
+        .subscribe(x => (svg = x));
+      let req = httpTestingController.expectOne('/abc');
+      expect(req.request.method).toBe('GET');
+      req.flush('<svg><svg>');
+      expect(svg).toBe('<svg><svg>');
+    })
+  ));
 
-  it('should send request for svg files', waitForAsync(fakeAsync(() => {
-    let filename = '';
-    svgFileFetcherBackendApiService.postSvgFile(
-      new Blob(['abc']),
-      {height: 1, width: 1},
-      'abc',
-      'def'
-    ).subscribe(
-      res => filename = res.filename
-    );
-    let req = httpTestingController.expectOne(
-      '/createhandler/imageupload/abc/def'
-    );
-    expect(req.request.method).toBe('POST');
-    req.flush({filename: 'file.name'});
-    expect(filename).toBe('file.name');
-  })));
+  it('should send request for svg files', waitForAsync(
+    fakeAsync(() => {
+      let filename = '';
+      svgFileFetcherBackendApiService
+        .postSvgFile(new Blob(['abc']), {height: 1, width: 1}, 'abc', 'def')
+        .subscribe(res => (filename = res.filename));
+      let req = httpTestingController.expectOne(
+        '/createhandler/imageupload/abc/def'
+      );
+      expect(req.request.method).toBe('POST');
+      req.flush({filename: 'file.name'});
+      expect(filename).toBe('file.name');
+    })
+  ));
 
   afterEach(() => {
     httpTestingController.verify();

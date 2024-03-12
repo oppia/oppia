@@ -17,61 +17,70 @@
  * about the concept card of a skill from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { ConceptCard, ConceptCardBackendDict } from
-  'domain/skill/concept-card.model';
-import { SkillDomainConstants } from
-  'domain/skill/skill-domain.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {
+  ConceptCard,
+  ConceptCardBackendDict,
+} from 'domain/skill/concept-card.model';
+import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface ConceptCardBackendDicts {
-  'concept_card_dicts': ConceptCardBackendDict[];
+  concept_card_dicts: ConceptCardBackendDict[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConceptCardBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) {}
+    private urlInterpolation: UrlInterpolationService
+  ) {}
 
   // Maps previously loaded concept cards to their IDs.
   private _conceptCardCache: Record<string, ConceptCard> = {};
 
   private _fetchConceptCards(
-      skillIds: string[],
-      successCallback: (value: ConceptCard[]) => void,
-      errorCallback: (reason: string) => void): void {
+    skillIds: string[],
+    successCallback: (value: ConceptCard[]) => void,
+    errorCallback: (reason: string) => void
+  ): void {
     var conceptCardDataUrl = this.urlInterpolation.interpolateUrl(
-      SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE, {
-        selected_skill_ids: JSON.stringify(skillIds)
-      });
+      SkillDomainConstants.CONCEPT_CARD_DATA_URL_TEMPLATE,
+      {
+        selected_skill_ids: JSON.stringify(skillIds),
+      }
+    );
 
     const conceptCardObjects: ConceptCard[] = [];
 
-    this.http.get<ConceptCardBackendDicts>(conceptCardDataUrl).toPromise()
-      .then(response => {
-        if (successCallback) {
-          var conceptCardDicts = response.concept_card_dicts;
-          conceptCardDicts.forEach(conceptCardDict => {
-            conceptCardObjects.push(
-              ConceptCard.createFromBackendDict(
-                conceptCardDict));
-          });
-          successCallback(conceptCardObjects);
+    this.http
+      .get<ConceptCardBackendDicts>(conceptCardDataUrl)
+      .toPromise()
+      .then(
+        response => {
+          if (successCallback) {
+            var conceptCardDicts = response.concept_card_dicts;
+            conceptCardDicts.forEach(conceptCardDict => {
+              conceptCardObjects.push(
+                ConceptCard.createFromBackendDict(conceptCardDict)
+              );
+            });
+            successCallback(conceptCardObjects);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      }, errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      );
   }
 
   private _isCached(skillId: string): boolean {
@@ -97,14 +106,17 @@ export class ConceptCardBackendApiService {
         // Case where only part (or none) of the concept cards are cached
         // locally.
         this._fetchConceptCards(
-          uncachedSkillIds, (uncachedConceptCards) => {
+          uncachedSkillIds,
+          uncachedConceptCards => {
             skillIds.forEach(skillId => {
               if (uncachedSkillIds.includes(skillId)) {
                 conceptCards.push(
-                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
+                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
+                );
                 // Save the fetched conceptCards to avoid future fetches.
                 this._conceptCardCache[skillId] = cloneDeep(
-                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]);
+                  uncachedConceptCards[uncachedSkillIds.indexOf(skillId)]
+                );
               } else {
                 conceptCards.push(cloneDeep(this._conceptCardCache[skillId]));
               }
@@ -112,7 +124,9 @@ export class ConceptCardBackendApiService {
             if (resolve) {
               resolve(cloneDeep(conceptCards));
             }
-          }, reject);
+          },
+          reject
+        );
       } else {
         // Case where all of the concept cards are cached locally.
         skillIds.forEach(skillId => {
@@ -126,6 +140,9 @@ export class ConceptCardBackendApiService {
   }
 }
 
-angular.module('oppia').factory(
-  'ConceptCardBackendApiService',
-  downgradeInjectable(ConceptCardBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ConceptCardBackendApiService',
+    downgradeInjectable(ConceptCardBackendApiService)
+  );

@@ -16,21 +16,28 @@
  * @fileoverview UnitTests for base root component.
  */
 
-import { EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, TestBed} from '@angular/core/testing';
-import { LangChangeEvent, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { of, Subscription } from 'rxjs';
+import {EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+} from '@angular/core/testing';
+import {
+  LangChangeEvent,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
+import {of, Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from './base-root.component';
-import { PageHeadService } from 'services/page-head.service';
-
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from './base-root.component';
+import {PageHeadService} from 'services/page-head.service';
 
 class MockComponent extends BaseRootComponent {
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE;
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN
+    .META as unknown as Readonly<MetaTagData>[];
 }
 
 describe('Base root component', () => {
@@ -43,10 +50,7 @@ describe('Base root component', () => {
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       declarations: [MockComponent],
-      providers: [
-        PageHeadService,
-        TranslateService
-      ],
+      providers: [PageHeadService, TranslateService],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MockComponent);
@@ -55,29 +59,40 @@ describe('Base root component', () => {
     translateServie = TestBed.inject(TranslateService);
   });
 
-  it('should subscribe to language ' +
-   'changes and update title and metadata', fakeAsync(() => {
-    const translatedTitle = 'translatedTitle';
-    const instantSpy = spyOn(
-      translateServie, 'instant').and.returnValue(translatedTitle);
-    const updateTitleAndMetaTagsSpy = spyOn(
-      pageHeadService, 'updateTitleAndMetaTags');
-    spyOnProperty(translateServie, 'onLangChange', 'get').and.returnValue(
-      of(null) as unknown as EventEmitter<LangChangeEvent>);
+  it(
+    'should subscribe to language ' + 'changes and update title and metadata',
+    fakeAsync(() => {
+      const translatedTitle = 'translatedTitle';
+      const instantSpy = spyOn(translateServie, 'instant').and.returnValue(
+        translatedTitle
+      );
+      const updateTitleAndMetaTagsSpy = spyOn(
+        pageHeadService,
+        'updateTitleAndMetaTags'
+      );
+      spyOnProperty(translateServie, 'onLangChange', 'get').and.returnValue(
+        of(null) as unknown as EventEmitter<LangChangeEvent>
+      );
 
-    component.ngOnInit();
-    flush();
+      component.ngOnInit();
+      flush();
 
-    expect(instantSpy).toHaveBeenCalledOnceWith(
-      component.title, component.titleInterpolationParams);
-    expect(updateTitleAndMetaTagsSpy).toHaveBeenCalledWith(
-      translatedTitle, component.meta);
-  }));
+      expect(instantSpy).toHaveBeenCalledOnceWith(
+        component.title,
+        component.titleInterpolationParams
+      );
+      expect(updateTitleAndMetaTagsSpy).toHaveBeenCalledWith(
+        translatedTitle,
+        component.meta
+      );
+    })
+  );
 
   it('should unsubscribe on destroy', () => {
     const mockUnsubscribe = jasmine.createSpy();
     component.directiveSubscriptions = {
-      unsubscribe: mockUnsubscribe} as unknown as Subscription;
+      unsubscribe: mockUnsubscribe,
+    } as unknown as Subscription;
 
     component.ngOnDestroy();
 

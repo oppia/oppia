@@ -20,26 +20,25 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { GuppyConfigurationService } from 'services/guppy-configuration.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { MathEquationInputRulesService } from './math-equation-input-rules.service';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {GuppyConfigurationService} from 'services/guppy-configuration.service';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {MathEquationInputRulesService} from './math-equation-input-rules.service';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
 
 interface FocusObj {
   focused: boolean;
 }
 
-
 @Component({
   selector: 'oppia-interactive-math-equation-input',
-  templateUrl: './math-equation-input-interaction.component.html'
+  templateUrl: './math-equation-input-interaction.component.html',
 })
 export class InteractiveMathEquationInput implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -59,21 +58,25 @@ export class InteractiveMathEquationInput implements OnInit {
     private htmlEscaperService: HtmlEscaperService,
     private mathEquationInputRulesService: MathEquationInputRulesService,
     private mathInteractionsService: MathInteractionsService,
-    private translateService: TranslateService,
+    private translateService: TranslateService
   ) {}
 
   isCurrentAnswerValid(checkForTouched = true): boolean {
-    let activeGuppyObject = (
-      this.guppyInitializationService.findActiveGuppyObject());
+    let activeGuppyObject =
+      this.guppyInitializationService.findActiveGuppyObject();
     if (
       (!checkForTouched || this.hasBeenTouched) &&
-      activeGuppyObject === undefined) {
+      activeGuppyObject === undefined
+    ) {
       // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
       // is not compatible with nerdamer or with the backend validations.
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
-        this.value);
+        this.value
+      );
       let answerIsValid = this.mathInteractionsService.validateEquation(
-        this.value, this.guppyInitializationService.getAllowedVariables());
+        this.value,
+        this.guppyInitializationService.getAllowedVariables()
+      );
       this.warningText = this.mathInteractionsService.getWarningText();
       return answerIsValid;
     }
@@ -87,12 +90,14 @@ export class InteractiveMathEquationInput implements OnInit {
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.value, this.mathEquationInputRulesService);
+      this.value,
+      this.mathEquationInputRulesService
+    );
   }
 
   onAnswerChange(focusObj: FocusObj): void {
-    const activeGuppyObject = (
-      this.guppyInitializationService.findActiveGuppyObject());
+    const activeGuppyObject =
+      this.guppyInitializationService.findActiveGuppyObject();
     if (activeGuppyObject !== undefined) {
       this.hasBeenTouched = true;
       this.value = activeGuppyObject.guppyInstance.asciimath();
@@ -113,18 +118,23 @@ export class InteractiveMathEquationInput implements OnInit {
     this.hasBeenTouched = false;
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
-      JSON.parse(this.useFractionForDivisionWithValue || 'false'));
+      JSON.parse(this.useFractionForDivisionWithValue || 'false')
+    );
     let translatedPlaceholder = this.translateService.instant(
-      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput);
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.MathEquationInput
+    );
     this.guppyInitializationService.init(
       'guppy-div-learner',
       translatedPlaceholder,
-      (this.savedSolution as string) !==
-      undefined ? this.savedSolution as string : ''
+      (this.savedSolution as string) !== undefined
+        ? (this.savedSolution as string)
+        : ''
     );
     this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.allowedVariablesWithValue) as string[]);
+        this.allowedVariablesWithValue
+      ) as string[]
+    );
 
     Guppy.event('change', this.onAnswerChange.bind(this));
 
@@ -137,12 +147,15 @@ export class InteractiveMathEquationInput implements OnInit {
     });
 
     this.currentInteractionService.registerCurrentInteraction(
-      this.submitAnswer.bind(this), this.isCurrentAnswerValid.bind(this));
+      this.submitAnswer.bind(this),
+      this.isCurrentAnswerValid.bind(this)
+    );
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaInteractiveMathEquationInput', downgradeComponent({
-    component: InteractiveMathEquationInput
+  'oppiaInteractiveMathEquationInput',
+  downgradeComponent({
+    component: InteractiveMathEquationInput,
   }) as angular.IDirectiveFactory
 );

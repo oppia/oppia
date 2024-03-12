@@ -16,19 +16,16 @@
  * @fileoverview Component for Delete Audio Translation Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-delete-audio-translation-modal',
-  templateUrl: './delete-audio-translation-modal.component.html'
+  templateUrl: './delete-audio-translation-modal.component.html',
 })
-
 export class DeleteAudioTranslationModalComponent extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the music notes input response component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ResponseMusicNotesInput } from './oppia-response-music-notes-input.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ResponseMusicNotesInput} from './oppia-response-music-notes-input.component';
 
 describe('Response music notes input component ', () => {
   let component: ResponseMusicNotesInput;
@@ -33,16 +33,14 @@ describe('Response music notes input component ', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ResponseMusicNotesInput,
-      ],
+      declarations: [ResponseMusicNotesInput],
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: MockHtmlEscaperService
-        }
+          useClass: MockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -50,13 +48,15 @@ describe('Response music notes input component ', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(ResponseMusicNotesInput);
       component = fixture.componentInstance;
-      component.answer = [{
-        readableNoteName: 'B4',
-        noteDuration: {
-          num: 1,
-          den: 1
-        }
-      }];
+      component.answer = [
+        {
+          readableNoteName: 'B4',
+          noteDuration: {
+            num: 1,
+            den: 1,
+          },
+        },
+      ];
     });
 
     it('should initialise the component when submits answer', () => {

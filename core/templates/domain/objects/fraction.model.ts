@@ -17,10 +17,8 @@
  * domain objects.
  */
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { FractionAnswer } from
-  'interactions/answer-defs';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
+import {FractionAnswer} from 'interactions/answer-defs';
 
 export interface FractionDict {
   isNegative: boolean;
@@ -35,8 +33,11 @@ export class Fraction {
   numerator: number;
   denominator: number;
   constructor(
-      isNegative: boolean, wholeNumber: number, numerator: number,
-      denominator: number) {
+    isNegative: boolean,
+    wholeNumber: number,
+    numerator: number,
+    denominator: number
+  ) {
     this.isNegative = isNegative;
     this.wholeNumber = wholeNumber;
     this.numerator = numerator;
@@ -65,13 +66,13 @@ export class Fraction {
       isNegative: this.isNegative,
       wholeNumber: this.wholeNumber,
       numerator: this.numerator,
-      denominator: this.denominator
+      denominator: this.denominator,
     };
   }
 
   toFloat(): number {
-    var totalParts = (this.wholeNumber * this.denominator) + this.numerator;
-    var floatVal = (totalParts / this.denominator);
+    var totalParts = this.wholeNumber * this.denominator + this.numerator;
+    var floatVal = totalParts / this.denominator;
     return this.isNegative ? -floatVal : floatVal;
   }
 
@@ -87,7 +88,11 @@ export class Fraction {
     var numerator = this.numerator / g;
     var denominator = this.denominator / g;
     return new Fraction(
-      this.isNegative, this.wholeNumber, numerator, denominator);
+      this.isNegative,
+      this.wholeNumber,
+      numerator,
+      denominator
+    );
   }
 
   hasNonzeroIntegerPart(): boolean {
@@ -113,12 +118,14 @@ export class Fraction {
     var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS);
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
+      );
     }
     var FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
     if (!FRACTION_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT);
+        ObjectsDomainConstants.FRACTION_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
+      );
     }
     var isNegative = false;
     var wholeNumber = 0;
@@ -131,7 +138,7 @@ export class Fraction {
       rawInput = rawInput.substring(1);
     }
     // Filter result from split to remove empty strings.
-    var numbers = rawInput.split(/\/|\s/g).filter((token) => {
+    var numbers = rawInput.split(/\/|\s/g).filter(token => {
       // The empty string will evaluate to false.
       return Boolean(token);
     });
@@ -160,6 +167,7 @@ export class Fraction {
       fractionDict.isNegative,
       fractionDict.wholeNumber,
       fractionDict.numerator,
-      fractionDict.denominator);
+      fractionDict.denominator
+    );
   }
 }

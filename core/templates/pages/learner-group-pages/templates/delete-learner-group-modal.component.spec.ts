@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the delete learner group modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { DeleteLearnerGroupModalComponent } from './delete-learner-group-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {DeleteLearnerGroupModalComponent} from './delete-learner-group-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -33,21 +32,20 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Learner Group Modal Component', function() {
+describe('Delete Learner Group Modal Component', function () {
   let component: DeleteLearnerGroupModalComponent;
   let fixture: ComponentFixture<DeleteLearnerGroupModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteLearnerGroupModalComponent,
-        MockTranslatePipe
+      declarations: [DeleteLearnerGroupModalComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

@@ -16,21 +16,29 @@
  * @fileoverview Unit tests for new lesson player sidebar component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { PlayerSidebarComponent } from './player-sidebar.component';
-import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { MobileMenuService } from '../new-lesson-player-services/mobile-menu.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {PlayerSidebarComponent} from './player-sidebar.component';
+import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {MobileMenuService} from '../new-lesson-player-services/mobile-menu.service';
 import './player-sidebar.component.css';
-import { I18nLanguageCodeService } from
-  'services/i18n-language-code.service';
-import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { BehaviorSubject } from 'rxjs';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { ContextService } from 'services/context.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
+import {BehaviorSubject} from 'rxjs';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {ContextService} from 'services/context.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -45,8 +53,7 @@ describe('PlayerSidebarComponent', () => {
   let mockMobileMenuService: Partial<MobileMenuService>;
   let contextService: ContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
-  let readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService;
+  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let urlService: UrlService;
 
   beforeEach(waitForAsync(() => {
@@ -69,14 +76,14 @@ describe('PlayerSidebarComponent', () => {
         UrlService,
         {
           provide: MobileMenuService,
-          useValue: mockMobileMenuService
+          useValue: mockMobileMenuService,
         },
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -85,7 +92,8 @@ describe('PlayerSidebarComponent', () => {
     component = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
     readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService);
+      ReadOnlyExplorationBackendApiService
+    );
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
@@ -97,13 +105,17 @@ describe('PlayerSidebarComponent', () => {
 
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/');
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
-    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
-      .and.returnValue(Promise.resolve({
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchExplorationAsync'
+    ).and.returnValue(
+      Promise.resolve({
         exploration: {
           title: explorationTitle,
-          objective: explorationObjective
-        }
-      } as FetchExplorationBackendResponse));
+          objective: explorationObjective,
+        },
+      } as FetchExplorationBackendResponse)
+    );
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(1);
     spyOn(urlService, 'getPidFromUrl').and.returnValue('');
     spyOn(i18nLanguageCodeService, 'getExplorationTranslationKey');
@@ -116,10 +128,12 @@ describe('PlayerSidebarComponent', () => {
     expect(urlService.getExplorationVersionFromUrl).toHaveBeenCalled();
     expect(urlService.getPidFromUrl).toHaveBeenCalled();
     expect(contextService.getExplorationId).toHaveBeenCalled();
-    expect(readOnlyExplorationBackendApiService.fetchExplorationAsync)
-      .toHaveBeenCalled();
-    expect(i18nLanguageCodeService.getExplorationTranslationKey)
-      .toHaveBeenCalled();
+    expect(
+      readOnlyExplorationBackendApiService.fetchExplorationAsync
+    ).toHaveBeenCalled();
+    expect(
+      i18nLanguageCodeService.getExplorationTranslationKey
+    ).toHaveBeenCalled();
   }));
 
   it('should toggle sidebar', () => {
@@ -133,8 +147,8 @@ describe('PlayerSidebarComponent', () => {
   it('should check if hacky exp desc translation is displayed', () => {
     // Translation is only displayed if the language is not English
     // and its hacky translation is available.
-    let hackyExpDescTranslationIsDisplayed = (
-      component.isHackyExpDescTranslationDisplayed());
+    let hackyExpDescTranslationIsDisplayed =
+      component.isHackyExpDescTranslationDisplayed();
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
   });
 });

@@ -16,16 +16,17 @@
  * @fileoverview Services for oppia email dashboard page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { QueryData, EmailDashboardBackendApiService } from
-  'domain/email-dashboard/email-dashboard-backend-api.service';
-import { EmailDashboardQuery } from
-  'domain/email-dashboard/email-dashboard-query.model';
+import {
+  QueryData,
+  EmailDashboardBackendApiService,
+} from 'domain/email-dashboard/email-dashboard-backend-api.service';
+import {EmailDashboardQuery} from 'domain/email-dashboard/email-dashboard-query.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EmailDashboardDataService {
   // No. of query results to display on a single page.
@@ -60,32 +61,36 @@ export class EmailDashboardDataService {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
-    return this.emailDashboardBackendApiService.submitQueryAsync(
-      data).then(query => {
-      var newQueries = [query];
-      this.queries = newQueries.concat(this.queries);
-      return this.queries.slice(startQueryIndex, endQueryIndex);
-    });
+    return this.emailDashboardBackendApiService
+      .submitQueryAsync(data)
+      .then(query => {
+        var newQueries = [query];
+        this.queries = newQueries.concat(this.queries);
+        return this.queries.slice(startQueryIndex, endQueryIndex);
+      });
   }
 
   async getNextQueriesAsync(): Promise<EmailDashboardQuery[]> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
-    if (this.queries.length >= endQueryIndex ||
-        (this.latestCursor === null && this.currentPageIndex !== -1)) {
+    if (
+      this.queries.length >= endQueryIndex ||
+      (this.latestCursor === null && this.currentPageIndex !== -1)
+    ) {
       this.currentPageIndex = this.currentPageIndex + 1;
-      return new Promise((resolver) => {
+      return new Promise(resolver => {
         resolver(this.queries.slice(startQueryIndex, endQueryIndex));
       });
     } else {
       this.currentPageIndex = this.currentPageIndex + 1;
-      return this.emailDashboardBackendApiService.fetchQueriesPageAsync(
-        this.QUERIES_PER_PAGE, this.latestCursor).then(data => {
-        this.queries = this.queries.concat(data.recentQueries);
-        this.latestCursor = data.cursor;
-        return this.queries.slice(startQueryIndex, endQueryIndex);
-      });
+      return this.emailDashboardBackendApiService
+        .fetchQueriesPageAsync(this.QUERIES_PER_PAGE, this.latestCursor)
+        .then(data => {
+          this.queries = this.queries.concat(data.recentQueries);
+          this.latestCursor = data.cursor;
+          return this.queries.slice(startQueryIndex, endQueryIndex);
+        });
     }
   }
 
@@ -98,17 +103,18 @@ export class EmailDashboardDataService {
 
   isNextPageAvailable(): boolean {
     var nextQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
-    return (this.queries.length > nextQueryIndex) || Boolean(this.latestCursor);
+    return this.queries.length > nextQueryIndex || Boolean(this.latestCursor);
   }
 
   isPreviousPageAvailable(): boolean {
-    return (this.currentPageIndex > 0);
+    return this.currentPageIndex > 0;
   }
 
   async fetchQueryAsync(queryId: string): Promise<EmailDashboardQuery> {
-    return this.emailDashboardBackendApiService.fetchQueryAsync(queryId)
+    return this.emailDashboardBackendApiService
+      .fetchQueryAsync(queryId)
       .then(newQuery => {
-        this.queries.forEach(function(query, index, queries) {
+        this.queries.forEach(function (query, index, queries) {
           if (query.id === queryId) {
             queries[index] = newQuery;
           }
@@ -118,6 +124,9 @@ export class EmailDashboardDataService {
   }
 }
 
-angular.module('oppia').factory(
-  'EmailDashboardDataService',
-  downgradeInjectable(EmailDashboardDataService));
+angular
+  .module('oppia')
+  .factory(
+    'EmailDashboardDataService',
+    downgradeInjectable(EmailDashboardDataService)
+  );

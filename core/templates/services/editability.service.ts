@@ -16,11 +16,11 @@
  * @fileoverview Service for checking the ability to edit an exploration.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EditabilityService {
   static isEditable: boolean = false;
@@ -35,7 +35,8 @@ export class EditabilityService {
     return (
       EditabilityService.isEditable &&
       !EditabilityService.inTutorialMode &&
-      !EditabilityService.isLockedByAdmin);
+      !EditabilityService.isLockedByAdmin
+    );
   }
 
   /**
@@ -43,7 +44,8 @@ export class EditabilityService {
    */
   isTranslatable(): boolean {
     return (
-      EditabilityService.isTranslatable && !EditabilityService.inTutorialMode);
+      EditabilityService.isTranslatable && !EditabilityService.inTutorialMode
+    );
   }
 
   /**
@@ -104,5 +106,6 @@ export class EditabilityService {
   }
 }
 
-angular.module('oppia').factory(
-  'EditabilityService', downgradeInjectable(EditabilityService));
+angular
+  .module('oppia')
+  .factory('EditabilityService', downgradeInjectable(EditabilityService));

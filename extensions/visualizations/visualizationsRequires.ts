@@ -17,7 +17,6 @@
  */
 
 require('visualizations/oppia-visualization-click-hexbins.directive.ts');
-require(
-  'visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
+require('visualizations/oppia-visualization-enumerated-frequency-table.directive.ts');
 require('visualizations/oppia-visualization-frequency-table.directive.ts');
 require('visualizations/oppia-visualization-sorted-tiles.component.ts');

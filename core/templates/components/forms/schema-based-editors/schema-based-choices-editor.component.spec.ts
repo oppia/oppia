@@ -16,9 +16,14 @@
  * @fileoverview Unit tests for Schema Based Choices Editor Component
  */
 
-import { FormControl, FormsModule } from '@angular/forms';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { SchemaBasedChoicesEditorComponent } from './schema-based-choices-editor.component';
+import {FormControl, FormsModule} from '@angular/forms';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {SchemaBasedChoicesEditorComponent} from './schema-based-choices-editor.component';
 
 describe('Schema Based Choices Editor Component', () => {
   let component: SchemaBasedChoicesEditorComponent;
@@ -27,9 +32,7 @@ describe('Schema Based Choices Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [
-        SchemaBasedChoicesEditorComponent
-      ]
+      declarations: [SchemaBasedChoicesEditorComponent],
     }).compileComponents();
   }));
 
@@ -41,7 +44,7 @@ describe('Schema Based Choices Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: string) {
+    let mockFunction = function (value: string) {
       return value;
     };
     component.registerOnChange(mockFunction);

@@ -16,31 +16,27 @@
  * @fileoverview Unit tests for maintenance page controller.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, async, TestBed } from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, async, TestBed} from '@angular/core/testing';
 
-import { MaintenancePageComponent } from
-  'pages/maintenance-page/maintenance-page.component';
-import { DocumentAttributeCustomizationService } from
-  'services/contextual/document-attribute-customization.service';
+import {MaintenancePageComponent} from 'pages/maintenance-page/maintenance-page.component';
+import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';
 
 let component: MaintenancePageComponent;
 let fixture: ComponentFixture<MaintenancePageComponent>;
 
 describe('Maintenance page', () => {
-  let documentAttributeCustomizationService:
-    DocumentAttributeCustomizationService;
+  let documentAttributeCustomizationService: DocumentAttributeCustomizationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [MaintenancePageComponent],
-      providers: [
-        DocumentAttributeCustomizationService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [DocumentAttributeCustomizationService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    documentAttributeCustomizationService =
-      TestBed.get(DocumentAttributeCustomizationService);
+    documentAttributeCustomizationService = TestBed.get(
+      DocumentAttributeCustomizationService
+    );
   }));
 
   beforeEach(() => {
@@ -49,15 +45,17 @@ describe('Maintenance page', () => {
     fixture.detectChanges();
   });
 
-
   it('should set document lang when $onInit is called', () => {
-    spyOn(documentAttributeCustomizationService, 'addAttribute').and
-      .callThrough();
+    spyOn(
+      documentAttributeCustomizationService,
+      'addAttribute'
+    ).and.callThrough();
     component.ngOnInit();
 
     expect(component.currentLang).toBe('en');
-    expect(documentAttributeCustomizationService.addAttribute)
-      .toHaveBeenCalledWith('lang', 'en');
+    expect(
+      documentAttributeCustomizationService.addAttribute
+    ).toHaveBeenCalledWith('lang', 'en');
   });
 
   it('should get static image url', () => {

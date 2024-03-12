@@ -16,12 +16,20 @@
  * @fileoverview Unit tests for the Connection Service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { Subscription } from 'rxjs';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { discardPeriodicTasks, fakeAsync, flushMicrotasks, tick } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {Subscription} from 'rxjs';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  discardPeriodicTasks,
+  fakeAsync,
+  flushMicrotasks,
+  tick,
+} from '@angular/core/testing';
 
 class MockWindowRef {
   nativeWindow = {
@@ -32,8 +40,8 @@ class MockWindowRef {
       return;
     },
     navigator: {
-      onLine: true
-    }
+      onLine: true,
+    },
   };
 }
 
@@ -46,15 +54,14 @@ describe('Connection Service', () => {
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
+      imports: [HttpClientTestingModule],
       providers: [
         InternetConnectivityService,
         {
           provide: WindowRef,
-          useValue: mockWindowRef
-        }]
+          useValue: mockWindowRef,
+        },
+      ],
     });
     internetConnectivityService = TestBed.get(InternetConnectivityService);
     httpTestingController = TestBed.get(HttpTestingController);
@@ -65,7 +72,8 @@ describe('Connection Service', () => {
     subscriptions.add(
       internetConnectivityService.onInternetStateChange.subscribe(
         connectionStateSpy
-      ));
+      )
+    );
   });
 
   afterEach(() => {
@@ -78,55 +86,51 @@ describe('Connection Service', () => {
     expect(internetConnectivityService).toBeTruthy();
   });
 
-  it('should report network status false when disconnected from network',
-    () => {
-      internetConnectivityService.startCheckingConnection();
-      spyOn(internetConnectivityService, 'startCheckingConnection');
-      mockWindowRef.nativeWindow.onoffline();
-      expect(connectionStateSpy).toHaveBeenCalledWith(false);
+  it('should report network status false when disconnected from network', () => {
+    internetConnectivityService.startCheckingConnection();
+    spyOn(internetConnectivityService, 'startCheckingConnection');
+    mockWindowRef.nativeWindow.onoffline();
+    expect(connectionStateSpy).toHaveBeenCalledWith(false);
+  });
+
+  it('should report internet status as online when internet is available', fakeAsync(() => {
+    internetConnectivityService.startCheckingConnection();
+    tick(100);
+    discardPeriodicTasks();
+    let req = httpTestingController.expectOne('/internetconnectivityhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      isInternetConnected: true,
     });
+    flushMicrotasks();
+    var internetAccessible = internetConnectivityService.isOnline();
+    expect(internetAccessible).toEqual(true);
+  }));
 
-  it('should report internet status as online when internet is available',
-    fakeAsync(() => {
-      internetConnectivityService.startCheckingConnection();
-      tick(100);
-      discardPeriodicTasks();
-      let req = httpTestingController.expectOne('/internetconnectivityhandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        isInternetConnected: true,
-      });
-      flushMicrotasks();
-      var internetAccessible = internetConnectivityService.isOnline();
-      expect(internetAccessible).toEqual(true);
-    }));
-
-  it('should report internet status as online when reconnected after offline',
-    fakeAsync(() => {
-      internetConnectivityService.startCheckingConnection();
-      tick(100);
-      let req = httpTestingController.expectOne('/internetconnectivityhandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        isInternetConnected: true,
-      });
-      flushMicrotasks();
-      // Disconnecting window from the network.
-      // eslint-disable-next-line dot-notation
-      internetConnectivityService['_connectedToNetwork'] = false;
-      // Delay timer to test for the network connection again after offline.
-      tick(8000);
-      // Connecting window to the network.
-      mockWindowRef.nativeWindow.ononline();
-      tick(3000);
-      discardPeriodicTasks();
-      let req2 = httpTestingController.expectOne(
-        '/internetconnectivityhandler');
-      expect(req2.request.method).toEqual('GET');
-      req2.flush({
-        isInternetConnected: true,
-      });
-      flushMicrotasks();
-      expect(connectionStateSpy).toHaveBeenCalledWith(true);
-    }));
+  it('should report internet status as online when reconnected after offline', fakeAsync(() => {
+    internetConnectivityService.startCheckingConnection();
+    tick(100);
+    let req = httpTestingController.expectOne('/internetconnectivityhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      isInternetConnected: true,
+    });
+    flushMicrotasks();
+    // Disconnecting window from the network.
+    // eslint-disable-next-line dot-notation
+    internetConnectivityService['_connectedToNetwork'] = false;
+    // Delay timer to test for the network connection again after offline.
+    tick(8000);
+    // Connecting window to the network.
+    mockWindowRef.nativeWindow.ononline();
+    tick(3000);
+    discardPeriodicTasks();
+    let req2 = httpTestingController.expectOne('/internetconnectivityhandler');
+    expect(req2.request.method).toEqual('GET');
+    req2.flush({
+      isInternetConnected: true,
+    });
+    flushMicrotasks();
+    expect(connectionStateSpy).toHaveBeenCalledWith(true);
+  }));
 });

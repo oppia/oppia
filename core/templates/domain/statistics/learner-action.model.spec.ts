@@ -16,51 +16,52 @@
  * @fileoverview Unit tests for the LearnerAction model class.
  */
 
-import { LearnerAction, LearnerActionType } from
-  'domain/statistics/learner-action.model';
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
+import {
+  LearnerAction,
+  LearnerActionType,
+} from 'domain/statistics/learner-action.model';
+import {StatisticsDomainConstants} from 'domain/statistics/statistics-domain.constants';
 
 describe('Learner Action Object Factory', () => {
   const LEARNER_ACTION_SCHEMA_LATEST_VERSION =
-      StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
+    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION;
 
   it('should create a new learner action', () => {
     var answerSubmitlearnerActionObject =
       LearnerAction.createNewAnswerSubmitAction({
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         dest_state_name: {
-          value: 'dest_state'
+          value: 'dest_state',
         },
         interaction_id: {
-          value: 'interaction_id'
+          value: 'interaction_id',
         },
         submitted_answer: {
-          value: 'answer'
+          value: 'answer',
         },
         feedback: {
-          value: 'feedback'
+          value: 'feedback',
         },
         time_spent_state_in_msecs: {
-          value: 2
-        }
+          value: 2,
+        },
       });
     var explorationStartlearnerActionObject =
       LearnerAction.createNewExplorationStartAction({
         state_name: {
-          value: 'state'
-        }
+          value: 'state',
+        },
       });
     var explorationQuitlearnerActionObject =
       LearnerAction.createNewExplorationQuitAction({
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         time_spent_in_state_in_msecs: {
-          value: 2
-        }
+          value: 2,
+        },
       });
 
     expect(answerSubmitlearnerActionObject.actionType).toEqual(
@@ -68,179 +69,180 @@ describe('Learner Action Object Factory', () => {
     );
     expect(answerSubmitlearnerActionObject.actionCustomizationArgs).toEqual({
       state_name: {
-        value: 'state'
+        value: 'state',
       },
       dest_state_name: {
-        value: 'dest_state'
+        value: 'dest_state',
       },
       interaction_id: {
-        value: 'interaction_id'
+        value: 'interaction_id',
       },
       submitted_answer: {
-        value: 'answer'
+        value: 'answer',
       },
       feedback: {
-        value: 'feedback'
+        value: 'feedback',
       },
       time_spent_state_in_msecs: {
-        value: 2
-      }
+        value: 2,
+      },
     });
-    expect(answerSubmitlearnerActionObject.schemaVersion)
-      .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(answerSubmitlearnerActionObject.schemaVersion).toEqual(
+      LEARNER_ACTION_SCHEMA_LATEST_VERSION
+    );
     expect(explorationStartlearnerActionObject.actionType).toEqual(
-      LearnerActionType.ExplorationStart);
-    expect(
-      explorationStartlearnerActionObject.actionCustomizationArgs).toEqual({
-      state_name: {
-        value: 'state'
+      LearnerActionType.ExplorationStart
+    );
+    expect(explorationStartlearnerActionObject.actionCustomizationArgs).toEqual(
+      {
+        state_name: {
+          value: 'state',
+        },
       }
-    });
-    expect(explorationStartlearnerActionObject.schemaVersion)
-      .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    );
+    expect(explorationStartlearnerActionObject.schemaVersion).toEqual(
+      LEARNER_ACTION_SCHEMA_LATEST_VERSION
+    );
     expect(explorationQuitlearnerActionObject.actionType).toEqual(
-      LearnerActionType.ExplorationQuit);
-    expect(
-      explorationQuitlearnerActionObject.actionCustomizationArgs).toEqual({
+      LearnerActionType.ExplorationQuit
+    );
+    expect(explorationQuitlearnerActionObject.actionCustomizationArgs).toEqual({
       state_name: {
-        value: 'state'
+        value: 'state',
       },
       time_spent_in_state_in_msecs: {
-        value: 2
-      }
+        value: 2,
+      },
     });
-    expect(explorationQuitlearnerActionObject.schemaVersion)
-      .toEqual(LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+    expect(explorationQuitlearnerActionObject.schemaVersion).toEqual(
+      LEARNER_ACTION_SCHEMA_LATEST_VERSION
+    );
   });
 
-  it('should create a new learner action AnswerSubmit from a backend dict',
-    () => {
-      var learnerActionObject =
-        LearnerAction.createFromBackendDict({
-          action_type: LearnerActionType.AnswerSubmit,
-          action_customization_args: {
-            state_name: {value: 'string'},
-            dest_state_name: {value: 'string'},
-            interaction_id: {value: 'string'},
-            submitted_answer: {value: 'string'},
-            feedback: {value: 'string'},
-            time_spent_state_in_msecs: {value: 5}
-          },
-          schema_version: 1
-        });
-
-      expect(learnerActionObject.actionType)
-        .toEqual(LearnerActionType.AnswerSubmit);
-      expect(learnerActionObject.actionCustomizationArgs).toEqual({
+  it('should create a new learner action AnswerSubmit from a backend dict', () => {
+    var learnerActionObject = LearnerAction.createFromBackendDict({
+      action_type: LearnerActionType.AnswerSubmit,
+      action_customization_args: {
         state_name: {value: 'string'},
         dest_state_name: {value: 'string'},
         interaction_id: {value: 'string'},
         submitted_answer: {value: 'string'},
         feedback: {value: 'string'},
-        time_spent_state_in_msecs: {value: 5}
-      });
-      expect(learnerActionObject.schemaVersion).toEqual(1);
+        time_spent_state_in_msecs: {value: 5},
+      },
+      schema_version: 1,
     });
 
-  it('should create a new learner action ExplorationStart from a backend dict',
-    () => {
-      var learnerActionObject =
-        LearnerAction.createFromBackendDict({
-          action_type: LearnerActionType.ExplorationStart,
-          action_customization_args: {
-            state_name: {
-              value: 'state'
-            },
-          },
-          schema_version: 1
-        });
+    expect(learnerActionObject.actionType).toEqual(
+      LearnerActionType.AnswerSubmit
+    );
+    expect(learnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {value: 'string'},
+      dest_state_name: {value: 'string'},
+      interaction_id: {value: 'string'},
+      submitted_answer: {value: 'string'},
+      feedback: {value: 'string'},
+      time_spent_state_in_msecs: {value: 5},
+    });
+    expect(learnerActionObject.schemaVersion).toEqual(1);
+  });
 
-      expect(learnerActionObject.actionType)
-        .toEqual(LearnerActionType.ExplorationStart);
-      expect(learnerActionObject.actionCustomizationArgs).toEqual({
+  it('should create a new learner action ExplorationStart from a backend dict', () => {
+    var learnerActionObject = LearnerAction.createFromBackendDict({
+      action_type: LearnerActionType.ExplorationStart,
+      action_customization_args: {
         state_name: {
-          value: 'state'
-        }
-      });
-      expect(learnerActionObject.schemaVersion).toEqual(1);
+          value: 'state',
+        },
+      },
+      schema_version: 1,
     });
 
-  it('should create a new learner action ExplorationQuit from a backend dict',
-    () => {
-      var learnerActionObject =
-        LearnerAction.createFromBackendDict({
-          action_type: LearnerActionType.ExplorationQuit,
-          action_customization_args: {
-            state_name: {
-              value: 'state'
-            },
-            time_spent_in_state_in_msecs: {
-              value: 2
-            }
-          },
-          schema_version: 1
-        });
+    expect(learnerActionObject.actionType).toEqual(
+      LearnerActionType.ExplorationStart
+    );
+    expect(learnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state',
+      },
+    });
+    expect(learnerActionObject.schemaVersion).toEqual(1);
+  });
 
-      expect(learnerActionObject.actionType)
-        .toEqual(LearnerActionType.ExplorationQuit);
-      expect(learnerActionObject.actionCustomizationArgs).toEqual({
+  it('should create a new learner action ExplorationQuit from a backend dict', () => {
+    var learnerActionObject = LearnerAction.createFromBackendDict({
+      action_type: LearnerActionType.ExplorationQuit,
+      action_customization_args: {
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         time_spent_in_state_in_msecs: {
-          value: 2
-        }
-      });
-      expect(learnerActionObject.schemaVersion).toEqual(1);
+          value: 2,
+        },
+      },
+      schema_version: 1,
     });
 
+    expect(learnerActionObject.actionType).toEqual(
+      LearnerActionType.ExplorationQuit
+    );
+    expect(learnerActionObject.actionCustomizationArgs).toEqual({
+      state_name: {
+        value: 'state',
+      },
+      time_spent_in_state_in_msecs: {
+        value: 2,
+      },
+    });
+    expect(learnerActionObject.schemaVersion).toEqual(1);
+  });
+
   it('should convert a learner action to a backend dict', () => {
-    var learnerActionObject =
-        LearnerAction.createNewAnswerSubmitAction({
-          state_name: {
-            value: 'state'
-          },
-          dest_state_name: {
-            value: 'dest_state'
-          },
-          interaction_id: {
-            value: 'interaction_id'
-          },
-          submitted_answer: {
-            value: 'answer'
-          },
-          feedback: {
-            value: 'feedback'
-          },
-          time_spent_state_in_msecs: {
-            value: 2
-          }
-        });
+    var learnerActionObject = LearnerAction.createNewAnswerSubmitAction({
+      state_name: {
+        value: 'state',
+      },
+      dest_state_name: {
+        value: 'dest_state',
+      },
+      interaction_id: {
+        value: 'interaction_id',
+      },
+      submitted_answer: {
+        value: 'answer',
+      },
+      feedback: {
+        value: 'feedback',
+      },
+      time_spent_state_in_msecs: {
+        value: 2,
+      },
+    });
 
     var learnerActionDict = learnerActionObject.toBackendDict();
     expect(learnerActionDict).toEqual({
       action_type: LearnerActionType.AnswerSubmit,
       action_customization_args: {
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         dest_state_name: {
-          value: 'dest_state'
+          value: 'dest_state',
         },
         interaction_id: {
-          value: 'interaction_id'
+          value: 'interaction_id',
         },
         submitted_answer: {
-          value: 'answer'
+          value: 'answer',
         },
         feedback: {
-          value: 'feedback'
+          value: 'feedback',
         },
         time_spent_state_in_msecs: {
-          value: 2
-        }
+          value: 2,
+        },
       },
-      schema_version: 1
+      schema_version: 1,
     });
   });
 
@@ -248,7 +250,7 @@ describe('Learner Action Object Factory', () => {
     const playthroughDict = {
       action_type: 'InvalidAction',
       action_customization_args: {},
-      schema_version: 1
+      schema_version: 1,
     };
 
     expect(() => {
@@ -260,6 +262,7 @@ describe('Learner Action Object Factory', () => {
       LearnerAction.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known action type: ' +
-      JSON.stringify(playthroughDict));
+        JSON.stringify(playthroughDict)
+    );
   });
 });

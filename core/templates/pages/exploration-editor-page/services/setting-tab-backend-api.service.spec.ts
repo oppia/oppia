@@ -16,10 +16,17 @@
  * @fileoverview Unit tests for Backend api service for Setting tab.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed, waitForAsync} from '@angular/core/testing';
-import { SettingTabBackendApiService } from './setting-tab-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {SettingTabBackendApiService} from './setting-tab-backend-api.service';
 
 describe('History Tab Backend Api Service', () => {
   let service: SettingTabBackendApiService;
@@ -30,7 +37,7 @@ describe('History Tab Backend Api Service', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [SettingTabBackendApiService]
+      providers: [SettingTabBackendApiService],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(SettingTabBackendApiService);
@@ -40,21 +47,17 @@ describe('History Tab Backend Api Service', () => {
     httpTestingController.verify();
   });
 
-  it('should get setting tab data when getData is called',
-    fakeAsync(() => {
-      let moderatorEmailDraftUrl = 'check';
-      service.getData(
-        moderatorEmailDraftUrl
-      ).then(successHandler, failHandler);
+  it('should get setting tab data when getData is called', fakeAsync(() => {
+    let moderatorEmailDraftUrl = 'check';
+    service.getData(moderatorEmailDraftUrl).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('check');
-      expect(req.request.method).toEqual('GET');
-      req.flush([]);
+    let req = httpTestingController.expectOne('check');
+    expect(req.request.method).toEqual('GET');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

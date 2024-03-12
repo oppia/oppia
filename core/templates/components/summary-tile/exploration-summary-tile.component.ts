@@ -16,28 +16,31 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { UserService } from 'services/user.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { Subscription } from 'rxjs';
-import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import {AppConstants} from 'app.constants';
+import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
+import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {UserService} from 'services/user.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {Subscription} from 'rxjs';
+import {HumanReadableContributorsSummary} from 'domain/summary/creator-exploration-summary.model';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 
 import './exploration-summary-tile.component.css';
 
 @Component({
   selector: 'oppia-exploration-summary-tile',
   templateUrl: './exploration-summary-tile.component.html',
-  styleUrls: ['./exploration-summary-tile.component.css']
+  styleUrls: ['./exploration-summary-tile.component.css'],
 })
 export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -108,50 +111,51 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       this.userIsLoggedIn = userInfo.isLoggedIn();
     });
     this.activityType = AppConstants.ACTIVITY_TYPE_EXPLORATION;
-    let contributorsSummary: HumanReadableContributorsSummary = (
-      this.contributorsSummary || {});
-    this.contributors = Object.keys(
-      contributorsSummary).sort(
+    let contributorsSummary: HumanReadableContributorsSummary =
+      this.contributorsSummary || {};
+    this.contributors = Object.keys(contributorsSummary).sort(
       (contributorUsername1, contributorUsername2) => {
-        let commitsOfContributor1 = contributorsSummary[
-          contributorUsername1].num_commits;
-        let commitsOfContributor2 = contributorsSummary[
-          contributorUsername2].num_commits;
+        let commitsOfContributor1 =
+          contributorsSummary[contributorUsername1].num_commits;
+        let commitsOfContributor2 =
+          contributorsSummary[contributorUsername2].num_commits;
         return commitsOfContributor2 - commitsOfContributor1;
       }
     );
 
     this.isRefresherExploration = false;
     if (this.parentExplorationIds) {
-      this.isRefresherExploration = (
-        this.parentExplorationIds.length > 0);
+      this.isRefresherExploration = this.parentExplorationIds.length > 0;
     }
 
     if (!this.mobileCutoffPx) {
       this.mobileCutoffPx = 0;
     }
-    this.isWindowLarge = (
-      this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+    this.isWindowLarge =
+      this.windowDimensionsService.getWidth() >= this.mobileCutoffPx;
     this.checkIfMobileCardToBeShown();
 
-    this.resizeSubscription = this.windowDimensionsService.getResizeEvent().
-      subscribe(evt => {
-        this.isWindowLarge = (
-          this.windowDimensionsService.getWidth() >= this.mobileCutoffPx);
+    this.resizeSubscription = this.windowDimensionsService
+      .getResizeEvent()
+      .subscribe(evt => {
+        this.isWindowLarge =
+          this.windowDimensionsService.getWidth() >= this.mobileCutoffPx;
         this.checkIfMobileCardToBeShown();
       });
     this.lastUpdatedDateTime = this.getLastUpdatedDatetime();
     this.relativeLastUpdatedDateTime = this.getRelativeLastUpdatedDateTime();
     this.avgRating = this.getAverageRating();
     this.thumbnailIcon = this.getCompleteThumbnailIconUrl();
-    this.expTitleTranslationKey = (
+    this.expTitleTranslationKey =
       this.i18nLanguageCodeService.getExplorationTranslationKey(
-        this.explorationId, TranslationKeyType.TITLE)
-    );
-    this.expObjectiveTranslationKey = (
+        this.explorationId,
+        TranslationKeyType.TITLE
+      );
+    this.expObjectiveTranslationKey =
       this.i18nLanguageCodeService.getExplorationTranslationKey(
-        this.explorationId, TranslationKeyType.DESCRIPTION)
-    );
+        this.explorationId,
+        TranslationKeyType.DESCRIPTION
+      );
   }
 
   ngOnDestroy(): void {
@@ -162,10 +166,10 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   checkIfMobileCardToBeShown(): void {
     let currentPageUrl = this.urlService.getPathname();
-    this.mobileCardToBeShown = (
-      !this.isWindowLarge && ((
-        currentPageUrl === '/community-library') ||
-        currentPageUrl.includes('/explore')));
+    this.mobileCardToBeShown =
+      !this.isWindowLarge &&
+      (currentPageUrl === '/community-library' ||
+        currentPageUrl.includes('/explore'));
   }
 
   setHoverState(hoverState: boolean): void {
@@ -179,8 +183,7 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   // Function will return null when Exploration Ratings are not present.
   getAverageRating(): number | null {
     if (this.ratings) {
-      return this.ratingComputationService.computeAverageRating(
-        this.ratings);
+      return this.ratingComputationService.computeAverageRating(this.ratings);
     }
     return null;
   }
@@ -190,7 +193,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   getLastUpdatedDatetime(): string | null {
     if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-        this.lastUpdatedMsec);
+        this.lastUpdatedMsec
+      );
     }
     return null;
   }
@@ -198,7 +202,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   getRelativeLastUpdatedDateTime(): string | null {
     if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getRelativeTimeFromNow(
-        this.lastUpdatedMsec);
+        this.lastUpdatedMsec
+      );
     }
     return null;
   }
@@ -216,35 +221,41 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
       let storyNodeIdToAdd = null;
       // Replace the collection ID with the one in the URL if it exists
       // in urlParams.
-      if (parentExplorationIds &&
-          urlParams.hasOwnProperty('collection_id')) {
+      if (parentExplorationIds && urlParams.hasOwnProperty('collection_id')) {
         collectionIdToAdd = urlParams.collection_id;
       } else if (
         this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-        this.storyNodeId) {
+        this.storyNodeId
+      ) {
         storyIdToAdd = this.urlService.getStoryIdFromViewerUrl();
         storyNodeIdToAdd = this.storyNodeId;
       } else if (
         urlParams.hasOwnProperty('story_id') &&
-        urlParams.hasOwnProperty('node_id')) {
+        urlParams.hasOwnProperty('node_id')
+      ) {
         storyIdToAdd = urlParams.story_id;
         storyNodeIdToAdd = this.storyNodeId;
       }
 
       if (collectionIdToAdd) {
         result = this.urlService.addField(
-          result, 'collection_id', collectionIdToAdd);
+          result,
+          'collection_id',
+          collectionIdToAdd
+        );
       }
       if (parentExplorationIds) {
         for (let i = 0; i < parentExplorationIds.length - 1; i++) {
           result = this.urlService.addField(
-            result, 'parent', parentExplorationIds[i]);
+            result,
+            'parent',
+            parentExplorationIds[i]
+          );
         }
       }
       if (storyIdToAdd && storyNodeIdToAdd) {
         result = this.urlService.addField(result, 'story_id', storyIdToAdd);
-        result = this.urlService.addField(
-          result, 'node_id', storyNodeIdToAdd);
+        result = this.urlService.addField(result, 'node_id', storyNodeIdToAdd);
       }
       return result;
     }
@@ -252,7 +263,8 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   getCompleteThumbnailIconUrl(): string {
     return this.urlInterpolationService.getStaticImageUrl(
-      this.thumbnailIconUrl);
+      this.thumbnailIconUrl
+    );
   }
 
   isHackyExpTitleTranslationDisplayed(): boolean {
@@ -272,6 +284,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaExplorationSummaryTile', downgradeComponent(
-    {component: ExplorationSummaryTileComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaExplorationSummaryTile',
+    downgradeComponent({component: ExplorationSummaryTileComponent})
+  );

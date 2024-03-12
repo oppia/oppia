@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for AddWorkedExampleModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AddWorkedExampleModalComponent } from './add-worked-example.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AddWorkedExampleModalComponent} from './add-worked-example.component';
 
 class MockActiveModal {
   close(): void {
@@ -40,17 +40,15 @@ describe('Add Worked Example Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        AddWorkedExampleModalComponent
-      ],
+      declarations: [AddWorkedExampleModalComponent],
       providers: [
         ChangeDetectorRef,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -62,11 +60,10 @@ describe('Add Worked Example Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize properties after component is initialized',
-    () => {
-      expect(component.tmpWorkedExampleQuestionHtml).toEqual('');
-      expect(component.tmpWorkedExampleExplanationHtml).toBe('');
-    });
+  it('should initialize properties after component is initialized', () => {
+    expect(component.tmpWorkedExampleQuestionHtml).toEqual('');
+    expect(component.tmpWorkedExampleExplanationHtml).toBe('');
+  });
 
   it('should close modal when saving worked example', () => {
     spyOn(ngbActiveModal, 'close');
@@ -77,13 +74,12 @@ describe('Add Worked Example Modal Component', () => {
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       workedExampleQuestionHtml: 'question',
-      workedExampleExplanationHtml: 'explanation'
+      workedExampleExplanationHtml: 'explanation',
     });
   });
 
   it('should get schema', () => {
-    expect(component.getSchema())
-      .toEqual(component.WORKED_EXAMPLE_FORM_SCHEMA);
+    expect(component.getSchema()).toEqual(component.WORKED_EXAMPLE_FORM_SCHEMA);
   });
 
   it('should update tmpWorkedExampleQuestionHtml', () => {

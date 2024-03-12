@@ -16,23 +16,29 @@
  * @fileoverview Unit tests for the svg editor.
  */
 
-import { fabric } from 'fabric';
-import { AppConstants } from 'app.constants';
-import { SvgEditorConstants } from './svg-editor.constants';
-import { PolyPoint, SvgEditorComponent } from './svg-editor.component';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { ContextService } from 'services/context.service';
-import { AlertsService } from 'services/alerts.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SvgFileFetcherBackendApiService } from './svg-file-fetcher-backend-api.service';
-import { of } from 'rxjs';
+import {fabric} from 'fabric';
+import {AppConstants} from 'app.constants';
+import {SvgEditorConstants} from './svg-editor.constants';
+import {PolyPoint, SvgEditorComponent} from './svg-editor.component';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {ContextService} from 'services/context.service';
+import {AlertsService} from 'services/alerts.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {SvgFileFetcherBackendApiService} from './svg-file-fetcher-backend-api.service';
+import {of} from 'rxjs';
 
 var initializeMockDocument = (svgFilenameCtrl: SvgEditorComponent) => {
   var mockDocument = document.createElement('div');
@@ -70,13 +76,13 @@ describe('SvgEditor', () => {
   var component: SvgEditorComponent;
   let svgSanitizerService: SvgSanitizerService;
   const mockilss = {
-    getRawImageData: (filename) => {
+    getRawImageData: filename => {
       return dataUrl;
-    }
+    },
   };
   // This sample SVG is generated using different tools present
   // in the SVG editor.
-  var samplesvg = (
+  var samplesvg =
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/' +
     '1999/xlink" version="1.1" width="494" height="368" viewBox="0 0 494 368' +
     '"><desc>Created with Fabric.js 4.4.0</desc><defs></defs><rect x="0" y="' +
@@ -140,43 +146,43 @@ describe('SvgEditor', () => {
     'ashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(1' +
     '90,65,65); fill-rule: nonzero; opacity: 1; vector-effect: non-scaling-s' +
     'troke" points="-7.5,0 7.5,25.98 7.5,-25.98 -7.5,0 " id="group0"/></g></' +
-    'g></g></g></g></svg>');
+    'g></g></g></g></svg>';
   var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
   var mockAssetsBackendApiService = {
     getImageUrlForPreview: (contentType, contentId, filepath) => {
       return dataUrl;
-    }
+    },
   };
 
   var mockImageUploadHelperService = {
-    convertImageDataToImageFile: (svgDataUri) => {
+    convertImageDataToImageFile: svgDataUri => {
       return new Blob();
     },
     generateImageFilename: (height, width, extension) => {
       return height + '_' + width + '.' + extension;
-    }
+    },
   };
 
   var mockSvgSanitizerService = {
-    getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) => {
-      return { tags: [], attrs: [] };
+    getInvalidSvgTagsAndAttrsFromDataUri: dataUri => {
+      return {tags: [], attrs: []};
     },
-    getTrustedSvgResourceUrl: (data) => {
+    getTrustedSvgResourceUrl: data => {
       return data;
     },
-    convertBase64ToUnicodeString: (base64) => {
+    convertBase64ToUnicodeString: base64 => {
       return decodeURIComponent(atob(base64));
-    }
+    },
   };
 
   var mockImagePreloaderService = {
     getDimensionsOfImage: () => {
       return {
         width: 450,
-        height: 350
+        height: 350,
       };
-    }
+    },
   };
 
   class mockReaderObject {
@@ -216,25 +222,25 @@ describe('SvgEditor', () => {
       providers: [
         {
           provide: AssetsBackendApiService,
-          useValue: mockAssetsBackendApiService
+          useValue: mockAssetsBackendApiService,
         },
         {
           provide: ImageLocalStorageService,
-          useValue: mockilss
+          useValue: mockilss,
         },
         {
           provide: ImagePreloaderService,
-          useValue: mockImagePreloaderService
+          useValue: mockImagePreloaderService,
         },
         {
           provide: ImageUploadHelperService,
-          useValue: mockImageUploadHelperService
+          useValue: mockImageUploadHelperService,
         },
         {
           provide: SvgSanitizerService,
-          useValue: mockSvgSanitizerService
-        }
-      ]
+          useValue: mockSvgSanitizerService,
+        },
+      ],
     }).compileComponents();
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     contextService = TestBed.inject(ContextService);
@@ -245,12 +251,14 @@ describe('SvgEditor', () => {
     spyOn(contextService, 'getEntityType').and.returnValue('exploration');
     spyOn(contextService, 'getEntityId').and.returnValue('1');
     spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+    );
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return Promise.resolve('sample-csrf-token');
     });
-    svgFileFetcherBackendApiService = (
-      TestBed.inject(SvgFileFetcherBackendApiService));
+    svgFileFetcherBackendApiService = TestBed.inject(
+      SvgFileFetcherBackendApiService
+    );
     // This throws "Argument of type 'mockImageObject' is not assignable to
     // parameter of type 'HTMLImageElement'.". We need to suppress this error
     // because 'HTMLImageElement' has around 250 more properties.
@@ -267,22 +275,20 @@ describe('SvgEditor', () => {
     component = fixture.componentInstance;
     initializeMockDocument(component);
     component.ngOnInit();
-    component.canvas = new fabric.Canvas(
-      component.canvasID);
+    component.canvas = new fabric.Canvas(component.canvasID);
     component.initializeMouseEvents();
     var mockPicker = {
-      setOptions: (data) => {
+      setOptions: data => {
         return 'The value is set.';
-      }
+      },
     };
     component.fillPicker = mockPicker;
     component.strokePicker = mockPicker;
     component.bgPicker = mockPicker;
   }));
 
-  it(
-    'should wait before updating diagram size when dom is loading',
-    waitForAsync(fakeAsync(() => {
+  it('should wait before updating diagram size when dom is loading', waitForAsync(
+    fakeAsync(() => {
       spyOnProperty(document, 'readyState').and.returnValue('loading');
       spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
         setTimeout(() => handler());
@@ -298,12 +304,13 @@ describe('SvgEditor', () => {
       expect(component.currentDiagramWidth).toBe(WIDTH);
       component.onHeightInputBlur();
       expect(component.currentDiagramHeight).toBe(HEIGHT);
-    })));
+    })
+  ));
 
-  it('should add tags to canvas regardless of ids specified',
-    waitForAsync(fakeAsync(() => {
+  it('should add tags to canvas regardless of ids specified', waitForAsync(
+    fakeAsync(() => {
       spyOnProperty(document, 'readyState').and.returnValue('loaded');
-      let sampleSVGWithoutId = (
+      let sampleSVGWithoutId =
         '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
         'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 ' +
         '494 367"><desc>Created with Fabric.js 3.6.3</desc><path d="M 15.0000' +
@@ -312,7 +319,7 @@ describe('SvgEditor', () => {
         'e-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; strok' +
         'e-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-ru' +
         'le: nonzero; opacity: 1; vector-effect: non-scaling-stroke' +
-        '"/></svg>');
+        '"/></svg>';
 
       component.savedSvgDiagram = 'saved';
       component.savedSvgDiagram = sampleSVGWithoutId;
@@ -320,7 +327,7 @@ describe('SvgEditor', () => {
       tick();
       expect(component.canvas.getObjects().length).toBe(1);
 
-      let sampleSVGWithGroup = (
+      let sampleSVGWithGroup =
         '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
         'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 ' +
         '494 367"><desc>Created with Fabric.js 3.6.3</desc><path d="M 15.0000' +
@@ -329,7 +336,7 @@ describe('SvgEditor', () => {
         'e-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; strok' +
         'e-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-ru' +
         'le: nonzero; opacity: 1; vector-effect: non-scaling-stroke' +
-        '" id="group0"/></svg>');
+        '" id="group0"/></svg>';
 
       component.savedSvgDiagram = 'saved';
       component.savedSvgDiagram = sampleSVGWithGroup;
@@ -337,7 +344,7 @@ describe('SvgEditor', () => {
       tick();
       expect(component.canvas.getObjects().length).toBe(1);
 
-      let sampleSVGWithRandomId = (
+      let sampleSVGWithRandomId =
         '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
         'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 ' +
         '494 367"><desc>Created with Fabric.js 3.6.3</desc><path d="M 15.0000' +
@@ -346,14 +353,15 @@ describe('SvgEditor', () => {
         'e-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; strok' +
         'e-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-ru' +
         'le: nonzero; opacity: 1; vector-effect: non-scaling-stroke' +
-        '" id="randomId"/></svg>');
+        '" id="randomId"/></svg>';
 
       component.savedSvgDiagram = 'saved';
       component.savedSvgDiagram = sampleSVGWithRandomId;
       component.continueDiagramEditing();
       tick();
       expect(component.canvas.getObjects().length).toBe(1);
-    })));
+    })
+  ));
 
   it('should discard SVG when discard button is clicked', () => {
     spyOn(component.discardImage, 'emit');
@@ -363,9 +371,8 @@ describe('SvgEditor', () => {
     expect(component.discardImage.emit).toHaveBeenCalled();
   });
 
-  it(
-    'should update diagram size when dom had loaded',
-    waitForAsync(fakeAsync(() => {
+  it('should update diagram size when dom had loaded', waitForAsync(
+    fakeAsync(() => {
       spyOnProperty(document, 'readyState').and.returnValue('loaded');
       component.ngOnInit();
       tick(100);
@@ -378,50 +385,56 @@ describe('SvgEditor', () => {
       expect(component.currentDiagramWidth).toBe(WIDTH);
       component.onHeightInputBlur();
       expect(component.currentDiagramHeight).toBe(HEIGHT);
-    })));
+    })
+  ));
 
   it('should reset to maximum width correctly', () => {
     component.diagramWidth = 600;
     component.onWidthInputBlur();
     expect(component.currentDiagramWidth).toBe(
-      SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH);
+      SvgEditorConstants.MAX_SVG_DIAGRAM_WIDTH
+    );
   });
 
   it('should reset to maximum height correctly', () => {
     component.diagramHeight = 600;
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(
-      SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT);
+      SvgEditorConstants.MAX_SVG_DIAGRAM_HEIGHT
+    );
   });
 
   it('should reset to minimum width correctly', () => {
     component.diagramWidth = 0;
     component.onWidthInputBlur();
     expect(component.currentDiagramWidth).toBe(
-      SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH);
+      SvgEditorConstants.MIN_SVG_DIAGRAM_WIDTH
+    );
   });
 
   it('should reset to minimum height correctly', () => {
     component.diagramHeight = 0;
     component.onHeightInputBlur();
     expect(component.currentDiagramHeight).toBe(
-      SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT);
+      SvgEditorConstants.MIN_SVG_DIAGRAM_HEIGHT
+    );
   });
 
   it('should fail svg validation', () => {
     spyOn(
-      svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri'
+      svgSanitizerService,
+      'getInvalidSvgTagsAndAttrsFromDataUri'
     ).and.callFake(() => {
-      return { tags: [], attrs: ['width'] };
+      return {tags: [], attrs: ['width']};
     });
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
-      (data) => data
+      data => data
     );
-    var invalidWidthAttribute = (
+    var invalidWidthAttribute =
       '<svg widht="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
       'f5b7-4194e2380d9f" x="143" y="97" width="12" height="29" stroke="hsla' +
       '(0, 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
-      '</svg>');
+      '</svg>';
     expect(() => {
       component.isSvgTagValid(invalidWidthAttribute);
     }).toThrowError('Invalid attributes in svg:width');
@@ -429,18 +442,19 @@ describe('SvgEditor', () => {
 
   it('should fail svg validation', () => {
     spyOn(
-      svgSanitizerService, 'getInvalidSvgTagsAndAttrsFromDataUri'
+      svgSanitizerService,
+      'getInvalidSvgTagsAndAttrsFromDataUri'
     ).and.callFake(() => {
-      return { tags: ['script'], attrs: [] };
+      return {tags: ['script'], attrs: []};
     });
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
-      (data) => data
+      data => data
     );
-    var invalidSvgTag = (
+    var invalidSvgTag =
       '<svg width="100" height="100"><rect id="rectangle-de569866-9c11-b553-' +
       'f5b7-4194e2380d9f" x="143" y="97" width="12" height29" stroke="hsla(0' +
       ', 0%, 0%, 1)" fill="hsla(0, 0%, 100%, 1)" stroke-width="1"></rect>' +
-      '<script src="evil.com"></script></svg>');
+      '<script src="evil.com"></script></svg>';
     expect(() => {
       component.isSvgTagValid(invalidSvgTag);
     }).toThrowError('Invalid tags in svg:script');
@@ -485,8 +499,7 @@ describe('SvgEditor', () => {
     component.createRect();
     expect(component.canvas.getObjects()[0].get('type')).toBe('circle');
     expect(component.canvas.getObjects()[1].get('type')).toBe('rect');
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[0]);
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
     component.bringObjectForward();
     expect(component.canvas.getObjects()[0].get('type')).toBe('rect');
     expect(component.canvas.getObjects()[1].get('type')).toBe('circle');
@@ -506,8 +519,7 @@ describe('SvgEditor', () => {
     expect(component.isRedoEnabled()).toBe(true);
     component.onRedo();
     expect(component.canvas.getObjects().length).toBe(6);
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[5]);
+    component.canvas.setActiveObject(component.canvas.getObjects()[5]);
     component.removeShape();
     expect(component.canvas.getObjects().length).toBe(5);
     component.onUndo();
@@ -521,8 +533,7 @@ describe('SvgEditor', () => {
 
   it('should change properties of a shape', () => {
     component.createRect();
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[0]);
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
     var color = 'rgba(10, 10, 10, 1)';
     component.fabricjsOptions.stroke = color;
     component.fabricjsOptions.fill = color;
@@ -539,8 +550,7 @@ describe('SvgEditor', () => {
     expect(rectShape.get('strokeWidth')).toBe(10);
     component.createText();
     component.canvas.discardActiveObject();
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[1]);
+    component.canvas.setActiveObject(component.canvas.getObjects()[1]);
     component.fabricjsOptions.bold = true;
     component.fabricjsOptions.italic = true;
     component.fabricjsOptions.fontFamily = 'comic sans ms';
@@ -552,8 +562,9 @@ describe('SvgEditor', () => {
     var textObj = component.canvas.getObjects()[1];
     expect(textObj.get('fontStyle' as keyof fabric.Object)).toBe('italic');
     expect(textObj.get('fontWeight' as keyof fabric.Object)).toBe('bold');
-    expect(textObj.get(
-      'fontFamily' as keyof fabric.Object)).toBe('comic sans ms');
+    expect(textObj.get('fontFamily' as keyof fabric.Object)).toBe(
+      'comic sans ms'
+    );
     expect(textObj.get('fontSize' as keyof fabric.Object)).toBe(12);
   });
 
@@ -562,14 +573,14 @@ describe('SvgEditor', () => {
     component.canvas.fire('mouse:down', {
       e: {
         pageX: 0,
-        pageY: 0
-      }
+        pageY: 0,
+      },
     });
     component.canvas.fire('mouse:move', {
       e: {
         pageX: 100,
-        pageY: 100
-      }
+        pageY: 100,
+      },
     });
     component.canvas.fire('mouse:dblclick');
     expect(component.canvas.getObjects()[0].get('type')).toBe('polyline');
@@ -578,14 +589,14 @@ describe('SvgEditor', () => {
     component.canvas.fire('mouse:down', {
       e: {
         pageX: 0,
-        pageY: 0
-      }
+        pageY: 0,
+      },
     });
     component.canvas.fire('mouse:down', {
       e: {
         pageX: 10,
-        pageY: 10
-      }
+        pageY: 10,
+      },
     });
     component.createClosedPolygon();
     expect(component.canvas.getObjects()[1].get('type')).toBe('polyline');
@@ -599,32 +610,34 @@ describe('SvgEditor', () => {
       target: {
         name: 'p0',
         left: 100,
-        top: 100
-      }
+        top: 100,
+      },
     });
     component.canvas.fire('object:moving', {
       target: {
         name: 'p1',
         left: 200,
-        top: 200
-      }
+        top: 200,
+      },
     });
     component.canvas.fire('object:moving', {
       target: {
         name: 'p2',
         left: 300,
-        top: 300
-      }
+        top: 300,
+      },
     });
     component.onStrokeChange();
     component.onFillChange();
     component.onSizeChange();
     component.createQuadraticBezier();
     expect(component.isDrawModeBezier()).toBe(false);
-    expect(component.canvas.getObjects()[1].get(
-      'path' as keyof fabric.Object)).toEqual(
-      [['M', 100, 100], ['Q', 200, 200, 300, 300]]
-    );
+    expect(
+      component.canvas.getObjects()[1].get('path' as keyof fabric.Object)
+    ).toEqual([
+      ['M', 100, 100],
+      ['Q', 200, 200, 300, 300],
+    ]);
     expect(component.canvas.getObjects()[1].get('type')).toBe('path');
   });
 
@@ -639,11 +652,11 @@ describe('SvgEditor', () => {
   });
 
   it('should upload an svg file', () => {
-    var fileContent = (
+    var fileContent =
       'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjA' +
       'wMC9zdmciICB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCI+PGNpcmNsZSBjeD0iNTAiIGN5' +
       'PSI1MCIgcj0iNDAiIHN0cm9rZT0iZ3JlZW4iIHN0cm9rZS13aWR0aD0iNCIgZmlsbD0ie' +
-      'WVsbG93IiAvPjwvc3ZnPg==');
+      'WVsbG93IiAvPjwvc3ZnPg==';
     component.uploadSvgFile();
     expect(component.isSvgUploadEnabled()).toBe(true);
     expect(component.isDrawModeSvgUpload()).toBe(true);
@@ -651,13 +664,12 @@ describe('SvgEditor', () => {
     component.onFileChanged(file, 'circle.svg');
     component.uploadedSvgDataUrl = {
       safeUrl: fileContent,
-      unsafeUrl: fileContent
+      unsafeUrl: fileContent,
     };
     expect(component.isFileUploaded()).toBe(true);
     component.uploadSvgFile();
     expect(component.canvas.getObjects()[0].get('type')).toBe('group');
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[0]);
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
     expect(component.displayFontStyles).toBe(false);
     component.uploadSvgFile();
     expect(component.isDrawModeSvgUpload()).toBe(true);
@@ -665,7 +677,7 @@ describe('SvgEditor', () => {
     component.onFileChanged(file, 'circle.svg');
     component.uploadedSvgDataUrl = {
       safeUrl: fileContent,
-      unsafeUrl: fileContent
+      unsafeUrl: fileContent,
     };
     expect(component.isFileUploaded()).toBe(true);
     component.loadType = 'nogroup';
@@ -685,8 +697,9 @@ describe('SvgEditor', () => {
       fixture.detectChanges();
       component.bgPicker.onOpen();
       let alphaSliders = document.querySelectorAll(
-        '.picker_alpha .picker_selector');
-      alphaSliders.forEach((element) => {
+        '.picker_alpha .picker_selector'
+      );
+      alphaSliders.forEach(element => {
         expect(element.getAttribute('title')).toBe('Transparency Slider');
       });
     });
@@ -695,10 +708,8 @@ describe('SvgEditor', () => {
   it('should trigger object selection and scaling events', () => {
     component.createRect();
     component.createText();
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[0]);
-    component.canvas.setActiveObject(
-      component.canvas.getObjects()[1]);
+    component.canvas.setActiveObject(component.canvas.getObjects()[0]);
+    component.canvas.setActiveObject(component.canvas.getObjects()[1]);
     expect(component.isSizeVisible()).toBe(true);
     expect(component.displayFontStyles).toBe(true);
     component.canvas.fire('object:scaling');
@@ -719,7 +730,8 @@ describe('SvgEditor', () => {
       expect(component.data.savedSvgFileName).toBe('imageFile1.svg');
       expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
       expect(component.validate()).toBe(true);
-    })));
+    })
+  ));
 
   it('should not save svg file when no diagram is created', () => {
     component.saveSvgFile();
@@ -738,70 +750,83 @@ describe('SvgEditor', () => {
       fixture.detectChanges();
       tick(1);
       expect(alertSpy).toHaveBeenCalledWith(errorMessage);
-    })));
+    })
+  ));
 
-  it(
-    'should allow user to continue editing the diagram when dom loaded',
-    waitForAsync(fakeAsync(() => {
+  it('should allow user to continue editing the diagram when dom loaded', waitForAsync(
+    fakeAsync(() => {
       spyOnProperty(document, 'readyState').and.returnValue('loaded');
       component.savedSvgDiagram = 'saved';
       component.savedSvgDiagram = samplesvg;
       component.continueDiagramEditing();
       tick(100);
-      var mocktoSVG = (arg) => {
+      var mocktoSVG = arg => {
         return '<path></path>';
       };
       var customToSVG = component.createCustomToSVG(
-        mocktoSVG as () => string, 'path', 'group1', component);
+        mocktoSVG as () => string,
+        'path',
+        'group1',
+        component
+      );
       expect(customToSVG()).toBe('<path id="group1"/>');
       expect(component.diagramStatus).toBe('editing');
-    })));
+    })
+  ));
 
   it(
     'should wait for the dom to load before allowing the user to continue ' +
-    'editing the diagram',
-    waitForAsync(fakeAsync(() => {
-      spyOnProperty(document, 'readyState').and.returnValue('loading');
-      spyOn(document, 'addEventListener').and.callFake((eventName, handler) => {
-        setTimeout(() => handler());
-      });
-      component.savedSvgDiagram = 'saved';
-      component.savedSvgDiagram = samplesvg;
-      component.continueDiagramEditing();
-      tick(10);
-      var mocktoSVG = (arg) => {
-        return '<path></path>';
-      };
-      var customToSVG = component.createCustomToSVG(
-        mocktoSVG as () => string, 'path', 'group1', component);
-      expect(customToSVG()).toBe('<path id="group1"/>');
-      expect(component.diagramStatus).toBe('editing');
-    })));
+      'editing the diagram',
+    waitForAsync(
+      fakeAsync(() => {
+        spyOnProperty(document, 'readyState').and.returnValue('loading');
+        spyOn(document, 'addEventListener').and.callFake(
+          (eventName, handler) => {
+            setTimeout(() => handler());
+          }
+        );
+        component.savedSvgDiagram = 'saved';
+        component.savedSvgDiagram = samplesvg;
+        component.continueDiagramEditing();
+        tick(10);
+        var mocktoSVG = arg => {
+          return '<path></path>';
+        };
+        var customToSVG = component.createCustomToSVG(
+          mocktoSVG as () => string,
+          'path',
+          'group1',
+          component
+        );
+        expect(customToSVG()).toBe('<path id="group1"/>');
+        expect(component.diagramStatus).toBe('editing');
+      })
+    )
+  );
 });
-
 
 describe('SvgEditor initialized with value attribute', () => {
   var component: SvgEditorComponent;
   var contextService: ContextService;
   let svgSanitizerService: SvgSanitizerService;
   let imageLocalStorageService: ImageLocalStorageService;
-  var samplesvg = (
+  var samplesvg =
     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
-      'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
-      ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
-      'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
+    'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
+    ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
+    'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>';
   var mockAssetsBackendApiService = {
     getImageUrlForPreview: (contentType, contentId, filepath) => {
       return '/imageurl_' + contentType + '_' + contentId + '_' + filepath;
-    }
+    },
   };
   var mockImagePreloaderService = {
     getDimensionsOfImage: () => {
       return {
         width: 450,
-        height: 350
+        height: 350,
       };
-    }
+    },
   };
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -810,211 +835,213 @@ describe('SvgEditor initialized with value attribute', () => {
       providers: [
         {
           provide: AssetsBackendApiService,
-          useValue: mockAssetsBackendApiService
+          useValue: mockAssetsBackendApiService,
         },
         {
           provide: ImagePreloaderService,
-          useValue: mockImagePreloaderService
-        }
+          useValue: mockImagePreloaderService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    component = TestBed.createComponent(
-      SvgEditorComponent).componentInstance;
+    component = TestBed.createComponent(SvgEditorComponent).componentInstance;
     component.value = 'svgimageFilename1.svg';
     contextService = TestBed.inject(ContextService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
-    const svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService = (
-      TestBed.inject(SvgFileFetcherBackendApiService));
+    const svgFileFetcherBackendApiService: SvgFileFetcherBackendApiService =
+      TestBed.inject(SvgFileFetcherBackendApiService);
     spyOn(svgFileFetcherBackendApiService, 'fetchSvg').and.returnValue(
-      of(samplesvg));
+      of(samplesvg)
+    );
     initializeMockDocument(component);
   }));
 
-  it('should load the svg file', waitForAsync(fakeAsync(() => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('1');
-    component.ngOnInit();
-    tick(10);
-    expect(component.diagramStatus).toBe('saved');
-    expect(component.savedSvgDiagram).toBe(samplesvg);
-  })));
+  it('should load the svg file', waitForAsync(
+    fakeAsync(() => {
+      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(contextService, 'getEntityId').and.returnValue('1');
+      component.ngOnInit();
+      tick(10);
+      expect(component.diagramStatus).toBe('saved');
+      expect(component.savedSvgDiagram).toBe(samplesvg);
+    })
+  ));
 
-  it('should handle previously uploaded svg diagram correctly',
-    waitForAsync(fakeAsync(() => {
+  it('should handle previously uploaded svg diagram correctly', waitForAsync(
+    fakeAsync(() => {
       spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
       spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-      let dataUrl = (
-        'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv');
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      );
+      let dataUrl =
+        'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv';
       spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
-        dataUrl);
+        dataUrl
+      );
       component.value = 'svgimageFilename1.svg';
       component.ngOnInit();
       tick(10);
-      expect(
-        svgSanitizerService.getTrustedSvgResourceUrl
-      ).toHaveBeenCalledWith(dataUrl);
-    })));
-}
-);
+      expect(svgSanitizerService.getTrustedSvgResourceUrl).toHaveBeenCalledWith(
+        dataUrl
+      );
+    })
+  ));
+});
 
-describe(
-  'SvgEditor with image save destination as local storage',
-  () => {
-    var contextService: ContextService;
-    let fixture: ComponentFixture<SvgEditorComponent>;
-    var component: SvgEditorComponent = null;
-    var samplesvg = (
-      '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
+describe('SvgEditor with image save destination as local storage', () => {
+  var contextService: ContextService;
+  let fixture: ComponentFixture<SvgEditorComponent>;
+  var component: SvgEditorComponent = null;
+  var samplesvg =
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
     'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 494' +
     ' 367"><desc>Created with Fabric.js 3.6.3</desc><rect x="0" y="0" ' +
-    'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>');
-    var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
+    'width="100%" height="100%" fill="rgba(10,245,49,0.607)"/></svg>';
+  var dataUrl = 'data:image/svg+xml;utf8,' + samplesvg;
 
-    var mockilss = {
-      getRawImageData: (filename) => {
-        return dataUrl;
-      },
-      saveImage: (filename, imageData) => {
-        return 'Image file save.';
-      },
-      deleteImage: (filename) => {
-        return 'Image file is deleted.';
-      },
-      isInStorage: (filename) => {
-        return true;
-      }
-    };
+  var mockilss = {
+    getRawImageData: filename => {
+      return dataUrl;
+    },
+    saveImage: (filename, imageData) => {
+      return 'Image file save.';
+    },
+    deleteImage: filename => {
+      return 'Image file is deleted.';
+    },
+    isInStorage: filename => {
+      return true;
+    },
+  };
 
-    var mockImageUploadHelperService = {
-      convertImageDataToImageFile: (svgDataUri) => {
-        return new Blob();
-      },
-      generateImageFilename: (height, widht, extension) => {
-        return height + '_' + widht + '.' + extension;
-      }
-    };
+  var mockImageUploadHelperService = {
+    convertImageDataToImageFile: svgDataUri => {
+      return new Blob();
+    },
+    generateImageFilename: (height, widht, extension) => {
+      return height + '_' + widht + '.' + extension;
+    },
+  };
 
-    var mockSvgSanitizerService = {
-      getInvalidSvgTagsAndAttrsFromDataUri: (dataUri) => {
-        return { tags: [], attrs: [] };
-      },
-      getTrustedSvgResourceUrl: (data) => {
-        return data;
-      }
-    };
+  var mockSvgSanitizerService = {
+    getInvalidSvgTagsAndAttrsFromDataUri: dataUri => {
+      return {tags: [], attrs: []};
+    },
+    getTrustedSvgResourceUrl: data => {
+      return data;
+    },
+  };
 
-    var mockImagePreloaderService = {
-      getDimensionsOfImage: () => {
-        return {
-          width: 450,
-          height: 350
-        };
-      }
-    };
+  var mockImagePreloaderService = {
+    getDimensionsOfImage: () => {
+      return {
+        width: 450,
+        height: 350,
+      };
+    },
+  };
 
-    class mockReaderObject {
-      result = null;
-      onload = null;
-      constructor() {
-        this.onload = () => {
-          return 'Fake onload executed';
-        };
-      }
-
-      readAsDataURL(file) {
-        this.onload();
-        return 'The file is loaded';
-      }
+  class mockReaderObject {
+    result = null;
+    onload = null;
+    constructor() {
+      this.onload = () => {
+        return 'Fake onload executed';
+      };
     }
 
-    class mockImageObject {
-      source = null;
-      onload = null;
-      constructor() {
-        this.onload = () => {
-          return 'Fake onload executed';
-        };
-      }
+    readAsDataURL(file) {
+      this.onload();
+      return 'The file is loaded';
+    }
+  }
 
-      set src(url) {
-        this.onload();
-      }
+  class mockImageObject {
+    source = null;
+    onload = null;
+    constructor() {
+      this.onload = () => {
+        return 'Fake onload executed';
+      };
     }
 
-    beforeEach(waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        declarations: [SvgEditorComponent],
-        providers: [
-          {
-            provide: AssetsBackendApiService,
-            useValue: {}
-          },
-          {
-            provide: ImageLocalStorageService,
-            useValue: mockilss
-          },
-          {
-            provide: ImagePreloaderService,
-            useValue: mockImagePreloaderService
-          },
-          {
-            provide: ImageUploadHelperService,
-            useValue: mockImageUploadHelperService
-          },
-          {
-            provide: SvgSanitizerService,
-            useValue: mockSvgSanitizerService
-          }
-        ],
-        schemas: [NO_ERRORS_SCHEMA]
-      }).compileComponents();
-      contextService = TestBed.inject(ContextService);
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    set src(url) {
+      this.onload();
+    }
+  }
 
-
-      // This throws "Argument of type 'mockImageObject' is not assignable to
-      // parameter of type 'HTMLImageElement'.". We need to suppress this error
-      // because 'HTMLImageElement' has around 250 more properties. We have only
-      // defined the properties we need in 'mockImageObject'.
-      // @ts-expect-error
-      spyOn(window, 'Image').and.returnValue(new mockImageObject());
-      // This throws "Argument of type 'mockReaderObject' is not assignable
-      // to parameter of type 'FileReader'.". We need to suppress this error
-      // because 'FileReader' has around 15 more properties. We have only
-      // defined the properties we need in 'mockReaderObject'.
-      // @ts-expect-error
-      spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
-      fixture = TestBed.createComponent(SvgEditorComponent);
-      component = fixture.componentInstance;
-      initializeMockDocument(component);
-      component.ngOnInit();
-      component.canvas = new fabric.Canvas(component.canvasID);
-      component.initializeMouseEvents();
-    }));
-
-
-    it('should save svg file to local storage created by the svg editor',
-      () => {
-        component.createRect();
-        component.saveSvgFile();
-        expect(component.data.savedSvgFileName).toBe('350_450.svg');
-        expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
-        expect(component.validate()).toBe(true);
-      }
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [SvgEditorComponent],
+      providers: [
+        {
+          provide: AssetsBackendApiService,
+          useValue: {},
+        },
+        {
+          provide: ImageLocalStorageService,
+          useValue: mockilss,
+        },
+        {
+          provide: ImagePreloaderService,
+          useValue: mockImagePreloaderService,
+        },
+        {
+          provide: ImageUploadHelperService,
+          useValue: mockImageUploadHelperService,
+        },
+        {
+          provide: SvgSanitizerService,
+          useValue: mockSvgSanitizerService,
+        },
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+    contextService = TestBed.inject(ContextService);
+    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
+    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
 
-    it('should allow user to continue editing the diagram and delete the ' +
-    'image from local storage', () => {
+    // This throws "Argument of type 'mockImageObject' is not assignable to
+    // parameter of type 'HTMLImageElement'.". We need to suppress this error
+    // because 'HTMLImageElement' has around 250 more properties. We have only
+    // defined the properties we need in 'mockImageObject'.
+    // @ts-expect-error
+    spyOn(window, 'Image').and.returnValue(new mockImageObject());
+    // This throws "Argument of type 'mockReaderObject' is not assignable
+    // to parameter of type 'FileReader'.". We need to suppress this error
+    // because 'FileReader' has around 15 more properties. We have only
+    // defined the properties we need in 'mockReaderObject'.
+    // @ts-expect-error
+    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+    fixture = TestBed.createComponent(SvgEditorComponent);
+    component = fixture.componentInstance;
+    initializeMockDocument(component);
+    component.ngOnInit();
+    component.canvas = new fabric.Canvas(component.canvasID);
+    component.initializeMouseEvents();
+  }));
+
+  it('should save svg file to local storage created by the svg editor', () => {
+    component.createRect();
+    component.saveSvgFile();
+    expect(component.data.savedSvgFileName).toBe('350_450.svg');
+    expect(component.data.savedSvgUrl.toString()).toBe(dataUrl);
+    expect(component.validate()).toBe(true);
+  });
+
+  it(
+    'should allow user to continue editing the diagram and delete the ' +
+      'image from local storage',
+    () => {
       component.data.savedSvgFileName = 'image.svg';
       component.savedSvgDiagram = 'saved';
       component.savedSvgDiagram = samplesvg;
       component.continueDiagramEditing();
       expect(component.diagramStatus).toBe('editing');
-    });
-  });
+    }
+  );
+});

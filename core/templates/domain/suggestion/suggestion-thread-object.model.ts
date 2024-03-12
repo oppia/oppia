@@ -17,14 +17,13 @@
    thread domain objects.
  */
 
-import { SuggestionBackendDict, Suggestion } from
-  'domain/suggestion/suggestion.model';
-import { ThreadMessage } from
-  'domain/feedback_message/ThreadMessage.model';
-import { ThreadMessageSummary } from
-  'domain/feedback_message/ThreadMessageSummary.model';
-import { FeedbackThreadBackendDict } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {
+  SuggestionBackendDict,
+  Suggestion,
+} from 'domain/suggestion/suggestion.model';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
+import {ThreadMessageSummary} from 'domain/feedback_message/ThreadMessageSummary.model';
+import {FeedbackThreadBackendDict} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 
 export class SuggestionThread {
   status: string;
@@ -41,11 +40,16 @@ export class SuggestionThread {
   messages: ThreadMessage[] = [];
 
   constructor(
-      status: string, subject: string, summary: string,
-      originalAuthorName: string, lastUpdatedMsecs: number,
-      messageCount: number, threadId: string,
-      lastNonemptyMessageSummary: ThreadMessageSummary,
-      suggestion: Suggestion | null) {
+    status: string,
+    subject: string,
+    summary: string,
+    originalAuthorName: string,
+    lastUpdatedMsecs: number,
+    messageCount: number,
+    threadId: string,
+    lastNonemptyMessageSummary: ThreadMessageSummary,
+    suggestion: Suggestion | null
+  ) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -104,19 +108,23 @@ export class SuggestionThread {
   }
 
   private static createEditExplorationStateContentSuggestionFromBackendDict(
-      suggestionBackendDict: SuggestionBackendDict): Suggestion | null {
-    if (suggestionBackendDict.suggestion_type !==
-        'edit_exploration_state_content') {
+    suggestionBackendDict: SuggestionBackendDict
+  ): Suggestion | null {
+    if (
+      suggestionBackendDict.suggestion_type !== 'edit_exploration_state_content'
+    ) {
       return null;
     }
     return Suggestion.createFromBackendDict(suggestionBackendDict);
   }
 
   static createFromBackendDicts(
-      feedbackThreadBackendDict: FeedbackThreadBackendDict,
-      suggestionBackendDict: SuggestionBackendDict): SuggestionThread {
+    feedbackThreadBackendDict: FeedbackThreadBackendDict,
+    suggestionBackendDict: SuggestionBackendDict
+  ): SuggestionThread {
     return new SuggestionThread(
-      feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+      feedbackThreadBackendDict.status,
+      feedbackThreadBackendDict.subject,
       feedbackThreadBackendDict.summary,
       feedbackThreadBackendDict.original_author_username,
       feedbackThreadBackendDict.last_updated_msecs,
@@ -124,8 +132,11 @@ export class SuggestionThread {
       feedbackThreadBackendDict.thread_id,
       new ThreadMessageSummary(
         feedbackThreadBackendDict.last_nonempty_message_author,
-        feedbackThreadBackendDict.last_nonempty_message_text),
+        feedbackThreadBackendDict.last_nonempty_message_text
+      ),
       this.createEditExplorationStateContentSuggestionFromBackendDict(
-        suggestionBackendDict));
+        suggestionBackendDict
+      )
+    );
   }
 }

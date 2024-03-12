@@ -16,7 +16,7 @@
  * @fileoverview Tests for Capitalize pipe for Oppia.
  */
 
-import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 
 describe('Testing filters', () => {
   let pipe: CapitalizePipe;
@@ -28,7 +28,7 @@ describe('Testing filters', () => {
     expect(pipe).not.toEqual(null);
   });
 
-  it('should correctly capitalize strings', () =>{
+  it('should correctly capitalize strings', () => {
     expect(pipe.transform('')).toEqual('');
 
     expect(pipe.transform('a')).toEqual('A');
@@ -40,6 +40,7 @@ describe('Testing filters', () => {
     expect(pipe.transform('  a  b ')).toEqual('A  b');
     expect(pipe.transform('  ab c ')).toEqual('Ab c');
     expect(pipe.transform('  only First lettEr is  Affected ')).toEqual(
-      'Only First lettEr is  Affected');
+      'Only First lettEr is  Affected'
+    );
   });
 });

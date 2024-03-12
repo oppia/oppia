@@ -15,32 +15,35 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { TextInputAnswer } from 'interactions/answer-defs';
-import { TextInputRuleInputs } from 'interactions/rule-input-defs';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {TextInputAnswer} from 'interactions/answer-defs';
+import {TextInputRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TextInputRulesService {
   constructor(private nws: NormalizeWhitespacePipe) {}
   Equals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
     return inputs.x.normalizedStrSet.some(
-      input => this.nws.transform(input).toLowerCase() === normalizedAnswer);
+      input => this.nws.transform(input).toLowerCase() === normalizedAnswer
+    );
   }
 
   FuzzyEquals(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
-    const normalizedInput = inputs.x.normalizedStrSet.map(
-      input => this.nws.transform(input).toLowerCase());
+    const normalizedInput = inputs.x.normalizedStrSet.map(input =>
+      this.nws.transform(input).toLowerCase()
+    );
 
     const hasEditDistanceEqualToOne = (
-        inputString: string, matchString: string) => {
+      inputString: string,
+      matchString: string
+    ) => {
       if (inputString === matchString) {
         return true;
       }
@@ -56,33 +59,40 @@ export class TextInputRulesService {
           if (inputString.charAt(i - 1) === matchString.charAt(j - 1)) {
             editDistance[i][j] = editDistance[i - 1][j - 1];
           } else {
-            editDistance[i][j] = Math.min(
-              editDistance[i - 1][j - 1], editDistance[i][j - 1],
-              editDistance[i - 1][j]) + 1;
+            editDistance[i][j] =
+              Math.min(
+                editDistance[i - 1][j - 1],
+                editDistance[i][j - 1],
+                editDistance[i - 1][j]
+              ) + 1;
           }
         }
       }
       return editDistance[inputString.length][matchString.length] === 1;
     };
 
-    return normalizedInput.some(
-      input => hasEditDistanceEqualToOne(input, normalizedAnswer));
+    return normalizedInput.some(input =>
+      hasEditDistanceEqualToOne(input, normalizedAnswer)
+    );
   }
 
   StartsWith(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
-    const normalizedInput = inputs.x.normalizedStrSet.map(
-      input => this.nws.transform(input).toLowerCase());
+    const normalizedInput = inputs.x.normalizedStrSet.map(input =>
+      this.nws.transform(input).toLowerCase()
+    );
     return normalizedInput.some(input => normalizedAnswer.indexOf(input) === 0);
   }
 
   Contains(answer: TextInputAnswer, inputs: TextInputRuleInputs): boolean {
     const normalizedAnswer = this.nws.transform(answer).toLowerCase();
-    const normalizedInput = inputs.x.normalizedStrSet.map(
-      input => this.nws.transform(input).toLowerCase());
+    const normalizedInput = inputs.x.normalizedStrSet.map(input =>
+      this.nws.transform(input).toLowerCase()
+    );
     return normalizedInput.some(input => normalizedAnswer.includes(input));
   }
 }
 
-angular.module('oppia').factory(
-  'TextInputRulesService', downgradeInjectable(TextInputRulesService));
+angular
+  .module('oppia')
+  .factory('TextInputRulesService', downgradeInjectable(TextInputRulesService));

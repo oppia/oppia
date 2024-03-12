@@ -16,8 +16,8 @@
  * @fileoverview Component for the end chapter celebration confetti component.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'oppia-end-chapter-confetti',
@@ -32,7 +32,8 @@ export class EndChapterConfettiComponent implements OnInit {
   ngOnInit(): void {
     this.endChapterCelebratoryAudio.src =
       this.urlInterpolationService.getStaticAudioUrl(
-        '/end_chapter_celebratory_tadaa.mp3');
+        '/end_chapter_celebratory_tadaa.mp3'
+      );
     this.endChapterCelebratoryAudio.load();
   }
 

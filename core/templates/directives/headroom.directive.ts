@@ -18,34 +18,40 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-import { Directive, ElementRef, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output,
+} from '@angular/core';
 import Headroom from 'headroom.js';
 
 @Directive({
-  selector: '[headroom]'
+  selector: '[headroom]',
 })
 export class HeadroomDirective implements OnDestroy {
   @Input() tolerance?: Headroom.Tolerance;
-  @Output() toleranceChange: EventEmitter<Headroom.Tolerance> = (
-    new EventEmitter());
+  @Output() toleranceChange: EventEmitter<Headroom.Tolerance> =
+    new EventEmitter();
 
   @Input() offset?: number;
   @Output() offsetChange?: number;
-  @Input() classes?: { [key: string]: string };
-  @Output() classesChange: EventEmitter<{ [key: string]: string }> = (
-    new EventEmitter());
+  @Input() classes?: {[key: string]: string};
+  @Output() classesChange: EventEmitter<{[key: string]: string}> =
+    new EventEmitter();
 
   @Input() scroller?: ElementRef;
   headroom: Headroom;
 
-  constructor(
-    private el: ElementRef
-  ) {
+  constructor(private el: ElementRef) {
     let headroomOptions: Headroom.HeadroomOptions = {
       tolerance: this.tolerance ? this.tolerance : Headroom.options.tolerance,
       offset: this.offset ? this.offset : Headroom.options.offset,
-      scroller: this.scroller ? document.querySelector(
-        this.scroller.nativeElement) : Headroom.options.scroller,
+      scroller: this.scroller
+        ? document.querySelector(this.scroller.nativeElement)
+        : Headroom.options.scroller,
       classes: this.classes ? this.classes : Headroom.options.classes,
     };
 

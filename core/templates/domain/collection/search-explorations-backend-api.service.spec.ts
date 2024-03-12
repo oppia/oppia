@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for SearchExplorationsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { SearchExplorationsBackendApiService } from
-  'domain/collection/search-explorations-backend-api.service';
-import { ExplorationSearchResult } from 'domain/exploration/exploration-search-result.model';
+import {SearchExplorationsBackendApiService} from 'domain/collection/search-explorations-backend-api.service';
+import {ExplorationSearchResult} from 'domain/exploration/exploration-search-result.model';
 
 describe('Exploration search backend API service', () => {
   let SearchExplorationsService: SearchExplorationsBackendApiService;
@@ -30,11 +31,12 @@ describe('Exploration search backend API service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     SearchExplorationsService = TestBed.get(
-      SearchExplorationsBackendApiService);
+      SearchExplorationsBackendApiService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -42,83 +44,92 @@ describe('Exploration search backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should call the provided success handler on HTTP success',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let query = escape(btoa('three'));
+  it('should call the provided success handler on HTTP success', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let query = escape(btoa('three'));
 
-      SearchExplorationsService.fetchExplorationsAsync('three')
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/exploration/metadata_search?q=' + query);
-      req.flush({collection_node_metadata_list: []});
+    SearchExplorationsService.fetchExplorationsAsync('three').then(
+      successHandler,
+      failHandler
+    );
+    let req = httpTestingController.expectOne(
+      '/exploration/metadata_search?q=' + query
+    );
+    req.flush({collection_node_metadata_list: []});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should search for explorations from the backend',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let query = escape(btoa('count'));
+  it('should search for explorations from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let query = escape(btoa('count'));
 
-      // Search result object returnable from the backend.
-      let searchResults = {
-        collection_node_metadata_list: [{
+    // Search result object returnable from the backend.
+    let searchResults = {
+      collection_node_metadata_list: [
+        {
           id: '12',
           objective:
-          'learn how to count permutations accurately and systematically',
-          title: 'Protractor Test'
-        }, {
+            'learn how to count permutations accurately and systematically',
+          title: 'Protractor Test',
+        },
+        {
           id: '4',
           objective:
-          'learn how to count permutations accurately and systematically',
-          title: 'Three Balls'
-        }]
-      };
+            'learn how to count permutations accurately and systematically',
+          title: 'Three Balls',
+        },
+      ],
+    };
 
-      var explorationSearchResultObjects = (
-        searchResults.collection_node_metadata_list.map(
-          explorationSearchResultBackendDict => ExplorationSearchResult
-            .createFromBackendDict(explorationSearchResultBackendDict)));
+    var explorationSearchResultObjects =
+      searchResults.collection_node_metadata_list.map(
+        explorationSearchResultBackendDict =>
+          ExplorationSearchResult.createFromBackendDict(
+            explorationSearchResultBackendDict
+          )
+      );
 
-      SearchExplorationsService.fetchExplorationsAsync('count')
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/exploration/metadata_search?q=' + query);
-      req.flush(searchResults);
+    SearchExplorationsService.fetchExplorationsAsync('count').then(
+      successHandler,
+      failHandler
+    );
+    let req = httpTestingController.expectOne(
+      '/exploration/metadata_search?q=' + query
+    );
+    req.flush(searchResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        explorationSearchResultObjects);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith(explorationSearchResultObjects);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should call the provided fail handler on HTTP failure',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let query = escape(btoa('oppia'));
+  it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let query = escape(btoa('oppia'));
 
-      SearchExplorationsService.fetchExplorationsAsync('oppia')
-        .then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/exploration/metadata_search?q=' + query);
-      req.flush('Error searching exploration', {
-        status: 500, statusText: 'Invalid Request'
-      });
+    SearchExplorationsService.fetchExplorationsAsync('oppia').then(
+      successHandler,
+      failHandler
+    );
+    let req = httpTestingController.expectOne(
+      '/exploration/metadata_search?q=' + query
+    );
+    req.flush('Error searching exploration', {
+      status: 500,
+      statusText: 'Invalid Request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

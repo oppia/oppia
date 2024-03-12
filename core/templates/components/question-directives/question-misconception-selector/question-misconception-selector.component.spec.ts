@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for the question misconception selector component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { MisconceptionSkillMap, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
-import { QuestionMisconceptionSelectorComponent } from './question-misconception-selector.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {
+  MisconceptionSkillMap,
+  MisconceptionObjectFactory,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {QuestionMisconceptionSelectorComponent} from './question-misconception-selector.component';
 
 describe('Question Misconception Selector Component', () => {
   let component: QuestionMisconceptionSelectorComponent;
@@ -34,13 +37,9 @@ describe('Question Misconception Selector Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        QuestionMisconceptionSelectorComponent
-      ],
-      providers: [
-        StateEditorService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [QuestionMisconceptionSelectorComponent],
+      providers: [StateEditorService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -56,12 +55,22 @@ describe('Question Misconception Selector Component', () => {
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
-          1, 'misc1', 'notes1', 'feedback1', true)
+          1,
+          'misc1',
+          'notes1',
+          'feedback1',
+          true
+        ),
       ],
       def: [
         misconceptionObjectFactory.create(
-          2, 'misc2', 'notes2', 'feedback1', true)
-      ]
+          2,
+          'misc2',
+          'notes2',
+          'feedback1',
+          true
+        ),
+      ],
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
       return mockMisconceptionObject;
@@ -87,13 +96,15 @@ describe('Question Misconception Selector Component', () => {
 
   it('should set selected misconception correctly', () => {
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.abc[0]);
+      mockMisconceptionObject.abc[0]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('abc');
 
     component.selectMisconception(mockMisconceptionObject.def[0], 'def');
 
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.def[0]);
+      mockMisconceptionObject.def[0]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('def');
   });
 });

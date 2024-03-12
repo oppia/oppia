@@ -21,7 +21,7 @@ import {
   ExplorationImprovementsConfigBackendDict,
 } from 'domain/improvements/exploration-improvements-config.model';
 
-describe('ExplorationImprovementsConfigModel', function() {
+describe('ExplorationImprovementsConfigModel', function () {
   it('should return an instance with specified backend values', () => {
     let backendDict: ExplorationImprovementsConfigBackendDict = {
       exploration_id: 'eid',
@@ -33,22 +33,22 @@ describe('ExplorationImprovementsConfigModel', function() {
     };
 
     expect(
-      ExplorationImprovementsConfig.createFromBackendDict(
-        backendDict))
-      .toEqual(
-        new ExplorationImprovementsConfig('eid', 1, true, 0.6, 0.5, 350));
+      ExplorationImprovementsConfig.createFromBackendDict(backendDict)
+    ).toEqual(new ExplorationImprovementsConfig('eid', 1, true, 0.6, 0.5, 350));
   });
 
   it('should throw an error when exp stats is zero or negative', () => {
     expect(
       () => new ExplorationImprovementsConfig('eid', 1, true, 0.6, 0.5, 0)
     ).toThrowError(
-      'highBounceRateTaskMinimumExplorationStarts must be greater than 0');
+      'highBounceRateTaskMinimumExplorationStarts must be greater than 0'
+    );
 
     expect(
       () => new ExplorationImprovementsConfig('eid', 1, true, 0.6, 0.5, -50)
     ).toThrowError(
-      'highBounceRateTaskMinimumExplorationStarts must be greater than 0');
+      'highBounceRateTaskMinimumExplorationStarts must be greater than 0'
+    );
   });
 
   it('should throw an error when creation threshold is not percent', () => {
@@ -56,13 +56,15 @@ describe('ExplorationImprovementsConfigModel', function() {
       () => new ExplorationImprovementsConfig('eid', 1, true, -0.6, 0.5, 350)
     ).toThrowError(
       'highBounceRateTaskStateBounceRateCreationThreshold must be in the ' +
-      'closed range: [0, 1], but got: -0.6');
+        'closed range: [0, 1], but got: -0.6'
+    );
 
     expect(
       () => new ExplorationImprovementsConfig('eid', 1, true, 1.6, 0.5, 350)
     ).toThrowError(
       'highBounceRateTaskStateBounceRateCreationThreshold must be in the ' +
-      'closed range: [0, 1], but got: 1.6');
+        'closed range: [0, 1], but got: 1.6'
+    );
   });
 
   it('should throw an error when obsoletion threshold is not percent', () => {
@@ -70,22 +72,28 @@ describe('ExplorationImprovementsConfigModel', function() {
       () => new ExplorationImprovementsConfig('eid', 1, true, 0.5, -0.6, 350)
     ).toThrowError(
       'highBounceRateTaskStateBounceRateObsoletionThreshold must be in the ' +
-      'closed range: [0, 1], but got: -0.6');
+        'closed range: [0, 1], but got: -0.6'
+    );
 
     expect(
       () => new ExplorationImprovementsConfig('eid', 1, true, 0.5, 1.6, 350)
     ).toThrowError(
       'highBounceRateTaskStateBounceRateObsoletionThreshold must be in the ' +
-      'closed range: [0, 1], but got: 1.6');
+        'closed range: [0, 1], but got: 1.6'
+    );
   });
 
-  it('should throw an error when creation threshold is less than obsoletion ' +
-    'threshold', () => {
-    expect(
-      () => new ExplorationImprovementsConfig('eid', 1, true, 0.4, 0.5, 350)
-    ).toThrowError(
-      'highBounceRateTaskStateBounceRateCreationThreshold must be greater ' +
-      'than highBounceRateTaskStateBounceRateObsoletionThreshold, but got: ' +
-      '0.4 < 0.5');
-  });
+  it(
+    'should throw an error when creation threshold is less than obsoletion ' +
+      'threshold',
+    () => {
+      expect(
+        () => new ExplorationImprovementsConfig('eid', 1, true, 0.4, 0.5, 350)
+      ).toThrowError(
+        'highBounceRateTaskStateBounceRateCreationThreshold must be greater ' +
+          'than highBounceRateTaskStateBounceRateObsoletionThreshold, but got: ' +
+          '0.4 < 0.5'
+      );
+    }
+  );
 });

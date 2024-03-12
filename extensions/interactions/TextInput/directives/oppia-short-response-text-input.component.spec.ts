@@ -16,21 +16,21 @@
  * @fileoverview Unit tests for the TextInput short response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseTextInputComponent } from './oppia-short-response-text-input.component';
-import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
-import { TextInputAnswer } from 'interactions/answer-defs';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseTextInputComponent} from './oppia-short-response-text-input.component';
+import {TruncateAtFirstLinePipe} from 'filters/string-utility-filters/truncate-at-first-line.pipe';
+import {TextInputAnswer} from 'interactions/answer-defs';
 
 describe('ShortResponseTextInputComponent', () => {
   let component: ShortResponseTextInputComponent;
   let fixture: ComponentFixture<ShortResponseTextInputComponent>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: TextInputAnswer) {
+    escapedJsonToObj: function (answer: TextInputAnswer) {
       return answer;
-    }
+    },
   };
 
   beforeEach(async(() => {
@@ -39,10 +39,10 @@ describe('ShortResponseTextInputComponent', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }
+          useValue: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

@@ -16,15 +16,26 @@
  * @fileoverview Unit tests for Schema Based Unicode Editor Component
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormControl, FormsModule } from '@angular/forms';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
-import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaBasedUnicodeEditor } from './schema-based-unicode-editor.component';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {FormControl, FormsModule} from '@angular/forms';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {SchemaBasedUnicodeEditor} from './schema-based-unicode-editor.component';
 
 describe('Schema Based Unicode Editor', () => {
   let component: SchemaBasedUnicodeEditor;
@@ -40,21 +51,19 @@ describe('Schema Based Unicode Editor', () => {
         TranslateModule.forRoot({
           loader: {
             provide: TranslateLoader,
-            useClass: TranslateFakeLoader
-          }
-        })
+            useClass: TranslateFakeLoader,
+          },
+        }),
       ],
-      declarations: [
-        SchemaBasedUnicodeEditor
-      ],
+      declarations: [SchemaBasedUnicodeEditor],
       providers: [
         DeviceInfoService,
         FocusManagerService,
         SchemaFormSubmittedService,
         StateCustomizationArgsService,
-        TranslateService
+        TranslateService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -63,8 +72,9 @@ describe('Schema Based Unicode Editor', () => {
     component = fixture.componentInstance;
     deviceInfoService = TestBed.inject(DeviceInfoService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
-    stateCustomizationArgsService = (
-      TestBed.inject(StateCustomizationArgsService));
+    stateCustomizationArgsService = TestBed.inject(
+      StateCustomizationArgsService
+    );
 
     component.uiConfig = {
       rows: ['Row 1', 'Row 2'],
@@ -88,15 +98,15 @@ describe('Schema Based Unicode Editor', () => {
       getDoc: () => {
         return {
           getCursor: () => {},
-          setCursor: () => {}
+          setCursor: () => {},
         };
-      }
+      },
     } as unknown as CodeMirror.Editor;
     spyOn(cm, 'replaceSelection');
     component.ngOnInit();
 
     component.registerOnTouched(null);
-    let mockFunction = function(value: string) {
+    let mockFunction = function (value: string) {
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -117,22 +127,23 @@ describe('Schema Based Unicode Editor', () => {
     expect(component.codemirrorStatus).toBeTrue();
   }));
 
-  it('should flip the codemirror status flag when form view is opened',
-    fakeAsync(() => {
-      let onSchemaBasedFormsShownEmitter = new EventEmitter();
-      spyOnProperty(stateCustomizationArgsService, 'onSchemaBasedFormsShown')
-        .and.returnValue(onSchemaBasedFormsShownEmitter);
+  it('should flip the codemirror status flag when form view is opened', fakeAsync(() => {
+    let onSchemaBasedFormsShownEmitter = new EventEmitter();
+    spyOnProperty(
+      stateCustomizationArgsService,
+      'onSchemaBasedFormsShown'
+    ).and.returnValue(onSchemaBasedFormsShownEmitter);
 
-      component.ngOnInit();
-      tick(200);
+    component.ngOnInit();
+    tick(200);
 
-      expect(component.codemirrorStatus).toBeTrue();
+    expect(component.codemirrorStatus).toBeTrue();
 
-      onSchemaBasedFormsShownEmitter.emit();
-      tick(200);
+    onSchemaBasedFormsShownEmitter.emit();
+    tick(200);
 
-      expect(component.codemirrorStatus).toBeFalse();
-    }));
+    expect(component.codemirrorStatus).toBeFalse();
+  }));
 
   it('should get empty object on validating', () => {
     expect(component.validate(new FormControl(1))).toEqual(null);
@@ -171,7 +182,8 @@ describe('Schema Based Unicode Editor', () => {
     };
 
     expect(component.getPlaceholder()).toBe(
-      'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
+      'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER'
+    );
 
     component.uiConfig = undefined;
 
@@ -181,12 +193,13 @@ describe('Schema Based Unicode Editor', () => {
   it('should submit form on keypress', () => {
     spyOn(schemaFormSubmittedService.onSubmittedSchemaBasedForm, 'emit');
     let evt = new KeyboardEvent('', {
-      keyCode: 13
+      keyCode: 13,
     });
 
     component.onKeypress(evt);
 
-    expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
-      .toHaveBeenCalled();
+    expect(
+      schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit
+    ).toHaveBeenCalled();
   });
 });

@@ -16,11 +16,17 @@
  * @fileoverview Unit tests for for learnerPlaylistModal.
  */
 
-import { async, ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerPlaylistModalComponent } from './learner-playlist-modal.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {LearnerPlaylistModalComponent} from './learner-playlist-modal.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockActiveModal {
   close(): void {
@@ -38,7 +44,7 @@ class MockUrlInterpolationService {
   }
 }
 
-describe('Learner Playlist Modal Component', function() {
+describe('Learner Playlist Modal Component', function () {
   let component: LearnerPlaylistModalComponent;
   let fixture: ComponentFixture<LearnerPlaylistModalComponent>;
   let ngbActiveModal: NgbActiveModal;
@@ -48,13 +54,14 @@ describe('Learner Playlist Modal Component', function() {
       declarations: [LearnerPlaylistModalComponent, MockTranslatePipe],
       providers: [
         {
-          provide: NgbActiveModal, useClass: MockActiveModal
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
         },
         {
           provide: UrlInterpolationService,
-          useClass: MockUrlInterpolationService
+          useClass: MockUrlInterpolationService,
         },
-      ]
+      ],
     }).compileComponents();
   }));
 
@@ -65,27 +72,33 @@ describe('Learner Playlist Modal Component', function() {
     component.activityId = '0';
     component.activityTitle = 'Title';
     component.activityType = 'exploration';
-    component.removeFromLearnerPlaylistUrl = (
-      '/learnerplaylistactivityhandler/exploration/0');
+    component.removeFromLearnerPlaylistUrl =
+      '/learnerplaylistactivityhandler/exploration/0';
     fixture.detectChanges();
   });
 
+  it(
+    'should remove exploration in learner playlist when clicking on' +
+      'remove button',
+    fakeAsync(() => {
+      const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
+      component.removeFromLearnerPlaylistUrl =
+        '/learnerplaylistactivityhandler/exploration/0';
+      component.remove();
+      flushMicrotasks();
+      expect(closeSpy).toHaveBeenCalledWith(
+        component.removeFromLearnerPlaylistUrl
+      );
+    })
+  );
 
-  it('should remove exploration in learner playlist when clicking on' +
-    'remove button', fakeAsync(() => {
-    const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
-    component.removeFromLearnerPlaylistUrl = (
-      '/learnerplaylistactivityhandler/exploration/0');
-    component.remove();
-    flushMicrotasks();
-    expect(closeSpy).toHaveBeenCalledWith(
-      component.removeFromLearnerPlaylistUrl);
-  }));
-
-  it('should not remove exploration in learner playlist' +
-    'when clicking on cancel button', () => {
-    const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-    component.cancel();
-    expect(dismissSpy).toHaveBeenCalled();
-  });
+  it(
+    'should not remove exploration in learner playlist' +
+      'when clicking on cancel button',
+    () => {
+      const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
+      component.cancel();
+      expect(dismissSpy).toHaveBeenCalled();
+    }
+  );
 });

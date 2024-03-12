@@ -20,7 +20,7 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var ExplorationEditorFeedbackTab = function() {
+var ExplorationEditorFeedbackTab = function () {
   /*
    * Interactive elements
    */
@@ -30,14 +30,13 @@ var ExplorationEditorFeedbackTab = function() {
   var feedbackResponseTextArea = $('.e2e-test-feedback-response-textarea');
   var suggestionRowClassName = '.e2e-test-oppia-feedback-tab-row';
   var suggestionRowElement = $('.e2e-test-oppia-feedback-tab-row');
-  var feedbackSubjectClassName = (
-    '.e2e-test-exploration-feedback-subject');
+  var feedbackSubjectClassName = '.e2e-test-exploration-feedback-subject';
   var suggestionCommitMessageInput = $('.e2e-test-suggestion-commit-message');
   var suggestionReviewMessageInput = $('.e2e-test-suggestion-review-message');
   var feedbackStatusDropdown = $('.e2e-test-oppia-feedback-status-menu');
   var feedbackMessage = $('.e2e-test-exploration-feedback');
   var feedbackMessageLocator = '.e2e-test-exploration-feedback';
-  var feedbackMessagesSelector = function() {
+  var feedbackMessagesSelector = function () {
     return $$('.e2e-test-exploration-feedback');
   };
   var feedbackStatusElement = $('.e2e-test-oppia-feedback-status-name');
@@ -46,67 +45,79 @@ var ExplorationEditorFeedbackTab = function() {
    */
   var acceptSuggestionButton = $('.e2e-test-exploration-accept-suggestion-btn');
   var feedbackSendResponseButton = $(
-    '.e2e-test-oppia-feedback-response-send-btn');
+    '.e2e-test-oppia-feedback-response-send-btn'
+  );
   var rejectSuggestionButton = $('.e2e-test-exploration-reject-suggestion-btn');
   var viewSuggestionButton = $('.e2e-test-view-suggestion-btn');
 
   /*
    * Workflows
    */
-  this.acceptSuggestion = async function(suggestionDescription) {
+  this.acceptSuggestion = async function (suggestionDescription) {
     await waitFor.visibilityOf(
       $(suggestionRowClassName),
-      'Suggestion row takes too long to appear');
+      'Suggestion row takes too long to appear'
+    );
     var matchingRow = $(
-      `.e2e-test-exploration-feedback-subject=${suggestionDescription}`);
+      `.e2e-test-exploration-feedback-subject=${suggestionDescription}`
+    );
     await action.click('Matching Row', matchingRow);
     await action.click('View Suggestion Button', viewSuggestionButton);
     await action.setValue(
       'Suggestion Commit Message Input',
-      suggestionCommitMessageInput, 'Commit message');
+      suggestionCommitMessageInput,
+      'Commit message'
+    );
     await action.click('Accept Suggestion Button', acceptSuggestionButton);
     await waitFor.invisibilityOf(
-      acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
+      acceptSuggestionButton,
+      'Suggestion modal takes too long to disappear'
+    );
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectToHaveFeedbackThread = async function() {
+  this.expectToHaveFeedbackThread = async function () {
     await waitFor.presenceOf(
-      feedbackTabRow, 'Feedback Tab Row takes too long to appear');
+      feedbackTabRow,
+      'Feedback Tab Row takes too long to appear'
+    );
   };
 
-  this.getSuggestionThreads = async function() {
+  this.getSuggestionThreads = async function () {
     var threads = [];
     await waitFor.visibilityOf(
       suggestionRowElement,
-      'No suggestion threads are visible');
+      'No suggestion threads are visible'
+    );
     var rows = await $$(suggestionRowClassName);
     var rowCount = rows.length;
     for (var i = 0; i < rowCount; i++) {
       var row = rows[i];
-      var subject = (
-        await row.$(feedbackSubjectClassName).getText());
+      var subject = await row.$(feedbackSubjectClassName).getText();
       threads.push(subject);
     }
     return threads;
   };
 
-  this.goBackToAllFeedbacks = async function() {
+  this.goBackToAllFeedbacks = async function () {
     await action.click('Feedback Back Button', feedbackBackButton);
   };
 
-  this.readFeedbackMessages = async function() {
+  this.readFeedbackMessages = async function () {
     var messages = [];
     await waitFor.visibilityOf(
       suggestionRowElement,
-      'No feedback messages are visible.');
+      'No feedback messages are visible.'
+    );
     var rows = await $$(suggestionRowClassName);
     var rowCount = rows.length;
     for (var i = 0; i < rowCount; i++) {
       var row = rows[i];
       await action.click(`suggestionRow at row index ${i}`, row);
       await waitFor.visibilityOf(
-        explorationFeedback, 'Feedback message text is not visible');
+        explorationFeedback,
+        'Feedback message text is not visible'
+      );
       var message = await explorationFeedback.getText();
       messages.push(message);
       await action.click('Feedback Back Button', feedbackBackButton);
@@ -114,76 +125,108 @@ var ExplorationEditorFeedbackTab = function() {
     return messages;
   };
 
-  this.rejectSuggestion = async function(suggestionDescription) {
+  this.rejectSuggestion = async function (suggestionDescription) {
     await waitFor.visibilityOf(
       $(suggestionRowClassName),
-      'Suggestion row takes too long to appear');
+      'Suggestion row takes too long to appear'
+    );
     var matchingRow = $(
-      `.e2e-test-exploration-feedback-subject=${suggestionDescription}`);
+      `.e2e-test-exploration-feedback-subject=${suggestionDescription}`
+    );
     await action.click(
-      'Matching Suggestion Row and feedback subject', matchingRow);
+      'Matching Suggestion Row and feedback subject',
+      matchingRow
+    );
     await action.click('View Suggestion Button', viewSuggestionButton);
     await action.setValue(
       'Suggestion Review Message Input',
-      suggestionReviewMessageInput, 'Review message');
+      suggestionReviewMessageInput,
+      'Review message'
+    );
     await action.click('Reject Suggestion Button', rejectSuggestionButton);
     await waitFor.invisibilityOf(
-      acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
+      acceptSuggestionButton,
+      'Suggestion modal takes too long to disappear'
+    );
     await waitFor.pageToFullyLoad();
   };
 
-  this.selectLatestFeedbackThread = async function() {
+  this.selectLatestFeedbackThread = async function () {
     await waitFor.visibilityOf(
-      suggestionRowElement, 'Suggestion row is taking too long to appear');
+      suggestionRowElement,
+      'Suggestion row is taking too long to appear'
+    );
     var suggestionRowFirst = await $$(suggestionRowClassName)[0];
-    await action.click(
-      'Suggestion Row First', suggestionRowFirst);
+    await action.click('Suggestion Row First', suggestionRowFirst);
   };
 
-  this.sendResponseToLatestFeedback = async function(feedbackResponse) {
+  this.sendResponseToLatestFeedback = async function (feedbackResponse) {
     await this.selectLatestFeedbackThread();
     await action.setValue(
       'Feedback Response Text Area',
-      feedbackResponseTextArea, feedbackResponse);
+      feedbackResponseTextArea,
+      feedbackResponse
+    );
     await action.click(
-      'Feedback Send Response Button', feedbackSendResponseButton);
+      'Feedback Send Response Button',
+      feedbackSendResponseButton
+    );
   };
 
-  this.changeFeedbackStatus = async function(
-      feedbackStatus, feedbackResponse) {
+  this.changeFeedbackStatus = async function (
+    feedbackStatus,
+    feedbackResponse
+  ) {
     await action.setValue(
       'Feedback Response Text Area',
-      feedbackResponseTextArea, feedbackResponse);
+      feedbackResponseTextArea,
+      feedbackResponse
+    );
 
     await waitFor.visibilityOf(
-      feedbackStatusDropdown, 'Feedback Status Dropdown is not visible');
+      feedbackStatusDropdown,
+      'Feedback Status Dropdown is not visible'
+    );
     await action.select(
-      'Option feedback status', feedbackStatusDropdown, feedbackStatus);
+      'Option feedback status',
+      feedbackStatusDropdown,
+      feedbackStatus
+    );
 
     await action.click(
-      'Feedback Send Response Button', feedbackSendResponseButton);
+      'Feedback Send Response Button',
+      feedbackSendResponseButton
+    );
   };
 
-  this.expectNumberOfFeedbackMessagesToBe = async function(number) {
+  this.expectNumberOfFeedbackMessagesToBe = async function (number) {
     await waitFor.numberOfElementsToBe(
-      feedbackMessageLocator, 'Feedback message', number);
+      feedbackMessageLocator,
+      'Feedback message',
+      number
+    );
   };
 
-  this.readFeedbackMessagesFromThread = async function() {
+  this.readFeedbackMessagesFromThread = async function () {
     await waitFor.visibilityOf(
-      feedbackMessage, 'Feedback message text is not visible');
+      feedbackMessage,
+      'Feedback message text is not visible'
+    );
     var feedbackMessages = await feedbackMessagesSelector();
     return feedbackMessages;
   };
 
-  this.expectFeedbackStatusNameToBe = async function(feedbackStatus) {
+  this.expectFeedbackStatusNameToBe = async function (feedbackStatus) {
     await waitFor.visibilityOf(
-      feedbackStatusElement, 'Feedback status is not visible.');
+      feedbackStatusElement,
+      'Feedback status is not visible.'
+    );
     await waitFor.textToBePresentInElement(
       feedbackStatusElement,
       feedbackStatus,
       `Expected ${await feedbackStatusElement.getText()} ` +
-      `to be ${feedbackStatus}`);
+        `to be ${feedbackStatus}`
+    );
   };
 };
 

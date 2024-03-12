@@ -18,46 +18,52 @@
  */
 
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 
-var customizeInteraction = async function(elem, placeholderText, heightOfBox) {
-  await objects.UnicodeStringEditor(
-    await elem.$('<schema-based-unicode-editor>')
-  ).setValue(placeholderText);
-  await objects.IntEditor(
-    await elem.$('<schema-based-int-editor>')
-  ).setValue(heightOfBox);
+var customizeInteraction = async function (elem, placeholderText, heightOfBox) {
+  await objects
+    .UnicodeStringEditor(await elem.$('<schema-based-unicode-editor>'))
+    .setValue(placeholderText);
+  await objects
+    .IntEditor(await elem.$('<schema-based-int-editor>'))
+    .setValue(heightOfBox);
 };
 
-var expectInteractionDetailsToMatch = async function(
-    elem, placeholderText, heightOfBox) {
+var expectInteractionDetailsToMatch = async function (
+  elem,
+  placeholderText,
+  heightOfBox
+) {
   const textInputInteraction = $('<oppia-interactive-text-input>');
   // We use presenceOf here instead of visibilityOf because the container
   // has a height and width of 0.
   await waitFor.presenceOf(
     textInputInteraction,
-    'TextInput interaction taking too long to appear');
+    'TextInput interaction taking too long to appear'
+  );
   if (placeholderText) {
     placeholderValue = await textInputInteraction.getAttribute(
-      'placeholder-with-value');
+      'placeholder-with-value'
+    );
     placeholderValueUnicode = JSON.parse(
       placeholderValue.replace(/&quot;/g, '"')
     ).unicode_str;
     expect(placeholderValueUnicode).toEqual(placeholderText);
   }
   if (heightOfBox) {
-    expect(await textInputInteraction.getAttribute('rows-with-value'))
-      .toEqual(heightOfBox.toString());
+    expect(await textInputInteraction.getAttribute('rows-with-value')).toEqual(
+      heightOfBox.toString()
+    );
   }
-  expect(
-    await elem.$('<oppia-interactive-text-input>').isExisting()
-  ).toBe(true);
+  expect(await elem.$('<oppia-interactive-text-input>').isExisting()).toBe(
+    true
+  );
 };
 
-var submitAnswer = async function(elem, answer) {
+var submitAnswer = async function (elem, answer) {
   // Try to get the text area element. If it doesn't exist, try input instead.
   // They are different depending on the height of the box.
   var textInputElem = elem.$('<oppia-interactive-text-input>');
@@ -85,13 +91,15 @@ var submitAnswer = async function(elem, answer) {
 
 var answerObjectType = 'NormalizedString';
 
-var testSuite = [{
-  interactionArguments: ['placeholder', 4],
-  ruleArguments: ['StartsWith', ['valid']],
-  expectedInteractionDetails: ['placeholder', 4],
-  wrongAnswers: ['invalid'],
-  correctAnswers: ['valid']
-}];
+var testSuite = [
+  {
+    interactionArguments: ['placeholder', 4],
+    ruleArguments: ['StartsWith', ['valid']],
+    expectedInteractionDetails: ['placeholder', 4],
+    wrongAnswers: ['invalid'],
+    correctAnswers: ['valid'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

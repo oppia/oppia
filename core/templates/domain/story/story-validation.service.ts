@@ -16,13 +16,13 @@
  * @fileoverview Service to validate a story.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { StoryContents } from 'domain/story/story-contents-object.model';
+import {StoryContents} from 'domain/story/story-contents-object.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StoryValidationService {
   /**
@@ -31,7 +31,9 @@ export class StoryValidationService {
    * @returns {string[]} - List of validation issues.
    */
   validatePrerequisiteSkillsInStoryContents(
-      topicRelevantSkills: string[], storyContents: StoryContents): string[] {
+    topicRelevantSkills: string[],
+    storyContents: StoryContents
+  ): string[] {
     let issues: string[] = [];
     let nodeIds = storyContents.getNodeIds();
     let nodes = storyContents.getNodes();
@@ -51,17 +53,15 @@ export class StoryValidationService {
     var simulatedSkillIds = new Set(startingNode.getPrerequisiteSkillIds());
 
     // Validate the prerequisite skills of the starting node.
-    startingNode.getPrerequisiteSkillIds().forEach(
-      (skillId: string) => {
-        if (
-          topicRelevantSkills.includes(skillId)) {
-          issues.push(
-            `The skill with id ${skillId} was specified as a ` +
+    startingNode.getPrerequisiteSkillIds().forEach((skillId: string) => {
+      if (topicRelevantSkills.includes(skillId)) {
+        issues.push(
+          `The skill with id ${skillId} was specified as a ` +
             `prerequisite for Chapter ${startingNode.getTitle()} but ` +
-            'was not taught in any chapter before it.');
-        }
+            'was not taught in any chapter before it.'
+        );
       }
-    );
+    });
 
     // The following loop employs a Breadth First Search from the given
     // starting node and makes sure that the user has acquired all the
@@ -72,7 +72,7 @@ export class StoryValidationService {
       nodeIsVisited[currentNodeIndex] = true;
       var currentNode = nodes[currentNodeIndex];
 
-      currentNode.getAcquiredSkillIds().forEach((skillId) => {
+      currentNode.getAcquiredSkillIds().forEach(skillId => {
         simulatedSkillIds.add(skillId);
       });
       for (var i = 0; i < currentNode.getDestinationNodeIds().length; i++) {
@@ -88,18 +88,18 @@ export class StoryValidationService {
           return issues;
         }
         var destinationNode = nodes[nodeIndex];
-        destinationNode.getPrerequisiteSkillIds().forEach(
-          (skillId: string) => {
-            if (
-              topicRelevantSkills.includes(skillId) &&
-              !simulatedSkillIds.has(skillId)) {
-              issues.push(
-                `The skill with id ${skillId} was specified as a ` +
+        destinationNode.getPrerequisiteSkillIds().forEach((skillId: string) => {
+          if (
+            topicRelevantSkills.includes(skillId) &&
+            !simulatedSkillIds.has(skillId)
+          ) {
+            issues.push(
+              `The skill with id ${skillId} was specified as a ` +
                 `prerequisite for Chapter ${destinationNode.getTitle()} but ` +
-                'was not taught in any chapter before it.');
-            }
+                'was not taught in any chapter before it.'
+            );
           }
-        );
+        });
         nodesQueue.push(nodeId);
       }
     }
@@ -107,5 +107,9 @@ export class StoryValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'StoryValidationService', downgradeInjectable(StoryValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'StoryValidationService',
+    downgradeInjectable(StoryValidationService)
+  );

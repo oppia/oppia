@@ -16,27 +16,29 @@
  * @fileoverview Component for the NumberWithUnits interaction.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Subject, Subscription} from 'rxjs';
+import {debounceTime, distinctUntilChanged} from 'rxjs/operators';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
-import { NumberWithUnitsAnswer, InteractionAnswer } from 'interactions/answer-defs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HelpModalNumberWithUnitsComponent } from './oppia-help-modal-number-with-units.component';
-import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { NumberWithUnitsRulesService } from './number-with-units-rules.service';
+import {
+  NumberWithUnitsAnswer,
+  InteractionAnswer,
+} from 'interactions/answer-defs';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {HelpModalNumberWithUnitsComponent} from './oppia-help-modal-number-with-units.component';
+import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnitsRulesService} from './number-with-units-rules.service';
 
 @Component({
   selector: 'oppia-interactive-number-with-units',
   templateUrl: './number-with-units-interaction.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-export class InteractiveNumberWithUnitsComponent
-    implements OnInit, OnDestroy {
+export class InteractiveNumberWithUnitsComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -50,7 +52,7 @@ export class InteractiveNumberWithUnitsComponent
   answerChanged: Subject<string> = new Subject<string>();
   NUMBER_WITH_UNITS_FORM_SCHEMA = {
     type: 'unicode',
-    ui_config: {}
+    ui_config: {},
   };
 
   constructor(
@@ -58,33 +60,38 @@ export class InteractiveNumberWithUnitsComponent
     private focusManagerService: FocusManagerService,
     private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
     private numberWithUnitsRulesService: NumberWithUnitsRulesService,
-    private ngbModal: NgbModal,
+    private ngbModal: NgbModal
   ) {
-    this.componentSubscriptions.add(this.answerChanged.pipe(
-      // Wait 150ms after the last event before emitting last event.
-      debounceTime(150),
-      // Only emit if value is different from previous value.
-      distinctUntilChanged()
-    ).subscribe(newValue => {
-      try {
-        this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
-        this.errorMessageI18nKey = '';
-        this.isValid = true;
-      } catch (parsingError) {
-        if (parsingError instanceof Error) {
-          this.errorMessageI18nKey = parsingError.message;
-        }
-        this.isValid = false;
-      }
-      this.currentInteractionService.updateViewWithNewAnswer();
-    }));
+    this.componentSubscriptions.add(
+      this.answerChanged
+        .pipe(
+          // Wait 150ms after the last event before emitting last event.
+          debounceTime(150),
+          // Only emit if value is different from previous value.
+          distinctUntilChanged()
+        )
+        .subscribe(newValue => {
+          try {
+            this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
+            this.errorMessageI18nKey = '';
+            this.isValid = true;
+          } catch (parsingError) {
+            if (parsingError instanceof Error) {
+              this.errorMessageI18nKey = parsingError.message;
+            }
+            this.isValid = false;
+          }
+          this.currentInteractionService.updateViewWithNewAnswer();
+        })
+    );
   }
 
   ngOnInit(): void {
     if (this.savedSolution !== undefined) {
       let savedSolution = this.savedSolution;
-      savedSolution = this.numberWithUnitsObjectFactory.fromDict(
-        savedSolution as NumberWithUnitsAnswer).toString();
+      savedSolution = this.numberWithUnitsObjectFactory
+        .fromDict(savedSolution as NumberWithUnitsAnswer)
+        .toString();
       this.answer = savedSolution;
     } else {
       this.answer = '';
@@ -97,27 +104,31 @@ export class InteractiveNumberWithUnitsComponent
     const submitAnswerFn = () => this.submitAnswer();
     const isAnswerValid = () => this.isAnswerValid();
     this.currentInteractionService.registerCurrentInteraction(
-      submitAnswerFn, isAnswerValid);
+      submitAnswerFn,
+      isAnswerValid
+    );
 
-    setTimeout(
-      () => {
-        let focusLabel: string = this.labelForFocusTarget;
-        this.focusManagerService.setFocusWithoutScroll(focusLabel);
-      }, 0);
+    setTimeout(() => {
+      let focusLabel: string = this.labelForFocusTarget;
+      this.focusManagerService.setFocusWithoutScroll(focusLabel);
+    }, 0);
   }
 
   submitAnswer(): void {
     try {
-      if (this.answer.trim() === '' &&
-          this.currentInteractionService.showNoResponseError()) {
+      if (
+        this.answer.trim() === '' &&
+        this.currentInteractionService.showNoResponseError()
+      ) {
         this.errorMessageI18nKey = 'I18N_INTERACTIONS_INPUT_NO_RESPONSE';
         return;
       }
-      const numberWithUnits = (
-        this.numberWithUnitsObjectFactory.fromRawInputString(this.answer));
+      const numberWithUnits =
+        this.numberWithUnitsObjectFactory.fromRawInputString(this.answer);
       this.currentInteractionService.onSubmit(
         numberWithUnits,
-        this.numberWithUnitsRulesService as NumberWithUnitsRulesService);
+        this.numberWithUnitsRulesService as NumberWithUnitsRulesService
+      );
     } catch (parsingError) {
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;
@@ -129,14 +140,19 @@ export class InteractiveNumberWithUnitsComponent
   }
 
   showHelp(): void {
-    this.ngbModal.open(HelpModalNumberWithUnitsComponent, {
-      backdrop: true,
-      windowClass: 'oppia-help-modal-number-with-units'
-    }).result.then(() => {}, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(HelpModalNumberWithUnitsComponent, {
+        backdrop: true,
+        windowClass: 'oppia-help-modal-number-with-units',
+      })
+      .result.then(
+        () => {},
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   isAnswerValid(): boolean {
@@ -154,6 +170,8 @@ export class InteractiveNumberWithUnitsComponent
 }
 
 angular.module('oppia').directive(
-  'oppiaInteractiveNumberWithUnits', downgradeComponent({
-    component: InteractiveNumberWithUnitsComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaInteractiveNumberWithUnits',
+  downgradeComponent({
+    component: InteractiveNumberWithUnitsComponent,
+  }) as angular.IDirectiveFactory
+);

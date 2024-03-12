@@ -24,11 +24,12 @@ export class SkillMastery {
   private _skillMasteryDict: SkillMasteryBackendDict;
 
   constructor(backendDict: SkillMasteryBackendDict) {
-    this._skillMasteryDict = { ...backendDict };
+    this._skillMasteryDict = {...backendDict};
   }
 
   static createFromBackendDict(
-      backendDict: SkillMasteryBackendDict): SkillMastery {
+    backendDict: SkillMasteryBackendDict
+  ): SkillMastery {
     return new SkillMastery(backendDict);
   }
 
@@ -41,6 +42,6 @@ export class SkillMastery {
   }
 
   toBackendDict(): SkillMasteryBackendDict {
-    return { ...this._skillMasteryDict };
+    return {...this._skillMasteryDict};
   }
 }

@@ -22,9 +22,14 @@ import 'zone.js';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', uiValidate
+  require('angular-cookies'),
+  'ngAnimate',
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  uiValidate,
 ]);
 
 require('Polyfills.ts');
@@ -39,7 +44,9 @@ require('base-components/base-content.component.ts');
 require('pages/collection-editor-page/collection-editor-page.component.ts');
 require(
   'pages/collection-editor-page/navbar/' +
-  'collection-editor-navbar-breadcrumb.component.ts');
+    'collection-editor-navbar-breadcrumb.component.ts'
+);
 require(
   'pages/collection-editor-page/navbar/' +
-  'collection-editor-navbar.component.ts');
+    'collection-editor-navbar.component.ts'
+);

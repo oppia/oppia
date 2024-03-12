@@ -20,13 +20,11 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
-var CreatorDashboardPage =
-  require('../webdriverio_utils/CreatorDashboardPage.js');
-var CollectionEditorPage =
-  require('../webdriverio_utils/CollectionEditorPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var CollectionEditorPage = require('../webdriverio_utils/CollectionEditorPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
-describe('Collections', function() {
+describe('Collections', function () {
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
   var collectionId = null;
@@ -39,7 +37,7 @@ describe('Collections', function() {
   var linearExplorationId = null;
   var testExplorationId = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -48,9 +46,13 @@ describe('Collections', function() {
     var CREATOR_USERNAME = 'creatorExplorations';
     await users.createUser('creator@explorations.com', CREATOR_USERNAME);
     await users.createCollectionEditor(
-      'player@collections.com', PLAYER_USERNAME);
+      'player@collections.com',
+      PLAYER_USERNAME
+    );
     await users.createCollectionEditor(
-      'alice@collections.com', EDITOR_USERNAME);
+      'alice@collections.com',
+      EDITOR_USERNAME
+    );
 
     await users.login('creator@explorations.com');
     // Create four test explorations.
@@ -126,7 +128,8 @@ describe('Collections', function() {
     await collectionEditorPage.publishCollection();
     await collectionEditorPage.setTitle('Test Collection 2');
     await collectionEditorPage.setObjective(
-      'This is the second test collection.');
+      'This is the second test collection.'
+    );
     await collectionEditorPage.setCategory('Algebra');
     await collectionEditorPage.saveChanges();
     var url = await browser.getUrl();
@@ -135,7 +138,7 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('should visit the collection editor', async function() {
+  it('should visit the collection editor', async function () {
     await users.login('alice@collections.com');
     await creatorDashboardPage.get();
     await creatorDashboardPage.clickCreateActivityButton();
@@ -164,7 +167,7 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('should visit the collection player', async function() {
+  it('should visit the collection player', async function () {
     await users.login('alice@collections.com');
     await libraryPage.get();
     await libraryPage.findCollection('Test Collection');
@@ -172,50 +175,49 @@ describe('Collections', function() {
     await users.logout();
   });
 
-  it('should check for errors in a collection with varying node count',
-    async function() {
+  it('should check for errors in a collection with varying node count', async function () {
     // Checking in a collection with one node.
-      await users.login('player@collections.com');
-      await browser.url('/collection/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
+    await users.login('player@collections.com');
+    await browser.url('/collection/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    await general.checkForConsoleErrors([]);
 
-      // Checking in a collection with two nodes.
-      await browser.url('/collection_editor/create/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      await collectionEditorPage.addExistingExploration(secondExplorationId);
-      await collectionEditorPage.saveDraft();
-      await collectionEditorPage.setCommitMessage('Add Exploration');
-      await collectionEditorPage.closeSaveModal();
-      await browser.url('/collection/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
+    // Checking in a collection with two nodes.
+    await browser.url('/collection_editor/create/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    await collectionEditorPage.addExistingExploration(secondExplorationId);
+    await collectionEditorPage.saveDraft();
+    await collectionEditorPage.setCommitMessage('Add Exploration');
+    await collectionEditorPage.closeSaveModal();
+    await browser.url('/collection/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    await general.checkForConsoleErrors([]);
 
-      // Checking in a collection with three nodes.
-      await browser.url('/collection_editor/create/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      await collectionEditorPage.addExistingExploration(thirdExplorationId);
-      await collectionEditorPage.saveDraft();
-      await collectionEditorPage.setCommitMessage('Add Exploration');
-      await collectionEditorPage.closeSaveModal();
-      await browser.url('/collection/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
+    // Checking in a collection with three nodes.
+    await browser.url('/collection_editor/create/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    await collectionEditorPage.addExistingExploration(thirdExplorationId);
+    await collectionEditorPage.saveDraft();
+    await collectionEditorPage.setCommitMessage('Add Exploration');
+    await collectionEditorPage.closeSaveModal();
+    await browser.url('/collection/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    await general.checkForConsoleErrors([]);
 
-      // Checking in a collection with four nodes.
-      await browser.url('/collection_editor/create/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      await collectionEditorPage.addExistingExploration(fourthExplorationId);
-      await collectionEditorPage.saveDraft();
-      await collectionEditorPage.setCommitMessage('Add Exploration');
-      await collectionEditorPage.closeSaveModal();
-      await browser.url('/collection/' + collectionId);
-      await waitFor.pageToFullyLoad();
-      await general.checkForConsoleErrors([]);
-      await users.logout();
-    });
+    // Checking in a collection with four nodes.
+    await browser.url('/collection_editor/create/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    await collectionEditorPage.addExistingExploration(fourthExplorationId);
+    await collectionEditorPage.saveDraft();
+    await collectionEditorPage.setCommitMessage('Add Exploration');
+    await collectionEditorPage.closeSaveModal();
+    await browser.url('/collection/' + collectionId);
+    await waitFor.pageToFullyLoad();
+    await general.checkForConsoleErrors([]);
+    await users.logout();
+  });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

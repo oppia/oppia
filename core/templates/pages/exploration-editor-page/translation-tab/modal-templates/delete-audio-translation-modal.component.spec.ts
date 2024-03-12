@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the DeleteAudioTranslationModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteAudioTranslationModalComponent } from './delete-audio-translation-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteAudioTranslationModalComponent} from './delete-audio-translation-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -32,20 +31,20 @@ class MockActiveModal {
   }
 }
 
-describe('Delete Exploration Modal Component', function() {
+describe('Delete Exploration Modal Component', function () {
   let component: DeleteAudioTranslationModalComponent;
   let fixture: ComponentFixture<DeleteAudioTranslationModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteAudioTranslationModalComponent
+      declarations: [DeleteAudioTranslationModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

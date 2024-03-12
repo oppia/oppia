@@ -16,24 +16,19 @@
  * @fileoverview Routing module for privacy page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { PrivacyPageRootComponent } from './privacy-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {PrivacyPageRootComponent} from './privacy-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: PrivacyPageRootComponent
-  }
+    component: PrivacyPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class PrivacyPageRoutingModule {}

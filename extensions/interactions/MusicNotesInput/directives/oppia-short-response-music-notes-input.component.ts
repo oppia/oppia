@@ -20,21 +20,19 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-music-notes-input',
-  templateUrl: './music-notes-input-short-response.component.html'
+  templateUrl: './music-notes-input-short-response.component.html',
 })
 export class ShortResponseMusicNotesInput implements OnInit {
   @Input() answer;
   displayedAnswer: string;
 
-  constructor(
-    private htmlEscaperService: HtmlEscaperService
-  ) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     let _answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
@@ -54,6 +52,8 @@ export class ShortResponseMusicNotesInput implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseMusicNotesInput', downgradeComponent(
-    {component: ShortResponseMusicNotesInput}
-  ) as angular.IDirectiveFactory);
+  'oppiaShortResponseMusicNotesInput',
+  downgradeComponent({
+    component: ShortResponseMusicNotesInput,
+  }) as angular.IDirectiveFactory
+);

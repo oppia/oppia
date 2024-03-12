@@ -16,27 +16,27 @@
  * @fileoverview Component for the navbar of the story editor.
  */
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StoryValidationService } from 'domain/story/story-validation.service';
-import { Story } from 'domain/story/story.model';
-import { StoryNode } from 'domain/story/story-node.model';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { StoryEditorStateService } from '../services/story-editor-state.service';
-import { StoryUpdateService } from 'domain/story/story-update.service';
-import { StoryEditorSaveModalComponent } from '../modal-templates/story-editor-save-modal.component';
-import { StoryEditorUnpublishModalComponent } from '../modal-templates/story-editor-unpublish-modal.component';
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { StoryEditorNavigationService } from '../services/story-editor-navigation.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { DraftChapterConfirmationModalComponent } from '../modal-templates/draft-chapter-confirmation-modal.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {StoryValidationService} from 'domain/story/story-validation.service';
+import {Story} from 'domain/story/story.model';
+import {StoryNode} from 'domain/story/story-node.model';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {StoryEditorStateService} from '../services/story-editor-state.service';
+import {StoryUpdateService} from 'domain/story/story-update.service';
+import {StoryEditorSaveModalComponent} from '../modal-templates/story-editor-save-modal.component';
+import {StoryEditorUnpublishModalComponent} from '../modal-templates/story-editor-unpublish-modal.component';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {DraftChapterConfirmationModalComponent} from '../modal-templates/draft-chapter-confirmation-modal.component';
 
 @Component({
   selector: 'oppia-story-editor-navbar',
-  templateUrl: './story-editor-navbar.component.html'
+  templateUrl: './story-editor-navbar.component.html',
 })
 export class StoryEditorNavbarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -73,9 +73,8 @@ export class StoryEditorNavbarComponent implements OnInit {
   explorationValidationIssues: string[] = [];
 
   isSerialChapterFeatureFlagEnabled(): boolean {
-    return (
-      this.platformFeatureService.
-        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
+    return this.platformFeatureService.status
+      .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
   isStoryPublished(): boolean {
@@ -102,18 +101,17 @@ export class StoryEditorNavbarComponent implements OnInit {
     return (
       this.validationIssues.length +
       this.explorationValidationIssues.length +
-      this.prepublishValidationIssues.length);
+      this.prepublishValidationIssues.length
+    );
   }
 
   isStorySaveable(): boolean {
     if (this.storyEditorStateService.isStoryPublished()) {
       return (
-        this.getChangeListLength() > 0 &&
-        this.getTotalWarningsCount() === 0);
+        this.getChangeListLength() > 0 && this.getTotalWarningsCount() === 0
+      );
     }
-    return (
-      this.getChangeListLength() > 0 &&
-      this.getWarningsCount() === 0);
+    return this.getChangeListLength() > 0 && this.getWarningsCount() === 0;
   }
 
   isChapterPublishable(): boolean {
@@ -133,9 +131,10 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 
   getAllStoryWarnings(): string {
-    return this.validationIssues.concat(
-      this.explorationValidationIssues
-    ).concat(this.prepublishValidationIssues).join('\n');
+    return this.validationIssues
+      .concat(this.explorationValidationIssues)
+      .concat(this.prepublishValidationIssues)
+      .join('\n');
   }
 
   discardChanges(): void {
@@ -152,32 +151,32 @@ export class StoryEditorNavbarComponent implements OnInit {
     if (this.currentTab === 'chapter_editor') {
       this.getStoryNodeData();
     }
-    let skillIdsInTopic = (
-      this.storyEditorStateService.getSkillSummaries().map(
-        skill => skill.id));
+    let skillIdsInTopic = this.storyEditorStateService
+      .getSkillSummaries()
+      .map(skill => skill.id);
     if (this.validationIssues.length === 0 && nodes.length > 0) {
-      let prerequisiteSkillValidationIssues = (
-        this.storyValidationService
-          .validatePrerequisiteSkillsInStoryContents(
-            skillIdsInTopic, this.story.getStoryContents()));
-      this.validationIssues = (
-        this.validationIssues.concat(
-          prerequisiteSkillValidationIssues));
+      let prerequisiteSkillValidationIssues =
+        this.storyValidationService.validatePrerequisiteSkillsInStoryContents(
+          skillIdsInTopic,
+          this.story.getStoryContents()
+        );
+      this.validationIssues = this.validationIssues.concat(
+        prerequisiteSkillValidationIssues
+      );
     }
     if (this.storyEditorStateService.getStoryWithUrlFragmentExists()) {
-      this.validationIssues.push(
-        'Story URL fragment already exists.');
+      this.validationIssues.push('Story URL fragment already exists.');
     }
     this.forceValidateExplorations = true;
     this._validateExplorations();
-    let storyPrepublishValidationIssues = (
-      this.story.prepublishValidate());
-    let nodePrepublishValidationIssues = (
-      Array.prototype.concat.apply([], nodes.map(
-        (node) => node.prepublishValidate())));
-    this.prepublishValidationIssues = (
-      storyPrepublishValidationIssues.concat(
-        nodePrepublishValidationIssues));
+    let storyPrepublishValidationIssues = this.story.prepublishValidate();
+    let nodePrepublishValidationIssues = Array.prototype.concat.apply(
+      [],
+      nodes.map(node => node.prepublishValidate())
+    );
+    this.prepublishValidationIssues = storyPrepublishValidationIssues.concat(
+      nodePrepublishValidationIssues
+    );
   }
 
   private _validateExplorations(): void {
@@ -186,7 +185,8 @@ export class StoryEditorNavbarComponent implements OnInit {
 
     if (
       this.storyEditorStateService.areAnyExpIdsChanged() ||
-      this.forceValidateExplorations) {
+      this.forceValidateExplorations
+    ) {
       this.explorationValidationIssues = [];
       for (let i = 0; i < nodes.length; i++) {
         let explorationId = nodes[i].getExplorationId();
@@ -194,92 +194,106 @@ export class StoryEditorNavbarComponent implements OnInit {
           explorationIds.push(explorationId);
         } else {
           this.explorationValidationIssues.push(
-            'Some chapters don\'t have exploration IDs provided.');
+            "Some chapters don't have exploration IDs provided."
+          );
         }
       }
       this.forceValidateExplorations = false;
       if (explorationIds.length > 0) {
-        this.editableStoryBackendApiService.validateExplorationsAsync(
-          this.story.getId(), explorationIds
-        ).then((validationIssues) => {
-          this.explorationValidationIssues =
-            this.explorationValidationIssues.concat(validationIssues);
-        });
+        this.editableStoryBackendApiService
+          .validateExplorationsAsync(this.story.getId(), explorationIds)
+          .then(validationIssues => {
+            this.explorationValidationIssues =
+              this.explorationValidationIssues.concat(validationIssues);
+          });
       }
     }
     this.storyEditorStateService.resetExpIdsChanged();
   }
 
   saveChanges(): void {
-    const modalRef = this.ngbModal.open(
-      StoryEditorSaveModalComponent,
-      { backdrop: 'static' });
-    modalRef.componentInstance.bindedMessage = this.commitMessage;
-    modalRef.result.then((commitMessage) => {
-      this.storyEditorStateService.saveStory(
-        commitMessage, () => {
-        }, (errorMessage: string) => {
-          this.alertsService.addInfoMessage(errorMessage, 5000);
-        }
-      );
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
+    const modalRef = this.ngbModal.open(StoryEditorSaveModalComponent, {
+      backdrop: 'static',
     });
+    modalRef.componentInstance.bindedMessage = this.commitMessage;
+    modalRef.result.then(
+      commitMessage => {
+        this.storyEditorStateService.saveStory(
+          commitMessage,
+          () => {},
+          (errorMessage: string) => {
+            this.alertsService.addInfoMessage(errorMessage, 5000);
+          }
+        );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   saveChangesInReadyToPublishChapter(): void {
     if (!this.isChapterPublishable()) {
       const modalRef = this.ngbModal.open(
         DraftChapterConfirmationModalComponent,
-        { backdrop: 'static' });
-      modalRef.result.then(() => {
-        this.storyUpdateService.setStoryNodeStatus(
-          this.story, this.storyNode.getId(), 'Draft');
-        this.saveChanges();
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+        {backdrop: 'static'}
+      );
+      modalRef.result.then(
+        () => {
+          this.storyUpdateService.setStoryNodeStatus(
+            this.story,
+            this.storyNode.getId(),
+            'Draft'
+          );
+          this.saveChanges();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
     } else {
       this.saveChanges();
     }
   }
 
   publishStory(): void {
-    this.storyEditorStateService.changeStoryPublicationStatus(
-      true, () => {
-        this.storyIsPublished =
-          this.storyEditorStateService.isStoryPublished();
-      });
+    this.storyEditorStateService.changeStoryPublicationStatus(true, () => {
+      this.storyIsPublished = this.storyEditorStateService.isStoryPublished();
+    });
   }
 
   unpublishStory(): void {
-    this.ngbModal.open(
-      StoryEditorUnpublishModalComponent,
-      { backdrop: 'static' }
-    ).result.then(() => {
-      this.storyEditorStateService.changeStoryPublicationStatus(
-        false, () => {
-          this.storyIsPublished =
-            this.storyEditorStateService.isStoryPublished();
-          this.forceValidateExplorations = true;
-          this._validateStory();
-        });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(StoryEditorUnpublishModalComponent, {backdrop: 'static'})
+      .result.then(
+        () => {
+          this.storyEditorStateService.changeStoryPublicationStatus(
+            false,
+            () => {
+              this.storyIsPublished =
+                this.storyEditorStateService.isStoryPublished();
+              this.forceValidateExplorations = true;
+              this._validateStory();
+            }
+          );
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   changeChapterStatus(newStatus: string): void {
     this.storyEditorStateService.setChapterStatusIsChanging(true);
     if (newStatus === 'Published') {
-      let selectedChapterIndexInPublishUptoDropdown = this.
-        storyEditorStateService.getSelectedChapterIndexInPublishUptoDropdown();
+      let selectedChapterIndexInPublishUptoDropdown =
+        this.storyEditorStateService.getSelectedChapterIndexInPublishUptoDropdown();
       let nodes = this.story.getStoryContents().getLinearNodesList();
       let lastPublishedChapterIndex = -1;
       for (let i = 0; i < nodes.length; i++) {
@@ -288,67 +302,102 @@ export class StoryEditorNavbarComponent implements OnInit {
         }
       }
 
-      if (selectedChapterIndexInPublishUptoDropdown <
-          lastPublishedChapterIndex) {
+      if (
+        selectedChapterIndexInPublishUptoDropdown < lastPublishedChapterIndex
+      ) {
         const modalRef = this.ngbModal.open(
           StoryEditorUnpublishModalComponent,
-          { backdrop: 'static' }
+          {backdrop: 'static'}
         );
         let unpublishedChapters = [];
-        for (let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
-          i <= lastPublishedChapterIndex; i++) {
+        for (
+          let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
+          i <= lastPublishedChapterIndex;
+          i++
+        ) {
           unpublishedChapters.push(Number(i) + 1);
         }
         modalRef.componentInstance.unpublishedChapters = unpublishedChapters;
-        modalRef.result.then((unpublishingReason) => {
-          for (let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
-            i <= lastPublishedChapterIndex; i++) {
-            this.storyUpdateService.setStoryNodeStatus(
-              this.story, nodes[i].getId(), 'Draft');
-            this.storyUpdateService.setStoryNodeUnpublishingReason(
-              this.story, nodes[i].getId(), unpublishingReason);
-            if (nodes[i].getPlannedPublicationDateMsecs()) {
-              this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
-                this.story, nodes[i].getId(), null);
+        modalRef.result.then(
+          unpublishingReason => {
+            for (
+              let i = Number(selectedChapterIndexInPublishUptoDropdown) + 1;
+              i <= lastPublishedChapterIndex;
+              i++
+            ) {
+              this.storyUpdateService.setStoryNodeStatus(
+                this.story,
+                nodes[i].getId(),
+                'Draft'
+              );
+              this.storyUpdateService.setStoryNodeUnpublishingReason(
+                this.story,
+                nodes[i].getId(),
+                unpublishingReason
+              );
+              if (nodes[i].getPlannedPublicationDateMsecs()) {
+                this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
+                  this.story,
+                  nodes[i].getId(),
+                  null
+                );
+              }
             }
-          }
-          if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
-            this.unpublishStory();
-          }
-          this.storyEditorStateService.saveStory(
-            'Unpublished chapters', () => {
-              this.storyEditorStateService.loadStory(this.story.getId());
-              this._validateStory();
-            }, (errorMessage: string) => {
-              this.alertsService.addInfoMessage(errorMessage, 5000);
+            if (Number(selectedChapterIndexInPublishUptoDropdown) === -1) {
+              this.unpublishStory();
             }
-          );
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
+            this.storyEditorStateService.saveStory(
+              'Unpublished chapters',
+              () => {
+                this.storyEditorStateService.loadStory(this.story.getId());
+                this._validateStory();
+              },
+              (errorMessage: string) => {
+                this.alertsService.addInfoMessage(errorMessage, 5000);
+              }
+            );
+          },
+          () => {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
+          }
+        );
       } else {
-        for (let i = Number(lastPublishedChapterIndex) + 1;
-          i <= selectedChapterIndexInPublishUptoDropdown; i++) {
+        for (
+          let i = Number(lastPublishedChapterIndex) + 1;
+          i <= selectedChapterIndexInPublishUptoDropdown;
+          i++
+        ) {
           this.storyUpdateService.setStoryNodeStatus(
-            this.story, nodes[i].getId(), 'Published');
+            this.story,
+            nodes[i].getId(),
+            'Published'
+          );
           this.storyUpdateService.setStoryNodeUnpublishingReason(
-            this.story, nodes[i].getId(), null);
+            this.story,
+            nodes[i].getId(),
+            null
+          );
           if (nodes[i].getFirstPublicationDateMsecs() === null) {
             let currentDate = new Date();
             this.storyUpdateService.setStoryNodeFirstPublicationDateMsecs(
-              this.story, nodes[i].getId(), currentDate.getTime());
+              this.story,
+              nodes[i].getId(),
+              currentDate.getTime()
+            );
           }
         }
         if (lastPublishedChapterIndex === -1) {
           this.publishStory();
         }
         this.storyEditorStateService.saveStory(
-          'Published chapters', () => {
+          'Published chapters',
+          () => {
             this.storyEditorStateService.loadStory(this.story.getId());
             this._validateStory();
-          }, (errorMessage: string) => {
+          },
+          (errorMessage: string) => {
             this.alertsService.addInfoMessage(errorMessage, 5000);
           }
         );
@@ -358,12 +407,18 @@ export class StoryEditorNavbarComponent implements OnInit {
 
     let oldStatus = this.storyNode.getStatus();
     this.storyUpdateService.setStoryNodeStatus(
-      this.story, this.storyNode.getId(), newStatus);
+      this.story,
+      this.storyNode.getId(),
+      newStatus
+    );
     this.storyEditorStateService.saveChapter(
+      () => {},
       () => {
-      }, () => {
         this.storyUpdateService.setStoryNodeStatus(
-          this.story, this.storyNode.getId(), oldStatus);
+          this.story,
+          this.storyNode.getId(),
+          oldStatus
+        );
       }
     );
   }
@@ -395,28 +450,30 @@ export class StoryEditorNavbarComponent implements OnInit {
   getStoryNodeData(): void {
     let nodeId = this.storyEditorNavigationService.getChapterId();
     let nodeIndex = this.story.getStoryContents().getNodeIndex(nodeId);
-    this.storyNode = this.story.getStoryContents().
-      getLinearNodesList()[nodeIndex];
+    this.storyNode = this.story.getStoryContents().getLinearNodesList()[
+      nodeIndex
+    ];
   }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.storyEditorStateService.onStoryInitialized.subscribe(
-        () => this._validateStory()
-      ));
+      this.storyEditorStateService.onStoryInitialized.subscribe(() =>
+        this._validateStory()
+      )
+    );
     this.directiveSubscriptions.add(
-      this.storyEditorStateService.onStoryReinitialized.subscribe(
-        () => this._validateStory()
-      ));
+      this.storyEditorStateService.onStoryReinitialized.subscribe(() =>
+        this._validateStory()
+      )
+    );
     this.directiveSubscriptions.add(
-      this.storyEditorNavigationService.onChangeActiveTab.subscribe(
-        (tab) => {
-          this.currentTab = tab;
-          if (tab === 'chapter_editor') {
-            this.getStoryNodeData();
-          }
+      this.storyEditorNavigationService.onChangeActiveTab.subscribe(tab => {
+        this.currentTab = tab;
+        if (tab === 'chapter_editor') {
+          this.getStoryNodeData();
         }
-      ));
+      })
+    );
     this.forceValidateExplorations = true;
     this.warningsAreShown = false;
     this.activeTab = this.EDITOR;
@@ -427,9 +484,9 @@ export class StoryEditorNavbarComponent implements OnInit {
     this.validationIssues = [];
     this.prepublishValidationIssues = [];
     this.directiveSubscriptions.add(
-      this.undoRedoService.getUndoRedoChangeEventEmitter().subscribe(
-        () => this._validateStory()
-      )
+      this.undoRedoService
+        .getUndoRedoChangeEventEmitter()
+        .subscribe(() => this._validateStory())
     );
   }
 
@@ -438,5 +495,9 @@ export class StoryEditorNavbarComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaStoryEditorNavbar',
-  downgradeComponent({component: StoryEditorNavbarComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaStoryEditorNavbar',
+    downgradeComponent({component: StoryEditorNavbarComponent})
+  );

@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for the CodeRepl response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ResponseCodeReplComponent } from './oppia-response-code-repl.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {ResponseCodeReplComponent} from './oppia-response-code-repl.component';
 
 describe('ResponseCodeReplComponent', () => {
   let focusManagerService: FocusManagerService;
@@ -39,10 +39,10 @@ describe('ResponseCodeReplComponent', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
+          useClass: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -53,7 +53,8 @@ describe('ResponseCodeReplComponent', () => {
   });
 
   it('should display a popup with response when user clicks response', () => {
-    component.answer = '{' +
+    component.answer =
+      '{' +
       '  "code": "# Type your code here.\\nprint(\'hello\')",' +
       '  "error": "",' +
       '  "evaluation": "",' +
@@ -66,25 +67,30 @@ describe('ResponseCodeReplComponent', () => {
       code: "# Type your code here.\nprint('hello')",
       error: '',
       evaluation: '',
-      output: 'hello\n'
+      output: 'hello\n',
     });
   });
 
-  it('should display a popup with error when user clicks response' +
-  ' after compilation fails', () => {
-    component.answer = '{' +
-      '  "code": "# Type your code here.\\nprint(\'hello\')",' +
-      '  "error": "SyntaxError: bad token on line 2",' +
-      '  "evaluation": "",' +
-      '  "output": ""' +
-      '}';
-    spyOn(focusManagerService, 'generateFocusLabel')
-      .and.returnValue('focusLabel');
-    spyOn(focusManagerService, 'setFocus');
+  it(
+    'should display a popup with error when user clicks response' +
+      ' after compilation fails',
+    () => {
+      component.answer =
+        '{' +
+        '  "code": "# Type your code here.\\nprint(\'hello\')",' +
+        '  "error": "SyntaxError: bad token on line 2",' +
+        '  "evaluation": "",' +
+        '  "output": ""' +
+        '}';
+      spyOn(focusManagerService, 'generateFocusLabel').and.returnValue(
+        'focusLabel'
+      );
+      spyOn(focusManagerService, 'setFocus');
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.errorFocusLabel).toBe('focusLabel');
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith('focusLabel');
-  });
+      expect(component.errorFocusLabel).toBe('focusLabel');
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith('focusLabel');
+    }
+  );
 });

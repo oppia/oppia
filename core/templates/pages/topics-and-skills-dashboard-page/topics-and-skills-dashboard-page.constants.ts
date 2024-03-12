@@ -15,7 +15,7 @@
 /**
  * @fileoverview Constants for the topics and skills dashboard.
  */
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 export enum ETopicSortOptions {
   IncreasingCreatedOn = 'Newly Created',
@@ -30,13 +30,13 @@ export enum ETopicNewSortingOptions {
   IncreasingUpdatedOn = 'Most Recently Updated',
   DecreasingUpdatedOn = 'Least Recently Updated',
   DecreasingUpcomingLaunches = 'Most Upcoming Launches',
-  DecreasingOverdueLaunches = 'Most Launches Behind Schedule'
+  DecreasingOverdueLaunches = 'Most Launches Behind Schedule',
 }
 
 export enum ETopicPublishedOptions {
   All = 'All',
   Published = 'Published',
-  NotPublished = 'Not Published'
+  NotPublished = 'Not Published',
 }
 
 export enum ETopicStatusOptions {
@@ -50,14 +50,12 @@ export const TopicsAndSkillsDashboardPageConstants = {
   SKILL_DESCRIPTION_STATUS_VALUES: {
     STATUS_UNCHANGED: 'unchanged',
     STATUS_CHANGED: 'changed',
-    STATUS_DISABLED: 'disabled'
+    STATUS_DISABLED: 'disabled',
   },
-  TOPIC_SORT_OPTIONS: (
-    AppConstants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS),
-  TOPIC_SORTING_OPTIONS: (
-    AppConstants.TOPIC_SKILL_DASHBOARD_SORTING_OPTIONS),
+  TOPIC_SORT_OPTIONS: AppConstants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS,
+  TOPIC_SORTING_OPTIONS: AppConstants.TOPIC_SKILL_DASHBOARD_SORTING_OPTIONS,
   TOPIC_PUBLISHED_OPTIONS: ETopicPublishedOptions,
   TOPIC_STATUS_OPTIONS: ETopicStatusOptions,
   TOPIC_FILTER_CLASSROOM_ALL: 'All',
-  SKILL_STATUS_OPTIONS: AppConstants.SKILL_STATUS_OPTIONS
+  SKILL_STATUS_OPTIONS: AppConstants.SKILL_STATUS_OPTIONS,
 } as const;

@@ -14,13 +14,12 @@
 
 /**
  * @fileoverview Unit tests for StateEditorRefreshService
-*/
+ */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
 
-import { StateEditorRefreshService } from
-  'pages/exploration-editor-page/services/state-editor-refresh.service';
+import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 
 describe('State Editor Refresh Service', () => {
   let stateEditorRefreshService: StateEditorRefreshService;
@@ -32,6 +31,7 @@ describe('State Editor Refresh Service', () => {
   it('should fetch refreshStateEditor event emitter', () => {
     let sampleRefreshStateEditorEventEmitter = new EventEmitter();
     expect(stateEditorRefreshService.onRefreshStateEditor).toEqual(
-      sampleRefreshStateEditorEventEmitter);
+      sampleRefreshStateEditorEventEmitter
+    );
   });
 });

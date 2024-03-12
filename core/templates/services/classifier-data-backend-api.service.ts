@@ -17,21 +17,21 @@
  * data file name from backend.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { Buffer } from 'buffer';
-import { unzipSync } from 'zlib';
+import {Buffer} from 'buffer';
+import {unzipSync} from 'zlib';
 
-import { AppConstants } from 'app.constants';
-import { Classifier } from 'domain/classifier/classifier.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
+import {Classifier} from 'domain/classifier/classifier.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface ClassifierMetaDataBackendDict {
-  'algorithm_id': string;
-  'algorithm_version': number;
-  'gcs_filename': string;
+  algorithm_id: string;
+  algorithm_version: number;
+  gcs_filename: string;
 }
 
 export interface ClassifierMetaData {
@@ -41,25 +41,29 @@ export interface ClassifierMetaData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ClassifierDataBackendApiService {
   private readonly classifierDataDownloadUrlTemplate: string;
 
   constructor(
-      private http: HttpClient,
-      private urlInterpolationService: UrlInterpolationService) {
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {
     if (
       !ClassifierDataBackendApiService.DEV_MODE &&
-      !ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME) {
+      !ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME
+    ) {
       throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
 
-    const urlPrefix = ClassifierDataBackendApiService.DEV_MODE ?
-      '/_ah/gcs/' : 'https://storage.googleapis.com/';
-    this.classifierDataDownloadUrlTemplate = (
-      urlPrefix + ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME +
-      '/<entity_type>/<entity_id>/assets/<filename>');
+    const urlPrefix = ClassifierDataBackendApiService.DEV_MODE
+      ? '/_ah/gcs/'
+      : 'https://storage.googleapis.com/';
+    this.classifierDataDownloadUrlTemplate =
+      urlPrefix +
+      ClassifierDataBackendApiService.GCS_RESOURCE_BUCKET_NAME +
+      '/<entity_type>/<entity_id>/assets/<filename>';
   }
 
   static get DEV_MODE(): boolean {
@@ -71,68 +75,102 @@ export class ClassifierDataBackendApiService {
   }
 
   private _getDownloadUrl(
-      entityType: string, entityId: string, filename: string): string {
+    entityType: string,
+    entityId: string,
+    filename: string
+  ): string {
     return this.urlInterpolationService.interpolateUrl(
-      this.classifierDataDownloadUrlTemplate, {
+      this.classifierDataDownloadUrlTemplate,
+      {
         entity_type: entityType,
         entity_id: entityId,
         filename: filename,
-      });
+      }
+    );
   }
 
   private async getClassifierMetadataAsync(
-      explorationId: string, explorationVersion: number,
-      stateName: string): Promise<ClassifierMetaData> {
+    explorationId: string,
+    explorationVersion: number,
+    stateName: string
+  ): Promise<ClassifierMetaData> {
     return new Promise((resolve, reject) => {
-      this.http.get<ClassifierMetaDataBackendDict>(
-        '/ml/trainedclassifierhandler', {
+      this.http
+        .get<ClassifierMetaDataBackendDict>('/ml/trainedclassifierhandler', {
           params: {
             exploration_id: explorationId,
             exploration_version: explorationVersion.toString(),
-            state_name: stateName
+            state_name: stateName,
           },
-          responseType: 'json'
-        }).toPromise().then(response => {
-        resolve({
-          algorithmId: response.algorithm_id,
-          algorithmVersion: response.algorithm_version,
-          filename: response.gcs_filename
-        });
-      }, errorResponse => {
-        reject(errorResponse);
-      });
+          responseType: 'json',
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              algorithmId: response.algorithm_id,
+              algorithmVersion: response.algorithm_version,
+              filename: response.gcs_filename,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse);
+          }
+        );
     });
   }
 
   async getClassifierDataAsync(
-      explorationId: string, explorationVersion: number,
-      stateName: string): Promise<Classifier> {
+    explorationId: string,
+    explorationVersion: number,
+    stateName: string
+  ): Promise<Classifier> {
     return new Promise((resolve, reject) => {
       this.getClassifierMetadataAsync(
-        explorationId, explorationVersion, stateName).then(
+        explorationId,
+        explorationVersion,
+        stateName
+      ).then(
         response => {
           let classifierMetaData = response;
-          this.http.get(
-            this._getDownloadUrl(
-              AppConstants.ENTITY_TYPE.EXPLORATION, explorationId,
-              response.filename), {
-              responseType: 'arraybuffer'
-            }).toPromise().then(response => {
-            resolve(new Classifier(
-              classifierMetaData.algorithmId,
-              unzipSync(Buffer.from(response)),
-              classifierMetaData.algorithmVersion
-            ));
-          }, classifierErrorResponse => {
-            reject(classifierErrorResponse);
-          });
-        }, classifierMetadataErrorResponse => {
+          this.http
+            .get(
+              this._getDownloadUrl(
+                AppConstants.ENTITY_TYPE.EXPLORATION,
+                explorationId,
+                response.filename
+              ),
+              {
+                responseType: 'arraybuffer',
+              }
+            )
+            .toPromise()
+            .then(
+              response => {
+                resolve(
+                  new Classifier(
+                    classifierMetaData.algorithmId,
+                    unzipSync(Buffer.from(response)),
+                    classifierMetaData.algorithmVersion
+                  )
+                );
+              },
+              classifierErrorResponse => {
+                reject(classifierErrorResponse);
+              }
+            );
+        },
+        classifierMetadataErrorResponse => {
           reject(classifierMetadataErrorResponse);
-        });
+        }
+      );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'ClassifierDataBackendApiService',
-  downgradeInjectable(ClassifierDataBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ClassifierDataBackendApiService',
+    downgradeInjectable(ClassifierDataBackendApiService)
+  );

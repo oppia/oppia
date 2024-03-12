@@ -16,15 +16,14 @@
  * @fileoverview Unit tests for NonExistentCollections.
  */
 
-import { NonExistentCollections } from
-  'domain/learner_dashboard/non-existent-collections.model';
+import {NonExistentCollections} from 'domain/learner_dashboard/non-existent-collections.model';
 
 describe('Non existent collections model', () => {
   it('should correctly convert backend dict to object', () => {
     let backendDict = {
       incomplete_collections: 1,
       completed_collections: 2,
-      collection_playlist: 3
+      collection_playlist: 3,
     };
 
     let object = NonExistentCollections.createFromBackendDict(backendDict);

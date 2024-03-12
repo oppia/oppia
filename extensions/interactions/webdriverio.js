@@ -44,8 +44,7 @@
  */
 
 var INTERACTIONS = {
-  AlgebraicExpressionInput: require(
-    './AlgebraicExpressionInput/webdriverio.js'),
+  AlgebraicExpressionInput: require('./AlgebraicExpressionInput/webdriverio.js'),
   Continue: require('./Continue/webdriverio.js'),
   EndExploration: require('./EndExploration/webdriverio.js'),
   FractionInput: require('./FractionInput/webdriverio.js'),
@@ -58,10 +57,10 @@ var INTERACTIONS = {
   NumberWithUnits: require('./NumberWithUnits/webdriverio.js'),
   RatioExpressionInput: require('./RatioExpressionInput/webdriverio.js'),
   TextInput: require('./TextInput/webdriverio.js'),
-  CodeRepl: require('./CodeRepl/webdriverio.js')
+  CodeRepl: require('./CodeRepl/webdriverio.js'),
 };
 
-var getInteraction = function(interactionName) {
+var getInteraction = function (interactionName) {
   if (INTERACTIONS.hasOwnProperty(interactionName)) {
     return INTERACTIONS[interactionName];
   } else {

@@ -16,40 +16,48 @@
  * @fileoverview Backend API service for playthrough.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { Playthrough } from
-  'domain/statistics/playthrough.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {Playthrough} from 'domain/statistics/playthrough.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlaythroughBackendApiService {
-  private readonly STORE_PLAYTHROUGH_URL: string = (
-    '/explorehandler/store_playthrough/<exploration_id>');
+  private readonly STORE_PLAYTHROUGH_URL: string =
+    '/explorehandler/store_playthrough/<exploration_id>';
 
   constructor(
-      private http: HttpClient,
-      private urlInterpolationService: UrlInterpolationService) {}
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async storePlaythroughAsync(
-      playthrough: Playthrough, issueSchemaVersion: number): Promise<void> {
+    playthrough: Playthrough,
+    issueSchemaVersion: number
+  ): Promise<void> {
     let playthroughUrl = this.urlInterpolationService.interpolateUrl(
-      this.STORE_PLAYTHROUGH_URL, {
-        exploration_id: playthrough.expId
-      });
+      this.STORE_PLAYTHROUGH_URL,
+      {
+        exploration_id: playthrough.expId,
+      }
+    );
 
-    return this.http.post<void>(playthroughUrl, {
-      playthrough_data: playthrough.toBackendDict(),
-      issue_schema_version: issueSchemaVersion,
-    }).toPromise();
+    return this.http
+      .post<void>(playthroughUrl, {
+        playthrough_data: playthrough.toBackendDict(),
+        issue_schema_version: issueSchemaVersion,
+      })
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'PlaythroughBackendApiService',
-  downgradeInjectable(PlaythroughBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'PlaythroughBackendApiService',
+    downgradeInjectable(PlaythroughBackendApiService)
+  );

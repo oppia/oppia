@@ -1,8 +1,6 @@
 {
   "extends": ["stylelint-config-recommended", "stylelint-config-html"],
-  "plugins": [
-    "stylelint-order"
-  ],
+  "plugins": ["stylelint-order"],
   "rules": {
     "no-duplicate-selectors": true,
     "no-empty-source": null,

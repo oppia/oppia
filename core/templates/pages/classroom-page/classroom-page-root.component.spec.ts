@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for the classroom page root component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync, tick, fakeAsync } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  TestBed,
+  waitForAsync,
+  tick,
+  fakeAsync,
+} from '@angular/core/testing';
 
-import { PageHeadService } from 'services/page-head.service';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ClassroomPageRootComponent } from './classroom-page-root.component';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ClassroomPageRootComponent} from './classroom-page-root.component';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 describe('Classroom Root Page', () => {
   let fixture: ComponentFixture<ClassroomPageRootComponent>;
@@ -36,18 +42,10 @@ describe('Classroom Root Page', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        ClassroomPageRootComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        PageHeadService,
-        UrlService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [HttpClientTestingModule],
+      declarations: [ClassroomPageRootComponent, MockTranslatePipe],
+      providers: [PageHeadService, UrlService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -56,36 +54,44 @@ describe('Classroom Root Page', () => {
     component = fixture.componentInstance;
     pageHeadService = TestBed.inject(PageHeadService);
     accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
+      AccessValidationBackendApiService
+    );
     urlService = TestBed.inject(UrlService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve());
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
+    expect(component).toBeDefined();
+  });
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
-      'classroom_url_fragment');
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
+      'classroom_url_fragment'
+    );
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
     component.ngOnInit();
 
     expect(
-      accessValidationBackendApiService.validateAccessToClassroomPage)
-      .toHaveBeenCalledWith('classroom_url_fragment');
+      accessValidationBackendApiService.validateAccessToClassroomPage
+    ).toHaveBeenCalledWith('classroom_url_fragment');
   });
 
   it('should show error when classroom does not exist', fakeAsync(() => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
-      'classroom_url_fragment');
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.reject());
+      'classroom_url_fragment'
+    );
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.reject());
 
     expect(component.errorPageIsShown).toBeFalse();
     expect(component.pageIsShown).toBeFalse();

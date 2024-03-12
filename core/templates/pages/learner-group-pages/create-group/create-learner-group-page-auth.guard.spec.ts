@@ -15,15 +15,18 @@
 /**
  * @fileoverview Tests for CreateLearnerGroupPageAuthGuard
  */
-import { Location } from '@angular/common';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import {Location} from '@angular/common';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
 
-import { AppConstants } from 'app.constants';
-import { CreateLearnerGroupPageAuthGuard } from './create-learner-group-page-auth.guard';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-
+import {AppConstants} from 'app.constants';
+import {CreateLearnerGroupPageAuthGuard} from './create-learner-group-page-auth.guard';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 class MockAccessValidationBackendApiService {
   validateAccessToLearnerGroupCreatorPage() {
@@ -47,9 +50,11 @@ describe('CreateLearnerGroupPageAuthGuard', () => {
       imports: [RouterTestingModule],
       providers: [
         CreateLearnerGroupPageAuthGuard,
-        { provide: AccessValidationBackendApiService,
-          useClass: MockAccessValidationBackendApiService },
-        { provide: Router, useClass: MockRouter },
+        {
+          provide: AccessValidationBackendApiService,
+          useClass: MockAccessValidationBackendApiService,
+        },
+        {provide: Router, useClass: MockRouter},
         Location,
       ],
     });
@@ -64,15 +69,17 @@ describe('CreateLearnerGroupPageAuthGuard', () => {
   it('should allow access if validation succeeds', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
-      'validateAccessToLearnerGroupCreatorPage')
-      .and.returnValue(Promise.resolve());
-    const navigateSpy = spyOn(router, 'navigate')
-      .and.returnValue(Promise.resolve(true));
+      'validateAccessToLearnerGroupCreatorPage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
 
     let canActivateResult: boolean | null = null;
 
-    guard.canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then((result) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
         canActivateResult = result;
       });
 
@@ -86,23 +93,25 @@ describe('CreateLearnerGroupPageAuthGuard', () => {
   it('should redirect to 404 page if validation fails', fakeAsync(() => {
     spyOn(
       accessValidationBackendApiService,
-      'validateAccessToLearnerGroupCreatorPage')
-      .and.returnValue(Promise.reject());
-    const navigateSpy = spyOn(router, 'navigate')
-      .and.returnValue(Promise.resolve(true));
+      'validateAccessToLearnerGroupCreatorPage'
+    ).and.returnValue(Promise.reject());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
 
     let canActivateResult: boolean | null = null;
 
-    guard.canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then((result) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
         canActivateResult = result;
       });
 
     tick();
 
     expect(canActivateResult).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith(
-      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`]
-    );
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+    ]);
   }));
 });

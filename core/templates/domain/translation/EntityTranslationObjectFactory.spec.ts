@@ -15,8 +15,11 @@
 /**
  * @fileoverview Unit tests for EntityTranslation class.
  */
-import { EntityTranslation, EntityTranslationBackendDict } from './EntityTranslationObjectFactory';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import {
+  EntityTranslation,
+  EntityTranslationBackendDict,
+} from './EntityTranslationObjectFactory';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 describe('EntityTranslation', () => {
   let entityTranslationBackendDict: EntityTranslationBackendDict;
@@ -31,85 +34,94 @@ describe('EntityTranslation', () => {
         content_1: {
           content_format: 'html',
           content_value: 'Translation',
-          needs_update: false
-        }
-      }
+          needs_update: false,
+        },
+      },
     };
   });
 
   it('should create a entity translation object from backend dict', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
-      entityTranslationBackendDict);
+      entityTranslationBackendDict
+    );
 
     expect(entityTranslation.languageCode).toEqual('hi');
   });
 
   it('should return null if content id not exist', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
-      entityTranslationBackendDict);
+      entityTranslationBackendDict
+    );
     expect(entityTranslation.getWrittenTranslation('invalid_id')).toBeNull();
   });
 
   it('should return correct translation for valid content Id', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
-      entityTranslationBackendDict);
-    const contentTranslation = entityTranslation.getWrittenTranslation(
-      'content_1');
+      entityTranslationBackendDict
+    );
+    const contentTranslation =
+      entityTranslation.getWrittenTranslation('content_1');
     expect(contentTranslation).not.toBeNull();
   });
 
   it('should do nothing if content id does not exist', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
-      entityTranslationBackendDict);
+      entityTranslationBackendDict
+    );
     entityTranslation.translationMapping = {};
 
     entityTranslation.markTranslationAsNeedingUpdate('invalid_id');
 
-    expect(entityTranslation.translationMapping).toEqual(
-      {});
+    expect(entityTranslation.translationMapping).toEqual({});
   });
 
   it('should mark translation as needing update', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
-      entityTranslationBackendDict);
+      entityTranslationBackendDict
+    );
 
     entityTranslation.markTranslationAsNeedingUpdate('content_1');
 
     expect(
-      entityTranslation.translationMapping.content_1.needsUpdate).toBeTrue();
+      entityTranslation.translationMapping.content_1.needsUpdate
+    ).toBeTrue();
   });
 
   it('should remove translation', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
-      entityTranslationBackendDict);
+      entityTranslationBackendDict
+    );
     expect(
-      entityTranslation.translationMapping.hasOwnProperty(
-        'content_1')).toBeTrue();
+      entityTranslation.translationMapping.hasOwnProperty('content_1')
+    ).toBeTrue();
 
     entityTranslation.removeTranslation('content_1');
 
     expect(
-      entityTranslation.translationMapping.hasOwnProperty(
-        'content_1')).toBeFalse();
+      entityTranslation.translationMapping.hasOwnProperty('content_1')
+    ).toBeFalse();
   });
 
   it('should update translation', () => {
     const entityTranslation = EntityTranslation.createFromBackendDict(
-      entityTranslationBackendDict);
+      entityTranslationBackendDict
+    );
     expect(
-      entityTranslation.translationMapping.content_1.toBackendDict()).toEqual(
-      entityTranslationBackendDict.translations.content_1);
+      entityTranslation.translationMapping.content_1.toBackendDict()
+    ).toEqual(entityTranslationBackendDict.translations.content_1);
     const newTranslationDict = {
       content_format: 'unicode',
       content_value: 'NewTranslation',
-      needs_update: true
+      needs_update: true,
     };
 
     entityTranslation.updateTranslation(
-      'content_1', TranslatedContent.createFromBackendDict(newTranslationDict));
+      'content_1',
+      TranslatedContent.createFromBackendDict(newTranslationDict)
+    );
 
     expect(
-      entityTranslation.translationMapping.content_1.toBackendDict()).toEqual(
-      newTranslationDict);
+      entityTranslation.translationMapping.content_1.toBackendDict()
+    ).toEqual(newTranslationDict);
   });
 });

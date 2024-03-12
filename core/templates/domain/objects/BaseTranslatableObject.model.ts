@@ -16,51 +16,50 @@
  * @fileoverview Model for the BaseTranslatableObject.
  */
 
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
-import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {
+  TranslatableSetOfNormalizedString,
+  TranslatableSetOfUnicodeString,
+} from 'interactions/rule-input-defs';
 
-export type TranslatableField = (
-  SubtitledHtml |
-  SubtitledUnicode |
-  TranslatableSetOfNormalizedString |
-  TranslatableSetOfUnicodeString
-);
+export type TranslatableField =
+  | SubtitledHtml
+  | SubtitledUnicode
+  | TranslatableSetOfNormalizedString
+  | TranslatableSetOfUnicodeString;
 interface ContentReplacers {
   [format: string]: (arg0: TranslatableField, arg1: TranslatedContent) => void;
 }
 
 const CONTENT_REPLACERS: ContentReplacers = {
-  html: (
-      translatableField,
-      writtenTranslation
-  ): void => {
-    (translatableField as SubtitledHtml).html = (
-      writtenTranslation.translation as string);
+  html: (translatableField, writtenTranslation): void => {
+    (translatableField as SubtitledHtml).html =
+      writtenTranslation.translation as string;
   },
   unicode: (
-      translatableField: TranslatableField,
-      writtenTranslation: TranslatedContent
+    translatableField: TranslatableField,
+    writtenTranslation: TranslatedContent
   ): void => {
-    (translatableField as SubtitledUnicode).unicode = (
-      writtenTranslation.translation as string);
+    (translatableField as SubtitledUnicode).unicode =
+      writtenTranslation.translation as string;
   },
   set_of_normalized_string: (
-      translatableField: TranslatableField,
-      writtenTranslation: TranslatedContent
+    translatableField: TranslatableField,
+    writtenTranslation: TranslatedContent
   ): void => {
-    (translatableField as TranslatableSetOfNormalizedString)
-      .normalizedStrSet = writtenTranslation.translation as string[];
+    (translatableField as TranslatableSetOfNormalizedString).normalizedStrSet =
+      writtenTranslation.translation as string[];
   },
   set_of_unicode_string: (
-      translatableField: TranslatableField,
-      writtenTranslation: TranslatedContent
+    translatableField: TranslatableField,
+    writtenTranslation: TranslatedContent
   ): void => {
-    (translatableField as TranslatableSetOfUnicodeString).unicodeStrSet = (
-      writtenTranslation.translation as string[]);
-  }
+    (translatableField as TranslatableSetOfUnicodeString).unicodeStrSet =
+      writtenTranslation.translation as string[];
+  },
 };
 
 export class BaseTranslatableObject {
@@ -91,20 +90,19 @@ export class BaseTranslatableObject {
   }
 
   swapContentsWithTranslation(entityTranslations: EntityTranslation): void {
-    this.getTranslatableFields().forEach((translatableField) => {
+    this.getTranslatableFields().forEach(translatableField => {
       const contentId = translatableField.contentId as string;
-      let writtenTranslation = entityTranslations.getWrittenTranslation(
-        contentId);
+      let writtenTranslation =
+        entityTranslations.getWrittenTranslation(contentId);
       if (writtenTranslation !== null) {
         let dataFormat: string = writtenTranslation.dataFormat;
         if (CONTENT_REPLACERS.hasOwnProperty(dataFormat)) {
-          CONTENT_REPLACERS[dataFormat](
-            translatableField, writtenTranslation);
+          CONTENT_REPLACERS[dataFormat](translatableField, writtenTranslation);
         }
       }
     });
 
-    this.getTranslatableObjects().forEach((translatableObject) => {
+    this.getTranslatableObjects().forEach(translatableObject => {
       translatableObject.swapContentsWithTranslation(entityTranslations);
     });
   }
@@ -112,25 +110,28 @@ export class BaseTranslatableObject {
   getAllContents(): TranslatableField[] {
     let translatableFields = this.getTranslatableFields();
 
-    this.getTranslatableObjects().forEach((translatableObject) => {
+    this.getTranslatableObjects().forEach(translatableObject => {
       translatableFields = translatableFields.concat(
-        translatableObject.getAllContents());
+        translatableObject.getAllContents()
+      );
     });
 
     return translatableFields;
   }
 
   getAllHTMLStrings(): string[] {
-    return this.getAllContents().filter((content) => {
-      return content instanceof SubtitledHtml;
-    }).map((content) => {
-      content = content as SubtitledHtml;
-      return content.html;
-    });
+    return this.getAllContents()
+      .filter(content => {
+        return content instanceof SubtitledHtml;
+      })
+      .map(content => {
+        content = content as SubtitledHtml;
+        return content.html;
+      });
   }
 
   getAllContentIds(): string[] {
-    return this.getAllContents().map((content) => {
+    return this.getAllContents().map(content => {
       return content.contentId as string;
     });
   }

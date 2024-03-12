@@ -16,34 +16,30 @@
  * @fileoverview Backend api service for fetching the admin data;
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants';
+import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
 import {
   PlatformParameter,
-  PlatformParameterBackendDict
+  PlatformParameterBackendDict,
 } from 'domain/platform-parameter/platform-parameter.model';
 import {
   CreatorTopicSummary,
-  CreatorTopicSummaryBackendDict
+  CreatorTopicSummaryBackendDict,
 } from 'domain/topic/creator-topic-summary.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { Schema } from 'services/schema-default-value.service';
-
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Schema} from 'services/schema-default-value.service';
 
 export interface NewConfigPropertyValues {
-  [property: string]: (
-    number | boolean | string | string[] | Object | Object[]);
+  [property: string]: number | boolean | string | string[] | Object | Object[];
 }
 
 export interface UserRolesBackendResponse {
   roles: string[];
-  'managed_topic_ids': string[];
-  'coordinated_language_ids': string[];
+  managed_topic_ids: string[];
+  coordinated_language_ids: string[];
   banned: boolean;
 }
 
@@ -64,24 +60,24 @@ export interface ConfigPropertiesBackendResponse {
 }
 
 interface PendingDeletionRequestBackendResponse {
-  'number_of_pending_deletion_models': string;
+  number_of_pending_deletion_models: string;
 }
 
 export interface ModelsRelatedToUserBackendResponse {
-  'related_models_exist': boolean;
+  related_models_exist: boolean;
 }
 
 export interface ClassroomPageData {
-  'name': string;
-  'topic_ids': string[];
-  'course_details': string;
-  'url_fragment': string;
-  'topic_list_intro': string;
+  name: string;
+  topic_ids: string[];
+  course_details: string;
+  url_fragment: string;
+  topic_list_intro: string;
 }
 
 export interface VmidSharedSecretKeyMapping {
-  'shared_secret_key': string;
-  'vm_id': string;
+  shared_secret_key: string;
+  vm_id: string;
 }
 
 export interface ConfigProperty {
@@ -91,22 +87,22 @@ export interface ConfigProperty {
 }
 
 export interface ConfigPropertyValues {
-  'classroom_pages_data': ClassroomPageData;
-  'record_playthrough_probability': number;
+  classroom_pages_data: ClassroomPageData;
+  record_playthrough_probability: number;
 }
 
 export interface AdminPageDataBackendDict {
-  'demo_explorations': string[][];
-  'demo_collections': string[][];
-  'demo_exploration_ids': string[];
-  'human_readable_current_time': string;
-  'updatable_roles': string[];
-  'role_to_actions': RoleToActionsBackendResponse;
-  'config_properties': ConfigPropertiesBackendResponse;
-  'viewable_roles': string[];
-  'human_readable_roles': HumanReadableRolesBackendResponse;
-  'topic_summaries': CreatorTopicSummaryBackendDict[];
-  'platform_params_dicts': PlatformParameterBackendDict[];
+  demo_explorations: string[][];
+  demo_collections: string[][];
+  demo_exploration_ids: string[];
+  human_readable_current_time: string;
+  updatable_roles: string[];
+  role_to_actions: RoleToActionsBackendResponse;
+  config_properties: ConfigPropertiesBackendResponse;
+  viewable_roles: string[];
+  human_readable_roles: HumanReadableRolesBackendResponse;
+  topic_summaries: CreatorTopicSummaryBackendDict[];
+  platform_params_dicts: PlatformParameterBackendDict[];
 }
 
 export interface AdminPageData {
@@ -131,419 +127,529 @@ export interface ExplorationInteractionIdsBackendResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AdminBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async getDataAsync(): Promise<AdminPageData> {
     return new Promise((resolve, reject) => {
-      this.http.get<AdminPageDataBackendDict>(
-        AdminPageConstants.ADMIN_HANDLER_URL).toPromise().then(response => {
-        resolve({
-          demoExplorations: response.demo_explorations,
-          demoCollections: response.demo_collections,
-          demoExplorationIds: response.demo_exploration_ids,
-          updatableRoles: response.updatable_roles,
-          roleToActions: response.role_to_actions,
-          configProperties: response.config_properties,
-          humanReadableRoles: response.human_readable_roles,
-          viewableRoles: response.viewable_roles,
-          topicSummaries: response.topic_summaries.map(
-            CreatorTopicSummary.createFromBackendDict),
-          platformParameters: response.platform_params_dicts.map(
-            dict => PlatformParameter.createFromBackendDict(dict))
-        });
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<AdminPageDataBackendDict>(AdminPageConstants.ADMIN_HANDLER_URL)
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              demoExplorations: response.demo_explorations,
+              demoCollections: response.demo_collections,
+              demoExplorationIds: response.demo_exploration_ids,
+              updatableRoles: response.updatable_roles,
+              roleToActions: response.role_to_actions,
+              configProperties: response.config_properties,
+              humanReadableRoles: response.human_readable_roles,
+              viewableRoles: response.viewable_roles,
+              topicSummaries: response.topic_summaries.map(
+                CreatorTopicSummary.createFromBackendDict
+              ),
+              platformParameters: response.platform_params_dicts.map(dict =>
+                PlatformParameter.createFromBackendDict(dict)
+              ),
+            });
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   // This is a helper function to handle all post<void>
   // requests in admin page.
   private async _postRequestAsync(
-      handlerUrl: string, payload?: Object, action?: string):
-      Promise<void> {
+    handlerUrl: string,
+    payload?: Object,
+    action?: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<void>(
-        handlerUrl, { action, ...payload }).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      this.http
+        .post<void>(handlerUrl, {action, ...payload})
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   // Admin Roles Tab Services.
   async viewUsersRoleAsync(
-      username: string
+    username: string
   ): Promise<UserRolesBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<UserRolesBackendResponse>(
-        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
-          params: {
-            filter_criterion: 'username',
-            username: username
+      this.http
+        .get<UserRolesBackendResponse>(
+          AdminPageConstants.ADMIN_ROLE_HANDLER_URL,
+          {
+            params: {
+              filter_criterion: 'username',
+              username: username,
+            },
           }
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async fetchUsersAssignedToRoleAsync(
-      role: string): Promise<AssignedUsersBackendResponse> {
+    role: string
+  ): Promise<AssignedUsersBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<AssignedUsersBackendResponse>(
-        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
-          params: {
-            filter_criterion: 'role',
-            role: role
+      this.http
+        .get<AssignedUsersBackendResponse>(
+          AdminPageConstants.ADMIN_ROLE_HANDLER_URL,
+          {
+            params: {
+              filter_criterion: 'role',
+              role: role,
+            },
           }
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
-  async addUserRoleAsync(
-      newRole: string, username: string): Promise<void> {
+  async addUserRoleAsync(newRole: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
+      this.http
+        .put<void>(AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           role: newRole,
-          username: username
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+          username: username,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async removeUserRoleAsync(
-      roleToRemove: string, username: string): Promise<void> {
+    roleToRemove: string,
+    username: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.delete<void>(
-        AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
+      this.http
+        .delete<void>(AdminPageConstants.ADMIN_ROLE_HANDLER_URL, {
           params: {
             role: roleToRemove,
-            username: username
-          }
-        }
-      ).toPromise().then(resolve, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+            username: username,
+          },
+        })
+        .toPromise()
+        .then(resolve, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 
   async assignManagerToTopicAsync(
-      username: string, topicId: string): Promise<void> {
+    username: string,
+    topicId: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+      this.http
+        .put<void>(AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
           username: username,
           topic_id: topicId,
-          action: 'assign'
-        }
-      ).toPromise().then(resolve, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+          action: 'assign',
+        })
+        .toPromise()
+        .then(resolve, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 
   async deassignManagerFromTopicAsync(
-      username: string, topicId: string): Promise<void> {
+    username: string,
+    topicId: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
+      this.http
+        .put<void>(AdminPageConstants.TOPIC_MANAGER_ROLE_HANDLER_URL, {
           username: username,
           topic_id: topicId,
-          action: 'deassign'
-        }
-      ).toPromise().then(resolve, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+          action: 'deassign',
+        })
+        .toPromise()
+        .then(resolve, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 
   async assignTranslationCoordinator(
-      username: string, languageId: string): Promise<void> {
+    username: string,
+    languageId: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL, {
-          username: username,
-          language_id: languageId,
-          action: 'assign'
-        }
-      ).toPromise().then(resolve, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .put<void>(
+          AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL,
+          {
+            username: username,
+            language_id: languageId,
+            action: 'assign',
+          }
+        )
+        .toPromise()
+        .then(resolve, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 
   async deassignTranslationCoordinator(
-      username: string, languageId: string): Promise<void> {
+    username: string,
+    languageId: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL, {
-          username: username,
-          language_id: languageId,
-          action: 'deassign'
-        }
-      ).toPromise().then(resolve, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .put<void>(
+          AdminPageConstants.TRANSLATION_COORDINATOR_ROLE_HANDLER_URL,
+          {
+            username: username,
+            language_id: languageId,
+            action: 'deassign',
+          }
+        )
+        .toPromise()
+        .then(resolve, errorResponse => {
+          reject(errorResponse.error.error);
+        });
     });
   }
 
   // Admin Misc Tab Services.
   async clearSearchIndexAsync(): Promise<void> {
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL);
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL);
   }
 
   async regenerateOpportunitiesRelatedToTopicAsync(
-      topicId: string): Promise<number> {
+    topicId: string
+  ): Promise<number> {
     return new Promise((resolve, reject) => {
-      this.http.post<number>(
-        AdminPageConstants.ADMIN_HANDLER_URL, {
+      this.http
+        .post<number>(AdminPageConstants.ADMIN_HANDLER_URL, {
           action: 'regenerate_topic_related_opportunities',
-          topic_id: topicId
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+          topic_id: topicId,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async rollbackExplorationToSafeState(expId: string): Promise<number> {
     return new Promise((resolve, reject) => {
-      this.http.post<{version: number}>(
-        AdminPageConstants.ADMIN_HANDLER_URL, {
+      this.http
+        .post<{version: number}>(AdminPageConstants.ADMIN_HANDLER_URL, {
           action: 'rollback_exploration_to_safe_state',
-          exp_id: expId
-        }
-      ).toPromise().then(response => {
-        resolve(response.version);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+          exp_id: expId,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.version);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
-  async uploadTopicSimilaritiesAsync(data: string):
-  Promise<void> {
+  async uploadTopicSimilaritiesAsync(data: string): Promise<void> {
     let action = 'upload_topic_similarities';
     let payload = {
-      data: data
+      data: data,
     };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      payload,
+      action
+    );
   }
 
   async sendDummyMailToAdminAsync(): Promise<void> {
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL);
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_SEND_DUMMY_MAIL_HANDLER_URL
+    );
   }
 
   async updateUserNameAsync(
-      oldUsername: string, newUsername: string): Promise<void> {
+    oldUsername: string,
+    newUsername: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.ADMIN_UPDATE_USERNAME_HANDLER_URL, {
+      this.http
+        .put<void>(AdminPageConstants.ADMIN_UPDATE_USERNAME_HANDLER_URL, {
           old_username: oldUsername,
-          new_username: newUsername
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+          new_username: newUsername,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async updateBlogPostDataAsync(
-      blogPostId: string, authorUsername: string, publishedOn: string
+    blogPostId: string,
+    authorUsername: string,
+    publishedOn: string
   ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.ADMIN_UPDATE_BLOG_POST_DATA_HANDLER, {
+      this.http
+        .put<void>(AdminPageConstants.ADMIN_UPDATE_BLOG_POST_DATA_HANDLER, {
           blog_post_id: blogPostId,
           author_username: authorUsername,
           published_on: publishedOn,
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
-  async getNumberOfPendingDeletionRequestAsync(
-  ): Promise<PendingDeletionRequestBackendResponse> {
+  async getNumberOfPendingDeletionRequestAsync(): Promise<PendingDeletionRequestBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<PendingDeletionRequestBackendResponse>(
-        AdminPageConstants.ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL, {}
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<PendingDeletionRequestBackendResponse>(
+          AdminPageConstants.ADMIN_NUMBER_OF_DELETION_REQUEST_HANDLER_URL,
+          {}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async grantSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http.put<void>(
-      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {username}
-    ).toPromise();
+    return this.http
+      .put<void>(AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
+        username,
+      })
+      .toPromise();
   }
 
   async revokeSuperAdminPrivilegesAsync(username: string): Promise<void> {
-    return this.http.delete<void>(
-      AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL, {
-        params: {username},
-      }
-    ).toPromise();
+    return this.http
+      .delete<void>(
+        AdminPageConstants.ADMIN_SUPER_ADMIN_PRIVILEGES_HANDLER_URL,
+        {
+          params: {username},
+        }
+      )
+      .toPromise();
   }
 
   async getModelsRelatedToUserAsync(userId: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.http.get<ModelsRelatedToUserBackendResponse>(
-        AdminPageConstants.ADMIN_VERIFY_USER_MODELS_DELETED_HANDLER_URL, {
-          params: {
-            user_id: userId
+      this.http
+        .get<ModelsRelatedToUserBackendResponse>(
+          AdminPageConstants.ADMIN_VERIFY_USER_MODELS_DELETED_HANDLER_URL,
+          {
+            params: {
+              user_id: userId,
+            },
           }
-        }
-      ).toPromise().then(response => {
-        resolve(response.related_models_exist);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.related_models_exist);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async deleteUserAsync(userId: string, username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.delete<void>(
-        AdminPageConstants.ADMIN_DELETE_USER_HANDLER_URL, {
+      this.http
+        .delete<void>(AdminPageConstants.ADMIN_DELETE_USER_HANDLER_URL, {
           params: {
             user_id: userId,
-            username: username
+            username: username,
+          },
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
           }
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        );
     });
   }
 
   // Admin Config Tab Services.
-  async revertConfigPropertyAsync(configPropertyId: string):
-  Promise<void> {
+  async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
     let action = 'revert_config_property';
     let payload = {
-      config_property_id: configPropertyId
+      config_property_id: configPropertyId,
     };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      payload,
+      action
+    );
   }
 
   async saveConfigPropertiesAsync(
-      newConfigPropertyValues: NewConfigPropertyValues):
-      Promise<void> {
+    newConfigPropertyValues: NewConfigPropertyValues
+  ): Promise<void> {
     let action = 'save_config_properties';
     let payload = {
-      new_config_property_values: newConfigPropertyValues
+      new_config_property_values: newConfigPropertyValues,
     };
-    return this._postRequestAsync (
-      AdminPageConstants.ADMIN_HANDLER_URL, payload, action);
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      payload,
+      action
+    );
   }
 
   // Admin Dev Mode Activities Tab Services.
   async generateDummyExplorationsAsync(
-      numDummyExpsToGenerate: number,
-      numDummyExpsToPublish: number): Promise<void> {
+    numDummyExpsToGenerate: number,
+    numDummyExpsToPublish: number
+  ): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_explorations',
       num_dummy_exps_to_generate: numDummyExpsToGenerate,
-      num_dummy_exps_to_publish: numDummyExpsToPublish
+      num_dummy_exps_to_publish: numDummyExpsToPublish,
     });
   }
 
-  async reloadExplorationAsync(explorationId: string):
-  Promise<void> {
+  async reloadExplorationAsync(explorationId: string): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_exploration',
-      exploration_id: String(explorationId)
+      exploration_id: String(explorationId),
     });
   }
 
   async generateDummyNewStructuresDataAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_new_structures_data'
+      action: 'generate_dummy_new_structures_data',
     });
   }
 
   async generateDummyNewSkillDataAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_new_skill_data'
+      action: 'generate_dummy_new_skill_data',
     });
   }
 
   async generateDummyClassroomDataAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
-      action: 'generate_dummy_classroom'
+      action: 'generate_dummy_classroom',
     });
   }
 
-  async reloadCollectionAsync(collectionId: string):
-  Promise<void> {
+  async reloadCollectionAsync(collectionId: string): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'reload_collection',
-      collection_id: String(collectionId)
+      collection_id: String(collectionId),
     });
   }
 
   async markUserBannedAsync(username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
-        { username }).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      this.http
+        .put<void>(AdminPageConstants.ADMIN_BANNED_USERS_HANDLER, {username})
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async unmarkUserBannedAsync(username: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.delete<void>(
-        AdminPageConstants.ADMIN_BANNED_USERS_HANDLER,
-        { params: { username } }).toPromise()
-        .then(response => {
-          resolve(response);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      this.http
+        .delete<void>(AdminPageConstants.ADMIN_BANNED_USERS_HANDLER, {
+          params: {username},
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
@@ -555,23 +661,34 @@ export class AdminBackendApiService {
   }
 
   async retrieveExplorationInteractionIdsAsync(
-      expId: string): Promise<ExplorationInteractionIdsBackendResponse> {
+    expId: string
+  ): Promise<ExplorationInteractionIdsBackendResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<ExplorationInteractionIdsBackendResponse>(
-        AdminPageConstants.EXPLORATION_INTERACTIONS_HANDLER, {
-          params: {
-            exp_id: expId
+      this.http
+        .get<ExplorationInteractionIdsBackendResponse>(
+          AdminPageConstants.EXPLORATION_INTERACTIONS_HANDLER,
+          {
+            params: {
+              exp_id: expId,
+            },
           }
-        }
-      ).toPromise().then(response => {
-        resolve(response);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'AdminBackendApiService',
-  downgradeInjectable(AdminBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'AdminBackendApiService',
+    downgradeInjectable(AdminBackendApiService)
+  );

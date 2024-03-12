@@ -16,17 +16,20 @@
  * @fileoverview Topic dependency graph vizualization modal component.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { StateGraphLayoutService, AugmentedLink, NodeDataDict } from 'components/graph-services/graph-layout.service';
-import { GraphNodes, GraphLink, GraphData } from 'services/compute-graph.service';
-import { AppConstants } from 'app.constants';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {
+  StateGraphLayoutService,
+  AugmentedLink,
+  NodeDataDict,
+} from 'components/graph-services/graph-layout.service';
+import {GraphNodes, GraphLink, GraphData} from 'services/compute-graph.service';
+import {AppConstants} from 'app.constants';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import cloneDeep from 'lodash/cloneDeep';
-import { TopicIdToPrerequisiteTopicIds } from '../existing-classroom.model';
-import { TopicIdToTopicName } from '../existing-classroom.model';
-
+import {TopicIdToPrerequisiteTopicIds} from '../existing-classroom.model';
+import {TopicIdToTopicName} from '../existing-classroom.model';
 
 interface NodeData {
   y0: number;
@@ -41,14 +44,13 @@ interface NodeData {
 
 @Component({
   selector: 'oppia-topics-dependency-graph',
-  templateUrl: './topic-dependency-graph-viz-modal.component.html'
+  templateUrl: './topic-dependency-graph-viz-modal.component.html',
 })
-export class TopicsDependencyGraphModalComponent
-  extends ConfirmOrCancelModal {
+export class TopicsDependencyGraphModalComponent extends ConfirmOrCancelModal {
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private stateGraphLayoutService: StateGraphLayoutService,
-    private truncate: TruncatePipe,
+    private truncate: TruncatePipe
   ) {
     super(ngbActiveModal);
   }
@@ -57,7 +59,7 @@ export class TopicsDependencyGraphModalComponent
     bottom: 0,
     left: 0,
     top: 0,
-    right: 0
+    right: 0,
   };
 
   graphData!: GraphData;
@@ -79,36 +81,53 @@ export class TopicsDependencyGraphModalComponent
   ngOnInit(): void {
     this.normalizeTopicDependencyGraph();
     this.drawGraph(
-      this.graphData.nodes, this.graphData.links,
-      this.graphData.initStateId, this.graphData.finalStateIds
+      this.graphData.nodes,
+      this.graphData.links,
+      this.graphData.initStateId,
+      this.graphData.finalStateIds
     );
   }
 
   drawGraph(
-      nodes: GraphNodes, originalLinks: GraphLink[],
-      initStateId: string, finalStateIds: string[]
+    nodes: GraphNodes,
+    originalLinks: GraphLink[],
+    initStateId: string,
+    finalStateIds: string[]
   ): void {
     this.initStateId = initStateId;
     this.finalStateIds = finalStateIds;
     let links = cloneDeep(originalLinks);
 
     this.nodeData = this.stateGraphLayoutService.computeLayout(
-      nodes, links, initStateId, cloneDeep(finalStateIds));
+      nodes,
+      links,
+      initStateId,
+      cloneDeep(finalStateIds)
+    );
 
     this.GRAPH_WIDTH = this.stateGraphLayoutService.getGraphWidth(
-      AppConstants.MAX_NODES_PER_ROW, AppConstants.MAX_NODE_LABEL_LENGTH);
+      AppConstants.MAX_NODES_PER_ROW,
+      AppConstants.MAX_NODE_LABEL_LENGTH
+    );
 
     this.GRAPH_HEIGHT = this.stateGraphLayoutService.getGraphHeight(
-      this.nodeData);
+      this.nodeData
+    );
 
     this.nodeData = this.stateGraphLayoutService.modifyPositionValues(
-      this.nodeData, this.GRAPH_WIDTH, this.GRAPH_HEIGHT);
+      this.nodeData,
+      this.GRAPH_WIDTH,
+      this.GRAPH_HEIGHT
+    );
 
     this.graphBounds = this.stateGraphLayoutService.getGraphBoundaries(
-      this.nodeData);
+      this.nodeData
+    );
 
     this.augmentedLinks = this.stateGraphLayoutService.getAugmentedLinks(
-      this.nodeData, links);
+      this.nodeData,
+      links
+    );
 
     this.nodeList = [];
     for (let nodeId in this.nodeData) {
@@ -119,14 +138,17 @@ export class TopicsDependencyGraphModalComponent
   getTruncatedLabel(nodeLabel: string): string {
     return this.truncate.transform(
       nodeLabel,
-      AppConstants.MAX_NODE_LABEL_LENGTH);
+      AppConstants.MAX_NODE_LABEL_LENGTH
+    );
   }
 
   normalizeTopicDependencyGraph(): void {
     const intialTopicIds = this.computeInitialTopicIds(
-      this.topicIdToPrerequisiteTopicIds);
+      this.topicIdToPrerequisiteTopicIds
+    );
     const finalTopics = this.computeFinalTopicIds(
-      this.topicIdToPrerequisiteTopicIds);
+      this.topicIdToPrerequisiteTopicIds
+    );
     const links = this.computeEdges(this.topicIdToPrerequisiteTopicIds);
     const nodes = this.topicIdToTopicName;
 
@@ -134,12 +156,12 @@ export class TopicsDependencyGraphModalComponent
       finalStateIds: finalTopics,
       initStateId: intialTopicIds[0],
       links: links,
-      nodes: nodes
+      nodes: nodes,
     };
   }
 
   computeInitialTopicIds(
-      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ): string[] {
     let initialTopicIds = [];
     for (let topicId in topicIdToPrerequisiteTopicIds) {
@@ -154,16 +176,14 @@ export class TopicsDependencyGraphModalComponent
   }
 
   computeEdges(
-      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ): GraphLink[] {
     let edgeSet = [];
     for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
-      let prerequisiteTopics = (
-        topicIdToPrerequisiteTopicIds[currentTopicId]);
+      let prerequisiteTopics = topicIdToPrerequisiteTopicIds[currentTopicId];
 
       for (let topicId of prerequisiteTopics) {
-        edgeSet.push(this.computeSingleEdge(
-          topicId, currentTopicId));
+        edgeSet.push(this.computeSingleEdge(topicId, currentTopicId));
       }
     }
     return edgeSet;
@@ -174,18 +194,19 @@ export class TopicsDependencyGraphModalComponent
       source: sourceTopic,
       target: destTopic,
       linkProperty: null,
-      connectsDestIfStuck: false
+      connectsDestIfStuck: false,
     };
   }
 
   computeFinalTopicIds(
-      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ): string[] {
     let prerequisitesOfAllTopics: string[] = [];
     let finalTopicIds = [];
     for (let topicId in topicIdToPrerequisiteTopicIds) {
       prerequisitesOfAllTopics = prerequisitesOfAllTopics.concat(
-        topicIdToPrerequisiteTopicIds[topicId]);
+        topicIdToPrerequisiteTopicIds[topicId]
+      );
     }
 
     for (let topicId in topicIdToPrerequisiteTopicIds) {

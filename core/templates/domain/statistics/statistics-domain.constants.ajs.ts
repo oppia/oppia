@@ -18,25 +18,42 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { StatisticsDomainConstants } from
-  'domain/statistics/statistics-domain.constants';
+import {StatisticsDomainConstants} from 'domain/statistics/statistics-domain.constants';
 
-angular.module('oppia').constant(
-  'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
-  StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
-angular.module('oppia').constant(
-  'ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE',
-  StatisticsDomainConstants.ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE);
-angular.module('oppia').constant(
-  'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
-  StatisticsDomainConstants.PLAYTHROUGH_IMPROVEMENT_TASK_TYPE);
+angular
+  .module('oppia')
+  .constant(
+    'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
+    StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION
+  );
+angular
+  .module('oppia')
+  .constant(
+    'ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE',
+    StatisticsDomainConstants.ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE
+  );
+angular
+  .module('oppia')
+  .constant(
+    'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
+    StatisticsDomainConstants.PLAYTHROUGH_IMPROVEMENT_TASK_TYPE
+  );
 
-angular.module('oppia').constant(
-  'FEEDBACK_IMPROVEMENT_TASK_TYPE',
-  StatisticsDomainConstants.FEEDBACK_IMPROVEMENT_TASK_TYPE);
-angular.module('oppia').constant(
-  'SUBMIT_LEARNER_ANSWER_DETAILS_URL',
-  StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL);
-angular.module('oppia').constant(
-  'SUGGESTION_IMPROVEMENT_TASK_TYPE',
-  StatisticsDomainConstants.SUGGESTION_IMPROVEMENT_TASK_TYPE);
+angular
+  .module('oppia')
+  .constant(
+    'FEEDBACK_IMPROVEMENT_TASK_TYPE',
+    StatisticsDomainConstants.FEEDBACK_IMPROVEMENT_TASK_TYPE
+  );
+angular
+  .module('oppia')
+  .constant(
+    'SUBMIT_LEARNER_ANSWER_DETAILS_URL',
+    StatisticsDomainConstants.SUBMIT_LEARNER_ANSWER_DETAILS_URL
+  );
+angular
+  .module('oppia')
+  .constant(
+    'SUGGESTION_IMPROVEMENT_TASK_TYPE',
+    StatisticsDomainConstants.SUGGESTION_IMPROVEMENT_TASK_TYPE
+  );

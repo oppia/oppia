@@ -16,24 +16,19 @@
  * @fileoverview Routing module for library page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { LibraryPageRootComponent } from './library-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {LibraryPageRootComponent} from './library-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: LibraryPageRootComponent
-  }
+    component: LibraryPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class LibraryPageRoutingModule {}

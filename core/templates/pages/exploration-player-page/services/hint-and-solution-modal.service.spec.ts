@@ -16,19 +16,20 @@
  * @fileoverview Tests for HintAndSolutionModalService.
  */
 
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { HintAndSolutionModalService } from './hint-and-solution-modal.service';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {HintAndSolutionModalService} from './hint-and-solution-modal.service';
 
 describe('Hint and Solution Modal Service', () => {
   let hintAndSolutionModalService: HintAndSolutionModalService;
 
   class MockNgbModal {
-    open(): { componentInstance: { index: number } } {
+    open(): {componentInstance: {index: number}} {
       return {
         componentInstance: {
-          index: 0
-        }};
+          index: 0,
+        },
+      };
     }
   }
 
@@ -37,9 +38,9 @@ describe('Hint and Solution Modal Service', () => {
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
-      ]
+          useClass: MockNgbModal,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -56,7 +57,8 @@ describe('Hint and Solution Modal Service', () => {
   });
 
   it('should display solution interstitial modal', () => {
-    expect(hintAndSolutionModalService.displaySolutionInterstitialModal())
-      .toBeDefined();
+    expect(
+      hintAndSolutionModalService.displaySolutionInterstitialModal()
+    ).toBeDefined();
   });
 });

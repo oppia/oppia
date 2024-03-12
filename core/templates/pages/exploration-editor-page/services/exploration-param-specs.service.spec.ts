@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the ExplorationParamSpecsService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ExplorationParamSpecsService } from './exploration-param-specs.service';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {ExplorationParamSpecsService} from './exploration-param-specs.service';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Exploration Param Specs Service', () => {
   let epcs: ExplorationParamSpecsService;
@@ -27,15 +27,13 @@ describe('Exploration Param Specs Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        ExplorationPropertyService
-      ]
+      providers: [ExplorationPropertyService],
     });
 
     epcs = TestBed.inject(ExplorationParamSpecsService);
   });
 
-  it('should test the child object properties', function() {
+  it('should test the child object properties', function () {
     expect(epcs.propertyName).toBe('param_specs');
   });
 });

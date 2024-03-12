@@ -17,28 +17,25 @@
  * each state of an exploration.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AnswerStats } from
-  'domain/exploration/answer-stats.model';
-import { States } from 'domain/exploration/StatesObjectFactory';
-import { AnswerClassificationService } from
-  'pages/exploration-player-page/services/answer-classification.service';
-import { InteractionRulesRegistryService } from
-  'services/interaction-rules-registry.service';
-import { StateTopAnswersStatsBackendApiService } from
-  'services/state-top-answers-stats-backend-api.service';
-import { State } from 'domain/state/StateObjectFactory';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {States} from 'domain/exploration/StatesObjectFactory';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
+import {StateTopAnswersStatsBackendApiService} from 'services/state-top-answers-stats-backend-api.service';
+import {State} from 'domain/state/StateObjectFactory';
 
 export class AnswerStatsEntry {
   constructor(
-      public readonly answers: readonly AnswerStats[],
-      public readonly interactionId: string) {}
+    public readonly answers: readonly AnswerStats[],
+    public readonly interactionId: string
+  ) {}
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateTopAnswersStatsService {
   private initializationHasStarted: boolean;
@@ -52,10 +49,10 @@ export class StateTopAnswersStatsService {
   private initPromise: Promise<void>;
 
   constructor(
-      private answerClassificationService: AnswerClassificationService,
-      private interactionRulesRegistryService: InteractionRulesRegistryService,
-      private stateTopAnswersStatsBackendApiService:
-        StateTopAnswersStatsBackendApiService) {
+    private answerClassificationService: AnswerClassificationService,
+    private interactionRulesRegistryService: InteractionRulesRegistryService,
+    private stateTopAnswersStatsBackendApiService: StateTopAnswersStatsBackendApiService
+  ) {
     this.initializationHasStarted = false;
     this.topAnswersStatsByStateName = new Map();
     this.initPromise = new Promise((resolve, reject) => {
@@ -72,13 +69,15 @@ export class StateTopAnswersStatsService {
     if (!this.initializationHasStarted) {
       this.initializationHasStarted = true;
       try {
-        const {answers, interactionIds} = (
+        const {answers, interactionIds} =
           await this.stateTopAnswersStatsBackendApiService.fetchStatsAsync(
-            explorationId));
+            explorationId
+          );
         for (const stateName of Object.keys(answers)) {
           this.topAnswersStatsByStateName.set(
-            stateName, new AnswerStatsEntry(
-              answers[stateName], interactionIds[stateName]));
+            stateName,
+            new AnswerStatsEntry(answers[stateName], interactionIds[stateName])
+          );
           this.refreshAddressedInfo(states.getState(stateName));
         }
         this.resolveInitPromise();
@@ -113,16 +112,24 @@ export class StateTopAnswersStatsService {
     return this.getStateStats(stateName).filter(a => !a.isAddressed);
   }
 
-  async getTopAnswersByStateNameAsync(expId: string, states: States): Promise<
-      Map<string, readonly AnswerStats[]>> {
+  async getTopAnswersByStateNameAsync(
+    expId: string,
+    states: States
+  ): Promise<Map<string, readonly AnswerStats[]>> {
     await this.initAsync(expId, states);
-    return new Map([...this.topAnswersStatsByStateName].map(
-      ([stateName, cachedStats]) => [stateName, cachedStats.answers]));
+    return new Map(
+      [...this.topAnswersStatsByStateName].map(([stateName, cachedStats]) => [
+        stateName,
+        cachedStats.answers,
+      ])
+    );
   }
 
   onStateAdded(stateName: string): void {
     this.topAnswersStatsByStateName.set(
-      stateName, new AnswerStatsEntry([], ''));
+      stateName,
+      new AnswerStatsEntry([], '')
+    );
   }
 
   onStateDeleted(stateName: string): void {
@@ -150,7 +157,8 @@ export class StateTopAnswersStatsService {
     }
 
     const stateStats = this.topAnswersStatsByStateName.get(
-      stateName) as AnswerStatsEntry;
+      stateName
+    ) as AnswerStatsEntry;
 
     let interactionId = updatedState.interaction.id;
     if (interactionId === null) {
@@ -158,17 +166,29 @@ export class StateTopAnswersStatsService {
     }
     if (stateStats.interactionId !== interactionId) {
       this.topAnswersStatsByStateName.set(
-        stateName, new AnswerStatsEntry([], interactionId));
+        stateName,
+        new AnswerStatsEntry([], interactionId)
+      );
     } else {
-      stateStats.answers.forEach(a => a.isAddressed = (
-        this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          stateName, updatedState, a.answer,
-          this.interactionRulesRegistryService.getRulesServiceByInteractionId(
-            stateStats.interactionId))));
+      stateStats.answers.forEach(
+        a =>
+          (a.isAddressed =
+            this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+              stateName,
+              updatedState,
+              a.answer,
+              this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+                stateStats.interactionId
+              )
+            ))
+      );
     }
   }
 }
 
-angular.module('oppia').factory(
-  'StateTopAnswersStatsService',
-  downgradeInjectable(StateTopAnswersStatsService));
+angular
+  .module('oppia')
+  .factory(
+    'StateTopAnswersStatsService',
+    downgradeInjectable(StateTopAnswersStatsService)
+  );

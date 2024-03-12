@@ -17,16 +17,16 @@
  */
 
 export interface FeedbackMessageSummaryBackendDict {
-  'message_id': number;
-  'text': string;
+  message_id: number;
+  text: string;
   // Below properties are only non-null when entered by the
   // user for a newly created message and null otherwise.
-  'updated_status': string | null;
-  'suggestion_html': string | null;
-  'current_content_html': string | null;
-  'description': string | null;
-  'author_username': string;
-  'created_on_msecs': number;
+  updated_status: string | null;
+  suggestion_html: string | null;
+  current_content_html: string | null;
+  description: string | null;
+  author_username: string;
+  created_on_msecs: number;
 }
 
 export class FeedbackMessageSummary {
@@ -43,10 +43,14 @@ export class FeedbackMessageSummary {
   createdOnMsecs: number;
 
   constructor(
-      messageId: number, text: string, updatedStatus: string | null,
-      suggestionHtml: string | null, currentContentHtml: string | null,
-      description: string | null, authorUsername: string,
-      createdOnMsecs: number
+    messageId: number,
+    text: string,
+    updatedStatus: string | null,
+    suggestionHtml: string | null,
+    currentContentHtml: string | null,
+    description: string | null,
+    authorUsername: string,
+    createdOnMsecs: number
   ) {
     this.messageId = messageId;
     this.text = text;
@@ -59,18 +63,27 @@ export class FeedbackMessageSummary {
   }
 
   static createNewMessage(
-      newMessageId: number, newMessageText: string, authorUsername: string
+    newMessageId: number,
+    newMessageText: string,
+    authorUsername: string
   ): FeedbackMessageSummary {
     // Date.now() returns number of milliseconds since 1970-01-01 UTC.
     let createdOnMsecs: number = new Date().getTime();
     return new FeedbackMessageSummary(
-      newMessageId, newMessageText, null, null, null, null, authorUsername,
-      createdOnMsecs);
+      newMessageId,
+      newMessageText,
+      null,
+      null,
+      null,
+      null,
+      authorUsername,
+      createdOnMsecs
+    );
   }
 
   static createFromBackendDict(
-      feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict):
-      FeedbackMessageSummary {
+    feedbackMessageSummaryBackendDict: FeedbackMessageSummaryBackendDict
+  ): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
       feedbackMessageSummaryBackendDict.message_id,
       feedbackMessageSummaryBackendDict.text,
@@ -79,6 +92,7 @@ export class FeedbackMessageSummary {
       feedbackMessageSummaryBackendDict.current_content_html,
       feedbackMessageSummaryBackendDict.description,
       feedbackMessageSummaryBackendDict.author_username,
-      feedbackMessageSummaryBackendDict.created_on_msecs);
+      feedbackMessageSummaryBackendDict.created_on_msecs
+    );
   }
 }

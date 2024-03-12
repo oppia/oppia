@@ -16,14 +16,21 @@
  * @fileoverview Unit tests for explorationTitleEditor component.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ExplorationTitleEditorComponent } from './exploration-title-editor.component';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { RouterService } from '../services/router.service';
-import { ExplorationTitleService } from '../services/exploration-title.service';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ExplorationTitleEditorComponent} from './exploration-title-editor.component';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {RouterService} from '../services/router.service';
+import {ExplorationTitleService} from '../services/exploration-title.service';
 
 describe('Exploration Title Editor Component', () => {
   let component: ExplorationTitleEditorComponent;
@@ -38,26 +45,19 @@ describe('Exploration Title Editor Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule,
-        ReactiveFormsModule
-      ],
-      declarations: [
-        ExplorationTitleEditorComponent
-      ],
+      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      declarations: [ExplorationTitleEditorComponent],
       providers: [
         {
           provide: RouterService,
-          useClass: MockRouterService
+          useClass: MockRouterService,
         },
         ExplorationTitleService,
         FocusManagerService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
-
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationTitleEditorComponent);
@@ -76,25 +76,29 @@ describe('Exploration Title Editor Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should set focus on settings tab when refreshSettingsTab flag is ' +
-    'emit', fakeAsync(() => {
-    spyOn(focusManagerService, 'setFocus').and.stub();
+  it(
+    'should set focus on settings tab when refreshSettingsTab flag is ' +
+      'emit',
+    fakeAsync(() => {
+      spyOn(focusManagerService, 'setFocus').and.stub();
 
-    component.focusLabel = 'xyzz';
+      component.focusLabel = 'xyzz';
 
-    mockEventEmitter.emit();
-    component.inputFieldBlur();
-    tick();
+      mockEventEmitter.emit();
+      component.inputFieldBlur();
+      tick();
 
-    flush();
+      flush();
 
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'xyzz');
-  }));
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith('xyzz');
+    })
+  );
 
   it('should unsubscribe when component is destroyed', () => {
-    const unsubscribeSpy =
-      spyOn(component.directiveSubscriptions, 'unsubscribe');
+    const unsubscribeSpy = spyOn(
+      component.directiveSubscriptions,
+      'unsubscribe'
+    );
 
     component.ngOnDestroy();
 

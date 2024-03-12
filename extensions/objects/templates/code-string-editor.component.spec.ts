@@ -16,8 +16,14 @@
  * @fileoverview Uni tests for code string editor.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { CodeStringEditorComponent } from './code-string-editor.component';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {CodeStringEditorComponent} from './code-string-editor.component';
 
 describe('CodeStringEditorComponent', () => {
   let component: CodeStringEditorComponent;
@@ -25,7 +31,7 @@ describe('CodeStringEditorComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [CodeStringEditorComponent]
+      declarations: [CodeStringEditorComponent],
     }).compileComponents();
   }));
 
@@ -48,24 +54,22 @@ describe('CodeStringEditorComponent', () => {
     expect(component.warningText).toBe('');
   });
 
-  it('should update value when user types in the text input box',
-    fakeAsync(() => {
-      spyOn(component.valueChanged, 'emit');
-      component.value = 'test';
-      component.ngOnInit();
+  it('should update value when user types in the text input box', fakeAsync(() => {
+    spyOn(component.valueChanged, 'emit');
+    component.value = 'test';
+    component.ngOnInit();
 
-      component.onEdit({
-        target: {
-          value: 'print(\'Hello\');'
-        }
-      });
-      tick(60);
+    component.onEdit({
+      target: {
+        value: "print('Hello');",
+      },
+    });
+    tick(60);
 
-      expect(component.warningText).toBe('');
-      expect(component.value).toBe('print(\'Hello\');');
-      expect(component.valueChanged.emit)
-        .toHaveBeenCalledWith('print(\'Hello\');');
-    }));
+    expect(component.warningText).toBe('');
+    expect(component.value).toBe("print('Hello');");
+    expect(component.valueChanged.emit).toHaveBeenCalledWith("print('Hello');");
+  }));
 
   it('should warn user when user inserts a tab character', fakeAsync(() => {
     spyOn(component.valueChanged, 'emit');
@@ -74,14 +78,15 @@ describe('CodeStringEditorComponent', () => {
 
     component.onEdit({
       target: {
-        value: '\tprint(\'Hello\');'
-      }
+        value: "\tprint('Hello');",
+      },
     });
     tick(60);
 
     expect(component.warningText).toBe('Code may not contain tab characters.');
-    expect(component.value).toBe('\tprint(\'Hello\');');
-    expect(component.valueChanged.emit)
-      .toHaveBeenCalledWith('\tprint(\'Hello\');');
+    expect(component.value).toBe("\tprint('Hello');");
+    expect(component.valueChanged.emit).toHaveBeenCalledWith(
+      "\tprint('Hello');"
+    );
   }));
 });

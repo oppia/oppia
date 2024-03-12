@@ -18,9 +18,11 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { SkillEditorPageConstants } from
-  'pages/skill-editor-page/skill-editor-page.constants';
+import {SkillEditorPageConstants} from 'pages/skill-editor-page/skill-editor-page.constants';
 
-angular.module('oppia').constant(
-  'SKILL_RIGHTS_URL_TEMPLATE',
-  SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE);
+angular
+  .module('oppia')
+  .constant(
+    'SKILL_RIGHTS_URL_TEMPLATE',
+    SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE
+  );

@@ -15,10 +15,10 @@
 /**
  * @fileoverview Unit tests for SuggestionModalService.
  */
-import { TestBed } from '@angular/core/testing';
-import { ui } from 'angular';
-import { AppConstants } from 'app.constants';
-import { ParamDict, SuggestionModalService } from './suggestion-modal.service';
+import {TestBed} from '@angular/core/testing';
+import {ui} from 'angular';
+import {AppConstants} from 'app.constants';
+import {ParamDict, SuggestionModalService} from './suggestion-modal.service';
 
 describe('Suggestion Modal Service', () => {
   let sms: SuggestionModalService;
@@ -42,7 +42,7 @@ describe('Suggestion Modal Service', () => {
       action: AppConstants.ACTION_ACCEPT_SUGGESTION,
       commitMessage: '',
       reviewMessage: '',
-      audioUpdateRequired: false
+      audioUpdateRequired: false,
     };
     sms.acceptSuggestion(uibModalInstanceMock, paramDict);
 
@@ -55,7 +55,7 @@ describe('Suggestion Modal Service', () => {
       action: AppConstants.ACTION_REJECT_SUGGESTION,
       commitMessage: '',
       reviewMessage: '',
-      audioUpdateRequired: false
+      audioUpdateRequired: false,
     };
     sms.rejectSuggestion(uibModalInstanceMock, paramDict);
 

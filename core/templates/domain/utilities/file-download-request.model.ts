@@ -16,7 +16,7 @@
  * @fileoverview Model class for creating audio files.
  */
 
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
 export class FileDownloadRequest {
   filename: string;

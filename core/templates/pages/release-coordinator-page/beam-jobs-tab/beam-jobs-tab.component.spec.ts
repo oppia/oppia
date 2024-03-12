@@ -16,40 +16,46 @@
  * @fileoverview Unit tests for BeamJobsTabComponent.
  */
 
-import { ClipboardModule } from '@angular/cdk/clipboard';
-import { HarnessLoader } from '@angular/cdk/testing';
-import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatAutocompleteHarness } from '@angular/material/autocomplete/testing';
-import { MatButtonModule } from '@angular/material/button';
-import { MatButtonHarness } from '@angular/material/button/testing';
-import { MatCardModule } from '@angular/material/card';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatDialogHarness } from '@angular/material/dialog/testing';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatInputHarness } from '@angular/material/input/testing';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatTableModule } from '@angular/material/table';
-import { MatTableHarness } from '@angular/material/table/testing';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of } from 'rxjs';
-import { marbles } from 'rxjs-marbles';
-import { BeamJobsTabComponent } from './beam-jobs-tab.component';
+import {ClipboardModule} from '@angular/cdk/clipboard';
+import {HarnessLoader} from '@angular/cdk/testing';
+import {TestbedHarnessEnvironment} from '@angular/cdk/testing/testbed';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatAutocompleteHarness} from '@angular/material/autocomplete/testing';
+import {MatButtonModule} from '@angular/material/button';
+import {MatButtonHarness} from '@angular/material/button/testing';
+import {MatCardModule} from '@angular/material/card';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatDialogHarness} from '@angular/material/dialog/testing';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatInputHarness} from '@angular/material/input/testing';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatTableModule} from '@angular/material/table';
+import {MatTableHarness} from '@angular/material/table/testing';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {of} from 'rxjs';
+import {marbles} from 'rxjs-marbles';
+import {BeamJobsTabComponent} from './beam-jobs-tab.component';
 
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { BeamJob } from 'domain/jobs/beam-job.model';
-import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
-import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
-import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {BeamJob} from 'domain/jobs/beam-job.model';
+import {CancelBeamJobDialogComponent} from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
+import {StartNewBeamJobDialogComponent} from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
+import {ViewBeamJobOutputDialogComponent} from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Beam Jobs Tab Component', () => {
   let fixture: ComponentFixture<BeamJobsTabComponent>;
@@ -63,15 +69,13 @@ describe('Beam Jobs Tab Component', () => {
   const bazJob = new BeamJob('BazJob');
   const beamJobs = [fooJob, barJob, bazJob];
 
-  const runningFooJob = (
-    new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false));
-  const pendingBarJob = (
-    new BeamJobRun('456', 'BarJob', 'PENDING', 0, 0, false));
+  const runningFooJob = new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false);
+  const pendingBarJob = new BeamJobRun('456', 'BarJob', 'PENDING', 0, 0, false);
   const doneBarJob = new BeamJobRun('789', 'BarJob', 'DONE', 0, 0, false);
   const beamJobRuns = [runningFooJob, pendingBarJob, doneBarJob];
   const terminalBeamJobRuns = [doneBarJob];
 
-  beforeEach(waitForAsync(async() => {
+  beforeEach(waitForAsync(async () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
@@ -99,15 +103,18 @@ describe('Beam Jobs Tab Component', () => {
         {
           provide: ReleaseCoordinatorBackendApiService,
           useValue: jasmine.createSpyObj<ReleaseCoordinatorBackendApiService>(
-            'ReleaseCoordinatorBackendApiService', {}, {
+            'ReleaseCoordinatorBackendApiService',
+            {},
+            {
               getBeamJobs: () => of(beamJobs),
               getBeamJobRuns: () => of(beamJobRuns),
-              startNewBeamJob: () => (
-                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false))),
-              cancelBeamJobRun: () => (
-                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false))),
+              startNewBeamJob: () =>
+                of(new BeamJobRun('123', 'FooJob', 'RUNNING', 0, 0, false)),
+              cancelBeamJobRun: () =>
+                of(new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false)),
               getBeamJobRunOutput: () => of(new BeamJobRunResult('abc', '123')),
-            } as Partial<ReleaseCoordinatorBackendApiService>),
+            } as Partial<ReleaseCoordinatorBackendApiService>
+          ),
         },
       ],
     });
@@ -120,7 +127,7 @@ describe('Beam Jobs Tab Component', () => {
           StartNewBeamJobDialogComponent,
           ViewBeamJobOutputDialogComponent,
         ],
-      }
+      },
     });
 
     await TestBed.compileComponents();
@@ -134,49 +141,62 @@ describe('Beam Jobs Tab Component', () => {
     loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
   }));
 
-  it('should wait until both jobs and runs are emitted', marbles(m => {
-    const beamJobsOutput = m.hot('   ^-j---|', {j: beamJobs});
-    const beamJobRunsOutput = m.hot('^---r-|', {r: beamJobRuns});
-    const expectedNames = '          e---n--';
-    const expectedRuns = '           e---r--';
-    spyOn(backendApiService, 'getBeamJobs')
-      .and.returnValue(beamJobsOutput);
-    spyOn(backendApiService, 'getBeamJobRuns')
-      .and.returnValue(beamJobRunsOutput);
+  it(
+    'should wait until both jobs and runs are emitted',
+    marbles(m => {
+      const beamJobsOutput = m.hot('   ^-j---|', {j: beamJobs});
+      const beamJobRunsOutput = m.hot('^---r-|', {r: beamJobRuns});
+      const expectedNames = '          e---n--';
+      const expectedRuns = '           e---r--';
+      spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobsOutput);
+      spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(
+        beamJobRunsOutput
+      );
 
-    fixture.detectChanges();
+      fixture.detectChanges();
 
-    m.expect(component.jobNames)
-      .toBeObservable(expectedNames, {e: [], n: beamJobs.map(j => j.name)});
-    m.expect(component.beamJobRuns)
-      .toBeObservable(expectedRuns, {e: [], r: beamJobRuns});
+      m.expect(component.jobNames).toBeObservable(expectedNames, {
+        e: [],
+        n: beamJobs.map(j => j.name),
+      });
+      m.expect(component.beamJobRuns).toBeObservable(expectedRuns, {
+        e: [],
+        r: beamJobRuns,
+      });
 
-    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
-  }));
+      component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
+    })
+  );
 
-  it('should return empty array when jobs fail to load', marbles(m => {
-    const beamJobs = m.hot('^-#', undefined, new Error('err'));
-    const expectedNames = ' e-e';
-    spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
+  it(
+    'should return empty array when jobs fail to load',
+    marbles(m => {
+      const beamJobs = m.hot('^-#', undefined, new Error('err'));
+      const expectedNames = ' e-e';
+      spyOn(backendApiService, 'getBeamJobs').and.returnValue(beamJobs);
 
-    fixture.detectChanges();
-    m.expect(component.jobNames).toBeObservable(expectedNames, { e: [] });
+      fixture.detectChanges();
+      m.expect(component.jobNames).toBeObservable(expectedNames, {e: []});
 
-    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
-  }));
+      component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
+    })
+  );
 
-  it('should return empty array when runs fail to load', marbles(m => {
-    const beamJobRuns = m.hot('^-#', undefined, new Error('err'));
-    const expectedRuns = '     e-e';
-    spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
+  it(
+    'should return empty array when runs fail to load',
+    marbles(m => {
+      const beamJobRuns = m.hot('^-#', undefined, new Error('err'));
+      const expectedRuns = '     e-e';
+      spyOn(backendApiService, 'getBeamJobRuns').and.returnValue(beamJobRuns);
 
-    fixture.detectChanges();
-    m.expect(component.beamJobRuns).toBeObservable(expectedRuns, { e: [] });
+      fixture.detectChanges();
+      m.expect(component.beamJobRuns).toBeObservable(expectedRuns, {e: []});
 
-    component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
-  }));
+      component.beamJobRunsRefreshIntervalSubscription.unsubscribe();
+    })
+  );
 
-  it('should update the table when the job name input changes', async() => {
+  it('should update the table when the job name input changes', async () => {
     const input = await loader.getHarness(MatInputHarness);
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const table = await loader.getHarness(MatTableHarness);
@@ -202,7 +222,7 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should deselect a job after changing the input', async() => {
+  it('should deselect a job after changing the input', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -222,14 +242,22 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should add a new job after starting a new job run', async() => {
+  it('should add a new job after starting a new job run', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
-    const newPendingFooJob = (
-      new BeamJobRun('123', 'FooJob', 'PENDING', 0, 0, false));
-    const startNewJobSpy = spyOn(backendApiService, 'startNewBeamJob')
-      .and.returnValue(of(newPendingFooJob));
+    const newPendingFooJob = new BeamJobRun(
+      '123',
+      'FooJob',
+      'PENDING',
+      0,
+      0,
+      false
+    );
+    const startNewJobSpy = spyOn(
+      backendApiService,
+      'startNewBeamJob'
+    ).and.returnValue(of(newPendingFooJob));
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
@@ -237,16 +265,20 @@ describe('Beam Jobs Tab Component', () => {
 
     expect(component.beamJobRuns.value).not.toContain(newPendingFooJob);
 
-    const startNewButton = await loader.getHarness(MatButtonHarness.with({
-      text: 'play_arrow'
-    }));
+    const startNewButton = await loader.getHarness(
+      MatButtonHarness.with({
+        text: 'play_arrow',
+      })
+    );
     await startNewButton.click();
 
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
 
-    const confirmButton = await loader.getHarness(MatButtonHarness.with({
-      text: 'Start New Job'
-    }));
+    const confirmButton = await loader.getHarness(
+      MatButtonHarness.with({
+        text: 'Start New Job',
+      })
+    );
     await confirmButton.click();
     await fixture.whenStable();
 
@@ -257,14 +289,22 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should cancel the job and update its status', async() => {
+  it('should cancel the job and update its status', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
-    const cancellingFooJob = (
-      new BeamJobRun('123', 'FooJob', 'CANCELLED', 0, 0, false));
-    const cancelBeamJobRunSpy = spyOn(backendApiService, 'cancelBeamJobRun')
-      .and.returnValue(of(cancellingFooJob));
+    const cancellingFooJob = new BeamJobRun(
+      '123',
+      'FooJob',
+      'CANCELLED',
+      0,
+      0,
+      false
+    );
+    const cancelBeamJobRunSpy = spyOn(
+      backendApiService,
+      'cancelBeamJobRun'
+    ).and.returnValue(of(cancellingFooJob));
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
@@ -273,16 +313,20 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.beamJobRuns.value).toContain(runningFooJob);
     expect(component.beamJobRuns.value).not.toContain(cancellingFooJob);
 
-    const cancelButton = await loader.getHarness(MatButtonHarness.with({
-      text: 'Cancel'
-    }));
+    const cancelButton = await loader.getHarness(
+      MatButtonHarness.with({
+        text: 'Cancel',
+      })
+    );
     await cancelButton.click();
 
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
 
-    const confirmButton = await loader.getHarness(MatButtonHarness.with({
-      text: 'Cancel this Job'
-    }));
+    const confirmButton = await loader.getHarness(
+      MatButtonHarness.with({
+        text: 'Cancel this Job',
+      })
+    );
     await confirmButton.click();
     await fixture.whenStable();
 
@@ -294,22 +338,24 @@ describe('Beam Jobs Tab Component', () => {
     component.ngOnDestroy();
   });
 
-  it('should show the job output', async() => {
+  it('should show the job output', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
-    const getBeamJobRunOutputSpy = (
-      spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(new BeamJobRunResult('Lorem Ipsum', '')))
-    );
+    const getBeamJobRunOutputSpy = spyOn(
+      backendApiService,
+      'getBeamJobRunOutput'
+    ).and.returnValue(of(new BeamJobRunResult('Lorem Ipsum', '')));
 
     await input.setValue('BarJob');
     await autocomplete.selectOption({text: 'BarJob'});
     fixture.detectChanges();
 
-    const viewOutputButton = await loader.getHarness(MatButtonHarness.with({
-      text: 'View Output'
-    }));
+    const viewOutputButton = await loader.getHarness(
+      MatButtonHarness.with({
+        text: 'View Output',
+      })
+    );
     await viewOutputButton.click();
 
     const dialog = await loader.getHarness(MatDialogHarness);
@@ -324,8 +370,10 @@ describe('Beam Jobs Tab Component', () => {
   });
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
-    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
-      .and.returnValue(of(beamJobRuns));
+    const getBeamJobRunsSpy = spyOn(
+      backendApiService,
+      'getBeamJobRuns'
+    ).and.returnValue(of(beamJobRuns));
 
     fixture.detectChanges();
 
@@ -342,8 +390,10 @@ describe('Beam Jobs Tab Component', () => {
   }));
 
   it('should not refresh beam jobs if all jobs are terminal', fakeAsync(() => {
-    const getBeamJobRunsSpy = spyOn(backendApiService, 'getBeamJobRuns')
-      .and.returnValue(of(terminalBeamJobRuns));
+    const getBeamJobRunsSpy = spyOn(
+      backendApiService,
+      'getBeamJobRuns'
+    ).and.returnValue(of(terminalBeamJobRuns));
 
     fixture.detectChanges();
 

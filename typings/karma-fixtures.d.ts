@@ -1,15 +1,15 @@
 interface KNN {
-  'occurrence': number;
-  'K': number;
-  'T': number;
-  'top': number;
-  'fingerprint_data': {
+  occurrence: number;
+  K: number;
+  T: number;
+  top: number;
+  fingerprint_data: {
     [key: number]: {
       class: number;
       fingerprint: number[][];
     };
   };
-  'token_to_id': {
+  token_to_id: {
     [key: string]: number;
   };
 }
@@ -22,19 +22,19 @@ interface KernelParams {
 }
 
 interface SVM {
-  'classes': number[];
-  'kernel_params': KernelParams;
-  'intercept': number[];
-  'n_support': number[];
-  'probA': number[];
-  'support_vectors': number[][];
-  'probB': number[];
-  'dual_coef': number[][];
+  classes: number[];
+  kernel_params: KernelParams;
+  intercept: number[];
+  n_support: number[];
+  probA: number[];
+  support_vectors: number[][];
+  probB: number[];
+  dual_coef: number[][];
 }
 
 type ClassifierAccuracyTest = {
-  'answer_group_index': number;
-  'answers': {
+  answer_group_index: number;
+  answers: {
     code: string;
   }[];
 }[];
@@ -60,26 +60,26 @@ interface InplaceReplaceTest {
 interface TestCasesRTE {
   RTE_TYPE_TEXTANGULAR: {
     TEST_CASES: {
-      'html_content': string;
-      'expected_output': string;
-      'case': string;
+      html_content: string;
+      expected_output: string;
+      case: string;
     }[];
   };
 }
 
 type TextClassifierResults = {
-  'answer_group_index': number;
-  'answers': string[];
+  answer_group_index: number;
+  answers: string[];
 }[];
 
 interface TextInputClassifierData {
-  'best_params': {
+  best_params: {
     kernel: string;
     C: number;
   };
-  'best_score': number;
-  'SVM': SVM;
-  'cv_vocabulary': {
+  best_score: number;
+  SVM: SVM;
+  cv_vocabulary: {
     [key: string]: number;
   };
 }

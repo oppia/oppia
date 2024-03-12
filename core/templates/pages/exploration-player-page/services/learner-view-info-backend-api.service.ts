@@ -15,36 +15,43 @@
  * @fileoverview Backend api service for fetching the learner data;
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 
 interface LearnerViewBackendDict {
-  'summaries': LearnerExplorationSummaryBackendDict[];
+  summaries: LearnerExplorationSummaryBackendDict[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LearnerViewInfoBackendApiService {
-  constructor(
-        private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
   async fetchLearnerInfoAsync(
-      stringifiedExpIds: string,
-      includePrivateExplorations: string): Promise<LearnerViewBackendDict> {
-    return this.http.get<LearnerViewBackendDict>(
-      AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
-        params: {
-          stringified_exp_ids: stringifiedExpIds,
-          include_private_explorations: includePrivateExplorations
-        }}).toPromise();
+    stringifiedExpIds: string,
+    includePrivateExplorations: string
+  ): Promise<LearnerViewBackendDict> {
+    return this.http
+      .get<LearnerViewBackendDict>(
+        AppConstants.EXPLORATION_SUMMARY_DATA_URL_TEMPLATE,
+        {
+          params: {
+            stringified_exp_ids: stringifiedExpIds,
+            include_private_explorations: includePrivateExplorations,
+          },
+        }
+      )
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'LearnerViewInfoBackendApiService',
-  downgradeInjectable(LearnerViewInfoBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'LearnerViewInfoBackendApiService',
+    downgradeInjectable(LearnerViewInfoBackendApiService)
+  );

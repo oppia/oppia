@@ -16,55 +16,69 @@
  * @fileoverview Service to fetch entity-translation from the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { EntityTranslation, EntityTranslationBackendDict } from 'domain/translation/EntityTranslationObjectFactory';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AppConstants } from 'app.constants';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {
+  EntityTranslation,
+  EntityTranslationBackendDict,
+} from 'domain/translation/EntityTranslationObjectFactory';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EntityTranslationBackendApiService {
   constructor(
-      private httpClient: HttpClient,
-      private urlInterpolationService: UrlInterpolationService,
+    private httpClient: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   private _getUrl(
-      entityId: string, entityType: string, entityVersion: number,
-      languageCode: string
+    entityId: string,
+    entityType: string,
+    entityVersion: number,
+    languageCode: string
   ) {
     return this.urlInterpolationService.interpolateUrl(
-      AppConstants.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE, {
+      AppConstants.ENTITY_TRANSLATIONS_HANDLER_URL_TEMPLATE,
+      {
         entity_id: entityId,
         entity_type: entityType,
         entity_version: String(entityVersion),
-        language_code: languageCode
+        language_code: languageCode,
       }
     );
   }
 
   async fetchEntityTranslationAsync(
-      entityId: string,
-      entityType: string,
-      entityVersion: number,
-      languageCode: string): Promise<EntityTranslation> {
+    entityId: string,
+    entityType: string,
+    entityVersion: number,
+    languageCode: string
+  ): Promise<EntityTranslation> {
     return new Promise((resolve, reject) => {
-      this.httpClient.get<EntityTranslationBackendDict>(
-        this._getUrl(
-          entityId, entityType, entityVersion, languageCode
-        )).toPromise().then(response => {
-        resolve(EntityTranslation.createFromBackendDict(response));
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.httpClient
+        .get<EntityTranslationBackendDict>(
+          this._getUrl(entityId, entityType, entityVersion, languageCode)
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(EntityTranslation.createFromBackendDict(response));
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 }
 
-
-angular.module('oppia').factory(
-  'EntityTranslationBackendApiService',
-  downgradeInjectable(EntityTranslationBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'EntityTranslationBackendApiService',
+    downgradeInjectable(EntityTranslationBackendApiService)
+  );

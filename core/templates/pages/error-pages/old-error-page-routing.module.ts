@@ -16,17 +16,17 @@
  * @fileoverview Routing module for error page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
 
-import { ErrorPageRootComponent } from 'pages/error-pages/error-page-root.component';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {ErrorPageRootComponent} from 'pages/error-pages/error-page-root.component';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 const routes: Route[] = [
   {
     path: '**',
-    component: ErrorPageRootComponent
-  }
+    component: ErrorPageRootComponent,
+  },
 ];
 
 @NgModule({
@@ -34,11 +34,8 @@ const routes: Route[] = [
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
-    RouterModule.forRoot(routes)
+    RouterModule.forRoot(routes),
   ],
-  exports: [
-    RouterModule
-  ]
+  exports: [RouterModule],
 })
-
 export class ErrorPageRoutingModule {}

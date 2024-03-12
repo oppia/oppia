@@ -16,7 +16,7 @@
  * @fileoverview LimitTo filter for Oppia.
  */
 
-import { LimitToPipe } from './limit-to.pipe';
+import {LimitToPipe} from './limit-to.pipe';
 
 describe('LimitTo Pipe', () => {
   const limitToPipe = new LimitToPipe();
@@ -24,8 +24,13 @@ describe('LimitTo Pipe', () => {
   it('should reduce number elements of array to given limit', () => {
     let list: string[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
     let limit: number = 5;
-    expect(limitToPipe.transform<string>(list, limit))
-      .toEqual(['a', 'b', 'c', 'd', 'e']);
+    expect(limitToPipe.transform<string>(list, limit)).toEqual([
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+    ]);
     let list2: number[] = [1, 2, 3];
     expect(limitToPipe.transform<number>(list2, limit)).toEqual(list2);
   });

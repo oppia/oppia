@@ -23,35 +23,38 @@ var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
 ruleTester.run('no-testonly', rule, {
-  valid: [
-    'otherFunction()',
-    'function testOnly(){}'
-  ],
+  valid: ['otherFunction()', 'function testOnly(){}'],
 
   invalid: [
     {
       code: 'testOnlySomething();',
-      errors: [{
-        message: 'Please do not call a testOnly function from a ' +
-        'non-test file.',
-        type: null
-      }]
+      errors: [
+        {
+          message:
+            'Please do not call a testOnly function from a ' + 'non-test file.',
+          type: null,
+        },
+      ],
     },
     {
       code: 'somethingTestOnly();',
-      errors: [{
-        message: 'Please do not call a testOnly function from a ' +
-        'non-test file.',
-        type: null
-      }]
+      errors: [
+        {
+          message:
+            'Please do not call a testOnly function from a ' + 'non-test file.',
+          type: null,
+        },
+      ],
     },
     {
       code: 'somethingtestOnlySomething();',
-      errors: [{
-        message: 'Please do not call a testOnly function from a ' +
-        'non-test file.',
-        type: null
-      }]
+      errors: [
+        {
+          message:
+            'Please do not call a testOnly function from a ' + 'non-test file.',
+          type: null,
+        },
+      ],
     },
-  ]
+  ],
 });

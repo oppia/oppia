@@ -16,21 +16,24 @@
  * @fileoverview Unit tests for math equation input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { MathEquationInputValidationService } from
-// eslint-disable-next-line max-len
-  'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule } from
-  'domain/exploration/rule.model';
-import { MathEquationInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  MathEquationInputValidationService,
+  // eslint-disable-next-line max-len
+} from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
+import {Rule} from 'domain/exploration/rule.model';
+import {MathEquationInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 describe('MathEquationInputValidationService', () => {
   let validatorService: MathEquationInputValidationService;
@@ -45,7 +48,7 @@ describe('MathEquationInputValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MathEquationInputValidationService]
+      providers: [MathEquationInputValidationService],
     });
 
     validatorService = TestBed.get(MathEquationInputValidationService);
@@ -59,42 +62,52 @@ describe('MathEquationInputValidationService', () => {
       dest_if_really_stuck: null,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
+      missing_prerequisite_skill_id: null,
     });
 
     customizationArgs = {
       useFractionForDivision: false,
       allowedVariables: {
-        value: ['x', 'y', 'm', 'x', 'c', 'a', 'b']
-      }
+        value: ['x', 'y', 'm', 'x', 'c', 'a', 'b'],
+      },
     };
 
-    isEquivalentTo = Rule.createFromBackendDict({
-      rule_type: 'IsEquivalentTo',
-      inputs: {
-        x: 'y = c + m*x'
-      }
-    }, 'MathEquationInput');
+    isEquivalentTo = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: 'y = c + m*x',
+        },
+      },
+      'MathEquationInput'
+    );
 
-    matchesExactlyWith = Rule.createFromBackendDict({
-      rule_type: 'MatchesExactlyWith',
-      inputs: {
-        x: 'y = m*x + c',
-        y: 'both'
-      }
-    }, 'MathEquationInput');
+    matchesExactlyWith = Rule.createFromBackendDict(
+      {
+        rule_type: 'MatchesExactlyWith',
+        inputs: {
+          x: 'y = m*x + c',
+          y: 'both',
+        },
+      },
+      'MathEquationInput'
+    );
 
     answerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
   });
 
   it('should be able to perform basic validation', () => {
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
     expect(warnings).toEqual([]);
   });
 
@@ -103,171 +116,243 @@ describe('MathEquationInputValidationService', () => {
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Learner answer 2 from Oppia response 1 will never be ' +
-      'matched because it is preceded by an \'IsEquivalentTo\' learner ' +
-      'answer with a matching input.'
-    }]);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 2 from Oppia response 1 will never be ' +
+          "matched because it is preceded by an 'IsEquivalentTo' learner " +
+          'answer with a matching input.',
+      },
+    ]);
 
-
-    let isEquivalentTo1 = Rule.createFromBackendDict({
-      rule_type: 'IsEquivalentTo',
-      inputs: {
-        x: '(a+b)^2 = 0'
-      }
-    }, 'MathEquationInput');
-    let isEquivalentTo2 = Rule.createFromBackendDict({
-      rule_type: 'IsEquivalentTo',
-      inputs: {
-        x: 'a^2 + 2*a*b + b^2 = 0'
-      }
-    }, 'MathEquationInput');
+    let isEquivalentTo1 = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: '(a+b)^2 = 0',
+        },
+      },
+      'MathEquationInput'
+    );
+    let isEquivalentTo2 = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: 'a^2 + 2*a*b + b^2 = 0',
+        },
+      },
+      'MathEquationInput'
+    );
 
     // The second rule will never get matched.
     answerGroups[0].rules = [isEquivalentTo1, isEquivalentTo2];
 
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Learner answer 2 from Oppia response 1 will never be ' +
-      'matched because it is preceded by an \'IsEquivalentTo\' learner ' +
-      'answer with a matching input.'
-    }]);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 2 from Oppia response 1 will never be ' +
+          "matched because it is preceded by an 'IsEquivalentTo' learner " +
+          'answer with a matching input.',
+      },
+    ]);
 
-
-    let matchesExactlyWith1 = Rule.createFromBackendDict({
-      rule_type: 'MatchesExactlyWith',
-      inputs: {
-        x: 'x*x = 1',
-        y: 'irrelevant'
-      }
-    }, 'MathEquationInput');
-    let matchesExactlyWith2 = Rule.createFromBackendDict({
-      rule_type: 'MatchesExactlyWith',
-      inputs: {
-        x: '-1 + x*x = 0',
-        y: 'irrelevant'
-      }
-    }, 'MathEquationInput');
+    let matchesExactlyWith1 = Rule.createFromBackendDict(
+      {
+        rule_type: 'MatchesExactlyWith',
+        inputs: {
+          x: 'x*x = 1',
+          y: 'irrelevant',
+        },
+      },
+      'MathEquationInput'
+    );
+    let matchesExactlyWith2 = Rule.createFromBackendDict(
+      {
+        rule_type: 'MatchesExactlyWith',
+        inputs: {
+          x: '-1 + x*x = 0',
+          y: 'irrelevant',
+        },
+      },
+      'MathEquationInput'
+    );
 
     // The second rule will never get matched.
     answerGroups[0].rules = [matchesExactlyWith1, matchesExactlyWith2];
 
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Learner answer 2 from Oppia response 1 will never be ' +
-      'matched because it is preceded by a \'MatchesExactlyWith\' learner ' +
-      'answer with a matching input.'
-    }]);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Learner answer 2 from Oppia response 1 will never be ' +
+          "matched because it is preceded by a 'MatchesExactlyWith' learner " +
+          'answer with a matching input.',
+      },
+    ]);
   });
 
   it('should not catch redundancy of rules with non-matching inputs', () => {
     answerGroups[0].rules = [matchesExactlyWith, isEquivalentTo];
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
     expect(warnings).toEqual([]);
 
-    matchesExactlyWith = Rule.createFromBackendDict({
-      rule_type: 'MatchesExactlyWith',
-      inputs: {
-        x: 'x * y = 0',
-        y: 'both'
-      }
-    }, 'MathEquationInput');
-    isEquivalentTo = Rule.createFromBackendDict({
-      rule_type: 'IsEquivalentTo',
-      inputs: {
-        x: 'x + y = 0'
-      }
-    }, 'MathEquationInput');
+    matchesExactlyWith = Rule.createFromBackendDict(
+      {
+        rule_type: 'MatchesExactlyWith',
+        inputs: {
+          x: 'x * y = 0',
+          y: 'both',
+        },
+      },
+      'MathEquationInput'
+    );
+    isEquivalentTo = Rule.createFromBackendDict(
+      {
+        rule_type: 'IsEquivalentTo',
+        inputs: {
+          x: 'x + y = 0',
+        },
+      },
+      'MathEquationInput'
+    );
 
     answerGroups[0].rules = [isEquivalentTo, matchesExactlyWith];
 
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
     expect(warnings).toEqual([]);
   });
 
-  it('should warn if there are missing custom variables', function() {
+  it('should warn if there are missing custom variables', function () {
     answerGroups[0].rules = [
-      Rule.createFromBackendDict({
-        rule_type: 'IsEquivalentTo',
-        inputs: {
-          x: 'x^2 = alpha - y/b'
-        }
-      }, 'MathEquationInput')
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'IsEquivalentTo',
+          inputs: {
+            x: 'x^2 = alpha - y/b',
+          },
+        },
+        'MathEquationInput'
+      ),
     ];
     customizationArgs = {
       useFractionForDivision: false,
       allowedVariables: {
-        value: ['y', 'a', 'b']
-      }
+        value: ['y', 'a', 'b'],
+      },
     };
 
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: (
-        'The following variables are present in some of the Oppia responses ' +
-        'but are missing from the custom letters list: x,α')
-    }]);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message:
+          'The following variables are present in some of the Oppia responses ' +
+          'but are missing from the custom letters list: x,α',
+      },
+    ]);
   });
 
-  it('should warn if there are too many custom variables', function() {
+  it('should warn if there are too many custom variables', function () {
     answerGroups[0].rules = [
-      Rule.createFromBackendDict({
-        rule_type: 'IsEquivalentTo',
-        inputs: {
-          x: 'x=y'
-        }
-      }, 'MathEquationInput')
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'IsEquivalentTo',
+          inputs: {
+            x: 'x=y',
+          },
+        },
+        'MathEquationInput'
+      ),
     ];
     customizationArgs = {
       useFractionForDivision: false,
       allowedVariables: {
-        value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']
-      }
+        value: ['y', 'x', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'],
+      },
     };
 
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: 'The number of custom letters cannot be more than 10.'
-    }]);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The number of custom letters cannot be more than 10.',
+      },
+    ]);
   });
 
-  it('should warn if there are inputs with unsupported functions', function() {
+  it('should warn if there are inputs with unsupported functions', function () {
     answerGroups[0].rules = [
-      Rule.createFromBackendDict({
-        rule_type: 'IsEquivalentTo',
-        inputs: {
-          x: 'x+log(y)=tan(x) - sqrt(y)'
-        }
-      }, 'MathEquationInput')
+      Rule.createFromBackendDict(
+        {
+          rule_type: 'IsEquivalentTo',
+          inputs: {
+            x: 'x+log(y)=tan(x) - sqrt(y)',
+          },
+        },
+        'MathEquationInput'
+      ),
     ];
     customizationArgs = {
       useFractionForDivision: false,
       allowedVariables: {
-        value: ['x', 'y']
-      }
+        value: ['x', 'y'],
+      },
     };
 
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArgs, answerGroups, goodDefaultOutcome);
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
 
-    expect(warnings).toEqual([{
-      type: AppConstants.WARNING_TYPES.ERROR,
-      message: (
-        'Input for learner answer 1 from Oppia response 1 uses these ' +
-        'function(s) that aren\'t supported: [log,tan] ' +
-        'The supported functions are: [sqrt,abs]')
-    }]);
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message:
+          'Input for learner answer 1 from Oppia response 1 uses these ' +
+          "function(s) that aren't supported: [log,tan] " +
+          'The supported functions are: [sqrt,abs]',
+      },
+    ]);
   });
 });

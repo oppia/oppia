@@ -16,36 +16,36 @@
  * @fileoverview Services for stats reporting.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, NgZone } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable, NgZone} from '@angular/core';
 
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { MessengerService } from 'services/messenger.service';
-import { PlaythroughService } from 'services/playthrough.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { AggregatedStats, StatsReportingBackendApiService } from
-  'domain/exploration/stats-reporting-backend-api.service';
-import { Stopwatch } from 'domain/utilities/stopwatch.model';
-import { ServicesConstants } from 'services/services.constants';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {MessengerService} from 'services/messenger.service';
+import {PlaythroughService} from 'services/playthrough.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {
+  AggregatedStats,
+  StatsReportingBackendApiService,
+} from 'domain/exploration/stats-reporting-backend-api.service';
+import {Stopwatch} from 'domain/utilities/stopwatch.model';
+import {ServicesConstants} from 'services/services.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StatsReportingService {
   constructor(
-      private contextService: ContextService,
-      private messengerService: MessengerService,
-      private playthroughService: PlaythroughService,
-      private siteAnalyticsService: SiteAnalyticsService,
-      private statsReportingBackendApiService: StatsReportingBackendApiService,
-      private urlService: UrlService,
-      private ngZone: NgZone
+    private contextService: ContextService,
+    private messengerService: MessengerService,
+    private playthroughService: PlaythroughService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private statsReportingBackendApiService: StatsReportingBackendApiService,
+    private urlService: UrlService,
+    private ngZone: NgZone
   ) {
-    this.editorPreviewMode = (
-      this.contextService.isInExplorationEditorPage());
-    this.questionPlayerMode = (
-      this.contextService.isInQuestionPlayerMode());
+    this.editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
     this.refreshAggregatedStats();
   }
 
@@ -81,14 +81,12 @@ export class StatsReportingService {
       num_starts: 0,
       num_completions: 0,
       num_actual_starts: 0,
-      state_stats_mapping: {}
+      state_stats_mapping: {},
     };
   }
 
   private createDefaultStateStatsMappingIfMissing(stateName: string): void {
-    if (
-      this.aggregatedStats.state_stats_mapping.hasOwnProperty(
-        stateName)) {
+    if (this.aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
       return;
     }
     this.aggregatedStats.state_stats_mapping[stateName] = {
@@ -97,13 +95,12 @@ export class StatsReportingService {
       total_hit_count: 0,
       first_hit_count: 0,
       num_times_solution_viewed: 0,
-      num_completions: 0
+      num_completions: 0,
     };
   }
 
   private startStatsTimer(): void {
-    if (!this.editorPreviewMode &&
-      !this.questionPlayerMode) {
+    if (!this.editorPreviewMode && !this.questionPlayerMode) {
       this.ngZone.runOutsideAngular(() => {
         setInterval(() => {
           this.ngZone.run(() => {
@@ -122,16 +119,19 @@ export class StatsReportingService {
       return;
     }
 
-    this.statsReportingBackendApiService.postsStatsAsync(
-      this.aggregatedStats,
-      this.explorationVersion,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .postsStatsAsync(
+        this.aggregatedStats,
+        this.explorationVersion,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
 
     this.refreshAggregatedStats();
   }
@@ -141,9 +141,12 @@ export class StatsReportingService {
   }
 
   initSession(
-      newExplorationId: string, newExplorationTitle: string,
-      newExplorationVersion: number, newSessionId: string,
-      collectionId: string): void {
+    newExplorationId: string,
+    newExplorationTitle: string,
+    newExplorationVersion: number,
+    newSessionId: string,
+    collectionId: string
+  ): void {
     this.explorationId = newExplorationId;
     this.explorationTitle = newExplorationTitle;
     this.explorationVersion = newExplorationVersion;
@@ -164,50 +167,60 @@ export class StatsReportingService {
     this.aggregatedStats.num_starts += 1;
 
     this.createDefaultStateStatsMappingIfMissing(stateName);
-    this.aggregatedStats.state_stats_mapping[
-      stateName].total_hit_count += 1;
-    this.aggregatedStats.state_stats_mapping[
-      stateName].first_hit_count += 1;
+    this.aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1;
+    this.aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1;
 
     this.postStatsToBackend();
 
     this.currentStateName = stateName;
 
-    this.statsReportingBackendApiService.recordExpStartedAsync(
-      params, this.sessionId, stateName,
-      this.explorationVersion,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordExpStartedAsync(
+        params,
+        this.sessionId,
+        stateName,
+        this.explorationVersion,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
 
-    this.statsReportingBackendApiService.recordStateHitAsync(
-      0.0, this.explorationVersion, stateName,
-      params, this.sessionId,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordStateHitAsync(
+        0.0,
+        this.explorationVersion,
+        stateName,
+        params,
+        this.sessionId,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
 
     this.messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED, {
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED,
+      {
         explorationVersion: this.explorationVersion,
-        explorationTitle: this.explorationTitle
-      });
+        explorationTitle: this.explorationTitle,
+      }
+    );
 
     this.statesVisited.add(stateName);
     this.siteAnalyticsService.registerNewCard(1, this.explorationId);
 
     this.stateStopwatch.reset();
     this.explorationStarted = true;
-    this.siteAnalyticsService.registerStartExploration(
-      this.explorationId);
+    this.siteAnalyticsService.registerStartExploration(this.explorationId);
   }
 
   recordExplorationActuallyStarted(stateName: string): void {
@@ -217,16 +230,20 @@ export class StatsReportingService {
     this.aggregatedStats.num_actual_starts += 1;
     this.currentStateName = stateName;
 
-    this.statsReportingBackendApiService.recordExplorationActuallyStartedAsync(
-      this.explorationVersion, stateName,
-      this.sessionId,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordExplorationActuallyStartedAsync(
+        this.explorationVersion,
+        stateName,
+        this.sessionId,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
 
     this.playthroughService.recordExplorationStartAction(stateName);
     this.explorationActuallyStarted = true;
@@ -235,90 +252,107 @@ export class StatsReportingService {
   recordSolutionHit(stateName: string): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
     this.aggregatedStats.state_stats_mapping[
-      stateName].num_times_solution_viewed += 1;
+      stateName
+    ].num_times_solution_viewed += 1;
     this.currentStateName = stateName;
 
-    this.statsReportingBackendApiService.recordSolutionHitAsync(
-      this.stateStopwatch.getTimeInSecs(),
-      this.explorationVersion,
-      stateName,
-      this.sessionId,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordSolutionHitAsync(
+        this.stateStopwatch.getTimeInSecs(),
+        this.explorationVersion,
+        stateName,
+        this.sessionId,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
   }
 
-  recordLeaveForRefresherExp(
-      stateName: string, refresherExpId: string): void {
+  recordLeaveForRefresherExp(stateName: string, refresherExpId: string): void {
     this.currentStateName = stateName;
     this.nextExpId = refresherExpId;
 
-    this.statsReportingBackendApiService.recordLeaveForRefresherExpAsync(
-      this.explorationVersion,
-      refresherExpId,
-      stateName,
-      this.sessionId,
-      this.stateStopwatch.getTimeInSecs(),
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordLeaveForRefresherExpAsync(
+        this.explorationVersion,
+        refresherExpId,
+        stateName,
+        this.sessionId,
+        this.stateStopwatch.getTimeInSecs(),
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
   }
 
   // Note that this also resets the stateStopwatch.
   // The type of oldParams is declared as Object since it can vary depending
   // on the oldStateName.
   recordStateTransition(
-      oldStateName: string, newStateName: string, answer: string,
-      oldParams: Object, isFirstHit: boolean,
-      chapterNumber: string, cardCount: string, language: string): void {
+    oldStateName: string,
+    newStateName: string,
+    answer: string,
+    oldParams: Object,
+    isFirstHit: boolean,
+    chapterNumber: string,
+    cardCount: string,
+    language: string
+  ): void {
     this.createDefaultStateStatsMappingIfMissing(newStateName);
-    this.aggregatedStats.state_stats_mapping[
-      newStateName].total_hit_count += 1;
+    this.aggregatedStats.state_stats_mapping[newStateName].total_hit_count += 1;
     if (isFirstHit) {
-      this.aggregatedStats.state_stats_mapping[
-        newStateName].first_hit_count += 1;
+      this.aggregatedStats.state_stats_mapping[newStateName].first_hit_count +=
+        1;
     }
 
     this.previousStateName = oldStateName;
     this.nextStateName = newStateName;
 
-    this.statsReportingBackendApiService.recordStateHitAsync(
-      this.stateStopwatch.getTimeInSecs(),
-      this.explorationVersion,
-      newStateName,
-      oldParams,
-      this.sessionId,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordStateHitAsync(
+        this.stateStopwatch.getTimeInSecs(),
+        this.explorationVersion,
+        newStateName,
+        oldParams,
+        this.sessionId,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
 
     // Broadcast information about the state transition to listeners.
     this.messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION, {
+      ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION,
+      {
         explorationVersion: this.explorationVersion,
         jsonAnswer: JSON.stringify(answer),
         newStateName: newStateName,
         oldStateName: oldStateName,
-        paramValues: oldParams
-      });
+        paramValues: oldParams,
+      }
+    );
 
     if (!this.statesVisited.has(newStateName)) {
       this.statesVisited.add(newStateName);
       this.siteAnalyticsService.registerNewCard(
         this.statesVisited.size,
-        this.explorationId);
+        this.explorationId
+      );
     }
     let numberOfStatesVisited = this.statesVisited.size;
     if (numberOfStatesVisited === this.MINIMUM_NUMBER_OF_VISITED_STATES) {
@@ -351,60 +385,66 @@ export class StatsReportingService {
 
   recordStateCompleted(stateName: string): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
-    this.aggregatedStats.state_stats_mapping[
-      stateName].num_completions += 1;
+    this.aggregatedStats.state_stats_mapping[stateName].num_completions += 1;
 
     this.currentStateName = stateName;
 
-    this.statsReportingBackendApiService.recordStateCompletedAsync(
-      this.explorationVersion,
-      this.sessionId,
-      stateName,
-      this.stateStopwatch.getTimeInSecs(),
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordStateCompletedAsync(
+        this.explorationVersion,
+        this.sessionId,
+        stateName,
+        this.stateStopwatch.getTimeInSecs(),
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
   }
 
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
   recordExplorationCompleted(
-      stateName: string,
-      params: Object,
-      chapterNumber: string,
-      cardCount: string,
-      language: string
+    stateName: string,
+    params: Object,
+    chapterNumber: string,
+    cardCount: string,
+    language: string
   ): void {
     this.aggregatedStats.num_completions += 1;
     this.currentStateName = stateName;
 
-    this.statsReportingBackendApiService.recordExplorationCompletedAsync(
-      this.stateStopwatch.getTimeInSecs(),
-      this.optionalCollectionId,
-      params,
-      this.sessionId,
-      stateName,
-      this.explorationVersion,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
-
-    this.messengerService.sendMessage(
-      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED, {
-        explorationVersion: this.explorationVersion,
-        paramValues: params
+    this.statsReportingBackendApiService
+      .recordExplorationCompletedAsync(
+        this.stateStopwatch.getTimeInSecs(),
+        this.optionalCollectionId,
+        params,
+        this.sessionId,
+        stateName,
+        this.explorationVersion,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
       });
 
-    this.siteAnalyticsService.registerFinishExploration(
-      this.explorationId);
+    this.messengerService.sendMessage(
+      ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED,
+      {
+        explorationVersion: this.explorationVersion,
+        paramValues: params,
+      }
+    );
+
+    this.siteAnalyticsService.registerFinishExploration(this.explorationId);
     let urlParams = this.urlService.getUrlParams();
     if (urlParams.hasOwnProperty('classroom_url_fragment')) {
       this.siteAnalyticsService.registerCuratedLessonCompleted(
@@ -424,7 +464,9 @@ export class StatsReportingService {
 
     this.postStatsToBackend();
     this.playthroughService.recordExplorationQuitAction(
-      stateName, this.stateStopwatch.getTimeInSecs());
+      stateName,
+      this.stateStopwatch.getTimeInSecs()
+    );
 
     this.explorationIsComplete = true;
   }
@@ -432,37 +474,51 @@ export class StatsReportingService {
   // The type of params is declared as Object since it can vary depending
   // on the stateName.
   recordAnswerSubmitted(
-      stateName: string, params: Object, answer: string,
-      explorationId: string, answerIsCorrect: boolean,
-      answerGroupIndex: number, ruleIndex: number,
-      classificationCategorization: string, feedbackIsUseful: boolean): void {
+    stateName: string,
+    params: Object,
+    answer: string,
+    explorationId: string,
+    answerIsCorrect: boolean,
+    answerGroupIndex: number,
+    ruleIndex: number,
+    classificationCategorization: string,
+    feedbackIsUseful: boolean
+  ): void {
     this.createDefaultStateStatsMappingIfMissing(stateName);
-    this.aggregatedStats.state_stats_mapping[
-      stateName].total_answers_count += 1;
+    this.aggregatedStats.state_stats_mapping[stateName].total_answers_count +=
+      1;
     if (feedbackIsUseful) {
       this.aggregatedStats.state_stats_mapping[
-        stateName].useful_feedback_count += 1;
+        stateName
+      ].useful_feedback_count += 1;
     }
     this.currentStateName = stateName;
 
-    this.statsReportingBackendApiService.recordAnswerSubmittedAsync(
-      answer, params, this.explorationVersion,
-      this.sessionId,
-      this.stateStopwatch.getTimeInSecs(),
-      stateName,
-      answerGroupIndex,
-      ruleIndex,
-      classificationCategorization,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordAnswerSubmittedAsync(
+        answer,
+        params,
+        this.explorationVersion,
+        this.sessionId,
+        this.stateStopwatch.getTimeInSecs(),
+        stateName,
+        answerGroupIndex,
+        ruleIndex,
+        classificationCategorization,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
 
     this.siteAnalyticsService.registerAnswerSubmitted(
-      explorationId, answerIsCorrect);
+      explorationId,
+      answerIsCorrect
+    );
   }
 
   // The type of params is declared as Object since it can vary depending
@@ -470,35 +526,50 @@ export class StatsReportingService {
   recordMaybeLeaveEvent(stateName: string, params: Object): void {
     this.currentStateName = stateName;
 
-    this.statsReportingBackendApiService.recordMaybeLeaveEventAsync(
-      this.stateStopwatch.getTimeInSecs(),
-      this.optionalCollectionId,
-      params,
-      this.sessionId,
-      stateName,
-      this.explorationVersion,
-      this.explorationId,
-      this.currentStateName,
-      this.nextExpId,
-      this.previousStateName,
-      this.nextStateName).then(() => {
-      // Required for the post operation to deliver data to backend.
-    });
+    this.statsReportingBackendApiService
+      .recordMaybeLeaveEventAsync(
+        this.stateStopwatch.getTimeInSecs(),
+        this.optionalCollectionId,
+        params,
+        this.sessionId,
+        stateName,
+        this.explorationVersion,
+        this.explorationId,
+        this.currentStateName,
+        this.nextExpId,
+        this.previousStateName,
+        this.nextStateName
+      )
+      .then(() => {
+        // Required for the post operation to deliver data to backend.
+      });
 
     this.postStatsToBackend();
 
     this.playthroughService.recordExplorationQuitAction(
-      stateName, this.stateStopwatch.getTimeInSecs());
+      stateName,
+      this.stateStopwatch.getTimeInSecs()
+    );
     this.playthroughService.storePlaythrough();
   }
 
   recordAnswerSubmitAction(
-      stateName: string, destStateName: string,
-      interactionId: string, answer: string, feedback: string): void {
+    stateName: string,
+    destStateName: string,
+    interactionId: string,
+    answer: string,
+    feedback: string
+  ): void {
     this.playthroughService.recordAnswerSubmitAction(
-      stateName, destStateName, interactionId, answer, feedback,
-      this.stateStopwatch.getTimeInSecs());
+      stateName,
+      destStateName,
+      interactionId,
+      answer,
+      feedback,
+      this.stateStopwatch.getTimeInSecs()
+    );
   }
 }
-angular.module('oppia').factory('StatsReportingService',
-  downgradeInjectable(StatsReportingService));
+angular
+  .module('oppia')
+  .factory('StatsReportingService', downgradeInjectable(StatsReportingService));

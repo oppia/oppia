@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for AddOutcomeModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { AddOutcomeModalComponent } from './add-outcome-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {AddOutcomeModalComponent} from './add-outcome-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -40,13 +40,11 @@ describe('Add Outcome Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AddOutcomeModalComponent
-      ],
+      declarations: [AddOutcomeModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -59,7 +57,6 @@ describe('Add Outcome Modal Component', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });
 
-
   it('should save outcome when closing the modal', () => {
     component.outcome = new Outcome(
       'Dest',
@@ -68,14 +65,14 @@ describe('Add Outcome Modal Component', () => {
       true,
       [],
       'OutcomeExpId',
-      'SkillId',
+      'SkillId'
     );
     spyOn(ngbActiveModal, 'close');
 
     component.save();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      outcome: component.outcome
+      outcome: component.outcome,
     });
   });
 
@@ -87,7 +84,7 @@ describe('Add Outcome Modal Component', () => {
       true,
       [],
       'OutcomeExpId',
-      'SkillId',
+      'SkillId'
     );
 
     expect(component.isFeedbackLengthExceeded()).toBe(false);
@@ -101,7 +98,7 @@ describe('Add Outcome Modal Component', () => {
       true,
       [],
       'OutcomeExpId',
-      'SkillId',
+      'SkillId'
     );
 
     expect(component.isFeedbackLengthExceeded()).toBe(true);

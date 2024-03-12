@@ -90,6 +90,8 @@ core.utils_test
 main_test
 scripts.build_test
 scripts.concurrent_task_utils_test
+# TODO(#19499): Fix topological sort coverage.
+scripts.create_topological_sort_of_all_services_test
 scripts.install_dependencies_json_packages_test
 scripts.install_python_prod_dependencies_test
 scripts.install_third_party_test

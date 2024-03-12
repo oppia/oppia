@@ -16,16 +16,15 @@
  * @fileoverview Component for looking up a user by username.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { SignupPageBackendApiService } from '../../signup-page/services/signup-page-backend-api.service';
+import {SignupPageBackendApiService} from '../../signup-page/services/signup-page-backend-api.service';
 
 @Component({
   selector: 'oppia-username-input-modal',
   templateUrl: './username-input-modal.component.html',
 })
-
 export class UsernameInputModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -47,9 +46,9 @@ export class UsernameInputModal implements OnInit {
   saveAndClose(): void {
     this.isChecking = true;
     this.isInvalidUsername = false;
-    this.signupPageBackendApiService.checkUsernameAvailableAsync(
-      this.username).then(
-      response => {
+    this.signupPageBackendApiService
+      .checkUsernameAvailableAsync(this.username)
+      .then(response => {
         if (!response.username_is_taken) {
           this.isInvalidUsername = true;
           this.username = '';

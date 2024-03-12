@@ -16,21 +16,17 @@
  * @fileoverview Unit tests for LearnerTopicGoalsSummaryTileComponent.
  */
 
-import { async, ComponentFixture, TestBed } from
-  '@angular/core/testing';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { LearnerTopicGoalsSummaryTileComponent } from
-  './learner-topic-goals-summary-tile.component';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { StoryNode } from 'domain/story/story-node.model';
-
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {LearnerTopicGoalsSummaryTileComponent} from './learner-topic-goals-summary-tile.component';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {StoryNode} from 'domain/story/story-node.model';
 
 describe('Learner Topic Goals Summary Tile Component', () => {
   let component: LearnerTopicGoalsSummaryTileComponent;
@@ -42,15 +38,11 @@ describe('Learner Topic Goals Summary Tile Component', () => {
         BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
-      declarations: [
-        LearnerTopicGoalsSummaryTileComponent,
-      ],
-      providers: [
-        UrlInterpolationService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [LearnerTopicGoalsSummaryTileComponent],
+      providers: [UrlInterpolationService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -64,7 +56,7 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       title: 'subtopic_name',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#F8BF74',
-      url_fragment: 'subtopic-name'
+      url_fragment: 'subtopic-name',
     };
     let nodeDict1 = {
       id: 'node_1',
@@ -82,7 +74,7 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
     let nodeDict2 = {
       id: 'node_2',
@@ -100,7 +92,7 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
     const learnerTopicSummaryBackendDict1 = {
       id: 'sample_topic_id',
@@ -114,45 +106,52 @@ describe('Learner Topic Goals Summary Tile Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1', 'Chapter 2'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 2'],
-        all_node_dicts: [nodeDict1, nodeDict2],
-        url_fragment: 'story-title',
-        topic_name: 'Topic Name',
-        classroom_url_fragment: 'math',
-        topic_url_fragment: 'topic-name'
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1', 'Chapter 2'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 2'],
+          all_node_dicts: [nodeDict1, nodeDict2],
+          url_fragment: 'story-title',
+          topic_name: 'Topic Name',
+          classroom_url_fragment: 'math',
+          topic_url_fragment: 'topic-name',
+        },
+      ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
     component.topicSummary = LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1);
+      learnerTopicSummaryBackendDict1
+    );
     fixture.detectChanges();
   });
 
-  it('should get # as story node link url if all chapters' +
-    ' are read', () => {
-    component.storyNodeToDisplay = StoryNode.createFromIdAndTitle(
-      '1', 'Story node title');
-    let storyNodeLink = component.getStoryNodeLink();
-    fixture.detectChanges();
-    expect(storyNodeLink).toBe('#');
-  });
+  it(
+    'should get # as story node link url if all chapters' + ' are read',
+    () => {
+      component.storyNodeToDisplay = StoryNode.createFromIdAndTitle(
+        '1',
+        'Story node title'
+      );
+      let storyNodeLink = component.getStoryNodeLink();
+      fixture.detectChanges();
+      expect(storyNodeLink).toBe('#');
+    }
+  );
 
   it('should get the story and story node title on init', () => {
     component.ngOnInit();
@@ -163,15 +162,20 @@ describe('Learner Topic Goals Summary Tile Component', () => {
   it('should make the tile blurred if it is hovered', () => {
     component.cardIsHovered = true;
     expect(component.isCardHovered()).toBe(
-      '-webkit-filter: blur(2px); filter: blur(2px);');
+      '-webkit-filter: blur(2px); filter: blur(2px);'
+    );
   });
 
-  it('should get story node link url for exploration page if unread' +
-    ' chapters are present in topic', () => {
-    let storyNodeLink = '/explore/exp_1?topic_url_fragment=topic-name&' +
-    'classroom_url_fragment=math&story_url_fragment=story-title&' +
-    'node_id=node_1';
-    component.ngOnInit();
-    expect(component.getStoryNodeLink()).toBe(storyNodeLink);
-  });
+  it(
+    'should get story node link url for exploration page if unread' +
+      ' chapters are present in topic',
+    () => {
+      let storyNodeLink =
+        '/explore/exp_1?topic_url_fragment=topic-name&' +
+        'classroom_url_fragment=math&story_url_fragment=story-title&' +
+        'node_id=node_1';
+      component.ngOnInit();
+      expect(component.getStoryNodeLink()).toBe(storyNodeLink);
+    }
+  );
 });

@@ -22,6 +22,5 @@ export const CollectionEditorPageConstants = {
   COLLECTION_RIGHTS_URL_TEMPLATE:
     '/collection_editor_handler/rights/<collection_id>',
 
-  COLLECTION_TITLE_INPUT_FOCUS_LABEL:
-    'collectionTitleInputFocusLabel'
+  COLLECTION_TITLE_INPUT_FOCUS_LABEL: 'collectionTitleInputFocusLabel',
 } as const;

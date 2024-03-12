@@ -25,31 +25,34 @@ var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
-describe('Classroom page functionality', function() {
+describe('Classroom page functionality', function () {
   var classroomPage = null;
   var libraryPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     classroomPage = new ClassroomPage.ClassroomPage();
     libraryPage = new LibraryPage.LibraryPage();
     diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
 
     await users.createAndLoginCurriculumAdminUser(
-      'creator@classroomPage.com', 'creatorClassroomPage');
+      'creator@classroomPage.com',
+      'creatorClassroomPage'
+    );
     await users.logout();
   });
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await users.login('creator@classroomPage.com');
   });
 
-  it('should search for explorations from classroom page', async function() {
+  it('should search for explorations from classroom page', async function () {
     await workflow.createAndPublishExploration(
       'Exploration Title',
       'Algorithms',
       'This is the objective.',
       'English',
-      true);
+      true
+    );
 
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
@@ -66,7 +69,7 @@ describe('Classroom page functionality', function() {
     await libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
     await users.logout();
   });

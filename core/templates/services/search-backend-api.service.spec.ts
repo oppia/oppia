@@ -16,11 +16,16 @@
  * @fileoverview Tests that search service is working as expected.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
-import { SearchBackendApiService, SearchResponseBackendDict } from 'services/search-backend-api.service';
+import {
+  SearchBackendApiService,
+  SearchResponseBackendDict,
+} from 'services/search-backend-api.service';
 
 describe('Search Backend Api Service', () => {
   let searchBackendApiService: SearchBackendApiService;
@@ -38,12 +43,13 @@ describe('Search Backend Api Service', () => {
   describe('fetchExplorationSearchResultAsync', () => {
     const sampleSearchResponse = {
       search_cursor: 'notempty',
-      activity_list: []
+      activity_list: [],
     };
 
     it('should return exploration search results', fakeAsync(() => {
-      searchBackendApiService.fetchExplorationSearchResultAsync('').then(
-        (response: SearchResponseBackendDict) => {
+      searchBackendApiService
+        .fetchExplorationSearchResultAsync('')
+        .then((response: SearchResponseBackendDict) => {
           expect(response.activity_list).toEqual([]);
           expect(response.search_cursor).toBe('notempty');
         });

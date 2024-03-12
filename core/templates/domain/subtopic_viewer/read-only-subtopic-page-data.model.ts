@@ -19,18 +19,17 @@
 
 import {
   SubtopicPageContentsBackendDict,
-  SubtopicPageContents
+  SubtopicPageContents,
 } from 'domain/topic/subtopic-page-contents.model';
-import { SubtopicBackendDict, Subtopic } from
-  'domain/topic/subtopic.model';
+import {SubtopicBackendDict, Subtopic} from 'domain/topic/subtopic.model';
 
 export interface SubtopicDataBackendDict {
-  'subtopic_title': string;
-  'page_contents': SubtopicPageContentsBackendDict;
-  'next_subtopic_dict': SubtopicBackendDict | null;
-  'prev_subtopic_dict': SubtopicBackendDict | null;
-  'topic_id': string;
-  'topic_name': string;
+  subtopic_title: string;
+  page_contents: SubtopicPageContentsBackendDict;
+  next_subtopic_dict: SubtopicBackendDict | null;
+  prev_subtopic_dict: SubtopicBackendDict | null;
+  topic_id: string;
+  topic_name: string;
 }
 
 export class ReadOnlySubtopicPageData {
@@ -42,12 +41,12 @@ export class ReadOnlySubtopicPageData {
   prevSubtopic: Subtopic | null;
 
   constructor(
-      parentTopicId: string,
-      parentTopicName: string,
-      subtopicTitle: string,
-      pageContents: SubtopicPageContents,
-      nextSubtopic: Subtopic | null,
-      prevSubtopic: Subtopic | null
+    parentTopicId: string,
+    parentTopicName: string,
+    subtopicTitle: string,
+    pageContents: SubtopicPageContents,
+    nextSubtopic: Subtopic | null,
+    prevSubtopic: Subtopic | null
   ) {
     this.parentTopicId = parentTopicId;
     this.parentTopicName = parentTopicName;
@@ -82,16 +81,14 @@ export class ReadOnlySubtopicPageData {
   }
 
   static createFromBackendDict(
-      subtopicDataBackendDict: SubtopicDataBackendDict):
-  ReadOnlySubtopicPageData {
-    let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict ? (
-    Subtopic
-      .create(subtopicDataBackendDict.next_subtopic_dict, {})
-  ) : null;
-    let prevSubtopic = subtopicDataBackendDict.prev_subtopic_dict ? (
-      Subtopic.create(
-        subtopicDataBackendDict.prev_subtopic_dict, {})
-      ) : null;
+    subtopicDataBackendDict: SubtopicDataBackendDict
+  ): ReadOnlySubtopicPageData {
+    let nextSubtopic = subtopicDataBackendDict.next_subtopic_dict
+      ? Subtopic.create(subtopicDataBackendDict.next_subtopic_dict, {})
+      : null;
+    let prevSubtopic = subtopicDataBackendDict.prev_subtopic_dict
+      ? Subtopic.create(subtopicDataBackendDict.prev_subtopic_dict, {})
+      : null;
     return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.topic_name,

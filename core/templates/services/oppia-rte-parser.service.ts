@@ -16,15 +16,15 @@
  * @fileoverview Service for parsing rich text string.
  */
 
-import { TemplatePortal } from '@angular/cdk/portal';
-import { Injectable } from '@angular/core';
-import { NoninteractiveCollapsible } from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
-import { NoninteractiveImage } from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
-import { NoninteractiveLink } from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
-import { NoninteractiveMath } from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
-import { NoninteractiveSkillreview } from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import { NoninteractiveTabs } from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
-import { NoninteractiveVideo } from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
+import {TemplatePortal} from '@angular/cdk/portal';
+import {Injectable} from '@angular/core';
+import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
+import {NoninteractiveLink} from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
+import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
+import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
 
 const selectorToComponentClassMap = {
   'oppia-noninteractive-collapsible': NoninteractiveCollapsible,
@@ -33,14 +33,13 @@ const selectorToComponentClassMap = {
   'oppia-noninteractive-math': NoninteractiveMath,
   'oppia-noninteractive-skillreview': NoninteractiveSkillreview,
   'oppia-noninteractive-tabs': NoninteractiveTabs,
-  'oppia-noninteractive-video': NoninteractiveVideo
+  'oppia-noninteractive-video': NoninteractiveVideo,
 };
 
 export class TextNode {
   portal: undefined | TemplatePortal;
   constructor(public value: string) {}
 }
-
 
 export class OppiaRteNode {
   children: (OppiaRteNode | TextNode)[] = [];
@@ -63,7 +62,7 @@ export class OppiaRteNode {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class OppiaRteParserService {
   NON_INTERACTIVE_PREFIX = 'oppia-noninteractive-';
@@ -72,9 +71,10 @@ export class OppiaRteParserService {
     let arr = key.replace(/_/g, '-').split('-');
     let capital = arr.map((item, index) => {
       // eslint-disable-next-line max-len
-      return index ? item.charAt(0).toUpperCase() + item.slice(1).toLowerCase() : item.toLowerCase();
-    }
-    );
+      return index
+        ? item.charAt(0).toUpperCase() + item.slice(1).toLowerCase()
+        : item.toLowerCase();
+    });
     return capital.join('');
   }
 
@@ -83,7 +83,8 @@ export class OppiaRteParserService {
       if (!node.tagName) {
         throw new Error(
           'tagName is undefined.\n' +
-          `body: ${ body.outerHTML }\n node: ${ node.outerHTML }`);
+            `body: ${body.outerHTML}\n node: ${node.outerHTML}`
+        );
       }
       const tagName = node.tagName.toLowerCase();
       const attrs: Record<string, string> = {};
@@ -110,8 +111,7 @@ export class OppiaRteParserService {
       const childNode = new OppiaRteNode(tagName, attrs);
       for (let child = 0; child < max; child++) {
         if (node.childNodes[child].nodeType === 3) {
-          const text = node.childNodes[child].nodeValue.replace(
-            /[\t\n]/g, '');
+          const text = node.childNodes[child].nodeValue.replace(/[\t\n]/g, '');
           childNode.children.push(new TextNode(text));
           continue;
         }

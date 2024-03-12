@@ -16,20 +16,20 @@
  * @fileoverview Unit tests for the TextInput response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TextInputAnswer } from 'interactions/answer-defs';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseTextInputComponent } from './oppia-response-text-input.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TextInputAnswer} from 'interactions/answer-defs';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseTextInputComponent} from './oppia-response-text-input.component';
 
 describe('ResponseTextInputComponent', () => {
   let component: ResponseTextInputComponent;
   let fixture: ComponentFixture<ResponseTextInputComponent>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: TextInputAnswer) {
+    escapedJsonToObj: function (answer: TextInputAnswer) {
       return answer;
-    }
+    },
   };
 
   beforeEach(async(() => {
@@ -38,10 +38,10 @@ describe('ResponseTextInputComponent', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }
+          useValue: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for ProfileSummary.
  */
 
-import { ProfileSummary } from
-  'domain/user/profile-summary.model';
+import {ProfileSummary} from 'domain/user/profile-summary.model';
 
 describe('Subscriber Summary model', () => {
   it('should correctly convert subscriber backend dict to object', () => {
@@ -26,8 +25,8 @@ describe('Subscriber Summary model', () => {
       subscriber_impact: 0,
     };
 
-    let subscriberObject = (
-      ProfileSummary.createFromSubscriberBackendDict(backendDict));
+    let subscriberObject =
+      ProfileSummary.createFromSubscriberBackendDict(backendDict);
 
     expect(subscriberObject.username).toEqual('username');
     expect(subscriberObject.impact).toEqual(0);
@@ -39,8 +38,8 @@ describe('Subscriber Summary model', () => {
       creator_impact: 0,
     };
 
-    let creatorObject = (
-      ProfileSummary.createFromCreatorBackendDict(backendDict));
+    let creatorObject =
+      ProfileSummary.createFromCreatorBackendDict(backendDict);
 
     expect(creatorObject.username).toEqual('username');
     expect(creatorObject.impact).toEqual(0);

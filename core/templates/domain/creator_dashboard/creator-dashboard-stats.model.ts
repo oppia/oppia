@@ -17,10 +17,10 @@
  */
 
 export interface CreatorDashboardStatsBackendDict {
-  'average_ratings': number;
-  'num_ratings': number;
-  'total_open_feedback': number;
-  'total_plays': number;
+  average_ratings: number;
+  num_ratings: number;
+  total_open_feedback: number;
+  total_plays: number;
 }
 
 export class CreatorDashboardStats {
@@ -28,15 +28,17 @@ export class CreatorDashboardStats {
     public averageRatings: number,
     public numRatings: number,
     public totalOpenFeedback: number,
-    public totalPlays: number) { }
+    public totalPlays: number
+  ) {}
 
   static createFromBackendDict(
-      dashboardStatsBackendDict: CreatorDashboardStatsBackendDict):
-      CreatorDashboardStats {
+    dashboardStatsBackendDict: CreatorDashboardStatsBackendDict
+  ): CreatorDashboardStats {
     return new CreatorDashboardStats(
       dashboardStatsBackendDict.average_ratings,
       dashboardStatsBackendDict.num_ratings,
       dashboardStatsBackendDict.total_open_feedback,
-      dashboardStatsBackendDict.total_plays);
+      dashboardStatsBackendDict.total_plays
+    );
   }
 }

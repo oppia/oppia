@@ -16,22 +16,26 @@
  * @fileoverview Tests for new lesson player flag guard
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot,
+  NavigationExtras,
+} from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { IsNewLessonPlayerGuard } from './lesson-player-flag.guard';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { FeatureStatusChecker } from 'domain/feature-flag/feature-status-summary.model';
-
+import {AppConstants} from 'app.constants';
+import {IsNewLessonPlayerGuard} from './lesson-player-flag.guard';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 
 class MockPlatformFeatureService {
   get status(): object {
     return {
       NewLessonPlayer: {
-        isEnabled: true
-      }
+        isEnabled: true,
+      },
     };
   }
 }
@@ -53,13 +57,13 @@ describe('IsNewLessonPlayerGuard', () => {
       providers: [
         {
           provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService
+          useClass: MockPlatformFeatureService,
         },
         {
           provide: Router,
-          useClass: MockRouter
-        }
-      ]
+          useClass: MockRouter,
+        },
+      ],
     }).compileComponents();
 
     guard = TestBed.inject(IsNewLessonPlayerGuard);
@@ -67,39 +71,36 @@ describe('IsNewLessonPlayerGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 404 page if flag is disabled', (done) => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
-      {
-        NewLessonPlayer: {
-          isEnabled: false
-        }
-      } as FeatureStatusChecker
-    );
+  it('should redirect user to 404 page if flag is disabled', done => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      NewLessonPlayer: {
+        isEnabled: false,
+      },
+    } as FeatureStatusChecker);
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-    guard.canActivate(
-      new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
-      (canActivate) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(canActivate => {
         expect(canActivate).toBeFalse();
         expect(navigateSpy).toHaveBeenCalledWith([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`]);
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+        ]);
         done();
       });
   });
 
-  it('should not redirect user to 404 page if flag is enabled', (done) => {
-    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
-      {
-        NewLessonPlayer: {
-          isEnabled: true
-        }
-      } as FeatureStatusChecker
-    );
+  it('should not redirect user to 404 page if flag is enabled', done => {
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      NewLessonPlayer: {
+        isEnabled: true,
+      },
+    } as FeatureStatusChecker);
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-    guard.canActivate(
-      new ActivatedRouteSnapshot(), {} as RouterStateSnapshot).then(
-      (canActivate) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(canActivate => {
         expect(canActivate).toBeTrue();
         expect(navigateSpy).not.toHaveBeenCalled();
         done();

@@ -16,20 +16,20 @@
  * @fileoverview Unit tests for the GraphInput short response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseGraphInput } from './oppia-short-response-graph-input.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseGraphInput} from './oppia-short-response-graph-input.component';
 
 describe('ShortResponseGraphInput', () => {
   let component: ShortResponseGraphInput;
   let fixture: ComponentFixture<ShortResponseGraphInput>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: string) {
+    escapedJsonToObj: function (answer: string) {
       return JSON.parse(answer);
-    }
+    },
   };
 
   beforeEach(async(() => {
@@ -39,17 +39,17 @@ describe('ShortResponseGraphInput', () => {
           useDefaultLang: true,
           isolate: false,
           extend: false,
-          defaultLanguage: 'en'
-        })
+          defaultLanguage: 'en',
+        }),
       ],
       declarations: [ShortResponseGraphInput],
       providers: [
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }
+          useValue: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -57,7 +57,8 @@ describe('ShortResponseGraphInput', () => {
     fixture = TestBed.createComponent(ShortResponseGraphInput);
     component = fixture.componentInstance;
 
-    component.answer = '{' +
+    component.answer =
+      '{' +
       '  "isWeighted": false,' +
       '  "edges": [' +
       '      {' +
@@ -102,33 +103,33 @@ describe('ShortResponseGraphInput', () => {
         {
           src: 0,
           dst: 1,
-          weight: 1
+          weight: 1,
         },
         {
           src: 1,
           dst: 2,
-          weight: 1
-        }
+          weight: 1,
+        },
       ],
       isDirected: false,
       vertices: [
         {
           x: 150,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 200,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 150,
           y: 100,
-          label: ''
-        }
+          label: '',
+        },
       ],
-      isLabeled: false
+      isLabeled: false,
     });
   });
 });

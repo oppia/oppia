@@ -16,28 +16,32 @@
  * @fileoverview Unit tests for for CommunityLessonsTabComponent.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed } from
-  '@angular/core/testing';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
-import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { UserService } from 'services/user.service';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+} from '@angular/core/testing';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {CommunityLessonsTabComponent} from './community-lessons-tab.component';
+import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {UserService} from 'services/user.service';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
     sectionNameI18nId: null,
     subsectionName: null,
     activityId: null,
-    activityTitle: null
+    activityTitle: null,
   };
 }
 
@@ -51,8 +55,7 @@ class MockTruncatePipe {
 describe('Community lessons tab Component', () => {
   let component: CommunityLessonsTabComponent;
   let fixture: ComponentFixture<CommunityLessonsTabComponent>;
-  let learnerDashboardActivityBackendApiService:
-    LearnerDashboardActivityBackendApiService;
+  let learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService;
   let ngbModal: NgbModal;
   let windowDimensionsService: WindowDimensionsService;
   let mockResizeEmitter: EventEmitter<void>;
@@ -65,12 +68,12 @@ describe('Community lessons tab Component', () => {
         BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
       declarations: [
         CommunityLessonsTabComponent,
         MockTranslatePipe,
-        MockTruncatePipe
+        MockTruncatePipe,
       ],
       providers: [
         LearnerDashboardActivityBackendApiService,
@@ -79,18 +82,19 @@ describe('Community lessons tab Component', () => {
           useValue: {
             isWindowNarrow: () => true,
             getResizeEvent: () => mockResizeEmitter,
-          }
+          },
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CommunityLessonsTabComponent);
     component = fixture.componentInstance;
-    learnerDashboardActivityBackendApiService =
-      TestBed.inject(LearnerDashboardActivityBackendApiService);
+    learnerDashboardActivityBackendApiService = TestBed.inject(
+      LearnerDashboardActivityBackendApiService
+    );
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     userService = TestBed.inject(UserService);
@@ -103,13 +107,15 @@ describe('Community lessons tab Component', () => {
     component.subscriptionsList = [];
     component.completedToIncompleteCollections = [];
 
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      'default-image-url-png',
+      'default-image-url-webp',
+    ]);
 
     fixture.detectChanges();
   });
 
-  it ('should initilize values on init for web view', () => {
+  it('should initilize values on init for web view', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
     component.ngOnInit();
@@ -140,7 +146,7 @@ describe('Community lessons tab Component', () => {
     expect(component.displayLessonsInPlaylist).toEqual([]);
   });
 
-  it ('should initilize values on init for mobile view', () => {
+  it('should initilize values on init for mobile view', () => {
     component.ngOnInit();
 
     expect(component.displayLessonsInPlaylist).toEqual([]);
@@ -190,16 +196,16 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let incompleteSummary = LearnerExplorationSummary.createFromBackendDict(
-      incomplete);
+    let incompleteSummary =
+      LearnerExplorationSummary.createFromBackendDict(incomplete);
     component.totalIncompleteLessonsList = [incompleteSummary];
     let result = component.getLessonType(incompleteSummary);
     expect(result).toEqual('Incomplete');
@@ -220,16 +226,16 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Art',
-      title: 'Test Title 1'
+      title: 'Test Title 1',
     };
-    let completedSummary = LearnerExplorationSummary.createFromBackendDict(
-      completed);
+    let completedSummary =
+      LearnerExplorationSummary.createFromBackendDict(completed);
     component.totalCompletedLessonsList = [completedSummary];
     result = component.getLessonType(completedSummary);
     expect(result).toEqual('Completed');
@@ -237,12 +243,14 @@ describe('Community lessons tab Component', () => {
 
   it('should get user profile image png data url correctly', () => {
     expect(component.getProfileImagePngDataUrl('username')).toBe(
-      'default-image-url-png');
+      'default-image-url-png'
+    );
   });
 
   it('should get user profile image webp data url correctly', () => {
     expect(component.getProfileImageWebpDataUrl('username')).toBe(
-      'default-image-url-webp');
+      'default-image-url-webp'
+    );
   });
 
   it('should show username popover based on its length', () => {
@@ -268,16 +276,15 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary1 = LearnerExplorationSummary.createFromBackendDict(
-      exp1);
+    let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
     const exp2 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -294,16 +301,15 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary2 = LearnerExplorationSummary.createFromBackendDict(
-      exp2);
+    let summary2 = LearnerExplorationSummary.createFromBackendDict(exp2);
     const exp3 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -320,16 +326,15 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary3 = LearnerExplorationSummary.createFromBackendDict(
-      exp3);
+    let summary3 = LearnerExplorationSummary.createFromBackendDict(exp3);
     const exp4 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -346,51 +351,62 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary4 = LearnerExplorationSummary.createFromBackendDict(
-      exp4);
+    let summary4 = LearnerExplorationSummary.createFromBackendDict(exp4);
 
     component.totalIncompleteLessonsList = [
-      summary1, summary2, summary3, summary4];
+      summary1,
+      summary2,
+      summary3,
+      summary4,
+    ];
     component.handleShowMore('incomplete');
     expect(component.showMoreInSection.incomplete).toEqual(true);
     expect(component.displayIncompleteLessonsList).toEqual(
-      component.totalIncompleteLessonsList);
+      component.totalIncompleteLessonsList
+    );
 
     component.showMoreInSection.incomplete = true;
     component.handleShowMore('incomplete');
     expect(component.showMoreInSection.incomplete).toEqual(false);
     expect(component.displayIncompleteLessonsList).toEqual(
-      component.totalIncompleteLessonsList.slice(0, 3));
+      component.totalIncompleteLessonsList.slice(0, 3)
+    );
 
     component.totalCompletedLessonsList = [
-      summary1, summary2, summary3, summary4];
+      summary1,
+      summary2,
+      summary3,
+      summary4,
+    ];
     component.totalIncompleteLessonsList = [];
     component.handleShowMore('completed');
     expect(component.showMoreInSection.completed).toEqual(true);
     expect(component.displayCompletedLessonsList).toEqual(
-      component.totalCompletedLessonsList);
+      component.totalCompletedLessonsList
+    );
 
     component.showMoreInSection.completed = true;
     component.handleShowMore('completed');
     expect(component.showMoreInSection.completed).toEqual(false);
     expect(component.displayCompletedLessonsList).toEqual(
-      component.totalCompletedLessonsList.slice(0, 3));
+      component.totalCompletedLessonsList.slice(0, 3)
+    );
 
-    component.totalLessonsInPlaylist = [
-      summary1, summary2, summary3, summary4];
+    component.totalLessonsInPlaylist = [summary1, summary2, summary3, summary4];
     component.totalCompletedLessonsList = [];
     component.handleShowMore('playlist');
     expect(component.showMoreInSection.playlist).toEqual(true);
     expect(component.displayLessonsInPlaylist).toEqual(
-      component.totalLessonsInPlaylist);
+      component.totalLessonsInPlaylist
+    );
 
     component.showMoreInSection.playlist = true;
     component.handleShowMore('playlist');
@@ -412,10 +428,9 @@ describe('Community lessons tab Component', () => {
       status: 'public',
       category: 'Algebra',
       title: 'Test Title',
-      node_count: 0
+      node_count: 0,
     };
-    let collectionSummary = CollectionSummary.createFromBackendDict(
-      collection);
+    let collectionSummary = CollectionSummary.createFromBackendDict(collection);
 
     const exploration = {
       last_updated_msec: 1591296737470.528,
@@ -433,16 +448,16 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let explorationSummary = LearnerExplorationSummary.createFromBackendDict(
-      exploration);
+    let explorationSummary =
+      LearnerExplorationSummary.createFromBackendDict(exploration);
 
     let result = component.getTileType(explorationSummary);
     expect(result).toEqual('exploration');
@@ -451,7 +466,7 @@ describe('Community lessons tab Component', () => {
     expect(result).toEqual('collection');
   });
 
-  it ('should change page by one', () => {
+  it('should change page by one', () => {
     const exp1 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -468,16 +483,15 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary1 = LearnerExplorationSummary.createFromBackendDict(
-      exp1);
+    let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
     const exp2 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -494,16 +508,15 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary2 = LearnerExplorationSummary.createFromBackendDict(
-      exp2);
+    let summary2 = LearnerExplorationSummary.createFromBackendDict(exp2);
     const exp3 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -520,16 +533,15 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary3 = LearnerExplorationSummary.createFromBackendDict(
-      exp3);
+    let summary3 = LearnerExplorationSummary.createFromBackendDict(exp3);
     const exp4 = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -546,18 +558,21 @@ describe('Community lessons tab Component', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
       activity_type: 'exploration',
       category: 'Algebra',
-      title: 'Test Title'
+      title: 'Test Title',
     };
-    let summary4 = LearnerExplorationSummary.createFromBackendDict(
-      exp4);
+    let summary4 = LearnerExplorationSummary.createFromBackendDict(exp4);
     component.displayInCommunityLessons = [
-      summary1, summary2, summary3, summary4];
+      summary1,
+      summary2,
+      summary3,
+      summary4,
+    ];
     component.changePageByOne('MOVE_TO_NEXT_PAGE', 'communityLessons');
     expect(component.pageNumberInCommunityLessons).toEqual(2);
 
@@ -567,7 +582,11 @@ describe('Community lessons tab Component', () => {
 
     component.displayInCommunityLessons = [];
     component.displayLessonsInPlaylist = [
-      summary1, summary2, summary3, summary4];
+      summary1,
+      summary2,
+      summary3,
+      summary4,
+    ];
     component.changePageByOne('MOVE_TO_NEXT_PAGE', 'playlist');
     expect(component.pageNumberInPlaylist).toEqual(2);
 
@@ -576,188 +595,188 @@ describe('Community lessons tab Component', () => {
     expect(component.pageNumberInPlaylist).toEqual(1);
   });
 
-  it('should open a modal to remove an exploration from playlist',
-    fakeAsync(() => {
-      spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-      expect(
-        learnerDashboardActivityBackendApiService.removeActivityModalStatus)
-        .toBeUndefined;
+  it('should open a modal to remove an exploration from playlist', fakeAsync(() => {
+    spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
 
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: MockRemoveActivityNgbModalRef,
-            result: Promise.resolve('success')
-          }) as NgbModalRef;
-      });
-      const exp1 = {
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      };
-      let summary1 = LearnerExplorationSummary.createFromBackendDict(
-        exp1);
-      component.explorationPlaylist = [summary1];
-      component.totalLessonsInPlaylist = [summary1];
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockRemoveActivityNgbModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
+    const exp1 = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+    let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
+    component.explorationPlaylist = [summary1];
+    component.totalLessonsInPlaylist = [summary1];
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, summary1);
-      fixture.detectChanges();
+    component.openRemoveActivityModal(
+      sectionNameI18nId,
+      subsectionName,
+      summary1
+    );
+    fixture.detectChanges();
 
-      expect(modalSpy).toHaveBeenCalled();
-    }));
+    expect(modalSpy).toHaveBeenCalled();
+  }));
 
-  it('should open a modal to remove a collection from playlist',
-    fakeAsync(() => {
-      expect(
-        learnerDashboardActivityBackendApiService.removeActivityModalStatus)
-        .toBeUndefined;
+  it('should open a modal to remove a collection from playlist', fakeAsync(() => {
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
 
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: MockRemoveActivityNgbModalRef,
-            result: Promise.resolve('success')
-          }) as NgbModalRef;
-      });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockRemoveActivityNgbModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
 
-      const collection = {
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on: 1591296635736.666,
-        status: 'public',
-        category: 'Algebra',
-        title: 'Test Title',
-        node_count: 0
-      };
-      let collectionSummary = CollectionSummary.createFromBackendDict(
-        collection);
-      component.collectionPlaylist = [collectionSummary];
-      component.totalLessonsInPlaylist = [collectionSummary];
-      component.showMoreInSection.playlist = true;
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    const collection = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on: 1591296635736.666,
+      status: 'public',
+      category: 'Algebra',
+      title: 'Test Title',
+      node_count: 0,
+    };
+    let collectionSummary = CollectionSummary.createFromBackendDict(collection);
+    component.collectionPlaylist = [collectionSummary];
+    component.totalLessonsInPlaylist = [collectionSummary];
+    component.showMoreInSection.playlist = true;
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
 
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, collectionSummary);
-      fixture.detectChanges();
+    component.openRemoveActivityModal(
+      sectionNameI18nId,
+      subsectionName,
+      collectionSummary
+    );
+    fixture.detectChanges();
 
-      expect(modalSpy).toHaveBeenCalled();
-    }));
+    expect(modalSpy).toHaveBeenCalled();
+  }));
 
-  it('should open a modal to remove an exploration from incomplete list',
-    fakeAsync(() => {
-      expect(
-        learnerDashboardActivityBackendApiService.removeActivityModalStatus)
-        .toBeUndefined;
+  it('should open a modal to remove an exploration from incomplete list', fakeAsync(() => {
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
 
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: MockRemoveActivityNgbModalRef,
-            result: Promise.resolve('success')
-          }) as NgbModalRef;
-      });
-      const exp1 = {
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
-        },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      };
-      let summary1 = LearnerExplorationSummary.createFromBackendDict(
-        exp1);
-      component.incompleteExplorationsList = [summary1];
-      component.totalIncompleteLessonsList = [summary1];
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockRemoveActivityNgbModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
+    const exp1 = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+    };
+    let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
+    component.incompleteExplorationsList = [summary1];
+    component.totalIncompleteLessonsList = [summary1];
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_EXPLORATIONS';
 
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, summary1);
-      fixture.detectChanges();
+    component.openRemoveActivityModal(
+      sectionNameI18nId,
+      subsectionName,
+      summary1
+    );
+    fixture.detectChanges();
 
-      expect(modalSpy).toHaveBeenCalled();
-    }));
+    expect(modalSpy).toHaveBeenCalled();
+  }));
 
-  it('should open a modal to remove a collection from incomplete list',
-    fakeAsync(() => {
-      expect(
-        learnerDashboardActivityBackendApiService.removeActivityModalStatus)
-        .toBeUndefined;
+  it('should open a modal to remove a collection from incomplete list', fakeAsync(() => {
+    expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
+      .toBeUndefined;
 
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return (
-          { componentInstance: MockRemoveActivityNgbModalRef,
-            result: Promise.resolve('success')
-          }) as NgbModalRef;
-      });
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockRemoveActivityNgbModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
 
-      const collection = {
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on: 1591296635736.666,
-        status: 'public',
-        category: 'Algebra',
-        title: 'Test Title',
-        node_count: 0
-      };
-      let collectionSummary = CollectionSummary.createFromBackendDict(
-        collection);
-      component.incompleteCollectionsList = [collectionSummary];
-      component.totalIncompleteLessonsList = [collectionSummary];
-      component.showMoreInSection.incomplete = true;
-      let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
-      let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
+    const collection = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on: 1591296635736.666,
+      status: 'public',
+      category: 'Algebra',
+      title: 'Test Title',
+      node_count: 0,
+    };
+    let collectionSummary = CollectionSummary.createFromBackendDict(collection);
+    component.incompleteCollectionsList = [collectionSummary];
+    component.totalIncompleteLessonsList = [collectionSummary];
+    component.showMoreInSection.incomplete = true;
+    let sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION';
+    let subsectionName = 'I18N_DASHBOARD_COLLECTIONS';
 
-      component.openRemoveActivityModal(
-        sectionNameI18nId, subsectionName, collectionSummary);
-      fixture.detectChanges();
+    component.openRemoveActivityModal(
+      sectionNameI18nId,
+      subsectionName,
+      collectionSummary
+    );
+    fixture.detectChanges();
 
-      expect(modalSpy).toHaveBeenCalled();
-    }));
+    expect(modalSpy).toHaveBeenCalled();
+  }));
 });

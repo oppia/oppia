@@ -16,19 +16,19 @@
  * @fileoverview Module for the login page.
  */
 
-import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import {NgModule} from '@angular/core';
+import {ReactiveFormsModule} from '@angular/forms';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { LoginPageComponent } from 'pages/login-page/login-page.component';
-import { LoginPageRootComponent } from './login-page-root.component';
-import { CommonModule } from '@angular/common';
-import { LoginPageRoutingModule } from './login-page-routing.module';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {LoginPageComponent} from 'pages/login-page/login-page.component';
+import {LoginPageRootComponent} from './login-page-root.component';
+import {CommonModule} from '@angular/common';
+import {LoginPageRoutingModule} from './login-page-routing.module';
 
 @NgModule({
   imports: [
@@ -40,15 +40,9 @@ import { LoginPageRoutingModule } from './login-page-routing.module';
     MatFormFieldModule,
     ReactiveFormsModule,
     SharedComponentsModule,
-    LoginPageRoutingModule
+    LoginPageRoutingModule,
   ],
-  declarations: [
-    LoginPageComponent,
-    LoginPageRootComponent,
-  ],
-  entryComponents: [
-    LoginPageComponent,
-    LoginPageRootComponent,
-  ]
+  declarations: [LoginPageComponent, LoginPageRootComponent],
+  entryComponents: [LoginPageComponent, LoginPageRootComponent],
 })
 export class LoginPageModule {}

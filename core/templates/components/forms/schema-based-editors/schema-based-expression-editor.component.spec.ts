@@ -16,14 +16,20 @@
  * @fileoverview Unit tests for Schema Based Editor Component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { SchemaBasedExpressionEditorComponent } from './schema-based-expression-editor.component';
-import { FormControl } from '@angular/forms';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
+import {SchemaBasedExpressionEditorComponent} from './schema-based-expression-editor.component';
+import {FormControl} from '@angular/forms';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 describe('Schema Based Expression Editor Component', () => {
   let component: SchemaBasedExpressionEditorComponent;
@@ -33,14 +39,9 @@ describe('Schema Based Expression Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        SchemaBasedExpressionEditorComponent
-      ],
-      providers: [
-        FocusManagerService,
-        SchemaFormSubmittedService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [SchemaBasedExpressionEditorComponent],
+      providers: [FocusManagerService, SchemaFormSubmittedService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -51,7 +52,7 @@ describe('Schema Based Expression Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: SchemaDefaultValue) {
+    let mockFunction = function (value: SchemaDefaultValue) {
       return value;
     };
     component.registerOnChange(mockFunction);

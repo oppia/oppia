@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for DisplaySolutionInterstitialModalComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DisplaySolutionInterstititalModalComponent } from './display-solution-interstitial-modal.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DisplaySolutionInterstititalModalComponent} from './display-solution-interstitial-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('Display Interstitial Solution Modal', () => {
   let fixture: ComponentFixture<DisplaySolutionInterstititalModalComponent>;
@@ -29,17 +29,16 @@ describe('Display Interstitial Solution Modal', () => {
     TestBed.configureTestingModule({
       declarations: [
         DisplaySolutionInterstititalModalComponent,
-        MockTranslatePipe
+        MockTranslatePipe,
       ],
-      providers: [
-        NgbActiveModal
-      ]
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      DisplaySolutionInterstititalModalComponent);
+      DisplaySolutionInterstititalModalComponent
+    );
     componentInstance = fixture.componentInstance;
   });
 

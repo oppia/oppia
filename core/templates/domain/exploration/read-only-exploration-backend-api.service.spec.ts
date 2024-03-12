@@ -16,13 +16,17 @@
  * @fileoverview Unit tests for ReadOnlyExplorationBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
-  'domain/exploration/read-only-exploration-backend-api.service';
-import { VersionedExplorationCachingService } from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
+import {
+  ReadOnlyExplorationBackendApiService,
+  FetchExplorationBackendResponse,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {VersionedExplorationCachingService} from 'pages/exploration-editor-page/services/versioned-exploration-caching.service';
 
 describe('Read only exploration backend API service', () => {
   let roebas: ReadOnlyExplorationBackendApiService;
@@ -53,17 +57,17 @@ describe('Read only exploration backend API service', () => {
                   filename: 'test.mp3',
                   file_size_bytes: 100,
                   needs_update: false,
-                  duration_secs: 0.1
-                }
-              }
-            }
+                  duration_secs: 0.1,
+                },
+              },
+            },
           },
           solicit_answer_details: true,
           card_is_checkpoint: true,
           linked_skill_id: null,
           content: {
             html: '',
-            content_id: 'content'
+            content_id: 'content',
           },
           interaction: {
             customization_args: {},
@@ -76,17 +80,17 @@ describe('Read only exploration backend API service', () => {
               dest_if_really_stuck: null,
               feedback: {
                 html: '',
-                content_id: 'content'
+                content_id: 'content',
               },
               labelled_as_correct: true,
               refresher_exploration_id: 'exp',
-              missing_prerequisite_skill_id: null
+              missing_prerequisite_skill_id: null,
             },
             confirmed_unclassified_answers: [],
-            id: null
-          }
-        }
-      }
+            id: null,
+          },
+        },
+      },
     },
     exploration_metadata: {
       title: 'Exploration',
@@ -101,7 +105,7 @@ describe('Read only exploration backend API service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      edits_allowed: true
+      edits_allowed: true,
     },
     version: 1,
     can_edit: true,
@@ -113,91 +117,31 @@ describe('Read only exploration backend API service', () => {
     furthest_reached_checkpoint_exp_version: 1,
     furthest_reached_checkpoint_state_name: 'State B',
     most_recently_reached_checkpoint_state_name: 'State A',
-    most_recently_reached_checkpoint_exp_version: 1
+    most_recently_reached_checkpoint_exp_version: 1,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     roebas = TestBed.inject(ReadOnlyExplorationBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
     versionedExplorationCachingService = TestBed.inject(
-      VersionedExplorationCachingService);
+      VersionedExplorationCachingService
+    );
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing exploration from the backend',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
-
-      roebas.fetchExplorationAsync('0', null).then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne('/explorehandler/init/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
-
-  it('should successfully fetch an existing exploration with version from' +
-    ' the backend and cache it if not already', fakeAsync(() => {
-    spyOn(
-      versionedExplorationCachingService, 'cacheVersionedExplorationData'
-    ).and.callThrough();
+  it('should successfully fetch an existing exploration from the backend', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const failHandler = jasmine.createSpy('fail');
 
-    roebas.fetchExplorationAsync('0', 1).then(successHandler, failHandler);
+    roebas.fetchExplorationAsync('0', null).then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/explorehandler/init/0?v=1');
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleDataResults);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-    expect(failHandler).not.toHaveBeenCalled();
-    expect(
-      versionedExplorationCachingService.cacheVersionedExplorationData
-    ).toHaveBeenCalledWith('0', 1, sampleDataResults);
-  }));
-
-  it('should use cached exploration data with version if the data is ' +
-  'already cached', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    versionedExplorationCachingService.cacheVersionedExplorationData(
-      '0', 1, sampleDataResults);
-    roebas.fetchExplorationAsync('0', 1).then(successHandler, failHandler);
-
-    httpTestingController.expectNone(
-      '/explorehandler/init/0?v=1');
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(
-      versionedExplorationCachingService
-        .retrieveCachedVersionedExplorationData('0', 1));
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should successfully fetch an existing exploration from a unique' +
-    ' URL progress id', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    roebas.fetchExplorationAsync('0', null, '123456').then(
-      successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/explorehandler/init/0?pid=123456');
+    let req = httpTestingController.expectOne('/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleDataResults);
     flushMicrotasks();
@@ -206,41 +150,119 @@ describe('Read only exploration backend API service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should load an existing exploration from the backend',
+  it(
+    'should successfully fetch an existing exploration with version from' +
+      ' the backend and cache it if not already',
     fakeAsync(() => {
+      spyOn(
+        versionedExplorationCachingService,
+        'cacheVersionedExplorationData'
+      ).and.callThrough();
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      roebas.loadExplorationAsync('0', 0).then(successHandler, failHandler);
+      roebas.fetchExplorationAsync('0', 1).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0');
+      let req = httpTestingController.expectOne('/explorehandler/init/0?v=1');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
       flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
-    }));
+      expect(
+        versionedExplorationCachingService.cacheVersionedExplorationData
+      ).toHaveBeenCalledWith('0', 1, sampleDataResults);
+    })
+  );
 
-  it('should use the rejection handler if the backend request failed',
+  it(
+    'should use cached exploration data with version if the data is ' +
+      'already cached',
     fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      roebas.loadExplorationAsync('0', 0).then(successHandler, failHandler);
+      versionedExplorationCachingService.cacheVersionedExplorationData(
+        '0',
+        1,
+        sampleDataResults
+      );
+      roebas.fetchExplorationAsync('0', 1).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/explorehandler/init/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Error loading exploration 0.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+      httpTestingController.expectNone('/explorehandler/init/0?v=1');
       flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading exploration 0.');
-    }));
+      expect(successHandler).toHaveBeenCalledWith(
+        versionedExplorationCachingService.retrieveCachedVersionedExplorationData(
+          '0',
+          1
+        )
+      );
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should successfully fetch an existing exploration from a unique' +
+      ' URL progress id',
+    fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
+
+      roebas
+        .fetchExplorationAsync('0', null, '123456')
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/explorehandler/init/0?pid=123456'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should load an existing exploration from the backend', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    roebas.loadExplorationAsync('0', 0).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should use the rejection handler if the backend request failed', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
+
+    roebas.loadExplorationAsync('0', 0).then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne('/explorehandler/init/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Error loading exploration 0.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error loading exploration 0.');
+  }));
 
   it('should report caching and support clearing the cache', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
@@ -271,8 +293,7 @@ describe('Read only exploration backend API service', () => {
     roebas.clearExplorationCache();
     expect(roebas.isCached('0')).toBe(false);
 
-    roebas.loadLatestExplorationAsync('0').then(
-      successHandler, failHandler);
+    roebas.loadLatestExplorationAsync('0').then(successHandler, failHandler);
 
     req = httpTestingController.expectOne('/explorehandler/init/0');
     expect(req.request.method).toEqual('GET');
@@ -301,7 +322,7 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        next_content_id_index: 1
+        next_content_id_index: 1,
       },
       exploration_metadata: {
         title: '',
@@ -316,7 +337,7 @@ describe('Read only exploration backend API service', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        edits_allowed: true
+        edits_allowed: true,
       },
       exploration_id: '0',
       is_logged_in: true,
@@ -332,7 +353,7 @@ describe('Read only exploration backend API service', () => {
       furthest_reached_checkpoint_exp_version: 1,
       furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
-      most_recently_reached_checkpoint_exp_version: 1
+      most_recently_reached_checkpoint_exp_version: 1,
     });
 
     // It should now be cached.
@@ -353,7 +374,7 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        next_content_id_index: 1
+        next_content_id_index: 1,
       },
       exploration_metadata: {
         title: '',
@@ -368,7 +389,7 @@ describe('Read only exploration backend API service', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        edits_allowed: true
+        edits_allowed: true,
       },
       exploration_id: '0',
       is_logged_in: true,
@@ -384,7 +405,7 @@ describe('Read only exploration backend API service', () => {
       furthest_reached_checkpoint_exp_version: 1,
       furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
-      most_recently_reached_checkpoint_exp_version: 1
+      most_recently_reached_checkpoint_exp_version: 1,
     });
     expect(failHandler).not.toHaveBeenCalled();
   }));
@@ -402,7 +423,7 @@ describe('Read only exploration backend API service', () => {
         title: '',
         language_code: '',
         objective: '',
-        next_content_id_index: 1
+        next_content_id_index: 1,
       },
       exploration_metadata: {
         title: '',
@@ -417,7 +438,7 @@ describe('Read only exploration backend API service', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        edits_allowed: true
+        edits_allowed: true,
       },
       exploration_id: '0',
       is_logged_in: true,
@@ -433,7 +454,7 @@ describe('Read only exploration backend API service', () => {
       furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1,
-      displayable_language_codes: []
+      displayable_language_codes: [],
     });
     expect(roebas.isCached('0')).toBe(true);
 

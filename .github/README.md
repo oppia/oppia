@@ -6,12 +6,12 @@ In addition to developing the Oppia platform, the team is also developing and pi
 
 Oppia is written using Python and AngularJS, and is built on top of Google App Engine. See also:
 
-  * [Oppia.org community site](https://www.oppia.org)
-  * [User Documentation](https://oppia.github.io/)
-  * [Contributors' wiki](https://github.com/oppia/oppia/wiki)
-  * [GitHub Discussions](https://github.com/oppia/oppia/discussions)
-  * [Developer announcements](http://groups.google.com/group/oppia-dev)
-  * [File an issue](https://github.com/oppia/oppia/issues/new/choose)
+- [Oppia.org community site](https://www.oppia.org)
+- [User Documentation](https://oppia.github.io/)
+- [Contributors' wiki](https://github.com/oppia/oppia/wiki)
+- [GitHub Discussions](https://github.com/oppia/oppia/discussions)
+- [Developer announcements](http://groups.google.com/group/oppia-dev)
+- [File an issue](https://github.com/oppia/oppia/issues/new/choose)
 
 You can also sign up to our [email newsletter](https://shorturl.at/CHPY6) for news and updates about the overall Oppia project.
 
@@ -30,11 +30,11 @@ Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/
 The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
 
 You can help with Oppia's development in many ways, including art, coding, design and documentation.
-  * **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
-  * **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
+
+- **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
+- **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
 
 If you'd like to donate to support our work, you can do so [here](https://www.oppia.org/donate).
-
 
 ## Support
 
@@ -42,18 +42,17 @@ If you have any feature requests or bug reports, please log them on our [issue t
 
 Please report security issues directly to admin@oppia.org.
 
-
 ## License
 
 The Oppia code is released under the [Apache v2 license](https://github.com/oppia/oppia/blob/develop/LICENSE).
 
-
 ## Keeping in touch
 
-  * [Discussion forum](https://github.com/oppia/oppia/discussions)
-  * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
+- [Discussion forum](https://github.com/oppia/oppia/discussions)
+- [Announcements mailing list](http://groups.google.com/group/oppia-announce)
 
 ## Social Media
+
 [<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter] [<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn] [<img height="30" src = "https://img.shields.io/badge/facebook-1877F2.svg?&style=for-the-badge&logo=facebook&logoColor=white">][Facebook] [<img height="30" src = "https://img.shields.io/badge/medium-12100E.svg?&style=for-the-badge&logo=medium&logoColor=white">][medium] [<img height="30" src = "https://img.shields.io/badge/oppia.org%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][oppia-org-youtube] [<img height="30" src = "https://img.shields.io/badge/oppia%20dev%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][dev-youtube]
 
 [twitter]: https://twitter.com/oppiaorg

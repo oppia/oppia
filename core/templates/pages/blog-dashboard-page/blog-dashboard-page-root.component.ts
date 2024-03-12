@@ -16,20 +16,18 @@
  * @fileoverview Blog dashboard page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-blog-dashboard-page-root',
   templateUrl: './blog-dashboard-page-root.component.html',
 })
 export class BlogDashboardPageRootComponent extends BaseRootComponent {
-  title: string = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .BLOG_DASHBOARD.TITLE);
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.TITLE;
 
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .BLOG_DASHBOARD.META as unknown as Readonly<MetaTagData>[];
 }

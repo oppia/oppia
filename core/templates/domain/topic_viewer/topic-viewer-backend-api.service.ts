@@ -16,65 +16,78 @@
  * @fileoverview Service to get topic data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import {
   ReadOnlyTopic,
   ReadOnlyTopicBackendDict,
-  ReadOnlyTopicObjectFactory
+  ReadOnlyTopicObjectFactory,
 } from 'domain/topic_viewer/read-only-topic-object.factory';
-import { TopicViewerDomainConstants } from
-  'domain/topic_viewer/topic-viewer-domain.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TopicViewerBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) {}
+    private urlInterpolation: UrlInterpolationService
+  ) {}
 
   private _fetchTopicData(
-      topicUrlFragment: string,
-      classroomUrlFragment: string,
-      successCallback: (value: ReadOnlyTopic) => void,
-      errorCallback: (reason: string) => void
+    topicUrlFragment: string,
+    classroomUrlFragment: string,
+    successCallback: (value: ReadOnlyTopic) => void,
+    errorCallback: (reason: string) => void
   ): void {
     const topicDataUrl = this.urlInterpolation.interpolateUrl(
-      TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
+      TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE,
+      {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
-      });
+      }
+    );
     var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
-    this.http.get<ReadOnlyTopicBackendDict>(topicDataUrl).toPromise().then(
-      (response) => {
-        let readOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
-          response);
-        if (successCallback) {
-          successCallback(readOnlyTopic);
+    this.http
+      .get<ReadOnlyTopicBackendDict>(topicDataUrl)
+      .toPromise()
+      .then(
+        response => {
+          let readOnlyTopic =
+            readOnlyTopicObjectFactory.createFromBackendDict(response);
+          if (successCallback) {
+            successCallback(readOnlyTopic);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      }, (errorResponse) => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      );
   }
 
   async fetchTopicDataAsync(
-      topicUrlFragment: string,
-      classroomUrlFragment: string
+    topicUrlFragment: string,
+    classroomUrlFragment: string
   ): Promise<ReadOnlyTopic> {
     return new Promise((resolve, reject) => {
       this._fetchTopicData(
-        topicUrlFragment, classroomUrlFragment, resolve, reject);
+        topicUrlFragment,
+        classroomUrlFragment,
+        resolve,
+        reject
+      );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'TopicViewerBackendApiService', downgradeInjectable(
-    TopicViewerBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'TopicViewerBackendApiService',
+    downgradeInjectable(TopicViewerBackendApiService)
+  );

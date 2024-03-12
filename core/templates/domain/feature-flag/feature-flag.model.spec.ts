@@ -16,7 +16,10 @@
  * @fileoverview Unit tests for FeatureFlagModel.
  */
 
-import { FeatureFlag, FeatureStage } from 'domain/feature-flag/feature-flag.model';
+import {
+  FeatureFlag,
+  FeatureStage,
+} from 'domain/feature-flag/feature-flag.model';
 
 describe('FeatureFlagModel', () => {
   it('should create an instance from a backend dict.', () => {
@@ -27,7 +30,7 @@ describe('FeatureFlagModel', () => {
       force_enable_for_all_users: true,
       rollout_percentage: 0,
       user_group_ids: [],
-      last_updated: 'September 4, 2023'
+      last_updated: 'September 4, 2023',
     });
 
     expect(feature.name).toEqual('feature name');

@@ -16,20 +16,17 @@
  * @fileoverview Unit tests for the player position service.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
 
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { PlayerPositionService } from
-  'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { AudioTranslationLanguageService } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Player position service', () => {
   let pts: PlayerTranscriptService;
@@ -44,8 +41,9 @@ describe('Player position service', () => {
     atls = TestBed.inject(AudioTranslationLanguageService);
     onQuestionChangeSpy = jasmine.createSpy('onQuestionChangeSpy');
     subscriptions = new Subscription();
-    subscriptions.add(pps.onCurrentQuestionChange.subscribe(
-      onQuestionChangeSpy));
+    subscriptions.add(
+      pps.onCurrentQuestionChange.subscribe(onQuestionChangeSpy)
+    );
   });
 
   afterEach(() => {
@@ -75,15 +73,29 @@ describe('Player position service', () => {
   });
 
   it('should get current state name', () => {
-    pts.addNewCard(StateCard.createNewCard(
-      'First state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>',
-      {} as Interaction, {} as RecordedVoiceovers, '', atls));
+    pts.addNewCard(
+      StateCard.createNewCard(
+        'First state',
+        'Content HTML',
+        '<oppia-text-input-html></oppia-text-input-html>',
+        {} as Interaction,
+        {} as RecordedVoiceovers,
+        '',
+        atls
+      )
+    );
 
-    pts.addNewCard(StateCard.createNewCard(
-      'Second state', 'Content HTML',
-      '<oppia-text-input-html></oppia-text-input-html>',
-      {} as Interaction, {} as RecordedVoiceovers, '', atls));
+    pts.addNewCard(
+      StateCard.createNewCard(
+        'Second state',
+        'Content HTML',
+        '<oppia-text-input-html></oppia-text-input-html>',
+        {} as Interaction,
+        {} as RecordedVoiceovers,
+        '',
+        atls
+      )
+    );
     let callBack = () => {};
     pps.init(callBack);
     pps.setDisplayedCardIndex(0);
@@ -92,24 +104,26 @@ describe('Player position service', () => {
     expect(pps.getCurrentStateName()).toBe('Second state');
   });
 
-  it('should throw error if callback ftn is not defined on changing index',
-    () => {
-      expect(() => {
-        pps.setDisplayedCardIndex(3);
-      }).toThrowError('The callback function has not been initialized');
-    });
-
-  it('should not change displayed card index if it is the same as the ' +
-     'previously displayed card index', () => {
-    let callBack = () => {};
-    expect(pps.getDisplayedCardIndex()).toBeUndefined();
-    pps.init(callBack);
-    pps.setDisplayedCardIndex(4);
-    pps.setDisplayedCardIndex(4);
-    expect(pps.getDisplayedCardIndex()).toBe(4);
-    pps.setDisplayedCardIndex(5);
-    expect(pps.getDisplayedCardIndex()).toBe(5);
+  it('should throw error if callback ftn is not defined on changing index', () => {
+    expect(() => {
+      pps.setDisplayedCardIndex(3);
+    }).toThrowError('The callback function has not been initialized');
   });
+
+  it(
+    'should not change displayed card index if it is the same as the ' +
+      'previously displayed card index',
+    () => {
+      let callBack = () => {};
+      expect(pps.getDisplayedCardIndex()).toBeUndefined();
+      pps.init(callBack);
+      pps.setDisplayedCardIndex(4);
+      pps.setDisplayedCardIndex(4);
+      expect(pps.getDisplayedCardIndex()).toBe(4);
+      pps.setDisplayedCardIndex(5);
+      expect(pps.getDisplayedCardIndex()).toBe(5);
+    }
+  );
 
   it('should get onNewCardOpened EventEmitter', () => {
     let mockNewCardOpenedEventEmitter = new EventEmitter();
@@ -134,6 +148,7 @@ describe('Player position service', () => {
   it('should fetch EventEmitter for loading most recent checkpoint', () => {
     let mockLoadMostRecentCheckpointEvent = new EventEmitter();
     expect(pps.onLoadedMostRecentCheckpoint).toEqual(
-      mockLoadMostRecentCheckpointEvent);
+      mockLoadMostRecentCheckpointEvent
+    );
   });
 });

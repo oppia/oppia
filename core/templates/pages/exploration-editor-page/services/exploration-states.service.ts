@@ -18,45 +18,59 @@
  * keeps no mementos.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { ConfirmDeleteStateModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
-import { ContextService } from 'services/context.service';
-import { ChangeListService, StatePropertyNames, StatePropertyValues } from 'pages/exploration-editor-page/services/change-list.service';
-import { StateObjectsBackendDict, States, StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
-import { AlertsService } from 'services/alerts.service';
-import { ValidatorsService } from 'services/validators.service';
-import { ExplorationInitStateNameService } from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateEditorRefreshService } from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import { State } from 'domain/state/StateObjectFactory';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { WrittenTranslations } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
-import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
-import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import { InteractionRulesRegistryService } from 'services/interaction-rules-registry.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { ExplorationNextContentIdIndexService } from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
-import { MarkTranslationsAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
+import {ContextService} from 'services/context.service';
+import {
+  ChangeListService,
+  StatePropertyNames,
+  StatePropertyValues,
+} from 'pages/exploration-editor-page/services/change-list.service';
+import {
+  StateObjectsBackendDict,
+  States,
+  StatesObjectFactory,
+} from 'domain/exploration/StatesObjectFactory';
+import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
+import {AlertsService} from 'services/alerts.service';
+import {ValidatorsService} from 'services/validators.service';
+import {ExplorationInitStateNameService} from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
+import {State} from 'domain/state/StateObjectFactory';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+} from 'domain/exploration/subtitled-html.model';
+import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {ExplorationNextContentIdIndexService} from 'pages/exploration-editor-page/services/exploration-next-content-id-index.service';
+import {MarkTranslationsAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-translations-as-needing-update-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {
+  BaseTranslatableObject,
+  TranslatableField,
+} from 'domain/objects/BaseTranslatableObject.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 interface ContentsMapping {
   [contentId: string]: TranslatableField;
@@ -69,14 +83,15 @@ interface ContentExtractors {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationStatesService {
   stateAddedCallbacks: ((addedStateName: string) => void)[] = [];
   stateDeletedCallbacks: ((deletedStateName: string) => void)[] = [];
-  stateRenamedCallbacks: (
-    (oldStateName: string, newStateName: string) => void
-  )[] = [];
+  stateRenamedCallbacks: ((
+    oldStateName: string,
+    newStateName: string
+  ) => void)[] = [];
 
   initalContentsMapping: ContentsMapping = {};
   contentChangesCanAffectTranslations: boolean = true;
@@ -102,15 +117,14 @@ export class ExplorationStatesService {
     private statesObjectFactory: StatesObjectFactory,
     private validatorsService: ValidatorsService,
     private generateContentIdService: GenerateContentIdService,
-    private explorationNextContentIdIndexService: (
-      ExplorationNextContentIdIndexService)
+    private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService
   ) {}
 
   // Properties that have a different backend representation from the
   // frontend and must be converted.
   private _BACKEND_CONVERSIONS = {
     answer_groups: (answerGroups: AnswerGroup[]) => {
-      return answerGroups.map((answerGroup) => {
+      return answerGroups.map(answerGroup => {
         return answerGroup.toBackendDict();
       });
     },
@@ -128,12 +142,12 @@ export class ExplorationStatesService {
       }
     },
     hints: (hints: Hint[]) => {
-      return hints.map((hint) => {
+      return hints.map(hint => {
         return hint.toBackendDict();
       });
     },
     param_changes: (paramChanges: ParamChange[]) => {
-      return paramChanges.map((paramChange) => {
+      return paramChanges.map(paramChange => {
         return paramChange.toBackendDict();
       });
     },
@@ -151,18 +165,21 @@ export class ExplorationStatesService {
       return writtenTranslations.toBackendDict();
     },
     widget_customization_args: (
-        customizationArgs: InteractionCustomizationArgs
+      customizationArgs: InteractionCustomizationArgs
     ) => {
       return Interaction.convertCustomizationArgsToBackendDict(
-        customizationArgs);
-    }
+        customizationArgs
+      );
+    },
   };
 
   // Maps backend names to the corresponding frontend dict accessor lists.
   PROPERTY_REF_DATA = {
     answer_groups: ['interaction', 'answerGroups'],
     confirmed_unclassified_answers: [
-      'interaction', 'confirmedUnclassifiedAnswers'],
+      'interaction',
+      'confirmedUnclassifiedAnswers',
+    ],
     content: ['content'],
     recorded_voiceovers: ['recordedVoiceovers'],
     linked_skill_id: ['linkedSkillId'],
@@ -174,16 +191,15 @@ export class ExplorationStatesService {
     card_is_checkpoint: ['cardIsCheckpoint'],
     solution: ['interaction', 'solution'],
     widget_id: ['interaction', 'id'],
-    widget_customization_args: ['interaction', 'customizationArgs']
+    widget_customization_args: ['interaction', 'customizationArgs'],
   };
 
   private _CONTENT_EXTRACTORS = {
     answer_groups: (answerGroups: BaseTranslatableObject[]) => {
       let contents: TranslatableField[] = [];
-      answerGroups.forEach(
-        answerGroup => {
-          contents = contents.concat(answerGroup.getAllContents());
-        });
+      answerGroups.forEach(answerGroup => {
+        contents = contents.concat(answerGroup.getAllContents());
+      });
       return contents;
     },
     default_outcome: (defaultOutcome: BaseTranslatableObject) => {
@@ -200,29 +216,36 @@ export class ExplorationStatesService {
       return solution ? solution.getAllContents() : [];
     },
     widget_customization_args: (
-        customizationArgs: InteractionCustomizationArgs) => {
-      return customizationArgs ? Interaction.getCustomizationArgContents(
-        customizationArgs) : [];
-    }
+      customizationArgs: InteractionCustomizationArgs
+    ) => {
+      return customizationArgs
+        ? Interaction.getCustomizationArgContents(customizationArgs)
+        : [];
+    },
   } as ContentExtractors;
 
   _extractContentIds(
-      backendName: string, value: StatePropertyValues
+    backendName: string,
+    value: StatePropertyValues
   ): Set<string> {
     let contents: TranslatableField[] = this._CONTENT_EXTRACTORS[backendName](
-      value as BaseTranslatableObject | BaseTranslatableObject[]);
-    return new Set(contents.map(content => (content.contentId as string)));
+      value as BaseTranslatableObject | BaseTranslatableObject[]
+    );
+    return new Set(contents.map(content => content.contentId as string));
   }
 
   _verifyChangesInitialContents(
-      backendName: string, value: StatePropertyValues): void {
+    backendName: string,
+    value: StatePropertyValues
+  ): void {
     let contents: TranslatableField[];
 
     if (backendName === 'content') {
       contents = [value as SubtitledHtml];
     } else if (this._CONTENT_EXTRACTORS.hasOwnProperty(backendName)) {
       contents = this._CONTENT_EXTRACTORS[backendName](
-        value as BaseTranslatableObject | BaseTranslatableObject[]);
+        value as BaseTranslatableObject | BaseTranslatableObject[]
+      );
     } else {
       return;
     }
@@ -236,12 +259,14 @@ export class ExplorationStatesService {
       let intialContent = this.initalContentsMapping[contentId];
       if (
         JSON.stringify(BaseTranslatableObject.getContentValue(content)) ===
-        JSON.stringify(BaseTranslatableObject.getContentValue(intialContent))) {
+        JSON.stringify(BaseTranslatableObject.getContentValue(intialContent))
+      ) {
         continue;
       }
 
       const modalRef = this.ngbModal.open(
-        MarkTranslationsAsNeedingUpdateModalComponent, {
+        MarkTranslationsAsNeedingUpdateModalComponent,
+        {
           size: 'lg',
           backdrop: 'static',
           // TODO(#12768): Remove the backdropClass & windowClass once the
@@ -249,13 +274,14 @@ export class ExplorationStatesService {
           // class is used for correctly stacking AngularJS modal on top of
           // Angular modal.
           backdropClass: 'forced-modal-stack',
-          windowClass: 'forced-modal-stack'
-        });
+          windowClass: 'forced-modal-stack',
+        }
+      );
       modalRef.componentInstance.contentId = contentId;
-      modalRef.componentInstance.markNeedsUpdateHandler = (
-        this.markTranslationAndVoiceoverNeedsUpdate.bind(this));
-      modalRef.componentInstance.removeHandler = (
-        this.removeTranslationAndVoiceover.bind(this));
+      modalRef.componentInstance.markNeedsUpdateHandler =
+        this.markTranslationAndVoiceoverNeedsUpdate.bind(this);
+      modalRef.componentInstance.removeHandler =
+        this.removeTranslationAndVoiceover.bind(this);
       this.initalContentsMapping[contentId] = content;
     }
   }
@@ -283,15 +309,20 @@ export class ExplorationStatesService {
   }
 
   private _getElementsInFirstSetButNotInSecond(
-      setA: Set<string>, setB: Set<string>): string[] {
-    let diffList = Array.from(setA).filter((element) => {
+    setA: Set<string>,
+    setB: Set<string>
+  ): string[] {
+    let diffList = Array.from(setA).filter(element => {
       return !setB.has(element);
     });
     return diffList as string[];
   }
 
   private _setState(
-      stateName: string, stateData: State, refreshGraph: boolean): void {
+    stateName: string,
+    stateData: State,
+    refreshGraph: boolean
+  ): void {
     (this._states as States).setState(stateName, cloneDeep(stateData));
     if (refreshGraph) {
       this._refreshGraphEventEmitter.emit();
@@ -299,42 +330,54 @@ export class ExplorationStatesService {
   }
 
   getStatePropertyMemento(
-     stateName: string, backendName: 'content'
+    stateName: string,
+    backendName: 'content'
   ): SubtitledHtml;
   getStatePropertyMemento(
-      stateName: string, backendName: 'param_changes'
+    stateName: string,
+    backendName: 'param_changes'
   ): ParamChange[];
   getStatePropertyMemento(stateName: string, backendName: 'widget_id'): string;
   getStatePropertyMemento(
-      stateName: string, backendName: 'widget_customization_args'
+    stateName: string,
+    backendName: 'widget_customization_args'
   ): InteractionCustomizationArgs;
   getStatePropertyMemento(
-      stateName: string, backendName: 'answer_groups'
+    stateName: string,
+    backendName: 'answer_groups'
   ): AnswerGroup[];
   getStatePropertyMemento(
-      stateName: string, backendName: 'confirmed_unclassified_answers'
+    stateName: string,
+    backendName: 'confirmed_unclassified_answers'
   ): AnswerGroup[];
   getStatePropertyMemento(
-      stateName: string, backendName: 'default_outcome'
+    stateName: string,
+    backendName: 'default_outcome'
   ): Outcome;
   getStatePropertyMemento(stateName: string, backendName: 'hints'): Hint[];
   getStatePropertyMemento(
-      stateName: string, backendName: 'solution'
+    stateName: string,
+    backendName: 'solution'
   ): SubtitledHtml;
   getStatePropertyMemento(
-      stateName: string, backendName: 'recorded_voiceovers'
+    stateName: string,
+    backendName: 'recorded_voiceovers'
   ): RecordedVoiceovers;
   getStatePropertyMemento(
-      stateName: string, backendName: 'solicit_answer_details'
+    stateName: string,
+    backendName: 'solicit_answer_details'
   ): boolean;
   getStatePropertyMemento(
-      stateName: string, backendName: 'card_is_checkpoint'
+    stateName: string,
+    backendName: 'card_is_checkpoint'
   ): boolean;
   getStatePropertyMemento(
-      stateName: string, backendName: StatePropertyNames
+    stateName: string,
+    backendName: StatePropertyNames
   ): StatePropertyValues;
   getStatePropertyMemento(
-      stateName: string, backendName: StatePropertyNames
+    stateName: string,
+    backendName: StatePropertyNames
   ): StatePropertyValues {
     let accessorList: string[] = this.PROPERTY_REF_DATA[backendName];
     let propertyRef = (this._states as States).getState(stateName);
@@ -343,13 +386,16 @@ export class ExplorationStatesService {
         propertyRef = propertyRef[key];
       });
     } catch (e) {
-      let additionalInfo = (
+      let additionalInfo =
         '\nUndefined states error debug logs:' +
-        '\nRequested state name: ' + stateName +
-        '\nExploration ID: ' + this.contextService.getExplorationId() +
-        '\nChange list: ' + JSON.stringify(
-          this.changeListService.getChangeList()) +
-        '\nAll states names: ' + this._states.getStateNames());
+        '\nRequested state name: ' +
+        stateName +
+        '\nExploration ID: ' +
+        this.contextService.getExplorationId() +
+        '\nChange list: ' +
+        JSON.stringify(this.changeListService.getChangeList()) +
+        '\nAll states names: ' +
+        this._states.getStateNames();
       e.message += additionalInfo;
       throw e;
     }
@@ -358,71 +404,96 @@ export class ExplorationStatesService {
   }
 
   saveStateProperty(
-      stateName: string, backendName: 'content', newValue: SubtitledHtml
+    stateName: string,
+    backendName: 'content',
+    newValue: SubtitledHtml
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'param_changes', newValue: ParamChange[]
+    stateName: string,
+    backendName: 'param_changes',
+    newValue: ParamChange[]
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'widget_id', newValue: string
+    stateName: string,
+    backendName: 'widget_id',
+    newValue: string
   ): void;
   saveStateProperty(
-      stateName: string,
-      backendName: 'widget_customization_args',
-      newValue: InteractionCustomizationArgs
+    stateName: string,
+    backendName: 'widget_customization_args',
+    newValue: InteractionCustomizationArgs
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'answer_groups', newValue: AnswerGroup[]
+    stateName: string,
+    backendName: 'answer_groups',
+    newValue: AnswerGroup[]
   ): void;
   saveStateProperty(
-      stateName: string,
-      backendName: 'confirmed_unclassified_answers',
-      newValue: AnswerGroup[]
+    stateName: string,
+    backendName: 'confirmed_unclassified_answers',
+    newValue: AnswerGroup[]
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'default_outcome', newValue: Outcome
+    stateName: string,
+    backendName: 'default_outcome',
+    newValue: Outcome
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'hints', newValue: Hint[]
+    stateName: string,
+    backendName: 'hints',
+    newValue: Hint[]
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'solution', newValue: SubtitledHtml
+    stateName: string,
+    backendName: 'solution',
+    newValue: SubtitledHtml
   ): void;
   saveStateProperty(
-      stateName: string,
-      backendName: 'recorded_voiceovers',
-      newValue: RecordedVoiceovers
+    stateName: string,
+    backendName: 'recorded_voiceovers',
+    newValue: RecordedVoiceovers
   ): void;
   saveStateProperty(
-      stateName: string,
-      backendName: 'solicit_answer_details',
-      newValue: boolean
+    stateName: string,
+    backendName: 'solicit_answer_details',
+    newValue: boolean
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'card_is_checkpoint', newValue: boolean
+    stateName: string,
+    backendName: 'card_is_checkpoint',
+    newValue: boolean
   ): void;
   saveStateProperty(
-      stateName: string, backendName: 'linked_skill_id', newValue: string
+    stateName: string,
+    backendName: 'linked_skill_id',
+    newValue: string
   ): void;
   saveStateProperty(
-      stateName: string,
-      backendName: StatePropertyNames,
-      newValue: StatePropertyValues
+    stateName: string,
+    backendName: StatePropertyNames,
+    newValue: StatePropertyValues
   ): void {
-    let oldValue = (
-      this.getStatePropertyMemento(stateName, backendName));
+    let oldValue = this.getStatePropertyMemento(stateName, backendName);
     let newBackendValue = cloneDeep(newValue);
     let oldBackendValue = cloneDeep(oldValue);
 
     if (this._BACKEND_CONVERSIONS.hasOwnProperty(backendName)) {
-      newBackendValue = (
-        this.convertToBackendRepresentation(newValue, backendName));
-      oldBackendValue = (
-        this.convertToBackendRepresentation(oldValue, backendName));
+      newBackendValue = this.convertToBackendRepresentation(
+        newValue,
+        backendName
+      );
+      oldBackendValue = this.convertToBackendRepresentation(
+        oldValue,
+        backendName
+      );
     }
     if (!isEqual(oldValue, newValue)) {
       this.changeListService.editStateProperty(
-        stateName, backendName, newBackendValue, oldBackendValue);
+        stateName,
+        backendName,
+        newBackendValue,
+        oldBackendValue
+      );
 
       let newStateData = this._states.getState(stateName);
       let accessorList = this.PROPERTY_REF_DATA[backendName];
@@ -434,13 +505,17 @@ export class ExplorationStatesService {
         let oldContentIds = this._extractContentIds(backendName, oldValue);
         let newContentIds = this._extractContentIds(backendName, newValue);
         let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-          oldContentIds, newContentIds);
+          oldContentIds,
+          newContentIds
+        );
         let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-          newContentIds, oldContentIds);
-        contentIdsToDelete.forEach((contentId) => {
+          newContentIds,
+          oldContentIds
+        );
+        contentIdsToDelete.forEach(contentId => {
           newStateData.recordedVoiceovers.deleteContentId(contentId);
         });
-        contentIdsToAdd.forEach((contentId) => {
+        contentIdsToAdd.forEach(contentId => {
           newStateData.recordedVoiceovers.addContentId(contentId);
         });
       }
@@ -449,33 +524,34 @@ export class ExplorationStatesService {
         propertyRef = propertyRef[accessorList[i]];
       }
 
-      propertyRef[accessorList[accessorList.length - 1]] = cloneDeep(
-        newValue);
+      propertyRef[accessorList[accessorList.length - 1]] = cloneDeep(newValue);
 
       // We do not refresh the state editor immediately after the interaction
       // id alone is saved, because the customization args dict will be
       // temporarily invalid. A change in interaction id will always entail
       // a change in the customization args dict anyway, so the graph will
       // get refreshed after both properties have been updated.
-      let refreshGraph = (backendName !== 'widget_id');
+      let refreshGraph = backendName !== 'widget_id';
       this._setState(stateName, newStateData, refreshGraph);
     }
   }
 
   convertToBackendRepresentation(
-      frontendValue: StatePropertyValues, backendName: string
+    frontendValue: StatePropertyValues,
+    backendName: string
   ): string {
     let conversionFunction = this._BACKEND_CONVERSIONS[backendName];
     return conversionFunction(frontendValue);
   }
 
   init(
-      statesBackendDict: StateObjectsBackendDict,
-      contentChangesCanAffectTranslations: boolean): void {
-    this._states = (
-      this.statesObjectFactory.createFromBackendDict(statesBackendDict));
-    this.contentChangesCanAffectTranslations = (
-      contentChangesCanAffectTranslations);
+    statesBackendDict: StateObjectsBackendDict,
+    contentChangesCanAffectTranslations: boolean
+  ): void {
+    this._states =
+      this.statesObjectFactory.createFromBackendDict(statesBackendDict);
+    this.contentChangesCanAffectTranslations =
+      contentChangesCanAffectTranslations;
     // Initialize the solutionValidityService.
     this.solutionValidityService.init(this._states.getStateNames());
     this._states.getStateNames().forEach((stateName: string) => {
@@ -483,7 +559,7 @@ export class ExplorationStatesService {
       let solution = state.interaction.solution;
       if (solution) {
         let interactionId = state.interaction.id;
-        let result = (
+        let result =
           this.answerClassificationService.getMatchingClassificationResult(
             stateName,
             state.interaction,
@@ -491,15 +567,16 @@ export class ExplorationStatesService {
             this.interactionRulesRegistryService.getRulesServiceByInteractionId(
               interactionId
             )
-          )
-        );
+          );
         let solutionIsValid = stateName !== result.outcome.dest;
-        this.solutionValidityService.updateValidity(
-          stateName, solutionIsValid);
+        this.solutionValidityService.updateValidity(stateName, solutionIsValid);
       }
 
-      state.getAllContents().forEach(
-        content => this.initalContentsMapping[content.contentId] = content);
+      state
+        .getAllContents()
+        .forEach(
+          content => (this.initalContentsMapping[content.contentId] = content)
+        );
     });
   }
 
@@ -526,7 +603,7 @@ export class ExplorationStatesService {
   getCheckpointCount(): number {
     let count: number = 0;
     if (this._states) {
-      this._states.getStateNames().forEach((stateName) => {
+      this._states.getStateNames().forEach(stateName => {
         if (this._states.getState(stateName).cardIsCheckpoint) {
           count++;
         }
@@ -542,8 +619,7 @@ export class ExplorationStatesService {
       }
       return false;
     }
-    return (
-      this.validatorsService.isValidStateName(newStateName, showWarnings));
+    return this.validatorsService.isValidStateName(newStateName, showWarnings);
   }
 
   getStateContentMemento(stateName: string): SubtitledHtml {
@@ -559,7 +635,8 @@ export class ExplorationStatesService {
   }
 
   saveStateParamChanges(
-      stateName: string, newParamChanges: ParamChange[]
+    stateName: string,
+    newParamChanges: ParamChange[]
   ): void {
     this.saveStateProperty(stateName, 'param_changes', newParamChanges);
   }
@@ -570,7 +647,7 @@ export class ExplorationStatesService {
 
   saveInteractionId(stateName: string, newInteractionId: string): void {
     this.saveStateProperty(stateName, 'widget_id', newInteractionId);
-    this.stateInteractionSavedCallbacks.forEach((callback) => {
+    this.stateInteractionSavedCallbacks.forEach(callback => {
       callback(this._states.getState(stateName));
     });
   }
@@ -580,17 +657,21 @@ export class ExplorationStatesService {
   }
 
   getInteractionCustomizationArgsMemento(
-      stateName: string
+    stateName: string
   ): InteractionCustomizationArgs {
     return this.getStatePropertyMemento(stateName, 'widget_customization_args');
   }
 
   saveInteractionCustomizationArgs(
-      stateName: string, newCustomizationArgs: InteractionCustomizationArgs
+    stateName: string,
+    newCustomizationArgs: InteractionCustomizationArgs
   ): void {
     this.saveStateProperty(
-      stateName, 'widget_customization_args', newCustomizationArgs);
-    this.stateInteractionSavedCallbacks.forEach((callback) => {
+      stateName,
+      'widget_customization_args',
+      newCustomizationArgs
+    );
+    this.stateInteractionSavedCallbacks.forEach(callback => {
       callback(this._states.getState(stateName));
     });
   }
@@ -600,25 +681,32 @@ export class ExplorationStatesService {
   }
 
   saveInteractionAnswerGroups(
-      stateName: string, newAnswerGroups: AnswerGroup[]
+    stateName: string,
+    newAnswerGroups: AnswerGroup[]
   ): void {
     this.saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-    this.stateInteractionSavedCallbacks.forEach((callback) => {
+    this.stateInteractionSavedCallbacks.forEach(callback => {
       callback(this._states.getState(stateName));
     });
   }
 
   getConfirmedUnclassifiedAnswersMemento(stateName: string): AnswerGroup[] {
     return this.getStatePropertyMemento(
-      stateName, 'confirmed_unclassified_answers');
+      stateName,
+      'confirmed_unclassified_answers'
+    );
   }
 
   saveConfirmedUnclassifiedAnswers(
-      stateName: string, newAnswers: AnswerGroup[] | InteractionAnswer[]
+    stateName: string,
+    newAnswers: AnswerGroup[] | InteractionAnswer[]
   ): void {
     this.saveStateProperty(
-      stateName, 'confirmed_unclassified_answers', newAnswers as AnswerGroup[]);
-    this.stateInteractionSavedCallbacks.forEach((callback) => {
+      stateName,
+      'confirmed_unclassified_answers',
+      newAnswers as AnswerGroup[]
+    );
+    this.stateInteractionSavedCallbacks.forEach(callback => {
       callback(this._states.getState(stateName));
     });
   }
@@ -628,7 +716,8 @@ export class ExplorationStatesService {
   }
 
   saveInteractionDefaultOutcome(
-      stateName: string, newDefaultOutcome: Outcome
+    stateName: string,
+    newDefaultOutcome: Outcome
   ): void {
     this.saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
   }
@@ -654,9 +743,14 @@ export class ExplorationStatesService {
   }
 
   saveRecordedVoiceovers(
-      stateName: string, newRecordedVoiceovers: RecordedVoiceovers): void {
+    stateName: string,
+    newRecordedVoiceovers: RecordedVoiceovers
+  ): void {
     this.saveStateProperty(
-      stateName, 'recorded_voiceovers', newRecordedVoiceovers);
+      stateName,
+      'recorded_voiceovers',
+      newRecordedVoiceovers
+    );
   }
 
   getSolicitAnswerDetailsMemento(stateName: string): boolean {
@@ -664,9 +758,14 @@ export class ExplorationStatesService {
   }
 
   saveSolicitAnswerDetails(
-      stateName: string, newSolicitAnswerDetails: boolean): void {
+    stateName: string,
+    newSolicitAnswerDetails: boolean
+  ): void {
     this.saveStateProperty(
-      stateName, 'solicit_answer_details', newSolicitAnswerDetails);
+      stateName,
+      'solicit_answer_details',
+      newSolicitAnswerDetails
+    );
   }
 
   getCardIsCheckpointMemento(stateName: string): boolean {
@@ -675,7 +774,10 @@ export class ExplorationStatesService {
 
   saveCardIsCheckpoint(stateName: string, newCardIsCheckpoint: boolean): void {
     this.saveStateProperty(
-      stateName, 'card_is_checkpoint', newCardIsCheckpoint);
+      stateName,
+      'card_is_checkpoint',
+      newCardIsCheckpoint
+    );
   }
 
   isInitialized(): boolean {
@@ -683,7 +785,8 @@ export class ExplorationStatesService {
   }
 
   addState(
-      newStateName: string, successCallback: (arg0: string) => void
+    newStateName: string,
+    successCallback: (arg0: string) => void
   ): void {
     newStateName = this.normalizeWhitespacePipe.transform(newStateName);
     if (!this.validatorsService.isValidStateName(newStateName, true)) {
@@ -695,18 +798,24 @@ export class ExplorationStatesService {
     }
     this.alertsService.clearWarnings();
 
-    let contentIdForContent = this.generateContentIdService
-      .getNextStateId('content');
-    let contentIdForDefaultOutcome = this.generateContentIdService
-      .getNextStateId('default_outcome');
+    let contentIdForContent =
+      this.generateContentIdService.getNextStateId('content');
+    let contentIdForDefaultOutcome =
+      this.generateContentIdService.getNextStateId('default_outcome');
 
     this._states.addState(
-      newStateName, contentIdForContent, contentIdForDefaultOutcome);
+      newStateName,
+      contentIdForContent,
+      contentIdForDefaultOutcome
+    );
 
     this.changeListService.addState(
-      newStateName, contentIdForContent, contentIdForDefaultOutcome);
+      newStateName,
+      contentIdForContent,
+      contentIdForDefaultOutcome
+    );
     this.explorationNextContentIdIndexService.saveDisplayedValue();
-    this.stateAddedCallbacks.forEach((callback) => {
+    this.stateAddedCallbacks.forEach(callback => {
       callback(newStateName);
     });
     this._refreshGraphEventEmitter.emit();
@@ -732,28 +841,32 @@ export class ExplorationStatesService {
       backdrop: true,
     });
     modalRef.componentInstance.deleteStateName = deleteStateName;
-    modalRef.result.then(() => {
-      this._states.deleteState(deleteStateName);
+    modalRef.result.then(
+      () => {
+        this._states.deleteState(deleteStateName);
 
-      this.changeListService.deleteState(deleteStateName);
+        this.changeListService.deleteState(deleteStateName);
 
-      if (this.stateEditorService.getActiveStateName() === deleteStateName) {
-        this.stateEditorService.setActiveStateName(
-          this.explorationInitStateNameService.savedMemento);
+        if (this.stateEditorService.getActiveStateName() === deleteStateName) {
+          this.stateEditorService.setActiveStateName(
+            this.explorationInitStateNameService.savedMemento
+          );
+        }
+
+        this.stateDeletedCallbacks.forEach(callback => {
+          callback(deleteStateName);
+        });
+        this.windowRef.nativeWindow.location.hash =
+          '/gui/' + this.stateEditorService.getActiveStateName();
+        this._refreshGraphEventEmitter.emit();
+        // This ensures that if the deletion changes rules in the current
+        // state, they get updated in the view.
+        this.stateEditorRefreshService.onRefreshStateEditor.emit();
+      },
+      () => {
+        this.alertsService.clearWarnings();
       }
-
-      this.stateDeletedCallbacks.forEach((callback) => {
-        callback(deleteStateName);
-      });
-      this.windowRef.nativeWindow.location.hash = (
-        '/gui/' + this.stateEditorService.getActiveStateName());
-      this._refreshGraphEventEmitter.emit();
-      // This ensures that if the deletion changes rules in the current
-      // state, they get updated in the view.
-      this.stateEditorRefreshService.onRefreshStateEditor.emit();
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
+    );
   }
 
   renameState(oldStateName: string, newStateName: string): void {
@@ -784,24 +897,27 @@ export class ExplorationStatesService {
       this.explorationInitStateNameService.displayed = newStateName;
       this.explorationInitStateNameService.saveDisplayedValue();
     }
-    this.stateRenamedCallbacks.forEach((callback) => {
+    this.stateRenamedCallbacks.forEach(callback => {
       callback(oldStateName, newStateName);
     });
     this._refreshGraphEventEmitter.emit();
   }
 
   registerOnStateAddedCallback(
-      callback: (addedStateName: string) => void): void {
+    callback: (addedStateName: string) => void
+  ): void {
     this.stateAddedCallbacks.push(callback);
   }
 
   registerOnStateDeletedCallback(
-      callback: (deletedStateName: string) => void): void {
+    callback: (deletedStateName: string) => void
+  ): void {
     this.stateDeletedCallbacks.push(callback);
   }
 
   registerOnStateRenamedCallback(
-      callback: (oldStateName: string, newStateName: string) => void): void {
+    callback: (oldStateName: string, newStateName: string) => void
+  ): void {
     this.stateRenamedCallbacks.push(callback);
   }
 
@@ -812,7 +928,8 @@ export class ExplorationStatesService {
   }
 
   registerOnStateInteractionSavedCallback(
-      callback: (state: State) => void): void {
+    callback: (state: State) => void
+  ): void {
     this.stateInteractionSavedCallbacks.push(callback);
   }
 
@@ -821,6 +938,9 @@ export class ExplorationStatesService {
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationStatesService',
-  downgradeInjectable(ExplorationStatesService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationStatesService',
+    downgradeInjectable(ExplorationStatesService)
+  );

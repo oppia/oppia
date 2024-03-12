@@ -16,20 +16,16 @@
  * @fileoverview Delete topic from classroom confirmation modal component.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-delete-topic-from-classroom-modal',
-  templateUrl: './delete-topic-from-classroom-modal.component.html'
+  templateUrl: './delete-topic-from-classroom-modal.component.html',
 })
-export class DeleteTopicFromClassroomModalComponent
-  extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+export class DeleteTopicFromClassroomModalComponent extends ConfirmOrCancelModal {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

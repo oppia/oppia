@@ -16,16 +16,15 @@
  * @fileoverview Component for primary buttons displayed on static pages.
  */
 
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import './primary-button.component.css';
-import { WindowRef } from 'services/contextual/window-ref.service';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-primary-button',
   templateUrl: './primary-button.component.html',
-  styleUrls: ['./primary-button.component.css']
+  styleUrls: ['./primary-button.component.css'],
 })
 export class PrimaryButtonComponent implements OnInit {
   /**
@@ -60,9 +59,7 @@ export class PrimaryButtonComponent implements OnInit {
   componentIsButton: boolean = false;
   openInNewTab: boolean = false;
 
-  constructor(
-    private windowRef: WindowRef,
-  ) {}
+  constructor(private windowRef: WindowRef) {}
 
   ngOnInit(): void {
     this.componentIsButton = this.buttonHref === '#';
@@ -115,7 +112,9 @@ export class PrimaryButtonComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaPrimaryButton',
+angular.module('oppia').directive(
+  'oppiaPrimaryButton',
   downgradeComponent({
-    component: PrimaryButtonComponent
-  }) as angular.IDirectiveFactory);
+    component: PrimaryButtonComponent,
+  }) as angular.IDirectiveFactory
+);

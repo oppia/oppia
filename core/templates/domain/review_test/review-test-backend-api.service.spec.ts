@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for ReviewTestBackendApiService.
  */
 
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
-import { ReviewTestBackendApiService } from
-  'domain/review_test/review-test-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 describe('Review test backend API service', () => {
   let reviewTestBackendApiService: ReviewTestBackendApiService;
@@ -34,66 +34,69 @@ describe('Review test backend API service', () => {
 
   var sampleDataResults = {
     story_name: 'Story Name',
-    skill_descriptions: {}
+    skill_descriptions: {},
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ReviewTestBackendApiService]
+      providers: [ReviewTestBackendApiService],
     });
     reviewTestBackendApiService = TestBed.inject(ReviewTestBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
     urlService = TestBed.inject(UrlService);
     spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.callFake(
-      () => 'abbrev-topic');
+      () => 'abbrev-topic'
+    );
     spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.callFake(
-      () => 'math');
+      () => 'math'
+    );
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an review test data from the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch an review test data from the backend', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      reviewTestBackendApiService.fetchReviewTestDataAsync('0').then(
-        successHandler, failHandler);
+    reviewTestBackendApiService
+      .fetchReviewTestDataAsync('0')
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
-        '/review_test_handler/data/math/abbrev-topic/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    var req = httpTestingController.expectOne(
+      '/review_test_handler/data/math/abbrev-topic/0'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use the rejection handler if the backend request failed',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend request failed', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      reviewTestBackendApiService.fetchReviewTestDataAsync('0').then(
-        successHandler, failHandler);
+    reviewTestBackendApiService
+      .fetchReviewTestDataAsync('0')
+      .then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
-        '/review_test_handler/data/math/abbrev-topic/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Error loading data.', {
-        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-      });
+    var req = httpTestingController.expectOne(
+      '/review_test_handler/data/math/abbrev-topic/0'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush('Error loading data.', {
+      status: ERROR_STATUS_CODE,
+      statusText: 'Invalid Request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

@@ -16,37 +16,36 @@
  * @fileoverview Tests for LearnerAnswerInfo.
  */
 
-import { LearnerAnswerInfo } from
-  'domain/statistics/learner-answer-info.model';
+import {LearnerAnswerInfo} from 'domain/statistics/learner-answer-info.model';
 
 describe('Learner answer info model', () => {
-  it('should create a learner answer info object from a backend dict',
-    () => {
-      var learnerAnswerInfoBackendDict = {
-        id: 'sample_id',
-        answer: 'sample_answer',
-        answer_details: 'answer_details',
-        created_on: 1000
-      };
-      var learnerAnswerInfo = (
-        LearnerAnswerInfo.createFromBackendDict(
-          learnerAnswerInfoBackendDict));
-      expect(learnerAnswerInfo.getId()).toEqual('sample_id');
-      expect(learnerAnswerInfo.getAnswer()).toEqual('sample_answer');
-      expect(learnerAnswerInfo.getAnswerDetails()).toEqual(
-        'answer_details');
-      expect(learnerAnswerInfo.getCreatedOn()).toEqual(1000);
-    });
+  it('should create a learner answer info object from a backend dict', () => {
+    var learnerAnswerInfoBackendDict = {
+      id: 'sample_id',
+      answer: 'sample_answer',
+      answer_details: 'answer_details',
+      created_on: 1000,
+    };
+    var learnerAnswerInfo = LearnerAnswerInfo.createFromBackendDict(
+      learnerAnswerInfoBackendDict
+    );
+    expect(learnerAnswerInfo.getId()).toEqual('sample_id');
+    expect(learnerAnswerInfo.getAnswer()).toEqual('sample_answer');
+    expect(learnerAnswerInfo.getAnswerDetails()).toEqual('answer_details');
+    expect(learnerAnswerInfo.getCreatedOn()).toEqual(1000);
+  });
 
   it('should create a default learner answer info object', () => {
-    var learnerAnswerInfo = (
-      LearnerAnswerInfo.createDefaultLearnerAnswerInfo(
-        'This is answer', 'This is answer details'));
+    var learnerAnswerInfo = LearnerAnswerInfo.createDefaultLearnerAnswerInfo(
+      'This is answer',
+      'This is answer details'
+    );
 
     expect(learnerAnswerInfo.getId()).toBeNull();
     expect(learnerAnswerInfo.getAnswer()).toEqual('This is answer');
     expect(learnerAnswerInfo.getAnswerDetails()).toEqual(
-      'This is answer details');
+      'This is answer details'
+    );
     expect(learnerAnswerInfo.getCreatedOn()).toBeNull();
   });
 });

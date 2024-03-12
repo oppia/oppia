@@ -16,19 +16,19 @@
  * @fileoverview Root component for Profile Page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-profile-page-root',
-  templateUrl: './profile-page-root.component.html'
+  templateUrl: './profile-page-root.component.html',
 })
 export class ProfilePageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -36,8 +36,7 @@ export class ProfilePageRootComponent implements OnDestroy {
   errorPageIsShown: boolean = false;
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private urlService: UrlService,
@@ -46,10 +45,12 @@ export class ProfilePageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.META
+    );
   }
 
   ngOnInit(): void {
@@ -61,12 +62,17 @@ export class ProfilePageRootComponent implements OnDestroy {
 
     let username = this.urlService.getPathname().split('/')[2];
     this.loaderService.showLoadingScreen('Loading');
-    this.accessValidationBackendApiService.doesProfileExist(username)
+    this.accessValidationBackendApiService
+      .doesProfileExist(username)
+      .then(
+        () => {
+          this.pageIsShown = true;
+        },
+        err => {
+          this.errorPageIsShown = true;
+        }
+      )
       .then(() => {
-        this.pageIsShown = true;
-      }, (err) => {
-        this.errorPageIsShown = true;
-      }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

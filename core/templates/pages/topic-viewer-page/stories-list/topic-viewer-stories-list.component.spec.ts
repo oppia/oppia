@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for storiesList.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { StoriesListComponent } from './topic-viewer-stories-list.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {StoriesListComponent} from './topic-viewer-stories-list.component';
 
 describe('Topic Viewer Stories List Component', () => {
   let component: StoriesListComponent;
@@ -31,11 +31,8 @@ describe('Topic Viewer Stories List Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        StoriesListComponent,
-        MockTranslatePipe
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [StoriesListComponent, MockTranslatePipe],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -53,39 +50,44 @@ describe('Topic Viewer Stories List Component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   it('should initialize properties after successfully', () => {
-    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-      .and.returnValues(
-        'I18N_TOPIC_123abcd_TITLE', 'I18N_TOPIC_123abcd_DESCRIPTION');
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
+      'I18N_TOPIC_123abcd_TITLE',
+      'I18N_TOPIC_123abcd_DESCRIPTION'
+    );
     expect(component).toBeDefined();
 
     component.ngOnInit();
 
-    expect(component.topicNameTranslationKey).toBe(
-      'I18N_TOPIC_123abcd_TITLE');
+    expect(component.topicNameTranslationKey).toBe('I18N_TOPIC_123abcd_TITLE');
     expect(component.topicDescTranslationKey).toBe(
-      'I18N_TOPIC_123abcd_DESCRIPTION');
+      'I18N_TOPIC_123abcd_DESCRIPTION'
+    );
   });
 
-  it('should check if topic name, desc translation is displayed correctly',
-    () => {
-      spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-        .and.returnValues(
-          'I18N_TOPIC_123abcd_TITLE', 'I18N_TOPIC_123abcd_DESCRIPTION');
-      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-        .and.returnValues(true, true);
-      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-        .and.returnValues(false, false);
+  it('should check if topic name, desc translation is displayed correctly', () => {
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValues(
+      'I18N_TOPIC_123abcd_TITLE',
+      'I18N_TOPIC_123abcd_DESCRIPTION'
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValues(true, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
+      false,
+      false
+    );
 
-      component.ngOnInit();
+    component.ngOnInit();
 
-      expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
-      expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
-    }
-  );
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
+    expect(component.isHackyTopicDescTranslationDisplayed()).toBe(true);
+  });
 
   it('should check if the view is tablet or not', () => {
     var widthSpy = spyOn(windowDimensionsService, 'getWidth');

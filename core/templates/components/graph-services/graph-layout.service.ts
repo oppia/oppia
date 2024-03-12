@@ -18,11 +18,11 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { GraphLink, GraphNodes } from 'services/compute-graph.service';
+import {AppConstants} from 'app.constants';
+import {GraphLink, GraphNodes} from 'services/compute-graph.service';
 
 export interface GraphBoundaries {
   bottom: number;
@@ -72,7 +72,7 @@ export interface NodeDataDict {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateGraphLayoutService {
   MAX_INDENTATION_LEVEL = 2.5;
@@ -84,7 +84,9 @@ export class StateGraphLayoutService {
   lastComputedArrangement: NodeDataDict | null = null;
 
   getGraphAsAdjacencyLists(
-      nodes: GraphNodes, links: GraphLink[]): GraphAdjacencyLists {
+    nodes: GraphNodes,
+    links: GraphLink[]
+  ): GraphAdjacencyLists {
     var adjacencyLists: GraphAdjacencyLists = {};
 
     for (var nodeId in nodes) {
@@ -103,7 +105,9 @@ export class StateGraphLayoutService {
   }
 
   getIndentationLevels(
-      adjacencyLists: GraphAdjacencyLists, trunkNodeIds: string[]): number[] {
+    adjacencyLists: GraphAdjacencyLists,
+    trunkNodeIds: string[]
+  ): number[] {
     var indentationLevels: number[] = [];
     // Recursively find and indent the longest shortcut for the segment of
     // nodes ranging from trunkNodeIds[startInd] to trunkNodeIds[endInd]
@@ -112,8 +116,10 @@ export class StateGraphLayoutService {
     // this interval, in which case we indent all nodes from A + 1 onwards.
     // NOTE: this mutates indentationLevels as a side-effect.
     var indentLongestShortcut = (startInd: number, endInd: number) => {
-      if (startInd >= endInd ||
-          indentationLevels[startInd] >= this.MAX_INDENTATION_LEVEL) {
+      if (
+        startInd >= endInd ||
+        indentationLevels[startInd] >= this.MAX_INDENTATION_LEVEL
+      ) {
         return;
       }
 
@@ -124,7 +130,8 @@ export class StateGraphLayoutService {
         var sourceNodeId = trunkNodeIds[sourceInd];
         for (var i = 0; i < adjacencyLists[sourceNodeId].length; i++) {
           var possibleTargetInd = trunkNodeIds.indexOf(
-            adjacencyLists[sourceNodeId][i]);
+            adjacencyLists[sourceNodeId][i]
+          );
           if (possibleTargetInd !== -1 && sourceInd < possibleTargetInd) {
             var targetInd = Math.min(possibleTargetInd, endInd + 1);
             if (targetInd - sourceInd > bestTargetInd - bestSourceInd) {
@@ -180,8 +187,11 @@ export class StateGraphLayoutService {
   //   - id: a unique id for the node.
   //   - label: the full label of the node.
   computeLayout(
-      nodes: GraphNodes, links: GraphLink[], initNodeId: string,
-      finalNodeIds: string[]): NodeDataDict {
+    nodes: GraphNodes,
+    links: GraphLink[],
+    initNodeId: string,
+    finalNodeIds: string[]
+  ): NodeDataDict {
     var adjacencyLists = this.getGraphAsAdjacencyLists(nodes, links);
 
     // Find a long path through the graph from the initial state to a
@@ -208,8 +218,7 @@ export class StateGraphLayoutService {
         numBacktrackingCalls++;
         if (numBacktrackingCalls <= MAX_BACKTRACKING_CALLS) {
           for (var i = 0; i < adjacencyLists[currentNodeId].length; i++) {
-            if (currentPath.indexOf(
-              adjacencyLists[currentNodeId][i]) === -1) {
+            if (currentPath.indexOf(adjacencyLists[currentNodeId][i]) === -1) {
               backtrack(adjacencyLists[currentNodeId][i]);
             }
           }
@@ -257,10 +266,12 @@ export class StateGraphLayoutService {
 
     var maxDepth = 0;
     var maxOffsetInEachLevel: {[id: number]: number} = {
-      0: 0
+      0: 0,
     };
     var trunkNodesIndentationLevels = this.getIndentationLevels(
-      adjacencyLists, bestPath);
+      adjacencyLists,
+      bestPath
+    );
 
     for (var i = 0; i < bestPath.length; i++) {
       nodeData[bestPath[i]].depth = maxDepth;
@@ -307,13 +318,14 @@ export class StateGraphLayoutService {
 
           if (nodeData[linkTarget].depth === SENTINEL_DEPTH) {
             nodeData[linkTarget].depth = nodeData[currNodeId].depth + 1;
-            nodeData[linkTarget].offset = (
-              nodeData[linkTarget].depth in maxOffsetInEachLevel ?
-              maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1 : 0);
+            nodeData[linkTarget].offset =
+              nodeData[linkTarget].depth in maxOffsetInEachLevel
+                ? maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1
+                : 0;
 
             maxDepth = Math.max(maxDepth, nodeData[linkTarget].depth);
-            maxOffsetInEachLevel[nodeData[linkTarget].depth] = (
-              nodeData[linkTarget].offset);
+            maxOffsetInEachLevel[nodeData[linkTarget].depth] =
+              nodeData[linkTarget].offset;
           }
 
           if (queue.indexOf(linkTarget) === -1) {
@@ -349,7 +361,7 @@ export class StateGraphLayoutService {
       if (nodeData[nodeId].depth !== SENTINEL_DEPTH) {
         nodePositionsToIds[nodeData[nodeId].depth].push({
           nodeId: nodeId,
-          offset: nodeData[nodeId].offset
+          offset: nodeData[nodeId].offset,
         });
       }
     }
@@ -383,8 +395,7 @@ export class StateGraphLayoutService {
           }
 
           nodeData[nodePositionsToIds[i][j].nodeId].depth = currentDepth;
-          nodeData[nodePositionsToIds[i][j].nodeId].offset = (
-            currentLeftOffset);
+          nodeData[nodePositionsToIds[i][j].nodeId].offset = currentLeftOffset;
 
           currentLeftOffset += 1;
         }
@@ -423,42 +434,48 @@ export class StateGraphLayoutService {
     // fraction of the total width, given a horizontal offset in terms of
     // grid rectangles.
     var getHorizontalPosition = (offsetInGridRectangles: number) => {
-      var fractionalGridWidth = (
-        (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns);
+      var fractionalGridWidth =
+        (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns;
       return (
         HORIZONTAL_EDGE_PADDING_FRACTION +
-        fractionalGridWidth * offsetInGridRectangles);
+        fractionalGridWidth * offsetInGridRectangles
+      );
     };
 
     // Helper function that returns a vertical position, in terms of a
     // fraction of the total height, given a vertical offset in terms of
     // grid rectangles.
     var getVerticalPosition = (offsetInGridRectangles: number) => {
-      var fractionalGridHeight = (
-        (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows);
+      var fractionalGridHeight =
+        (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows;
       return (
         VERTICAL_EDGE_PADDING_FRACTION +
-        fractionalGridHeight * offsetInGridRectangles);
+        fractionalGridHeight * offsetInGridRectangles
+      );
     };
 
     for (var nodeId in nodeData) {
       nodeData[nodeId].y0 = getVerticalPosition(
-        nodeData[nodeId].depth + GRID_NODE_Y_PADDING_FRACTION);
+        nodeData[nodeId].depth + GRID_NODE_Y_PADDING_FRACTION
+      );
       nodeData[nodeId].x0 = getHorizontalPosition(
-        nodeData[nodeId].offset + GRID_NODE_X_PADDING_FRACTION);
+        nodeData[nodeId].offset + GRID_NODE_X_PADDING_FRACTION
+      );
 
       nodeData[nodeId].yLabel = getVerticalPosition(
-        nodeData[nodeId].depth + 0.5);
-      nodeData[nodeId].xLabel = getHorizontalPosition(
-        nodeData[nodeId].offset + 0.5) + X_LABEL_OFFSET_CHECKPOINT_ICON;
+        nodeData[nodeId].depth + 0.5
+      );
+      nodeData[nodeId].xLabel =
+        getHorizontalPosition(nodeData[nodeId].offset + 0.5) +
+        X_LABEL_OFFSET_CHECKPOINT_ICON;
 
-      nodeData[nodeId].height = (
-        (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows
-      ) * (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2);
-      nodeData[nodeId].width = (
-        (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns
-      ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2) +
-      WIDTH_OFFSET_CHECKPOINT_ICON;
+      nodeData[nodeId].height =
+        ((1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows) *
+        (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2);
+      nodeData[nodeId].width =
+        ((1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns) *
+          (1.0 - GRID_NODE_X_PADDING_FRACTION * 2) +
+        WIDTH_OFFSET_CHECKPOINT_ICON;
     }
 
     // Assign id and label to each node.
@@ -477,8 +494,10 @@ export class StateGraphLayoutService {
       queue.shift();
 
       for (var i = 0; i < links.length; i++) {
-        if (links[i].target === currNodeId &&
-            !nodeData[links[i].source].reachableFromEnd) {
+        if (
+          links[i].target === currNodeId &&
+          !nodeData[links[i].source].reachableFromEnd
+        ) {
           nodeData[links[i].source].reachableFromEnd = true;
           queue.push(links[i].source);
         }
@@ -506,23 +525,23 @@ export class StateGraphLayoutService {
     var rightEdge = -INFINITY;
 
     for (var nodeId in nodeData) {
-      leftEdge = Math.min(
-        nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
-      topEdge = Math.min(
-        nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
+      leftEdge = Math.min(nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
+      topEdge = Math.min(nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
       rightEdge = Math.max(
         nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
-        rightEdge);
+        rightEdge
+      );
       bottomEdge = Math.max(
         nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
-        bottomEdge);
+        bottomEdge
+      );
     }
 
     return {
       bottom: bottomEdge,
       left: leftEdge,
       right: rightEdge,
-      top: topEdge
+      top: topEdge,
     };
   }
 
@@ -530,15 +549,15 @@ export class StateGraphLayoutService {
      State1.xLabel === State2.xLabel and State1.yLabel === State2.yLabel
      where State1 and State2 refers to objects inside nodeData. */
   getAugmentedLinks(
-      nodeData: NodeDataDict,
-      nodeLinks: GraphLink[]
+    nodeData: NodeDataDict,
+    nodeLinks: GraphLink[]
   ): AugmentedLink[] {
     var links = cloneDeep(nodeLinks);
     var augmentedLinks: AugmentedLink[] = links.map(link => {
       return {
         source: cloneDeep(nodeData[link.source]),
         target: cloneDeep(nodeData[link.target]),
-        connectsDestIfStuck: cloneDeep(link.connectsDestIfStuck)
+        connectsDestIfStuck: cloneDeep(link.connectsDestIfStuck),
       };
     });
 
@@ -565,15 +584,17 @@ export class StateGraphLayoutService {
 
         /* Fractional amount of truncation to be applied to the end of
            each link. */
-        var startCutoff = (sourceWidth / 2) / Math.abs(dx);
-        var endCutoff = (targetWidth / 2) / Math.abs(dx);
+        var startCutoff = sourceWidth / 2 / Math.abs(dx);
+        var endCutoff = targetWidth / 2 / Math.abs(dx);
         if (dx === 0 || dy !== 0) {
-          startCutoff = (
-            (dx === 0) ? (sourceHeight / 2) / Math.abs(dy) :
-            Math.min(startCutoff, (sourceHeight / 2) / Math.abs(dy)));
-          endCutoff = (
-            (dx === 0) ? (targetHeight / 2) / Math.abs(dy) :
-            Math.min(endCutoff, (targetHeight / 2) / Math.abs(dy)));
+          startCutoff =
+            dx === 0
+              ? sourceHeight / 2 / Math.abs(dy)
+              : Math.min(startCutoff, sourceHeight / 2 / Math.abs(dy));
+          endCutoff =
+            dx === 0
+              ? targetHeight / 2 / Math.abs(dy)
+              : Math.min(endCutoff, targetHeight / 2 / Math.abs(dy));
         }
 
         var dxperp = targety - sourcey;
@@ -590,18 +611,28 @@ export class StateGraphLayoutService {
         var endy = targety - endCutoff * dy;
 
         // Draw a quadratic bezier curve.
-        augmentedLinks[i].d = (
-          'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
-          ' ' + endx + ' ' + endy);
+        augmentedLinks[i].d =
+          'M' +
+          startx +
+          ' ' +
+          starty +
+          ' Q ' +
+          midx +
+          ' ' +
+          midy +
+          ' ' +
+          endx +
+          ' ' +
+          endy;
       }
     }
     return augmentedLinks;
   }
 
   modifyPositionValues(
-      nodeData: NodeDataDict,
-      graphWidth: number,
-      graphHeight: number
+    nodeData: NodeDataDict,
+    graphWidth: number,
+    graphHeight: number
   ): NodeDataDict {
     Object.keys(nodeData).forEach(nodeId => {
       nodeData[nodeId].x0 *= graphWidth;
@@ -633,5 +664,9 @@ export class StateGraphLayoutService {
 }
 
 // Service for computing layout of state graph nodes.
-angular.module('oppia').factory(
-  'StateGraphLayoutService', downgradeInjectable(StateGraphLayoutService));
+angular
+  .module('oppia')
+  .factory(
+    'StateGraphLayoutService',
+    downgradeInjectable(StateGraphLayoutService)
+  );

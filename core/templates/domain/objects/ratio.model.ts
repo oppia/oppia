@@ -16,10 +16,8 @@
  * @fileoverview Frontend Model for ratio.
  */
 
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
-import { RatioInputAnswer } from
-  'interactions/answer-defs';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
+import {RatioInputAnswer} from 'interactions/answer-defs';
 
 type GreatestCommonDivisor = (x: number, y: number) => number;
 
@@ -32,29 +30,33 @@ export class Ratio {
   static fromRawInputString(rawInput: string): Ratio {
     if (rawInput.length === 0) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.EMPTY_STRING);
+        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.EMPTY_STRING
+      );
     }
     var INVALID_CHARS_REGEX = /[^\d^:^\.^\/^\s]/g;
     if (INVALID_CHARS_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INVALID_CHARS);
+        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INVALID_CHARS
+      );
     }
     var INVALID_COLON_REGEX = /(:{2})/g;
     if (INVALID_COLON_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INVALID_COLONS);
+        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INVALID_COLONS
+      );
     }
     var INVALID_RATIO_REGEX = /\d+[\.\/]{1,}\d*/g;
     if (INVALID_RATIO_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants
-          .RATIO_PARSING_ERROR_I18N_KEYS.NON_INTEGER_ELEMENTS);
+        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.NON_INTEGER_ELEMENTS
+      );
     }
     // Checking for badly formatted ratio e.g. :2:3:4 or 2:3:4:.
     var RATIO_REGEX = /^(\s)*(\d+((\s)*:(\s)*\d+)+)(\s)*$/;
     if (!RATIO_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT);
+        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INVALID_FORMAT
+      );
     }
     var numbersList = [];
     rawInput = rawInput.trim();
@@ -62,17 +64,20 @@ export class Ratio {
     var ratio = new Ratio(numbersList);
     if (ratio.components.some(element => element === 0)) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INCLUDES_ZERO);
+        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.INCLUDES_ZERO
+      );
     }
     return ratio;
   }
 
   // Checks the equality of arrays value by value.
   static arrayEquals(a: number[], b: number[]): boolean {
-    return Array.isArray(a) &&
+    return (
+      Array.isArray(a) &&
       Array.isArray(b) &&
       a.length === b.length &&
-      a.every((val, index) => val === b[index]);
+      a.every((val, index) => val === b[index])
+    );
   }
 
   static fromList(ratioList: RatioInputAnswer): Ratio {

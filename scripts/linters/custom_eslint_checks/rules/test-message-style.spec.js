@@ -44,13 +44,12 @@ ruleTester.run('test-message-style', rule, {
         expect($injector.has(constantName)).toBe(true);
         expect($injector.get(constantName)).toEqual(constants[constantName]);
     }
-    });`
+    });`,
   ],
 
   invalid: [
     {
-      code:
-      `it('should transform all key value  pairs to angular constants',
+      code: `it('should transform all key value  pairs to angular constants',
         function() {
         for (var constantName in constants) {
             expect($injector.has(constantName)).toBe(true);
@@ -58,15 +57,16 @@ ruleTester.run('test-message-style', rule, {
                 constants[constantName]);
         }
         });`,
-      errors: [{
-        message: (
-          'Please remove multiple consecutive spaces in the test message'),
-        type: null
-      }]
+      errors: [
+        {
+          message:
+            'Please remove multiple consecutive spaces in the test message',
+          type: null,
+        },
+      ],
     },
     {
-      code:
-    `it('should transform all key value pairs to angular constants ',
+      code: `it('should transform all key value pairs to angular constants ',
         function() {
         for (var constantName in constants) {
             expect($injector.has(constantName)).toBe(true);
@@ -74,14 +74,15 @@ ruleTester.run('test-message-style', rule, {
                 constants[constantName]);
         }
         });`,
-      errors: [{
-        message: 'Please remove space from the end of the test message',
-        type: null
-      }]
+      errors: [
+        {
+          message: 'Please remove space from the end of the test message',
+          type: null,
+        },
+      ],
     },
     {
-      code:
-    `it('hould transform all key value pairs to angular constants',
+      code: `it('hould transform all key value pairs to angular constants',
         function() {
         for (var constantName in constants) {
             expect($injector.has(constantName)).toBe(true);
@@ -89,14 +90,15 @@ ruleTester.run('test-message-style', rule, {
                 constants[constantName]);
         }
         });`,
-      errors: [{
-        message: 'Test message should start with \'should\'',
-        type: null
-      }]
+      errors: [
+        {
+          message: "Test message should start with 'should'",
+          type: null,
+        },
+      ],
     },
     {
-      code:
-    `it('hould transform all key' + ' value pairs to ' + 'angular constants',
+      code: `it('hould transform all key' + ' value pairs to ' + 'angular constants',
         function() {
         for (var constantName in constants) {
             expect($injector.has(constantName)).toBe(true);
@@ -104,10 +106,12 @@ ruleTester.run('test-message-style', rule, {
                 constants[constantName]);
         }
         });`,
-      errors: [{
-        message: 'Test message should start with \'should\'',
-        type: null
-      }]
+      errors: [
+        {
+          message: "Test message should start with 'should'",
+          type: null,
+        },
+      ],
     },
-  ]
+  ],
 });

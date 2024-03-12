@@ -23,8 +23,8 @@ import {
 } from 'domain/email-dashboard/email-dashboard-query.model';
 
 export interface EmailDashboardQueryResultsBackendDict {
-  'cursor': string;
-  'recent_queries': EmailDashboardQueryDict[];
+  cursor: string;
+  recent_queries: EmailDashboardQueryDict[];
 }
 
 export class EmailDashboardQueryResults {
@@ -37,16 +37,14 @@ export class EmailDashboardQueryResults {
   }
 
   static createFromBackendDict(
-      backendDict: EmailDashboardQueryResultsBackendDict):
-      EmailDashboardQueryResults {
+    backendDict: EmailDashboardQueryResultsBackendDict
+  ): EmailDashboardQueryResults {
     let queryObjects: EmailDashboardQuery[] = [];
 
     for (let queryDict of backendDict.recent_queries) {
-      queryObjects.push(
-        EmailDashboardQuery.createFromQueryDict(queryDict));
+      queryObjects.push(EmailDashboardQuery.createFromQueryDict(queryDict));
     }
 
-    return new EmailDashboardQueryResults(
-      backendDict.cursor, queryObjects);
+    return new EmailDashboardQueryResults(backendDict.cursor, queryObjects);
   }
 }

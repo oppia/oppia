@@ -23,8 +23,10 @@ export class Classifier {
   algorithmVersion: number;
 
   constructor(
-      algorithmId: string, classifierData: ArrayBuffer,
-      algorithmVersion: number) {
+    algorithmId: string,
+    classifierData: ArrayBuffer,
+    algorithmVersion: number
+  ) {
     this.algorithmId = algorithmId;
     this.classifierData = classifierData;
     this.algorithmVersion = algorithmVersion;

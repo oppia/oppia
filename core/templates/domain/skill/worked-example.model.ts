@@ -18,7 +18,8 @@
  */
 
 import {
-  SubtitledHtml, SubtitledHtmlBackendDict
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
 
 export interface WorkedExampleBackendDict {
@@ -38,7 +39,7 @@ export class WorkedExample {
   toBackendDict(): WorkedExampleBackendDict {
     return {
       question: this._question.toBackendDict(),
-      explanation: this._explanation.toBackendDict()
+      explanation: this._explanation.toBackendDict(),
     };
   }
 
@@ -51,17 +52,17 @@ export class WorkedExample {
   }
 
   static createFromBackendDict(
-      workedExampleDict: WorkedExampleBackendDict): WorkedExample {
+    workedExampleDict: WorkedExampleBackendDict
+  ): WorkedExample {
     return new WorkedExample(
-      SubtitledHtml.createFromBackendDict(
-        workedExampleDict.question),
-      SubtitledHtml.createFromBackendDict(
-        workedExampleDict.explanation)
+      SubtitledHtml.createFromBackendDict(workedExampleDict.question),
+      SubtitledHtml.createFromBackendDict(workedExampleDict.explanation)
     );
   }
 
   static create(
-      question: SubtitledHtml, explanation: SubtitledHtml
+    question: SubtitledHtml,
+    explanation: SubtitledHtml
   ): WorkedExample {
     return new WorkedExample(question, explanation);
   }

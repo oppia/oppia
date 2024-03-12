@@ -16,9 +16,8 @@
  * @fileoverview Unit tests for the NeedsGuidingResponsesTaskModel.
  */
 
-import { NeedsGuidingResponsesTask } from
-  'domain/improvements/needs-guiding-response-task.model';
-import { AnswerStats } from 'domain/exploration/answer-stats.model';
+import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
 
 describe('Needs guiding responses task model', () => {
   let newTop10AnswerStats: (numUnaddressedAnswers: number) => AnswerStats[];
@@ -27,8 +26,11 @@ describe('Needs guiding responses task model', () => {
       const answerStats: AnswerStats[] = [];
       for (let i = 0; i < 10; ++i) {
         const newAnswerStats = new AnswerStats(
-          `Answer #${i}`, `Answer #${i}`, (10 - i) * 100,
-          i >= numUnaddressedAnswers);
+          `Answer #${i}`,
+          `Answer #${i}`,
+          (10 - i) * 100,
+          i >= numUnaddressedAnswers
+        );
         answerStats.push(newAnswerStats);
       }
       return answerStats;
@@ -37,7 +39,11 @@ describe('Needs guiding responses task model', () => {
 
   it('should return new task if state answer needs a guiding response', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', newTop10AnswerStats(3));
+      'eid',
+      1,
+      'Introduction',
+      newTop10AnswerStats(3)
+    );
 
     expect(task.entityType).toEqual('exploration');
     expect(task.entityId).toEqual('eid');
@@ -47,13 +53,18 @@ describe('Needs guiding responses task model', () => {
     expect(task.targetId).toEqual('Introduction');
     expect(task.getIssueDescription()).toEqual(
       '3 of the top 10 answers for this card did not have explicit feedback ' +
-      'from Oppia.');
+        'from Oppia.'
+    );
     expect(task.isOpen()).toBeTrue();
   });
 
   it('should return obsolete task if all answers are addressed', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', newTop10AnswerStats(0));
+      'eid',
+      1,
+      'Introduction',
+      newTop10AnswerStats(0)
+    );
 
     expect(task.entityType).toEqual('exploration');
     expect(task.entityId).toEqual('eid');
@@ -73,9 +84,9 @@ describe('Needs guiding responses task model', () => {
       task_type: 'needs_guiding_responses',
       target_type: 'state',
       target_id: 'Introduction',
-      issue_description: (
+      issue_description:
         '3 of the top 10 answers for this card did not have explicit ' +
-        'feedback from Oppia.'),
+        'feedback from Oppia.',
       status: 'open',
       resolver_username: null,
       resolved_on_msecs: null,
@@ -89,33 +100,35 @@ describe('Needs guiding responses task model', () => {
     expect(task.targetId).toEqual('Introduction');
     expect(task.getIssueDescription()).toEqual(
       '3 of the top 10 answers for this card did not have explicit feedback ' +
-      'from Oppia.');
+        'from Oppia.'
+    );
     expect(task.isOpen()).toBeTrue();
   });
 
   it('should throw when backend dict entity type is not exploration', () => {
-    expect(
-      () => NeedsGuidingResponsesTask.createFromBackendDict({
+    expect(() =>
+      NeedsGuidingResponsesTask.createFromBackendDict({
         entity_type: '???',
         entity_id: 'eid',
         entity_version: 1,
         task_type: 'needs_guiding_responses',
         target_type: 'state',
         target_id: 'Introduction',
-        issue_description: (
+        issue_description:
           '3 of the top 10 answers for this card did not have explicit ' +
-          'feedback from Oppia.'),
+          'feedback from Oppia.',
         status: 'open',
         resolver_username: null,
         resolved_on_msecs: null,
       })
     ).toThrowError(
-      'backend dict has entity_type "???" but expected "exploration"');
+      'backend dict has entity_type "???" but expected "exploration"'
+    );
   });
 
   it('should throw when backend dict task type is not NGR', () => {
-    expect(
-      () => NeedsGuidingResponsesTask.createFromBackendDict({
+    expect(() =>
+      NeedsGuidingResponsesTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
@@ -127,9 +140,9 @@ describe('Needs guiding responses task model', () => {
         task_type: '???',
         target_type: 'state',
         target_id: 'Introduction',
-        issue_description: (
+        issue_description:
           '3 of the top 10 answers for this card did not have explicit ' +
-          'feedback from Oppia.'),
+          'feedback from Oppia.',
         status: 'open',
         resolver_username: null,
         resolved_on_msecs: null,
@@ -140,17 +153,17 @@ describe('Needs guiding responses task model', () => {
   });
 
   it('should throw when backend dict target type is not state', () => {
-    expect(
-      () => NeedsGuidingResponsesTask.createFromBackendDict({
+    expect(() =>
+      NeedsGuidingResponsesTask.createFromBackendDict({
         entity_type: 'exploration',
         entity_id: 'eid',
         entity_version: 1,
         task_type: 'needs_guiding_responses',
         target_type: '???',
         target_id: 'Introduction',
-        issue_description: (
+        issue_description:
           '3 of the top 10 answers for this card did not have explicit ' +
-          'feedback from Oppia.'),
+          'feedback from Oppia.',
         status: 'open',
         resolver_username: null,
         resolved_on_msecs: null,
@@ -160,7 +173,11 @@ describe('Needs guiding responses task model', () => {
 
   it('should update status based on changes to exploration stats', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', newTop10AnswerStats(3));
+      'eid',
+      1,
+      'Introduction',
+      newTop10AnswerStats(3)
+    );
     expect(task.isOpen()).toBeTrue();
     expect(task.isResolved()).toBeFalse();
 
@@ -175,22 +192,29 @@ describe('Needs guiding responses task model', () => {
 
   it('should not change issue description after it is generated', () => {
     const task = NeedsGuidingResponsesTask.createFromAnswerStats(
-      'eid', 1, 'Introduction', newTop10AnswerStats(0));
+      'eid',
+      1,
+      'Introduction',
+      newTop10AnswerStats(0)
+    );
     expect(task.getIssueDescription()).toBeNull();
 
     task.refreshStatus(newTop10AnswerStats(7));
     expect(task.getIssueDescription()).toEqual(
       '7 of the top 10 answers for this card did not have explicit feedback ' +
-      'from Oppia.');
+        'from Oppia.'
+    );
 
     task.refreshStatus(newTop10AnswerStats(0));
     expect(task.getIssueDescription()).toEqual(
       '7 of the top 10 answers for this card did not have explicit feedback ' +
-      'from Oppia.');
+        'from Oppia.'
+    );
 
     task.refreshStatus(newTop10AnswerStats(3));
     expect(task.getIssueDescription()).toEqual(
       '7 of the top 10 answers for this card did not have explicit feedback ' +
-      'from Oppia.');
+        'from Oppia.'
+    );
   });
 });

@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for PrimaryButtonComponent
  */
 
-import { PrimaryButtonComponent } from './primary-button.component';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {PrimaryButtonComponent} from './primary-button.component';
+import {TestBed, ComponentFixture} from '@angular/core/testing';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
   _window = {
@@ -30,9 +30,9 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val: string) => {}
+      replace: (val: string) => {},
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -52,7 +52,7 @@ describe('PrimaryButtonComponent', () => {
       providers: [
         {
           provide: WindowRef,
-          useValue: windowRef
+          useValue: windowRef,
         },
       ],
     });
@@ -87,9 +87,9 @@ describe('PrimaryButtonComponent', () => {
     const event = {
       target: {
         href: '#',
-        target: '_blank'
+        target: '_blank',
       },
-      preventDefault: () => {}
+      preventDefault: () => {},
     } as unknown as MouseEvent;
     component.handleButtonClick(event);
     expect(component.onClickPrimaryButton.emit).toHaveBeenCalled();
@@ -100,9 +100,9 @@ describe('PrimaryButtonComponent', () => {
     const event = {
       target: {
         href: '/about',
-        target: '_self'
+        target: '_self',
       },
-      preventDefault: () => {}
+      preventDefault: () => {},
     } as unknown as MouseEvent;
 
     component.buttonHref = '/about';
@@ -120,15 +120,15 @@ describe('PrimaryButtonComponent', () => {
     const event = {
       target: {
         href: externalLink,
-        target: '_blank'
+        target: '_blank',
       },
-      preventDefault: () => {}
+      preventDefault: () => {},
     } as unknown as MouseEvent;
 
     const windowOpenSpy = jasmine.createSpyObj('Window', [
       'location',
       'opener',
-      'reload'
+      'reload',
     ]);
     spyOn(window, 'open').and.returnValue(windowOpenSpy);
     const newTab = window.open('', '_blank') as Window;
@@ -143,16 +143,14 @@ describe('PrimaryButtonComponent', () => {
     expect(newTab.location.href).toBe(externalLink);
   });
 
-  it('should set componentIsButton to false when buttonHref is provided',
-    () => {
-      component.buttonHref = 'http://example.com';
-      fixture.detectChanges();
-      expect(component.componentIsButton).toBe(false);
-    });
+  it('should set componentIsButton to false when buttonHref is provided', () => {
+    component.buttonHref = 'http://example.com';
+    fixture.detectChanges();
+    expect(component.componentIsButton).toBe(false);
+  });
 
-  it('should set componentIsButton to true when buttonHref is not provided',
-    () => {
-      fixture.detectChanges();
-      expect(component.componentIsButton).toBe(true);
-    });
+  it('should set componentIsButton to true when buttonHref is not provided', () => {
+    fixture.detectChanges();
+    expect(component.componentIsButton).toBe(true);
+  });
 });

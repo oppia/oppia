@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for ClassroomBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ClassroomBackendApiService } from
-  'domain/classroom/classroom-backend-api.service';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { CreatorTopicSummaryBackendDict } from 'domain/topic/creator-topic-summary.model';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {CreatorTopicSummaryBackendDict} from 'domain/topic/creator-topic-summary.model';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 
-describe('Classroom backend API service', function() {
+describe('Classroom backend API service', function () {
   let classroomBackendApiService: ClassroomBackendApiService;
   let httpTestingController: HttpTestingController;
   let firstTopicSummaryDict: CreatorTopicSummaryBackendDict = {
@@ -51,7 +52,7 @@ describe('Classroom backend API service', function() {
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
     total_chapter_counts_for_each_story: [5, 4],
-    published_chapter_counts_for_each_story: [3, 4]
+    published_chapter_counts_for_each_story: [3, 4],
   };
   let secondTopicSummaryDict: CreatorTopicSummaryBackendDict = {
     id: 'topic2',
@@ -75,99 +76,94 @@ describe('Classroom backend API service', function() {
     total_upcoming_chapters_count: 1,
     total_overdue_chapters_count: 1,
     total_chapter_counts_for_each_story: [5, 4],
-    published_chapter_counts_for_each_story: [3, 4]
+    published_chapter_counts_for_each_story: [3, 4],
   };
 
   let responseDictionaries = {
     name: 'Math',
     topic_summary_dicts: [firstTopicSummaryDict, secondTopicSummaryDict],
     course_details: 'Course Details',
-    topic_list_intro: 'Topics Covered'
+    topic_list_intro: 'Topics Covered',
   };
 
   let sampleClassroomDataObject: ClassroomData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
     // Sample topic object returnable from the backend.
-    sampleClassroomDataObject = (
-      ClassroomData.createFromBackendData(
-        responseDictionaries.name,
-        responseDictionaries.topic_summary_dicts,
-        responseDictionaries.course_details,
-        responseDictionaries.topic_list_intro));
+    sampleClassroomDataObject = ClassroomData.createFromBackendData(
+      responseDictionaries.name,
+      responseDictionaries.topic_summary_dicts,
+      responseDictionaries.course_details,
+      responseDictionaries.topic_list_intro
+    );
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch classroom data from the backend',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch classroom data from the backend', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomDataAsync('math').then(
-        successHandler, failHandler);
+    classroomBackendApiService
+      .fetchClassroomDataAsync('math')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/classroom_data_handler/math');
-      expect(req.request.method).toEqual('GET');
-      req.flush(responseDictionaries);
+    let req = httpTestingController.expectOne('/classroom_data_handler/math');
+    expect(req.request.method).toEqual('GET');
+    req.flush(responseDictionaries);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use the fail handler for requests that cannot be processed',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should use the fail handler for requests that cannot be processed', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomDataAsync('0').then(
-        successHandler, failHandler);
+    classroomBackendApiService
+      .fetchClassroomDataAsync('0')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('/classroom_data_handler/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    let req = httpTestingController.expectOne('/classroom_data_handler/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
-  it('should work with successCallback set to a function',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should work with successCallback set to a function', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.fetchClassroomDataAsync('0').then(
-        successHandler, failHandler);
+    classroomBackendApiService
+      .fetchClassroomDataAsync('0')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/classroom_data_handler/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(responseDictionaries);
+    let req = httpTestingController.expectOne('/classroom_data_handler/0');
+    expect(req.request.method).toEqual('GET');
+    req.flush(responseDictionaries);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalledWith(sampleClassroomDataObject);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
   it('should create new classroom id', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -175,8 +171,7 @@ describe('Classroom backend API service', function() {
     let service = classroomBackendApiService;
 
     service.getNewClassroomIdAsync().then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/new_classroom_id_handler');
+    let req = httpTestingController.expectOne('/new_classroom_id_handler');
     expect(req.request.method).toEqual('GET');
     req.flush({classroom_id: 'classroomId'});
 
@@ -186,78 +181,80 @@ describe('Classroom backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should handle errorcallback while getting new classroom id',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let service = classroomBackendApiService;
+  it('should handle errorcallback while getting new classroom id', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let service = classroomBackendApiService;
 
-      service.getNewClassroomIdAsync().then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/new_classroom_id_handler');
-      expect(req.request.method).toEqual('GET');
+    service.getNewClassroomIdAsync().then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/new_classroom_id_handler');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should get all classroom id to classroom name dict', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
     let service = classroomBackendApiService;
 
-    service.getAllClassroomIdToClassroomNameDictAsync().then(
-      successHandler, failHandler);
+    service
+      .getAllClassroomIdToClassroomNameDictAsync()
+      .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE);
+      ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
+    );
     expect(req.request.method).toEqual('GET');
 
     let classroomIdToClassroomNameDict = {
       math_classroom_id: 'math',
-      physics_classroom_id: 'physics'
+      physics_classroom_id: 'physics',
     };
     req.flush({
-      classroom_id_to_classroom_name: classroomIdToClassroomNameDict
+      classroom_id_to_classroom_name: classroomIdToClassroomNameDict,
     });
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(
-      classroomIdToClassroomNameDict);
+    expect(successHandler).toHaveBeenCalledWith(classroomIdToClassroomNameDict);
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
   it(
     'should handle errorcallbask while fetching classroom id to ' +
-    'classroom name dict', fakeAsync(() => {
+      'classroom name dict',
+    fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
       let service = classroomBackendApiService;
 
-      service.getAllClassroomIdToClassroomNameDictAsync().then(
-        successHandler, failHandler);
+      service
+        .getAllClassroomIdToClassroomNameDictAsync()
+        .then(successHandler, failHandler);
       let req = httpTestingController.expectOne(
-        ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE);
+        ClassroomDomainConstants.CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE
+      );
       expect(req.request.method).toEqual('GET');
 
       req.flush('Invalid request', {
         status: 400,
-        statusText: 'Invalid request'
+        statusText: 'Invalid request',
       });
 
       flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-    }));
+    })
+  );
 
   it('should be able to get the classroom data', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -270,7 +267,7 @@ describe('Classroom backend API service', function() {
       url_fragment: 'math',
       course_details: 'Curated math foundations course.',
       topic_list_intro: 'Start from the basics with our first topic.',
-      topic_id_to_prerequisite_topic_ids: {}
+      topic_id_to_prerequisite_topic_ids: {},
     };
     let expectedClassroomDict = {
       classroomId: 'math_classroom_id',
@@ -278,11 +275,12 @@ describe('Classroom backend API service', function() {
       urlFragment: 'math',
       courseDetails: 'Curated math foundations course.',
       topicListIntro: 'Start from the basics with our first topic.',
-      topicIdToPrerequisiteTopicIds: {}
+      topicIdToPrerequisiteTopicIds: {},
     };
 
-    service.getClassroomDataAsync(classroomId).then(
-      successHandler, failHandler);
+    service
+      .getClassroomDataAsync(classroomId)
+      .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/classroom/math_classroom_id');
     expect(req.request.method).toEqual('GET');
 
@@ -290,35 +288,34 @@ describe('Classroom backend API service', function() {
 
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(
-      {classroomDict: expectedClassroomDict}
-    );
+    expect(successHandler).toHaveBeenCalledWith({
+      classroomDict: expectedClassroomDict,
+    });
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should handle errorcallback while getting classroom data',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let service = classroomBackendApiService;
-      let classroomId = 'math_classroom_id';
+  it('should handle errorcallback while getting classroom data', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let service = classroomBackendApiService;
+    let classroomId = 'math_classroom_id';
 
-      service.getClassroomDataAsync(classroomId).then(
-        successHandler, failHandler);
-      let req = httpTestingController.expectOne('/classroom/math_classroom_id');
-      expect(req.request.method).toEqual('GET');
+    service
+      .getClassroomDataAsync(classroomId)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/classroom/math_classroom_id');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should be able to update classroom data', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -331,20 +328,20 @@ describe('Classroom backend API service', function() {
       url_fragment: 'math',
       course_details: 'Curated math foundations course.',
       topic_list_intro: 'Start from the basics with our first topic.',
-      topic_id_to_prerequisite_topic_ids: {}
+      topic_id_to_prerequisite_topic_ids: {},
     };
     let payload = {
-      classroom_dict: classroomBackendDict
+      classroom_dict: classroomBackendDict,
     };
 
-    service.updateClassroomDataAsync(classroomId, classroomBackendDict).then(
-      successHandler, failHandler);
+    service
+      .updateClassroomDataAsync(classroomId, classroomBackendDict)
+      .then(successHandler, failHandler);
     let req = httpTestingController.expectOne('/classroom/math_classroom_id');
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush(
-      { status: 200, statusText: 'Success.'});
+    req.flush({status: 200, statusText: 'Success.'});
 
     flushMicrotasks();
 
@@ -352,41 +349,40 @@ describe('Classroom backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should handle errorcallback while updating classroom data',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let service = classroomBackendApiService;
-      let classroomId = 'math_classroom_id';
-      let classroomBackendDict = {
-        classroom_id: 'math_classroom_id',
-        name: 'math',
-        url_fragment: 'math',
-        course_details: 'Curated math foundations course.',
-        topic_list_intro: 'Start from the basics with our first topic.',
-        topic_id_to_prerequisite_topic_ids: {}
-      };
-      let payload = {
-        classroom_dict: classroomBackendDict
-      };
+  it('should handle errorcallback while updating classroom data', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let service = classroomBackendApiService;
+    let classroomId = 'math_classroom_id';
+    let classroomBackendDict = {
+      classroom_id: 'math_classroom_id',
+      name: 'math',
+      url_fragment: 'math',
+      course_details: 'Curated math foundations course.',
+      topic_list_intro: 'Start from the basics with our first topic.',
+      topic_id_to_prerequisite_topic_ids: {},
+    };
+    let payload = {
+      classroom_dict: classroomBackendDict,
+    };
 
-      service.updateClassroomDataAsync(classroomId, classroomBackendDict).then(
-        successHandler, failHandler);
-      let req = httpTestingController.expectOne('/classroom/math_classroom_id');
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(payload);
+    service
+      .updateClassroomDataAsync(classroomId, classroomBackendDict)
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/classroom/math_classroom_id');
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
 
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should be able to delete classroom', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -399,8 +395,7 @@ describe('Classroom backend API service', function() {
     let req = httpTestingController.expectOne('/classroom/math_classroom_id');
     expect(req.request.method).toEqual('DELETE');
 
-    req.flush(
-      { status: 200, statusText: 'Success.'});
+    req.flush({status: 200, statusText: 'Success.'});
 
     flushMicrotasks();
 
@@ -421,7 +416,7 @@ describe('Classroom backend API service', function() {
 
     req.flush('Invalid request', {
       status: 400,
-      statusText: 'Invalid request'
+      statusText: 'Invalid request',
     });
 
     flushMicrotasks();
@@ -430,48 +425,50 @@ describe('Classroom backend API service', function() {
     expect(failHandler).toHaveBeenCalled();
   }));
 
-  it('should check if a classroom url fragment already exists',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should check if a classroom url fragment already exists', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
-        'classroom-url-fragment').then(successHandler, failHandler);
+    classroomBackendApiService
+      .doesClassroomWithUrlFragmentExistAsync('classroom-url-fragment')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/classroom_url_fragment_handler/classroom-url-fragment');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        classroom_url_fragment_exists: true
-      });
+    let req = httpTestingController.expectOne(
+      '/classroom_url_fragment_handler/classroom-url-fragment'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      classroom_url_fragment_exists: true,
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use the rejection handler if the url fragment already exists',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the url fragment already exists', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      classroomBackendApiService.doesClassroomWithUrlFragmentExistAsync(
-        'classroom-url-fragment').then(successHandler, failHandler);
+    classroomBackendApiService
+      .doesClassroomWithUrlFragmentExistAsync('classroom-url-fragment')
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/classroom_url_fragment_handler/classroom-url-fragment');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Error: Failed to check classroom url fragment.', {
-        status: 500,
-        statusText: 'Error: Failed to check classroom url fragment.'
-      });
+    let req = httpTestingController.expectOne(
+      '/classroom_url_fragment_handler/classroom-url-fragment'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush('Error: Failed to check classroom url fragment.', {
+      status: 500,
+      statusText: 'Error: Failed to check classroom url fragment.',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should be able to get classroom id', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -479,8 +476,7 @@ describe('Classroom backend API service', function() {
     let service = classroomBackendApiService;
 
     service.getClassroomIdAsync('math').then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/classroom_id_handler/math');
+    let req = httpTestingController.expectOne('/classroom_id_handler/math');
     expect(req.request.method).toEqual('GET');
     req.flush({classroom_id: 'classroomId'});
 
@@ -490,26 +486,23 @@ describe('Classroom backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should handle errorcallback while getting the classroom id',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
-      let service = classroomBackendApiService;
+  it('should handle errorcallback while getting the classroom id', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let service = classroomBackendApiService;
 
-      service.getClassroomIdAsync('math').then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/classroom_id_handler/math');
-      expect(req.request.method).toEqual('GET');
+    service.getClassroomIdAsync('math').then(successHandler, failHandler);
+    let req = httpTestingController.expectOne('/classroom_id_handler/math');
+    expect(req.request.method).toEqual('GET');
 
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

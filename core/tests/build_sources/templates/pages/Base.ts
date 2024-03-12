@@ -17,12 +17,28 @@
  */
 
 angular.module('oppia').controller('Base', [
-  '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
-  'LoaderService', 'SidebarStatusService', 'UrlService',
-  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
-  function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
-      LoaderService, SidebarStatusService, UrlService,
-      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
+  '$scope',
+  '$rootScope',
+  '$document',
+  'AlertsService',
+  'BackgroundMaskService',
+  'LoaderService',
+  'SidebarStatusService',
+  'UrlService',
+  'SITE_FEEDBACK_FORM_URL',
+  'SITE_NAME',
+  function (
+    $scope,
+    $rootScope,
+    $document,
+    AlertsService,
+    BackgroundMaskService,
+    LoaderService,
+    SidebarStatusService,
+    UrlService,
+    SITE_FEEDBACK_FORM_URL,
+    SITE_NAME
+  ) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
@@ -39,17 +55,17 @@ angular.module('oppia').controller('Base', [
     $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
 
     // Listener function to catch the change in language preference.
-    $rootScope.$on('$translateChangeSuccess', function(evt, response) {
+    $rootScope.$on('$translateChangeSuccess', function (evt, response) {
       $scope.currentLang = response.language;
     });
 
     // TODO(sll): use 'touchstart' for mobile.
-    $document.on('click', function() {
+    $document.on('click', function () {
       SidebarStatusService.onDocumentClick();
       $scope.$apply();
     });
 
-    $scope.skipToMainContent = function() {
+    $scope.skipToMainContent = function () {
       var mainContentElement = document.getElementById('oppia-main-content');
 
       if (!mainContentElement) {
@@ -59,5 +75,5 @@ angular.module('oppia').controller('Base', [
       mainContentElement.scrollIntoView();
       mainContentElement.focus();
     };
-  }
+  },
 ]);

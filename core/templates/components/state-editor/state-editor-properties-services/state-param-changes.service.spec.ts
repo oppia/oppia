@@ -16,22 +16,21 @@
  * @fileoverview Unit test for the State Param Changes service.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { StateParamChangesService } from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
+import {TestBed} from '@angular/core/testing';
+import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 
 describe('State Param Changes service', () => {
   let spcs: StateParamChangesService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [StateParamChangesService]
+      providers: [StateParamChangesService],
     });
 
     spcs = TestBed.get(StateParamChangesService);
   });
 
-
-  it('should call service constructor', () =>{
+  it('should call service constructor', () => {
     expect(spcs.setterMethodKey).toBe('saveStateParamChanges');
   });
 });

@@ -34,15 +34,21 @@
  * value.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ContextService } from 'services/context.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ContextService} from 'services/context.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-noninteractive-link',
   templateUrl: './link.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class NoninteractiveLink implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
@@ -56,14 +62,16 @@ export class NoninteractiveLink implements OnInit, OnChanges {
   tabIndexVal: number = 0;
   constructor(
     private contextService: ContextService,
-    private htmlEscaperService: HtmlEscaperService) {}
+    private htmlEscaperService: HtmlEscaperService
+  ) {}
 
   private _updateViewOnLinkChange(): void {
     if (!this.urlWithValue || !this.textWithValue) {
       return;
     }
-    let untrustedUrl = encodeURI(this.htmlEscaperService.escapedJsonToObj(
-      this.urlWithValue) as string);
+    let untrustedUrl = encodeURI(
+      this.htmlEscaperService.escapedJsonToObj(this.urlWithValue) as string
+    );
     if (
       !untrustedUrl.startsWith('http://') &&
       !untrustedUrl.startsWith('https://')
@@ -76,8 +84,9 @@ export class NoninteractiveLink implements OnInit, OnChanges {
       // This is done for backward-compatibility; some old explorations
       // have content parts that don't include a 'text' attribute on
       // their links.
-      this.text = (
-        this.htmlEscaperService.escapedJsonToObj(this.textWithValue) as string);
+      this.text = this.htmlEscaperService.escapedJsonToObj(
+        this.textWithValue
+      ) as string;
       // Note that this second 'if' condition is needed because a link
       // may have an empty 'text' value.
       if (this.text) {
@@ -105,7 +114,9 @@ export class NoninteractiveLink implements OnInit, OnChanges {
   }
 }
 
-angular.module('oppia').directive('oppiaNoninteractiveLink',
+angular.module('oppia').directive(
+  'oppiaNoninteractiveLink',
   downgradeComponent({
-    component: NoninteractiveLink
-  }));
+    component: NoninteractiveLink,
+  })
+);

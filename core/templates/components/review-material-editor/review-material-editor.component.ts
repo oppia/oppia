@@ -16,27 +16,33 @@
  * @fileoverview Component for the skill review material editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 interface HtmlSchema {
   type: 'html';
 }
 
 interface BindableDict {
-  'displayedConceptCardExplanation': string;
-  'displayedWorkedExamples': string;
+  displayedConceptCardExplanation: string;
+  displayedWorkedExamples: string;
 }
 
 @Component({
   selector: 'oppia-review-material-editor',
-  templateUrl: './review-material-editor.component.html'
+  templateUrl: './review-material-editor.component.html',
 })
 export class ReviewMaterialEditorComponent implements OnInit {
-  @Output() onSaveExplanation:
-    EventEmitter<SubtitledHtml> = (new EventEmitter());
+  @Output() onSaveExplanation: EventEmitter<SubtitledHtml> = new EventEmitter();
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -47,18 +53,15 @@ export class ReviewMaterialEditorComponent implements OnInit {
   COMPONENT_NAME_EXPLANATION!: string;
   conceptCardExplanationEditorIsShown: boolean = false;
   HTML_SCHEMA: HtmlSchema = {
-    type: 'html'
+    type: 'html',
   };
 
-  constructor(
-    private changeDetectorRef: ChangeDetectorRef
-  ) {}
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.COMPONENT_NAME_EXPLANATION = (
-      AppConstants.COMPONENT_NAME_EXPLANATION);
-    this.editableExplanation = (
-      this.bindableDict.displayedConceptCardExplanation);
+    this.COMPONENT_NAME_EXPLANATION = AppConstants.COMPONENT_NAME_EXPLANATION;
+    this.editableExplanation =
+      this.bindableDict.displayedConceptCardExplanation;
     this.conceptCardExplanationEditorIsShown = false;
   }
 
@@ -88,10 +91,16 @@ export class ReviewMaterialEditorComponent implements OnInit {
   saveConceptCardExplanation(): void {
     this.conceptCardExplanationEditorIsShown = false;
     let explanationObject = SubtitledHtml.createDefault(
-      this.editableExplanation, this.COMPONENT_NAME_EXPLANATION);
+      this.editableExplanation,
+      this.COMPONENT_NAME_EXPLANATION
+    );
     this.onSaveExplanation.emit(explanationObject);
   }
 }
 
-angular.module('oppia').directive('oppiaReviewMaterialEditor',
-  downgradeComponent({component: ReviewMaterialEditorComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaReviewMaterialEditor',
+    downgradeComponent({component: ReviewMaterialEditorComponent})
+  );

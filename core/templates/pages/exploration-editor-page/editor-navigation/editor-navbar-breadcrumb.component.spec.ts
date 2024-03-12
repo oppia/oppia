@@ -16,19 +16,25 @@
  * @fileoverview Unit tests for editorNavbarBreadcrumb.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { ExplorationTitleService } from '../services/exploration-title.service';
-import { RouterService } from '../services/router.service';
-import { EditorNavbarBreadcrumbComponent } from './editor-navbar-breadcrumb.component';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {ExplorationTitleService} from '../services/exploration-title.service';
+import {RouterService} from '../services/router.service';
+import {EditorNavbarBreadcrumbComponent} from './editor-navbar-breadcrumb.component';
 
 class MockNgbModal {
-  open(): { result: Promise<void> } {
+  open(): {result: Promise<void>} {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -44,19 +50,17 @@ describe('Editor Navbar Breadcrumb component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        EditorNavbarBreadcrumbComponent
-      ],
+      declarations: [EditorNavbarBreadcrumbComponent],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         ExplorationTitleService,
         FocusManagerService,
-        RouterService
+        RouterService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -72,8 +76,8 @@ describe('Editor Navbar Breadcrumb component', () => {
 
     spyOnProperty(
       explorationTitleService,
-      'onExplorationPropertyChanged').and.returnValue(
-      mockExplorationPropertyChangedEventEmitter);
+      'onExplorationPropertyChanged'
+    ).and.returnValue(mockExplorationPropertyChangedEventEmitter);
 
     component.ngOnInit();
   });
@@ -82,39 +86,40 @@ describe('Editor Navbar Breadcrumb component', () => {
     component.ngOnDestroy();
   });
 
-  it('should initialize component properties after controller is initialized',
-    () => {
-      expect(component.navbarTitle).toBeUndefined();
-    });
-
-  it('should go to settings tabs and focus on exploration title input' +
-    ' when editing title', () => {
-    spyOn(routerService, 'navigateToSettingsTab');
-    spyOn(focusManagerService, 'setFocus');
-
-    component.editTitle();
-
-    expect(routerService.navigateToSettingsTab).toHaveBeenCalled();
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      'explorationTitleInputFocusLabel');
+  it('should initialize component properties after controller is initialized', () => {
+    expect(component.navbarTitle).toBeUndefined();
   });
 
-  it('should get an empty current tab name when there is no active tab',
+  it(
+    'should go to settings tabs and focus on exploration title input' +
+      ' when editing title',
     () => {
-      spyOn(routerService, 'getActiveTabName').and.returnValue('');
-      expect(component.getCurrentTabName()).toBe('');
-    });
+      spyOn(routerService, 'navigateToSettingsTab');
+      spyOn(focusManagerService, 'setFocus');
+
+      component.editTitle();
+
+      expect(routerService.navigateToSettingsTab).toHaveBeenCalled();
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        'explorationTitleInputFocusLabel'
+      );
+    }
+  );
+
+  it('should get an empty current tab name when there is no active tab', () => {
+    spyOn(routerService, 'getActiveTabName').and.returnValue('');
+    expect(component.getCurrentTabName()).toBe('');
+  });
 
   it('should get current tab name when there is an active tab', () => {
     spyOn(routerService, 'getActiveTabName').and.returnValue('settings');
     expect(component.getCurrentTabName()).toBe('Settings');
   });
 
-  it('should update nav bar title when exploration property changes',
-    fakeAsync(() => {
-      mockExplorationPropertyChangedEventEmitter.emit('title');
-      tick();
+  it('should update nav bar title when exploration property changes', fakeAsync(() => {
+    mockExplorationPropertyChangedEventEmitter.emit('title');
+    tick();
 
-      expect(component.navbarTitle).toBe('Exploration Title...');
-    }));
+    expect(component.navbarTitle).toBe('Exploration Title...');
+  }));
 });

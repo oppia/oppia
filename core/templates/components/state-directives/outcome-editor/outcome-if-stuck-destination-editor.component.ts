@@ -16,16 +16,16 @@
  * @fileoverview Component for the outcome if stuck destination editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
-import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { AppConstants } from 'app.constants';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {AppConstants} from 'app.constants';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 interface DestinationChoice {
   id: string | null;
@@ -39,7 +39,7 @@ interface DestValidation {
 
 @Component({
   selector: 'oppia-outcome-if-stuck-destination-editor',
-  templateUrl: './outcome-if-stuck-destination-editor.component.html'
+  templateUrl: './outcome-if-stuck-destination-editor.component.html',
 })
 export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   @Output() addState: EventEmitter<string> = new EventEmitter<string>();
@@ -56,11 +56,10 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   currentStateName: string | null = null;
   directiveSubscriptions: Subscription = new Subscription();
 
-  MAX_STATE_NAME_LENGTH: number = (
-    AppConstants.MAX_STATE_NAME_LENGTH);
+  MAX_STATE_NAME_LENGTH: number = AppConstants.MAX_STATE_NAME_LENGTH;
 
-  PLACEHOLDER_OUTCOME_DEST_IF_STUCK: string = (
-    AppConstants.PLACEHOLDER_OUTCOME_DEST_IF_STUCK);
+  PLACEHOLDER_OUTCOME_DEST_IF_STUCK: string =
+    AppConstants.PLACEHOLDER_OUTCOME_DEST_IF_STUCK;
 
   constructor(
     private editorFirstTimeEventsService: EditorFirstTimeEventsService,
@@ -74,21 +73,22 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
       this.outcomeNewStateName = $event;
       let validation = {
         isCreatingNewState: this.isCreatingNewState(),
-        value: $event
+        value: $event,
       };
       this.getChanges.emit(validation);
     }
   }
 
   onDestIfStuckSelectorChange(): void {
-    if (this.outcome.destIfReallyStuck ===
-      this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
+    if (
+      this.outcome.destIfReallyStuck === this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK
+    ) {
       this.focusManagerService.setFocus('newStateNameInputField');
     }
 
     let validation = {
       isCreatingNewState: this.isCreatingNewState(),
-      value: this.outcomeNewStateName
+      value: this.outcomeNewStateName,
     };
     this.getChanges.emit(validation);
   }
@@ -96,8 +96,8 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   isCreatingNewState(): boolean {
     this.maxLen = this.MAX_STATE_NAME_LENGTH;
     return (
-      this.outcome.destIfReallyStuck ===
-        this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK);
+      this.outcome.destIfReallyStuck === this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK
+    );
   }
 
   updateOptionNames(): void {
@@ -108,15 +108,17 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
       // This is a list of objects, each with an ID and name. These
       // represent all states, as well as an option to create a
       // new state.
-      this.destinationChoices = [{
-        id: null,
-        text: 'None'
-      }];
+      this.destinationChoices = [
+        {
+          id: null,
+          text: 'None',
+        },
+      ];
 
       // Arrange the remaining states based on their order in the state
       // graph.
-      let lastComputedArrangement = (
-        this.stateGraphLayoutService.getLastComputedArrangement());
+      let lastComputedArrangement =
+        this.stateGraphLayoutService.getLastComputedArrangement();
       let allStateNames = this.stateEditorService.getStateNames();
 
       // It is possible that lastComputedArrangement is null if the
@@ -129,9 +131,13 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
         let maxOffset = 0;
         for (let stateName in lastComputedArrangement) {
           maxDepth = Math.max(
-            maxDepth, lastComputedArrangement[stateName].depth);
+            maxDepth,
+            lastComputedArrangement[stateName].depth
+          );
           maxOffset = Math.max(
-            maxOffset, lastComputedArrangement[stateName].offset);
+            maxOffset,
+            lastComputedArrangement[stateName].offset
+          );
         }
 
         // Higher scores come later.
@@ -140,16 +146,15 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
         for (let i = 0; i < allStateNames.length; i++) {
           stateName = allStateNames[i];
           if (lastComputedArrangement.hasOwnProperty(stateName)) {
-            allStateScores[stateName] = (
-              lastComputedArrangement[stateName].depth *
-              (maxOffset + 1) +
-              lastComputedArrangement[stateName].offset);
+            allStateScores[stateName] =
+              lastComputedArrangement[stateName].depth * (maxOffset + 1) +
+              lastComputedArrangement[stateName].offset;
           } else {
             // States that have just been added in the rule 'create new'
             // modal are not yet included as part of
             // lastComputedArrangement so we account for them here.
-            allStateScores[stateName] = (
-              (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount);
+            allStateScores[stateName] =
+              (maxDepth + 1) * (maxOffset + 1) + unarrangedStateCount;
             unarrangedStateCount++;
           }
         }
@@ -163,7 +168,7 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
         if (stateNames[i] !== this.currentStateName) {
           this.destinationChoices.push({
             id: stateNames[i],
-            text: stateNames[i]
+            text: stateNames[i],
           });
         }
       }
@@ -171,33 +176,35 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
       if (!questionModeEnabled) {
         this.destinationChoices.push({
           id: this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK,
-          text: 'A New Card Called...'
+          text: 'A New Card Called...',
         });
       }
-    // This value of 10ms is arbitrary, it has no significance.
+      // This value of 10ms is arbitrary, it has no significance.
     }, 10);
   }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.stateEditorService.onSaveOutcomeDestIfStuckDetails.
-        subscribe(() => {
-          // Create new state if specified.
-          if (this.outcome.destIfReallyStuck ===
-                this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK) {
-            this.editorFirstTimeEventsService
-              .registerFirstCreateSecondStateEvent();
+      this.stateEditorService.onSaveOutcomeDestIfStuckDetails.subscribe(() => {
+        // Create new state if specified.
+        if (
+          this.outcome.destIfReallyStuck ===
+          this.PLACEHOLDER_OUTCOME_DEST_IF_STUCK
+        ) {
+          this.editorFirstTimeEventsService.registerFirstCreateSecondStateEvent();
 
-            let newStateName = this.outcomeNewStateName;
-            this.outcome.destIfReallyStuck = newStateName;
-            this.addState.emit(newStateName);
-          }
-        }));
+          let newStateName = this.outcomeNewStateName;
+          this.outcome.destIfReallyStuck = newStateName;
+          this.addState.emit(newStateName);
+        }
+      })
+    );
     this.updateOptionNames();
     this.directiveSubscriptions.add(
       this.stateEditorService.onStateNamesChanged.subscribe(() => {
         this.updateOptionNames();
-      }));
+      })
+    );
 
     this.newStateNamePattern = /^[a-zA-Z0-9.\s-]+$/;
     this.destinationChoices = [];
@@ -208,7 +215,9 @@ export class OutcomeIfStuckDestinationEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaOutcomeIfStuckDestinationEditor',
+angular.module('oppia').directive(
+  'oppiaOutcomeIfStuckDestinationEditor',
   downgradeComponent({
-    component: OutcomeIfStuckDestinationEditorComponent
-  }) as angular.IDirectiveFactory);
+    component: OutcomeIfStuckDestinationEditorComponent,
+  }) as angular.IDirectiveFactory
+);

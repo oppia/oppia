@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the prediction algorithm registry service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { PredictionAlgorithmRegistryService } from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
-import { TextInputPredictionService } from 'interactions/TextInput/text-input-prediction.service';
+import {PredictionAlgorithmRegistryService} from 'pages/exploration-player-page/services/prediction-algorithm-registry.service';
+import {TextInputPredictionService} from 'interactions/TextInput/text-input-prediction.service';
 
 describe('Prediction Algorithm Registry Service', () => {
   let predictionAlgorithmRegistryService: PredictionAlgorithmRegistryService;
@@ -27,77 +27,103 @@ describe('Prediction Algorithm Registry Service', () => {
 
   beforeEach(() => {
     predictionAlgorithmRegistryService = TestBed.inject(
-      PredictionAlgorithmRegistryService);
+      PredictionAlgorithmRegistryService
+    );
     textInputPredictionService = TestBed.inject(TextInputPredictionService);
   });
 
   it('should return service for TextClassifier at schema version 1.', () => {
     expect(
-      predictionAlgorithmRegistryService
-        .getPredictionService('TextClassifier', 1)
+      predictionAlgorithmRegistryService.getPredictionService(
+        'TextClassifier',
+        1
+      )
     ).toEqual(textInputPredictionService);
   });
 
   it('should return null for TextClassifier at schema version 999.', () => {
     expect(
-      predictionAlgorithmRegistryService
-        .getPredictionService('TextClassifier', 999)
+      predictionAlgorithmRegistryService.getPredictionService(
+        'TextClassifier',
+        999
+      )
     ).toBeNull();
   });
 
   it('should return null for NullClassifier which does not exist.', () => {
     expect(
-      predictionAlgorithmRegistryService
-        .getPredictionService('NullClassifier', 1)
+      predictionAlgorithmRegistryService.getPredictionService(
+        'NullClassifier',
+        1
+      )
     ).toBeNull();
   });
 
   describe('when trying to mock prediction services in tests', () => {
     it('should overwrite corresponding service if one exists.', () => {
       expect(
-        predictionAlgorithmRegistryService
-          .getPredictionService('TextClassifier', 1)
+        predictionAlgorithmRegistryService.getPredictionService(
+          'TextClassifier',
+          1
+        )
       ).toEqual(textInputPredictionService);
 
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'TextClassifier', 1, textInputPredictionService);
+        'TextClassifier',
+        1,
+        textInputPredictionService
+      );
 
       expect(
-        predictionAlgorithmRegistryService
-          .getPredictionService('TextClassifier', 1)
+        predictionAlgorithmRegistryService.getPredictionService(
+          'TextClassifier',
+          1
+        )
       ).toEqual(textInputPredictionService);
     });
 
     it('should create new algorithm id entry when it does not exist.', () => {
       expect(
-        predictionAlgorithmRegistryService
-          .getPredictionService('NullClassifier', 1)
+        predictionAlgorithmRegistryService.getPredictionService(
+          'NullClassifier',
+          1
+        )
       ).toBeNull();
 
       predictionAlgorithmRegistryService.testOnlySetPredictionService(
-        'NullClassifier', 1, textInputPredictionService);
+        'NullClassifier',
+        1,
+        textInputPredictionService
+      );
 
       expect(
-        predictionAlgorithmRegistryService
-          .getPredictionService('NullClassifier', 1)
+        predictionAlgorithmRegistryService.getPredictionService(
+          'NullClassifier',
+          1
+        )
       ).toEqual(textInputPredictionService);
     });
 
-    it(
-      'should create new data schema version entry when it does not exist.',
-      () => {
-        expect(
-          predictionAlgorithmRegistryService
-            .getPredictionService('TextClassifier', 999)
-        ).toBeNull();
+    it('should create new data schema version entry when it does not exist.', () => {
+      expect(
+        predictionAlgorithmRegistryService.getPredictionService(
+          'TextClassifier',
+          999
+        )
+      ).toBeNull();
 
-        predictionAlgorithmRegistryService.testOnlySetPredictionService(
-          'TextClassifier', 999, textInputPredictionService);
+      predictionAlgorithmRegistryService.testOnlySetPredictionService(
+        'TextClassifier',
+        999,
+        textInputPredictionService
+      );
 
-        expect(
-          predictionAlgorithmRegistryService
-            .getPredictionService('TextClassifier', 999)
-        ).toEqual(textInputPredictionService);
-      });
+      expect(
+        predictionAlgorithmRegistryService.getPredictionService(
+          'TextClassifier',
+          999
+        )
+      ).toEqual(textInputPredictionService);
+    });
   });
 });

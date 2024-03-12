@@ -16,19 +16,20 @@
  * @fileoverview Unit test for the state interaction id service.
  */
 
-import { EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import {EventEmitter} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
 
-import { StateInteractionIdService } from
+import {
+  StateInteractionIdService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 
 describe('State Interaction Id Service', () => {
   let stateInteractionIdService: StateInteractionIdService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [StateInteractionIdService]
+      providers: [StateInteractionIdService],
     });
 
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
@@ -37,6 +38,7 @@ describe('State Interaction Id Service', () => {
   it('should fetch event emitter for change in interaction id', () => {
     let mockEventEmitter = new EventEmitter();
     expect(stateInteractionIdService.onInteractionIdChanged).toEqual(
-      mockEventEmitter);
+      mockEventEmitter
+    );
   });
 });

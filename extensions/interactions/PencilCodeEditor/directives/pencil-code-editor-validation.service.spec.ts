@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for Pencil Code Editor Validation Service.
  */
 
-import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AppConstants } from 'app.constants';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
-import { Rule, RuleInputs } from 'domain/exploration/rule.model';
-import { TestBed } from '@angular/core/testing';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AppConstants} from 'app.constants';
+import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import {Rule, RuleInputs} from 'domain/exploration/rule.model';
+import {TestBed} from '@angular/core/testing';
 
 describe('Pencil Code Editor Validation Service', () => {
   let pcevs: PencilCodeEditorValidationService;
@@ -39,8 +42,8 @@ describe('Pencil Code Editor Validation Service', () => {
     it('should return empty list when feedback is given', () => {
       var customizationArgs = {
         initialCode: {
-          value: ' Add the initial code snippet here.↵code is here'
-        }
+          value: ' Add the initial code snippet here.↵code is here',
+        },
       };
 
       expect(pcevs.getCustomizationArgsWarnings(customizationArgs)).toEqual([]);
@@ -52,39 +55,56 @@ describe('Pencil Code Editor Validation Service', () => {
       var statename = 'Introduction';
       var customizationArgs = {
         initialCode: {
-          value: ' Add the initial code snippet here.↵code is here'
-        }
+          value: ' Add the initial code snippet here.↵code is here',
+        },
       };
       const testOutcome1 = oof.createNew(
-        'Introduction', 'default_outcome', '', []);
+        'Introduction',
+        'default_outcome',
+        '',
+        []
+      );
       var answergroup1: AnswerGroup[] = [];
       var partialWarningsList = [];
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: (
+        message:
           'Please add feedback for the user in the [All other answers] ' +
-          'rule.')
+          'rule.',
       });
 
       // It returns the error when feedback is not provided.
-      expect(pcevs.getAllWarnings(
-        statename, customizationArgs, answergroup1, testOutcome1)
+      expect(
+        pcevs.getAllWarnings(
+          statename,
+          customizationArgs,
+          answergroup1,
+          testOutcome1
+        )
       ).toEqual(partialWarningsList);
 
       inputBackend = {
-        x: [['<p>one</p>']]
+        x: [['<p>one</p>']],
       };
       const testOutcome2 = oof.createNew(
-        'Introduction', 'feedback_0', '<p>YES</p>', []);
+        'Introduction',
+        'feedback_0',
+        '<p>YES</p>',
+        []
+      );
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
-        x: 'CodeString'
+        x: 'CodeString',
       });
       let answergroup2 = agof.createNew([rulesDict], testOutcome2, [], null);
 
       // It also returns the error when feedback is not provided.
-      expect(pcevs.getAllWarnings(
-        statename, customizationArgs,
-        [answergroup2], testOutcome1)
+      expect(
+        pcevs.getAllWarnings(
+          statename,
+          customizationArgs,
+          [answergroup2],
+          testOutcome1
+        )
       ).toEqual(partialWarningsList);
     });
 
@@ -92,25 +112,37 @@ describe('Pencil Code Editor Validation Service', () => {
       var statename = 'Introduction';
       var customizationArgs = {
         initialCode: {
-          value: ' Add the initial code snippet here.↵code is here'
-        }
+          value: ' Add the initial code snippet here.↵code is here',
+        },
       };
       inputBackend = {
-        x: [['<p>one</p>']]
+        x: [['<p>one</p>']],
       };
       const testOutcome = oof.createNew(
-        'Introduction', 'feedback_0', '<p>YES</p>', []);
+        'Introduction',
+        'feedback_0',
+        '<p>YES</p>',
+        []
+      );
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
-        x: 'CodeString'
+        x: 'CodeString',
       });
       let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
-        'Introduction', 'default_outcome',
-        '<p>no</p>', []);
+        'Introduction',
+        'default_outcome',
+        '<p>no</p>',
+        []
+      );
 
       // It returns the list when feedback is provided.
-      expect(pcevs.getAllWarnings(
-        statename, customizationArgs, [answergroup2], testOutcome2)
+      expect(
+        pcevs.getAllWarnings(
+          statename,
+          customizationArgs,
+          [answergroup2],
+          testOutcome2
+        )
       ).toEqual([]);
     });
 
@@ -118,19 +150,28 @@ describe('Pencil Code Editor Validation Service', () => {
       var statename = 'Introduction';
       var customizationArgs = {
         initialCode: {
-          value: ' Add the initial code snippet here.↵code is here'
-        }
+          value: ' Add the initial code snippet here.↵code is here',
+        },
       };
       const testOutcome1 = oof.createNew(
-        'Introduction', 'default_outcome', '', []);
+        'Introduction',
+        'default_outcome',
+        '',
+        []
+      );
       var answergroup1: AnswerGroup[] = [];
 
       spyOn(pcevs, 'getCustomizationArgsWarnings')
-        .withArgs(customizationArgs).and.returnValue([]);
+        .withArgs(customizationArgs)
+        .and.returnValue([]);
 
       // It returns the error when feedback is not provided.
       pcevs.getAllWarnings(
-        statename, customizationArgs, answergroup1, testOutcome1);
+        statename,
+        customizationArgs,
+        answergroup1,
+        testOutcome1
+      );
 
       // It checks the getCustomizationArgsWarnings has been called or not.
       expect(pcevs.getCustomizationArgsWarnings).toHaveBeenCalled();
@@ -140,32 +181,44 @@ describe('Pencil Code Editor Validation Service', () => {
       var statename = 'Introduction';
       var customizationArgs = {
         initialCode: {
-          value: 1
-        }
+          value: 1,
+        },
       };
       inputBackend = {
-        x: [['<p>one</p>']]
+        x: [['<p>one</p>']],
       };
       const testOutcome = oof.createNew(
-        'Introduction', 'feedback_0', '<p>YES</p>', []);
+        'Introduction',
+        'feedback_0',
+        '<p>YES</p>',
+        []
+      );
       let rulesDict = Rule.createNew('CodeEquals', inputBackend, {
-        x: 'CodeString'
+        x: 'CodeString',
       });
       let answergroup2 = agof.createNew([rulesDict], testOutcome, [], null);
       const testOutcome2 = oof.createNew(
-        'Introduction', 'default_outcome',
-        '<p>no</p>', []);
+        'Introduction',
+        'default_outcome',
+        '<p>no</p>',
+        []
+      );
       var partialWarningsList = [];
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The initialCode must be a string.'
+        message: 'The initialCode must be a string.',
       });
-      expect(pcevs.getAllWarnings(
-        // This throws "Type '1'. We need to suppress this error because is not
-        // assignable to type 'string'." Here we are assigning the wrong type
-        // of value to "customizationArguments" in order to test validations.
-        // @ts-expect-error
-        statename, customizationArgs, [answergroup2], testOutcome2)
+      expect(
+        pcevs.getAllWarnings(
+          statename,
+          // This throws "Type '1'. We need to suppress this error because is not
+          // assignable to type 'string'." Here we are assigning the wrong type
+          // of value to "customizationArguments" in order to test validations.
+          // @ts-expect-error
+          customizationArgs,
+          [answergroup2],
+          testOutcome2
+        )
       ).toEqual(partialWarningsList);
     });
   });

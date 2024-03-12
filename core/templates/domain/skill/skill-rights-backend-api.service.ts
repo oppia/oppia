@@ -16,54 +16,63 @@
  * @fileoverview Service to change the rights of skills in the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { SkillRightsBackendDict, SkillRights } from
-  'domain/skill/skill-rights.model';
-import { SkillEditorPageConstants } from
-  'pages/skill-editor-page/skill-editor-page.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {
+  SkillRightsBackendDict,
+  SkillRights,
+} from 'domain/skill/skill-rights.model';
+import {SkillEditorPageConstants} from 'pages/skill-editor-page/skill-editor-page.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 export interface SkillRightsCache {
   [propName: string]: SkillRights;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkillRightsBackendApiService {
   skillRightsCache: SkillRightsCache = {};
 
   constructor(
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   _fetchSkillRights(
-      skillId: string,
-      successCallback: (value: SkillRights) => void,
-      errorCallback: (value: string) => void): void {
+    skillId: string,
+    successCallback: (value: SkillRights) => void,
+    errorCallback: (value: string) => void
+  ): void {
     let skillRightsUrl = this.urlInterpolationService.interpolateUrl(
-      SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE, {
-        skill_id: skillId
-      });
+      SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE,
+      {
+        skill_id: skillId,
+      }
+    );
 
-    this.http.get<SkillRightsBackendDict>(skillRightsUrl).toPromise()
-      .then(response => {
-        let skillRightsObject = SkillRights.createFromBackendDict(response);
+    this.http
+      .get<SkillRightsBackendDict>(skillRightsUrl)
+      .toPromise()
+      .then(
+        response => {
+          let skillRightsObject = SkillRights.createFromBackendDict(response);
 
-        if (successCallback) {
-          successCallback(skillRightsObject);
+          if (successCallback) {
+            successCallback(skillRightsObject);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      }, errorResponse => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      );
   }
 
   _isCached(skillId: string): boolean {
@@ -71,8 +80,8 @@ export class SkillRightsBackendApiService {
   }
 
   /**
-    * Gets a skill's rights, given its ID.
-    */
+   * Gets a skill's rights, given its ID.
+   */
   async fetchSkillRightsAsync(skillId: string): Promise<SkillRights> {
     return new Promise((resolve, reject) => {
       this._fetchSkillRights(skillId, resolve, reject);
@@ -80,14 +89,14 @@ export class SkillRightsBackendApiService {
   }
 
   /**
-    * Behaves exactly as fetchSkillRights (including callback
-    * behavior and returning a promise object), except this function will
-    * attempt to see whether the given skill rights has been
-    * cached. If it has not yet been cached, it will fetch the skill
-    * rights from the backend. If it successfully retrieves the skill
-    * rights from the backend, it will store it in the cache to avoid
-    * requests from the backend in further function calls.
-    */
+   * Behaves exactly as fetchSkillRights (including callback
+   * behavior and returning a promise object), except this function will
+   * attempt to see whether the given skill rights has been
+   * cached. If it has not yet been cached, it will fetch the skill
+   * rights from the backend. If it successfully retrieves the skill
+   * rights from the backend, it will store it in the cache to avoid
+   * requests from the backend in further function calls.
+   */
   async loadSkillRightsAsync(skillId: string): Promise<SkillRights> {
     return new Promise((resolve, reject) => {
       if (this._isCached(skillId)) {
@@ -95,12 +104,16 @@ export class SkillRightsBackendApiService {
           resolve(this.skillRightsCache[skillId]);
         }
       } else {
-        this._fetchSkillRights(skillId, skillRights => {
-          this.cacheSkillRights(skillId, skillRights);
-          if (resolve) {
-            resolve(this.skillRightsCache[skillId]);
-          }
-        }, reject);
+        this._fetchSkillRights(
+          skillId,
+          skillRights => {
+            this.cacheSkillRights(skillId, skillRights);
+            if (resolve) {
+              resolve(this.skillRightsCache[skillId]);
+            }
+          },
+          reject
+        );
       }
     });
   }
@@ -114,5 +127,9 @@ export class SkillRightsBackendApiService {
   }
 }
 
-angular.module('oppia').factory('SkillRightsBackendApiService',
-  downgradeInjectable(SkillRightsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'SkillRightsBackendApiService',
+    downgradeInjectable(SkillRightsBackendApiService)
+  );

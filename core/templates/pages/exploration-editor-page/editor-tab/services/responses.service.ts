@@ -19,31 +19,37 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { EventEmitter } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {EventEmitter} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AppConstants } from 'app.constants';
-import { ExplorationEditorPageConstants } from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { ItemSelectionInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
-import { LoggerService } from 'services/contextual/logger.service';
-import { Outcome, OutcomeObjectFactory, } from 'domain/exploration/OutcomeObjectFactory';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { SolutionVerificationService } from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
-import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {AlertsService} from 'services/alerts.service';
+import {
+  AnswerChoice,
+  StateEditorService,
+} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AppConstants} from 'app.constants';
+import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {InteractionRuleInputs} from 'interactions/rule-input-defs';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
+import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { Rule } from 'domain/exploration/rule.model';
-import { InitializeAnswerGroups } from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {Rule} from 'domain/exploration/rule.model';
+import {InitializeAnswerGroups} from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -71,14 +77,13 @@ interface UpdateRule {
   rules: Rule[];
 }
 
-export type UpdateActiveAnswerGroup = (
-  AnswerGroup |
-  DestIfReallyStuck |
-  UpdateAnswerGroupFeedback |
-  UpdateAnswerGroupCorrectnessLabel |
-  UpdateActiveAnswerGroupDest |
-  UpdateRule
-);
+export type UpdateActiveAnswerGroup =
+  | AnswerGroup
+  | DestIfReallyStuck
+  | UpdateAnswerGroupFeedback
+  | UpdateAnswerGroupCorrectnessLabel
+  | UpdateActiveAnswerGroupDest
+  | UpdateRule;
 
 @Injectable({
   providedIn: 'root',
@@ -121,16 +126,14 @@ export class ResponsesService {
     // This checks if the solution is valid once a rule has been changed or
     // added.
     const currentInteractionId = this.stateInteractionIdService.savedMemento;
-    const interactionCanHaveSolution = (
+    const interactionCanHaveSolution =
       currentInteractionId &&
-      INTERACTION_SPECS[
-        currentInteractionId as InteractionSpecsKey
-      ].can_have_solution);
-    const stateSolutionSavedMemento = (
-      this.stateSolutionService.savedMemento);
-    const solutionExists = (
+      INTERACTION_SPECS[currentInteractionId as InteractionSpecsKey]
+        .can_have_solution;
+    const stateSolutionSavedMemento = this.stateSolutionService.savedMemento;
+    const solutionExists =
       stateSolutionSavedMemento &&
-      stateSolutionSavedMemento.correctAnswer !== null);
+      stateSolutionSavedMemento.correctAnswer !== null;
 
     const activeStateName = this.stateEditorService.getActiveStateName();
     if (
@@ -143,22 +146,25 @@ export class ResponsesService {
       interaction.answerGroups = cloneDeep(this._answerGroups);
       interaction.defaultOutcome = cloneDeep(this._defaultOutcome);
       const solutionIsValid = this.solutionVerificationService.verifySolution(
-        activeStateName, interaction, stateSolutionSavedMemento.correctAnswer
+        activeStateName,
+        interaction,
+        stateSolutionSavedMemento.correctAnswer
       );
 
-
-      const solutionWasPreviouslyValid = (
-        this.solutionValidityService.isSolutionValid(activeStateName));
+      const solutionWasPreviouslyValid =
+        this.solutionValidityService.isSolutionValid(activeStateName);
       this.solutionValidityService.updateValidity(
-        activeStateName, solutionIsValid);
+        activeStateName,
+        solutionIsValid
+      );
 
       if (solutionIsValid && !solutionWasPreviouslyValid) {
         this.alertsService.addInfoMessage(
-          ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
+          ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID
+        );
       } else if (!solutionIsValid && solutionWasPreviouslyValid) {
         this.alertsService.addInfoMessage(
-          ExplorationEditorPageConstants.
-            INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE
+          ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE
         );
       } else if (!solutionIsValid && !solutionWasPreviouslyValid) {
         this.alertsService.addInfoMessage(
@@ -183,26 +189,26 @@ export class ResponsesService {
   };
 
   private _updateAnswerGroup = (
-      index: number,
-      updates: UpdateActiveAnswerGroup,
-      callback: (value: AnswerGroup[]) => void
+    index: number,
+    updates: UpdateActiveAnswerGroup,
+    callback: (value: AnswerGroup[]) => void
   ) => {
     const answerGroup = this._answerGroups[index];
 
     if (answerGroup) {
       if (updates.hasOwnProperty('rules')) {
-        let ruleUpdates = updates as { rules: Rule[] };
+        let ruleUpdates = updates as {rules: Rule[]};
         answerGroup.rules = ruleUpdates.rules;
       }
       if (updates.hasOwnProperty('taggedSkillMisconceptionId')) {
         let taggedSkillMisconceptionIdUpdates = updates as {
           taggedSkillMisconceptionId: string;
         };
-        answerGroup.taggedSkillMisconceptionId = (
-          taggedSkillMisconceptionIdUpdates.taggedSkillMisconceptionId);
+        answerGroup.taggedSkillMisconceptionId =
+          taggedSkillMisconceptionIdUpdates.taggedSkillMisconceptionId;
       }
       if (updates.hasOwnProperty('feedback')) {
-        let feedbackUpdates = updates as { feedback: SubtitledHtml };
+        let feedbackUpdates = updates as {feedback: SubtitledHtml};
         answerGroup.outcome.feedback = feedbackUpdates.feedback;
       }
       if (updates.hasOwnProperty('dest')) {
@@ -213,29 +219,29 @@ export class ResponsesService {
         let refresherExplorationIdUpdates = updates as {
           refresherExplorationId: string;
         };
-        answerGroup.outcome.refresherExplorationId = (
-          refresherExplorationIdUpdates.refresherExplorationId);
+        answerGroup.outcome.refresherExplorationId =
+          refresherExplorationIdUpdates.refresherExplorationId;
       }
       if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
         let missingPrerequisiteSkillIdUpdates = updates as {
           missingPrerequisiteSkillId: string;
         };
-        answerGroup.outcome.missingPrerequisiteSkillId = (
-          missingPrerequisiteSkillIdUpdates.missingPrerequisiteSkillId);
+        answerGroup.outcome.missingPrerequisiteSkillId =
+          missingPrerequisiteSkillIdUpdates.missingPrerequisiteSkillId;
       }
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         let labelledAsCorrectUpdates = updates as {
           labelledAsCorrect: boolean;
         };
-        answerGroup.outcome.labelledAsCorrect = (
-          labelledAsCorrectUpdates.labelledAsCorrect);
+        answerGroup.outcome.labelledAsCorrect =
+          labelledAsCorrectUpdates.labelledAsCorrect;
       }
       if (updates.hasOwnProperty('destIfReallyStuck')) {
         let destIfReallyStuckUpdates = updates as {
           destIfReallyStuck: string | null;
         };
-        answerGroup.outcome.destIfReallyStuck = (
-          destIfReallyStuckUpdates.destIfReallyStuck);
+        answerGroup.outcome.destIfReallyStuck =
+          destIfReallyStuckUpdates.destIfReallyStuck;
       }
       if (updates.hasOwnProperty('trainingData')) {
         let trainingDataUpdates = updates as AnswerGroup;
@@ -262,10 +268,10 @@ export class ResponsesService {
   };
 
   private _saveConfirmedUnclassifiedAnswers = (
-      newConfirmedUnclassifiedAnswers: readonly InteractionAnswer[]
+    newConfirmedUnclassifiedAnswers: readonly InteractionAnswer[]
   ) => {
-    const oldConfirmedUnclassifiedAnswers = this
-      ._confirmedUnclassifiedAnswersMemento;
+    const oldConfirmedUnclassifiedAnswers =
+      this._confirmedUnclassifiedAnswersMemento;
     if (
       !angular.equals(
         newConfirmedUnclassifiedAnswers,
@@ -274,8 +280,8 @@ export class ResponsesService {
     ) {
       this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
-      this._confirmedUnclassifiedAnswersMemento = (
-        cloneDeep(newConfirmedUnclassifiedAnswers)
+      this._confirmedUnclassifiedAnswersMemento = cloneDeep(
+        newConfirmedUnclassifiedAnswers
       );
     }
   };
@@ -338,8 +344,8 @@ export class ResponsesService {
   }
 
   onInteractionIdChanged(
-      newInteractionId: string,
-      callback: (value: AnswerGroup[], value2: Outcome | null) => void
+    newInteractionId: string,
+    callback: (value: AnswerGroup[], value2: Outcome | null) => void
   ): void {
     this._answerGroups = [];
 
@@ -347,9 +353,9 @@ export class ResponsesService {
     // Recreate the default outcome if switching away from a terminal
     // interaction.
     if (newInteractionId) {
-      if (INTERACTION_SPECS[
-        newInteractionId as InteractionSpecsKey
-      ].is_terminal) {
+      if (
+        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey].is_terminal
+      ) {
         this._defaultOutcome = null;
       } else if (!this._defaultOutcome) {
         const stateName = this.stateEditorService.getActiveStateName();
@@ -404,8 +410,7 @@ export class ResponsesService {
     // This array contains the text of each of the possible answers
     // for the interaction.
     let answerChoices = [];
-    let customizationArgs = (
-      this.stateCustomizationArgsService.savedMemento);
+    let customizationArgs = this.stateCustomizationArgsService.savedMemento;
     let handledAnswersArray: InteractionRuleInputs[] = [];
 
     if (interactionId === 'MultipleChoiceInput') {
@@ -423,13 +428,13 @@ export class ResponsesService {
       }
       // We only suppress the default warning if each choice index has
       // been handled by at least one answer group.
-      return choiceIndices.every((choiceIndex) => {
+      return choiceIndices.every(choiceIndex => {
         return handledAnswersArray.indexOf(choiceIndex) !== -1;
       });
     } else if (interactionId === 'ItemSelectionInput') {
       let maxSelectionCount = (
-        (customizationArgs as ItemSelectionInputCustomizationArgs)
-          .maxAllowableSelectionCount.value);
+        customizationArgs as ItemSelectionInputCustomizationArgs
+      ).maxAllowableSelectionCount.value;
       if (maxSelectionCount === 1) {
         let numChoices = this.getAnswerChoices().length;
         // This array contains a list of booleans, one for each answer
@@ -441,20 +446,21 @@ export class ResponsesService {
           answerChoices.push(this.getAnswerChoices()[i].val);
         }
 
-        let answerChoiceToIndex:
-         Record<string, number> = {};
+        let answerChoiceToIndex: Record<string, number> = {};
         answerChoices.forEach((answerChoice, choiceIndex) => {
           answerChoiceToIndex[answerChoice as string] = choiceIndex;
         });
 
-        answerGroups.forEach((answerGroup) => {
+        answerGroups.forEach(answerGroup => {
           let rules = answerGroup.rules;
-          rules.forEach((rule) => {
+          rules.forEach(rule => {
             let ruleInputs = rule.inputs.x;
-            Object.keys(ruleInputs).forEach((ruleInput) => {
+            Object.keys(ruleInputs).forEach(ruleInput => {
               let choiceIndex = answerChoiceToIndex[ruleInput];
-              if (rule.type === 'Equals' ||
-                  rule.type === 'ContainsAtLeastOneOf') {
+              if (
+                rule.type === 'Equals' ||
+                rule.type === 'ContainsAtLeastOneOf'
+              ) {
                 handledAnswersArray[choiceIndex] = true;
               } else if (rule.type === 'DoesNotContainAtLeastOneOf') {
                 for (let i = 0; i < handledAnswersArray.length; i++) {
@@ -467,10 +473,9 @@ export class ResponsesService {
           });
         });
 
-        let areAllChoicesCovered = handledAnswersArray.every(
-          (handledAnswer) => {
-            return handledAnswer;
-          });
+        let areAllChoicesCovered = handledAnswersArray.every(handledAnswer => {
+          return handledAnswer;
+        });
         // We only suppress the default warning if each choice text has
         // been handled by at least one answer group, based on rule
         // type.
@@ -481,16 +486,16 @@ export class ResponsesService {
   }
 
   updateAnswerGroup(
-      index: number,
-      updates: AnswerGroup,
-      callback: (value: AnswerGroup[]) => void
+    index: number,
+    updates: AnswerGroup,
+    callback: (value: AnswerGroup[]) => void
   ): void {
     this._updateAnswerGroup(index, updates, callback);
   }
 
   deleteAnswerGroup(
-      index: number,
-      callback: (value: AnswerGroup[]) => void
+    index: number,
+    callback: (value: AnswerGroup[]) => void
   ): void {
     this._answerGroupsMemento = cloneDeep(this._answerGroups);
     this._answerGroups.splice(index, 1);
@@ -500,15 +505,15 @@ export class ResponsesService {
   }
 
   updateActiveAnswerGroup(
-      updates: UpdateActiveAnswerGroup,
-      callback: (value: AnswerGroup[]) => void
+    updates: UpdateActiveAnswerGroup,
+    callback: (value: AnswerGroup[]) => void
   ): void {
     this._updateAnswerGroup(this._activeAnswerGroupIndex, updates, callback);
   }
 
   updateDefaultOutcome(
-      updates: Outcome,
-      callback: (value: Outcome | null) => void
+    updates: Outcome,
+    callback: (value: Outcome | null) => void
   ): void {
     const outcome = this._defaultOutcome;
     if (!outcome) {
@@ -537,7 +542,7 @@ export class ResponsesService {
   }
 
   updateConfirmedUnclassifiedAnswers(
-      confirmedUnclassifiedAnswers: InteractionAnswer[]
+    confirmedUnclassifiedAnswers: InteractionAnswer[]
   ): void {
     this._saveConfirmedUnclassifiedAnswers(confirmedUnclassifiedAnswers);
   }
@@ -552,8 +557,8 @@ export class ResponsesService {
   // Handles changes to custom args by updating the answer choices
   // accordingly.
   handleCustomArgsUpdate(
-      newAnswerChoices: AnswerChoice[],
-      callback: (value: AnswerGroup[]) => void
+    newAnswerChoices: AnswerChoice[],
+    callback: (value: AnswerGroup[]) => void
   ): void {
     const oldAnswerChoices = this._updateAnswerChoices(newAnswerChoices);
     // If the interaction is ItemSelectionInput, update the answer groups
@@ -592,17 +597,17 @@ export class ResponsesService {
         }
       }
 
-      const oldChoiceStrings = oldAnswerChoices.map((choice) => {
+      const oldChoiceStrings = oldAnswerChoices.map(choice => {
         return choice.val;
       });
-      const newChoiceStrings = newAnswerChoices.map((choice) => {
+      const newChoiceStrings = newAnswerChoices.map(choice => {
         return choice.val;
       });
 
       let key: string, newInputValue: (string | number | SubtitledHtml)[];
       this._answerGroups.forEach((answerGroup, answerGroupIndex) => {
         const newRules = cloneDeep(answerGroup.rules);
-        newRules.forEach((rule) => {
+        newRules.forEach(rule => {
           for (key in rule.inputs) {
             newInputValue = [];
             let inputValue = rule.inputs[key] as string[];
@@ -668,7 +673,7 @@ export class ResponsesService {
       if (anyChangesHappened) {
         this._answerGroups.forEach((answerGroup, answerGroupIndex) => {
           const newRules = cloneDeep(answerGroup.rules);
-          newRules.forEach((rule) => {
+          newRules.forEach(rule => {
             if (rule.type === 'HasElementXAtPositionY') {
               rule.inputs.x = newAnswerChoices[0].val;
               rule.inputs.y = 1;
@@ -676,7 +681,7 @@ export class ResponsesService {
               rule.inputs.x = newAnswerChoices[0].val;
               rule.inputs.y = newAnswerChoices[1].val;
             } else {
-              rule.inputs.x = newAnswerChoices.map(({ val }) => [val]);
+              rule.inputs.x = newAnswerChoices.map(({val}) => [val]);
             }
           });
 
@@ -694,9 +699,9 @@ export class ResponsesService {
 
   // This registers the change to the handlers in the list of changes.
   save(
-      newAnswerGroups: AnswerGroup[],
-      defaultOutcome: Outcome | null,
-      callback: (value: AnswerGroup[], value2: Outcome | null) => void
+    newAnswerGroups: AnswerGroup[],
+    defaultOutcome: Outcome | null,
+    callback: (value: AnswerGroup[], value2: Outcome | null) => void
   ): void {
     this._saveAnswerGroups(newAnswerGroups);
     this._saveDefaultOutcome(defaultOutcome);
@@ -707,12 +712,13 @@ export class ResponsesService {
     return this._answerGroupsChangedEventEmitter;
   }
 
-  get onInitializeAnswerGroups(): (
-    EventEmitter<string | Interaction | InitializeAnswerGroups>
-  ) {
+  get onInitializeAnswerGroups(): EventEmitter<
+    string | Interaction | InitializeAnswerGroups
+  > {
     return this._initializeAnswerGroupsEventEmitter;
   }
 }
 
-angular.module('oppia').factory('ResponsesService',
-  downgradeInjectable(ResponsesService));
+angular
+  .module('oppia')
+  .factory('ResponsesService', downgradeInjectable(ResponsesService));

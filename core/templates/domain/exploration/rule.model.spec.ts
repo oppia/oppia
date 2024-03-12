@@ -16,8 +16,7 @@
  * @fileoverview unit test for rule-object.model.
  */
 
-import { RuleBackendDict, RuleInputs, Rule } from
-  'domain/exploration/rule.model';
+import {RuleBackendDict, RuleInputs, Rule} from 'domain/exploration/rule.model';
 
 describe('Rule', () => {
   let ruleBackendDict: RuleBackendDict;
@@ -25,34 +24,40 @@ describe('Rule', () => {
 
   beforeEach(() => {
     inputBackend = {
-      x: [['<p>list_of_sets_of_html_strings</p>']]
+      x: [['<p>list_of_sets_of_html_strings</p>']],
     };
     ruleBackendDict = {
       rule_type: 'Equals',
-      inputs: inputBackend
+      inputs: inputBackend,
     };
   });
 
   it('should convert to a backend dictionary', () => {
     const rule = Rule.createFromBackendDict(
-      ruleBackendDict, 'ItemSelectionInput');
+      ruleBackendDict,
+      'ItemSelectionInput'
+    );
     expect(rule.toBackendDict()).toEqual(ruleBackendDict);
   });
 
   it('should create a new rule from createNew()', () => {
-    let rulesDict = Rule.createNew(
-      'rule_type_1', inputBackend, {
-        x: ''
-      });
-    expect(rulesDict).toEqual(new Rule('rule_type_1', inputBackend, {
-      x: ''
-    }));
+    let rulesDict = Rule.createNew('rule_type_1', inputBackend, {
+      x: '',
+    });
+    expect(rulesDict).toEqual(
+      new Rule('rule_type_1', inputBackend, {
+        x: '',
+      })
+    );
   });
 
-  it('should throw an error on createNew() if the keys in inputs and ' +
-    'inputTypes do not match', () => {
-    expect(() => {
-      Rule.createNew('rule_type_1', inputBackend, {});
-    }).toThrowError('The keys of inputs and inputTypes do not match.');
-  });
+  it(
+    'should throw an error on createNew() if the keys in inputs and ' +
+      'inputTypes do not match',
+    () => {
+      expect(() => {
+        Rule.createNew('rule_type_1', inputBackend, {});
+      }).toThrowError('The keys of inputs and inputTypes do not match.');
+    }
+  );
 });

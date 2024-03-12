@@ -24,7 +24,7 @@ import {
 } from 'domain/collection/collection-node.model';
 import {
   CollectionPlaythrough,
-  CollectionPlaythroughBackendDict
+  CollectionPlaythroughBackendDict,
 } from 'domain/collection/collection-playthrough.model';
 
 interface ExplorationIdToNodeIndexMap {
@@ -35,16 +35,16 @@ export interface CollectionBackendDict {
   // When creating a new collection, properties below are always
   // initialized with null values. These are null until populated
   // from the backend and provided themselves by the user.
-  'id': string | null;
-  'title': string | null;
-  'objective': string | null;
-  'language_code': string | null;
-  'tags': string[] | null;
-  'schema_version': number | null;
-  'category': string | null;
-  'version': number | null;
-  'playthrough_dict': CollectionPlaythroughBackendDict;
-  'nodes': CollectionNodeBackendDict[];
+  id: string | null;
+  title: string | null;
+  objective: string | null;
+  language_code: string | null;
+  tags: string[] | null;
+  schema_version: number | null;
+  category: string | null;
+  version: number | null;
+  playthrough_dict: CollectionPlaythroughBackendDict;
+  nodes: CollectionNodeBackendDict[];
 }
 
 export class Collection {
@@ -61,11 +61,17 @@ export class Collection {
   explorationIdToNodeIndexMap: ExplorationIdToNodeIndexMap = {};
 
   constructor(
-      id: string | null, title: string | null, objective: string | null,
-      languageCode: string | null, tags: string[] | null,
-      playthrough: CollectionPlaythrough, category: string | null,
-      version: number | null, schemaVersion: number | null,
-      nodes: CollectionNode[]) {
+    id: string | null,
+    title: string | null,
+    objective: string | null,
+    languageCode: string | null,
+    tags: string[] | null,
+    playthrough: CollectionPlaythrough,
+    category: string | null,
+    version: number | null,
+    schemaVersion: number | null,
+    nodes: CollectionNode[]
+  ) {
     this.id = id;
     this.title = title;
     this.objective = objective;
@@ -88,11 +94,12 @@ export class Collection {
   }
 
   static create(collectionBackendObject: CollectionBackendDict): Collection {
-    let collectionNodes = collectionBackendObject.nodes.map(
-      node => CollectionNode.create(node));
-    let collectionPlaythrough = (
-      CollectionPlaythrough.createFromBackendObject(
-        collectionBackendObject.playthrough_dict));
+    let collectionNodes = collectionBackendObject.nodes.map(node =>
+      CollectionNode.create(node)
+    );
+    let collectionPlaythrough = CollectionPlaythrough.createFromBackendObject(
+      collectionBackendObject.playthrough_dict
+    );
 
     return new Collection(
       collectionBackendObject.id,
@@ -104,7 +111,8 @@ export class Collection {
       collectionBackendObject.category,
       collectionBackendObject.version,
       collectionBackendObject.schema_version,
-      collectionNodes);
+      collectionNodes
+    );
   }
 
   // Create a new, empty collection. This is not guaranteed to pass validation
@@ -112,8 +120,17 @@ export class Collection {
   static createEmptyCollection(): Collection {
     let emptyCollectionPlaythrough = CollectionPlaythrough.create(null, []);
     return new Collection(
-      null, null, null, null, null, emptyCollectionPlaythrough,
-      null, null, null, []);
+      null,
+      null,
+      null,
+      null,
+      null,
+      emptyCollectionPlaythrough,
+      null,
+      null,
+      null,
+      []
+    );
   }
 
   getId(): string | null {
@@ -190,10 +207,12 @@ export class Collection {
   // This will swap 2 nodes of the collection and update the exploration id
   // to node index map accordingly.
   swapCollectionNodes(firstIndex: number, secondIndex: number): boolean {
-    if (firstIndex >= this.nodes.length ||
-        secondIndex >= this.nodes.length ||
-        firstIndex < 0 ||
-        secondIndex < 0) {
+    if (
+      firstIndex >= this.nodes.length ||
+      secondIndex >= this.nodes.length ||
+      firstIndex < 0 ||
+      secondIndex < 0
+    ) {
       return false;
     }
 

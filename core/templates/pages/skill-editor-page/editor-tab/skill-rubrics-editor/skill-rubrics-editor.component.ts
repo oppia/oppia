@@ -16,18 +16,18 @@
  * @fileoverview Component for the skill rubrics editor.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { Rubric } from 'domain/skill/rubric.model';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {Rubric} from 'domain/skill/rubric.model';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-skill-rubrics-editor',
-  templateUrl: './skill-rubrics-editor.component.html'
+  templateUrl: './skill-rubrics-editor.component.html',
 })
 export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -48,7 +48,10 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
 
   onSaveRubric(difficulty: string, explanations: string[]): void {
     this.skillUpdateService.updateRubricForDifficulty(
-      this.skill, difficulty, explanations);
+      this.skill,
+      difficulty,
+      explanations
+    );
   }
 
   toggleRubricsList(): void {
@@ -68,22 +71,20 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     if (this.windowDimensionsService.getResizeEvent) {
       this.directiveSubscriptions.add(
-        this.windowDimensionsService.getResizeEvent().subscribe(
-          () => {
-            this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
-            this.rubricsListIsShown = (
-              !this.windowDimensionsService.isWindowNarrow());
-          }
-        )
+        this.windowDimensionsService.getResizeEvent().subscribe(() => {
+          this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+          this.rubricsListIsShown =
+            !this.windowDimensionsService.isWindowNarrow();
+        })
       );
     }
 
     this.skill = this.skillEditorStateService.getSkill();
-    this.rubricsListIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.rubricsListIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.skillEditorStateService.onSkillChange.subscribe(
-        () => this.rubrics = this.skill.getRubrics())
+        () => (this.rubrics = this.skill.getRubrics())
+      )
     );
   }
 
@@ -92,7 +93,9 @@ export class SkillRubricsEditorComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaSkillRubricsEditor',
+angular.module('oppia').directive(
+  'oppiaSkillRubricsEditor',
   downgradeComponent({
-    component: SkillRubricsEditorComponent
-  }) as angular.IDirectiveFactory);
+    component: SkillRubricsEditorComponent,
+  }) as angular.IDirectiveFactory
+);

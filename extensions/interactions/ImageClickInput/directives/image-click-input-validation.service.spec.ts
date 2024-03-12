@@ -16,18 +16,21 @@
  * @fileoverview Unit tests for image click input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ImageClickInputCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { Rule } from 'domain/exploration/rule.model';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {ImageClickInputValidationService} from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
+import {Rule} from 'domain/exploration/rule.model';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 describe('ImageClickInputValidationService', () => {
   let WARNING_TYPES: typeof AppConstants.WARNING_TYPES;
@@ -41,7 +44,7 @@ describe('ImageClickInputValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ImageClickInputValidationService]
+      providers: [ImageClickInputValidationService],
     });
 
     validatorService = TestBed.inject(ImageClickInputValidationService);
@@ -55,12 +58,12 @@ describe('ImageClickInputValidationService', () => {
       dest_if_really_stuck: null,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
+      missing_prerequisite_skill_id: null,
     });
 
     badOutcome = oof.createFromBackendDict({
@@ -68,149 +71,214 @@ describe('ImageClickInputValidationService', () => {
       dest_if_really_stuck: null,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
+      missing_prerequisite_skill_id: null,
     });
 
     customizationArguments = {
       imageAndRegions: {
         value: {
           imagePath: '/path/to/image',
-          labeledRegions: [{
-            label: 'FirstLabel',
-            region: {
-              area: [[0]]
-            }
-          }, {
-            label: 'SecondLabel',
-            region: {
-              area: [[0]]
-            }
-          }]
-        }
+          labeledRegions: [
+            {
+              label: 'FirstLabel',
+              region: {
+                area: [[0]],
+              },
+            },
+            {
+              label: 'SecondLabel',
+              region: {
+                area: [[0]],
+              },
+            },
+          ],
+        },
       },
       highlightRegionsOnHover: {
-        value: true
-      }
+        value: true,
+      },
     };
 
-    goodAnswerGroups = [agof.createNew(
-      [Rule.createFromBackendDict({
-        rule_type: 'IsInRegion',
-        inputs: {
-          x: 'SecondLabel'
-        }
-      }, 'ImageClickInput')],
-      goodDefaultOutcome,
-      [],
-      null)];
+    goodAnswerGroups = [
+      agof.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'IsInRegion',
+              inputs: {
+                x: 'SecondLabel',
+              },
+            },
+            'ImageClickInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
   });
 
-  it('should expect a customization argument for image and regions',
-    () => {
-      goodAnswerGroups[0].rules = [];
-      expect(() => {
-        validatorService.getAllWarnings(
-          // This throws "Argument of type '{}'. We need to suppress this error
-          // because ..  oppia/comment-style is not assignable to parameter of
-          // type 'ImageClickInputCustomizationArgs'." We are purposely
-          // assigning the wrong type of customization args in order to test
-          // validations.
-          // @ts-expect-error
-          currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      }).toThrowError(
-        'Expected customization arguments to have property: imageAndRegions');
-    });
+  it('should expect a customization argument for image and regions', () => {
+    goodAnswerGroups[0].rules = [];
+    expect(() => {
+      validatorService.getAllWarnings(
+        currentState,
+        // This throws "Argument of type '{}'. We need to suppress this error
+        // because ..  oppia/comment-style is not assignable to parameter of
+        // type 'ImageClickInputCustomizationArgs'." We are purposely
+        // assigning the wrong type of customization args in order to test
+        // validations.
+        // @ts-expect-error
+        {},
+        goodAnswerGroups,
+        goodDefaultOutcome
+      );
+    }).toThrowError(
+      'Expected customization arguments to have property: imageAndRegions'
+    );
+  });
 
   it('should expect an image path customization argument', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
     expect(warnings).toEqual([]);
 
     customizationArguments.imageAndRegions.value.imagePath = '';
     warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please add an image for the learner to click on.'
-    }]);
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.CRITICAL,
+        message: 'Please add an image for the learner to click on.',
+      },
+    ]);
   });
 
-  it('should expect labeled regions with non-empty, unique, and ' +
-    'alphanumeric labels',
-  () => {
-    var regions = customizationArguments.imageAndRegions.value.labeledRegions;
-    regions[0].label = '';
-    var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the region labels are nonempty.'
-    }]);
+  it(
+    'should expect labeled regions with non-empty, unique, and ' +
+      'alphanumeric labels',
+    () => {
+      var regions = customizationArguments.imageAndRegions.value.labeledRegions;
+      regions[0].label = '';
+      var warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArguments,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the region labels are nonempty.',
+        },
+      ]);
 
-    regions[0].label = 'SecondLabel';
-    warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the region labels are unique.'
-    }]);
+      regions[0].label = 'SecondLabel';
+      warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArguments,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message: 'Please ensure the region labels are unique.',
+        },
+      ]);
 
-    regions[0].label = '@';
-    warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The region labels should consist of alphanumeric characters.'
-    }]);
+      regions[0].label = '@';
+      warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArguments,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: WARNING_TYPES.CRITICAL,
+          message:
+            'The region labels should consist of alphanumeric characters.',
+        },
+      ]);
 
-    customizationArguments.imageAndRegions.value.labeledRegions = [];
-    goodAnswerGroups[0].rules = [];
-    warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Please specify at least one region in the image.'
-    }]);
-  });
+      customizationArguments.imageAndRegions.value.labeledRegions = [];
+      goodAnswerGroups[0].rules = [];
+      warnings = validatorService.getAllWarnings(
+        currentState,
+        customizationArguments,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'Please specify at least one region in the image.',
+        },
+      ]);
+    }
+  );
 
   it('should expect rule types to reference valid region labels', () => {
     goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';
     var warnings = validatorService.getAllWarnings(
-      currentState, customizationArguments, goodAnswerGroups,
-      goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.CRITICAL,
-      message: 'The region label \'FakeLabel\' in learner answer 1 in ' +
-        'Oppia response 1 is invalid.'
-    }]);
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.CRITICAL,
+        message:
+          "The region label 'FakeLabel' in learner answer 1 in " +
+          'Oppia response 1 is invalid.',
+      },
+    ]);
   });
 
-  it('should expect a non-confusing and non-null default outcome',
-    () => {
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups, null);
-      expect(warnings).toEqual([{
+  it('should expect a non-confusing and non-null default outcome', () => {
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      null
+    );
+    expect(warnings).toEqual([
+      {
         type: WARNING_TYPES.ERROR,
-        message: 'Please add a learner answer to cover what should happen ' +
-          'if none of the given regions are clicked.'
-      }]);
-      warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups, badOutcome);
-      expect(warnings).toEqual([{
+        message:
+          'Please add a learner answer to cover what should happen ' +
+          'if none of the given regions are clicked.',
+      },
+    ]);
+    warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      goodAnswerGroups,
+      badOutcome
+    );
+    expect(warnings).toEqual([
+      {
         type: WARNING_TYPES.ERROR,
-        message: 'Please add a learner answer to cover what should happen ' +
-        'if none of the given regions are clicked.'
-      }]);
-    });
+        message:
+          'Please add a learner answer to cover what should happen ' +
+          'if none of the given regions are clicked.',
+      },
+    ]);
+  });
 });

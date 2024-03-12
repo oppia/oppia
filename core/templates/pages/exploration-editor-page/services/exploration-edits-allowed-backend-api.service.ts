@@ -17,28 +17,33 @@
  * exploration.
  */
 
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationEditsAllowedBackendApiService {
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
   async setEditsAllowed(
-      editsAreAllowed: boolean,
-      explorationId: string,
-      callback: () => void
+    editsAreAllowed: boolean,
+    explorationId: string,
+    callback: () => void
   ): Promise<void> {
-    return this.http.put(`/editsallowedhandler/${explorationId}`, {
-      edits_are_allowed: editsAreAllowed
-    }).toPromise().then(callback, () => {});
+    return this.http
+      .put(`/editsallowedhandler/${explorationId}`, {
+        edits_are_allowed: editsAreAllowed,
+      })
+      .toPromise()
+      .then(callback, () => {});
   }
 }
 
-angular.module('oppia').factory('ExplorationEditsAllowedBackendApiService',
-  downgradeInjectable(ExplorationEditsAllowedBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationEditsAllowedBackendApiService',
+    downgradeInjectable(ExplorationEditsAllowedBackendApiService)
+  );

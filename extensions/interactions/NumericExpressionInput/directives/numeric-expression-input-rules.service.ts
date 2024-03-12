@@ -16,22 +16,23 @@
  * @fileoverview Rules service for the NumericExpressionInput interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { NumericExpressionAnswer } from 'interactions/answer-defs';
-import { NumericExpressionRuleInputs } from 'interactions/rule-input-defs';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {NumericExpressionAnswer} from 'interactions/answer-defs';
+import {NumericExpressionRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NumericExpressionInputRulesService {
   MatchesExactlyWith(
-      answer: NumericExpressionAnswer,
-      inputs: NumericExpressionRuleInputs): boolean {
+    answer: NumericExpressionAnswer,
+    inputs: NumericExpressionRuleInputs
+  ): boolean {
     answer = answer.replace(/\s/g, '');
     inputs.x = inputs.x.replace(/\s/g, '');
 
@@ -39,8 +40,8 @@ export class NumericExpressionInputRulesService {
   }
 
   MatchesUpToTrivialManipulations(
-      answer: NumericExpressionAnswer,
-      inputs: NumericExpressionRuleInputs
+    answer: NumericExpressionAnswer,
+    inputs: NumericExpressionRuleInputs
   ): boolean {
     let mis = new MathInteractionsService();
 
@@ -70,14 +71,16 @@ export class NumericExpressionInputRulesService {
   }
 
   IsEquivalentTo(
-      answer: NumericExpressionAnswer, inputs: NumericExpressionRuleInputs
+    answer: NumericExpressionAnswer,
+    inputs: NumericExpressionRuleInputs
   ): boolean {
-    return nerdamer(answer).eq(
-      nerdamer(inputs.x).toString()
-    );
+    return nerdamer(answer).eq(nerdamer(inputs.x).toString());
   }
 }
 
-angular.module('oppia').factory(
-  'NumericExpressionInputRulesService',
-  downgradeInjectable(NumericExpressionInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'NumericExpressionInputRulesService',
+    downgradeInjectable(NumericExpressionInputRulesService)
+  );

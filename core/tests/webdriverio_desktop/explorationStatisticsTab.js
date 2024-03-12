@@ -21,41 +21,34 @@ var forms = require('../webdriverio_utils/forms.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-
-var CreatorDashboardPage =
-  require('../webdriverio_utils/CreatorDashboardPage.js');
-var ExplorationEditorPage =
-  require('../webdriverio_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage =
-  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
-describe('Statistics tab', function() {
+describe('Statistics tab', function () {
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
 
-  beforeEach(function() {
+  beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   });
 
-  it('should check statistics tab for an exploration', async function() {
+  it('should check statistics tab for an exploration', async function () {
     var EXPLORATION_TITLE = 'Exploration for stats testing';
     var EXPLORATION_OBJECTIVE = 'To explore something';
     var EXPLORATION_CATEGORY = 'Algorithms';
     var EXPLORATION_LANGUAGE = 'English';
-    await users.createUser(
-      'user1@statisticsTab.com', 'statisticsTabCreator');
-    await users.createUser(
-      'user2@statisticsTab.com', 'statisticsTabLearner1');
-    await users.createUser(
-      'user3@statisticsTab.com', 'statisticsTabLearner2');
+    await users.createUser('user1@statisticsTab.com', 'statisticsTabCreator');
+    await users.createUser('user2@statisticsTab.com', 'statisticsTabLearner1');
+    await users.createUser('user3@statisticsTab.com', 'statisticsTabLearner2');
     var libraryPage = new LibraryPage.LibraryPage();
     var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    var explorationPlayerPage = (
-      new ExplorationPlayerPage.ExplorationPlayerPage());
+    var explorationPlayerPage =
+      new ExplorationPlayerPage.ExplorationPlayerPage();
     var explorationStatsTab = explorationEditorPage.getStatsTab();
 
     // Creator creates and publishes an exploration.
@@ -71,39 +64,60 @@ describe('Statistics tab', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setStateName('One');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Please write 1 in words.'), true);
+      await forms.toRichText('Please write 1 in words.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('Good job'), 'Two', true, 'Equals',
-      ['One']);
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+      'TextInput',
+      await forms.toRichText('Good job'),
+      'Two',
+      true,
+      'Equals',
+      ['One']
+    );
+    var responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setFeedback(await forms.toRichText('Try again'));
 
     await explorationEditorMainTab.moveToState('Two');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Please write 2 in words.'), true);
+      await forms.toRichText('Please write 2 in words.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('Good job'), 'Three', true, 'Equals',
-      ['Two']);
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+      'TextInput',
+      await forms.toRichText('Good job'),
+      'Three',
+      true,
+      'Equals',
+      ['Two']
+    );
+    responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setFeedback(await forms.toRichText('Try again'));
     await explorationEditorMainTab.addHint('The number 2 in words.');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'Two',
-      explanation: 'The English equivalent of 2'
+      explanation: 'The English equivalent of 2',
     });
     await explorationEditorMainTab.moveToState('Three');
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Please write 3 in words.'), true);
+      await forms.toRichText('Please write 3 in words.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('Good job'), 'End', true, 'Equals',
-      ['Three']);
-    responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
+      'TextInput',
+      await forms.toRichText('Good job'),
+      'End',
+      true,
+      'Equals',
+      ['Three']
+    );
+    responseEditor =
+      await explorationEditorMainTab.getResponseEditor('default');
     await responseEditor.setFeedback(await forms.toRichText('Try again'));
 
     await explorationEditorMainTab.moveToState('End');

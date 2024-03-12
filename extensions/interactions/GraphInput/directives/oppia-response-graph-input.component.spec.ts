@@ -16,29 +16,31 @@
  * @fileoverview Unti tests for the GraphInput response.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { GraphDetailService } from './graph-detail.service';
-import { ResponseGraphInput } from './oppia-response-graph-input.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {GraphDetailService} from './graph-detail.service';
+import {ResponseGraphInput} from './oppia-response-graph-input.component';
 
 describe('ResponseGraphInput', () => {
   let component: ResponseGraphInput;
   let fixture: ComponentFixture<ResponseGraphInput>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: string) {
+    escapedJsonToObj: function (answer: string) {
       return JSON.parse(answer);
-    }
+    },
   };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseGraphInput],
-      providers: [GraphDetailService,
+      providers: [
+        GraphDetailService,
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }]
+          useValue: mockHtmlEscaperService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -46,7 +48,8 @@ describe('ResponseGraphInput', () => {
     fixture = TestBed.createComponent(ResponseGraphInput);
     component = fixture.componentInstance;
 
-    component.answer = '{' +
+    component.answer =
+      '{' +
       '  "isWeighted": false,' +
       '  "edges": [' +
       '      {' +
@@ -93,44 +96,45 @@ describe('ResponseGraphInput', () => {
         {
           src: 0,
           dst: 1,
-          weight: 1
+          weight: 1,
         },
         {
           src: 1,
           dst: 2,
-          weight: 1
-        }
+          weight: 1,
+        },
       ],
       isDirected: false,
       vertices: [
         {
           x: 150,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 200,
           y: 50,
-          label: ''
+          label: '',
         },
         {
           x: 150,
           y: 100,
-          label: ''
-        }
+          label: '',
+        },
       ],
-      isLabeled: false
+      isLabeled: false,
     });
     expect(component.VERTEX_RADIUS).toBe(6);
     expect(component.EDGE_WIDTH).toBe(3);
   });
 
   it('should return directed edge arrow points when called', () => {
-    expect(component.getDirectedEdgeArrowPoints(0))
-      .toBe('196,50 186,45 186,55');
+    expect(component.getDirectedEdgeArrowPoints(0)).toBe(
+      '196,50 186,45 186,55'
+    );
   });
 
   it('should return edge center when called', () => {
-    expect(component.getEdgeCenter(0)).toEqual({ x: 175, y: 50 });
+    expect(component.getEdgeCenter(0)).toEqual({x: 175, y: 50});
   });
 });

@@ -16,19 +16,18 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ContentTranslationLanguageService } from
-  'pages/exploration-player-page/services/content-translation-language.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { State } from 'domain/state/StateObjectFactory';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { ImageClickInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { EntityTranslationsService } from 'services/entity-translations.services';
+import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {State} from 'domain/state/StateObjectFactory';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {EntityTranslationsService} from 'services/entity-translations.services';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExtractImageFilenamesFromModelService {
   constructor(
@@ -51,23 +50,27 @@ export class ExtractImageFilenamesFromModelService {
    *                           filepath should be extracted.
    */
   _extractFilepathValueFromOppiaNonInteractiveImageTag(
-      htmlString: string
+    htmlString: string
   ): string[] {
     let filenames = [];
-    let unescapedHtmlString = (
-      this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
-    let dummyDocument = (
-      new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
+    let unescapedHtmlString =
+      this.htmlEscaperService.escapedStrToUnescapedStr(htmlString);
+    let dummyDocument = new DOMParser().parseFromString(
+      unescapedHtmlString,
+      'text/html'
+    );
 
     let imageTagLists = [];
 
     // Add images that are in the base content (not embedded).
     imageTagLists.push(
-      dummyDocument.getElementsByTagName('oppia-noninteractive-image'));
+      dummyDocument.getElementsByTagName('oppia-noninteractive-image')
+    );
 
     // Add images that are embedded in collapsibles.
     let collapsibleTagList = dummyDocument.getElementsByTagName(
-      'oppia-noninteractive-collapsible');
+      'oppia-noninteractive-collapsible'
+    );
     for (let i = 0; i < collapsibleTagList.length; i++) {
       // Get attribute from a collapsible. If the given attribute does not
       // exist, then attribute is null which means skip the current
@@ -76,17 +79,20 @@ export class ExtractImageFilenamesFromModelService {
       let attribute = collapsibleTagList[i].getAttribute('content-with-value');
       if (attribute !== null) {
         let contentWithValue = JSON.parse(attribute);
-        let collapsibleDocument = (
-          new DOMParser().parseFromString(contentWithValue, 'text/html'));
+        let collapsibleDocument = new DOMParser().parseFromString(
+          contentWithValue,
+          'text/html'
+        );
         imageTagLists.push(
-          collapsibleDocument.getElementsByTagName(
-            'oppia-noninteractive-image'));
+          collapsibleDocument.getElementsByTagName('oppia-noninteractive-image')
+        );
       }
     }
 
     // Add images that are embedded in tabs.
     let tabsTagList = dummyDocument.getElementsByTagName(
-      'oppia-noninteractive-tabs');
+      'oppia-noninteractive-tabs'
+    );
     for (let i = 0; i < tabsTagList.length; i++) {
       // Get attribute from a tab. If the given attribute does not exist,
       // then attribute is null which means skip the current tab. If the
@@ -96,11 +102,13 @@ export class ExtractImageFilenamesFromModelService {
       if (attribute !== null) {
         let contentsWithValue = JSON.parse(attribute);
         for (let contentWithValue of contentsWithValue) {
-          let tabDocument = (
-            new DOMParser().parseFromString(
-              contentWithValue.content, 'text/html'));
+          let tabDocument = new DOMParser().parseFromString(
+            contentWithValue.content,
+            'text/html'
+          );
           imageTagLists.push(
-            tabDocument.getElementsByTagName('oppia-noninteractive-image'));
+            tabDocument.getElementsByTagName('oppia-noninteractive-image')
+          );
         }
       }
     }
@@ -119,8 +127,8 @@ export class ExtractImageFilenamesFromModelService {
         let attribute = imageTagList[i].getAttribute('filepath-with-value');
         if (attribute !== null) {
           let filename = JSON.parse(
-            this.htmlEscaperService.escapedStrToUnescapedStr(
-              attribute));
+            this.htmlEscaperService.escapedStrToUnescapedStr(attribute)
+          );
           filenames.push(filename);
         }
       }
@@ -135,16 +143,19 @@ export class ExtractImageFilenamesFromModelService {
    *                           filepath should be extracted.
    */
   _extractSvgFilenameFromOppiaNonInteractiveMathTag(
-      htmlString: string
+    htmlString: string
   ): string[] {
     let filenames = [];
-    let unescapedHtmlString = (
-      this.htmlEscaperService.escapedStrToUnescapedStr(htmlString));
-    let dummyDocument = (
-      new DOMParser().parseFromString(unescapedHtmlString, 'text/html'));
+    let unescapedHtmlString =
+      this.htmlEscaperService.escapedStrToUnescapedStr(htmlString);
+    let dummyDocument = new DOMParser().parseFromString(
+      unescapedHtmlString,
+      'text/html'
+    );
 
     let mathTagList = dummyDocument.getElementsByTagName(
-      'oppia-noninteractive-math');
+      'oppia-noninteractive-math'
+    );
     for (let i = 0; i < mathTagList.length; i++) {
       // Get attribute from a mathTag. If the given attribute does not exist,
       // then attribute is null which means skip the current mathTag.
@@ -169,18 +180,17 @@ export class ExtractImageFilenamesFromModelService {
     // directly stored in the customizationArgs.imageAndRegion.value
     // .imagePath.
     if (state.interaction.id === this.INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-      let filename = ((
+      let filename = (
         state.interaction.customizationArgs as ImageClickInputCustomizationArgs
-      ).imageAndRegions.value.imagePath);
+      ).imageAndRegions.value.imagePath;
       filenamesInState.push(filename);
     }
     let allHtmlOfState: string[] = state.getAllHTMLStrings();
-    let htmlTranslations: string[] = (
+    let htmlTranslations: string[] =
       this.entityTranslationsService.getHtmlTranslations(
         this.contentTranslationLanguageService.getCurrentContentLanguageCode(),
         state.getAllContentIds()
-      )
-    );
+      );
     return [
       ...filenamesInState,
       ...this._extractFilenamesFromHtmlList(allHtmlOfState),
@@ -200,7 +210,9 @@ export class ExtractImageFilenamesFromModelService {
     }
     for (let workedExample of skill.getConceptCard().getWorkedExamples()) {
       htmlList.push(
-        workedExample.getExplanation().html, workedExample.getQuestion().html);
+        workedExample.getExplanation().html,
+        workedExample.getQuestion().html
+      );
     }
     htmlList.push(skill.getConceptCard().getExplanation().html);
     skill.getRubrics().forEach(rubric => {
@@ -211,10 +223,11 @@ export class ExtractImageFilenamesFromModelService {
 
   _extractFilenamesFromHtmlList(htmlList: string[]): string[] {
     let filenames: string[] = [];
-    htmlList.forEach((htmlStr) => {
+    htmlList.forEach(htmlStr => {
       filenames.push(
         ...this._extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr),
-        ...this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr));
+        ...this._extractSvgFilenameFromOppiaNonInteractiveMathTag(htmlStr)
+      );
     });
     return filenames;
   }
@@ -223,7 +236,9 @@ export class ExtractImageFilenamesFromModelService {
   getImageFilenamesInState = this._getImageFilenamesInState;
 }
 
-
-angular.module('oppia').factory(
-  'ExtractImageFilenamesFromModelService',
-  downgradeInjectable(ExtractImageFilenamesFromModelService));
+angular
+  .module('oppia')
+  .factory(
+    'ExtractImageFilenamesFromModelService',
+    downgradeInjectable(ExtractImageFilenamesFromModelService)
+  );

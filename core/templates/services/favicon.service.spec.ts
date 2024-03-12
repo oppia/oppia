@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for favicon service.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { WindowRef } from './contextual/window-ref.service';
-import { FaviconService } from './favicon.service';
+import {TestBed} from '@angular/core/testing';
+import {WindowRef} from './contextual/window-ref.service';
+import {FaviconService} from './favicon.service';
 
 describe('Favicon service', () => {
   let faviconService: FaviconService;
@@ -32,9 +32,9 @@ describe('Favicon service', () => {
   it('should set the favicon to the given url', () => {
     const faviconUrl = '/assets/images/logo/favicon.png';
     const linkElement: HTMLLinkElement = document.createElement('link');
-    spyOn(
-      windowRef.nativeWindow.document, 'querySelector'
-    ).and.returnValue(linkElement);
+    spyOn(windowRef.nativeWindow.document, 'querySelector').and.returnValue(
+      linkElement
+    );
 
     faviconService.setFavicon(faviconUrl);
 

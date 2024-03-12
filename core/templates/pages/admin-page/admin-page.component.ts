@@ -16,14 +16,14 @@
  * @fileoverview Data and component for the Oppia admin page.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminRouterService } from './services/admin-router.service';
+import {ChangeDetectorRef, Component, EventEmitter} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AdminRouterService} from './services/admin-router.service';
 
 @Component({
   selector: 'oppia-admin-page',
-  templateUrl: './admin-page.component.html'
+  templateUrl: './admin-page.component.html',
 })
 export class AdminPageComponent {
   statusMessage = '';
@@ -37,11 +37,11 @@ export class AdminPageComponent {
   ) {}
 
   ngOnInit(): void {
-    this.adminRouterService.showTab(
-      this.windowRef.nativeWindow.location.hash);
+    this.adminRouterService.showTab(this.windowRef.nativeWindow.location.hash);
     this.windowRef.nativeWindow.onhashchange = () => {
       this.adminRouterService.showTab(
-        this.windowRef.nativeWindow.location.hash);
+        this.windowRef.nativeWindow.location.hash
+      );
     };
   }
 

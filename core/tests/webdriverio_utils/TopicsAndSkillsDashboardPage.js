@@ -22,14 +22,14 @@ var waitFor = require('./waitFor.js');
 var workflow = require('./workflow.js');
 var general = require('../webdriverio_utils/general.js');
 
-var TopicsAndSkillsDashboardPage = function() {
+var TopicsAndSkillsDashboardPage = function () {
   var assignSkillToTopicButton = $('.e2e-test-assign-skill-to-topic-button');
   var assignSkillToTopicButtonLocator =
     '.e2e-test-assign-skill-to-topic-button';
-  var assignSkillToTopicButtonsSelector = function() {
+  var assignSkillToTopicButtonsSelector = function () {
     return $$('.e2e-test-assign-skill-to-topic-button');
   };
-  var topicEditOptionsMobileSelector = function() {
+  var topicEditOptionsMobileSelector = function () {
     return $$('.e2e-test-mobile-topic-name');
   };
   var assignedTopicNameInputClass = '.e2e-test-unassign-topic';
@@ -44,7 +44,8 @@ var TopicsAndSkillsDashboardPage = function() {
   var createSkillButton = $('.e2e-test-create-skill-button');
   var createSkillButtonSecondary = $('.e2e-test-create-skill-button-circle');
   var createSkillButtonSecondaryMobile = $(
-    '.e2e-test-mobile-create-skill-button-secondary');
+    '.e2e-test-mobile-create-skill-button-secondary'
+  );
   var createTopicButton = $('.e2e-test-create-topic-button');
   var deleteSkillButton = $('.e2e-test-delete-skill-button');
   var deleteTopicButton = $('.e2e-test-delete-topic-button');
@@ -53,18 +54,18 @@ var TopicsAndSkillsDashboardPage = function() {
   var mergeSkillsButton = $('.e2e-test-merge-skills-button');
   var noSkillsPresentMessage = $('.e2e-test-no-skills-present-message');
   var openConceptCardExplanationButton = $('.e2e-test-open-concept-card');
-  var openSkillEditorButtonsSelector = function() {
+  var openSkillEditorButtonsSelector = function () {
     return $$('.e2e-test-open-skill-editor');
   };
-  var skillDescriptionsElementSelector = function() {
+  var skillDescriptionsElementSelector = function () {
     return $$('.e2e-test-skill-description');
   };
   var skillDescriptionField = $('.e2e-test-skill-description-field');
-  var skillEditOptionsSelector = function() {
+  var skillEditOptionsSelector = function () {
     return $$('.e2e-test-skill-edit-box');
   };
   var skillsListItem = $('.e2e-test-skills-list-item');
-  var skillsListItemsSelector = function() {
+  var skillsListItemsSelector = function () {
     return $$('.e2e-test-skills-list-item');
   };
   var skillNameField = $('.e2e-test-new-skill-description-field');
@@ -73,18 +74,18 @@ var TopicsAndSkillsDashboardPage = function() {
   var skillsTable = $('.e2e-test-skills-table');
   var thumbnailContainer = $('.e2e-test-thumbnail-container');
   var topicDescriptionField = $('.e2e-test-new-topic-description-field');
-  var topicEditOptionsSelector = function() {
+  var topicEditOptionsSelector = function () {
     return $$('.e2e-test-topic-edit-box');
   };
   var topicFilterKeywordField = $('.e2e-test-select-keyword-dropdown');
   var topicFilterClassroomField = $('.e2e-test-select-classroom-dropdown');
   var topicsListItem = $('.e2e-test-topics-list-item');
-  var topicsListItemsSelector = function() {
+  var topicsListItemsSelector = function () {
     return $$('.e2e-test-topics-list-item');
   };
   var topicNameField = $('.e2e-test-new-topic-name-field');
   var topicNameFieldElement = $('.e2e-test-topic-name-field');
-  var topicNamesSelector = function() {
+  var topicNamesSelector = function () {
     return $$('.e2e-test-topic-name');
   };
   var topicPageTitleFragmentField = $('.e2e-test-new-page-title-fragm-field');
@@ -98,78 +99,96 @@ var TopicsAndSkillsDashboardPage = function() {
   var closeSkillFilter = $('.e2e-test-mobile-filter-close');
   var skillsTableMobile = $('.e2e-test-mobile-skills-table');
   var assignSkillToTopicButtonsMobile = $(
-    '.e2e-test-mobile-assign-skill-to-topic-button');
+    '.e2e-test-mobile-assign-skill-to-topic-button'
+  );
   var skillOptions = $('.e2e-test-mobile-skills-option');
 
-  this.get = async function() {
-    await waitFor.clientSideRedirection(async() => {
-      await browser.url('/');
-    }, (url) => {
-      return /learner-dashboard/.test(url);
-    }, async() => {
-      await waitFor.pageToFullyLoad();
-    });
+  this.get = async function () {
+    await waitFor.clientSideRedirection(
+      async () => {
+        await browser.url('/');
+      },
+      url => {
+        return /learner-dashboard/.test(url);
+      },
+      async () => {
+        await waitFor.pageToFullyLoad();
+      }
+    );
     await general.navigateToTopicsAndSkillsDashboardPage();
     expect(await browser.getUrl()).toEqual(
-      'http://localhost:8181/topics-and-skills-dashboard');
+      'http://localhost:8181/topics-and-skills-dashboard'
+    );
   };
 
   // Only use this if the skills count is not zero. This is supposed to be used
   // for actions being performed on the skills like deleting, assigning etc.
-  this.waitForSkillsToLoad = async function() {
+  this.waitForSkillsToLoad = async function () {
     let width = (await browser.getWindowSize()).width;
     if (width < 831) {
       await waitFor.visibilityOf(
-        skillsTableMobile, 'Skills table taking too long to appear.');
+        skillsTableMobile,
+        'Skills table taking too long to appear.'
+      );
       await waitFor.invisibilityOf(
-        noSkillsPresentMessage, 'Skills list taking too long to appear.');
+        noSkillsPresentMessage,
+        'Skills list taking too long to appear.'
+      );
     } else {
       await waitFor.visibilityOf(
-        skillsTable, 'Skills table taking too long to appear.');
+        skillsTable,
+        'Skills table taking too long to appear.'
+      );
       await waitFor.invisibilityOf(
-        noSkillsPresentMessage, 'Skills list taking too long to appear.');
+        noSkillsPresentMessage,
+        'Skills list taking too long to appear.'
+      );
     }
   };
 
   // Only use this if the topics count is not zero. This is supposed to be used
   // for actions being performed on the topics like editing, deleting etc.
-  this.waitForTopicsToLoad = async function() {
+  this.waitForTopicsToLoad = async function () {
     let width = (await browser.getWindowSize()).width;
     if (width < 831) {
       await waitFor.visibilityOf(
-        topicsTableMobile, 'Topics table taking too long to appear');
+        topicsTableMobile,
+        'Topics table taking too long to appear'
+      );
     } else {
       await waitFor.visibilityOf(
-        topicsTable, 'Topics table taking too long to appear');
+        topicsTable,
+        'Topics table taking too long to appear'
+      );
       await waitFor.visibilityOf(
-        topicsListItem, 'Topics list taking too long to appear');
+        topicsListItem,
+        'Topics list taking too long to appear'
+      );
     }
   };
 
-  this.isTopicTablePresent = async function() {
+  this.isTopicTablePresent = async function () {
     return await topicsTable.isExisting();
   };
 
-  this.mergeSkills = async function(oldSkillName, newSkillName) {
+  this.mergeSkills = async function (oldSkillName, newSkillName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(oldSkillName);
     var skillEditOptions = await skillEditOptionsSelector();
     expect(skillEditOptions.length).toEqual(1);
-    await action.click(
-      'Skill edit options', skillEditOptions[0]);
-    await action.click(
-      'Merge skill button', mergeSkillsButton);
+    await action.click('Skill edit options', skillEditOptions[0]);
+    await action.click('Merge skill button', mergeSkillsButton);
 
     var skill = $(`.e2e-test-skills-list-item*=${newSkillName}`);
     await action.click('Skill radio button', skill);
-    await action.click(
-      'Confirm Skills Merge button', confirmSkillsMergeButton);
+    await action.click('Confirm Skills Merge button', confirmSkillsMergeButton);
     await waitFor.invisibilityOf(
       confirmSkillsMergeButton,
-      'Confirm Skill Modal takes too long to close.');
+      'Confirm Skill Modal takes too long to close.'
+    );
   };
 
-  this.navigateToTopicWithIndex = async function(index) {
+  this.navigateToTopicWithIndex = async function (index) {
     await this.waitForTopicsToLoad();
     let width = (await browser.getWindowSize()).width;
     if (width < 831) {
@@ -177,15 +196,13 @@ var TopicsAndSkillsDashboardPage = function() {
       await action.click('Topic name', topicEditOptionsMobile[index]);
     } else {
       var topicEditOptions = await topicEditOptionsSelector();
-      await action.click(
-        'Topic edit option', topicEditOptions[index]);
-      await action.click(
-        'Edit topic button', editTopicButton);
+      await action.click('Topic edit option', topicEditOptions[index]);
+      await action.click('Edit topic button', editTopicButton);
     }
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSkillWithDescription = async function(description) {
+  this.navigateToSkillWithDescription = async function (description) {
     await this.navigateToSkillsTab();
     await this.waitForSkillsToLoad();
     var openSkillEditorButtons = await openSkillEditorButtonsSelector();
@@ -200,7 +217,7 @@ var TopicsAndSkillsDashboardPage = function() {
     }
   };
 
-  this.assignSkillToTopic = async function(skillName, topicName) {
+  this.assignSkillToTopic = async function (skillName, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
 
@@ -209,19 +226,27 @@ var TopicsAndSkillsDashboardPage = function() {
       await action.click('Skill Options', skillOptions);
       await waitFor.visibilityOf(
         assignSkillToTopicButtonsMobile,
-        'Assign skill to topic buttons taking too long to appear');
+        'Assign skill to topic buttons taking too long to appear'
+      );
       await action.click(
         'Assign skill to topic button',
-        assignSkillToTopicButtonsMobile);
+        assignSkillToTopicButtonsMobile
+      );
     } else {
       await waitFor.visibilityOf(
         assignSkillToTopicButton,
-        'Assign skill to topic buttons taking too long to appear');
+        'Assign skill to topic buttons taking too long to appear'
+      );
       await waitFor.numberOfElementsToBe(
-        assignSkillToTopicButtonLocator, 'assignSkillToTopicButtons', 1);
+        assignSkillToTopicButtonLocator,
+        'assignSkillToTopicButtons',
+        1
+      );
       var assignSkillToTopicButtons = await assignSkillToTopicButtonsSelector();
       await action.click(
-        'Assign skill to topic button', assignSkillToTopicButtons[0]);
+        'Assign skill to topic button',
+        assignSkillToTopicButtons[0]
+      );
     }
 
     var topic = $(`.e2e-test-topic-name-in-topic-select-modal=${topicName}`);
@@ -229,39 +254,61 @@ var TopicsAndSkillsDashboardPage = function() {
     await action.click('Confirm move button', confirmMoveButton);
     await waitFor.invisibilityOf(
       confirmMoveButton,
-      'Topic assignment modal taking too long to disappear');
+      'Topic assignment modal taking too long to disappear'
+    );
   };
 
-  this.createTopic = async function(
-      topicName, topicUrlFragment, description, shouldCloseTopicEditor) {
+  this.createTopic = async function (
+    topicName,
+    topicUrlFragment,
+    description,
+    shouldCloseTopicEditor
+  ) {
     var initialHandles = [];
     var handles = await browser.getWindowHandles();
     initialHandles = handles;
     var parentHandle = await browser.getWindowHandle();
     await waitFor.visibilityOf(
       createTopicButton,
-      'Create Topic Button takes too long to appear.');
+      'Create Topic Button takes too long to appear.'
+    );
     await action.click('Create Topic button', createTopicButton);
     await waitFor.visibilityOf(
       topicNameField,
-      'Create Topic modal takes too long to appear.');
+      'Create Topic modal takes too long to appear.'
+    );
     await action.setValue('Topic name field', topicNameField, topicName);
     await action.setValue(
-      'Topic URL fragment field', topicUrlFragmentField, topicUrlFragment);
+      'Topic URL fragment field',
+      topicUrlFragmentField,
+      topicUrlFragment
+    );
     await action.setValue(
-      'Topic description field', topicDescriptionField, description);
+      'Topic description field',
+      topicDescriptionField,
+      description
+    );
     await action.setValue(
       'Topic page title fragment field',
-      topicPageTitleFragmentField, description);
+      topicPageTitleFragmentField,
+      description
+    );
     await workflow.submitImage(
-      topicThumbnailButton, thumbnailContainer,
-      ('../data/test_svg.svg'), false);
+      topicThumbnailButton,
+      thumbnailContainer,
+      '../data/test_svg.svg',
+      false
+    );
 
     await action.click(
-      'Confirm Topic creation button', confirmTopicCreationButton);
+      'Confirm Topic creation button',
+      confirmTopicCreationButton
+    );
 
     await waitFor.newTabToBeCreated(
-      'Creating topic takes too long', '/topic_editor/');
+      'Creating topic takes too long',
+      '/topic_editor/'
+    );
     handles = await browser.getWindowHandles();
 
     var newHandle = null;
@@ -273,35 +320,39 @@ var TopicsAndSkillsDashboardPage = function() {
     }
     await browser.switchToWindow(newHandle);
     await waitFor.visibilityOf(
-      topicNameFieldElement, 'Topic Editor is taking too long to appear.');
+      topicNameFieldElement,
+      'Topic Editor is taking too long to appear.'
+    );
     if (shouldCloseTopicEditor) {
       await browser.closeWindow();
       await browser.switchToWindow(parentHandle);
       await waitFor.invisibilityOf(
         confirmTopicCreationButton,
-        'Create Topic modal takes too long to disappear.');
+        'Create Topic modal takes too long to disappear.'
+      );
     }
     return await waitFor.pageToFullyLoad();
   };
 
-  this.filterSkillsByStatus = async function(status) {
+  this.filterSkillsByStatus = async function (status) {
     let width = (await browser.getWindowSize()).width;
     if (width < 831) {
       await action.click('Skill Filter', openFilter);
     }
 
     await action.click(
-      'Skill Dashboard status filter', skillStatusFilterDropdown);
+      'Skill Dashboard status filter',
+      skillStatusFilterDropdown
+    );
     var dropdownOption = $(`.mat-option-text=${status}`);
-    await action.click(
-      'Skill status filter option: ' + status, dropdownOption);
+    await action.click('Skill status filter option: ' + status, dropdownOption);
 
     if (width < 831) {
       await action.click('Close Filter', closeSkillFilter);
     }
   };
 
-  this.filterTopicsByKeyword = async function(keyword) {
+  this.filterTopicsByKeyword = async function (keyword) {
     let width = (await browser.getWindowSize()).width;
     if (width < 831) {
       await action.click('Skill Filter', openFilter);
@@ -309,61 +360,73 @@ var TopicsAndSkillsDashboardPage = function() {
 
     await waitFor.visibilityOf(
       topicFilterKeywordField,
-      'Topic Dashboard keyword filter parent taking too long to appear.');
+      'Topic Dashboard keyword filter parent taking too long to appear.'
+    );
     var filterKeywordInput = topicFilterKeywordField.$(
-      '.e2e-test-multi-selection-input');
+      '.e2e-test-multi-selection-input'
+    );
 
     await action.setValue(
       'Topic Dashboard keyword filter: ' + keyword,
-      filterKeywordInput, keyword + '\n');
+      filterKeywordInput,
+      keyword + '\n'
+    );
 
     if (width < 831) {
       await action.click('Close Filter', closeSkillFilter);
     }
   };
 
-  this.filterTopicsByClassroom = async function(keyword) {
+  this.filterTopicsByClassroom = async function (keyword) {
     await action.click(
-      'Topic Dashboard classroom filter', topicFilterClassroomField);
+      'Topic Dashboard classroom filter',
+      topicFilterClassroomField
+    );
 
     var dropdownOption = $(`.mat-option-text=${keyword}`);
     await action.click(
-      'Topic dashboard classroom filter option', dropdownOption);
+      'Topic dashboard classroom filter option',
+      dropdownOption
+    );
   };
 
-  this.resetTopicFilters = async function() {
+  this.resetTopicFilters = async function () {
     await action.click('Reset button', topicResetFilters);
   };
 
-  this.deleteTopicWithName = async function(topicName) {
+  this.deleteTopicWithName = async function (topicName) {
     await this.waitForTopicsToLoad();
     await this.filterTopicsByKeyword(topicName);
     var topicEditOptions = await topicEditOptionsSelector();
     expect(topicEditOptions.length).toEqual(1);
-    await action.click(
-      'Topic edit option', topicEditOptions[0]);
+    await action.click('Topic edit option', topicEditOptions[0]);
     await action.click('Delete topic button', deleteTopicButton);
     await action.click(
-      'Confirm Delete Topic button', confirmTopicDeletionButton);
+      'Confirm Delete Topic button',
+      confirmTopicDeletionButton
+    );
     await this.get();
   };
 
-  this.deleteSkillWithName = async function(skillName) {
+  this.deleteSkillWithName = async function (skillName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillName);
     var skillEditOptions = await skillEditOptionsSelector();
     expect(await skillEditOptions.length).toEqual(1);
+    await action.click('Skill edit option', skillEditOptions[0]);
+    await action.click('Delete skill button', deleteSkillButton);
     await action.click(
-      'Skill edit option', skillEditOptions[0]);
-    await action.click(
-      'Delete skill button', deleteSkillButton);
-    await action.click(
-      'Confirm delete skill button', confirmSkillDeletionButton);
+      'Confirm delete skill button',
+      confirmSkillDeletionButton
+    );
     await waitFor.pageToFullyLoad();
   };
 
-  this.createSkillWithDescriptionAndExplanation = async function(
-      description, reviewMaterial, shouldCloseSkillEditor) {
+  this.createSkillWithDescriptionAndExplanation = async function (
+    description,
+    reviewMaterial,
+    shouldCloseSkillEditor
+  ) {
     var initialHandles = [];
     var handles = await browser.getWindowHandles();
     initialHandles = handles;
@@ -377,7 +440,9 @@ var TopicsAndSkillsDashboardPage = function() {
       } catch (e) {
         await this.navigateToSkillsTab();
         await action.click(
-          'Create Skill button', createSkillButtonSecondaryMobile);
+          'Create Skill button',
+          createSkillButtonSecondaryMobile
+        );
       }
     } else {
       try {
@@ -390,19 +455,28 @@ var TopicsAndSkillsDashboardPage = function() {
 
     await action.setValue('Skill Name Field', skillNameField, description);
     await action.click(
-      'Open Concept Card button', openConceptCardExplanationButton);
+      'Open Concept Card button',
+      openConceptCardExplanationButton
+    );
 
     await waitFor.visibilityOf(
-      editor, 'Explanation Editor takes too long to appear');
+      editor,
+      'Explanation Editor takes too long to appear'
+    );
     var skillReviewMaterialInput = editor.$('.e2e-test-rte');
     await action.setValue(
-      'Skill Review Material Field', skillReviewMaterialInput,
-      reviewMaterial, true);
+      'Skill Review Material Field',
+      skillReviewMaterialInput,
+      reviewMaterial,
+      true
+    );
 
     await action.click('Create Skill button', confirmSkillCreationButton);
 
     await waitFor.newTabToBeCreated(
-      'Creating skill takes too long', '/skill_editor/');
+      'Creating skill takes too long',
+      '/skill_editor/'
+    );
     handles = await browser.getWindowHandles();
     var newHandle = null;
     for (var i = 0; i < handles.length; i++) {
@@ -417,15 +491,18 @@ var TopicsAndSkillsDashboardPage = function() {
       await browser.switchToWindow(parentHandle);
       await waitFor.invisibilityOf(
         confirmSkillCreationButton,
-        'Create skill modal takes too long to be disappear.');
+        'Create skill modal takes too long to be disappear.'
+      );
     } else {
       await waitFor.visibilityOf(
-        skillDescriptionField, 'Skill Editor is taking too long to appear.');
+        skillDescriptionField,
+        'Skill Editor is taking too long to appear.'
+      );
     }
     await waitFor.pageToFullyLoad();
   };
 
-  this.unassignSkillFromTopic = async function(skillDescription, topicName) {
+  this.unassignSkillFromTopic = async function (skillDescription, topicName) {
     await this.waitForSkillsToLoad();
     await this.searchSkillByName(skillDescription);
     var skillEditOptions = await skillEditOptionsSelector();
@@ -438,24 +515,24 @@ var TopicsAndSkillsDashboardPage = function() {
     await waitFor.visibilityOf(
       assignedTopicNamesInput,
       'Topic names in unassign skill from topics modal taking' +
-      ' too long to appear.');
-    var topicListItem = $(
-      `.e2e-test-unassign-topic-label=${topicName}`);
-    var assignedTopicInput = topicListItem.$(
-      assignedTopicNameInputClass);
+        ' too long to appear.'
+    );
+    var topicListItem = $(`.e2e-test-unassign-topic-label=${topicName}`);
+    var assignedTopicInput = topicListItem.$(assignedTopicNameInputClass);
     await action.click('Assigned Topic Input', assignedTopicInput);
 
     await action.click('Confirm Unassign Skill', confirmUnassignSkillButton);
     await waitFor.invisibilityOf(
       confirmUnassignSkillButton,
-      'Unassign skill modal takes too long to close.');
+      'Unassign skill modal takes too long to close.'
+    );
   };
 
-  this.navigateToSkillsTab = async function() {
+  this.navigateToSkillsTab = async function () {
     await action.click('Skills tab button', skillsTabButton);
   };
 
-  this.expectNumberOfTopicsToBe = async function(number) {
+  this.expectNumberOfTopicsToBe = async function (number) {
     var topicsListItems = await topicsListItemsSelector();
     let topicsTableIsPresent = await topicsTable.isExisting();
     if (topicsTableIsPresent) {
@@ -463,7 +540,7 @@ var TopicsAndSkillsDashboardPage = function() {
     }
   };
 
-  this.expectTopicNameToBe = async function(topicName, index) {
+  this.expectTopicNameToBe = async function (topicName, index) {
     await this.waitForTopicsToLoad();
     var topicNames = await topicNamesSelector();
     var topicNamesElement = topicNames[index];
@@ -471,12 +548,12 @@ var TopicsAndSkillsDashboardPage = function() {
     expect(text).toEqual(topicName);
   };
 
-  this.getTopicsCount = async function() {
+  this.getTopicsCount = async function () {
     var topicsListItems = await topicsListItemsSelector();
     return topicsListItems.length;
   };
 
-  this.editTopic = async function(topicName) {
+  this.editTopic = async function (topicName) {
     await this.waitForTopicsToLoad();
     await this.filterTopicsByKeyword(topicName);
     var topicNames = await topicNamesSelector();
@@ -484,30 +561,34 @@ var TopicsAndSkillsDashboardPage = function() {
     await this.navigateToTopicWithIndex(0);
   };
 
-  this.expectSkillDescriptionToBe = async function(description, index) {
+  this.expectSkillDescriptionToBe = async function (description, index) {
     await this.waitForSkillsToLoad();
     var skillDescriptionsElement = await skillDescriptionsElementSelector();
     var text = await action.getText(
-      'Skill Description Element', skillDescriptionsElement[index]);
+      'Skill Description Element',
+      skillDescriptionsElement[index]
+    );
     expect(text).toEqual(description);
   };
 
-  this.expectNumberOfSkillsToBe = async function(number) {
+  this.expectNumberOfSkillsToBe = async function (number) {
     if (!number) {
       await waitFor.visibilityOf(
         noSkillsPresentMessage,
-        'No skills present message taking too long to appear.');
+        'No skills present message taking too long to appear.'
+      );
       expect(await noSkillsPresentMessage.isDisplayed()).toBe(true);
       return;
     }
     await waitFor.visibilityOf(
       skillsListItem,
-      'Skills are taking too long to appear.');
+      'Skills are taking too long to appear.'
+    );
     var skillsListItems = await skillsListItemsSelector();
     expect(skillsListItems.length).toEqual(number);
   };
 
-  this.searchSkillByName = async function(name) {
+  this.searchSkillByName = async function (name) {
     return await this.filterTopicsByKeyword(name);
   };
 };

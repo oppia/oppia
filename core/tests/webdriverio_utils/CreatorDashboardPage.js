@@ -20,17 +20,18 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var CreatorDashboardPage = function() {
+var CreatorDashboardPage = function () {
   var CREATOR_DASHBOARD_URL = '/creator-dashboard';
 
-  var allExplorationCardsSelector = function() {
+  var allExplorationCardsSelector = function () {
     return $$('.e2e-test-exploration-dashboard-card');
   };
   var activityCreationModal = $('.e2e-test-creation-modal');
   var averageRating = $('.e2e-test-oppia-average-rating');
   var collectionCard = $('.e2e-test-collection-card');
   var collectionEditorContainer = $(
-    '.e2e-test-collection-editor-cards-container');
+    '.e2e-test-collection-editor-cards-container'
+  );
   var createActivityButton = $('.e2e-test-create-activity');
   var createCollectionButton = $('.e2e-test-create-collection');
   var createExplorationButton = $('.e2e-test-create-exploration');
@@ -38,37 +39,39 @@ var CreatorDashboardPage = function() {
   var explorationDashboardCard = $('.e2e-test-exploration-dashboard-card');
   var explorationFeedbackCount = $('.e2e-test-exp-summary-tile-open-feedback');
   var expSummaryRowFeedbackElement = $(
-    '.e2e-test-exp-summary-row-open-feedback');
-  var expSummaryRowFeedbackElementsSelector = function() {
+    '.e2e-test-exp-summary-row-open-feedback'
+  );
+  var expSummaryRowFeedbackElementsSelector = function () {
     return $$('.e2e-test-exp-summary-row-open-feedback');
   };
   var expSummaryRowRatingElement = $('.e2e-test-exp-summary-row-rating');
-  var expSummaryRowRatingElementsSelector = function() {
+  var expSummaryRowRatingElementsSelector = function () {
     return $$('.e2e-test-exp-summary-row-rating');
   };
   var expSummaryRowTitleElement = $('.e2e-test-exp-summary-row-title');
-  var expSummaryRowTitleElementsSelector = function() {
+  var expSummaryRowTitleElementsSelector = function () {
     return $$('.e2e-test-exp-summary-row-title');
   };
   var expSummaryRowViewsElement = $('.e2e-test-exp-summary-row-num-views');
-  var expSummaryRowViewsElementsSelector = function() {
+  var expSummaryRowViewsElementsSelector = function () {
     return $$('.e2e-test-exp-summary-row-num-views');
   };
   var expSummaryTileFeedbackElement = $(
-    '.e2e-test-exp-summary-tile-open-feedback');
-  var expSummaryTileFeedbackElementsSelector = function() {
+    '.e2e-test-exp-summary-tile-open-feedback'
+  );
+  var expSummaryTileFeedbackElementsSelector = function () {
     return $$('.e2e-test-exp-summary-tile-open-feedback');
   };
   var expSummaryTileRatingElement = $('.e2e-test-exp-summary-tile-rating');
-  var expSummaryTileRatingElementsSelector = function() {
+  var expSummaryTileRatingElementsSelector = function () {
     return $$('.e2e-test-exp-summary-tile-rating');
   };
   var expSummaryTileTitleElement = $('.e2e-test-exp-summary-tile-title');
-  var expSummaryTileTitleElementsSelector = function() {
+  var expSummaryTileTitleElementsSelector = function () {
     return $$('.e2e-test-exp-summary-tile-title');
   };
   var expSummaryTileViewsElement = $('.e2e-test-exp-summary-tile-num-views');
-  var expSummaryTileViewsElementsSelector = function() {
+  var expSummaryTileViewsElementsSelector = function () {
     return $$('.e2e-test-exp-summary-tile-num-views');
   };
   var listViewButton = $('.e2e-test-oppia-list-view-btn');
@@ -79,193 +82,206 @@ var CreatorDashboardPage = function() {
   var totalPlays = $('.e2e-test-oppia-total-plays');
 
   // Returns all exploration card elements with the given name.
-  var _getExplorationElements = async function(explorationTitle) {
+  var _getExplorationElements = async function (explorationTitle) {
     await waitFor.visibilityOf(explorationDashboardCard);
     var allExplorationCards = allExplorationCardsSelector();
-    return await allExplorationCards.filter(async function(tile) {
+    return await allExplorationCards.filter(async function (tile) {
       var text = await tile.getText();
       // Tile text contains title, possibly followed by newline and text.
       return (
-        text.startsWith(explorationTitle + '\n') ||
-        text === explorationTitle
+        text.startsWith(explorationTitle + '\n') || text === explorationTitle
       );
     });
   };
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.url(CREATOR_DASHBOARD_URL);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getNumberOfFeedbackMessages = async function() {
+  this.getNumberOfFeedbackMessages = async function () {
     var feedbackCount = await explorationFeedbackCount.getText();
     return parseInt(feedbackCount);
   };
 
-  this.navigateToExplorationEditor = async function() {
+  this.navigateToExplorationEditor = async function () {
     await action.click('Exploration Dashboard Card', explorationDashboardCard);
     await waitFor.pageToFullyLoad();
   };
 
-  this.clickCreateActivityButton = async function() {
+  this.clickCreateActivityButton = async function () {
     await action.click('Create Activity Button', createActivityButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.clickCreateCollectionButton = async function() {
+  this.clickCreateCollectionButton = async function () {
     await waitFor.visibilityOf(
-      activityCreationModal, 'Activity Creation modal is not visible');
+      activityCreationModal,
+      'Activity Creation modal is not visible'
+    );
     await action.click('Create Collection Button', createCollectionButton);
     await waitFor.pageToFullyLoad();
     await waitFor.visibilityOf(collectionEditorContainer);
   };
 
-  this.clickCreateExplorationButton = async function() {
+  this.clickCreateExplorationButton = async function () {
     await action.click('Create Exploration Button', createExplorationButton);
     await waitFor.pageToFullyLoad();
   };
 
-  this.clickCreateNewExplorationButton = async function() {
+  this.clickCreateNewExplorationButton = async function () {
     await action.click(
-      'Create New Exploration Button', createNewExplorationButton);
+      'Create New Exploration Button',
+      createNewExplorationButton
+    );
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToCollectionEditor = async function() {
+  this.navigateToCollectionEditor = async function () {
     await action.click('Collection Card', collectionCard);
     await waitFor.pageToFullyLoad();
   };
 
-  this.navigateToSubscriptionDashboard = async function() {
+  this.navigateToSubscriptionDashboard = async function () {
     await action.click('Subscription Tab', subscriptionTab);
     await waitFor.pageToFullyLoad();
   };
 
-  this.editExploration = async function(explorationTitle) {
+  this.editExploration = async function (explorationTitle) {
     var elems = await _getExplorationElements(explorationTitle);
     if (elems.length === 0) {
       throw new Error(
-        'Could not find exploration tile with name ' + explorationTitle);
+        'Could not find exploration tile with name ' + explorationTitle
+      );
     }
     var explorationElement = elems[0].$('.e2e-test-title-mask');
     await action.click('Exploration Element', explorationElement);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getAverageRating = async function() {
-    await waitFor.visibilityOf(
-      averageRating, 'Unable to find average rating');
+  this.getAverageRating = async function () {
+    await waitFor.visibilityOf(averageRating, 'Unable to find average rating');
     return await averageRating.getText();
   };
 
-  this.getTotalPlays = async function() {
-    await waitFor.visibilityOf(
-      totalPlays, 'Unable to find total plays');
+  this.getTotalPlays = async function () {
+    await waitFor.visibilityOf(totalPlays, 'Unable to find total plays');
     return await totalPlays.getText();
   };
 
-  this.getOpenFeedbacks = async function() {
+  this.getOpenFeedbacks = async function () {
     await waitFor.visibilityOf(
-      openFeedbacks, 'Unable to find open feedbacks count');
+      openFeedbacks,
+      'Unable to find open feedbacks count'
+    );
     return await openFeedbacks.getText();
   };
 
-  this.getSubscribers = async function() {
-    await waitFor.visibilityOf(
-      subscribers, 'Unable to find subscribers count');
+  this.getSubscribers = async function () {
+    await waitFor.visibilityOf(subscribers, 'Unable to find subscribers count');
     return await subscribers.getText();
   };
 
-  this.getListView = async function() {
+  this.getListView = async function () {
     await waitFor.visibilityOf(
-      listViewButton, 'Unable to find list view button');
+      listViewButton,
+      'Unable to find list view button'
+    );
     await action.click('List View Button', listViewButton);
   };
 
   // Returns titles of each explorations in grid view.
-  this.getExpSummaryTileTitles = async function() {
+  this.getExpSummaryTileTitles = async function () {
     await waitFor.visibilityOf(
       expSummaryTileTitleElement,
-      'Unable to find exploration titles');
-    var expSummaryTileTitleElements = (
-      await expSummaryTileTitleElementsSelector());
+      'Unable to find exploration titles'
+    );
+    var expSummaryTileTitleElements =
+      await expSummaryTileTitleElementsSelector();
     return expSummaryTileTitleElements;
   };
 
   // Returns ratings of each explorations in grid view.
-  this.getExpSummaryTileRatings = async function() {
+  this.getExpSummaryTileRatings = async function () {
     await waitFor.visibilityOf(
       expSummaryTileRatingElement,
-      'Unable to find exploration ratings');
-    var expSummaryTileRatingElements = (
-      await expSummaryTileRatingElementsSelector());
+      'Unable to find exploration ratings'
+    );
+    var expSummaryTileRatingElements =
+      await expSummaryTileRatingElementsSelector();
     return expSummaryTileRatingElements;
   };
 
   // Returns open feedback count of each exploration in grid view.
-  this.getExpSummaryTileOpenFeedbackCount = async function() {
+  this.getExpSummaryTileOpenFeedbackCount = async function () {
     await waitFor.visibilityOf(
       expSummaryTileFeedbackElement,
-      'Unable to find exploration feedbacks');
-    var expSummaryTileFeedbackElements = (
-      await expSummaryTileFeedbackElementsSelector());
+      'Unable to find exploration feedbacks'
+    );
+    var expSummaryTileFeedbackElements =
+      await expSummaryTileFeedbackElementsSelector();
     return expSummaryTileFeedbackElements;
   };
 
   // Returns total views count of each exploration in grid view.
-  this.getExpSummaryTileViewsCount = async function() {
+  this.getExpSummaryTileViewsCount = async function () {
     await waitFor.visibilityOf(
       expSummaryTileViewsElement,
-      'Unable to find exploration views');
-    var expSummaryTileViewsElements = (
-      await expSummaryTileViewsElementsSelector());
+      'Unable to find exploration views'
+    );
+    var expSummaryTileViewsElements =
+      await expSummaryTileViewsElementsSelector();
     return expSummaryTileViewsElements;
   };
 
   // Returns titles of each explorations in list view.
-  this.getExpSummaryRowTitles = async function() {
+  this.getExpSummaryRowTitles = async function () {
     await waitFor.visibilityOf(
       expSummaryRowTitleElement,
-      'Unable to find exploration titles');
-    var expSummaryRowTitleElements = (
-      await expSummaryRowTitleElementsSelector());
+      'Unable to find exploration titles'
+    );
+    var expSummaryRowTitleElements = await expSummaryRowTitleElementsSelector();
     return expSummaryRowTitleElements;
   };
 
   // Returns ratings of each explorations in list view.
-  this.getExpSummaryRowRatings = async function() {
+  this.getExpSummaryRowRatings = async function () {
     await waitFor.visibilityOf(
       expSummaryRowRatingElement,
-      'Unable to find exploration ratings');
-    var expSummaryRowRatingElements = (
-      await expSummaryRowRatingElementsSelector());
+      'Unable to find exploration ratings'
+    );
+    var expSummaryRowRatingElements =
+      await expSummaryRowRatingElementsSelector();
     return expSummaryRowRatingElements;
   };
 
   // Returns open feedback count of each exploration in list view.
-  this.getExpSummaryRowOpenFeedbackCount = async function() {
+  this.getExpSummaryRowOpenFeedbackCount = async function () {
     await waitFor.visibilityOf(
       expSummaryRowFeedbackElement,
-      'Unable to find exploration feedbacks');
-    var expSummaryRowFeedbackElements = (
-      await expSummaryRowFeedbackElementsSelector());
+      'Unable to find exploration feedbacks'
+    );
+    var expSummaryRowFeedbackElements =
+      await expSummaryRowFeedbackElementsSelector();
     return expSummaryRowFeedbackElements;
   };
 
   // Returns total views count of each exploration in list view.
-  this.getExpSummaryRowViewsCount = async function() {
+  this.getExpSummaryRowViewsCount = async function () {
     await waitFor.visibilityOf(
       expSummaryRowViewsElement,
-      'Unable to find exploration views');
+      'Unable to find exploration views'
+    );
     var expSummaryRowViewsElements = await expSummaryRowViewsElementsSelector();
     return expSummaryRowViewsElements;
   };
 
-  this.expectToHaveExplorationCard = async function(explorationName) {
+  this.expectToHaveExplorationCard = async function (explorationName) {
     var explorationCards = await _getExplorationElements(explorationName);
     if (explorationCards.length === 0) {
       throw new Error(
-        'Could not find exploration title with name ' + explorationName);
+        'Could not find exploration title with name ' + explorationName
+      );
     }
     expect(explorationCards.length).toBeGreaterThanOrEqual(1);
   };

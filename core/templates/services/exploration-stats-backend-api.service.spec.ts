@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for the ExplorationStatsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {
   ExplorationStats,
-  ExplorationStatsBackendDict
+  ExplorationStatsBackendDict,
 } from 'domain/statistics/exploration-stats.model';
-import { ExplorationStatsBackendApiService } from
-  'services/exploration-stats-backend-api.service';
-import { StateStatsBackendDict } from
-  'domain/statistics/state-stats-model';
+import {ExplorationStatsBackendApiService} from 'services/exploration-stats-backend-api.service';
+import {StateStatsBackendDict} from 'domain/statistics/state-stats-model';
 
 describe('Exploration stats backend api service', () => {
   let explorationStatsBackendApiService: ExplorationStatsBackendApiService;
@@ -36,8 +36,9 @@ describe('Exploration stats backend api service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    explorationStatsBackendApiService = (
-      TestBed.get(ExplorationStatsBackendApiService));
+    explorationStatsBackendApiService = TestBed.get(
+      ExplorationStatsBackendApiService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -49,26 +50,25 @@ describe('Exploration stats backend api service', () => {
       num_actual_starts: 0,
       num_completions: 0,
       state_stats_mapping: {
-        Introduction: (
-          {
-            total_answers_count: 0,
-            useful_feedback_count: 0,
-            total_hit_count: 0,
-            first_hit_count: 0,
-            num_completions: 0,
-          } as StateStatsBackendDict),
+        Introduction: {
+          total_answers_count: 0,
+          useful_feedback_count: 0,
+          total_hit_count: 0,
+          first_hit_count: 0,
+          num_completions: 0,
+        } as StateStatsBackendDict,
       },
     };
-    let explorationStats: ExplorationStats = (
-      ExplorationStats.createFromBackendDict(
-        explorationStatsBackendDict));
+    let explorationStats: ExplorationStats =
+      ExplorationStats.createFromBackendDict(explorationStatsBackendDict);
 
     let onSuccess = jasmine.createSpy('onSuccess', stats => {
       expect(stats).toEqual(explorationStats);
     });
     let onFailure = jasmine.createSpy('onFailure');
 
-    explorationStatsBackendApiService.fetchExplorationStatsAsync('eid')
+    explorationStatsBackendApiService
+      .fetchExplorationStatsAsync('eid')
       .then(onSuccess, onFailure);
 
     let req = httpTestingController.expectOne('/createhandler/statistics/eid');

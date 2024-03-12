@@ -18,16 +18,21 @@
 
 require(
   'interactions/NumberWithUnits/directives/' +
-  'number-with-units-rules.service.ts');
+    'number-with-units-rules.service.ts'
+);
 require(
   'interactions/NumberWithUnits/directives/' +
-  'number-with-units-validation.service.ts');
+    'number-with-units-validation.service.ts'
+);
 require(
   'interactions/NumberWithUnits/directives/' +
-  'oppia-interactive-number-with-units.component.ts');
+    'oppia-interactive-number-with-units.component.ts'
+);
 require(
   'interactions/NumberWithUnits/directives/' +
-  'oppia-response-number-with-units.component.ts');
+    'oppia-response-number-with-units.component.ts'
+);
 require(
   'interactions/NumberWithUnits/directives/' +
-  'oppia-short-response-number-with-units.component.ts');
+    'oppia-short-response-number-with-units.component.ts'
+);

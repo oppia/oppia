@@ -16,17 +16,15 @@
  * @fileoverview Component for the Draft Chapter Confirmation Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-story-editor-draft-confirmation-modal',
-  templateUrl: './draft-chapter-confirmation-modal.component.html'
+  templateUrl: './draft-chapter-confirmation-modal.component.html',
 })
 export class DraftChapterConfirmationModalComponent {
-  constructor(
-     private activeModal: NgbActiveModal
-  ) {}
+  constructor(private activeModal: NgbActiveModal) {}
 
   cancel(): void {
     this.activeModal.dismiss();

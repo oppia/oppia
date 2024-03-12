@@ -16,16 +16,16 @@
  * @fileoverview Root component for get started page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-get-started-page-root',
-  templateUrl: './get-started-page-root.component.html'
+  templateUrl: './get-started-page-root.component.html',
 })
 export class GetStartedPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -36,10 +36,12 @@ export class GetStartedPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.META
+    );
   }
 
   ngOnInit(): void {

@@ -18,8 +18,8 @@
  */
 
 export interface SubtitledHtmlBackendDict {
-  'content_id': string | null;
-  'html': string;
+  content_id: string | null;
+  html: string;
 }
 
 export class SubtitledHtml {
@@ -36,7 +36,7 @@ export class SubtitledHtml {
   toBackendDict(): SubtitledHtmlBackendDict {
     return {
       html: this._html,
-      content_id: this._contentId
+      content_id: this._contentId,
     };
   }
 
@@ -61,9 +61,12 @@ export class SubtitledHtml {
   }
 
   static createFromBackendDict(
-      subtitledHtmlBackendDict: SubtitledHtmlBackendDict): SubtitledHtml {
+    subtitledHtmlBackendDict: SubtitledHtmlBackendDict
+  ): SubtitledHtml {
     return new SubtitledHtml(
-      subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
+      subtitledHtmlBackendDict.html,
+      subtitledHtmlBackendDict.content_id
+    );
   }
 
   static createDefault(html: string, contentId: string): SubtitledHtml {

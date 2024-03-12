@@ -15,18 +15,19 @@
 /**
  * @fileoverview A data service that stores the current state content.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { StatePropertyService } from
+import {AlertsService} from 'services/alerts.service';
+import {
+  StatePropertyService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
-import { UtilsService } from 'services/utils.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+} from 'components/state-editor/state-editor-properties-services/state-property.service';
+import {UtilsService} from 'services/utils.service';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 // TODO(sll): Add validation.
 export class StateContentService extends StatePropertyService<SubtitledHtml> {
@@ -43,5 +44,6 @@ export class StateContentService extends StatePropertyService<SubtitledHtml> {
   }
 }
 
-angular.module('oppia').factory(
-  'StateContentService', downgradeInjectable(StateContentService));
+angular
+  .module('oppia')
+  .factory('StateContentService', downgradeInjectable(StateContentService));

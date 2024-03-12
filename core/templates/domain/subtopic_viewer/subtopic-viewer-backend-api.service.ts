@@ -16,67 +16,81 @@
  * @fileoverview Service to get subtopic data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import {
   ReadOnlySubtopicPageData,
-  SubtopicDataBackendDict
+  SubtopicDataBackendDict,
 } from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
-import { SubtopicViewerDomainConstants } from
-  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {SubtopicViewerDomainConstants} from 'domain/subtopic_viewer/subtopic-viewer-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SubtopicViewerBackendApiService {
   constructor(
     private http: HttpClient,
-    private urlInterpolation: UrlInterpolationService) {}
+    private urlInterpolation: UrlInterpolationService
+  ) {}
 
   private _fetchSubtopicData(
-      topicUrlFragment: string,
-      classroomUrlFragment: string,
-      subtopicUrlFragment: string,
-      successCallback: (value: ReadOnlySubtopicPageData) => void,
-      errorCallback: (reason: string) => void): void {
+    topicUrlFragment: string,
+    classroomUrlFragment: string,
+    subtopicUrlFragment: string,
+    successCallback: (value: ReadOnlySubtopicPageData) => void,
+    errorCallback: (reason: string) => void
+  ): void {
     var subtopicDataUrl = this.urlInterpolation.interpolateUrl(
-      SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE, {
+      SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE,
+      {
         topic_url_fragment: topicUrlFragment,
         classroom_url_fragment: classroomUrlFragment,
-        subtopic_url_fragment: subtopicUrlFragment
-      });
+        subtopic_url_fragment: subtopicUrlFragment,
+      }
+    );
 
-    this.http.get<SubtopicDataBackendDict>(subtopicDataUrl).toPromise()
-      .then(response => {
-        let subtopicDataObject = (
-          ReadOnlySubtopicPageData.createFromBackendDict(
-            response));
-        if (successCallback) {
-          successCallback(subtopicDataObject);
+    this.http
+      .get<SubtopicDataBackendDict>(subtopicDataUrl)
+      .toPromise()
+      .then(
+        response => {
+          let subtopicDataObject =
+            ReadOnlySubtopicPageData.createFromBackendDict(response);
+          if (successCallback) {
+            successCallback(subtopicDataObject);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      }, (errorResponse) => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      );
   }
 
   async fetchSubtopicDataAsync(
-      topicUrlFragment: string,
-      classroomUrlFragment: string,
-      subtopicUrlFragment: string): Promise<ReadOnlySubtopicPageData> {
+    topicUrlFragment: string,
+    classroomUrlFragment: string,
+    subtopicUrlFragment: string
+  ): Promise<ReadOnlySubtopicPageData> {
     return new Promise((resolve, reject) => {
       this._fetchSubtopicData(
-        topicUrlFragment, classroomUrlFragment,
-        subtopicUrlFragment, resolve, reject);
+        topicUrlFragment,
+        classroomUrlFragment,
+        subtopicUrlFragment,
+        resolve,
+        reject
+      );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'SubtopicViewerBackendApiService',
-  downgradeInjectable(SubtopicViewerBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'SubtopicViewerBackendApiService',
+    downgradeInjectable(SubtopicViewerBackendApiService)
+  );

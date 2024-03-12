@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for about foundation page.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AboutFoundationPageComponent } from './about-foundation-page.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { PageTitleService } from 'services/page-title.service';
+import {AboutFoundationPageComponent} from './about-foundation-page.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {PageTitleService} from 'services/page-title.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -35,21 +35,18 @@ class MockTranslateService {
 describe('About foundation page', () => {
   let translateService: TranslateService;
   let pageTitleService: PageTitleService;
-  beforeEach(async() => {
+  beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [
-        AboutFoundationPageComponent,
-        MockTranslatePipe
-      ],
+      declarations: [AboutFoundationPageComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
         PageTitleService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -57,16 +54,16 @@ describe('About foundation page', () => {
 
   beforeEach(() => {
     const aboutFoundationPageComponent = TestBed.createComponent(
-      AboutFoundationPageComponent);
+      AboutFoundationPageComponent
+    );
     component = aboutFoundationPageComponent.componentInstance;
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component from beforeEach block', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should set component properties when ngOnInit() is called', () => {
     spyOn(translateService.onLangChange, 'subscribe');
@@ -76,15 +73,18 @@ describe('About foundation page', () => {
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
 
-  it('should obtain translated page title whenever the selected' +
-  'language changes', () => {
-    component.ngOnInit();
-    spyOn(component, 'setPageTitle');
+  it(
+    'should obtain translated page title whenever the selected' +
+      'language changes',
+    () => {
+      component.ngOnInit();
+      spyOn(component, 'setPageTitle');
 
-    translateService.onLangChange.emit();
+      translateService.onLangChange.emit();
 
-    expect(component.setPageTitle).toHaveBeenCalled();
-  });
+      expect(component.setPageTitle).toHaveBeenCalled();
+    }
+  );
 
   it('should set new page title', () => {
     spyOn(translateService, 'instant').and.callThrough();
@@ -93,9 +93,11 @@ describe('About foundation page', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+      'I18N_ABOUT_FOUNDATION_PAGE_TITLE'
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+      'I18N_ABOUT_FOUNDATION_PAGE_TITLE'
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

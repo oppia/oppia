@@ -17,12 +17,12 @@
  * conversions.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 import yaml from 'js-yaml';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class YamlService {
   constructor() {}
@@ -38,5 +38,6 @@ export class YamlService {
   }
 }
 
-angular.module('oppia').factory(
-  'YamlService', downgradeInjectable(YamlService));
+angular
+  .module('oppia')
+  .factory('YamlService', downgradeInjectable(YamlService));

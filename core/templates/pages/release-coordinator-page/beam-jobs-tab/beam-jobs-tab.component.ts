@@ -17,31 +17,52 @@
  * release-coordinator panel.
  */
 
-import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { BehaviorSubject, combineLatest, interval, NEVER, Observable, of, Subscription, zip } from 'rxjs';
-import { catchError, distinctUntilChanged, first, map, startWith, switchMap } from 'rxjs/operators';
+import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {MatDialog} from '@angular/material/dialog';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {
+  BehaviorSubject,
+  combineLatest,
+  interval,
+  NEVER,
+  Observable,
+  of,
+  Subscription,
+  zip,
+} from 'rxjs';
+import {
+  catchError,
+  distinctUntilChanged,
+  first,
+  map,
+  startWith,
+  switchMap,
+} from 'rxjs/operators';
 
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { BeamJob } from 'domain/jobs/beam-job.model';
-import { CancelBeamJobDialogComponent } from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
-import { StartNewBeamJobDialogComponent } from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
-import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {BeamJob} from 'domain/jobs/beam-job.model';
+import {CancelBeamJobDialogComponent} from 'pages/release-coordinator-page/components/cancel-beam-job-dialog.component';
+import {StartNewBeamJobDialogComponent} from 'pages/release-coordinator-page/components/start-new-beam-job-dialog.component';
+import {ViewBeamJobOutputDialogComponent} from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-beam-jobs-tab',
-  templateUrl: './beam-jobs-tab.component.html'
+  templateUrl: './beam-jobs-tab.component.html',
 })
 export class BeamJobsTabComponent implements OnInit, OnDestroy {
   static readonly BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS = 15000;
 
   public dataFailedToLoad = false;
   readonly jobRunTableColumns: readonly string[] = [
-    'run_status', 'job_name', 'started_on', 'updated_on', 'action'];
+    'run_status',
+    'job_name',
+    'started_on',
+    'updated_on',
+    'action',
+  ];
 
   jobNameControl = new FormControl('');
 
@@ -59,15 +80,18 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   beamJobRuns = new BehaviorSubject<BeamJobRun[]>([]);
 
   constructor(
-      private backendApiService: ReleaseCoordinatorBackendApiService,
-      private alertsService: AlertsService,
-      private matDialog: MatDialog,
-      private ngZone: NgZone) {}
+    private backendApiService: ReleaseCoordinatorBackendApiService,
+    private alertsService: AlertsService,
+    private matDialog: MatDialog,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit(): void {
-    const initialBeamJobs = this.backendApiService.getBeamJobs()
+    const initialBeamJobs = this.backendApiService
+      .getBeamJobs()
       .pipe(catchError(error => this.onError<BeamJob>(error)));
-    const initialBeamJobRuns = this.backendApiService.getBeamJobRuns()
+    const initialBeamJobRuns = this.backendApiService
+      .getBeamJobRuns()
       .pipe(catchError(error => this.onError<BeamJobRun>(error)));
 
     zip(initialBeamJobs, initialBeamJobRuns)
@@ -79,8 +103,10 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
         this.dataIsReady = true;
       });
 
-    const jobNameInputChanges = this.jobNameControl.valueChanges
-      .pipe(startWith(''), distinctUntilChanged());
+    const jobNameInputChanges = this.jobNameControl.valueChanges.pipe(
+      startWith(''),
+      distinctUntilChanged()
+    );
 
     jobNameInputChanges.subscribe(input => {
       if (this.selectedJob?.name !== input) {
@@ -88,24 +114,27 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.filteredJobNames = combineLatest([jobNameInputChanges, this.jobNames])
-      .pipe(map(filterArgs => this.filterJobNames(...filterArgs)));
+    this.filteredJobNames = combineLatest([
+      jobNameInputChanges,
+      this.jobNames,
+    ]).pipe(map(filterArgs => this.filterJobNames(...filterArgs)));
 
-    this.filteredBeamJobRuns = (
-      combineLatest([this.beamJobRuns, this.filteredJobNames]).pipe(
-        map(
-          ([runs, jobNames]) => runs.filter(r => jobNames.includes(r.jobName))
-        )
-      )
+    this.filteredBeamJobRuns = combineLatest([
+      this.beamJobRuns,
+      this.filteredJobNames,
+    ]).pipe(
+      map(([runs, jobNames]) => runs.filter(r => jobNames.includes(r.jobName)))
     );
 
     // Intervals need to be executed *outside* of Angular so that they don't
     // interfere with testability (otherwise, the Angular component will never
     // be "ready" since an interval executes indefinitely).
     this.ngZone.runOutsideAngular(() => {
-      this.beamJobRunsRefreshIntervalSubscription = (
-        interval(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS)
-          .pipe(switchMap(() => {
+      this.beamJobRunsRefreshIntervalSubscription = interval(
+        BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS
+      )
+        .pipe(
+          switchMap(() => {
             // If every job in the current list is in a terminal state (won't
             // ever change), then we return NEVER (an Observable which neither
             // completes nor emits values) to avoid calling out to the backend.
@@ -119,13 +148,13 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
               // update on the state of our jobs.
               return this.backendApiService.getBeamJobRuns();
             }
-          }))
-          .subscribe(beamJobRuns => {
-            // When we're ready to update the beam jobs, we want the update to
-            // execute *inside* of Angular so that change detection can notice.
-            this.ngZone.run(() => this.beamJobRuns.next(beamJobRuns));
           })
-      );
+        )
+        .subscribe(beamJobRuns => {
+          // When we're ready to update the beam jobs, we want the update to
+          // execute *inside* of Angular so that change detection can notice.
+          this.ngZone.run(() => this.beamJobRuns.next(beamJobRuns));
+        });
     });
   }
 
@@ -150,8 +179,10 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
     ev.stopPropagation();
 
     this.matDialog
-      .open(StartNewBeamJobDialogComponent, { data: this.selectedJob })
-      .afterClosed().pipe(first()).subscribe(newBeamJobRun => {
+      .open(StartNewBeamJobDialogComponent, {data: this.selectedJob})
+      .afterClosed()
+      .pipe(first())
+      .subscribe(newBeamJobRun => {
         if (newBeamJobRun) {
           this.addNewBeamJobRun(newBeamJobRun);
         }
@@ -160,8 +191,10 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
 
   onCancelClick(beamJobRun: BeamJobRun): void {
     this.matDialog
-      .open(CancelBeamJobDialogComponent, { data: beamJobRun })
-      .afterClosed().pipe(first()).subscribe(cancelledBeamJobRun => {
+      .open(CancelBeamJobDialogComponent, {data: beamJobRun})
+      .afterClosed()
+      .pipe(first())
+      .subscribe(cancelledBeamJobRun => {
         if (cancelledBeamJobRun) {
           this.replaceBeamJobRun(beamJobRun, cancelledBeamJobRun);
         }
@@ -169,7 +202,7 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   }
 
   onViewOutputClick(beamJobRun: BeamJobRun): void {
-    this.matDialog.open(ViewBeamJobOutputDialogComponent, { data: beamJobRun });
+    this.matDialog.open(ViewBeamJobOutputDialogComponent, {data: beamJobRun});
   }
 
   private filterJobNames(input: string, jobNames: string[]): string[] {
@@ -190,5 +223,9 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaBeamJobsTab', downgradeComponent({ component: BeamJobsTabComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaBeamJobsTab',
+    downgradeComponent({component: BeamJobsTabComponent})
+  );

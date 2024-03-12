@@ -20,16 +20,16 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { Ratio } from 'domain/objects/ratio.model';
-import { RatioInputAnswer } from 'interactions/answer-defs';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {Ratio} from 'domain/objects/ratio.model';
+import {RatioInputAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-response-ratio-expression-input',
   templateUrl: './ratio-expression-input-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseRatioExpressionInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -50,6 +50,8 @@ export class ResponseRatioExpressionInputComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaResponseRatioExpressionInput', downgradeComponent({
-    component: ResponseRatioExpressionInputComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaResponseRatioExpressionInput',
+  downgradeComponent({
+    component: ResponseRatioExpressionInputComponent,
+  }) as angular.IDirectiveFactory
+);

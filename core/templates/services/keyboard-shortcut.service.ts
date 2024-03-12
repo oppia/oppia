@@ -17,33 +17,33 @@
  */
 
 import Mousetrap from 'mousetrap';
-import { Injectable, ApplicationRef } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { KeyboardShortcutHelpModalComponent } from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
-
+import {Injectable, ApplicationRef} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {KeyboardShortcutHelpModalComponent} from 'components/keyboard-shortcut-help/keyboard-shortcut-help-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class KeyboardShortcutService {
   constructor(
     private windowRef: WindowRef,
     private ngbModal: NgbModal,
-    private appRef: ApplicationRef) {}
+    private appRef: ApplicationRef
+  ) {}
 
   openQuickReference(): void {
     this.ngbModal.dismissAll();
-    this.ngbModal.open(
-      KeyboardShortcutHelpModalComponent, {backdrop: true});
+    this.ngbModal.open(KeyboardShortcutHelpModalComponent, {backdrop: true});
     this.appRef.tick();
   }
 
   bindExplorationPlayerShortcuts(): void {
     Mousetrap.bind('s', () => {
       var skipButton = document.querySelector(
-        '.oppia-skip-to-content') as HTMLElement;
+        '.oppia-skip-to-content'
+      ) as HTMLElement;
       if (skipButton !== null) {
         skipButton.focus();
       }
@@ -51,7 +51,8 @@ export class KeyboardShortcutService {
 
     Mousetrap.bind('k', () => {
       var previousButton = document.querySelector(
-        '.oppia-back-button') as HTMLElement;
+        '.oppia-back-button'
+      ) as HTMLElement;
       if (previousButton !== null) {
         previousButton.focus();
       }
@@ -59,9 +60,11 @@ export class KeyboardShortcutService {
 
     Mousetrap.bind('j', () => {
       var nextButton = document.querySelector(
-        '.oppia-next-button') as HTMLElement;
+        '.oppia-next-button'
+      ) as HTMLElement;
       var continueButton = document.querySelector(
-        '.oppia-learner-confirm-button') as HTMLElement;
+        '.oppia-learner-confirm-button'
+      ) as HTMLElement;
       if (nextButton !== null) {
         nextButton.focus();
       }
@@ -76,7 +79,8 @@ export class KeyboardShortcutService {
 
     Mousetrap.bind('left', () => {
       let previousButton = document.querySelector(
-        '.oppia-back-button') as HTMLElement;
+        '.oppia-back-button'
+      ) as HTMLElement;
       if (previousButton !== null) {
         previousButton.click();
       }
@@ -84,7 +88,8 @@ export class KeyboardShortcutService {
 
     Mousetrap.bind('right', () => {
       let nextButton = document.querySelector(
-        '.oppia-next-button') as HTMLElement;
+        '.oppia-next-button'
+      ) as HTMLElement;
       if (nextButton !== null) {
         nextButton.click();
       }
@@ -94,20 +99,23 @@ export class KeyboardShortcutService {
   bindLibraryPageShortcuts(): void {
     Mousetrap.bind('/', () => {
       var searchBar = document.querySelector(
-        '.oppia-search-bar-text-input') as HTMLElement;
+        '.oppia-search-bar-text-input'
+      ) as HTMLElement;
       searchBar.focus();
       return false;
     });
 
     Mousetrap.bind('c', () => {
       var categoryBar = document.querySelector(
-        '.oppia-search-bar-dropdown-toggle') as HTMLElement;
+        '.oppia-search-bar-dropdown-toggle'
+      ) as HTMLElement;
       categoryBar.focus();
     });
 
     Mousetrap.bind('s', () => {
       var skipButton = document.querySelector(
-        '.oppia-skip-to-content') as HTMLElement;
+        '.oppia-skip-to-content'
+      ) as HTMLElement;
       if (skipButton !== null) {
         skipButton.focus();
       }
@@ -117,7 +125,6 @@ export class KeyboardShortcutService {
       this.openQuickReference();
     });
   }
-
 
   bindNavigationShortcuts(): void {
     Mousetrap.bind('ctrl+6', () => {
@@ -146,5 +153,9 @@ export class KeyboardShortcutService {
   }
 }
 
-angular.module('oppia').factory(
-  'KeyboardShortcutService', downgradeInjectable(KeyboardShortcutService));
+angular
+  .module('oppia')
+  .factory(
+    'KeyboardShortcutService',
+    downgradeInjectable(KeyboardShortcutService)
+  );

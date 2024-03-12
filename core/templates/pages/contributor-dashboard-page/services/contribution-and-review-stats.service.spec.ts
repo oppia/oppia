@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for contribution and review service
  */
 
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ContributionAndReviewStatsService } from './contribution-and-review-stats.service';
-import { ContributionAndReviewStatsBackendApiService } from './contribution-and-review-stats-backend-api.service';
+import {TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ContributionAndReviewStatsService} from './contribution-and-review-stats.service';
+import {ContributionAndReviewStatsBackendApiService} from './contribution-and-review-stats-backend-api.service';
 
 describe('Contribution and review stats service', () => {
   let cars: ContributionAndReviewStatsService;
@@ -39,7 +39,7 @@ describe('Contribution and review stats service', () => {
     rejected_translations_count: 0,
     rejected_translation_word_count: 0,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
   const translationReviewStat = {
     language_code: 'es',
@@ -50,7 +50,7 @@ describe('Contribution and review stats service', () => {
     accepted_translations_with_reviewer_edits_count: 0,
     accepted_translation_word_count: 1,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
   const questionContributionStat = {
     topic_name: 'published_topic_name',
@@ -58,7 +58,7 @@ describe('Contribution and review stats service', () => {
     accepted_questions_count: 1,
     accepted_questions_without_reviewer_edits_count: 0,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
   const questionReviewStat = {
     topic_name: 'published_topic_name',
@@ -66,26 +66,26 @@ describe('Contribution and review stats service', () => {
     accepted_questions_count: 1,
     accepted_questions_with_reviewer_edits_count: 1,
     first_contribution_date: 'Mar 2021',
-    last_contribution_date: 'Mar 2021'
+    last_contribution_date: 'Mar 2021',
   };
 
   const fetchTranslationContributionStatResponse = {
-    translation_contribution_stats: [translationContributionStat]
+    translation_contribution_stats: [translationContributionStat],
   };
   const fetchTranslationReviewStatResponse = {
-    translation_review_stats: [translationReviewStat]
+    translation_review_stats: [translationReviewStat],
   };
   const fetchQuestionContributionStatResponse = {
-    question_contribution_stats: [questionContributionStat]
+    question_contribution_stats: [questionContributionStat],
   };
   const fetchQuestionReviewStatResponse = {
-    question_review_stats: [questionReviewStat]
+    question_review_stats: [questionReviewStat],
   };
   const fetchAllStatsResponse = {
     translation_contribution_stats: [translationContributionStat],
     translation_review_stats: [translationReviewStat],
     question_contribution_stats: [questionContributionStat],
-    question_review_stats: [questionReviewStat]
+    question_review_stats: [questionReviewStat],
   };
 
   beforeEach(() => {
@@ -93,106 +93,119 @@ describe('Contribution and review stats service', () => {
       imports: [HttpClientTestingModule],
       providers: [
         UrlInterpolationService,
-        ContributionAndReviewStatsBackendApiService
-      ]
+        ContributionAndReviewStatsBackendApiService,
+      ],
     });
     cars = TestBed.inject(ContributionAndReviewStatsService);
     carbas = TestBed.inject(ContributionAndReviewStatsBackendApiService);
   });
 
   describe('fetchTranslationContributionStats', () => {
-    it('should return available translation contribution stats',
-      () => {
-        fetchContributionAndReviewStatsAsyncSpy = spyOn(
-          carbas, 'fetchContributionAndReviewStatsAsync');
-        fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
-          Promise.resolve(fetchTranslationContributionStatResponse));
+    it('should return available translation contribution stats', () => {
+      fetchContributionAndReviewStatsAsyncSpy = spyOn(
+        carbas,
+        'fetchContributionAndReviewStatsAsync'
+      );
+      fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
+        Promise.resolve(fetchTranslationContributionStatResponse)
+      );
 
-        cars.fetchTranslationContributionStats('translator')
-          .then((response) => {
-            expect(response.translation_contribution_stats)
-              .toEqual([translationContributionStat]);
-          });
-
-        expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
+      cars.fetchTranslationContributionStats('translator').then(response => {
+        expect(response.translation_contribution_stats).toEqual([
+          translationContributionStat,
+        ]);
       });
+
+      expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
+    });
   });
 
   describe('fetchTranslationReviewStats', () => {
-    it('should return available translation review stats',
-      () => {
-        fetchContributionAndReviewStatsAsyncSpy = spyOn(
-          carbas, 'fetchContributionAndReviewStatsAsync');
-        fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
-          Promise.resolve(fetchTranslationReviewStatResponse));
+    it('should return available translation review stats', () => {
+      fetchContributionAndReviewStatsAsyncSpy = spyOn(
+        carbas,
+        'fetchContributionAndReviewStatsAsync'
+      );
+      fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
+        Promise.resolve(fetchTranslationReviewStatResponse)
+      );
 
-        cars.fetchTranslationReviewStats('translation_reviewer')
-          .then((response) => {
-            expect(response.translation_review_stats)
-              .toEqual([translationReviewStat]);
-          });
+      cars
+        .fetchTranslationReviewStats('translation_reviewer')
+        .then(response => {
+          expect(response.translation_review_stats).toEqual([
+            translationReviewStat,
+          ]);
+        });
 
-        expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
-      });
+      expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
+    });
   });
 
   describe('fetchQuestionContributionStats', () => {
-    it('should return available question contribution stats',
-      () => {
-        fetchContributionAndReviewStatsAsyncSpy = spyOn(
-          carbas, 'fetchContributionAndReviewStatsAsync');
-        fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
-          Promise.resolve(fetchQuestionContributionStatResponse));
+    it('should return available question contribution stats', () => {
+      fetchContributionAndReviewStatsAsyncSpy = spyOn(
+        carbas,
+        'fetchContributionAndReviewStatsAsync'
+      );
+      fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
+        Promise.resolve(fetchQuestionContributionStatResponse)
+      );
 
-        cars.fetchQuestionContributionStats('question_submitter')
-          .then((response) => {
-            expect(response.question_contribution_stats)
-              .toEqual([questionContributionStat]);
-          });
+      cars
+        .fetchQuestionContributionStats('question_submitter')
+        .then(response => {
+          expect(response.question_contribution_stats).toEqual([
+            questionContributionStat,
+          ]);
+        });
 
-        expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
-      });
+      expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
+    });
   });
 
   describe('fetchQuestionReviewStats', () => {
-    it('should return available question revieew stats',
-      () => {
-        fetchContributionAndReviewStatsAsyncSpy = spyOn(
-          carbas, 'fetchContributionAndReviewStatsAsync');
-        fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
-          Promise.resolve(fetchQuestionReviewStatResponse));
+    it('should return available question revieew stats', () => {
+      fetchContributionAndReviewStatsAsyncSpy = spyOn(
+        carbas,
+        'fetchContributionAndReviewStatsAsync'
+      );
+      fetchContributionAndReviewStatsAsyncSpy.and.returnValue(
+        Promise.resolve(fetchQuestionReviewStatResponse)
+      );
 
-        cars.fetchQuestionReviewStats('translator')
-          .then((response) => {
-            expect(response.question_review_stats)
-              .toEqual([questionReviewStat]);
-          });
-
-        expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
+      cars.fetchQuestionReviewStats('translator').then(response => {
+        expect(response.question_review_stats).toEqual([questionReviewStat]);
       });
+
+      expect(fetchContributionAndReviewStatsAsyncSpy).toHaveBeenCalled();
+    });
   });
 
   describe('fetchAllStats', () => {
-    it('should return available all stats',
-      () => {
-        fetchAllContributionAndReviewStatsAsync = spyOn(
-          carbas, 'fetchAllContributionAndReviewStatsAsync');
-        fetchAllContributionAndReviewStatsAsync.and.returnValue(
-          Promise.resolve(fetchAllStatsResponse));
+    it('should return available all stats', () => {
+      fetchAllContributionAndReviewStatsAsync = spyOn(
+        carbas,
+        'fetchAllContributionAndReviewStatsAsync'
+      );
+      fetchAllContributionAndReviewStatsAsync.and.returnValue(
+        Promise.resolve(fetchAllStatsResponse)
+      );
 
-        cars.fetchAllStats('user')
-          .then((response) => {
-            expect(response.translation_contribution_stats)
-              .toEqual([translationContributionStat]);
-            expect(response.translation_review_stats)
-              .toEqual([translationReviewStat]);
-            expect(response.question_contribution_stats)
-              .toEqual([questionContributionStat]);
-            expect(response.question_review_stats)
-              .toEqual([questionReviewStat]);
-          });
-
-        expect(fetchAllContributionAndReviewStatsAsync).toHaveBeenCalled();
+      cars.fetchAllStats('user').then(response => {
+        expect(response.translation_contribution_stats).toEqual([
+          translationContributionStat,
+        ]);
+        expect(response.translation_review_stats).toEqual([
+          translationReviewStat,
+        ]);
+        expect(response.question_contribution_stats).toEqual([
+          questionContributionStat,
+        ]);
+        expect(response.question_review_stats).toEqual([questionReviewStat]);
       });
+
+      expect(fetchAllContributionAndReviewStatsAsync).toHaveBeenCalled();
+    });
   });
 });

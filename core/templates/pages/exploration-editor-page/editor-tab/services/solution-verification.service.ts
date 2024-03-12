@@ -16,40 +16,46 @@
  * @fileoverview Service for solution verification.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { StateEditorService } from
+import {
+  StateEditorService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { AnswerClassificationService } from
-  'pages/exploration-player-page/services/answer-classification.service';
-import { InteractionRulesRegistryService } from
-  'services/interaction-rules-registry.service';
+} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SolutionVerificationService {
   constructor(
-      private interactionRulesRegistryService: InteractionRulesRegistryService,
-      private answerClassificationService: AnswerClassificationService,
-      private stateEditorService: StateEditorService) {}
+    private interactionRulesRegistryService: InteractionRulesRegistryService,
+    private answerClassificationService: AnswerClassificationService,
+    private stateEditorService: StateEditorService
+  ) {}
 
   verifySolution(
-      stateName: string,
-      interaction: Interaction,
-      correctAnswer: InteractionAnswer): boolean {
+    stateName: string,
+    interaction: Interaction,
+    correctAnswer: InteractionAnswer
+  ): boolean {
     if (interaction.id === null) {
       throw new Error('Interaction ID must not be null');
     }
-    let rulesService = this.interactionRulesRegistryService.
-      getRulesServiceByInteractionId(interaction.id);
+    let rulesService =
+      this.interactionRulesRegistryService.getRulesServiceByInteractionId(
+        interaction.id
+      );
     let result =
       this.answerClassificationService.getMatchingClassificationResult(
-        stateName, interaction, correctAnswer, rulesService
+        stateName,
+        interaction,
+        correctAnswer,
+        rulesService
       );
     if (this.stateEditorService.isInQuestionMode()) {
       return result.outcome.labelledAsCorrect;
@@ -57,5 +63,9 @@ export class SolutionVerificationService {
     return stateName !== result.outcome.dest;
   }
 }
-angular.module('oppia').factory('SolutionVerificationService',
-  downgradeInjectable(SolutionVerificationService));
+angular
+  .module('oppia')
+  .factory(
+    'SolutionVerificationService',
+    downgradeInjectable(SolutionVerificationService)
+  );

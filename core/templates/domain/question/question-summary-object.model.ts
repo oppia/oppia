@@ -18,10 +18,10 @@
  */
 
 export interface QuestionSummaryBackendDict {
-  'id': string;
-  'question_content': string;
-  'interaction_id': string;
-  'misconception_ids': string[];
+  id: string;
+  question_content: string;
+  interaction_id: string;
+  misconception_ids: string[];
 }
 
 export class QuestionSummary {
@@ -31,8 +31,11 @@ export class QuestionSummary {
   _misconceptionIds: string[];
 
   constructor(
-      questionId: string, questionContent: string, interactionId: string,
-      misconceptionIds: string[]) {
+    questionId: string,
+    questionContent: string,
+    interactionId: string,
+    misconceptionIds: string[]
+  ) {
     this._questionId = questionId;
     this._questionContent = questionContent;
     this._interactionId = interactionId;
@@ -60,11 +63,13 @@ export class QuestionSummary {
   }
 
   static createFromBackendDict(
-      backendDict: QuestionSummaryBackendDict): QuestionSummary {
+    backendDict: QuestionSummaryBackendDict
+  ): QuestionSummary {
     return new QuestionSummary(
       backendDict.id,
       backendDict.question_content,
       backendDict.interaction_id,
-      backendDict.misconception_ids);
+      backendDict.misconception_ids
+    );
   }
 }

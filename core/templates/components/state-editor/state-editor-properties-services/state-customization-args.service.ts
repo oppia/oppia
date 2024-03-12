@@ -18,23 +18,22 @@
  * to dicts of the form {value: customization_arg_value}.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AlertsService } from 'services/alerts.service';
-import { StatePropertyService } from
+import {AlertsService} from 'services/alerts.service';
+import {
+  StatePropertyService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
-import { UtilsService } from 'services/utils.service';
-import { InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
+} from 'components/state-editor/state-editor-properties-services/state-property.service';
+import {UtilsService} from 'services/utils.service';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 // TODO(sll): Add validation.
-export class StateCustomizationArgsService extends
-  StatePropertyService<InteractionCustomizationArgs> {
+export class StateCustomizationArgsService extends StatePropertyService<InteractionCustomizationArgs> {
   private _schemaBasedFormsShownEventEmitter = new EventEmitter<void>();
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
@@ -46,6 +45,9 @@ export class StateCustomizationArgsService extends
   }
 }
 
-angular.module('oppia').factory(
-  'StateCustomizationArgsService', downgradeInjectable(
-    StateCustomizationArgsService));
+angular
+  .module('oppia')
+  .factory(
+    'StateCustomizationArgsService',
+    downgradeInjectable(StateCustomizationArgsService)
+  );

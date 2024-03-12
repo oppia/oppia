@@ -16,13 +16,18 @@
  * @fileoverview Component for the rubric editor for skills.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { Rubric } from 'domain/skill/rubric.model';
-import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
+import {Rubric} from 'domain/skill/rubric.model';
+import {TopicsAndSkillsDashboardPageConstants} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 interface Explanation {
   [key: string]: string[];
@@ -30,7 +35,7 @@ interface Explanation {
 
 interface ExplanationFormSchema {
   type: string;
-  'ui_config': object;
+  ui_config: object;
 }
 
 interface RubricsOptions {
@@ -51,11 +56,10 @@ interface SkillDescriptionStatusValuesInterface {
 
 @Component({
   selector: 'oppia-rubrics-editor',
-  templateUrl: './rubrics-editor.component.html'
+  templateUrl: './rubrics-editor.component.html',
 })
 export class RubricsEditorComponent {
-  @Output() saveRubric: EventEmitter<RubricData> = (
-    new EventEmitter());
+  @Output() saveRubric: EventEmitter<RubricData> = new EventEmitter();
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -66,17 +70,18 @@ export class RubricsEditorComponent {
   rubricsOptions!: RubricsOptions[];
   rubric!: Rubric;
 
-  skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface = (
-    TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
+  skillDescriptionStatusValues: SkillDescriptionStatusValuesInterface =
+    TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES;
 
-  skillDifficultyMedium: string = (
-    AppConstants.SKILL_DIFFICULTY_MEDIUM);
+  skillDifficultyMedium: string = AppConstants.SKILL_DIFFICULTY_MEDIUM;
 
   explanationsMemento: Record<string, string[]> = {};
   explanationEditorIsOpen: Record<string, boolean[]> = {};
   editableExplanations: Explanation = {};
-  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {type: 'html',
-    ui_config: {}};
+  EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {
+    type: 'html',
+    ui_config: {},
+  };
 
   maximumNumberofExplanations: number = 10;
   maximumCharacterLengthOfExplanation: number = 300;
@@ -108,16 +113,18 @@ export class RubricsEditorComponent {
   }
 
   isExplanationLengthValid(difficulty: string, idx: number): boolean {
-    return this.editableExplanations[difficulty][idx].length <=
-    this.maximumCharacterLengthOfExplanation;
+    return (
+      this.editableExplanations[difficulty][idx].length <=
+      this.maximumCharacterLengthOfExplanation
+    );
   }
 
   isMediumLevelExplanationValid(): boolean {
     // Checking if medium level rubrics have at least one explantion.
     return (
       this.rubrics[this.MEDIUM_EXPLANATION_INDEX] &&
-      this.rubrics[this.MEDIUM_EXPLANATION_INDEX].getExplanations().length >=
-      1);
+      this.rubrics[this.MEDIUM_EXPLANATION_INDEX].getExplanations().length >= 1
+    );
   }
 
   hasReachedExplanationCountLimit(): boolean {
@@ -131,8 +138,9 @@ export class RubricsEditorComponent {
   }
 
   updateExplanation($event: string, idx: number): void {
-    if (this.editableExplanations[this.rubric.getDifficulty()][idx] !==
-    $event) {
+    if (
+      this.editableExplanations[this.rubric.getDifficulty()][idx] !== $event
+    ) {
       this.editableExplanations[this.rubric.getDifficulty()][idx] = $event;
       this.changeDetectorRef.detectChanges();
     }
@@ -143,24 +151,24 @@ export class RubricsEditorComponent {
       this.skillCreationService.disableSkillDescriptionStatusMarker();
     }
     this.explanationEditorIsOpen[difficulty][index] = false;
-    let explanationHasChanged: boolean = (
+    let explanationHasChanged: boolean =
       this.editableExplanations[difficulty][index] !==
-      this.explanationsMemento[difficulty][index]);
+      this.explanationsMemento[difficulty][index];
 
     if (explanationHasChanged) {
       const rubricData: RubricData = {
         difficulty: difficulty,
-        data: this.editableExplanations[difficulty]
+        data: this.editableExplanations[difficulty],
       };
       this.saveRubric.emit(rubricData);
-      this.explanationsMemento[difficulty][index] = (
-        this.editableExplanations[difficulty][index]);
+      this.explanationsMemento[difficulty][index] =
+        this.editableExplanations[difficulty][index];
     }
   }
 
   cancelEditExplanation(difficulty: string, index: number): void {
-    this.editableExplanations[difficulty][index] = (
-      this.explanationsMemento[difficulty][index]);
+    this.editableExplanations[difficulty][index] =
+      this.explanationsMemento[difficulty][index];
     if (!this.editableExplanations[difficulty][index]) {
       this.deleteExplanation(difficulty, index);
     }
@@ -171,14 +179,15 @@ export class RubricsEditorComponent {
     this.editableExplanations[difficulty].push('');
     const rubricData: RubricData = {
       difficulty: difficulty,
-      data: this.editableExplanations[difficulty]
+      data: this.editableExplanations[difficulty],
     };
     this.saveRubric.emit(rubricData);
     this.explanationsMemento[difficulty] = [
-      ...this.editableExplanations[difficulty]];
-    this.explanationEditorIsOpen[
-      difficulty][
-      this.editableExplanations[difficulty].length - 1] = true;
+      ...this.editableExplanations[difficulty],
+    ];
+    this.explanationEditorIsOpen[difficulty][
+      this.editableExplanations[difficulty].length - 1
+    ] = true;
   }
 
   deleteExplanation(difficulty: string, index: number): void {
@@ -189,19 +198,17 @@ export class RubricsEditorComponent {
     this.editableExplanations[difficulty].splice(index, 1);
     const rubricData: RubricData = {
       difficulty: difficulty,
-      data: this.editableExplanations[difficulty]
+      data: this.editableExplanations[difficulty],
     };
     this.saveRubric.emit(rubricData);
     this.explanationsMemento[difficulty] = [
-      ...this.editableExplanations[difficulty]];
+      ...this.editableExplanations[difficulty],
+    ];
   }
-
 
   isAnyExplanationEmptyForDifficulty(difficulty: string): boolean {
     for (let idx in this.explanationsMemento[difficulty]) {
-      if (
-        this.isExplanationEmpty(
-          this.explanationsMemento[difficulty][idx])) {
+      if (this.isExplanationEmpty(this.explanationsMemento[difficulty][idx])) {
         return true;
       }
     }
@@ -213,14 +220,15 @@ export class RubricsEditorComponent {
       let explanations = this.rubrics[idx].getExplanations();
       let difficulty = this.rubrics[idx].getDifficulty();
       this.explanationsMemento[difficulty] = [...explanations];
-      this.explanationEditorIsOpen[difficulty] = (
-        Array(explanations.length).fill(false));
+      this.explanationEditorIsOpen[difficulty] = Array(
+        explanations.length
+      ).fill(false);
       this.editableExplanations[difficulty] = [...explanations];
     }
     this.rubricsOptions = [
       {id: 0, difficulty: 'Easy'},
       {id: 1, difficulty: 'Medium'},
-      {id: 2, difficulty: 'Hard'}
+      {id: 2, difficulty: 'Hard'},
     ];
     this.selectedRubricIndex = 1;
     this.rubric = this.rubrics[1];
@@ -231,5 +239,9 @@ export class RubricsEditorComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaRubricsEditor',
-  downgradeComponent({ component: RubricsEditorComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaRubricsEditor',
+    downgradeComponent({component: RubricsEditorComponent})
+  );

@@ -18,19 +18,19 @@
  * adding a new exploration.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { CollectionUpdateService } from 'domain/collection/collection-update.service';
-import { CollectionValidationService } from 'domain/collection/collection-validation.service';
-import { Collection } from 'domain/collection/collection.model';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { CollectionEditorPageConstants } from '../collection-editor-page.constants';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {CollectionUpdateService} from 'domain/collection/collection-update.service';
+import {CollectionValidationService} from 'domain/collection/collection-validation.service';
+import {Collection} from 'domain/collection/collection.model';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {CollectionEditorPageConstants} from '../collection-editor-page.constants';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 
 @Component({
   selector: 'collection-details-editor',
-  templateUrl: './collection-details-editor.component.html'
+  templateUrl: './collection-details-editor.component.html',
 })
 export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -44,8 +44,8 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
   displayedCollectionObjective!: string | null;
   displayedCollectionCategory!: string | null;
   displayedCollectionLanguage!: string | null;
-  COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
-    CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+  COLLECTION_TITLE_INPUT_FOCUS_LABEL =
+    CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL;
 
   CATEGORY_LIST: string[] = [...AppConstants.ALL_CATEGORIES];
   languageListForSelect = AppConstants.SUPPORTED_CONTENT_LANGUAGES;
@@ -61,9 +61,10 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.collectionEditorStateService.onCollectionInitialized.subscribe(
-        () => this.refreshSettingsTab()
-      ));
+      this.collectionEditorStateService.onCollectionInitialized.subscribe(() =>
+        this.refreshSettingsTab()
+      )
+    );
     this.collection = this.collectionEditorStateService.getCollection();
   }
 
@@ -74,7 +75,7 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
     this.displayedCollectionLanguage = this.collection.getLanguageCode();
     this.displayedCollectionTags = this.collection.getTags();
 
-    let categoryIsInList = this.CATEGORY_LIST.some((categoryItem) => {
+    let categoryIsInList = this.CATEGORY_LIST.some(categoryItem => {
       return categoryItem === this.collection.getCategory();
     });
 
@@ -103,22 +104,30 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
 
   updateCollectionTitle(): void {
     this.collectionUpdateService.setCollectionTitle(
-      this.collection, this.displayedCollectionTitle);
+      this.collection,
+      this.displayedCollectionTitle
+    );
   }
 
   updateCollectionObjective(): void {
     this.collectionUpdateService.setCollectionObjective(
-      this.collection, this.displayedCollectionObjective);
+      this.collection,
+      this.displayedCollectionObjective
+    );
   }
 
   updateCollectionCategory(): void {
     this.collectionUpdateService.setCollectionCategory(
-      this.collection, this.displayedCollectionCategory);
+      this.collection,
+      this.displayedCollectionCategory
+    );
   }
 
   updateCollectionLanguageCode(): void {
     this.collectionUpdateService.setCollectionLanguageCode(
-      this.collection, this.displayedCollectionLanguage);
+      this.collection,
+      this.displayedCollectionLanguage
+    );
   }
 
   updateCollectionTags(): void {
@@ -126,15 +135,19 @@ export class CollectionDetailsEditorComponent implements OnInit, OnDestroy {
       this.displayedCollectionTags
     );
 
-    if (!this.collectionValidationService.isTagValid(
-      this.displayedCollectionTags)) {
+    if (
+      !this.collectionValidationService.isTagValid(this.displayedCollectionTags)
+    ) {
       this.alertsService.addWarning(
         'Please ensure that there are no duplicate tags and that all ' +
-                'tags contain only lower case and spaces.');
+          'tags contain only lower case and spaces.'
+      );
       return;
     }
     this.collectionUpdateService.setCollectionTags(
-      this.collection, this.displayedCollectionTags);
+      this.collection,
+      this.displayedCollectionTags
+    );
   }
 
   ngOnDestroy(): void {

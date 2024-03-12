@@ -16,20 +16,19 @@
  * @fileoverview Component for editor reloading modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-editor-reloading-modal',
-  templateUrl: './editor-reloading-modal.component.html'
+  templateUrl: './editor-reloading-modal.component.html',
 })
-
 export class EditorReloadingModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

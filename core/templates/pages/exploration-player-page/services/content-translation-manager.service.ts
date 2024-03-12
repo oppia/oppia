@@ -16,29 +16,29 @@
  * @fileoverview Service to manage the content translations displayed.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExtensionTagAssemblerService } from 'services/extension-tag-assembler.service';
-import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { ContextService } from 'services/context.service';
-import { ImagePreloaderService } from './image-preloader.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExtensionTagAssemblerService} from 'services/extension-tag-assembler.service';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {ContextService} from 'services/context.service';
+import {ImagePreloaderService} from './image-preloader.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContentTranslationManagerService {
   // This is initialized using the class initialization method.
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private explorationLanguageCode!: string;
-  private onStateCardContentUpdateEmitter: EventEmitter<void> = (
-    new EventEmitter());
+  private onStateCardContentUpdateEmitter: EventEmitter<void> =
+    new EventEmitter();
 
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
@@ -55,7 +55,8 @@ export class ContentTranslationManagerService {
   setOriginalTranscript(explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
     this.originalTranscript = cloneDeep(
-      this.playerTranscriptService.transcript);
+      this.playerTranscriptService.transcript
+    );
   }
 
   get onStateCardContentUpdate(): EventEmitter<void> {
@@ -76,28 +77,32 @@ export class ContentTranslationManagerService {
   displayTranslations(languageCode: string): void {
     if (languageCode === this.explorationLanguageCode) {
       this.playerTranscriptService.restoreImmutably(
-        cloneDeep(this.originalTranscript));
+        cloneDeep(this.originalTranscript)
+      );
       this.onStateCardContentUpdateEmitter.emit();
     } else {
-      this.entityTranslationsService.getEntityTranslationsAsync(
-        languageCode
-      ).then((entityTranslations) => {
-        // Image preloading is disabled in the exploration editor preview mode.
-        if (!this.contextService.isInExplorationEditorPage()) {
-          this.imagePreloaderService.restartImagePreloader(
-            this.playerTranscriptService.getCard(0).getStateName());
-        }
+      this.entityTranslationsService
+        .getEntityTranslationsAsync(languageCode)
+        .then(entityTranslations => {
+          // Image preloading is disabled in the exploration editor preview mode.
+          if (!this.contextService.isInExplorationEditorPage()) {
+            this.imagePreloaderService.restartImagePreloader(
+              this.playerTranscriptService.getCard(0).getStateName()
+            );
+          }
 
-        const cards = this.playerTranscriptService.transcript;
-        cards.forEach(
-          card => this._displayTranslationsForCard(card, entityTranslations));
-        this.onStateCardContentUpdateEmitter.emit();
-      });
+          const cards = this.playerTranscriptService.transcript;
+          cards.forEach(card =>
+            this._displayTranslationsForCard(card, entityTranslations)
+          );
+          this.onStateCardContentUpdateEmitter.emit();
+        });
     }
   }
 
   _displayTranslationsForCard(
-      card: StateCard, entityTranslations: EntityTranslation
+    card: StateCard,
+    entityTranslations: EntityTranslation
   ): void {
     card.swapContentsWithTranslation(entityTranslations);
     if (card.getInteractionId()) {
@@ -105,7 +110,8 @@ export class ContentTranslationManagerService {
       // the HTML string and it's body contains our required element
       // as a childnode.
       const element = new DOMParser().parseFromString(
-        card.getInteractionHtml(), 'text/html'
+        card.getInteractionHtml(),
+        'text/html'
       ).body.childNodes[0] as HTMLElement;
       this.extensionTagAssemblerService.formatCustomizationArgAttrs(
         element,
@@ -116,6 +122,9 @@ export class ContentTranslationManagerService {
   }
 }
 
-angular.module('oppia').factory(
-  'ContentTranslationManagerService',
-  downgradeInjectable(ContentTranslationManagerService));
+angular
+  .module('oppia')
+  .factory(
+    'ContentTranslationManagerService',
+    downgradeInjectable(ContentTranslationManagerService)
+  );

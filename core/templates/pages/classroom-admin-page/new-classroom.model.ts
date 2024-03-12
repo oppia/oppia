@@ -16,8 +16,7 @@
  * @fileoverview New classroom model.
  */
 
-import { AppConstants } from 'app.constants';
-
+import {AppConstants} from 'app.constants';
 
 export interface NewClassroom {
   _classroomId: string;
@@ -35,18 +34,13 @@ export interface NewClassroom {
   setClassroomValidityFlag: (classroomDataIsValid: boolean) => void;
 }
 
-
 export class NewClassroomData implements NewClassroom {
   _classroomId: string;
   _name: string;
   _urlFragment: string;
   _classroomDataIsValid!: boolean;
 
-  constructor(
-      classroomId: string,
-      name: string,
-      urlFragment: string
-  ) {
+  constructor(classroomId: string, name: string, urlFragment: string) {
     this._classroomId = classroomId;
     this._name = name;
     this._urlFragment = urlFragment;
@@ -93,21 +87,21 @@ export class NewClassroomData implements NewClassroom {
   getClassroomUrlValidationErrors(): string {
     let errorMsg = '';
     const validUrlFragmentRegex = new RegExp(
-      AppConstants.VALID_URL_FRAGMENT_REGEX);
+      AppConstants.VALID_URL_FRAGMENT_REGEX
+    );
 
     if (this._urlFragment === '') {
       errorMsg = 'The classroom URL fragment should not be empty.';
     } else if (
       this._urlFragment.length >
-        AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
+      AppConstants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT
     ) {
-      errorMsg = (
-        'The classroom URL fragment should contain at most 20 characters.'
-      );
+      errorMsg =
+        'The classroom URL fragment should contain at most 20 characters.';
     } else if (!validUrlFragmentRegex.test(this._urlFragment)) {
-      errorMsg = (
+      errorMsg =
         'The classroom URL fragment should only contain lowercase ' +
-        'letters separated by hyphens.');
+        'letters separated by hyphens.';
     }
     return errorMsg;
   }

@@ -21,9 +21,9 @@ var action = require('./action.js');
 var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
-var ReleaseCoordinatorPage = function() {
+var ReleaseCoordinatorPage = function () {
   var RELEASE_COORDINATOR_URL_SUFFIX = '/release-coordinator';
-  var featureFlagElementsSelector = function() {
+  var featureFlagElementsSelector = function () {
     return $$('.e2e-test-feature-flag');
   };
   var featureFlagElement = $('.e2e-test-feature-flag');
@@ -32,30 +32,33 @@ var ReleaseCoordinatorPage = function() {
   var saveButtonLocator = '.e2e-test-save-button';
   var valueSelectorLocator = '.e2e-test-value-selector';
   var statusMessage = $('.e2e-test-status-message');
-  var featureFlagRolloutPercentage = (
-    '.e2e-test-rollout-percentage');
+  var featureFlagRolloutPercentage = '.e2e-test-rollout-percentage';
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.url(RELEASE_COORDINATOR_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
 
-  this.getFeaturesTab = async function() {
+  this.getFeaturesTab = async function () {
     await this.get();
     await action.click('Release coordinator features tab', featuresTab);
     await waitFor.visibilityOf(
-      featureFlagElement, 'Feature flags not showing up');
+      featureFlagElement,
+      'Feature flags not showing up'
+    );
   };
 
   // Remove this method after the dummy_feature_flag_for_e2e_tests feature flag
   // is deprecated.
-  this.getDummyFeatureFlagForE2ETests = async function() {
+  this.getDummyFeatureFlagForE2ETests = async function () {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'dummy_feature_flag_for_e2e_tests') {
+      if (
+        (await elem.$(featureNameLocator).getText()) ===
+        'dummy_feature_flag_for_e2e_tests'
+      ) {
         return elem;
       }
     }
@@ -63,13 +66,15 @@ var ReleaseCoordinatorPage = function() {
     return null;
   };
 
-  this.getImprovementsTabFeatureElement = async function() {
+  this.getImprovementsTabFeatureElement = async function () {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'is_improvements_tab_enabled') {
+      if (
+        (await elem.$(featureNameLocator).getText()) ===
+        'is_improvements_tab_enabled'
+      ) {
         return elem;
       }
     }
@@ -79,13 +84,15 @@ var ReleaseCoordinatorPage = function() {
 
   // Remove this method after the end_chapter_celebration feature flag
   // is deprecated.
-  this.getEndChapterCelebrationFeatureElement = async function() {
+  this.getEndChapterCelebrationFeatureElement = async function () {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'end_chapter_celebration') {
+      if (
+        (await elem.$(featureNameLocator).getText()) ===
+        'end_chapter_celebration'
+      ) {
         return elem;
       }
     }
@@ -95,13 +102,15 @@ var ReleaseCoordinatorPage = function() {
 
   // Remove this method after the checkpoint_celebration feature flag
   // is deprecated.
-  this.getCheckpointCelebrationFeatureElement = async function() {
+  this.getCheckpointCelebrationFeatureElement = async function () {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'checkpoint_celebration') {
+      if (
+        (await elem.$(featureNameLocator).getText()) ===
+        'checkpoint_celebration'
+      ) {
         return elem;
       }
     }
@@ -111,13 +120,15 @@ var ReleaseCoordinatorPage = function() {
 
   // TODO(#18881): Remove this method after the cd_admin_dashboard_new_ui
   // feature flag is deprecated.
-  this.getCdAdminDashboardNewUiFeatureElement = async function() {
+  this.getCdAdminDashboardNewUiFeatureElement = async function () {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
-      if ((await elem.$(featureNameLocator).getText()) ===
-          'cd_admin_dashboard_new_ui') {
+      if (
+        (await elem.$(featureNameLocator).getText()) ===
+        'cd_admin_dashboard_new_ui'
+      ) {
         return elem;
       }
     }
@@ -127,13 +138,15 @@ var ReleaseCoordinatorPage = function() {
 
   // Remove this method after the serial_chapter_launch_curriculum_admin_view
   // feature flag is deprecated.
-  this.getSerialChapterCurriculumAdminFeatureElement = async function() {
+  this.getSerialChapterCurriculumAdminFeatureElement = async function () {
     var featureFlagElements = await featureFlagElementsSelector();
     var count = featureFlagElements.length;
     for (let i = 0; i < count; i++) {
       var elem = featureFlagElements[i];
-      if (await action.getText('Feature Flag', elem.$(featureNameLocator)) ===
-          'serial_chapter_launch_curriculum_admin_view') {
+      if (
+        (await action.getText('Feature Flag', elem.$(featureNameLocator))) ===
+        'serial_chapter_launch_curriculum_admin_view'
+      ) {
         return elem;
       }
     }
@@ -143,60 +156,65 @@ var ReleaseCoordinatorPage = function() {
 
   // This function is meant to be used to enable a feature gated behind
   // a feature flag.
-  this.enableFeature = async function(featureElement) {
+  this.enableFeature = async function (featureElement) {
     await waitFor.visibilityOf(
       featureElement.$(valueSelectorLocator),
       'Enabling force-enable property takes too long to appear'
     );
 
-    await (featureElement.$(valueSelectorLocator)).selectByVisibleText('Yes');
+    await featureElement.$(valueSelectorLocator).selectByVisibleText('Yes');
     await this.saveChangeOfFeature(featureElement);
   };
 
-  this.disableFeatureFlag = async function(featureFlagElement) {
+  this.disableFeatureFlag = async function (featureFlagElement) {
     await waitFor.visibilityOf(
       featureFlagElement.$(valueSelectorLocator),
       'Disabling force-enable property takes too long to appear'
     );
 
-    await (
-      featureFlagElement.$(valueSelectorLocator)).selectByVisibleText('No');
+    await featureFlagElement.$(valueSelectorLocator).selectByVisibleText('No');
     await this.saveChangeOfFeature(featureFlagElement);
   };
 
-  this.setRolloutPercentageForFeatureFlag = async function(
-      featureFlagElement, rolloutPercentage) {
+  this.setRolloutPercentageForFeatureFlag = async function (
+    featureFlagElement,
+    rolloutPercentage
+  ) {
     await waitFor.visibilityOf(
       featureFlagElement.$(featureFlagRolloutPercentage),
       'Setting rollout-percentage property takes too long to appear'
     );
     await action.setValue(
       'rolloutPercentage',
-      featureFlagElement.$(featureFlagRolloutPercentage).$(
-        '.e2e-test-editor-int'),
-      rolloutPercentage);
+      featureFlagElement
+        .$(featureFlagRolloutPercentage)
+        .$('.e2e-test-editor-int'),
+      rolloutPercentage
+    );
     await this.saveChangeOfFeature(featureFlagElement);
   };
 
-  this.expectRolloutPercentageToMatch = async function(
-      featureFlagElement, rolloutPercentage) {
+  this.expectRolloutPercentageToMatch = async function (
+    featureFlagElement,
+    rolloutPercentage
+  ) {
     await waitFor.visibilityOf(
       featureFlagElement.$(featureFlagRolloutPercentage),
       'Rollout-percentage property takes too long to appear'
     );
     var value = await action.getValue(
       'rolloutPercentage',
-      featureFlagElement.$(featureFlagRolloutPercentage).$(
-        '.e2e-test-editor-int')
+      featureFlagElement
+        .$(featureFlagRolloutPercentage)
+        .$('.e2e-test-editor-int')
     );
     expect(value).toBe(rolloutPercentage);
   };
 
-  this.saveChangeOfFeature = async function(featureElement) {
+  this.saveChangeOfFeature = async function (featureElement) {
     await action.click(
       'Save feature button',
-      featureElement
-        .$(saveButtonLocator)
+      featureElement.$(saveButtonLocator)
     );
 
     await general.acceptAlert();

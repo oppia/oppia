@@ -16,9 +16,9 @@
  * @fileoverview Controller for upload activity modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsService } from 'services/alerts.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AlertsService} from 'services/alerts.service';
 
 interface ExplorationObj {
   yamlFile: File | null;
@@ -30,16 +30,15 @@ interface ExplorationObj {
 })
 export class UploadActivityModalComponent {
   constructor(
-     private alertsService: AlertsService,
-     private activeModal: NgbActiveModal
+    private alertsService: AlertsService,
+    private activeModal: NgbActiveModal
   ) {}
 
   save(): void {
     let returnObj: ExplorationObj = {
-      yamlFile: null
+      yamlFile: null,
     };
-    let label =
-      document.getElementById('newFileInput') as HTMLInputElement;
+    let label = document.getElementById('newFileInput') as HTMLInputElement;
     if (label === null) {
       throw new Error('No label found for uploading files.');
     }

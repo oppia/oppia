@@ -18,17 +18,17 @@
  */
 
 export interface BlogPostSummaryBackendDict {
-  'id': string;
-  'title': string;
-  'summary': string;
-  'author_username': string;
-  'displayed_author_name': string;
-  'tags': string[];
-  'url_fragment': string;
-  'thumbnail_filename': string | null;
-  'published_on'?: string;
-  'last_updated': string;
-  'profile_pic_url'?: string;
+  id: string;
+  title: string;
+  summary: string;
+  author_username: string;
+  displayed_author_name: string;
+  tags: string[];
+  url_fragment: string;
+  thumbnail_filename: string | null;
+  published_on?: string;
+  last_updated: string;
+  profile_pic_url?: string;
 }
 
 export class BlogPostSummary {
@@ -44,17 +44,18 @@ export class BlogPostSummary {
   _publishedOn?: string;
   _authorProfilePicUrl?: string;
   constructor(
-      id: string,
-      authorUsername: string,
-      displayedAuthorName: string,
-      title: string,
-      summary: string,
-      tags: string[],
-      thumbnailFilename: string | null,
-      urlFragment: string,
-      lastUpdated?: string,
-      publishedOn?: string,
-      authorProfilePicUrl?: string) {
+    id: string,
+    authorUsername: string,
+    displayedAuthorName: string,
+    title: string,
+    summary: string,
+    tags: string[],
+    thumbnailFilename: string | null,
+    urlFragment: string,
+    lastUpdated?: string,
+    publishedOn?: string,
+    authorProfilePicUrl?: string
+  ) {
     this._id = id;
     this._authorUsername = authorUsername;
     this._displayedAuthorName = displayedAuthorName;
@@ -113,9 +114,9 @@ export class BlogPostSummary {
   }
 
   static createFromBackendDict(
-      blogPostSummaryBackendDict: BlogPostSummaryBackendDict
+    blogPostSummaryBackendDict: BlogPostSummaryBackendDict
   ): BlogPostSummary {
-    return new BlogPostSummary (
+    return new BlogPostSummary(
       blogPostSummaryBackendDict.id,
       blogPostSummaryBackendDict.author_username,
       blogPostSummaryBackendDict.displayed_author_name,

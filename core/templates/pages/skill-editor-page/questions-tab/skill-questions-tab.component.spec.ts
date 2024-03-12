@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the Skill question tab Component.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillQuestionsTabComponent } from './skill-questions-tab.component';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillQuestionsTabComponent} from './skill-questions-tab.component';
 
 describe('Skill question tab component', () => {
   let component: SkillQuestionsTabComponent;
@@ -35,10 +35,8 @@ describe('Skill question tab component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SkillQuestionsTabComponent],
-      providers: [
-        SkillEditorStateService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [SkillEditorStateService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -53,12 +51,12 @@ describe('Skill question tab component', () => {
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
-      must_be_addressed: true
+      must_be_addressed: true,
     };
 
     const rubricDict = {
       difficulty: 'medium',
-      explanations: ['explanation']
+      explanations: ['explanation'],
     };
 
     const skillContentsDict = {
@@ -68,8 +66,8 @@ describe('Skill question tab component', () => {
       },
       worked_examples: [],
       recorded_voiceovers: {
-        voiceovers_mapping: {}
-      }
+        voiceovers_mapping: {},
+      },
     };
 
     sampleSkill = skillObjectFactory.createFromBackendDict({
@@ -83,11 +81,12 @@ describe('Skill question tab component', () => {
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
       superseding_skill_id: 'skill0',
-      all_questions_merged: true
+      all_questions_merged: true,
     });
 
-    spyOnProperty(skillEditorStateService, 'onSkillChange')
-      .and.returnValue(initEventEmitter);
+    spyOnProperty(skillEditorStateService, 'onSkillChange').and.returnValue(
+      initEventEmitter
+    );
   });
 
   afterEach(() => {
@@ -96,37 +95,39 @@ describe('Skill question tab component', () => {
 
   it('should fetch skill when initialized', () => {
     const fetchSkillSpy = spyOn(
-      skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+      skillEditorStateService,
+      'getSkill'
+    ).and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
     component.ngOnInit();
     initEventEmitter.emit();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
-    expect(
-      skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
+    expect(skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
   });
 
   it('should not initialize when skill is not available', () => {
-    const fetchSkillSpy = spyOn(
-      skillEditorStateService, 'getSkill');
+    const fetchSkillSpy = spyOn(skillEditorStateService, 'getSkill');
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
 
     component.ngOnInit();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
     expect(
-      skillEditorStateService.getGroupedSkillSummaries).not.toHaveBeenCalled();
+      skillEditorStateService.getGroupedSkillSummaries
+    ).not.toHaveBeenCalled();
   });
 
   it('should initialize when skill is available', () => {
     const fetchSkillSpy = spyOn(
-      skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
+      skillEditorStateService,
+      'getSkill'
+    ).and.returnValue(sampleSkill);
     spyOn(skillEditorStateService, 'getGroupedSkillSummaries');
 
     component.ngOnInit();
 
     expect(fetchSkillSpy).toHaveBeenCalled();
-    expect(
-      skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
+    expect(skillEditorStateService.getGroupedSkillSummaries).toHaveBeenCalled();
   });
 });

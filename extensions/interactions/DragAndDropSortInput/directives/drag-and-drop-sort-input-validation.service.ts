@@ -16,35 +16,37 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { DragAndDropSortInputCustomizationArgs } from
-  'extensions/interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {DragAndDropSortInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
-import { Rule } from 'domain/exploration/rule.model';
+import {AppConstants} from 'app.constants';
+import {Rule} from 'domain/exploration/rule.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DragAndDropSortInputValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: DragAndDropSortInputCustomizationArgs): Warning[] {
+    customizationArgs: DragAndDropSortInputCustomizationArgs
+  ): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
-      customizationArgs, ['choices']);
+      customizationArgs,
+      ['choices']
+    );
 
     var areAnyChoicesEmpty = false;
     var areAnyChoicesDuplicated = false;
@@ -54,7 +56,7 @@ export class DragAndDropSortInputValidationService {
     if (numChoices < 2) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please enter at least two choices.'
+        message: 'Please enter at least two choices.',
       });
     }
 
@@ -72,14 +74,14 @@ export class DragAndDropSortInputValidationService {
     if (areAnyChoicesEmpty) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please ensure that the choices are nonempty.'
+        message: 'Please ensure that the choices are nonempty.',
       });
     }
 
     if (areAnyChoicesDuplicated) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please ensure that the choices are unique.'
+        message: 'Please ensure that the choices are unique.',
       });
     }
 
@@ -87,9 +89,11 @@ export class DragAndDropSortInputValidationService {
   }
 
   getAllWarnings(
-      stateName: string,
-      customizationArgs: DragAndDropSortInputCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    stateName: string,
+    customizationArgs: DragAndDropSortInputCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome
+  ): Warning[] {
     var warningsList: Warning[] = [];
     var seenItems = [];
     var ranges = [];
@@ -97,15 +101,15 @@ export class DragAndDropSortInputValidationService {
     var areAnyItemsDuplicated = false;
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     var checkRedundancy = (earlierRule: Rule, laterRule: Rule) => {
       var noOfMismatches = 0;
       var inputs = earlierRule.inputs.x as string[][];
       var answer = laterRule.inputs.x as string[][];
       for (var i = 0; i < Math.min(inputs.length, answer.length); i++) {
-        for (var j = 0; j < Math.max(answer[i].length, inputs[i].length);
-          j++) {
+        for (var j = 0; j < Math.max(answer[i].length, inputs[i].length); j++) {
           if (inputs[i].length > answer[i].length) {
             if (answer[i].indexOf(inputs[i][j]) === -1) {
               noOfMismatches += 1;
@@ -131,7 +135,7 @@ export class DragAndDropSortInputValidationService {
             if (xInputs[k].length > 1) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Multiple items in a single position are not allowed.'
+                message: 'Multiple items in a single position are not allowed.',
               });
               break;
             }
@@ -139,41 +143,39 @@ export class DragAndDropSortInputValidationService {
         }
         var range = {
           answerGroupIndex: i,
-          ruleIndex: j
+          ruleIndex: j,
         };
         seenItems = [];
         areAnyItemsEmpty = false;
         areAnyItemsDuplicated = false;
 
-        let choiceValues = (
-          customizationArgs.choices.value.map(x => x.html));
+        let choiceValues = customizationArgs.choices.value.map(x => x.html);
         const choiceContentIdToHtml: Record<string, string> = {};
-        customizationArgs.choices.value.forEach(
-          choice => {
-            const contentId = choice.contentId;
-            if (contentId === null) {
-              throw new Error ('ContentId of choice does not exist');
-            }
-            choiceContentIdToHtml[contentId] = choice.html;
-          });
+        customizationArgs.choices.value.forEach(choice => {
+          const contentId = choice.contentId;
+          if (contentId === null) {
+            throw new Error('ContentId of choice does not exist');
+          }
+          choiceContentIdToHtml[contentId] = choice.html;
+        });
 
         switch (rule.type) {
           case 'HasElementXAtPositionY':
             if (!choiceContentIdToHtml.hasOwnProperty(inputs.x as string)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
+                message:
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'contains a choice that does not match any of ' +
-                  'the choices in the customization arguments.')
+                  'the choices in the customization arguments.',
               });
             }
             if (inputs.y > customizationArgs.choices.value.length) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
-                  'refers to an invalid choice position.')
+                message:
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
+                  'refers to an invalid choice position.',
               });
             }
             break;
@@ -181,10 +183,10 @@ export class DragAndDropSortInputValidationService {
             if (inputs.x === inputs.y) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
+                message:
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'will never be matched because both the selected ' +
-                  'elements are same.')
+                  'elements are same.',
               });
             }
             if (
@@ -193,10 +195,10 @@ export class DragAndDropSortInputValidationService {
             ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
+                message:
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'contains choices that do not match any of ' +
-                  'the choices in the customization arguments.')
+                  'the choices in the customization arguments.',
               });
             }
             break;
@@ -220,41 +222,49 @@ export class DragAndDropSortInputValidationService {
             if (areAnyItemsEmpty || xInputs.length === 0) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the list is nonempty.'
+                message: 'Please ensure the list is nonempty.',
               });
             }
 
             if (areAnyItemsDuplicated) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: 'Please ensure the items are unique.'
+                message: 'Please ensure the items are unique.',
               });
             }
 
-            if (!customizationArgs.allowMultipleItemsInSamePosition.value &&
-                rule.type === (
-                  'IsEqualToOrderingWithOneItemAtIncorrectPosition')) {
+            if (
+              !customizationArgs.allowMultipleItemsInSamePosition.value &&
+              rule.type === 'IsEqualToOrderingWithOneItemAtIncorrectPosition'
+            ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  'Learner answer ' + (j + 1) + ' from Oppia response ' +
-                  (i + 1) + ' will never be matched because there will be ' +
+                message:
+                  'Learner answer ' +
+                  (j + 1) +
+                  ' from Oppia response ' +
+                  (i + 1) +
+                  ' will never be matched because there will be ' +
                   'at least 2 elements at incorrect positions if multiple ' +
-                  'elements cannot occupy the same position.')
+                  'elements cannot occupy the same position.',
               });
             }
             var sortedCustomArgsChoices = choiceValues.sort();
-            var flattenedAndSortedXInputs = (
-              xInputs.reduce((acc, val) => acc.concat(val), [])
-            ).map(contentId => choiceContentIdToHtml[contentId]).sort();
+            var flattenedAndSortedXInputs = xInputs
+              .reduce((acc, val) => acc.concat(val), [])
+              .map(contentId => choiceContentIdToHtml[contentId])
+              .sort();
             if (
               !angular.equals(
-                sortedCustomArgsChoices, flattenedAndSortedXInputs)) {
+                sortedCustomArgsChoices,
+                flattenedAndSortedXInputs
+              )
+            ) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
-                  'options do not match customization argument choices.')
+                message:
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
+                  'options do not match customization argument choices.',
               });
             }
             break;
@@ -262,19 +272,21 @@ export class DragAndDropSortInputValidationService {
         }
 
         for (var k = 0; k < ranges.length; k++) {
-          var earlierRule = answerGroups[ranges[k].answerGroupIndex].
-            rules[ranges[k].ruleIndex];
-          if (earlierRule.type ===
-            'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
-            rule.type === 'IsEqualToOrdering') {
+          var earlierRule =
+            answerGroups[ranges[k].answerGroupIndex].rules[ranges[k].ruleIndex];
+          if (
+            earlierRule.type ===
+              'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
+            rule.type === 'IsEqualToOrdering'
+          ) {
             if (checkRedundancy(earlierRule, rule)) {
               warningsList.push({
                 type: AppConstants.WARNING_TYPES.ERROR,
-                message: (
-                  `Learner answer ${(j + 1)} from Oppia response ${(i + 1)} ` +
+                message:
+                  `Learner answer ${j + 1} from Oppia response ${i + 1} ` +
                   'will never be matched because it is made redundant by ' +
                   `answer ${ranges[k].ruleIndex + 1} from response ` +
-                  `${ranges[k].answerGroupIndex + 1}.`)
+                  `${ranges[k].answerGroupIndex + 1}.`,
               });
             }
           }
@@ -285,12 +297,19 @@ export class DragAndDropSortInputValidationService {
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+        answerGroups,
+        defaultOutcome,
+        stateName
+      )
+    );
 
     return warningsList;
   }
 }
 
-angular.module('oppia').factory(
-  'DragAndDropSortInputValidationService',
-  downgradeInjectable(DragAndDropSortInputValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'DragAndDropSortInputValidationService',
+    downgradeInjectable(DragAndDropSortInputValidationService)
+  );

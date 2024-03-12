@@ -16,9 +16,9 @@
  * @fileoverview Unit test for SkillCreationService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
-import { SkillCreationService } from './skill-creation.service';
+import {TestBed} from '@angular/core/testing';
+import {TopicsAndSkillsDashboardPageConstants} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import {SkillCreationService} from './skill-creation.service';
 
 describe('SkillCreationService', () => {
   let skillCreationService: SkillCreationService;
@@ -30,48 +30,56 @@ describe('SkillCreationService', () => {
   it('should get skill description status', () => {
     expect(skillCreationService.getSkillDescriptionStatus()).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_UNCHANGED);
+        .STATUS_UNCHANGED
+    );
   });
 
   it('should mark change in skill description status', () => {
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_UNCHANGED);
+        .STATUS_UNCHANGED
+    );
 
     skillCreationService.markChangeInSkillDescription();
 
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_CHANGED);
+        .STATUS_CHANGED
+    );
   });
 
   it('should disable skill description status marker', () => {
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_UNCHANGED);
+        .STATUS_UNCHANGED
+    );
 
     skillCreationService.disableSkillDescriptionStatusMarker();
 
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_DISABLED);
+        .STATUS_DISABLED
+    );
   });
 
   it('should reset skill description status marker', () => {
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_UNCHANGED);
+        .STATUS_UNCHANGED
+    );
 
     skillCreationService.disableSkillDescriptionStatusMarker();
 
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_DISABLED);
+        .STATUS_DISABLED
+    );
 
     skillCreationService.resetSkillDescriptionStatusMarker();
 
     expect(skillCreationService.skillDescriptionStatusMarker).toBe(
       TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_UNCHANGED);
+        .STATUS_UNCHANGED
+    );
   });
 });

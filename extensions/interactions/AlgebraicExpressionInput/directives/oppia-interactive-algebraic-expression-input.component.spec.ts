@@ -17,14 +17,20 @@
  * component.
  */
 
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { AlgebraicExpressionInputInteractionComponent } from './oppia-interactive-algebraic-expression-input.component';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { GuppyInitializationService, GuppyObject } from 'services/guppy-initialization.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { TranslateService } from '@ngx-translate/core';
-import { AlgebraicExpressionAnswer, InteractionAnswer } from 'interactions/answer-defs';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {AlgebraicExpressionInputInteractionComponent} from './oppia-interactive-algebraic-expression-input.component';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {
+  GuppyInitializationService,
+  GuppyObject,
+} from 'services/guppy-initialization.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {TranslateService} from '@ngx-translate/core';
+import {
+  AlgebraicExpressionAnswer,
+  InteractionAnswer,
+} from 'interactions/answer-defs';
 
 class MockTranslateService {
   instant(key: string): string {
@@ -43,10 +49,10 @@ describe('AlgebraicExpressionInputInteractive', () => {
   let mockGuppyObject = {
     divId: '1',
     guppyInstance: {
-      asciimath: function() {
+      asciimath: function () {
         return asciiDummyValue;
-      }
-    }
+      },
+    },
   };
   class MockGuppy {
     static focused = true;
@@ -62,38 +68,39 @@ describe('AlgebraicExpressionInputInteractive', () => {
     }
 
     static configure(name: string, val: Object): void {}
-    static 'remove_global_symbol'(symbol: string): void {}
-    static 'add_global_symbol'(name: string, symbol: Object): void {}
+    static remove_global_symbol(symbol: string): void {}
+    static add_global_symbol(name: string, symbol: Object): void {}
   }
 
   let mockCurrentInteractionService = {
     onSubmit: (
-        answer: AlgebraicExpressionAnswer,
-        rulesService: CurrentInteractionService
+      answer: AlgebraicExpressionAnswer,
+      rulesService: CurrentInteractionService
     ) => {},
     updateCurrentAnswer: (answer: InteractionAnswer) => {},
     registerCurrentInteraction: (
-        submitAnswerFn: Function, validateExpressionFn: Function) => {
+      submitAnswerFn: Function,
+      validateExpressionFn: Function
+    ) => {
       submitAnswerFn();
       validateExpressionFn();
-    }
+    },
   };
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        declarations: [AlgebraicExpressionInputInteractionComponent],
-        providers: [
-          {
-            provide: CurrentInteractionService,
-            useValue: mockCurrentInteractionService
-          },
-          {
-            provide: TranslateService,
-            useClass: MockTranslateService
-          }
-        ]
-      }).compileComponents();
+    TestBed.configureTestingModule({
+      declarations: [AlgebraicExpressionInputInteractionComponent],
+      providers: [
+        {
+          provide: CurrentInteractionService,
+          useValue: mockCurrentInteractionService,
+        },
+        {
+          provide: TranslateService,
+          useClass: MockTranslateService,
+        },
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -103,7 +110,8 @@ describe('AlgebraicExpressionInputInteractive', () => {
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
     deviceInfoService = TestBed.inject(DeviceInfoService);
     fixture = TestBed.createComponent(
-      AlgebraicExpressionInputInteractionComponent);
+      AlgebraicExpressionInputInteractionComponent
+    );
     component = fixture.componentInstance;
     component.allowedVariablesWithValue = '[&quot;a&quot;, &quot;b&quot;]';
     fixture.detectChanges();
@@ -111,7 +119,8 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
   it('should add the change handler to guppy', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject as GuppyObject);
+      mockGuppyObject as GuppyObject
+    );
     component.ngOnInit();
     expect(guppyInitializationService.findActiveGuppyObject).toHaveBeenCalled();
   });
@@ -133,7 +142,8 @@ describe('AlgebraicExpressionInputInteractive', () => {
     component.submitAnswer();
     expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
     expect(component.warningText).toBe(
-      'Your answer seems to be missing a variable/number after the "/".');
+      'Your answer seems to be missing a variable/number after the "/".'
+    );
     expect(component.hasBeenTouched).toBeTrue();
   });
 
@@ -148,8 +158,9 @@ describe('AlgebraicExpressionInputInteractive', () => {
     // This should be validated as false if the editor has been touched.
     component.value = '';
     expect(component.isCurrentAnswerValid()).toBeFalse();
-    expect(
-      component.warningText).toBe('Please enter an answer before submitting.');
+    expect(component.warningText).toBe(
+      'Please enter an answer before submitting.'
+    );
   });
 
   it('should set the value of showOSK to true', () => {
@@ -163,7 +174,8 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
   it('should initialize component.value with an empty string', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject as GuppyObject);
+      mockGuppyObject as GuppyObject
+    );
     MockGuppy.focused = false;
     component.ngOnInit();
     expect(component.value).not.toBeNull();
@@ -171,7 +183,8 @@ describe('AlgebraicExpressionInputInteractive', () => {
 
   it('should update current answer on change', () => {
     spyOn(guppyInitializationService, 'findActiveGuppyObject').and.returnValue(
-      mockGuppyObject as GuppyObject);
+      mockGuppyObject as GuppyObject
+    );
     component.ngOnInit();
     spyOn(currentInteractionService, 'updateCurrentAnswer');
     spyOn(component, 'isCurrentAnswerValid');

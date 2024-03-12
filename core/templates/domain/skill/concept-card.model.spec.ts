@@ -16,10 +16,16 @@
  * @fileoverview Unit tests for concept-card.model.
  */
 
-import { ConceptCardBackendDict, ConceptCard } from 'domain/skill/concept-card.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { WorkedExampleBackendDict, WorkedExample } from 'domain/skill/worked-example.model';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import {
+  ConceptCardBackendDict,
+  ConceptCard,
+} from 'domain/skill/concept-card.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {
+  WorkedExampleBackendDict,
+  WorkedExample,
+} from 'domain/skill/worked-example.model';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Concept card object factory', () => {
   let conceptCardDict: ConceptCardBackendDict;
@@ -30,22 +36,22 @@ describe('Concept card object factory', () => {
     example1 = {
       question: {
         html: 'worked example question 1',
-        content_id: 'worked_example_q_1'
+        content_id: 'worked_example_q_1',
       },
       explanation: {
         html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1'
-      }
+        content_id: 'worked_example_e_1',
+      },
     };
     example2 = {
       question: {
         html: 'worked example question 2',
-        content_id: 'worked_example_q_2'
+        content_id: 'worked_example_q_2',
       },
       explanation: {
         html: 'worked example explanation 2',
-        content_id: 'worked_example_e_2'
-      }
+        content_id: 'worked_example_e_2',
+      },
     };
     conceptCardDict = {
       explanation: {
@@ -61,40 +67,48 @@ describe('Concept card object factory', () => {
               filename: 'filename1.mp3',
               file_size_bytes: 100000,
               needs_update: false,
-              duration_secs: 10.0
-            }
+              duration_secs: 10.0,
+            },
           },
           worked_example_e_1: {},
           worked_example_q_2: {},
-          worked_example_e_2: {}
-        }
-      }
+          worked_example_e_2: {},
+        },
+      },
     };
   });
 
   it('should create a new concept card from a backend dictionary', () => {
-    let conceptCard =
-      ConceptCard.createFromBackendDict(conceptCardDict);
+    let conceptCard = ConceptCard.createFromBackendDict(conceptCardDict);
     expect(conceptCard.getExplanation()).toEqual(
-      SubtitledHtml.createDefault(
-        'test explanation', 'explanation'));
+      SubtitledHtml.createDefault('test explanation', 'explanation')
+    );
     expect(conceptCard.getWorkedExamples()).toEqual([
       WorkedExample.create(
         SubtitledHtml.createDefault(
-          'worked example question 1', 'worked_example_q_1'),
+          'worked example question 1',
+          'worked_example_q_1'
+        ),
         SubtitledHtml.createDefault(
-          'worked example explanation 1', 'worked_example_e_1')),
+          'worked example explanation 1',
+          'worked_example_e_1'
+        )
+      ),
       WorkedExample.create(
         SubtitledHtml.createDefault(
-          'worked example question 2', 'worked_example_q_2'),
+          'worked example question 2',
+          'worked_example_q_2'
+        ),
         SubtitledHtml.createDefault(
-          'worked example explanation 2', 'worked_example_e_2'))
+          'worked example explanation 2',
+          'worked_example_e_2'
+        )
+      ),
     ]);
   });
 
   it('should convert to a backend dictionary', () => {
-    let conceptCard =
-      ConceptCard.createFromBackendDict(conceptCardDict);
+    let conceptCard = ConceptCard.createFromBackendDict(conceptCardDict);
     expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
   });
 
@@ -106,23 +120,23 @@ describe('Concept card object factory', () => {
             filename: 'filename1.mp3',
             file_size_bytes: 100000,
             needs_update: false,
-            duration_secs: 10.0
+            duration_secs: 10.0,
           },
           hi: {
             filename: 'filename2.mp3',
             file_size_bytes: 11000,
             needs_update: false,
-            duration_secs: 0.11
-          }
-        }
-      }
+            duration_secs: 0.11,
+          },
+        },
+      },
     };
 
     conceptCardDict.recorded_voiceovers = voiceover;
-    let conceptCard =
-      ConceptCard.createFromBackendDict(conceptCardDict);
+    let conceptCard = ConceptCard.createFromBackendDict(conceptCardDict);
 
-    expect(conceptCard.getRecordedVoiceovers())
-      .toEqual(RecordedVoiceovers.createFromBackendDict(voiceover));
+    expect(conceptCard.getRecordedVoiceovers()).toEqual(
+      RecordedVoiceovers.createFromBackendDict(voiceover)
+    );
   });
 });

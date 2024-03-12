@@ -16,10 +16,13 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 
-import { AuthBackendApiService } from 'services/auth-backend-api.service';
+import {AuthBackendApiService} from 'services/auth-backend-api.service';
 
 describe('Auth Backend Api Service', () => {
   let authBackendApiService: AuthBackendApiService;
@@ -33,7 +36,7 @@ describe('Auth Backend Api Service', () => {
 
   afterEach(() => httpTestingController.verify());
 
-  it('should call /session_begin', fakeAsync(async() => {
+  it('should call /session_begin', fakeAsync(async () => {
     const response = authBackendApiService.beginSessionAsync('TKN');
     flushMicrotasks();
 
@@ -46,7 +49,7 @@ describe('Auth Backend Api Service', () => {
     await expectAsync(response).toBeResolved();
   }));
 
-  it('should call /session_end', fakeAsync(async() => {
+  it('should call /session_end', fakeAsync(async () => {
     const response = authBackendApiService.endSessionAsync();
     flushMicrotasks();
 

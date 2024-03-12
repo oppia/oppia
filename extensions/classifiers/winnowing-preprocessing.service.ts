@@ -21,15 +21,15 @@
  * same task.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 export interface TokenToId {
   [x: string]: number;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WinnowingPreprocessingService {
   static generateHashValue(tokens: string[], tokenToId: TokenToId): number {
@@ -45,21 +45,24 @@ export class WinnowingPreprocessingService {
     return hashVal;
   }
 
-  getKGramHashes(
-      tokens: string[], tokenToId: TokenToId, K: number): number[] {
+  getKGramHashes(tokens: string[], tokenToId: TokenToId, K: number): number[] {
     // Generate all possible k-gram hashes from tokens.
     var kGramHashes = [];
     var kTokens: string[];
     for (var i = 0; i < tokens.length - K + 1; i += 1) {
       kTokens = tokens.slice(i, i + K);
-      kGramHashes.push(WinnowingPreprocessingService.generateHashValue(
-        kTokens, tokenToId));
+      kGramHashes.push(
+        WinnowingPreprocessingService.generateHashValue(kTokens, tokenToId)
+      );
     }
     return kGramHashes;
   }
 
   getFingerprintFromHashes(
-      kGramHashes: number[], T: number, K: number): number[][] {
+    kGramHashes: number[],
+    T: number,
+    K: number
+  ): number[][] {
     // Generate fingerprint of a document from its k-gram hashes.
     var windowSize = T - K + 1;
     var fingerprintHashesIndex: Set<number> = new Set();
@@ -79,6 +82,9 @@ export class WinnowingPreprocessingService {
   }
 }
 
-angular.module('oppia').factory(
-  'WinnowingPreprocessingService',
-  downgradeInjectable(WinnowingPreprocessingService));
+angular
+  .module('oppia')
+  .factory(
+    'WinnowingPreprocessingService',
+    downgradeInjectable(WinnowingPreprocessingService)
+  );

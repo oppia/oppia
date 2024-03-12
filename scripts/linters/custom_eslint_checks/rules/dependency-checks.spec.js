@@ -108,13 +108,12 @@ ruleTester.run('no-unused-dependency', rule, {
           '$http', '$translate', 'I18nLanguageCodeService',
           'UserService', 'SUPPORTED_SITE_LANGUAGES'
         ]
-    }`
+    }`,
   ],
 
   invalid: [
     {
-      code:
-      `function test() {
+      code: `function test() {
         return {
           controller: [
             '$http', '$translate', 'I18nLanguageCodeService',
@@ -149,14 +148,15 @@ ruleTester.run('no-unused-dependency', rule, {
           ]
         };
       }`,
-      errors: [{
-        message: 'SUPPORTED_SITE_LANGUAGES is injected but never used.',
-        type: 'ArrayExpression'
-      }]
+      errors: [
+        {
+          message: 'SUPPORTED_SITE_LANGUAGES is injected but never used.',
+          type: 'ArrayExpression',
+        },
+      ],
     },
     {
-      code:
-      `function test() {
+      code: `function test() {
         return {
           controller: [
             '$http', 'I18nLanguageCodeService', '$translate',
@@ -191,10 +191,12 @@ ruleTester.run('no-unused-dependency', rule, {
           ]
         };
       }`,
-      errors: [{
-        message: 'Dependencies are not sorted.',
-        type: 'ArrayExpression'
-      }]
-    }
-  ]
+      errors: [
+        {
+          message: 'Dependencies are not sorted.',
+          type: 'ArrayExpression',
+        },
+      ],
+    },
+  ],
 });

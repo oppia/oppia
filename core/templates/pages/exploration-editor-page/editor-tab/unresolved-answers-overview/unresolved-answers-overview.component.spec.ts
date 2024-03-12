@@ -16,19 +16,24 @@
  * @fileoverview Unit tests for unresolvedAnswersOverview.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { EditabilityService } from 'services/editability.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ImprovementsService } from 'services/improvements.service';
-import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
-import { UnresolvedAnswersOverviewComponent } from './unresolved-answers-overview.component';
-import { ExternalSaveService } from 'services/external-save.service';
-import { State } from 'domain/state/StateObjectFactory';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {EditabilityService} from 'services/editability.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ImprovementsService} from 'services/improvements.service';
+import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
+import {UnresolvedAnswersOverviewComponent} from './unresolved-answers-overview.component';
+import {ExternalSaveService} from 'services/external-save.service';
+import {State} from 'domain/state/StateObjectFactory';
 
 describe('Unresolved Answers Overview Component', () => {
   let component: UnresolvedAnswersOverviewComponent;
@@ -48,7 +53,7 @@ describe('Unresolved Answers Overview Component', () => {
   class MockNgbModal {
     open() {
       return {
-        result: Promise.resolve()
+        result: Promise.resolve(),
       };
     }
   }
@@ -60,9 +65,7 @@ describe('Unresolved Answers Overview Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        UnresolvedAnswersOverviewComponent
-      ],
+      declarations: [UnresolvedAnswersOverviewComponent],
       providers: [
         EditabilityService,
         ExplorationStatesService,
@@ -72,17 +75,16 @@ describe('Unresolved Answers Overview Component', () => {
         StateTopAnswersStatsService,
         {
           provide: ExternalSaveService,
-          useClass: MockExternalSaveService
+          useClass: MockExternalSaveService,
         },
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
-
 
   beforeEach(() => {
     fixture = TestBed.createComponent(UnresolvedAnswersOverviewComponent);
@@ -99,102 +101,119 @@ describe('Unresolved Answers Overview Component', () => {
     component.ngOnInit();
   });
 
-  it('should initialize component properties after controller is initialized',
-    () => {
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-      expect(component.unresolvedAnswersOverviewIsShown).toBe(false);
-      expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
-    });
-
-  it('should check unresolved answers overview are shown when it has' +
-    ' state stats', () => {
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
-    spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-    spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
-    spyOn(
-      improvementsService,
-      'isStateForcedToResolveOutstandingUnaddressedAnswers')
-      .and.returnValue(true);
-
-    expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
-  });
-
-  it('should check unresolved answers overview are shown when it has' +
-    ' state stats', () => {
+  it('should initialize component properties after controller is initialized', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-    spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
-    spyOn(
-      improvementsService,
-      'isStateForcedToResolveOutstandingUnaddressedAnswers')
-      .and.returnValue(true);
-
-    expect(component.isUnresolvedAnswersOverviewShown()).toBe(true);
+    expect(component.unresolvedAnswersOverviewIsShown).toBe(false);
+    expect(component.SHOW_TRAINABLE_UNRESOLVED_ANSWERS).toBe(false);
   });
 
-  it('should check unresolved answers overview are not shown when it' +
-    ' has no state stats', () => {
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
-    spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-    spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(false);
-    spyOn(
-      improvementsService,
-      'isStateForcedToResolveOutstandingUnaddressedAnswers');
+  it(
+    'should check unresolved answers overview are shown when it has' +
+      ' state stats',
+    () => {
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+      spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
+      spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
+      spyOn(
+        improvementsService,
+        'isStateForcedToResolveOutstandingUnaddressedAnswers'
+      ).and.returnValue(true);
 
-    expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
-    expect(
-      improvementsService.isStateForcedToResolveOutstandingUnaddressedAnswers)
-      .not.toHaveBeenCalled();
-  });
+      expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
+    }
+  );
 
-  it('should check unresolved answers overview are not shown when' +
-    ' the state is not forced to resolved unaddressed answers', () => {
-    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
-    spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-    spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
-    spyOn(
-      improvementsService,
-      'isStateForcedToResolveOutstandingUnaddressedAnswers')
-      .and.returnValue(false);
-
-    expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
-  });
-
-  it('should check whenever the current interaction is trainable or not',
+  it(
+    'should check unresolved answers overview are shown when it has' +
+      ' state stats',
     () => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
+        stateName
+      );
       spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-      stateInteractionIdService.init(stateName, 'CodeRepl');
-      expect(component.getCurrentInteractionId()).toBe('CodeRepl');
-      expect(component.isCurrentInteractionTrainable()).toBe(true);
+      spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
+      spyOn(
+        improvementsService,
+        'isStateForcedToResolveOutstandingUnaddressedAnswers'
+      ).and.returnValue(true);
 
-      stateInteractionIdService.init(stateName, 'Continue');
-      expect(component.getCurrentInteractionId()).toBe('Continue');
-      expect(component.isCurrentInteractionTrainable()).toBe(false);
-    });
+      expect(component.isUnresolvedAnswersOverviewShown()).toBe(true);
+    }
+  );
 
-  it('should check whenever the current interaction is linear or not',
+  it(
+    'should check unresolved answers overview are not shown when it' +
+      ' has no state stats',
     () => {
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
+        stateName
+      );
       spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-      stateInteractionIdService.init(stateName, 'Continue');
-      expect(component.getCurrentInteractionId()).toBe('Continue');
-      expect(component.isCurrentInteractionLinear()).toBe(true);
+      spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(
+        false
+      );
+      spyOn(
+        improvementsService,
+        'isStateForcedToResolveOutstandingUnaddressedAnswers'
+      );
 
-      stateInteractionIdService.init(stateName, 'PencilCodeEditor');
-      expect(component.getCurrentInteractionId()).toBe('PencilCodeEditor');
-      expect(component.isCurrentInteractionLinear()).toBe(false);
-    });
+      expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
+      expect(
+        improvementsService.isStateForcedToResolveOutstandingUnaddressedAnswers
+      ).not.toHaveBeenCalled();
+    }
+  );
+
+  it(
+    'should check unresolved answers overview are not shown when' +
+      ' the state is not forced to resolved unaddressed answers',
+    () => {
+      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+        stateName
+      );
+      spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
+      spyOn(stateTopAnswersStatsService, 'hasStateStats').and.returnValue(true);
+      spyOn(
+        improvementsService,
+        'isStateForcedToResolveOutstandingUnaddressedAnswers'
+      ).and.returnValue(false);
+
+      expect(component.isUnresolvedAnswersOverviewShown()).toBe(false);
+    }
+  );
+
+  it('should check whenever the current interaction is trainable or not', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
+    spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
+    stateInteractionIdService.init(stateName, 'CodeRepl');
+    expect(component.getCurrentInteractionId()).toBe('CodeRepl');
+    expect(component.isCurrentInteractionTrainable()).toBe(true);
+
+    stateInteractionIdService.init(stateName, 'Continue');
+    expect(component.getCurrentInteractionId()).toBe('Continue');
+    expect(component.isCurrentInteractionTrainable()).toBe(false);
+  });
+
+  it('should check whenever the current interaction is linear or not', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
+    spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
+    stateInteractionIdService.init(stateName, 'Continue');
+    expect(component.getCurrentInteractionId()).toBe('Continue');
+    expect(component.isCurrentInteractionLinear()).toBe(true);
+
+    stateInteractionIdService.init(stateName, 'PencilCodeEditor');
+    expect(component.getCurrentInteractionId()).toBe('PencilCodeEditor');
+    expect(component.isCurrentInteractionLinear()).toBe(false);
+  });
 
   it('should throw error if state name is null', fakeAsync(() => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
     spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-    spyOn(stateTopAnswersStatsService, 'getUnresolvedStateStats').and
-      .returnValue([]);
+    spyOn(
+      stateTopAnswersStatsService,
+      'getUnresolvedStateStats'
+    ).and.returnValue([]);
     expect(() => {
       component.getUnresolvedStateStats();
     }).toThrowError('State name should not be null.');
@@ -204,7 +223,9 @@ describe('Unresolved Answers Overview Component', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
     let editabilitySpy = spyOn(
-      editabilityService, 'isEditableOutsideTutorialMode');
+      editabilityService,
+      'isEditableOutsideTutorialMode'
+    );
 
     editabilitySpy.and.returnValue(true);
     expect(component.isEditableOutsideTutorialMode()).toBe(true);
@@ -228,7 +249,7 @@ describe('Unresolved Answers Overview Component', () => {
     spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
     spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
     spyOn(ngbModal, 'open').and.returnValue({
-      result: Promise.resolve()
+      result: Promise.resolve(),
     } as NgbModalRef);
 
     component.openTeachOppiaModal();
@@ -236,26 +257,26 @@ describe('Unresolved Answers Overview Component', () => {
     expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
   });
 
-  it('should broadcast externalSave flag when dismissing the modal',
-    () => {
-      spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
-        stateName);
-      spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-      spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.reject()
-      } as NgbModalRef);
+  it('should broadcast externalSave flag when dismissing the modal', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
+    spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
+    spyOn(mockExternalSaveEventEmitter, 'emit').and.callThrough();
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
 
-      component.openTeachOppiaModal();
+    component.openTeachOppiaModal();
 
-      expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
-    });
+    expect(mockExternalSaveEventEmitter.emit).toHaveBeenCalled();
+  });
 
   it('should fetch unresolved state stats from backend', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(stateName);
     spyOn(explorationStatesService, 'getState').and.returnValue({} as State);
-    spyOn(stateTopAnswersStatsService, 'getUnresolvedStateStats').and
-      .returnValue([]);
+    spyOn(
+      stateTopAnswersStatsService,
+      'getUnresolvedStateStats'
+    ).and.returnValue([]);
     expect(component.getUnresolvedStateStats()).toEqual([]);
   });
 });

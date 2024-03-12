@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for SkillOpportunityModel.
  */
 
-import { SkillOpportunity, SkillOpportunityBackendDict } from
-  'domain/opportunity/skill-opportunity.model';
+import {
+  SkillOpportunity,
+  SkillOpportunityBackendDict,
+} from 'domain/opportunity/skill-opportunity.model';
 
 describe('Skill opportunity model', () => {
   describe('SkillOpportunityModel', () => {
@@ -28,37 +30,38 @@ describe('Skill opportunity model', () => {
         id: 'skill_id',
         skill_description: 'A new skill for question',
         topic_name: 'A new topic',
-        question_count: 30
+        question_count: 30,
       };
     });
 
     it('should return a correct skill id', () => {
-      let skillOpportunity = (
-        SkillOpportunity.createFromBackendDict(backendDict));
+      let skillOpportunity =
+        SkillOpportunity.createFromBackendDict(backendDict);
 
-      expect(skillOpportunity.getSkillId()).toEqual(
-        'skill_id');
+      expect(skillOpportunity.getSkillId()).toEqual('skill_id');
     });
 
     it('should return a correct opportunity heading', () => {
-      let skillOpportunity = (
-        SkillOpportunity.createFromBackendDict(backendDict));
+      let skillOpportunity =
+        SkillOpportunity.createFromBackendDict(backendDict);
 
       expect(skillOpportunity.getOpportunityHeading()).toEqual(
-        'A new skill for question');
+        'A new skill for question'
+      );
     });
 
     it('should return a correct opportunity subheading', () => {
-      let skillOpportunity = (
-        SkillOpportunity.createFromBackendDict(backendDict));
+      let skillOpportunity =
+        SkillOpportunity.createFromBackendDict(backendDict);
 
       expect(skillOpportunity.getOpportunitySubheading()).toEqual(
-        'A new topic');
+        'A new topic'
+      );
     });
 
     it('should return a correct content count', () => {
-      let skillOpportunity = (
-        SkillOpportunity.createFromBackendDict(backendDict));
+      let skillOpportunity =
+        SkillOpportunity.createFromBackendDict(backendDict);
 
       expect(skillOpportunity.getQuestionCount()).toEqual(30);
     });

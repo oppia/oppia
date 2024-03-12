@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for ThreadMessageModel.
  */
 
-
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 
 describe('ThreadMessageModel', () => {
   describe('.createFromBackendDict', () => {
@@ -30,7 +29,7 @@ describe('ThreadMessageModel', () => {
         message_id: 1,
         text: 'message content',
         updated_status: null,
-        updated_subject: null
+        updated_subject: null,
       });
 
       expect(threadMessage.authorUsername).toEqual('author');
@@ -56,7 +55,7 @@ describe('ThreadMessageModel', () => {
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         text: '',
-        updated_status: null
+        updated_status: null,
       });
 
       expect(threadMessage.hasSubjectUpdate()).toBe(true);
@@ -71,7 +70,7 @@ describe('ThreadMessageModel', () => {
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         text: '',
-        updated_status: null
+        updated_status: null,
       });
 
       expect(threadMessage.hasSubjectUpdate()).toBe(false);
@@ -88,7 +87,7 @@ describe('ThreadMessageModel', () => {
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         text: '',
-        updated_subject: null
+        updated_subject: null,
       });
 
       expect(threadMessage.hasStatusUpdate()).toBe(true);
@@ -103,7 +102,7 @@ describe('ThreadMessageModel', () => {
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         text: '',
-        updated_subject: null
+        updated_subject: null,
       });
 
       expect(threadMessage.hasStatusUpdate()).toBe(false);
@@ -120,7 +119,7 @@ describe('ThreadMessageModel', () => {
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         updated_status: null,
-        updated_subject: null
+        updated_subject: null,
       });
 
       expect(threadMessage.hasText()).toBe(true);
@@ -135,7 +134,7 @@ describe('ThreadMessageModel', () => {
         entity_id: 'exploration.exp1.thread1',
         message_id: 1,
         updated_status: null,
-        updated_subject: null
+        updated_subject: null,
       });
 
       expect(threadMessage.hasText()).toBe(false);

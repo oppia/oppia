@@ -16,16 +16,16 @@
  * @fileoverview A data service that stores the current interaction hints.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { StatePropertyService } from 'components/state-editor/state-editor-properties-services/state-property.service';
-import { UtilsService } from 'services/utils.service';
+import {AlertsService} from 'services/alerts.service';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {StatePropertyService} from 'components/state-editor/state-editor-properties-services/state-property.service';
+import {UtilsService} from 'services/utils.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateHintsService extends StatePropertyService<Hint[]> {
   // 'activeHintIndex' is initialized with null when no hints exist.
@@ -51,5 +51,6 @@ export class StateHintsService extends StatePropertyService<Hint[]> {
   }
 }
 
-angular.module('oppia').factory(
-  'StateHintsService', downgradeInjectable(StateHintsService));
+angular
+  .module('oppia')
+  .factory('StateHintsService', downgradeInjectable(StateHintsService));

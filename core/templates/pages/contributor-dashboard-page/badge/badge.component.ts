@@ -16,8 +16,8 @@
  * @fileoverview Component for the badge.
  */
 
-import { Component, Input } from '@angular/core';
-import { AppConstants } from 'app.constants';
+import {Component, Input} from '@angular/core';
+import {AppConstants} from 'app.constants';
 
 interface ContributionSubTypeTexts {
   submission: string;
@@ -28,7 +28,7 @@ interface ContributionSubTypeTexts {
 @Component({
   selector: 'badge',
   templateUrl: './badge.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class BadgeComponent {
   @Input() contributionType!: string;
@@ -43,14 +43,14 @@ export class BadgeComponent {
   CONTRIBUTION_SUB_TYPE_TEXTS: ContributionSubTypeTexts = {
     [AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION]: 'Submission',
     [AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW]: 'Review',
-    [AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION]: 'Correction'
+    [AppConstants.CONTRIBUTION_STATS_SUBTYPE_CORRECTION]: 'Correction',
   };
 
   constructor() {}
 
   ngOnInit(): void {
-    this.contributionSubTypeText = this.CONTRIBUTION_SUB_TYPE_TEXTS[
-      this.contributionSubType];
+    this.contributionSubTypeText =
+      this.CONTRIBUTION_SUB_TYPE_TEXTS[this.contributionSubType];
 
     if (this.contributionCount > 1) {
       this.contributionSubTypeText += 's';

@@ -16,24 +16,19 @@
  * @fileoverview Routing module for teach page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { TeachPageRootComponent } from './teach-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {TeachPageRootComponent} from './teach-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: TeachPageRootComponent
-  }
+    component: TeachPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class TeachPageRoutingModule {}

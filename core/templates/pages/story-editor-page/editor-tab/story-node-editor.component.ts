@@ -16,27 +16,33 @@
  * @fileoverview Component for the story node editor.
  */
 
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { SelectSkillModalComponent } from 'components/skill-selector/select-skill-modal.component';
-import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { StoryUpdateService } from 'domain/story/story-update.service';
-import { Story } from 'domain/story/story.model';
-import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { PageTitleService } from 'services/page-title.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { StoryEditorStateService } from '../services/story-editor-state.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {SelectSkillModalComponent} from 'components/skill-selector/select-skill-modal.component';
+import {CuratedExplorationValidationService} from 'domain/exploration/curated-exploration-validation.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {StoryUpdateService} from 'domain/story/story-update.service';
+import {Story} from 'domain/story/story.model';
+import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {PageTitleService} from 'services/page-title.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {StoryEditorStateService} from '../services/story-editor-state.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-story-node-editor',
-  templateUrl: './story-node-editor.component.html'
+  templateUrl: './story-node-editor.component.html',
 })
 export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   @Input() nodeId: string;
@@ -89,8 +95,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     type: 'html',
     ui_config: {
       startupFocusEnabled: false,
-      rows: 100
-    }
+      rows: 100,
+    },
   };
 
   private _categorizedSkills = {};
@@ -102,8 +108,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   constructor(
     private alertsService: AlertsService,
-    private curatedExplorationValidationService:
-    CuratedExplorationValidationService,
+    private curatedExplorationValidationService: CuratedExplorationValidationService,
     private changeDetectorRef: ChangeDetectorRef,
     private focusManagerService: FocusManagerService,
     private ngbModal: NgbModal,
@@ -111,31 +116,31 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     private skillBackendApiService: SkillBackendApiService,
     private storyEditorStateService: StoryEditorStateService,
     private storyUpdateService: StoryUpdateService,
-    private topicsAndSkillsDashboardBackendApiService:
-    TopicsAndSkillsDashboardBackendApiService,
+    private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private windowDimensionsService: WindowDimensionsService,
     private platformFeatureService: PlatformFeatureService
   ) {}
 
   isSerialChapterFeatureFlagEnabled(): boolean {
-    return (
-      this.platformFeatureService.
-        status.SerialChapterLaunchCurriculumAdminView.isEnabled);
+    return this.platformFeatureService.status
+      .SerialChapterLaunchCurriculumAdminView.isEnabled;
   }
 
   private _init(): void {
     this.story = this.storyEditorStateService.getStory();
     this.storyNodeIds = this.story.getStoryContents().getNodeIds();
-    this.nodeIdToTitleMap = this.story.getStoryContents().getNodeIdsToTitleMap(
-      this.storyNodeIds);
+    this.nodeIdToTitleMap = this.story
+      .getStoryContents()
+      .getNodeIdsToTitleMap(this.storyNodeIds);
     this.skillInfoHasLoaded = false;
 
     this._recalculateAvailableNodes();
 
     let skillSummaries = this.storyEditorStateService.getSkillSummaries();
 
-    this.topicsAndSkillsDashboardBackendApiService.fetchDashboardDataAsync()
-      .then((response) => {
+    this.topicsAndSkillsDashboardBackendApiService
+      .fetchDashboardDataAsync()
+      .then(response => {
         this._categorizedSkills = response.categorizedSkillsDict;
         this._untriagedSkillSummaries = response.untriagedSkillSummaries;
         this.skillInfoHasLoaded = true;
@@ -143,7 +148,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
     for (let idx in skillSummaries) {
       this.skillIdToSummaryMap[skillSummaries[idx].id] =
-      skillSummaries[idx].description;
+        skillSummaries[idx].description;
     }
 
     this.isStoryPublished = this.storyEditorStateService.isStoryPublished;
@@ -160,8 +165,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.expIdIsValid = true;
     this.invalidExpErrorIsShown = false;
     this.nodeTitleEditorIsShown = false;
-    this.plannedPublicationDate = this.plannedPublicationDateMsecs ? new Date(
-      this.plannedPublicationDateMsecs) : null;
+    this.plannedPublicationDate = this.plannedPublicationDateMsecs
+      ? new Date(this.plannedPublicationDateMsecs)
+      : null;
     this.editablePlannedPublicationDate = this.plannedPublicationDate;
 
     this.updateCurrentNodeIsPublishable();
@@ -176,20 +182,22 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
     if (skills && skills.length > 0) {
       this.skillBackendApiService.fetchMultiSkillsAsync(skills).then(
-        (response) => {
+        response => {
           for (let idx in response) {
-            this.skillIdToSummaryMap[response[idx].getId()] = (
-              response[idx].getDescription());
+            this.skillIdToSummaryMap[response[idx].getId()] =
+              response[idx].getDescription();
           }
-        }, (error) => {
+        },
+        error => {
           this.alertsService.addWarning('');
-        });
+        }
+      );
     }
   }
 
   checkCanSaveExpId(): void {
-    this.expIdCanBeSaved = this.explorationIdPattern.test(
-      this.explorationId) || !this.explorationId;
+    this.expIdCanBeSaved =
+      this.explorationIdPattern.test(this.explorationId) || !this.explorationId;
     this.invalidExpErrorIsShown = false;
   }
 
@@ -202,14 +210,18 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
         if (node.getTitle() === newTitle) {
           titleIsValid = false;
           this.alertsService.addInfoMessage(
-            'A chapter already exists with given title.', 5000
+            'A chapter already exists with given title.',
+            5000
           );
         }
       }
 
       if (titleIsValid) {
         this.storyUpdateService.setStoryNodeTitle(
-          this.story, this.nodeId, newTitle);
+          this.story,
+          this.nodeId,
+          newTitle
+        );
         this.currentTitle = newTitle;
         this.updateCurrentNodeIsPublishable();
       }
@@ -219,7 +231,10 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   updateDescription(newDescription: string): void {
     if (newDescription !== this.currentDescription) {
       this.storyUpdateService.setStoryNodeDescription(
-        this.story, this.nodeId, newDescription);
+        this.story,
+        this.nodeId,
+        newDescription
+      );
       this.currentDescription = newDescription;
       this.updateCurrentNodeIsPublishable();
     }
@@ -235,22 +250,33 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
           this.plannedPublicationDateIsInPast = true;
           if (this.plannedPublicationDate) {
             this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
-              this.story, this.nodeId, null);
+              this.story,
+              this.nodeId,
+              null
+            );
           }
           this.plannedPublicationDate = null;
           this.editablePlannedPublicationDate = null;
           return;
-        } else if (this.plannedPublicationDate === null ||
+        } else if (
+          this.plannedPublicationDate === null ||
           this.plannedPublicationDate.getTime() !==
-          newPlannedPublicationDate.getTime()) {
+            newPlannedPublicationDate.getTime()
+        ) {
           this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
-            this.story, this.nodeId, newPlannedPublicationDate.getTime());
+            this.story,
+            this.nodeId,
+            newPlannedPublicationDate.getTime()
+          );
           this.plannedPublicationDate = newPlannedPublicationDate;
           this.plannedPublicationDateIsInPast = false;
         }
       } else {
         this.storyUpdateService.setStoryNodePlannedPublicationDateMsecs(
-          this.story, this.nodeId, null);
+          this.story,
+          this.nodeId,
+          null
+        );
         this.plannedPublicationDate = null;
         this.plannedPublicationDateIsInPast = false;
       }
@@ -262,7 +288,10 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   updateThumbnailFilename(newThumbnailFilename: string): void {
     if (newThumbnailFilename !== this.editableThumbnailFilename) {
       this.storyUpdateService.setStoryNodeThumbnailFilename(
-        this.story, this.nodeId, newThumbnailFilename);
+        this.story,
+        this.nodeId,
+        newThumbnailFilename
+      );
       this.updateCurrentNodeIsPublishable();
     }
   }
@@ -270,16 +299,24 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   updateThumbnailBgColor(newThumbnailBgColor: string): void {
     if (newThumbnailBgColor !== this.editableThumbnailBgColor) {
       this.storyUpdateService.setStoryNodeThumbnailBgColor(
-        this.story, this.nodeId, newThumbnailBgColor);
+        this.story,
+        this.nodeId,
+        newThumbnailBgColor
+      );
       this.editableThumbnailBgColor = newThumbnailBgColor;
       this.updateCurrentNodeIsPublishable();
     }
   }
 
   updateCurrentNodeIsPublishable(): void {
-    if (this.currentTitle && this.currentDescription && this.explorationId &&
+    if (
+      this.currentTitle &&
+      this.currentDescription &&
+      this.explorationId &&
       (this.editableThumbnailBgColor || this.editableThumbnailFilename) &&
-      this.outlineIsFinalized && this.plannedPublicationDate) {
+      this.outlineIsFinalized &&
+      this.plannedPublicationDate
+    ) {
       this.storyEditorStateService.setCurrentNodeAsPublishable(true);
     } else {
       this.storyEditorStateService.setCurrentNodeAsPublishable(false);
@@ -302,18 +339,23 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     if (this.storyEditorStateService.isStoryPublished()) {
       if (explorationId === '' || explorationId === null) {
         this.alertsService.addInfoMessage(
-          'You cannot remove an exploration from a published story.', 5000);
+          'You cannot remove an exploration from a published story.',
+          5000
+        );
         return;
       }
 
-      this.curatedExplorationValidationService.isExpPublishedAsync(
-        explorationId)
-        .then((expIdIsValid) => {
+      this.curatedExplorationValidationService
+        .isExpPublishedAsync(explorationId)
+        .then(expIdIsValid => {
           this.expIdIsValid = expIdIsValid;
 
           if (this.expIdIsValid) {
             this.storyUpdateService.setStoryNodeExplorationId(
-              this.story, this.nodeId, explorationId);
+              this.story,
+              this.nodeId,
+              explorationId
+            );
             this.currentExplorationId = explorationId;
           } else {
             this.invalidExpErrorIsShown = true;
@@ -323,12 +365,17 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       if (explorationId === '') {
         this.alertsService.addInfoMessage(
           'Please click the delete icon to remove an exploration ' +
-          'from the story.', 5000);
+            'from the story.',
+          5000
+        );
         return;
       }
 
       this.storyUpdateService.setStoryNodeExplorationId(
-        this.story, this.nodeId, explorationId);
+        this.story,
+        this.nodeId,
+        explorationId
+      );
       this.currentExplorationId = explorationId;
       if (explorationId === null) {
         this.explorationId = null;
@@ -338,94 +385,107 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
   removePrerequisiteSkillId(skillId: string): void {
     this.storyUpdateService.removePrerequisiteSkillIdFromNode(
-      this.story, this.nodeId, skillId);
+      this.story,
+      this.nodeId,
+      skillId
+    );
   }
 
   addPrerequisiteSkillId(): void {
     let sortedSkillSummaries = this.storyEditorStateService.getSkillSummaries();
     let allowSkillsFromOtherTopics = true;
     let skillsInSameTopicCount = 0;
-    let modalRef: NgbModalRef = this.ngbModal.open(
-      SelectSkillModalComponent, {
-        backdrop: 'static',
-        windowClass: 'skill-select-modal',
-        size: 'xl'
-      }
-    );
+    let modalRef: NgbModalRef = this.ngbModal.open(SelectSkillModalComponent, {
+      backdrop: 'static',
+      windowClass: 'skill-select-modal',
+      size: 'xl',
+    });
 
     modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-    modalRef.componentInstance.skillsInSameTopicCount = (
-      skillsInSameTopicCount);
+    modalRef.componentInstance.skillsInSameTopicCount = skillsInSameTopicCount;
     modalRef.componentInstance.categorizedSkills = this._categorizedSkills;
-    modalRef.componentInstance.allowSkillsFromOtherTopics = (
-      allowSkillsFromOtherTopics);
-    modalRef.componentInstance.untriagedSkillSummaries = (
-      this._untriagedSkillSummaries);
+    modalRef.componentInstance.allowSkillsFromOtherTopics =
+      allowSkillsFromOtherTopics;
+    modalRef.componentInstance.untriagedSkillSummaries =
+      this._untriagedSkillSummaries;
 
-    modalRef.result.then((summary) => {
-      try {
-        this.skillIdToSummaryMap[summary.id] = summary.description;
-        this.storyUpdateService.addPrerequisiteSkillIdToNode(
-          this.story, this.nodeId, summary.id);
-        // The catch parameter type can only be any or unknown. The type
-        // 'unknown' is safer than type 'any' because it reminds us
-        // that we need to performsome sorts of type-checks before
-        // operating on our values.
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          this.alertsService.addInfoMessage(
-            err.message, 5000);
+    modalRef.result.then(
+      summary => {
+        try {
+          this.skillIdToSummaryMap[summary.id] = summary.description;
+          this.storyUpdateService.addPrerequisiteSkillIdToNode(
+            this.story,
+            this.nodeId,
+            summary.id
+          );
+          // The catch parameter type can only be any or unknown. The type
+          // 'unknown' is safer than type 'any' because it reminds us
+          // that we need to performsome sorts of type-checks before
+          // operating on our values.
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            this.alertsService.addInfoMessage(err.message, 5000);
+          }
         }
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    );
   }
 
   addAcquiredSkillId(): void {
-    let sortedSkillSummaries = (
-      this.storyEditorStateService.getSkillSummaries());
+    let sortedSkillSummaries = this.storyEditorStateService.getSkillSummaries();
     let allowSkillsFromOtherTopics = false;
     let skillsInSameTopicCount = 0;
     let topicName = this.storyEditorStateService.getTopicName();
     let categorizedSkillsInTopic = {};
     categorizedSkillsInTopic[topicName] = this._categorizedSkills[topicName];
-    let modalRef: NgbModalRef = this.ngbModal.open(
-      SelectSkillModalComponent, {
-        backdrop: 'static',
-        windowClass: 'skill-select-modal',
-        size: 'xl'
-      });
+    let modalRef: NgbModalRef = this.ngbModal.open(SelectSkillModalComponent, {
+      backdrop: 'static',
+      windowClass: 'skill-select-modal',
+      size: 'xl',
+    });
 
     modalRef.componentInstance.skillSummaries = sortedSkillSummaries;
-    modalRef.componentInstance.skillsInSameTopicCount = (
-      skillsInSameTopicCount);
+    modalRef.componentInstance.skillsInSameTopicCount = skillsInSameTopicCount;
     modalRef.componentInstance.categorizedSkills = this._categorizedSkills;
-    modalRef.componentInstance.allowSkillsFromOtherTopics = (
-      allowSkillsFromOtherTopics);
-    modalRef.componentInstance.untriagedSkillSummaries = (
-      this._untriagedSkillSummaries);
+    modalRef.componentInstance.allowSkillsFromOtherTopics =
+      allowSkillsFromOtherTopics;
+    modalRef.componentInstance.untriagedSkillSummaries =
+      this._untriagedSkillSummaries;
 
-    modalRef.result.then((summary) => {
-      try {
-        this.storyUpdateService.addAcquiredSkillIdToNode(
-          this.story, this.nodeId, summary.id);
-      } catch (err) {
-        this.alertsService.addInfoMessage(
-          'Given skill is already an acquired skill', 5000);
+    modalRef.result.then(
+      summary => {
+        try {
+          this.storyUpdateService.addAcquiredSkillIdToNode(
+            this.story,
+            this.nodeId,
+            summary.id
+          );
+        } catch (err) {
+          this.alertsService.addInfoMessage(
+            'Given skill is already an acquired skill',
+            5000
+          );
+        }
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    );
   }
 
   removeAcquiredSkillId(skillId: string): void {
     this.storyUpdateService.removeAcquiredSkillIdFromNode(
-      this.story, this.nodeId, skillId);
+      this.story,
+      this.nodeId,
+      skillId
+    );
   }
 
   unfinalizeOutline(): void {
@@ -449,7 +509,10 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   updateOutline(newOutline: string): void {
     if (this.isOutlineModified(newOutline)) {
       this.storyUpdateService.setStoryNodeOutline(
-        this.story, this.nodeId, newOutline);
+        this.story,
+        this.nodeId,
+        newOutline
+      );
       this.oldOutline = newOutline;
     }
   }
@@ -489,8 +552,8 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   toggleExplorationInputButtons(): void {
-    this.explorationInputButtonsAreShown = (
-      !this.explorationInputButtonsAreShown);
+    this.explorationInputButtonsAreShown =
+      !this.explorationInputButtonsAreShown;
   }
 
   updateLocalEditableOutline($event: string): void {
@@ -512,7 +575,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.availableNodes = [];
     let linearNodesList = this.story.getStoryContents().getLinearNodesList();
 
-    let linearNodeIds = linearNodesList.map((node) => node.getId());
+    let linearNodeIds = linearNodesList.map(node => node.getId());
 
     for (let i = 0; i < this.storyNodeIds.length; i++) {
       if (this.storyNodeIds[i] === this.nodeId) {
@@ -526,7 +589,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       if (linearNodeIds.indexOf(this.storyNodeIds[i]) === -1) {
         this.availableNodes.push({
           id: this.storyNodeIds[i],
-          text: this.nodeIdToTitleMap[this.storyNodeIds[i]]
+          text: this.nodeIdToTitleMap[this.storyNodeIds[i]],
         });
       }
     }
@@ -535,26 +598,27 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.pageTitleService.setNavbarTitleForMobileView('Chapter Editor');
     this.chapterOutlineIsShown = !this.windowDimensionsService.isWindowNarrow();
-    this.chapterTodoCardIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
-    this.prerequisiteSkillIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
-    this.acquiredSkillIsShown = (
-      !this.windowDimensionsService.isWindowNarrow());
+    this.chapterTodoCardIsShown =
+      !this.windowDimensionsService.isWindowNarrow();
+    this.prerequisiteSkillIsShown =
+      !this.windowDimensionsService.isWindowNarrow();
+    this.acquiredSkillIsShown = !this.windowDimensionsService.isWindowNarrow();
 
     this.subscriptions.add(
-      this.storyEditorStateService.onStoryInitialized.subscribe(
-        () => this._init())
+      this.storyEditorStateService.onStoryInitialized.subscribe(() =>
+        this._init()
+      )
     );
 
     this.subscriptions.add(
-      this.storyEditorStateService.onStoryReinitialized.subscribe(
-        () => this._init())
+      this.storyEditorStateService.onStoryReinitialized.subscribe(() =>
+        this._init()
+      )
     );
 
     this.subscriptions.add(
-      this.storyEditorStateService.onRecalculateAvailableNodes.subscribe(
-        () => this._recalculateAvailableNodes()
+      this.storyEditorStateService.onRecalculateAvailableNodes.subscribe(() =>
+        this._recalculateAvailableNodes()
       )
     );
 
@@ -573,6 +637,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaStoryNodeEditor', downgradeComponent({
-  component: StoryNodeEditorComponent
-}));
+angular.module('oppia').directive(
+  'oppiaStoryNodeEditor',
+  downgradeComponent({
+    component: StoryNodeEditorComponent,
+  })
+);

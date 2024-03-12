@@ -16,11 +16,10 @@
  * @fileoverview Tests for Truncate pipe for Oppia.
  */
 
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { ConvertToPlainTextPipe } from
-  'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let truncatePipe: TruncatePipe;
   beforeEach(() => {
     truncatePipe = new TruncatePipe(new ConvertToPlainTextPipe());
@@ -32,13 +31,12 @@ describe('Testing filters', function() {
 
   it('should correctly truncate', () => {
     expect(truncatePipe.transform('testcool', 7)).toBe('test...');
-    expect(truncatePipe.transform(Array(80).join('a'), NaN))
-      .toBe(Array(68).join('a') + '...');
+    expect(truncatePipe.transform(Array(80).join('a'), NaN)).toBe(
+      Array(68).join('a') + '...'
+    );
     expect(truncatePipe.transform('HelloWorld', 10)).toBe('HelloWorld');
-    expect(truncatePipe.transform('HelloWorld', 8, 'contd'))
-      .toBe('Helcontd');
+    expect(truncatePipe.transform('HelloWorld', 8, 'contd')).toBe('Helcontd');
     expect(truncatePipe.transform('', 10)).toBe('');
-    expect(truncatePipe.transform((12345678), 7))
-      .toBe('1234...');
+    expect(truncatePipe.transform(12345678, 7)).toBe('1234...');
   });
 });

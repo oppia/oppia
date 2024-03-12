@@ -16,34 +16,40 @@
  * @fileoverview Backend Api Service for Delete Account Page.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import analyticsConstants from 'analytics-constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DeleteAccountBackendApiService {
   constructor(
     private siteAnalyticsService: SiteAnalyticsService,
     private windowRef: WindowRef,
-    private http: HttpClient,
+    private http: HttpClient
   ) {}
 
   deleteAccount(): void {
     this.http.delete('/delete-account-handler').subscribe(() => {
       this.siteAnalyticsService.registerAccountDeletion();
-      setTimeout(() => {
-        this.windowRef.nativeWindow.location.href = (
-          '/logout?redirect_url=/pending-account-deletion');
-      }, analyticsConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0);
+      setTimeout(
+        () => {
+          this.windowRef.nativeWindow.location.href =
+            '/logout?redirect_url=/pending-account-deletion';
+        },
+        analyticsConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0
+      );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'DeleteAccountBackendApiService',
-  downgradeInjectable(DeleteAccountBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'DeleteAccountBackendApiService',
+    downgradeInjectable(DeleteAccountBackendApiService)
+  );

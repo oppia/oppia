@@ -16,9 +16,11 @@
  * @fileoverview Tests for ReadOnlyTopicObjectFactory.
  */
 
-import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/read-only-topic-object.factory';
-import { StoryNode } from 'domain/story/story-node.model';
+import {
+  ReadOnlyTopic,
+  ReadOnlyTopicObjectFactory,
+} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {StoryNode} from 'domain/story/story-node.model';
 
 describe('Read only topic object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
@@ -43,105 +45,116 @@ describe('Read only topic object Factory', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
 
     let sampleTopicDataDict = {
       topic_name: 'topic_name',
       topic_id: 'topic_id',
       topic_description: 'Topic description',
-      canonical_story_dicts: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
-      additional_story_dicts: [{
-        id: '1',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title-one',
-        all_node_dicts: [nodeDict]
-      }],
+      canonical_story_dicts: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [nodeDict],
+        },
+      ],
+      additional_story_dicts: [
+        {
+          id: '1',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title-one',
+          all_node_dicts: [nodeDict],
+        },
+      ],
       uncategorized_skill_ids: ['skill_id_1'],
-      subtopics: [{
-        skill_ids: ['skill_id_2'],
-        id: 1,
-        title: 'subtopic_name',
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        url_fragment: 'subtopic-name'
-      }],
+      subtopics: [
+        {
+          skill_ids: ['skill_id_2'],
+          id: 1,
+          title: 'subtopic_name',
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          url_fragment: 'subtopic-name',
+        },
+      ],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
+        skill_id_2: 'Skill Description 2',
       },
       practice_tab_is_displayed: false,
       meta_tag_content: 'Topic meta tag content',
-      page_title_fragment_for_web: 'topic page title'
+      page_title_fragment_for_web: 'topic page title',
     };
 
-    _sampleReadOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
-      sampleTopicDataDict);
+    _sampleReadOnlyTopic =
+      readOnlyTopicObjectFactory.createFromBackendDict(sampleTopicDataDict);
   });
 
   it('should return correct values for read-only topic object', () => {
     expect(_sampleReadOnlyTopic.getTopicName()).toEqual('topic_name');
-    expect(
-      _sampleReadOnlyTopic.getTopicDescription()).toEqual('Topic description');
+    expect(_sampleReadOnlyTopic.getTopicDescription()).toEqual(
+      'Topic description'
+    );
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
     expect(_sampleReadOnlyTopic.getPracticeTabIsDisplayed()).toEqual(false);
     expect(_sampleReadOnlyTopic.getMetaTagContent()).toEqual(
-      'Topic meta tag content');
+      'Topic meta tag content'
+    );
     expect(_sampleReadOnlyTopic.getPageTitleFragmentForWeb()).toEqual(
-      'topic page title');
+      'topic page title'
+    );
   });
 
-  it('should return correct value of uncategorized skill summary object',
-    () => {
-      expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].getId())
-        .toEqual('skill_id_1');
-      expect(
-        _sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0]
-          .getDescription()).toEqual('Skill Description 1');
-    });
+  it('should return correct value of uncategorized skill summary object', () => {
+    expect(
+      _sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].getId()
+    ).toEqual('skill_id_1');
+    expect(
+      _sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].getDescription()
+    ).toEqual('Skill Description 1');
+  });
 
   it('should return correct values of subtopic object', () => {
     expect(_sampleReadOnlyTopic.getSubtopics()[0].getId()).toEqual(1);
     expect(_sampleReadOnlyTopic.getSubtopics()[0].getTitle()).toEqual(
-      'subtopic_name');
-    expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].getId())
-      .toEqual('skill_id_2');
+      'subtopic_name'
+    );
     expect(
-      _sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0]
-        .getDescription()).toEqual('Skill Description 2');
+      _sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].getId()
+    ).toEqual('skill_id_2');
+    expect(
+      _sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].getDescription()
+    ).toEqual('Skill Description 2');
   });
 
   it('should return correct values of skill descriptions', () => {
     expect(_sampleReadOnlyTopic.getSkillDescriptions()).toEqual({
       skill_id_1: 'Skill Description 1',
-      skill_id_2: 'Skill Description 2'
+      skill_id_2: 'Skill Description 2',
     });
   });
 
   it('should return correct values of canonical stories', () => {
-    let expectedStorySummary = (
-      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0]);
+    let expectedStorySummary =
+      _sampleReadOnlyTopic.getCanonicalStorySummaries()[0];
     expect(expectedStorySummary.getId()).toEqual('0');
     expect(expectedStorySummary.getTitle()).toEqual('Story Title');
     expect(expectedStorySummary.getDescription()).toEqual('Story Description');
@@ -164,31 +177,35 @@ describe('Read only topic object Factory', () => {
         planned_publication_date_msecs: 100,
         last_modified_msecs: 100,
         first_publication_date_msecs: 200,
-        unpublishing_reason: null
-      })
+        unpublishing_reason: null,
+      }),
     ]);
   });
 
   it('should return correct values of additional stories', () => {
-    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getId())
-      .toEqual('1');
-    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getTitle())
-      .toEqual('Story Title');
     expect(
-      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-        .getDescription()).toEqual('Story Description');
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getId()
+    ).toEqual('1');
     expect(
-      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0]
-        .getNodeTitles()).toEqual(['Chapter 1']);
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getTitle()
+    ).toEqual('Story Title');
     expect(
-      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].isNodeCompleted(
-        'Chapter 1')).toEqual(true);
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getDescription()
+    ).toEqual('Story Description');
+    expect(
+      _sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getNodeTitles()
+    ).toEqual(['Chapter 1']);
+    expect(
+      _sampleReadOnlyTopic
+        .getAdditionalStorySummaries()[0]
+        .isNodeCompleted('Chapter 1')
+    ).toEqual(true);
   });
 
   it('should return the correct value of degrees for skills', () => {
     expect(_sampleReadOnlyTopic.getDegreesOfMastery()).toEqual({
       skill_id_1: 0.5,
-      skill_id_2: 0.3
+      skill_id_2: 0.3,
     });
   });
 });

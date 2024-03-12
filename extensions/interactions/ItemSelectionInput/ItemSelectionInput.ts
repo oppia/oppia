@@ -18,16 +18,21 @@
 
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'item-selection-input-rules.service.ts');
+    'item-selection-input-rules.service.ts'
+);
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'item-selection-input-validation.service.ts');
+    'item-selection-input-validation.service.ts'
+);
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'oppia-interactive-item-selection-input.component.ts');
+    'oppia-interactive-item-selection-input.component.ts'
+);
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'oppia-response-item-selection-input.component.ts');
+    'oppia-response-item-selection-input.component.ts'
+);
 require(
   'interactions/ItemSelectionInput/directives/' +
-  'oppia-short-response-item-selection-input.component.ts');
+    'oppia-short-response-item-selection-input.component.ts'
+);

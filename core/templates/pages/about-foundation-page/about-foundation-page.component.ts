@@ -16,19 +16,18 @@
  * @fileoverview Component for the about foundation page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { PageTitleService } from 'services/page-title.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-
+import {PageTitleService} from 'services/page-title.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'about-foundation-page',
   templateUrl: './about-foundation-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class AboutFoundationPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -48,7 +47,8 @@ export class AboutFoundationPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_ABOUT_FOUNDATION_PAGE_TITLE');
+      'I18N_ABOUT_FOUNDATION_PAGE_TITLE'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -57,6 +57,9 @@ export class AboutFoundationPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive(
-  'aboutFoundationPage',
-  downgradeComponent({component: AboutFoundationPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'aboutFoundationPage',
+    downgradeComponent({component: AboutFoundationPageComponent})
+  );

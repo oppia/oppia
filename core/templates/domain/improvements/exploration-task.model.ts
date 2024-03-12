@@ -16,41 +16,38 @@
  * @fileoverview Frontend Model for exploration improvement tasks.
  */
 
-import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
-import { TaskEntryBackendDict } from 'domain/improvements/task-entry.model';
-import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
-import {
-  IneffectiveFeedbackLoopTask
-} from 'domain/improvements/ineffective-feedback-loop-task.model';
-import {
-  NeedsGuidingResponsesTask
-} from 'domain/improvements/needs-guiding-response-task.model';
-import {
-  SuccessiveIncorrectAnswersTask
-} from 'domain/improvements/successive-incorrect-answers-task.model';
+import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
+import {TaskEntryBackendDict} from 'domain/improvements/task-entry.model';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
+import {IneffectiveFeedbackLoopTask} from 'domain/improvements/ineffective-feedback-loop-task.model';
+import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
+import {SuccessiveIncorrectAnswersTask} from 'domain/improvements/successive-incorrect-answers-task.model';
 
-export type ExplorationTaskType = (
-  'high_bounce_rate' |
-  'ineffective_feedback_loop' |
-  'needs_guiding_responses' |
-  'successive_incorrect_answers');
+export type ExplorationTaskType =
+  | 'high_bounce_rate'
+  | 'ineffective_feedback_loop'
+  | 'needs_guiding_responses'
+  | 'successive_incorrect_answers';
 
-export type ExplorationTaskBackendDict = (
-  TaskEntryBackendDict<'high_bounce_rate'> |
-  TaskEntryBackendDict<'ineffective_feedback_loop'> |
-  TaskEntryBackendDict<'needs_guiding_responses'> |
-  TaskEntryBackendDict<'successive_incorrect_answers'>);
+export type ExplorationTaskBackendDict =
+  | TaskEntryBackendDict<'high_bounce_rate'>
+  | TaskEntryBackendDict<'ineffective_feedback_loop'>
+  | TaskEntryBackendDict<'needs_guiding_responses'>
+  | TaskEntryBackendDict<'successive_incorrect_answers'>;
 
-export type ExplorationTask = (
-  HighBounceRateTask |
-  IneffectiveFeedbackLoopTask |
-  NeedsGuidingResponsesTask |
-  SuccessiveIncorrectAnswersTask);
+export type ExplorationTask =
+  | HighBounceRateTask
+  | IneffectiveFeedbackLoopTask
+  | NeedsGuidingResponsesTask
+  | SuccessiveIncorrectAnswersTask;
 
 export class ExplorationTaskModel {
   static createNewObsoleteTask(
-      expId: string, expVersion: number, taskType: ExplorationTaskType,
-      stateName: string): ExplorationTask {
+    expId: string,
+    expVersion: number,
+    taskType: ExplorationTaskType,
+    stateName: string
+  ): ExplorationTask {
     return ExplorationTaskModel.createFromBackendDict({
       entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
       entity_id: expId,
@@ -66,8 +63,11 @@ export class ExplorationTaskModel {
   }
 
   static createNewResolvedTask(
-      expId: string, expVersion: number, taskType: ExplorationTaskType,
-      stateName: string): ExplorationTask {
+    expId: string,
+    expVersion: number,
+    taskType: ExplorationTaskType,
+    stateName: string
+  ): ExplorationTask {
     return ExplorationTaskModel.createFromBackendDict({
       entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
       entity_id: expId,
@@ -83,7 +83,8 @@ export class ExplorationTaskModel {
   }
 
   static createFromBackendDict(
-      backendDict: ExplorationTaskBackendDict): ExplorationTask {
+    backendDict: ExplorationTaskBackendDict
+  ): ExplorationTask {
     const taskType = backendDict.task_type;
     switch (backendDict.task_type) {
       case 'high_bounce_rate':
@@ -94,12 +95,14 @@ export class ExplorationTaskModel {
         return NeedsGuidingResponsesTask.createFromBackendDict(backendDict);
       case 'successive_incorrect_answers':
         return SuccessiveIncorrectAnswersTask.createFromBackendDict(
-          backendDict);
+          backendDict
+        );
       default: {
         const invalidBackendDict: never = backendDict;
         throw new Error(
           `Unsupported task type "${taskType}" for backend dict: ` +
-          JSON.stringify(invalidBackendDict));
+            JSON.stringify(invalidBackendDict)
+        );
       }
     }
   }

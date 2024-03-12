@@ -22,99 +22,106 @@ var users = require('../webdriverio_utils/users.js');
 var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-
 var ClassroomPage = require('../webdriverio_utils/ClassroomPage.js');
 var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
-var TopicsAndSkillsDashboardPage = require(
-  '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+var TopicsAndSkillsDashboardPage = require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 
-describe('Classroom page functionality', function() {
+describe('Classroom page functionality', function () {
   var classroomPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var skillEditorPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     classroomPage = new ClassroomPage.ClassroomPage();
     diagnosticTestPage = new DiagnosticTestPage.DiagnosticTestPage();
     libraryPage = new LibraryPage.LibraryPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
-    topicsAndSkillsDashboardPage = (
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
-    topicEditorPage = (
-      new TopicEditorPage.TopicEditorPage());
+    topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+    topicEditorPage = new TopicEditorPage.TopicEditorPage();
 
     await users.createAndLoginCurriculumAdminUser(
-      'creator@classroomPage.com', 'creatorClassroomPage');
+      'creator@classroomPage.com',
+      'creatorClassroomPage'
+    );
   });
 
-  afterAll(async function() {
+  afterAll(async function () {
     await users.logout();
   });
 
-  it('should add a new published topic to the Math classroom',
-    async function() {
-      var handle = await browser.getWindowHandle();
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.createTopic(
-        'Topic 1', 'topic-one', 'Description', false);
-      await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
-      await topicEditorPage.updateMetaTagContent('topic meta tag');
-      await topicEditorPage.updatePageTitleFragment('topic page title');
-      await topicEditorPage.saveTopic('Added thumbnail.');
-      var url = await browser.getUrl();
-      var topicId = url.split('/')[4].slice(0, -1);
-      await general.closeCurrentTabAndSwitchTo(handle);
+  it('should add a new published topic to the Math classroom', async function () {
+    var handle = await browser.getWindowHandle();
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createTopic(
+      'Topic 1',
+      'topic-one',
+      'Description',
+      false
+    );
+    await topicEditorPage.submitTopicThumbnail('../data/test2_svg.svg', true);
+    await topicEditorPage.updateMetaTagContent('topic meta tag');
+    await topicEditorPage.updatePageTitleFragment('topic page title');
+    await topicEditorPage.saveTopic('Added thumbnail.');
+    var url = await browser.getUrl();
+    var topicId = url.split('/')[4].slice(0, -1);
+    await general.closeCurrentTabAndSwitchTo(handle);
 
-      await browser.url('/classroom-admin/');
-      await waitFor.pageToFullyLoad();
-      await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
-      await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
-      await classroomPage.get('math');
-      // Even if the topic is unpublished, an unclickable tile is shown
-      // currently.
-      await classroomPage.expectNumberOfTopicsToBe(1);
-      await topicsAndSkillsDashboardPage.get();
-      (
-        await
-        topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-          'Skill 1', 'Concept card explanation', false));
-      await skillEditorPage.addRubricExplanationForDifficulty(
-        'Easy', 'Second explanation for easy difficulty.');
-      await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-      // A minimum of three questions are required for skill to get assigned in
-      // a topic’s diagnostic test.
-      await workflow.createQuestion();
-      await workflow.createQuestion();
-      await workflow.createQuestion();
+    await browser.url('/classroom-admin/');
+    await waitFor.pageToFullyLoad();
+    await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
+    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+    await classroomPage.get('math');
+    // Even if the topic is unpublished, an unclickable tile is shown
+    // currently.
+    await classroomPage.expectNumberOfTopicsToBe(1);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 1',
+      'Concept card explanation',
+      false
+    );
+    await skillEditorPage.addRubricExplanationForDifficulty(
+      'Easy',
+      'Second explanation for easy difficulty.'
+    );
+    await skillEditorPage.saveOrPublishSkill('Edited rubrics');
+    // A minimum of three questions are required for skill to get assigned in
+    // a topic’s diagnostic test.
+    await workflow.createQuestion();
+    await workflow.createQuestion();
+    await workflow.createQuestion();
 
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToSkillsTab();
-      await topicsAndSkillsDashboardPage.assignSkillToTopic(
-        'Skill 1', 'Topic 1');
-      await topicsAndSkillsDashboardPage.get();
-      await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToSkillsTab();
+    await topicsAndSkillsDashboardPage.assignSkillToTopic('Skill 1', 'Topic 1');
+    await topicsAndSkillsDashboardPage.get();
+    await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
 
-      await topicEditorPage.addDiagnosticTestSkill('Skill 1');
+    await topicEditorPage.addDiagnosticTestSkill('Skill 1');
 
-      await topicEditorPage.addSubtopic(
-        'Subtopic 1', 'subtopic-one', '../data/test2_svg.svg',
-        'Subtopic content');
-      await topicEditorPage.saveTopic('Added subtopic.');
+    await topicEditorPage.addSubtopic(
+      'Subtopic 1',
+      'subtopic-one',
+      '../data/test2_svg.svg',
+      'Subtopic content'
+    );
+    await topicEditorPage.saveTopic('Added subtopic.');
 
-      await topicEditorPage.navigateToTopicEditorTab();
-      await topicEditorPage.replacementDragSkillToSubtopic(0);
-      await topicEditorPage.saveTopic('Added skill to subtopic.');
+    await topicEditorPage.navigateToTopicEditorTab();
+    await topicEditorPage.replacementDragSkillToSubtopic(0);
+    await topicEditorPage.saveTopic('Added skill to subtopic.');
 
-      await topicEditorPage.publishTopic();
-      await classroomPage.get('math');
-      await classroomPage.expectNumberOfTopicsToBe(1);
-    });
+    await topicEditorPage.publishTopic();
+    await classroomPage.get('math');
+    await classroomPage.expectNumberOfTopicsToBe(1);
+  });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

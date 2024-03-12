@@ -16,52 +16,46 @@
  * @fileoverview Component for the Platform Parameters tab in the admin panel.
  */
 
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import {Component, OnInit, EventEmitter, Output} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { AdminFeaturesTabConstants } from
-  'pages/release-coordinator-page/features-tab/features-tab.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
-import { LoaderService } from 'services/loader.service';
-import { PlatformParameterAdminBackendApiService } from
-  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
+import {AdminFeaturesTabConstants} from 'pages/release-coordinator-page/features-tab/features-tab.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
+import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
+import {LoaderService} from 'services/loader.service';
+import {PlatformParameterAdminBackendApiService} from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import {
   PlatformParameterFilterType,
   PlatformParameterFilter,
 } from 'domain/platform-parameter/platform-parameter-filter.model';
-import { PlatformParameter } from
-  'domain/platform-parameter/platform-parameter.model';
-import { PlatformParameterRule } from
-  'domain/platform-parameter/platform-parameter-rule.model';
-import { HttpErrorResponse } from '@angular/common/http';
+import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
+import {PlatformParameterRule} from 'domain/platform-parameter/platform-parameter-rule.model';
+import {HttpErrorResponse} from '@angular/common/http';
 
 interface PlatformSchema {
-  'type': string;
-  'ui_config'?: { 'rows': number };
+  type: string;
+  ui_config?: {rows: number};
 }
 
 type FilterType = keyof typeof PlatformParameterFilterType;
 
 @Component({
   selector: 'oppia-admin-platform-parameters-tab',
-  templateUrl: './admin-platform-parameters-tab.component.html'
+  templateUrl: './admin-platform-parameters-tab.component.html',
 })
 export class AdminPlatformParametersTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
 
-  readonly availableFilterTypes: PlatformParameterFilterType[] = Object
-    .keys(PlatformParameterFilterType)
-    .map(key => {
-      var filterType = key as FilterType;
-      return PlatformParameterFilterType[filterType];
-    });
+  readonly availableFilterTypes: PlatformParameterFilterType[] = Object.keys(
+    PlatformParameterFilterType
+  ).map(key => {
+    var filterType = key as FilterType;
+    return PlatformParameterFilterType[filterType];
+  });
 
   readonly filterTypeToContext: {
     [key in PlatformParameterFilterType]: {
@@ -70,32 +64,31 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       options?: readonly string[];
       placeholder?: string;
       inputRegex?: RegExp;
-    }
-  } = {
-      [PlatformParameterFilterType.PlatformType]: {
-        displayName: 'Platform Type',
-        options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
-        operators: ['=']
-      },
-      [PlatformParameterFilterType.AppVersion]: {
-        displayName: 'App Version',
-        operators: ['=', '<', '>', '<=', '>='],
-        placeholder: 'e.g. 1.0.0',
-        inputRegex: AdminFeaturesTabConstants.APP_VERSION_REGEXP
-      },
-      [PlatformParameterFilterType.AppVersionFlavor]: {
-        displayName: 'App Version Flavor',
-        options: AdminFeaturesTabConstants.ALLOWED_APP_VERSION_FLAVORS,
-        operators: ['=', '<', '>', '<=', '>=']
-      }
     };
+  } = {
+    [PlatformParameterFilterType.PlatformType]: {
+      displayName: 'Platform Type',
+      options: AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES,
+      operators: ['='],
+    },
+    [PlatformParameterFilterType.AppVersion]: {
+      displayName: 'App Version',
+      operators: ['=', '<', '>', '<=', '>='],
+      placeholder: 'e.g. 1.0.0',
+      inputRegex: AdminFeaturesTabConstants.APP_VERSION_REGEXP,
+    },
+    [PlatformParameterFilterType.AppVersionFlavor]: {
+      displayName: 'App Version Flavor',
+      options: AdminFeaturesTabConstants.ALLOWED_APP_VERSION_FLAVORS,
+      operators: ['=', '<', '>', '<=', '>='],
+    },
+  };
 
-  private readonly defaultNewFilter: PlatformParameterFilter = (
+  private readonly defaultNewFilter: PlatformParameterFilter =
     PlatformParameterFilter.createFromBackendDict({
       type: PlatformParameterFilterType.PlatformType,
-      conditions: []
-    })
-  );
+      conditions: [],
+    });
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -114,17 +107,19 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     private adminDataService: AdminDataService,
     private adminTaskManager: AdminTaskManagerService,
     private apiService: PlatformParameterAdminBackendApiService,
-    private loaderService: LoaderService,
-  ) { }
+    private loaderService: LoaderService
+  ) {}
 
   async reloadPlatformParametersAsync(): Promise<void> {
     const data = await this.adminDataService.getDataAsync();
     this.platformParametersAreFetched = false;
     this.platformParameters = data.platformParameters;
     this.platformParameterNameToBackupMap = new Map(
-      this.platformParameters.map(param => [param.name, cloneDeep(param)]));
+      this.platformParameters.map(param => [param.name, cloneDeep(param)])
+    );
     this.platformParametersInEditMode = new Map(
-      this.platformParameters.map(param => [param.name, false]));
+      this.platformParameters.map(param => [param.name, false])
+    );
     for (const platformParameter of this.platformParameters) {
       this.updateFilterValuesForDisplay(platformParameter);
     }
@@ -134,7 +129,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   getdefaultNewRule(param: PlatformParameter): PlatformParameterRule {
     return PlatformParameterRule.createFromBackendDict({
       filters: [this.defaultNewFilter.toBackendDict()],
-      value_when_matched: param.defaultValue
+      value_when_matched: param.defaultValue,
     });
   }
 
@@ -155,15 +150,16 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       return {type: 'bool'};
     }
     throw new Error(
-      'Unexpected data type value, must be one of string, number or bool.');
+      'Unexpected data type value, must be one of string, number or bool.'
+    );
   }
 
   getReadonlyFilterValues(rule: PlatformParameterRule): string {
     let resultantString: string = '';
     const filters: PlatformParameterFilter[] = rule.filters;
     for (let filterIdx = 0; filterIdx < filters.length; filterIdx++) {
-      const filterName: string = (
-        this.filterTypeToContext[filters[filterIdx].type].displayName);
+      const filterName: string =
+        this.filterTypeToContext[filters[filterIdx].type].displayName;
       if (filters[filterIdx].conditions.length === 0) {
         resultantString += `${filterName} in [ ]`;
       } else {
@@ -191,7 +187,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
       ruleReadOnlyValue.push(this.getReadonlyFilterValues(parameterRule));
     }
     this.platformParameterNameToRulesReadonlyData.set(
-      platformParameter.name, ruleReadOnlyValue);
+      platformParameter.name,
+      ruleReadOnlyValue
+    );
   }
 
   addNewRuleToBottom(param: PlatformParameter): void {
@@ -207,7 +205,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     const context = this.filterTypeToContext[filter.type];
     filter.conditions.push([
       context.operators[0],
-      context.options ? context.options[0] : ''
+      context.options ? context.options[0] : '',
     ]);
   }
 
@@ -220,7 +218,9 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   removeCondition(
-      filter: PlatformParameterFilter, conditionIndex: number): void {
+    filter: PlatformParameterFilter,
+    conditionIndex: number
+  ): void {
     filter.conditions.splice(conditionIndex, 1);
   }
 
@@ -247,8 +247,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   async saveDefaultValueToStorage(): Promise<void> {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible.')) {
+    if (!this.windowRef.nativeWindow.confirm('This action is irreversible.')) {
       return;
     }
     for (const param of this.platformParameters) {
@@ -258,21 +257,27 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   async updatePlatformParameter(
-      param: PlatformParameter, commitMessage: string): Promise<void> {
+    param: PlatformParameter,
+    commitMessage: string
+  ): Promise<void> {
     try {
       this.adminTaskManager.startTask();
 
       await this.apiService.updatePlatformParameter(
-        param.name, commitMessage, param.rules, param.defaultValue);
+        param.name,
+        commitMessage,
+        param.rules,
+        param.defaultValue
+      );
 
       this.platformParameterNameToBackupMap.set(param.name, cloneDeep(param));
       this.updateFilterValuesForDisplay(param);
 
       this.setStatusMessage.emit('Saved successfully.');
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
     } catch (e: unknown) {
       if (e instanceof HttpErrorResponse) {
         if (e.error && e.error.error) {
@@ -289,8 +294,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   async updateParameterRulesAsync(param: PlatformParameter): Promise<void> {
-    const issues = (
-      AdminPlatformParametersTabComponent.validatePlatformParam(param));
+    const issues =
+      AdminPlatformParametersTabComponent.validatePlatformParam(param);
     if (issues.length > 0) {
       this.windowRef.nativeWindow.alert(issues.join('\n'));
       return;
@@ -300,7 +305,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
     }
     const commitMessage = this.windowRef.nativeWindow.prompt(
       'This action is irreversible. If you insist to proceed, please enter ' +
-      'the commit message for the update',
+        'the commit message for the update',
       `Update parameter '${param.name}'.`
     );
     if (commitMessage === null) {
@@ -312,8 +317,11 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   clearChanges(param: PlatformParameter): void {
     if (this.isPlatformParamChanged(param)) {
-      if (!this.windowRef.nativeWindow.confirm(
-        'This will revert all changes you made. Are you sure?')) {
+      if (
+        !this.windowRef.nativeWindow.confirm(
+          'This will revert all changes you made. Are you sure?'
+        )
+      ) {
         return;
       }
       const backup = this.platformParameterNameToBackupMap.get(param.name);
@@ -329,9 +337,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
   }
 
   isPlatformParamChanged(param: PlatformParameter): boolean {
-    const original = this.platformParameterNameToBackupMap.get(
-      param.name
-    );
+    const original = this.platformParameterNameToBackupMap.get(param.name);
     if (original === undefined) {
       throw new Error('Backup not found for platform params: ' + param.name);
     }
@@ -354,23 +360,27 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
     const seenRules: PlatformParameterRule[] = [];
     for (const [ruleIndex, rule] of param.rules.entries()) {
-      const sameRuleIndex = seenRules.findIndex(
-        seenRule => isEqual(seenRule, rule));
+      const sameRuleIndex = seenRules.findIndex(seenRule =>
+        isEqual(seenRule, rule)
+      );
       if (sameRuleIndex !== -1) {
         issues.push(
-          `Rules ${sameRuleIndex + 1} & ${ruleIndex + 1} are identical.`);
+          `Rules ${sameRuleIndex + 1} & ${ruleIndex + 1} are identical.`
+        );
         continue;
       }
       seenRules.push(rule);
 
       const seenFilters: PlatformParameterFilter[] = [];
       for (const [filterIndex, filter] of rule.filters.entries()) {
-        const sameFilterIndex = seenFilters.findIndex(
-          seenFilter => isEqual(seenFilter, filter));
+        const sameFilterIndex = seenFilters.findIndex(seenFilter =>
+          isEqual(seenFilter, filter)
+        );
         if (sameFilterIndex !== -1) {
           issues.push(
             `In rule ${ruleIndex + 1}, filters ${sameFilterIndex + 1}` +
-            ` & ${filterIndex + 1} are identical.`);
+              ` & ${filterIndex + 1} are identical.`
+          );
           continue;
         }
         seenFilters.push(filter);
@@ -378,20 +388,22 @@ export class AdminPlatformParametersTabComponent implements OnInit {
         if (filter.conditions.length === 0) {
           issues.push(
             `In rule ${ruleIndex + 1}, filter ${filterIndex + 1} ` +
-            'should have at least one condition.');
+              'should have at least one condition.'
+          );
           continue;
         }
 
         const seenConditions: [string, string][] = [];
-        for (const [conditionIndex, condition] of filter.conditions
-          .entries()) {
-          const sameCondIndex = seenConditions.findIndex(
-            seenCond => isEqual(seenCond, condition));
+        for (const [conditionIndex, condition] of filter.conditions.entries()) {
+          const sameCondIndex = seenConditions.findIndex(seenCond =>
+            isEqual(seenCond, condition)
+          );
           if (sameCondIndex !== -1) {
             issues.push(
               `In rule ${ruleIndex + 1}, filter ${filterIndex + 1},` +
-              ` conditions ${sameCondIndex + 1} & ` +
-              `${conditionIndex + 1} are identical.`);
+                ` conditions ${sameCondIndex + 1} & ` +
+                `${conditionIndex + 1} are identical.`
+            );
             continue;
           }
 
@@ -399,7 +411,7 @@ export class AdminPlatformParametersTabComponent implements OnInit {
             if (condition[1] === '') {
               issues.push(
                 `In rule ${ruleIndex + 1}, filter ${filterIndex + 1}, ` +
-                `condition ${conditionIndex + 1}, the app version is empty.`
+                  `condition ${conditionIndex + 1}, the app version is empty.`
               );
               continue;
             }
@@ -411,8 +423,8 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
       if (rule.filters.length === 0) {
         issues.push(
-          `In rule ${ruleIndex + 1}, there should be at least ` +
-          'one filter.');
+          `In rule ${ruleIndex + 1}, there should be at least ` + 'one filter.'
+        );
         continue;
       }
     }
@@ -429,11 +441,10 @@ export class AdminPlatformParametersTabComponent implements OnInit {
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.loaderService.onLoadingMessageChange.subscribe(
-        (message: string) => {
-          this.loadingMessage = message;
-        }
-      ));
+      this.loaderService.onLoadingMessageChange.subscribe((message: string) => {
+        this.loadingMessage = message;
+      })
+    );
     this.platformParametersAreFetched = true;
     this.loaderService.showLoadingScreen('Loading');
     this.reloadPlatformParametersAsync();

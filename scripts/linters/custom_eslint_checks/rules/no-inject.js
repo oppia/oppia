@@ -29,26 +29,28 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      useAngularMockInject: (
-        'Please use “angular.mock.inject”  instead of “inject”.')
+      useAngularMockInject:
+        'Please use “angular.mock.inject”  instead of “inject”.',
     },
   },
 
-  create: function(context) {
-    var checkAndReportInjectCall = function(node) {
-      if (node.arguments[0].type === 'CallExpression' &&
-       node.arguments[0].callee.name === 'inject') {
+  create: function (context) {
+    var checkAndReportInjectCall = function (node) {
+      if (
+        node.arguments[0].type === 'CallExpression' &&
+        node.arguments[0].callee.name === 'inject'
+      ) {
         context.report({
           node: node.arguments[0].callee,
-          messageId: 'useAngularMockInject'
+          messageId: 'useAngularMockInject',
         });
       }
     };
 
     return {
-      'CallExpression[callee.name=beforeEach]': function(node) {
+      'CallExpression[callee.name=beforeEach]': function (node) {
         checkAndReportInjectCall(node);
-      }
+      },
     };
-  }
+  },
 };

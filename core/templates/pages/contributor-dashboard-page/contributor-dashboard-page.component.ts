@@ -16,26 +16,28 @@
  * @fileoverview Component for the contributor dashboard page.
  */
 
-import { AppConstants } from 'app.constants';
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { ContributorDashboardConstants, ContributorDashboardTabsDetails } from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
-import { ContributionAndReviewService } from './services/contribution-and-review.service';
-import { ContributionOpportunitiesService } from './services/contribution-opportunities.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { TranslationLanguageService } from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import { TranslationTopicService } from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import { UserService } from 'services/user.service';
+import {AppConstants} from 'app.constants';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {
+  ContributorDashboardConstants,
+  ContributorDashboardTabsDetails,
+} from 'pages/contributor-dashboard-page/contributor-dashboard-page.constants';
+import {ContributionAndReviewService} from './services/contribution-and-review.service';
+import {ContributionOpportunitiesService} from './services/contribution-opportunities.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'contributor-dashboard-page',
-  templateUrl: './contributor-dashboard-page.component.html'
+  templateUrl: './contributor-dashboard-page.component.html',
 })
-export class ContributorDashboardPageComponent
-  implements OnInit {
+export class ContributorDashboardPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -66,7 +68,7 @@ export class ContributorDashboardPageComponent
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
     private urlInterpolationService: UrlInterpolationService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   onTabClick(activeTabName: string): void {
@@ -90,12 +92,15 @@ export class ContributorDashboardPageComponent
     this.languageCode = languageCode;
     this.translationLanguageService.setActiveLanguageCode(this.languageCode);
     this.localStorageService.updateLastSelectedTranslationLanguageCode(
-      this.languageCode);
+      this.languageCode
+    );
   }
 
   showLanguageSelector(): boolean {
-    const activeTabDetail = this.tabsDetails[
-      this.activeTabName as keyof ContributorDashboardTabsDetails];
+    const activeTabDetail =
+      this.tabsDetails[
+        this.activeTabName as keyof ContributorDashboardTabsDetails
+      ];
     return activeTabDetail.customizationOptions.includes('language');
   }
 
@@ -103,38 +108,41 @@ export class ContributorDashboardPageComponent
     this.topicName = topicName;
     this.translationTopicService.setActiveTopicName(this.topicName);
     this.localStorageService.updateLastSelectedTranslationTopicName(
-      this.topicName);
+      this.topicName
+    );
   }
 
   showTopicSelector(): boolean {
-    const activeTabDetail = this.tabsDetails[
-      this.activeTabName as keyof ContributorDashboardTabsDetails];
+    const activeTabDetail =
+      this.tabsDetails[
+        this.activeTabName as keyof ContributorDashboardTabsDetails
+      ];
     const activeSuggestionType =
       this.contributionAndReviewService.getActiveSuggestionType();
     const activeTabType = this.contributionAndReviewService.getActiveTabType();
 
-    const userIsReviewingQuestionSuggestions = (
+    const userIsReviewingQuestionSuggestions =
       activeTabType === 'reviews' &&
       activeSuggestionType === 'add_question' &&
-      this.activeTabName !== 'submitQuestionTab'
-    );
-    const userIsReviewingTranslationSuggestions = (
+      this.activeTabName !== 'submitQuestionTab';
+    const userIsReviewingTranslationSuggestions =
       activeTabType === 'reviews' &&
       activeSuggestionType === 'translate_content' &&
-      this.activeTabName !== 'submitQuestionTab'
-    );
+      this.activeTabName !== 'submitQuestionTab';
 
-    return activeTabDetail.customizationOptions.includes('topic') ||
+    return (
+      activeTabDetail.customizationOptions.includes('topic') ||
       userIsReviewingQuestionSuggestions ||
-      userIsReviewingTranslationSuggestions;
+      userIsReviewingTranslationSuggestions
+    );
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
     const languageDescriptions: string[] = [];
-    languageCodes.forEach((languageCode) => {
+    languageCodes.forEach(languageCode => {
       languageDescriptions.push(
-        this.languageUtilService.getAudioLanguageDescription(
-          languageCode));
+        this.languageUtilService.getAudioLanguageDescription(languageCode)
+      );
     });
     return languageDescriptions;
   }
@@ -149,52 +157,53 @@ export class ContributorDashboardPageComponent
     this.userCanReviewQuestions = false;
     this.defaultHeaderVisible = true;
 
-    const prevSelectedTopicName = (
-      this.localStorageService.getLastSelectedTranslationTopicName());
+    const prevSelectedTopicName =
+      this.localStorageService.getLastSelectedTranslationTopicName();
 
-    this.userService.getUserContributionRightsDataAsync().then(
-      (userContributionRights) => {
+    this.userService
+      .getUserContributionRightsDataAsync()
+      .then(userContributionRights => {
         if (userContributionRights === null) {
           throw new Error('User contribution rights not found.');
         }
-        this.userCanReviewTranslationSuggestionsInLanguages = (
+        this.userCanReviewTranslationSuggestionsInLanguages =
           this.getLanguageDescriptions(
-            userContributionRights
-              .can_review_translation_for_language_codes));
+            userContributionRights.can_review_translation_for_language_codes
+          );
 
-        this.userCanReviewVoiceoverSuggestionsInLanguages = (
+        this.userCanReviewVoiceoverSuggestionsInLanguages =
           this.getLanguageDescriptions(
-            userContributionRights
-              .can_review_voiceover_for_language_codes));
+            userContributionRights.can_review_voiceover_for_language_codes
+          );
 
-        this.userCanReviewQuestions = (
-          userContributionRights.can_review_questions);
+        this.userCanReviewQuestions =
+          userContributionRights.can_review_questions;
 
-        this.userIsReviewer = (
-          this.userCanReviewTranslationSuggestionsInLanguages
-            .length > 0 ||
-          this.userCanReviewVoiceoverSuggestionsInLanguages
-            .length > 0 ||
-          this.userCanReviewQuestions);
+        this.userIsReviewer =
+          this.userCanReviewTranslationSuggestionsInLanguages.length > 0 ||
+          this.userCanReviewVoiceoverSuggestionsInLanguages.length > 0 ||
+          this.userCanReviewQuestions;
 
-        this.tabsDetails.submitQuestionTab.enabled = (
-          userContributionRights.can_suggest_questions);
+        this.tabsDetails.submitQuestionTab.enabled =
+          userContributionRights.can_suggest_questions;
       });
 
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.userInfoIsLoading = false;
-      this.profilePictureWebpDataUrl = (
+      this.profilePictureWebpDataUrl =
         this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-      this.profilePicturePngDataUrl = (
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+        );
+      this.profilePicturePngDataUrl =
         this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+          AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+        );
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
         if (this.username !== null) {
-          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-            this.userService.getProfileImageDataUrl(this.username));
+          [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
+            this.userService.getProfileImageDataUrl(this.username);
         }
       } else {
         this.userIsLoggedIn = false;
@@ -202,12 +211,14 @@ export class ContributorDashboardPageComponent
       }
     });
 
-    this.contributionOpportunitiesService.getTranslatableTopicNamesAsync()
-      .then((topicNames) => {
+    this.contributionOpportunitiesService
+      .getTranslatableTopicNamesAsync()
+      .then(topicNames => {
         // TODO(#15710): Set default active topic to 'All'.
         if (topicNames.length <= 0) {
           this.translationTopicService.setActiveTopicName(
-            ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME);
+            ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME
+          );
           return;
         }
         this.topicName = topicNames[0];
@@ -223,17 +234,20 @@ export class ContributorDashboardPageComponent
     this.activeTabName = 'myContributionTab';
 
     this.tabsDetails = {
-      ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS
-    // TODO(#13015): Remove use of unknown as a type.
+      ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
+      // TODO(#13015): Remove use of unknown as a type.
     } as unknown as ContributorDashboardTabsDetails;
-    this.OPPIA_AVATAR_IMAGE_URL = (
+    this.OPPIA_AVATAR_IMAGE_URL =
       this.urlInterpolationService.getStaticImageUrl(
-        '/avatar/oppia_avatar_100px.svg'));
+        '/avatar/oppia_avatar_100px.svg'
+      );
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
   }
 }
 
-angular.module('oppia').directive('contributorDashboardPage',
+angular.module('oppia').directive(
+  'contributorDashboardPage',
   downgradeComponent({
-    component: ContributorDashboardPageComponent
-  }) as angular.IDirectiveFactory);
+    component: ContributorDashboardPageComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,17 +16,16 @@
  * @fileoverview Component for ratio editor.
  */
 
-import { Ratio } from 'domain/objects/ratio.model';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Ratio} from 'domain/objects/ratio.model';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'ratio-expression-editor',
-  templateUrl: './ratio-expression-editor.component.html'
+  templateUrl: './ratio-expression-editor.component.html',
 })
-
 export class RatioExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -34,7 +33,7 @@ export class RatioExpressionEditorComponent implements OnInit {
   @Input() modalId!: symbol;
   @Input() value!: number[];
   @Output() valueChanged = new EventEmitter();
-  localValue!: { label: string };
+  localValue!: {label: string};
   warningTextI18nKey: string = '';
   eventBusGroup: EventBusGroup;
 
@@ -48,7 +47,7 @@ export class RatioExpressionEditorComponent implements OnInit {
       this.valueChanged.emit(this.value);
     }
     this.localValue = {
-      label: Ratio.fromList(this.value).toAnswerString()
+      label: Ratio.fromList(this.value).toAnswerString(),
     };
   }
 
@@ -57,27 +56,34 @@ export class RatioExpressionEditorComponent implements OnInit {
       this.value = Ratio.fromRawInputString(value).components;
       this.valueChanged.emit(this.value);
       this.warningTextI18nKey = '';
-      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-        modalId: this.modalId,
-        value: false
-      }));
+      this.eventBusGroup.emit(
+        new ObjectFormValidityChangeEvent({
+          modalId: this.modalId,
+          value: false,
+        })
+      );
       return true;
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
     } catch (parsingError: unknown) {
       if (parsingError instanceof Error) {
         this.warningTextI18nKey = parsingError.message;
       }
-      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-        modalId: this.modalId,
-        value: true
-      }));
+      this.eventBusGroup.emit(
+        new ObjectFormValidityChangeEvent({
+          modalId: this.modalId,
+          value: true,
+        })
+      );
       return false;
     }
   }
 }
-angular.module('oppia').directive('ratioExpressionEditor', downgradeComponent({
-  component: RatioExpressionEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'ratioExpressionEditor',
+  downgradeComponent({
+    component: RatioExpressionEditorComponent,
+  }) as angular.IDirectiveFactory
+);

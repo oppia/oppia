@@ -16,20 +16,20 @@
  * @fileoverview Unit tests for NavigationService
  */
 
-import { TestBed } from '@angular/core/testing';
-import { EventToCodes, NavigationService } from './navigation.service';
+import {TestBed} from '@angular/core/testing';
+import {EventToCodes, NavigationService} from './navigation.service';
 
 describe('Navigation Service', () => {
   let navigationService: NavigationService;
   let element = {
     focus: () => {},
-    closest: () => {}
+    closest: () => {},
   };
   let closestReturn = {
-    find: () => {}
+    find: () => {},
   };
   let findReturn = {
-    blur: () => {}
+    blur: () => {},
   };
 
   beforeEach(() => {
@@ -37,16 +37,16 @@ describe('Navigation Service', () => {
     navigationService.KEYBOARD_EVENT_TO_KEY_CODES = {
       enter: {
         shiftKeyIsPressed: false,
-        keyCode: 13
+        keyCode: 13,
       },
       tab: {
         shiftKeyIsPressed: false,
-        keyCode: 9
+        keyCode: 9,
       },
       shiftTab: {
         shiftKeyIsPressed: true,
-        keyCode: 9
-      }
+        keyCode: 9,
+      },
     };
     navigationService.ACTION_OPEN = 'open';
     navigationService.ACTION_CLOSE = 'close';
@@ -61,29 +61,32 @@ describe('Navigation Service', () => {
   it('should open submenu when event has open action type', () => {
     let mockEvent = {
       keyCode: 13,
-      shiftKey: false
+      shiftKey: false,
     } as KeyboardEvent;
     let eventsTobeHandled = {
-      enter: 'open'
+      enter: 'open',
     } as EventToCodes;
 
-    let openSubmenuSpy = spyOn(navigationService, 'openSubmenu')
-      .and.callThrough();
-    navigationService.onMenuKeypress(
-      mockEvent, 'New menu', eventsTobeHandled);
+    let openSubmenuSpy = spyOn(
+      navigationService,
+      'openSubmenu'
+    ).and.callThrough();
+    navigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
     expect(openSubmenuSpy).toHaveBeenCalled();
   });
 
   it('should close submenu when event has close action type', () => {
     let mockEvent = {
       keyCode: 9,
-      shiftKey: true
+      shiftKey: true,
     } as KeyboardEvent;
     let eventsTobeHandled = {
       shiftTab: 'close',
     } as EventToCodes;
-    let closeSubmenuSpy = spyOn(navigationService, 'closeSubmenu').and
-      .callThrough();
+    let closeSubmenuSpy = spyOn(
+      navigationService,
+      'closeSubmenu'
+    ).and.callThrough();
     navigationService.onMenuKeypress(mockEvent, 'New menu', eventsTobeHandled);
     expect(closeSubmenuSpy).toHaveBeenCalled();
   });
@@ -91,15 +94,18 @@ describe('Navigation Service', () => {
   it('should throw an error when event has invalid action type', () => {
     let mockEvent = {
       keyCode: 9,
-      shiftKey: true
+      shiftKey: true,
     } as KeyboardEvent;
     let eventsTobeHandled = {
-      shiftTab: 'invalid'
+      shiftTab: 'invalid',
     } as EventToCodes;
 
     expect(() => {
       navigationService.onMenuKeypress(
-        mockEvent, 'New menu', eventsTobeHandled);
+        mockEvent,
+        'New menu',
+        eventsTobeHandled
+      );
     }).toThrowError('Invalid action type.');
   });
 });

@@ -16,7 +16,7 @@
  * @fileoverview Tests for CamelCaseToHyphens pipe for Oppia.
  */
 
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 
 describe('Testing FilterForMatchingSubstringPipe', () => {
   let pipe: FilterForMatchingSubstringPipe;
@@ -54,8 +54,11 @@ describe('Testing FilterForMatchingSubstringPipe', () => {
 
   it('should get items when input is a space', () => {
     let list = ['cat and dog', 'dog', 'caterpillar', 'cat  and dog', '  '];
-    expect(pipe.transform(list, ' '))
-      .toEqual(['cat and dog', 'cat  and dog', '  ']);
+    expect(pipe.transform(list, ' ')).toEqual([
+      'cat and dog',
+      'cat  and dog',
+      '  ',
+    ]);
     expect(pipe.transform(list, '  ')).toEqual(['cat  and dog', '  ']);
   });
 
