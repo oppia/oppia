@@ -219,17 +219,10 @@
 }
 
 /*Redesign classes*/
-.greeting-heading { 
+.learner-home_greeting { 
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
-}
-
-.page-heading {
-  color: #00645c;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 24px;
-  margin: 0;
 }
 
 .section-button {
@@ -249,19 +242,20 @@
   text-decoration: none;
 }
 
-.section-container {
+.learner-section_container {
   background-color: #fff;
   border-radius: .25em;
   margin-bottom: 16px;
   padding: 16px;
 }
 
-.section-heading {
+.learner-section_heading {
   color: #205D86;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
 }
 
+/*move to card-display*/
 .subsection-heading {
   color: #333333;
   font-size: 20px;

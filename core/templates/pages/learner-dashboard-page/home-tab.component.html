@@ -85,9 +85,9 @@
 
   <!--REDESIGN-->
   <div *ngIf="featureFlag"> 
-    <p class="greeting-heading mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
-    <div class="section-container" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
-      <p class="section-heading">
+    <p class="learner-home_greeting mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
+    <div class="learner-section_container" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
+      <p class="learner-section_heading">
         {{(continueWhereYouLeftOffList.length !== 0 ? 
             'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' 
           : 
@@ -97,7 +97,7 @@
       </p>
       <div [ngStyle]="{'min-width': 'fit-content'}">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles"> 
-          <p class="section-heading mb-0">
+          <p class="learner-section_heading mb-0">
             {{'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate}}
           </p>
           <a id="setting-a-goal-link" class="d-inline-block mb-0" (click)="changeActiveSection()">
@@ -115,8 +115,8 @@
         </ng-container>
       </div>
     </div>
-    <div class="section-container e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
-      <p class="section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+    <div class="learner-section_container e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
+      <p class="learner-section_heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <div class="suggested-for-you-section">
         <ng-container *ngFor="let item of untrackedTopics | keyvalue">
           <p *ngIf="item.value.length !== 0" class="subsection-heading"> Basic {{item.key}} </p>
@@ -137,8 +137,8 @@
         </ng-container>
       </div>
     </div>
-    <div class="section-container px-3 py-4 w-100" *ngIf="isGoalLimitReached()">
-      <p class="section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+    <div class="learner-section_container px-3 py-4 w-100" *ngIf="isGoalLimitReached()">
+      <p class="learner-section_heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <p class="mt-4"> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
         [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
@@ -147,9 +147,9 @@
         [oppiaFocusOn]="'ourLessonsBtn'">
       </a>
     </div>
-    <div class="section-container px-3 py-4 w-100"
+    <div class="learner-section_container px-3 py-4 w-100"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
-      <p class="section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+      <p class="learner-section_heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <div class="empty-suggested-for-you-section">
         <p> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate }} </p>
       </div>
