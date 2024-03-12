@@ -32,7 +32,7 @@ import {
 } from '../modals/flag-exploration-modal.component';
 import {ExplorationEngineService} from '../services/exploration-engine.service';
 import {LearnerLocalNavBackendApiService} from '../services/learner-local-nav-backend-api.service';
-import { FeedbackPopupComponent } from './feedback-popup.component';
+import {FeedbackPopupComponent} from './feedback-popup.component';
 
 @Component({
   selector: 'oppia-learner-local-nav',
@@ -128,17 +128,22 @@ export class LearnerLocalNavComponent implements OnInit {
   }
 
   togglePopover(): void {
-    this.ngbModal.open(FeedbackPopupComponent, {
-      backdrop: true,
-      windowClass: 'feedback-modal',
-      size: 'lg'
-    }).result.then(() => {
-      this.feedbackPopOver.close();
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(FeedbackPopupComponent, {
+        backdrop: true,
+        windowClass: 'feedback-modal',
+        size: 'lg',
+      })
+      .result.then(
+        () => {
+          this.feedbackPopOver.close();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   toggleDropdown(): void {

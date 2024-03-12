@@ -16,15 +16,15 @@
  * @fileoverview Component for the feedback popup.
  */
 
-import { Component, Output, EventEmitter } from '@angular/core';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { UserService } from 'services/user.service';
-import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
-import { PlayerPositionService } from '../services/player-position.service';
-import { AppConstants } from 'app.constants';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, Output, EventEmitter} from '@angular/core';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {BackgroundMaskService} from 'services/stateful/background-mask.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {UserService} from 'services/user.service';
+import {FeedbackPopupBackendApiService} from '../services/feedback-popup-backend-api.service';
+import {PlayerPositionService} from '../services/player-position.service';
+import {AppConstants} from 'app.constants';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-feedback-popup',

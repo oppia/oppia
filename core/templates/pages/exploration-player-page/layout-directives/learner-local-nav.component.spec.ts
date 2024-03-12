@@ -41,7 +41,7 @@ import {LearnerLocalNavBackendApiService} from '../services/learner-local-nav-ba
 import {LearnerLocalNavComponent} from './learner-local-nav.component';
 import {FlagExplorationModalComponent} from '../modals/flag-exploration-modal.component';
 import {UserInfo} from 'domain/user/user-info.model';
-import { FeedbackPopupComponent } from './feedback-popup.component';
+import {FeedbackPopupComponent} from './feedback-popup.component';
 
 describe('Learner Local Nav Component ', () => {
   let component: LearnerLocalNavComponent;
@@ -190,22 +190,26 @@ describe('Learner Local Nav Component ', () => {
     }
   );
 
-  it('should open a modal to feedback popup when ' +
-    'clicking on feedback button', () => {
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: {},
-          result: Promise.resolve()
-        }) as NgbModalRef;
-    });
+  it(
+    'should open a modal to feedback popup when ' +
+      'clicking on feedback button',
+    () => {
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: {},
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
 
-    component.togglePopover();
+      component.togglePopover();
 
-    expect(modalSpy).toHaveBeenCalledWith(
-      FeedbackPopupComponent, { backdrop: true,
+      expect(modalSpy).toHaveBeenCalledWith(FeedbackPopupComponent, {
+        backdrop: true,
         windowClass: 'feedback-modal',
-        size: 'lg' });
-  });
+        size: 'lg',
+      });
+    }
+  );
 
   it('should toggle the dropdown state when toggleDropdown is called', () => {
     expect(component.isDropdownOpen).toBeFalse();
