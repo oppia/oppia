@@ -98,7 +98,7 @@ describe('Exploration Creator', function() {
       await explorationCreator.publishExploration();
       await explorationCreator.expectExplorationToBePublished();
 
-      await explorationCreator.addVoiceArtist(
+      await explorationCreator.addVoiceArtists(
         ['guestUsr1', 'guestUsr2', 'guestUsr3']);
 
       await explorationCreator.optInToEmailNotifications();

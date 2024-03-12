@@ -250,7 +250,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding tags.
    */
   async addTags(TagNames: string[]): Promise<void> {
-    for(let i = 0; i < 2; i++){
+    for (let i = 0; i < 2; i++) {
       await this.clickOn(addTags);
       await this.type(addTags, TagNames[i]);
       await this.clickOn('.secondary-info-text');
@@ -364,13 +364,12 @@ export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in adding voice artist.
    */
-  async addVoiceArtist(voiceArtists: string[]): Promise<void> {
-    for(let i = 0; i < 2; i++){
+  async addVoiceArtists(voiceArtists: string[]): Promise<void> {
+    for (let i = 0; i < 2; i++) {
       await this.clickOn(voiceArtistEditButton);
       await this.clickOn(addVoiceArtistUserName);
       await this.type(addVoiceArtistUserName, voiceArtists[i]);
       await this.clickOn(voiceArtistSaveButton);
-  
     }
   }
 
