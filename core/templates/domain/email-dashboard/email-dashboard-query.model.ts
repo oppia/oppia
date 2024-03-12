@@ -17,11 +17,11 @@
  */
 
 export interface EmailDashboardQueryDict {
-  'id': string;
-  'status': string;
-  'num_qualified_users': number;
-  'submitter_username': string;
-  'created_on': string;
+  id: string;
+  status: string;
+  num_qualified_users: number;
+  submitter_username: string;
+  created_on: string;
 }
 
 export interface EmailDashboardQueryBackendDict {
@@ -36,8 +36,12 @@ export class EmailDashboardQuery {
   createdOn: string;
 
   constructor(
-      id: string, status: string, numQualifiedUsers: number,
-      submitterUsername: string, createdOn: string) {
+    id: string,
+    status: string,
+    numQualifiedUsers: number,
+    submitterUsername: string,
+    createdOn: string
+  ) {
     this.id = id;
     this.status = status;
     this.numQualifiedUsers = numQualifiedUsers;
@@ -46,17 +50,26 @@ export class EmailDashboardQuery {
   }
 
   static createFromQueryDict(
-      queryDict: EmailDashboardQueryDict): EmailDashboardQuery {
+    queryDict: EmailDashboardQueryDict
+  ): EmailDashboardQuery {
     return new EmailDashboardQuery(
-      queryDict.id, queryDict.status, queryDict.num_qualified_users,
-      queryDict.submitter_username, queryDict.created_on);
+      queryDict.id,
+      queryDict.status,
+      queryDict.num_qualified_users,
+      queryDict.submitter_username,
+      queryDict.created_on
+    );
   }
 
   static createFromBackendDict(
-      backendDict: EmailDashboardQueryBackendDict): EmailDashboardQuery {
+    backendDict: EmailDashboardQueryBackendDict
+  ): EmailDashboardQuery {
     return new EmailDashboardQuery(
-      backendDict.query.id, backendDict.query.status,
+      backendDict.query.id,
+      backendDict.query.status,
       backendDict.query.num_qualified_users,
-      backendDict.query.submitter_username, backendDict.query.created_on);
+      backendDict.query.submitter_username,
+      backendDict.query.created_on
+    );
   }
 }

@@ -19,33 +19,38 @@
 // Every editor component should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface ListOfTabsEditorSchema {
   type: 'list';
   items: {
     type: 'dict';
-    properties: [{
-      name: 'title';
-      description: 'Tab title';
-      schema: {
-        type: 'unicode';
-        validators: [{
-          id: 'is_nonempty';
-        }];
-      };
-    }, {
-      name: 'content';
-      description: 'Tab content';
-      schema: {
-        type: 'html';
-        ui_config: {
-          hide_complex_extensions: true;
+    properties: [
+      {
+        name: 'title';
+        description: 'Tab title';
+        schema: {
+          type: 'unicode';
+          validators: [
+            {
+              id: 'is_nonempty';
+            },
+          ];
         };
-      };
-    }];
+      },
+      {
+        name: 'content';
+        description: 'Tab content';
+        schema: {
+          type: 'html';
+          ui_config: {
+            hide_complex_extensions: true;
+          };
+        };
+      },
+    ];
   };
   ui_config: {
     add_element_text: 'Add new tab';
@@ -55,7 +60,7 @@ interface ListOfTabsEditorSchema {
 @Component({
   selector: 'list-of-tabs-editor',
   templateUrl: './list-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ListOfTabsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -68,29 +73,34 @@ export class ListOfTabsEditorComponent implements OnInit {
     type: 'list',
     items: {
       type: 'dict',
-      properties: [{
-        name: 'title',
-        description: 'Tab title',
-        schema: {
-          type: 'unicode',
-          validators: [{
-            id: 'is_nonempty'
-          }]
-        }
-      }, {
-        name: 'content',
-        description: 'Tab content',
-        schema: {
-          type: 'html',
-          ui_config: {
-            hide_complex_extensions: true
-          }
-        }
-      }]
+      properties: [
+        {
+          name: 'title',
+          description: 'Tab title',
+          schema: {
+            type: 'unicode',
+            validators: [
+              {
+                id: 'is_nonempty',
+              },
+            ],
+          },
+        },
+        {
+          name: 'content',
+          description: 'Tab content',
+          schema: {
+            type: 'html',
+            ui_config: {
+              hide_complex_extensions: true,
+            },
+          },
+        },
+      ],
     },
     ui_config: {
-      add_element_text: 'Add new tab'
-    }
+      add_element_text: 'Add new tab',
+    },
   };
 
   ngOnInit(): void {
@@ -114,6 +124,9 @@ export class ListOfTabsEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('listOfTabsEditor', downgradeComponent({
-  component: ListOfTabsEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'listOfTabsEditor',
+  downgradeComponent({
+    component: ListOfTabsEditorComponent,
+  }) as angular.IDirectiveFactory
+);

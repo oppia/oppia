@@ -17,74 +17,101 @@
  * can open links by clicking all buttons in about foundation page
  */
 
-import { UserFactory } from
-  '../../puppeteer-testing-utilities/user-factory';
-import { LoggedInUser } from '../../user-utilities/logged-in-users-utils';
-import testConstants from
-  '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Logged-in User in About Foundation page', function() {
+describe('Logged-in User in About Foundation page', function () {
   let testUser: LoggedInUser;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      'testuser', 'testuser@example.com');
+      'testuser',
+      'testuser@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await testUser.navigateToAboutFoundationPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open the page with the 61 million children link.',
-    async function() {
+  it(
+    'should open the page with the 61 million children link.',
+    async function () {
       await testUser.click61MillionChildrenLinkInAboutFoundation();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the page with the Even Those Who Are In School link.',
-    async function() {
+  it(
+    'should open the page with the Even Those Who Are In School link.',
+    async function () {
       await testUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the page with the Source: UNESCO link.',
-    async function() {
+  it(
+    'should open the page with the Source: UNESCO link.',
+    async function () {
       await testUser.clickSourceUnescoLinkInAboutFoundation();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the page with the 420 Million link.',
-    async function() {
+  it(
+    'should open the page with the 420 Million link.',
+    async function () {
       await testUser.click420MillionLinkInAboutFoundation();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the About page with the Learn More About Oppia button.',
-    async function() {
+  it(
+    'should open the About page with the Learn More About Oppia button.',
+    async function () {
       await testUser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the Volunteer page with the Become A Volunteer button.',
-    async function() {
+  it(
+    'should open the Volunteer page with the Become A Volunteer button.',
+    async function () {
       await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the Partnerships page with the Consider Becoming A ' +
-    'Partner Today! link.',
-  async function() {
-    await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should open the Partnerships page with the Consider Becoming A ' +
+      'Partner Today! link.',
+    async function () {
+      await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the Volunteer page with the Join Our Large Volunteer ' +
-    'Community link.',
-  async function() {
-    await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should open the Volunteer page with the Join Our Large Volunteer ' +
+      'Community link.',
+    async function () {
+      await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open the Donate page with the donations link.',
-    async function() {
+  it(
+    'should open the Donate page with the donations link.',
+    async function () {
       await testUser.clickDonationsLinkInAboutFoundation();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

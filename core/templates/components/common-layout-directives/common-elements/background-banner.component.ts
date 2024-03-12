@@ -16,28 +16,37 @@
  * @fileoverview Component for the background banner.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'background-banner',
-  templateUrl: './background-banner.component.html'
+  templateUrl: './background-banner.component.html',
 })
 export class BackgroundBannerComponent implements OnInit {
   constructor(private urlInterpolationService: UrlInterpolationService) {}
   bannerImageFileUrl: string = '';
   ngOnInit(): void {
     const possibleBannerFilenames: string[] = [
-      'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
-    const bannerImageFilename: string = possibleBannerFilenames[
-      Math.floor(Math.random() * possibleBannerFilenames.length)];
+      'bannerA.svg',
+      'bannerB.svg',
+      'bannerC.svg',
+      'bannerD.svg',
+    ];
+    const bannerImageFilename: string =
+      possibleBannerFilenames[
+        Math.floor(Math.random() * possibleBannerFilenames.length)
+      ];
     this.bannerImageFileUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/background/' + bannerImageFilename);
+      '/background/' + bannerImageFilename
+    );
   }
 }
 
-angular.module('oppia').directive(
-  'backgroundBanner', downgradeComponent(
-    {component: BackgroundBannerComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'backgroundBanner',
+    downgradeComponent({component: BackgroundBannerComponent})
+  );

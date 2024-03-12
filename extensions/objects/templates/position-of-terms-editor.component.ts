@@ -19,14 +19,14 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'position-of-terms-editor',
   templateUrl: './position-of-terms-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class PositionOfTermsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -38,7 +38,7 @@ export class PositionOfTermsEditorComponent implements OnInit {
   alwaysEditable = true;
   positionOfTerms = AppConstants.POSITION_OF_TERMS_MAPPING;
   localValue!: {name: string; humanReadableName: string};
-  constructor() { }
+  constructor() {}
 
   ngOnInit(): void {
     this.localValue = this.positionOfTerms[2];
@@ -65,6 +65,9 @@ export class PositionOfTermsEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('positionOfTermsEditor', downgradeComponent({
-  component: PositionOfTermsEditorComponent
-}));
+angular.module('oppia').directive(
+  'positionOfTermsEditor',
+  downgradeComponent({
+    component: PositionOfTermsEditorComponent,
+  })
+);

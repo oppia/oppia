@@ -16,51 +16,60 @@
  * @fileoverview Frontend Model for exploration stats.
  */
 
-import { StateStatsBackendDict, StateStats } from
-  'domain/statistics/state-stats-model';
+import {
+  StateStatsBackendDict,
+  StateStats,
+} from 'domain/statistics/state-stats-model';
 
 export interface ExplorationStatsBackendDict {
-  'exp_id': string;
-  'exp_version': number;
-  'num_starts': number;
-  'num_actual_starts': number;
-  'num_completions': number;
-  'state_stats_mapping': {
+  exp_id: string;
+  exp_version: number;
+  num_starts: number;
+  num_actual_starts: number;
+  num_completions: number;
+  state_stats_mapping: {
     [stateName: string]: StateStatsBackendDict;
   };
 }
 
 export class ExplorationStats {
   constructor(
-      public readonly expId: string,
-      public readonly expVersion: number,
-      public readonly numStarts: number,
-      public readonly numActualStarts: number,
-      public readonly numCompletions: number,
-      public readonly stateStatsMapping: ReadonlyMap<string, StateStats>) {
+    public readonly expId: string,
+    public readonly expVersion: number,
+    public readonly numStarts: number,
+    public readonly numActualStarts: number,
+    public readonly numCompletions: number,
+    public readonly stateStatsMapping: ReadonlyMap<string, StateStats>
+  ) {
     this.stateStatsMapping = new Map(stateStatsMapping);
   }
 
   static createFromBackendDict(
-      backendDict: ExplorationStatsBackendDict): ExplorationStats {
-    const stateStatsMapping = (
-      new Map(Object.entries(backendDict.state_stats_mapping).map(
+    backendDict: ExplorationStatsBackendDict
+  ): ExplorationStats {
+    const stateStatsMapping = new Map(
+      Object.entries(backendDict.state_stats_mapping).map(
         ([stateName, stateStatsBackendDict]) => [
           stateName,
-          StateStats.createFromBackendDict(
-            stateStatsBackendDict)
-        ])));
+          StateStats.createFromBackendDict(stateStatsBackendDict),
+        ]
+      )
+    );
     return new ExplorationStats(
-      backendDict.exp_id, backendDict.exp_version, backendDict.num_starts,
-      backendDict.num_actual_starts, backendDict.num_completions,
-      stateStatsMapping);
+      backendDict.exp_id,
+      backendDict.exp_version,
+      backendDict.num_starts,
+      backendDict.num_actual_starts,
+      backendDict.num_completions,
+      stateStatsMapping
+    );
   }
 
   getBounceRate(stateName: string): number {
     if (this.numStarts === 0) {
       throw new Error('Can not get bounce rate of an unplayed exploration');
     }
-    const { totalHitCount, numCompletions } = this.getStateStats(stateName);
+    const {totalHitCount, numCompletions} = this.getStateStats(stateName);
     return (totalHitCount - numCompletions) / this.numStarts;
   }
 
@@ -92,8 +101,13 @@ export class ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     newStateStatsMapping.set(newStateName, new StateStats(0, 0, 0, 0, 0, 0));
     return new ExplorationStats(
-      this.expId, this.expVersion, this.numStarts, this.numActualStarts,
-      this.numCompletions, newStateStatsMapping);
+      this.expId,
+      this.expVersion,
+      this.numStarts,
+      this.numActualStarts,
+      this.numCompletions,
+      newStateStatsMapping
+    );
   }
 
   /**
@@ -108,8 +122,13 @@ export class ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     newStateStatsMapping.delete(oldStateName);
     return new ExplorationStats(
-      this.expId, this.expVersion, this.numStarts, this.numActualStarts,
-      this.numCompletions, newStateStatsMapping);
+      this.expId,
+      this.expVersion,
+      this.numStarts,
+      this.numActualStarts,
+      this.numCompletions,
+      newStateStatsMapping
+    );
   }
 
   /**
@@ -121,13 +140,20 @@ export class ExplorationStats {
    * exploration.
    */
   createNewWithStateRenamed(
-      oldStateName: string, newStateName: string): ExplorationStats {
+    oldStateName: string,
+    newStateName: string
+  ): ExplorationStats {
     const newStateStatsMapping = new Map(this.stateStatsMapping);
     const stateStats = this.getStateStats(oldStateName);
     newStateStatsMapping.set(newStateName, stateStats);
     newStateStatsMapping.delete(oldStateName);
     return new ExplorationStats(
-      this.expId, this.expVersion, this.numStarts, this.numActualStarts,
-      this.numCompletions, newStateStatsMapping);
+      this.expId,
+      this.expVersion,
+      this.numStarts,
+      this.numActualStarts,
+      this.numCompletions,
+      newStateStatsMapping
+    );
   }
 }

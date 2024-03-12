@@ -16,24 +16,19 @@
  * @fileoverview Routing module for login page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { LoginPageRootComponent } from './login-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {LoginPageRootComponent} from './login-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: LoginPageRootComponent
-  }
+    component: LoginPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class LoginPageRoutingModule {}

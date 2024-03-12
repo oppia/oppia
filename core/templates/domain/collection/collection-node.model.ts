@@ -18,13 +18,12 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AppConstants } from 'app.constants';
-import { LearnerExplorationSummaryBackendDict } from
-  'domain/summary/learner-exploration-summary.model';
+import {AppConstants} from 'app.constants';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 
 export interface CollectionNodeBackendDict {
-  'exploration_id': string;
-  'exploration_summary': LearnerExplorationSummaryBackendDict | null;
+  exploration_id: string;
+  exploration_summary: LearnerExplorationSummaryBackendDict | null;
 }
 
 export class CollectionNode {
@@ -34,19 +33,20 @@ export class CollectionNode {
   constructor(collectionNodeBackendObject: CollectionNodeBackendDict) {
     this._explorationId = collectionNodeBackendObject.exploration_id;
     this._explorationSummaryObject = cloneDeep(
-      collectionNodeBackendObject.exploration_summary);
+      collectionNodeBackendObject.exploration_summary
+    );
   }
 
   static create(
-      collectionNodeBackendObject: CollectionNodeBackendDict):
-      CollectionNode {
+    collectionNodeBackendObject: CollectionNodeBackendDict
+  ): CollectionNode {
     return new CollectionNode(collectionNodeBackendObject);
   }
 
   static createFromExplorationId(explorationId: string): CollectionNode {
     return CollectionNode.create({
       exploration_id: explorationId,
-      exploration_summary: null
+      exploration_summary: null,
     });
   }
 
@@ -78,8 +78,10 @@ export class CollectionNode {
   // function is undefined if doesExplorationExist() returns false.
   isExplorationPrivate(): boolean {
     if (this._explorationSummaryObject !== null) {
-      return this._explorationSummaryObject.status === (
-        AppConstants.ACTIVITY_STATUS_PRIVATE);
+      return (
+        this._explorationSummaryObject.status ===
+        AppConstants.ACTIVITY_STATUS_PRIVATE
+      );
     } else {
       return false;
     }
@@ -99,17 +101,17 @@ export class CollectionNode {
 
   // Sets the raw exploration summary object stored within this node.
   setExplorationSummaryObject(
-      explorationSummaryBackendObject:
-      LearnerExplorationSummaryBackendDict | null): void {
-    this._explorationSummaryObject = cloneDeep(
-      explorationSummaryBackendObject);
+    explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict | null
+  ): void {
+    this._explorationSummaryObject = cloneDeep(explorationSummaryBackendObject);
   }
 
   getCapitalizedObjective(): string | null {
     if (this._explorationSummaryObject !== null) {
       return (
         this._explorationSummaryObject.objective.charAt(0).toUpperCase() +
-        this._explorationSummaryObject.objective.slice(1));
+        this._explorationSummaryObject.objective.slice(1)
+      );
     } else {
       return null;
     }

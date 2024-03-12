@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for NonExistentTopicsAndStories.
  */
 
-import { NonExistentTopicsAndStories } from
-  'domain/learner_dashboard/non-existent-topics-and-stories.model';
+import {NonExistentTopicsAndStories} from 'domain/learner_dashboard/non-existent-topics-and-stories.model';
 
 describe('Non existent topics and stories model', () => {
   it('should correctly convert backend dict to object', () => {

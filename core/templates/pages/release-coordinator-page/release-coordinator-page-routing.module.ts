@@ -16,24 +16,19 @@
  * @fileoverview Routing module for release coordinator page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { ReleaseCoordinatorPageRootComponent } from './release-coordinator-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {ReleaseCoordinatorPageRootComponent} from './release-coordinator-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: ReleaseCoordinatorPageRootComponent
-  }
+    component: ReleaseCoordinatorPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class ReleaseCoordinatorPageRoutingModule {}

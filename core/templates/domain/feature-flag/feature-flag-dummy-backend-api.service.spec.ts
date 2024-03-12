@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for FeatureFlagDummyBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { FeatureFlagDomainConstants } from
-  'domain/feature-flag/feature-flag-domain.constants';
-import { FeatureFlagDummyBackendApiService } from
-  'domain/feature-flag/feature-flag-dummy-backend-api.service';
+import {FeatureFlagDomainConstants} from 'domain/feature-flag/feature-flag-domain.constants';
+import {FeatureFlagDummyBackendApiService} from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
 
 describe('FeatureFlagDummyBackendApiService', () => {
   let httpTestingController: HttpTestingController;
@@ -31,7 +31,7 @@ describe('FeatureFlagDummyBackendApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     apiService = TestBed.get(FeatureFlagDummyBackendApiService);
@@ -47,12 +47,11 @@ describe('FeatureFlagDummyBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      apiService.isHandlerEnabled()
-        .then(successHandler, failHandler);
+      apiService.isHandlerEnabled().then(successHandler, failHandler);
 
       httpTestingController
         .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
-        .flush({ msg: 'ok', is_enabled: true });
+        .flush({msg: 'ok', is_enabled: true});
 
       flushMicrotasks();
 
@@ -64,12 +63,11 @@ describe('FeatureFlagDummyBackendApiService', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      apiService.isHandlerEnabled()
-        .then(successHandler, failHandler);
+      apiService.isHandlerEnabled().then(successHandler, failHandler);
 
       httpTestingController
         .expectOne(FeatureFlagDomainConstants.DUMMY_HANDLER_URL)
-        .flush({ msg: 'ok', is_enabled: false });
+        .flush({msg: 'ok', is_enabled: false});
 
       flushMicrotasks();
 

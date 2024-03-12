@@ -16,7 +16,7 @@
  * @fileoverview Utility function for logging the progress of the tests.
  */
 
-export let showMessage = function(message: string): void {
+export let showMessage = function (message: string): void {
   // We use console statements to log the progress or feedback of the tests.
   // eslint-disable-next-line no-console
   console.log('LOG: ' + message);
