@@ -404,10 +404,6 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     color: #00645c;
   }
 
-  .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover span {
-    color:#00645c;
-  }
-
   .oppia-learner-dash-sidebar_btn span {
     color: #fff;
     margin-bottom: .5em;
@@ -422,6 +418,10 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   }
 
   .oppia-learner-dash-sidebar_btn--active span {
+    color: #00645c;
+  }
+
+  .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover span {
     color: #00645c;
   }
 
