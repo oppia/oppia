@@ -56,7 +56,7 @@ const revisionDateSelector = '.e2e-test-history-tab-commit-date';
 
 // History tab elements.
 const userNameEdit = 'input.e2e-history-filter-input';
-const versionsList = 'div.e2e-test-history-list-item';
+const historyListItem = 'div.e2e-test-history-list-item';
 const firstVersionDropdown = '.e2e-test-history-version-dropdown-first';
 const secondVersionDropdown = '.e2e-test-history-version-dropdown-second';
 const revertVersionButton = '.e2e-test-revert-version';
@@ -178,7 +178,7 @@ export class ExplorationEditor extends BaseUser {
    */
 
   async getRevisionsList(
-      versionsListSelector: string
+    versionsListSelector: string
   ): Promise<{
     versionNo: string;
     notes: string;
@@ -186,7 +186,8 @@ export class ExplorationEditor extends BaseUser {
     date: string;
   }[]> {
     let elements = await this.page.$$(versionsListSelector);
-    let revisions = [];
+    let revisions: { 
+      versionNo: string; notes: string; user: string; date: string; }[] = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
         revisionVersionNoSelector, async(el) => el.textContent);
@@ -196,10 +197,12 @@ export class ExplorationEditor extends BaseUser {
         revisionUsernameSelector, async(el) => el.textContent);
       let date = await element.$eval(
         revisionDateSelector, async(el) => el.textContent);
-      revisions.push({ versionNo, notes, user, date });
+      if (versionNo && notes && user && date) {
+        revisions.push({ versionNo, notes, user, date });
+      }
     }
     return revisions;
-  }
+  }  
 
   /**
    * Function to confirm the existence of the Version number, Notes, Username,
@@ -207,7 +210,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectlatestRevisionToHaveVersionNoNotesUsernameDate(): Promise<void> {
     await this.page.waitForTimeout(500);
-    let element = await this.page.$(versionsList);
+    let element = await this.page.$(historyListItem);
     if (!element) {
       throw new Error('No revisions found');
     }
@@ -229,7 +232,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to verify whether the revisions are sorted by dates or not.
    */
   async expectRevisionsToBeOrderedByDate(): Promise<void> {
-    let revisions = await this.getRevisionsList(versionsList);
+    let revisions = await this.getRevisionsList(historyListItem);
     for (let i = 0; i < revisions.length - 1; i++) {
       let date1 = new Date(revisions[i].date);
       let date2 = new Date(revisions[i + 1].date);
@@ -261,7 +264,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn('#mat-option-1');
 
     await this.page.waitForTimeout(500);
-    let revisions = await this.getRevisionsList(versionsList);
+    let revisions = await this.getRevisionsList(historyListItem);
     if (revisions.length !== itemsPerPage) {
       throw new Error(
         `Pagination Error: When the items per page is set to ${itemsPerPage},
@@ -346,10 +349,16 @@ export class ExplorationEditor extends BaseUser {
   async expectSuccessfulReversionOfRevision(): Promise<void> {
     // This page takes 3-5 seconds to reload to reflect the reverted revision.
     await this.page.waitForTimeout(5000);
-    await this.page.waitForSelector(versionsList);
-    let element = await this.page.$(versionsList);
+    await this.page.waitForSelector(historyListItem);
+    let element = await this.page.$(historyListItem);
+    if (element === null) {
+      throw new Error('No Revisions found');
+    }
     let notes = await element.$eval(
       revisionNoteSelector, async(el) => el.textContent);
+    if (notes === null) {
+      throw new Error('Revision does not contain a Note');
+    }
     showMessage(notes);
     await this.page.waitForTimeout(500);
     if (notes === ' Reverted exploration to version 14 ') {
@@ -357,7 +366,7 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error('Revision is not reverting');
     }
-  }
+  }  
 
   /**
   * Function to create a new card in the exploration creator.
