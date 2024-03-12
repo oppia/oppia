@@ -147,7 +147,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} numOfVersion - Number of versions to be created.
    */
   async createMultipleRevisionsOfTheSameExploration(
-    text: string, numOfVersion: number): Promise<void> {
+      text: string, numOfVersion: number): Promise<void> {
     await this.makeMetaDataChanges('changes');
     await this.saveExplorationDraft();
     await this.page.waitForTimeout(300);
@@ -254,7 +254,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} itemsPerPage - Number of items/revisions to show per page.
    */
   async ExpectPaginatorToChangeItemsPerPage(
-    itemsPerPage: number): Promise<void> {
+      itemsPerPage: number): Promise<void> {
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(paginatorToggler, { visible: true });
     await this.clickOn(paginatorToggler);
