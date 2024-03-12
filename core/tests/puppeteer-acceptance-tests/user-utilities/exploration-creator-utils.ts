@@ -417,7 +417,7 @@ export class ExplorationCreator extends BaseUser {
   async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(): Promise<void> {
     await this.page.waitForSelector(
       '.oppia-editor-publish-button:([disabled])'
-    ); //checking
+    );
     try {
       await this.page.goto(explorationUrlAfterPublished);
       throw new Error('Exploration is not deleted successfully.');
@@ -494,7 +494,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn('button.e2e-test-save-discard-toggle');
     await this.page.waitForSelector(
       'a.e2e-test-discard-changes:not([disabled])'
-    ); //working
+    );
     await this.clickOn(discardDraftButton);
     await this.clickOn(discardConfirmButton);
 
