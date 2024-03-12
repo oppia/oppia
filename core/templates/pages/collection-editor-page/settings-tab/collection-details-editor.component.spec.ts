@@ -16,17 +16,17 @@
  * @fileoverview Unit tests for collection details editor component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
-import { CollectionUpdateService } from 'domain/collection/collection-update.service';
-import { CollectionValidationService } from 'domain/collection/collection-validation.service';
-import { Collection } from 'domain/collection/collection.model';
-import { AlertsService } from 'services/alerts.service';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { CollectionDetailsEditorComponent } from './collection-details-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
+import {CollectionUpdateService} from 'domain/collection/collection-update.service';
+import {CollectionValidationService} from 'domain/collection/collection-validation.service';
+import {Collection} from 'domain/collection/collection.model';
+import {AlertsService} from 'services/alerts.service';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
+import {CollectionDetailsEditorComponent} from './collection-details-editor.component';
 
 describe('Collection details editor component', () => {
   let fixture: ComponentFixture<CollectionDetailsEditorComponent>;
@@ -43,24 +43,29 @@ describe('Collection details editor component', () => {
   let languageCode = 'en';
   let collectionTags = ['mock tag'];
   let mockCollection = new Collection(
-    'id', collectionTitle, collectionObjective, languageCode, collectionTags,
-    new CollectionPlaythrough(null, []), collectionCategory, 0, 1, []);
+    'id',
+    collectionTitle,
+    collectionObjective,
+    languageCode,
+    collectionTags,
+    new CollectionPlaythrough(null, []),
+    collectionCategory,
+    0,
+    1,
+    []
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        CollectionDetailsEditorComponent
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [CollectionDetailsEditorComponent],
       providers: [
         AlertsService,
         CollectionEditorStateService,
         CollectionUpdateService,
-        CollectionValidationService
+        CollectionValidationService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -81,11 +86,14 @@ describe('Collection details editor component', () => {
   it('should initialize', () => {
     let mockOnCollectionInitializedEventEmitter = new EventEmitter<void>();
 
-    spyOnProperty(collectionEditorStateService, 'onCollectionInitialized')
-      .and.returnValue(mockOnCollectionInitializedEventEmitter);
+    spyOnProperty(
+      collectionEditorStateService,
+      'onCollectionInitialized'
+    ).and.returnValue(mockOnCollectionInitializedEventEmitter);
     spyOn(componentInstance, 'refreshSettingsTab');
     spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
-      mockCollection);
+      mockCollection
+    );
 
     componentInstance.ngOnInit();
     mockOnCollectionInitializedEventEmitter.emit();
@@ -105,9 +113,11 @@ describe('Collection details editor component', () => {
 
     expect(componentInstance.displayedCollectionTitle).toEqual(collectionTitle);
     expect(componentInstance.displayedCollectionObjective).toEqual(
-      collectionObjective);
+      collectionObjective
+    );
     expect(componentInstance.displayedCollectionCategory).toEqual(
-      collectionCategory);
+      collectionCategory
+    );
     expect(componentInstance.displayedCollectionLanguage).toEqual(languageCode);
     expect(componentInstance.displayedCollectionTags).toEqual(collectionTags);
     expect(componentInstance.CATEGORY_LIST).toEqual(categoryList);
@@ -115,15 +125,19 @@ describe('Collection details editor component', () => {
 
   it('should tell page has loaded', () => {
     spyOn(collectionEditorStateService, 'hasLoadedCollection').and.returnValues(
-      true, false);
+      true,
+      false
+    );
     expect(componentInstance.hasPageLoaded()).toBeTrue();
     expect(componentInstance.hasPageLoaded()).toBeFalse();
   });
 
   it('should normlize tags', () => {
     let tags = ['   category 1  ', 'category 2   '];
-    expect(componentInstance.normalizeTags(tags)).toEqual(
-      ['category 1', 'category 2']);
+    expect(componentInstance.normalizeTags(tags)).toEqual([
+      'category 1',
+      'category 2',
+    ]);
   });
 
   it('should return empty list if there are no tags on normalization', () => {
@@ -149,14 +163,23 @@ describe('Collection details editor component', () => {
     componentInstance.updateCollectionLanguageCode();
 
     expect(collectionUpdateService.setCollectionTitle).toHaveBeenCalledWith(
-      mockCollection, componentInstance.displayedCollectionTitle);
+      mockCollection,
+      componentInstance.displayedCollectionTitle
+    );
     expect(collectionUpdateService.setCollectionObjective).toHaveBeenCalledWith(
-      mockCollection, componentInstance.displayedCollectionObjective);
+      mockCollection,
+      componentInstance.displayedCollectionObjective
+    );
     expect(collectionUpdateService.setCollectionCategory).toHaveBeenCalledWith(
-      mockCollection, componentInstance.displayedCollectionCategory);
-    expect(collectionUpdateService.setCollectionLanguageCode)
-      .toHaveBeenCalledWith(
-        mockCollection, componentInstance.displayedCollectionLanguage);
+      mockCollection,
+      componentInstance.displayedCollectionCategory
+    );
+    expect(
+      collectionUpdateService.setCollectionLanguageCode
+    ).toHaveBeenCalledWith(
+      mockCollection,
+      componentInstance.displayedCollectionLanguage
+    );
   });
 
   it('should update collection tags', () => {
@@ -170,7 +193,9 @@ describe('Collection details editor component', () => {
     componentInstance.updateCollectionTags();
 
     expect(collectionUpdateService.setCollectionTags).toHaveBeenCalledWith(
-      mockCollection, collectionTags);
+      mockCollection,
+      collectionTags
+    );
   });
 
   it('should show alert when collection tags are not valid', () => {
@@ -185,6 +210,7 @@ describe('Collection details editor component', () => {
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'Please ensure that there are no duplicate tags and that all ' +
-                'tags contain only lower case and spaces.');
+        'tags contain only lower case and spaces.'
+    );
   });
 });

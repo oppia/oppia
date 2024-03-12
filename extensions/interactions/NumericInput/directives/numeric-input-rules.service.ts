@@ -16,66 +16,75 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { NumericInputAnswer } from 'interactions/answer-defs';
+import {NumericInputAnswer} from 'interactions/answer-defs';
 import {
   NumericInputEqualRuleInputs,
   NumericInputIsInclusivelyBetweenRuleInputs,
-  NumericInputIsWithinToleranceRuleInputs
+  NumericInputIsWithinToleranceRuleInputs,
 } from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NumericInputRulesService {
   Equals(
-      answer: NumericInputAnswer,
-      inputs: NumericInputEqualRuleInputs): boolean {
+    answer: NumericInputAnswer,
+    inputs: NumericInputEqualRuleInputs
+  ): boolean {
     return answer === inputs.x;
   }
 
   IsLessThan(
-      answer: NumericInputAnswer,
-      inputs: NumericInputEqualRuleInputs): boolean {
+    answer: NumericInputAnswer,
+    inputs: NumericInputEqualRuleInputs
+  ): boolean {
     return answer < inputs.x;
   }
 
   IsGreaterThan(
-      answer: NumericInputAnswer,
-      inputs: NumericInputEqualRuleInputs): boolean {
+    answer: NumericInputAnswer,
+    inputs: NumericInputEqualRuleInputs
+  ): boolean {
     return answer > inputs.x;
   }
 
   IsLessThanOrEqualTo(
-      answer: NumericInputAnswer,
-      inputs: NumericInputEqualRuleInputs): boolean {
+    answer: NumericInputAnswer,
+    inputs: NumericInputEqualRuleInputs
+  ): boolean {
     return answer <= inputs.x;
   }
 
   IsGreaterThanOrEqualTo(
-      answer: NumericInputAnswer,
-      inputs: NumericInputEqualRuleInputs): boolean {
+    answer: NumericInputAnswer,
+    inputs: NumericInputEqualRuleInputs
+  ): boolean {
     return answer >= inputs.x;
   }
 
   IsInclusivelyBetween(
-      answer: NumericInputAnswer,
-      inputs: NumericInputIsInclusivelyBetweenRuleInputs): boolean {
+    answer: NumericInputAnswer,
+    inputs: NumericInputIsInclusivelyBetweenRuleInputs
+  ): boolean {
     // TODO(wxy): Have frontend validation at creation time to check that
     // inputs.a <= inputs.b.
     return answer >= inputs.a && answer <= inputs.b;
   }
 
   IsWithinTolerance(
-      answer: NumericInputAnswer,
-      inputs: NumericInputIsWithinToleranceRuleInputs): boolean {
-    return answer >= inputs.x - inputs.tol &&
-      answer <= inputs.x + inputs.tol;
+    answer: NumericInputAnswer,
+    inputs: NumericInputIsWithinToleranceRuleInputs
+  ): boolean {
+    return answer >= inputs.x - inputs.tol && answer <= inputs.x + inputs.tol;
   }
 }
 
-angular.module('oppia').factory(
-  'NumericInputRulesService',
-  downgradeInjectable(NumericInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'NumericInputRulesService',
+    downgradeInjectable(NumericInputRulesService)
+  );

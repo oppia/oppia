@@ -16,16 +16,16 @@
  * @fileoverview Module for the music notes input interaction.
  */
 
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 
-import { MaterialModule } from 'modules/material.module';
-import { MusicNotesInputComponent } from './directives/oppia-interactive-music-notes-input.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { ResponseMusicNotesInput } from './directives/oppia-response-music-notes-input.component';
-import { ShortResponseMusicNotesInput } from './directives/oppia-short-response-music-notes-input.component';
-import { CommonModule } from '@angular/common';
-import { ObjectComponentsModule } from '../../../extensions/objects/object-components.module';
+import {MaterialModule} from 'modules/material.module';
+import {MusicNotesInputComponent} from './directives/oppia-interactive-music-notes-input.component';
+import {TranslateModule} from '@ngx-translate/core';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {ResponseMusicNotesInput} from './directives/oppia-response-music-notes-input.component';
+import {ShortResponseMusicNotesInput} from './directives/oppia-short-response-music-notes-input.component';
+import {CommonModule} from '@angular/common';
+import {ObjectComponentsModule} from '../../../extensions/objects/object-components.module';
 
 @NgModule({
   imports: [
@@ -38,18 +38,17 @@ import { ObjectComponentsModule } from '../../../extensions/objects/object-compo
   declarations: [
     MusicNotesInputComponent,
     ResponseMusicNotesInput,
-    ShortResponseMusicNotesInput
+    ShortResponseMusicNotesInput,
   ],
   entryComponents: [
     MusicNotesInputComponent,
     ResponseMusicNotesInput,
-    ShortResponseMusicNotesInput
+    ShortResponseMusicNotesInput,
   ],
   exports: [
     MusicNotesInputComponent,
     ResponseMusicNotesInput,
-    ShortResponseMusicNotesInput
+    ShortResponseMusicNotesInput,
   ],
 })
-
 export class MusicNotesInputModule {}

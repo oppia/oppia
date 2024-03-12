@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Delete Last Hint Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteLastHintModalComponent } from './delete-last-hint-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteLastHintModalComponent} from './delete-last-hint-modal.component';
 
 describe('Delete Hint Modal Component', () => {
   let fixture: ComponentFixture<DeleteLastHintModalComponent>;
@@ -26,12 +26,8 @@ describe('Delete Hint Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteLastHintModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [DeleteLastHintModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

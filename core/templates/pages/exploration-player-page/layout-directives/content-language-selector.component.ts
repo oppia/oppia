@@ -17,42 +17,38 @@
  * playing an exploration.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ContentTranslationLanguageService } from
-  'pages/exploration-player-page/services/content-translation-language.service';
-import { ExplorationLanguageInfo } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
-import { PlayerPositionService } from
-  'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from
+import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
+import {ExplorationLanguageInfo} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {
+  SwitchContentLanguageRefreshRequiredModalComponent,
   // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { ContentTranslationManagerService } from '../services/content-translation-manager.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-content-language-selector',
   templateUrl: './content-language-selector.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ContentLanguageSelectorComponent implements OnInit {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contentTranslationLanguageService:
-      ContentTranslationLanguageService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private ngbModal: NgbModal,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef
-  ) { }
+  ) {}
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -64,22 +60,22 @@ export class ContentLanguageSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     const url = new URL(this.windowRef.nativeWindow.location.href);
-    this.currentGlobalLanguageCode = (
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode());
-    this.selectedLanguageCode = (
-      this.contentTranslationLanguageService.getCurrentContentLanguageCode());
-    this.languageOptions = (
-      this.contentTranslationLanguageService.getLanguageOptionsForDropdown());
-    this.newLanguageCode = (
+    this.currentGlobalLanguageCode =
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+    this.selectedLanguageCode =
+      this.contentTranslationLanguageService.getCurrentContentLanguageCode();
+    this.languageOptions =
+      this.contentTranslationLanguageService.getLanguageOptionsForDropdown();
+    this.newLanguageCode =
       url.searchParams.get('initialContentLanguageCode') ||
-      this.currentGlobalLanguageCode);
+      this.currentGlobalLanguageCode;
     for (let option of this.languageOptions) {
       if (option.value === this.newLanguageCode) {
         this.contentTranslationLanguageService.setCurrentContentLanguageCode(
-          option.value);
-        this.selectedLanguageCode = (
-          this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+          option.value
         );
+        this.selectedLanguageCode =
+          this.contentTranslationLanguageService.getCurrentContentLanguageCode();
         break;
       }
     }
@@ -88,13 +84,16 @@ export class ContentLanguageSelectorComponent implements OnInit {
   onSelectLanguage(newLanguageCode: string): void {
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(
-        SwitchContentLanguageRefreshRequiredModalComponent);
+        SwitchContentLanguageRefreshRequiredModalComponent
+      );
       modalRef.componentInstance.languageCode = newLanguageCode;
     } else if (this.selectedLanguageCode !== newLanguageCode) {
       this.contentTranslationLanguageService.setCurrentContentLanguageCode(
-        newLanguageCode);
+        newLanguageCode
+      );
       this.contentTranslationManagerService.displayTranslations(
-        newLanguageCode);
+        newLanguageCode
+      );
       this.selectedLanguageCode = newLanguageCode;
       this.changeDetectorRef.detectChanges();
     }
@@ -103,7 +102,8 @@ export class ContentLanguageSelectorComponent implements OnInit {
   shouldDisplaySelector(): boolean {
     return (
       this.languageOptions.length > 1 &&
-      this.playerPositionService.displayedCardIndex === 0);
+      this.playerPositionService.displayedCardIndex === 0
+    );
   }
 
   private shouldPromptForRefresh(): boolean {
@@ -112,6 +112,9 @@ export class ContentLanguageSelectorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaContentLanguageSelector',
-  downgradeComponent({ component: ContentLanguageSelectorComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaContentLanguageSelector',
+    downgradeComponent({component: ContentLanguageSelectorComponent})
+  );

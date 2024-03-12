@@ -18,31 +18,28 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { InteractiveImageClickInput } from './directives/oppia-interactive-image-click-input.component';
-import { ResponseImageClickInput } from './directives/oppia-response-image-click-input.component';
-import { ShortResponseImageClickInput } from './directives/oppia-short-response-image-click-input.component';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {InteractiveImageClickInput} from './directives/oppia-interactive-image-click-input.component';
+import {ResponseImageClickInput} from './directives/oppia-response-image-click-input.component';
+import {ShortResponseImageClickInput} from './directives/oppia-short-response-image-click-input.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-  ],
+  imports: [CommonModule],
   declarations: [
     InteractiveImageClickInput,
     ResponseImageClickInput,
-    ShortResponseImageClickInput
+    ShortResponseImageClickInput,
   ],
   entryComponents: [
     InteractiveImageClickInput,
     ResponseImageClickInput,
-    ShortResponseImageClickInput
+    ShortResponseImageClickInput,
   ],
   exports: [
     InteractiveImageClickInput,
     ResponseImageClickInput,
-    ShortResponseImageClickInput
+    ShortResponseImageClickInput,
   ],
 })
-
-export class ImageClickInputInteractionModule { }
+export class ImageClickInputInteractionModule {}

@@ -18,32 +18,18 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
-import { CopierComponent } from './copier.component';
-import { RandomSelectorComponent } from './random-selector.component';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
+import {CopierComponent} from './copier.component';
+import {RandomSelectorComponent} from './random-selector.component';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    SharedFormsModule
-  ],
-  providers: [
-    RandomSelectorComponent,
-    CopierComponent
-  ],
-  declarations: [
-    RandomSelectorComponent,
-    CopierComponent
-  ],
-  exports: [
-    RandomSelectorComponent,
-    CopierComponent
-  ],
+  imports: [CommonModule, FormsModule, SharedFormsModule],
+  providers: [RandomSelectorComponent, CopierComponent],
+  declarations: [RandomSelectorComponent, CopierComponent],
+  exports: [RandomSelectorComponent, CopierComponent],
 })
-
-export class DynamicComponentModule { }
+export class DynamicComponentModule {}

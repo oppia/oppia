@@ -26,7 +26,7 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
-  'This action is irreversible. Are you sure?'
+  'This action is irreversible. Are you sure?',
 ];
 
 export class BaseUser {
@@ -44,7 +44,7 @@ export class BaseUser {
   async openBrowser(): Promise<Page> {
     const args: string[] = [
       '--start-fullscreen',
-      '--use-fake-ui-for-media-stream'
+      '--use-fake-ui-for-media-stream',
     ];
 
     const headless = process.env.HEADLESS === 'true';
@@ -64,9 +64,9 @@ export class BaseUser {
          * headless mode. As per the expected behavior we need to make sure
          * every test passes on both modes. */
         headless,
-        args
+        args,
       })
-      .then(async(browser) => {
+      .then(async browser => {
         this.browserObject = browser;
         this.page = await browser.newPage();
         if (mobile) {
@@ -121,7 +121,8 @@ export class BaseUser {
     await this.type('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])');
+      'button.e2e-test-register-user:not([disabled])'
+    );
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
 
@@ -145,7 +146,8 @@ export class BaseUser {
        * Check the documentation for the normalize-space function here :
        * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
       const [button] = await this.page.$x(
-        `\/\/*[contains(text(), normalize-space('${selector}'))]`);
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`
+      );
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector);

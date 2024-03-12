@@ -25,18 +25,18 @@ var ruleTester = new RuleTester();
 ruleTester.run('no-relative-import', rule, {
   valid: [
     {
-      code:
-      "var path = require('path');"
-    }
+      code: "var path = require('path');",
+    },
   ],
 
   invalid: [
     {
-      code:
-      'var forms = require("../protractor_utils/forms.js");',
-      errors: [{
-        message: "Please don't use relative imports in require()."
-      }],
+      code: 'var forms = require("../protractor_utils/forms.js");',
+      errors: [
+        {
+          message: "Please don't use relative imports in require().",
+        },
+      ],
     },
-  ]
+  ],
 });

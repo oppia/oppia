@@ -15,18 +15,17 @@
 /**
  * @fileoverview Component for the teach page.
  */
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { Subscription } from 'rxjs';
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {Subscription} from 'rxjs';
 
 export interface Testimonial {
   quote: string;
@@ -40,9 +39,8 @@ export interface Testimonial {
 @Component({
   selector: 'teach-page',
   templateUrl: './teach-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-
 export class TeachPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -63,7 +61,7 @@ export class TeachPageComponent implements OnInit {
     private windowDimensionService: WindowDimensionsService,
     private windowRef: WindowRef,
     private userService: UserService,
-    private loaderService: LoaderService,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -72,12 +70,14 @@ export class TeachPageComponent implements OnInit {
     this.testimonialCount = 3;
     this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
-      '/learn/<classroomUrlFragment>', {
-        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT
-      });
+      '/learn/<classroomUrlFragment>',
+      {
+        classroomUrlFragment: AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT,
+      }
+    );
     this.libraryUrl = '/community-library';
     this.loaderService.showLoadingScreen('Loading');
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       this.loaderService.hideLoadingScreen();
     });
@@ -85,52 +85,57 @@ export class TeachPageComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.isWindowNarrow = this.windowDimensionService.isWindowNarrow();
-      }));
+      })
+    );
   }
 
   // TODO(#11657): Extract the testimonials code into a separate component.
   // The 2 functions below are to cycle between values:
   // 0 to (testimonialCount - 1) for displayedTestimonialId.
   incrementDisplayedTestimonialId(): void {
-  // This makes sure that incrementing from (testimonialCount - 1)
-  // returns 0 instead of testimonialCount,since we want the testimonials
-  // to cycle through.
-    this.displayedTestimonialId = (
-      this.displayedTestimonialId + 1) % this.testimonialCount;
+    // This makes sure that incrementing from (testimonialCount - 1)
+    // returns 0 instead of testimonialCount,since we want the testimonials
+    // to cycle through.
+    this.displayedTestimonialId =
+      (this.displayedTestimonialId + 1) % this.testimonialCount;
   }
 
   decrementDisplayedTestimonialId(): void {
-  // This makes sure that decrementing from 0, returns
-  // (testimonialCount - 1) instead of -1, since we want the testimonials
-  // to cycle through.
-    this.displayedTestimonialId = (
-      this.displayedTestimonialId + this.testimonialCount - 1) %
+    // This makes sure that decrementing from 0, returns
+    // (testimonialCount - 1) instead of -1, since we want the testimonials
+    // to cycle through.
+    this.displayedTestimonialId =
+      (this.displayedTestimonialId + this.testimonialCount - 1) %
       this.testimonialCount;
   }
 
   getTestimonials(): [Testimonial, Testimonial, Testimonial] {
-    return [{
-      quote: 'I18N_TEACH_TESTIMONIAL_1',
-      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
-      imageUrl: '/teach/riya.jpg',
-      imageUrlWebp: '/teach/riya.webp',
-      borderPresent: true,
-      altText: 'Photo of Riya'
-    }, {
-      quote: 'I18N_TEACH_TESTIMONIAL_2',
-      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
-      imageUrl: '/teach/awad.jpg',
-      imageUrlWebp: '/teach/awad.webp',
-      borderPresent: true,
-      altText: 'Photo of Awad'
-    }, {
-      quote: 'I18N_TEACH_TESTIMONIAL_3',
-      studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
-      imageUrl: '/teach/himanshu.jpg',
-      imageUrlWebp: '/teach/himanshu.webp',
-      borderPresent: true,
-      altText: 'Photo of Himanshu'
-    }];
+    return [
+      {
+        quote: 'I18N_TEACH_TESTIMONIAL_1',
+        studentDetails: 'I18N_TEACH_STUDENT_DETAILS_1',
+        imageUrl: '/teach/riya.jpg',
+        imageUrlWebp: '/teach/riya.webp',
+        borderPresent: true,
+        altText: 'Photo of Riya',
+      },
+      {
+        quote: 'I18N_TEACH_TESTIMONIAL_2',
+        studentDetails: 'I18N_TEACH_STUDENT_DETAILS_2',
+        imageUrl: '/teach/awad.jpg',
+        imageUrlWebp: '/teach/awad.webp',
+        borderPresent: true,
+        altText: 'Photo of Awad',
+      },
+      {
+        quote: 'I18N_TEACH_TESTIMONIAL_3',
+        studentDetails: 'I18N_TEACH_STUDENT_DETAILS_3',
+        imageUrl: '/teach/himanshu.jpg',
+        imageUrlWebp: '/teach/himanshu.webp',
+        borderPresent: true,
+        altText: 'Photo of Himanshu',
+      },
+    ];
   }
 
   onClickAccessAndroidButton(): void {
@@ -178,5 +183,6 @@ export class TeachPageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('teachPage',
-  downgradeComponent({component: TeachPageComponent}));
+angular
+  .module('oppia')
+  .directive('teachPage', downgradeComponent({component: TeachPageComponent}));

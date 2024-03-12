@@ -16,8 +16,7 @@
  * @fileoverview Unit test for the Angular names service.
  */
 
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 
 describe('Angular names service', () => {
   describe('angular name service', () => {
@@ -29,7 +28,8 @@ describe('Angular names service', () => {
 
     it('should map interaction ID to correct RulesService', () => {
       expect(ans.getNameOfInteractionRulesService('TextInput')).toEqual(
-        'TextInputRulesService');
+        'TextInputRulesService'
+      );
     });
   });
 });

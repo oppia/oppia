@@ -17,13 +17,13 @@
  * permissions.
  */
 
-import { Component } from '@angular/core';
-import { CollectionRights } from 'domain/collection/collection-rights.model';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
+import {Component} from '@angular/core';
+import {CollectionRights} from 'domain/collection/collection-rights.model';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 
 @Component({
   selector: 'collection-permissions-card',
-  templateUrl: './collection-permissions-card.component.html'
+  templateUrl: './collection-permissions-card.component.html',
 })
 export class CollectionPermissionsCardComponent {
   // This property is initialized using Angular lifecycle hooks
@@ -40,7 +40,7 @@ export class CollectionPermissionsCardComponent {
   }
 
   ngOnInit(): void {
-    this.collectionRights = (
-      this.collectionEditorStateService.getCollectionRights());
+    this.collectionRights =
+      this.collectionEditorStateService.getCollectionRights();
   }
 }

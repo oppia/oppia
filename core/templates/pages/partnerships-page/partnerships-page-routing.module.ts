@@ -16,24 +16,19 @@
  * @fileoverview Routing module for partnerships page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { PartnershipsPageRootComponent } from './partnerships-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {PartnershipsPageRootComponent} from './partnerships-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: PartnershipsPageRootComponent
-  }
+    component: PartnershipsPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class PartnershipsPageRoutingModule {}

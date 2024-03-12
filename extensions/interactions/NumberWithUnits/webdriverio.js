@@ -17,35 +17,34 @@
  * Interaction in webdriverio.
  */
 
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 
-var customizeInteraction = function() {
+var customizeInteraction = function () {
   // There are no customizations.
 };
 
-var expectInteractionDetailsToMatch = async function(elem) {
+var expectInteractionDetailsToMatch = async function (elem) {
   expect(
-    await elem.$(
-      '<oppia-interactive-number-with-units>').isExisting()
+    await elem.$('<oppia-interactive-number-with-units>').isExisting()
   ).toBe(true);
 };
 
-var submitAnswer = async function(elem, answer) {
-  var submitBtn = elem.$('<oppia-interactive-number-with-units>').
-    $('<input>');
+var submitAnswer = async function (elem, answer) {
+  var submitBtn = elem.$('<oppia-interactive-number-with-units>').$('<input>');
   await action.setValue('Submit Button', submitBtn, answer + '\n');
 };
 
 var answerObjectType = 'NumberWithUnits';
 
-var testSuite = [{
-  interactionArguments: [],
-  ruleArguments: ['IsEquivalentTo', '2 km / hr'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['2 m / s'],
-  correctAnswers: ['2000 m / hr']
-}];
+var testSuite = [
+  {
+    interactionArguments: [],
+    ruleArguments: ['IsEquivalentTo', '2 km / hr'],
+    expectedInteractionDetails: [],
+    wrongAnswers: ['2 m / s'],
+    correctAnswers: ['2000 m / hr'],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
