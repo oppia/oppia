@@ -62,6 +62,9 @@ export default {
     BLOG_ADMIN: 'BLOG_ADMIN',
     BLOG_POST_EDITOR: 'BLOG_POST_EDITOR'
   } as const,
+  Breakpoints: {
+    MOBILE: 480
+  },
   images: {
     blogPostThumbnailImage: path.resolve(
       __dirname, '../images/blog-post-thumbnail.svg')

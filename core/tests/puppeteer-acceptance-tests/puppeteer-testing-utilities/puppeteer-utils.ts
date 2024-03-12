@@ -48,6 +48,7 @@ export class BaseUser {
     ];
 
     const headless = process.env.HEADLESS === 'true';
+    const mobile = process.env.MOBILE === 'true';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -68,7 +69,23 @@ export class BaseUser {
       .then(async(browser) => {
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({ width: 1920, height: 1080 });
+        if (mobile) {
+          // This is the default viewport and user agent settings for iPhone 6.
+          await this.page.setViewport({
+            width: 375,
+            height: 667,
+            deviceScaleFactor: 2,
+            isMobile: true,
+            hasTouch: true,
+            isLandscape: false
+          });
+          await this.page.setUserAgent(
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+            'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+            'Mobile/15A372 Safari/604.1');
+        } else {
+          await this.page.setViewport({width: 1920, height: 1080});
+        }
         this.page.on('dialog', async(dialog) => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -184,6 +201,28 @@ export class BaseUser {
    */
   async closeBrowser(): Promise<void> {
     await this.browserObject.close();
+  }
+
+  /**
+   * This function executes the given function while at a certain width
+   * breakpoint or another function if the breakpoint is not met.
+   */
+  async executeAtBreakpoint(
+      breakpoint: number,
+      callbacks: {
+        execute: () => Promise<void>;
+        otherwise?: () => Promise<void>;
+      }
+  ): Promise<void> {
+    const viewport = this.page.viewport();
+    if (viewport === null) {
+      throw new Error('Viewport is not defined.');
+    }
+    if (viewport.width <= breakpoint) {
+      await callbacks.execute();
+    } else if (callbacks.otherwise) {
+      await callbacks.otherwise();
+    }
   }
 }
 

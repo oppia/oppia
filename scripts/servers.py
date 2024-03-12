@@ -738,6 +738,7 @@ def managed_webdriverio_server(
 def managed_acceptance_tests_server(
     suite_name: str,
     headless: bool = False,
+    mobile: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the acceptance tests
@@ -747,6 +748,7 @@ def managed_acceptance_tests_server(
     Args:
         suite_name: str. The suite name whose tests should be run.
         headless: bool. Whether to run the acceptance tests in headless mode.
+        mobile: bool. Whether to run the acceptance tests in mobile mode.
         stdout: int. This parameter specifies the executed program's standard
             output file handle.
 
@@ -757,13 +759,20 @@ def managed_acceptance_tests_server(
         Exception. The suite_name is not in the list of the acceptance tests
             suite names.
     """
-    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+    if not mobile and suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+        raise Exception('Invalid suite name: %s' % suite_name)
+    if mobile and suite_name not in common.MOBILE_ACCEPTANCE_TESTS_SUITE_NAMES:
         raise Exception('Invalid suite name: %s' % suite_name)
 
     if headless:
         os.environ['HEADLESS'] = 'true'
     else:
         os.environ['HEADLESS'] = 'false'
+
+    if mobile:
+        os.environ['MOBILE'] = 'true'
+    else:
+        os.environ['MOBILE'] = 'false'
 
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')
