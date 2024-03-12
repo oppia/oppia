@@ -324,10 +324,10 @@ export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in assigning role of collaborator to any guest user.
    */
-  async assignUserToCollaboratorRole(user1: string): Promise<void> {
+  async assignUserToCollaboratorRole(username: string): Promise<void> {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
-    await this.type(addUserName, user1);
+    await this.type(addUserName, username);
     await this.clickOn(addRoleBar);
     await this.clickOn(collaboratorRoleOption);
     await this.clickOn(saveRole);
@@ -336,10 +336,10 @@ export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in assigning role of Playtester to guest user.
    */
-  async assignUserToPlaytesterRole(user2: string): Promise<void> {
+  async assignUserToPlaytesterRole(username: string): Promise<void> {
     await this.clickOn(editbutton);
     await this.clickOn(addUserName);
-    await this.type(addUserName, user2);
+    await this.type(addUserName, username);
     await this.clickOn(addRoleBar);
     await this.clickOn(playTesterRoleOption);
     await this.clickOn(saveRole);
