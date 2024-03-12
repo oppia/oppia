@@ -28,7 +28,7 @@ export default function isElementClickable(element: Element): boolean {
     return context.elementFromPoint(x, y);
   };
 
-  const getOverlappingRects = (
+  const getOverlappingRect = (
     element: Element,
     context: ShadowRoot | Document = document
   ): Element | null => {
@@ -45,13 +45,13 @@ export default function isElementClickable(element: Element): boolean {
     context: ShadowRoot | Document = document
   ): Element[] => {
     const overlappingElement = getOverlappingElement(element, context);
-    const overlappingRects = getOverlappingRects(element, context);
+    const overlappingRect = getOverlappingRect(element, context);
     const overlappingElements: Element[] = [];
     if (overlappingElement) {
       overlappingElements.push(overlappingElement);
     }
-    if (overlappingRects) {
-      overlappingElements.push(overlappingRects);
+    if (overlappingRect) {
+      overlappingElements.push(overlappingRect);
     }
     return overlappingElements;
   };
@@ -59,7 +59,7 @@ export default function isElementClickable(element: Element): boolean {
   const isOverlappingElementMatch = (
     element: Element,
     elementsFromPoint: Element[]
-  ) => {
+  ): boolean => {
     if (
       elementsFromPoint.some(
         elementFromPoint =>
@@ -94,8 +94,8 @@ export default function isElementClickable(element: Element): boolean {
     return isOverlappingElementMatch(element, shadowElementsFromPoint);
   };
 
-  const isElementInViewport = (element: Element) => {
-    const rect = element.getBoundingClientRect();
+  const isElementInViewport = (element: Element): boolean => {
+    const elementDimensions = element.getBoundingClientRect();
 
     const windowHeight =
       window.innerHeight || document.documentElement.clientHeight;
@@ -103,14 +103,16 @@ export default function isElementClickable(element: Element): boolean {
       window.innerWidth || document.documentElement.clientWidth;
 
     const verticalInView =
-      rect.top <= windowHeight && rect.top + rect.height > 0;
+      elementDimensions.top <= windowHeight &&
+      elementDimensions.top + elementDimensions.height > 0;
     const horizontalInView =
-      rect.left <= windowWidth && rect.left + rect.width > 0;
+      elementDimensions.left <= windowWidth &&
+      elementDimensions.left + elementDimensions.width > 0;
 
     return verticalInView && horizontalInView;
   };
 
-  const isClickable = (element: Element) => {
+  const isClickable = (element: Element): boolean => {
     return (
       (element as HTMLButtonElement).disabled !== true &&
       isElementInViewport(element) &&
