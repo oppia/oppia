@@ -16,45 +16,56 @@
  * @fileoverview Unit tests for learner dashboard parge.
  */
 
+import {
+  Collection,
+  CollectionBackendDict,
+} from 'domain/collection/collection.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 
-import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {ProfileSummary} from 'domain/user/profile-summary.model';
+import {LearnerDashboardPageComponent} from './learner-dashboard-page.component';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
 
-
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
-import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-
-import { AlertsService } from 'services/alerts.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ExplorationBackendDict, ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
-import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { SuggestionModalForLearnerDashboardService } from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
-import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
-import { UserService } from 'services/user.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NonExistentTopicsAndStories } from 'domain/learner_dashboard/non-existent-topics-and-stories.model';
-import { NonExistentCollections } from 'domain/learner_dashboard/non-existent-collections.model';
-import { NonExistentExplorations } from 'domain/learner_dashboard/non-existent-explorations.model';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { UserInfo } from 'domain/user/user-info.model';
+import {AlertsService} from 'services/alerts.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {
+  ExplorationBackendDict,
+  ExplorationObjectFactory,
+} from 'domain/exploration/ExplorationObjectFactory';
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {SuggestionModalForLearnerDashboardService} from './suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import {SortByPipe} from 'filters/string-utility-filters/sort-by.pipe';
+import {UserService} from 'services/user.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {NonExistentTopicsAndStories} from 'domain/learner_dashboard/non-existent-topics-and-stories.model';
+import {NonExistentCollections} from 'domain/learner_dashboard/non-existent-collections.model';
+import {NonExistentExplorations} from 'domain/learner_dashboard/non-existent-explorations.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {PageTitleService} from 'services/page-title.service';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
+import {UserInfo} from 'domain/user/user-info.model';
 
 @Pipe({name: 'slice'})
 class MockSlicePipe {
@@ -89,8 +100,8 @@ class MockPlatformFeatureService {
   get status(): object {
     return {
       ShowRedesignedLearnerDashboard: {
-        isEnabled: false
-      }
+        isEnabled: false,
+      },
     };
   }
 }
@@ -328,7 +339,7 @@ describe('Learner dashboard page', () => {
           },
           {
             provide: PlatformFeatureService,
-            useClass: MockPlatformFeatureService
+            useClass: MockPlatformFeatureService,
           },
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
@@ -364,7 +375,8 @@ describe('Learner dashboard page', () => {
       pageTitleService = TestBed.inject(PageTitleService);
       urlService = TestBed.inject(UrlService);
       learnerGroupBackendApiService = TestBed.inject(
-        LearnerGroupBackendApiService);
+        LearnerGroupBackendApiService
+      );
       platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       const mockElement = document.createElement('div');
@@ -683,13 +695,11 @@ describe('Learner dashboard page', () => {
     });
 
     it('should get show_redesigned_learner_dashboard flag', () => {
-      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue(
-        {
-          ShowRedesignedLearnerDashboard: {
-            isEnabled: false
-          }
-        }
-      );
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        ShowRedesignedLearnerDashboard: {
+          isEnabled: false,
+        },
+      });
     });
   });
 
@@ -721,12 +731,12 @@ describe('Learner dashboard page', () => {
           PageTitleService,
           {
             provide: TranslateService,
-            useClass: MockTranslateService
+            useClass: MockTranslateService,
           },
           {
             provide: PlatformFeatureService,
-            useClass: MockPlatformFeatureService
-          }
+            useClass: MockPlatformFeatureService,
+          },
         ],
         schemas: [NO_ERRORS_SCHEMA],
       }).compileComponents();

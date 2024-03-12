@@ -16,34 +16,40 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { trigger, state, style, transition,
-  animate, group } from '@angular/animations';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+  group,
+} from '@angular/animations';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
-import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
-import { AlertsService } from 'services/alerts.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {AppConstants} from 'app.constants';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {ProfileSummary} from 'domain/user/profile-summary.model';
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import {SuggestionModalForLearnerDashboardService} from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import {AlertsService} from 'services/alerts.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PageTitleService} from 'services/page-title.service';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './learner-dashboard-page.component.css';
 
