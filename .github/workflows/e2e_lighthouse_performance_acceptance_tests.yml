@@ -11,16 +11,15 @@ on:
       - develop
       - release-*
 
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
-#   cancel-in-progress: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.head_branch }}
+  cancel-in-progress: true
 
 jobs:
   e2e_test:
     runs-on:  ${{ matrix.os }}
     
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-22.04]
         suite:
