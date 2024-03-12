@@ -223,8 +223,8 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         with self.oppia_is_dockerized_swap:
             with self.popen_swap_success:
                 with self.install_swap, self.install_mypy_prereq_swap_success:
-                    process = run_mypy_checks.main(args=['--files',
-                                                         'file1.py'])
+                    process = run_mypy_checks.main(args=[
+                        '--files', 'file1.py'])
                     self.assertEqual(process, 0)
 
     def test_main_without_mypy_errors(self) -> None:
