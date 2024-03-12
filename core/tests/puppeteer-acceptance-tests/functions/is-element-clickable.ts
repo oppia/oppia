@@ -56,7 +56,7 @@ export default function isElementClickable(element: Element): boolean {
     return overlappingElements;
   };
 
-  const isOverlappingElementsMatching = (
+  const isOverlappingElementsMatch = (
     targetElement: Element,
     elements: Element[]
   ): boolean => {
@@ -86,7 +86,7 @@ export default function isElementClickable(element: Element): boolean {
       return false;
     }
 
-    return isOverlappingElementsMatching(targetElement, shadowElements);
+    return isOverlappingElementsMatch(targetElement, shadowElements);
   };
 
   const isElementInViewport = (element: Element): boolean => {
@@ -111,7 +111,7 @@ export default function isElementClickable(element: Element): boolean {
     return (
       (element as HTMLButtonElement).disabled !== true &&
       isElementInViewport(element) &&
-      isOverlappingElementsMatching(element, getOverlappingElements(element))
+      isOverlappingElementsMatch(element, getOverlappingElements(element))
     );
   };
 
