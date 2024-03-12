@@ -331,6 +331,14 @@ const routes: Route[] = [
     loadChildren: () => import(
       'pages/blog-post-page/blog-post-page.module')
       .then(m => m.BlogPostPageModule)
+  },
+  {
+    path:
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
+    loadChildren: () => import(
+      'pages/skill-editor-page/skill-editor-page.module')
+      .then(m => m.SkillEditorPageModule),
+    canActivate: [IsLoggedInGuard]
   }
 ];
 

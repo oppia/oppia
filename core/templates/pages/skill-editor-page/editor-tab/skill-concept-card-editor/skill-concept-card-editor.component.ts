@@ -18,7 +18,6 @@
 
 import { CdkDragSortEvent, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subscription } from 'rxjs';
 import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
@@ -238,8 +237,3 @@ export class SkillConceptCardEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive('oppiaSkillConceptCardEditor',
-downgradeComponent({
-  component: SkillConceptCardEditorComponent
-}) as angular.IDirectiveFactory);

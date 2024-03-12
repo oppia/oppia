@@ -29,7 +29,6 @@ import { TopicsAndSkillsDashboardBackendApiService, TopicsAndSkillDashboardData 
 import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -187,8 +186,3 @@ implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillPrerequisiteSkillsEditor', downgradeComponent({
-    component: SkillPrerequisiteSkillsEditorComponent
-  }) as angular.IDirectiveFactory);

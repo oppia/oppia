@@ -451,6 +451,7 @@ import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard'
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import { SkillEditorAccessGuard } from 'pages/skill-editor-page/skill-editor-access.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
 
 export const angularServices: [string, Type<{}>][] = [
@@ -795,6 +796,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['SidebarStatusService', SidebarStatusService],
   ['SignupPageBackendApiService', SignupPageBackendApiService],
   ['SiteAnalyticsService', SiteAnalyticsService],
+  ['SkillEditorAccessGuard', SkillEditorAccessGuard],
   ['SkillBackendApiService', SkillBackendApiService],
   ['SkillCreationService', SkillCreationService],
   ['SkillCreationBackendApiService', SkillCreationBackendApiService],
