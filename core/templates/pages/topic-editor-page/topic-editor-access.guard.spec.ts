@@ -16,14 +16,19 @@
  * @fileoverview Tests for TopicEditorAccessGuard.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {
+  ActivatedRouteSnapshot,
+  Router,
+  RouterStateSnapshot,
+  NavigationExtras,
+} from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { TopicEditorAccessGuard } from './topic-editor-access.guard';
+import {AppConstants} from 'app.constants';
+import {UserInfo} from 'domain/user/user-info.model';
+import {UserService} from 'services/user.service';
+import {TopicEditorAccessGuard} from './topic-editor-access.guard';
 
 class MockRouter {
   navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
@@ -39,8 +44,11 @@ describe('Topic editor access guard', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [UserService,
-        { provide: Router, useClass: MockRouter }, TopicEditorAccessGuard],
+      providers: [
+        UserService,
+        {provide: Router, useClass: MockRouter},
+        TopicEditorAccessGuard,
+      ],
     }).compileComponents();
 
     topicEditorAccessGuard = TestBed.inject(TopicEditorAccessGuard);
@@ -48,42 +56,43 @@ describe('Topic editor access guard', () => {
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 401 page if user is not curriculum admin',
-    async() => {
-      const getUserInfoAsyncSpy = spyOn(
-        userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(UserInfo.createDefault())
-      );
-      const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+  it('should redirect user to 401 page if user is not curriculum admin', async () => {
+    const getUserInfoAsyncSpy = spyOn(
+      userService,
+      'getUserInfoAsync'
+    ).and.returnValue(Promise.resolve(UserInfo.createDefault()));
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-      const canActivate = await topicEditorAccessGuard.canActivate(
-        {} as ActivatedRouteSnapshot,
-        {} as RouterStateSnapshot
-      );
+    const canActivate = await topicEditorAccessGuard.canActivate(
+      {} as ActivatedRouteSnapshot,
+      {} as RouterStateSnapshot
+    );
 
-      expect(canActivate).toBeFalse();
-      expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-      expect(navigateSpy).toHaveBeenCalledWith(
-        [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]
-      );
-    });
+    expect(canActivate).toBeFalse();
+    expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+    ]);
+  });
 
-  it('should allow user to access the page if user is curriculum admin',
-    async() => {
-      const getUserInfoAsyncSpy = spyOn(
-        userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(new UserInfo(
-          [], false, true, false, false, false, '', '', '', true))
-      );
-      const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+  it('should allow user to access the page if user is curriculum admin', async () => {
+    const getUserInfoAsyncSpy = spyOn(
+      userService,
+      'getUserInfoAsync'
+    ).and.returnValue(
+      Promise.resolve(
+        new UserInfo([], false, true, false, false, false, '', '', '', true)
+      )
+    );
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-      const canActivate = await topicEditorAccessGuard.canActivate(
-          {} as ActivatedRouteSnapshot,
-          {} as RouterStateSnapshot
-      );
+    const canActivate = await topicEditorAccessGuard.canActivate(
+      {} as ActivatedRouteSnapshot,
+      {} as RouterStateSnapshot
+    );
 
-      expect(canActivate).toBeTrue();
-      expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-      expect(navigateSpy).not.toHaveBeenCalled();
-    });
+    expect(canActivate).toBeTrue();
+    expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
+    expect(navigateSpy).not.toHaveBeenCalled();
+  });
 });

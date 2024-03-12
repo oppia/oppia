@@ -58,8 +58,8 @@ import {CreateNewSkillModalService} from './services/create-new-skill-modal.serv
       {
         path: '',
         component: TopicEditorPageRootComponent,
-        canActivate: [TopicEditorAccessGuard]
-      }
+        canActivate: [TopicEditorAccessGuard],
+      },
     ]),
   ],
   declarations: [
@@ -80,7 +80,7 @@ import {CreateNewSkillModalService} from './services/create-new-skill-modal.serv
     TopicEditorTabComponent,
     TopicEditorPageComponent,
     TopicEditorPageRootComponent,
-    SubtopicEditorTabComponent
+    SubtopicEditorTabComponent,
   ],
   entryComponents: [
     ChangeSubtopicAssignmentModalComponent,
@@ -105,6 +105,6 @@ import {CreateNewSkillModalService} from './services/create-new-skill-modal.serv
     StoryCreationBackendApiService,
     EntityCreationService,
     CreateNewSkillModalService,
-  ]
+  ],
 })
 export class TopicEditorPageModule {}

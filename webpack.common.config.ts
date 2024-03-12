@@ -119,7 +119,7 @@ module.exports = {
     subtopic_viewer:
       commonPrefix +
       '/pages/subtopic-viewer-page/subtopic-viewer-page.import.ts',
-    topics_and_skills_dashboard: (
+    topics_and_skills_dashboard:
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
       'topics-and-skills-dashboard-page.import.ts',

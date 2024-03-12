@@ -14,16 +14,16 @@
 
 /**
  * @fileoverview Unit tests for Topic Editor page root component.
-*/
+ */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-import { TopicEditorPageRootComponent } from './topic-editor-page-root.component';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {TopicEditorPageRootComponent} from './topic-editor-page-root.component';
 
 describe('TopicEditorPageRootComponent', () => {
   let component: TopicEditorPageRootComponent;
@@ -43,11 +43,13 @@ describe('TopicEditorPageRootComponent', () => {
 
   it('should have correct title', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE
+    );
   });
 
   it('should have correct meta tags', () => {
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.META
+    );
   });
 });
