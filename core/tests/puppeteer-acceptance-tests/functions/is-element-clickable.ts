@@ -117,9 +117,7 @@ export default function isElementClickable(element: Element): boolean {
 
   if (!isElementInViewport(element)) {
     element.scrollIntoView({block: 'nearest', inline: 'nearest'});
-
-    return isClickable(element);
   }
 
-  return true;
+  return isClickable(element);
 }
