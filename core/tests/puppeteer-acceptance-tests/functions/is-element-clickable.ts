@@ -19,33 +19,33 @@
 export default function isElementClickable(element: Element): boolean {
   const getOverlappingElement = (
     element: Element,
-    context: ShadowRoot | Document = document
+    parent: ShadowRoot | Document = document
   ): Element | null => {
     const elementDimensions = element.getBoundingClientRect();
     const x = elementDimensions.left + element.clientWidth / 2;
     const y = elementDimensions.top + element.clientHeight / 2;
 
-    return context.elementFromPoint(x, y);
+    return parent.elementFromPoint(x, y);
   };
 
   const getOverlappingRect = (
     element: Element,
-    context: ShadowRoot | Document = document
+    parent: ShadowRoot | Document = document
   ): Element | null => {
     const rects = element.getClientRects();
     const rect = rects[0];
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
 
-    return context.elementFromPoint(x, y);
+    return parent.elementFromPoint(x, y);
   };
 
   const getOverlappingElements = (
     element: Element,
-    context: ShadowRoot | Document = document
+    parent: ShadowRoot | Document = document
   ): Element[] => {
-    const overlappingElement = getOverlappingElement(element, context);
-    const overlappingRect = getOverlappingRect(element, context);
+    const overlappingElement = getOverlappingElement(element, parent);
+    const overlappingRect = getOverlappingRect(element, parent);
     const overlappingElements: Element[] = [];
     if (overlappingElement) {
       overlappingElements.push(overlappingElement);
@@ -56,42 +56,37 @@ export default function isElementClickable(element: Element): boolean {
     return overlappingElements;
   };
 
-  const isOverlappingElementMatch = (
-    element: Element,
-    elementsFromPoint: Element[]
+  const isOverlappingElementsMatching = (
+    targetElement: Element,
+    elements: Element[]
   ): boolean => {
     if (
-      elementsFromPoint.some(
-        elementFromPoint =>
-          elementFromPoint === element || element.contains(elementFromPoint)
-      )
+      elements.some(el => el === targetElement || targetElement.contains(el))
     ) {
       return true;
     }
 
-    let elementsWithShadowRoot = [...new Set(elementsFromPoint)];
-    elementsWithShadowRoot = elementsWithShadowRoot.filter(
-      e => e && e.shadowRoot && e.shadowRoot.elementFromPoint
+    let elementsWithShadow = [...new Set(elements)];
+    elementsWithShadow = elementsWithShadow.filter(
+      el => el && el.shadowRoot && el.shadowRoot.elementFromPoint
     );
 
-    let shadowElementsFromPoint: Element[] = [];
-    for (const shadowElement of elementsWithShadowRoot) {
-      if (shadowElement.shadowRoot) {
-        shadowElementsFromPoint.push(
-          ...getOverlappingElements(element, shadowElement.shadowRoot)
+    let shadowElements: Element[] = [];
+    for (const shadowEl of elementsWithShadow) {
+      if (shadowEl.shadowRoot) {
+        shadowElements.push(
+          ...getOverlappingElements(targetElement, shadowEl.shadowRoot)
         );
       }
     }
-    shadowElementsFromPoint = [...new Set(shadowElementsFromPoint)];
-    shadowElementsFromPoint = shadowElementsFromPoint.filter(
-      e => !elementsFromPoint.includes(e)
-    );
+    shadowElements = [...new Set(shadowElements)];
+    shadowElements = shadowElements.filter(el => !elements.includes(el));
 
-    if (shadowElementsFromPoint.length === 0) {
+    if (shadowElements.length === 0) {
       return false;
     }
 
-    return isOverlappingElementMatch(element, shadowElementsFromPoint);
+    return isOverlappingElementsMatching(targetElement, shadowElements);
   };
 
   const isElementInViewport = (element: Element): boolean => {
@@ -116,11 +111,11 @@ export default function isElementClickable(element: Element): boolean {
     return (
       (element as HTMLButtonElement).disabled !== true &&
       isElementInViewport(element) &&
-      isOverlappingElementMatch(element, getOverlappingElements(element))
+      isOverlappingElementsMatching(element, getOverlappingElements(element))
     );
   };
 
-  if (!isClickable(element)) {
+  if (!isElementInViewport(element)) {
     element.scrollIntoView({block: 'nearest', inline: 'nearest'});
 
     return isClickable(element);
