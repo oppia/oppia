@@ -23,8 +23,8 @@ import os
 import subprocess
 import sys
 
-from core.tests import test_utils
 from core import feconf
+from core.tests import test_utils
 from typing import List, Optional
 
 from . import run_lint_checks
