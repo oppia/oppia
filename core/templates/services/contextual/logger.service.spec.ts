@@ -15,8 +15,8 @@
 /**
  * @fileoverview Unit tests for LoggerService.
  */
-import { TestBed } from '@angular/core/testing';
-import { LoggerService } from 'services/contextual/logger.service';
+import {TestBed} from '@angular/core/testing';
+import {LoggerService} from 'services/contextual/logger.service';
 
 describe('Logger Service', () => {
   let ls: LoggerService;

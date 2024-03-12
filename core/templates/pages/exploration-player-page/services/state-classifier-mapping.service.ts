@@ -16,13 +16,13 @@
  * @fileoverview Services for mapping state names to classifier details.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppService } from 'services/app.service';
-import { Classifier } from 'domain/classifier/classifier.model';
-import { ClassifierDataBackendApiService } from 'services/classifier-data-backend-api.service';
-import { LoggerService } from 'services/contextual/logger.service';
+import {AppService} from 'services/app.service';
+import {Classifier} from 'domain/classifier/classifier.model';
+import {ClassifierDataBackendApiService} from 'services/classifier-data-backend-api.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 interface StateClassifierMapping {
   // The classifier corresponding to a state will be null if machine learning
@@ -31,7 +31,7 @@ interface StateClassifierMapping {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateClassifierMappingService {
   _explorationId!: string;
@@ -41,7 +41,8 @@ export class StateClassifierMappingService {
   constructor(
     private appService: AppService,
     private classifierDataService: ClassifierDataBackendApiService,
-    private loggerService: LoggerService) {}
+    private loggerService: LoggerService
+  ) {}
 
   init(explorationId: string, explorationVersion: number): void {
     this.loggerService.info('Initializing state classifier mapping service');
@@ -55,14 +56,20 @@ export class StateClassifierMappingService {
       this.stateClassifierMapping[stateName] = null;
       this.loggerService.info('Fetching classifier data for ' + stateName);
       try {
-        const classifier = (
+        const classifier =
           await this.classifierDataService.getClassifierDataAsync(
-            this._explorationId, this._explorationVersion, stateName));
+            this._explorationId,
+            this._explorationVersion,
+            stateName
+          );
         this.stateClassifierMapping[stateName] = classifier;
       } catch (error) {
         this.loggerService.error(
-          'Fetching classifier data for ' + stateName +
-          ' failed with error: ' + error);
+          'Fetching classifier data for ' +
+            stateName +
+            ' failed with error: ' +
+            error
+        );
       }
     }
   }
@@ -71,16 +78,20 @@ export class StateClassifierMappingService {
     if (!this.appService.isMachineLearningClassificationEnabled()) {
       return false;
     }
-    return this.stateClassifierMapping &&
-           stateName in this.stateClassifierMapping &&
-           this.stateClassifierMapping[stateName] !== null;
+    return (
+      this.stateClassifierMapping &&
+      stateName in this.stateClassifierMapping &&
+      this.stateClassifierMapping[stateName] !== null
+    );
   }
 
   // Function returns null if Machine Learning Classification is not enabled.
   getClassifier(stateName: string): Classifier | null {
-    if (this.stateClassifierMapping[stateName] &&
-        this.appService.isMachineLearningClassificationEnabled() &&
-        this.hasClassifierData(stateName)) {
+    if (
+      this.stateClassifierMapping[stateName] &&
+      this.appService.isMachineLearningClassificationEnabled() &&
+      this.hasClassifierData(stateName)
+    ) {
       return this.stateClassifierMapping[stateName];
     }
     return null;
@@ -88,11 +99,16 @@ export class StateClassifierMappingService {
 
   // NOTE TO DEVELOPERS: This method should only be used for tests.
   testOnlySetClassifierData(
-      stateName: string, classifierData: Classifier): void {
+    stateName: string,
+    classifierData: Classifier
+  ): void {
     this.stateClassifierMapping[stateName] = classifierData;
   }
 }
 
-angular.module('oppia').factory(
-  'StateClassifierMappingService',
-  downgradeInjectable(StateClassifierMappingService));
+angular
+  .module('oppia')
+  .factory(
+    'StateClassifierMappingService',
+    downgradeInjectable(StateClassifierMappingService)
+  );

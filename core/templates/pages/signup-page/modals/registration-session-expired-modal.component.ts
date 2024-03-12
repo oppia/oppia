@@ -16,14 +16,14 @@
  * @fileoverview Component for registration session expired modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { UserService } from 'services/user.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'oppia-registration-session-expired-modal',
-  templateUrl: './registration-session-expired-modal.component.html'
+  templateUrl: './registration-session-expired-modal.component.html',
 })
 export class RegistrationSessionExpiredModalComponent {
   constructor(
@@ -33,7 +33,7 @@ export class RegistrationSessionExpiredModalComponent {
   ) {}
 
   continueRegistration(): void {
-    this.userService.getLoginUrlAsync().then((loginUrl) => {
+    this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;

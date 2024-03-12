@@ -16,9 +16,9 @@
  * @fileoverview Tests for the topic dependency graph viz modal component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TopicsDependencyGraphModalComponent } from './topic-dependency-graph-viz-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TopicsDependencyGraphModalComponent} from './topic-dependency-graph-viz-modal.component';
 
 describe('Topic Dependency Graph Visualization Modal Component', () => {
   let fixture: ComponentFixture<TopicsDependencyGraphModalComponent>;
@@ -28,12 +28,8 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TopicsDependencyGraphModalComponent
-      ],
-      providers: [
-        NgbActiveModal,
-      ]
+      declarations: [TopicsDependencyGraphModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 
@@ -66,7 +62,7 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
       2: ['1'],
       3: ['1'],
       4: ['2'],
-      5: ['3']
+      5: ['3'],
     };
     const expectedGraphData = {
       finalStateIds: ['4', '5'],
@@ -76,23 +72,26 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
           source: '1',
           target: '2',
           linkProperty: null,
-          connectsDestIfStuck: false
-        }, {
+          connectsDestIfStuck: false,
+        },
+        {
           source: '1',
           target: '3',
           linkProperty: null,
-          connectsDestIfStuck: false
-        }, {
+          connectsDestIfStuck: false,
+        },
+        {
           source: '2',
           target: '4',
           linkProperty: null,
-          connectsDestIfStuck: false
-        }, {
+          connectsDestIfStuck: false,
+        },
+        {
           source: '3',
           target: '5',
           linkProperty: null,
-          connectsDestIfStuck: false
-        }
+          connectsDestIfStuck: false,
+        },
       ],
       nodes: {
         1: 'Dummy Topic 1',
@@ -100,7 +99,7 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
         3: 'Dummy Topic 3',
         4: 'Dummy Topic 4',
         5: 'Dummy Topic 5',
-      }
+      },
     };
 
     componentInstance.ngOnInit();
@@ -110,7 +109,8 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
 
   it(
     'should be able to create graph data from the topics prerequisite ' +
-    'when all topics can be initial topic ID', () => {
+      'when all topics can be initial topic ID',
+    () => {
       componentInstance.topicIdToTopicName = {
         1: 'Dummy Topic 1',
         2: 'Dummy Topic 2',
@@ -123,7 +123,7 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
         2: ['1'],
         3: ['2'],
         4: ['3'],
-        5: ['4']
+        5: ['4'],
       };
       const expectedGraphData = {
         finalStateIds: [],
@@ -133,28 +133,32 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
             source: '5',
             target: '1',
             linkProperty: null,
-            connectsDestIfStuck: false
-          }, {
+            connectsDestIfStuck: false,
+          },
+          {
             source: '1',
             target: '2',
             linkProperty: null,
-            connectsDestIfStuck: false
-          }, {
+            connectsDestIfStuck: false,
+          },
+          {
             source: '2',
             target: '3',
             linkProperty: null,
-            connectsDestIfStuck: false
-          }, {
+            connectsDestIfStuck: false,
+          },
+          {
             source: '3',
             target: '4',
             linkProperty: null,
-            connectsDestIfStuck: false
-          }, {
+            connectsDestIfStuck: false,
+          },
+          {
             source: '4',
             target: '5',
             linkProperty: null,
-            connectsDestIfStuck: false
-          }
+            connectsDestIfStuck: false,
+          },
         ],
         nodes: {
           1: 'Dummy Topic 1',
@@ -162,16 +166,18 @@ describe('Topic Dependency Graph Visualization Modal Component', () => {
           3: 'Dummy Topic 3',
           4: 'Dummy Topic 4',
           5: 'Dummy Topic 5',
-        }
+        },
       };
 
       componentInstance.ngOnInit();
 
       expect(componentInstance.graphData).toEqual(expectedGraphData);
-    });
+    }
+  );
 
   it('should get truncated label with truncate filter', () => {
-    expect(componentInstance.getTruncatedLabel(
-      'This is a label for node 3')).toBe('This is a la...');
+    expect(
+      componentInstance.getTruncatedLabel('This is a label for node 3')
+    ).toBe('This is a la...');
   });
 });

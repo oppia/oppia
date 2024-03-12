@@ -18,8 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // learner-params.service.ts is upgraded to Angular 8.
-import { LearnerParamsService } from
-  'pages/exploration-player-page/services/learner-params.service';
+import {LearnerParamsService} from 'pages/exploration-player-page/services/learner-params.service';
 // ^^^ This block is to be removed.
 
 describe('Learner parameters service', () => {
@@ -33,16 +32,16 @@ describe('Learner parameters service', () => {
     it('should correctly initialize parameters', () => {
       expect(learnerParamsService.getAllParams()).toEqual({});
       learnerParamsService.init({
-        a: 'b'
+        a: 'b',
       });
       expect(learnerParamsService.getAllParams()).toEqual({
-        a: 'b'
+        a: 'b',
       });
     });
 
     it('should correctly get and set parameters', () => {
       learnerParamsService.init({
-        a: 'b'
+        a: 'b',
       });
       expect(learnerParamsService.getValue('a')).toEqual('b');
       learnerParamsService.setValue('a', 'c');
@@ -51,7 +50,7 @@ describe('Learner parameters service', () => {
 
     it('should not get an invalid parameter', () => {
       learnerParamsService.init({
-        a: 'b'
+        a: 'b',
       });
       expect(() => {
         learnerParamsService.getValue('b');
@@ -60,7 +59,7 @@ describe('Learner parameters service', () => {
 
     it('should not set an invalid parameter', () => {
       learnerParamsService.init({
-        a: 'b'
+        a: 'b',
       });
       expect(() => {
         learnerParamsService.setValue('b', 'c');

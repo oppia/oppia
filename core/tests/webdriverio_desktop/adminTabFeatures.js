@@ -20,51 +20,61 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 
-describe('Admin Page', function() {
+describe('Admin Page', function () {
   var adminPage = null;
 
-  beforeAll(function() {
+  beforeAll(function () {
     adminPage = new AdminPage.AdminPage();
   });
 
-  it('should allow assigning roles and show them', async function() {
+  it('should allow assigning roles and show them', async function () {
     await users.createUser('moderator1@adminTab.com', 'moderator1');
     await users.createUser('moderator2@adminTab.com', 'moderator2');
     await users.createUser(
-      'collectionEdtior1@adminTab.com', 'collectionEditor1');
+      'collectionEdtior1@adminTab.com',
+      'collectionEditor1'
+    );
     await users.createAndLoginSuperAdminUser(
-      'management@adminTab.com', 'management');
+      'management@adminTab.com',
+      'management'
+    );
 
     await adminPage.expectUserRolesToMatch('moderator1', ['full user']);
     await adminPage.addRole('moderator1', 'moderator');
-    await adminPage.expectUserRolesToMatch(
-      'moderator1', ['full user', 'moderator']);
+    await adminPage.expectUserRolesToMatch('moderator1', [
+      'full user',
+      'moderator',
+    ]);
 
     await adminPage.expectUserRolesToMatch('moderator2', ['full user']);
     await adminPage.addRole('moderator2', 'moderator');
-    await adminPage.expectUserRolesToMatch(
-      'moderator2', ['full user', 'moderator']);
+    await adminPage.expectUserRolesToMatch('moderator2', [
+      'full user',
+      'moderator',
+    ]);
 
-    await adminPage.expectUserRolesToMatch(
-      'collectionEditor1', ['full user']);
+    await adminPage.expectUserRolesToMatch('collectionEditor1', ['full user']);
     await adminPage.addRole('collectionEditor1', 'collection editor');
-    await adminPage.expectUserRolesToMatch(
-      'collectionEditor1', ['full user', 'collection editor']);
+    await adminPage.expectUserRolesToMatch('collectionEditor1', [
+      'full user',
+      'collection editor',
+    ]);
 
     await users.logout();
   });
 
-  it('should allow assigning role of translation coordinator',
-    async function() {
-      await users.createUser('user1@admintab.com', 'user1');
-      await users.login('management@adminTab.com');
+  it('should allow assigning role of translation coordinator', async function () {
+    await users.createUser('user1@admintab.com', 'user1');
+    await users.login('management@adminTab.com');
 
-      await adminPage.makeUserTranslationCoordinator('user1', 'English');
-      await adminPage.expectUserRolesToMatch(
-        'user1', ['full user', 'translation coordinator']);
-    });
+    await adminPage.makeUserTranslationCoordinator('user1', 'English');
+    await adminPage.expectUserRolesToMatch('user1', [
+      'full user',
+      'translation coordinator',
+    ]);
+  });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

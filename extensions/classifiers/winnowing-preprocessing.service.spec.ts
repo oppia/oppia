@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for the winnowing preprocessing functions.
  */
 
-import { WinnowingPreprocessingService } from
-  'classifiers/winnowing-preprocessing.service';
+import {WinnowingPreprocessingService} from 'classifiers/winnowing-preprocessing.service';
 
 describe('Winnowing preprocessing functions', () => {
   describe('Test winnowing preprocessing functions', () => {
@@ -28,7 +27,9 @@ describe('Winnowing preprocessing functions', () => {
 
     it('should generate k-gram hashes correctly.', () => {
       var tokenToId = {
-        a: 0, b: 1, c: 2
+        a: 0,
+        b: 1,
+        c: 2,
       };
       var tokens = ['a', 'b', 'a', 'c', 'b'];
       var expectedHashes = [3, 11, 7];
@@ -40,7 +41,11 @@ describe('Winnowing preprocessing functions', () => {
 
     it('should obtain correct fingerprint from hashes', () => {
       var kGramHashes = [3, 11, 7, 10, 8, 6];
-      var expectedFingerprint = [[3, 0], [7, 2], [6, 5]];
+      var expectedFingerprint = [
+        [3, 0],
+        [7, 2],
+        [6, 5],
+      ];
       var fingerprint = wps.getFingerprintFromHashes(kGramHashes, 5, 3);
 
       expect(fingerprint.length).toEqual(3);

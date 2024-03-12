@@ -16,21 +16,22 @@
  * @fileoverview Controller for keyboard shortcut help modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlService } from 'services/contextual/url.service';
-import { ContextService } from 'services/context.service';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlService} from 'services/contextual/url.service';
+import {ContextService} from 'services/context.service';
 
 @Component({
   selector: 'keyboard-shortcut-help-modal',
   templateUrl: './keyboard-shortcut-help-modal.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class KeyboardShortcutHelpModalComponent implements OnInit {
   constructor(
     private activeModal: NgbActiveModal,
     private urlService: UrlService,
-    private contextService: ContextService) {}
+    private contextService: ContextService
+  ) {}
 
   KEYBOARD_SHORTCUTS = {};
 

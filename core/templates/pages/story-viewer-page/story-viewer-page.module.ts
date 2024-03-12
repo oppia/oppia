@@ -16,32 +16,28 @@
  * @fileoverview Module for the story viewer page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { StoryViewerNavbarBreadcrumbComponent } from './navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
-import { StoryViewerNavbarPreLogoActionComponent } from './navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
-import { StoryViewerPageComponent } from './story-viewer-page.component';
-import { StoryViewerPageRootComponent } from './story-viewer-page-root.component';
-import { CommonModule } from '@angular/common';
-import { StoryViewerPageRoutingModule } from './story-viewer-page-routing.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {StoryViewerNavbarBreadcrumbComponent} from './navbar-breadcrumb/story-viewer-navbar-breadcrumb.component';
+import {StoryViewerNavbarPreLogoActionComponent} from './navbar-pre-logo-action/story-viewer-navbar-pre-logo-action.component';
+import {StoryViewerPageComponent} from './story-viewer-page.component';
+import {StoryViewerPageRootComponent} from './story-viewer-page-root.component';
+import {CommonModule} from '@angular/common';
+import {StoryViewerPageRoutingModule} from './story-viewer-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    StoryViewerPageRoutingModule
-  ],
+  imports: [CommonModule, SharedComponentsModule, StoryViewerPageRoutingModule],
   declarations: [
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
     StoryViewerPageComponent,
-    StoryViewerPageRootComponent
+    StoryViewerPageRootComponent,
   ],
   entryComponents: [
     StoryViewerNavbarBreadcrumbComponent,
     StoryViewerNavbarPreLogoActionComponent,
     StoryViewerPageComponent,
-    StoryViewerPageRootComponent
-  ]
+    StoryViewerPageRootComponent,
+  ],
 })
 export class StoryViewerPageModule {}

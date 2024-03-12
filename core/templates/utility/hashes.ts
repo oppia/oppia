@@ -17,7 +17,6 @@
  * process.
  */
 
-
 // Relative path used as an work around to get the angular compiler and webpack
 // build to not complain.
 // Webpack absolute import is just "hashes.json".
@@ -29,5 +28,5 @@ export default {
   _hashes: resourceHashes as Record<string, string>,
   get hashes(): Record<string, string> {
     return resourceHashes as Record<string, string>;
-  }
+  },
 };

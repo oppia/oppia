@@ -16,7 +16,10 @@
  * @fileoverview unit tests for the local save services.
  */
 
-import { ExplorationDraft, ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import {
+  ExplorationDraft,
+  ExplorationChange,
+} from 'domain/exploration/exploration-draft.model';
 
 describe('ExplorationDraft model', () => {
   describe('exploration draft model', () => {
@@ -24,12 +27,12 @@ describe('ExplorationDraft model', () => {
     const changeList: ExplorationChange[] = [];
     const draftDict = {
       draftChanges: changeList,
-      draftChangeListId: draftChangeListId
+      draftChangeListId: draftChangeListId,
     };
     let draft: ExplorationDraft;
 
     beforeEach(() => {
-      draft = (ExplorationDraft.createFromLocalStorageDict(draftDict));
+      draft = ExplorationDraft.createFromLocalStorageDict(draftDict);
     });
 
     it('should determine if the draft is valid', () => {
@@ -42,8 +45,9 @@ describe('ExplorationDraft model', () => {
     });
 
     it('should create a valid local storage dict', () => {
-      expect(ExplorationDraft.toLocalStorageDict(
-        changeList, draftChangeListId)).toEqual(draftDict);
+      expect(
+        ExplorationDraft.toLocalStorageDict(changeList, draftChangeListId)
+      ).toEqual(draftDict);
     });
   });
 });

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for AudioLanguage model.
  */
 
-import { AudioLanguage } from 'domain/utilities/audio-language.model';
+import {AudioLanguage} from 'domain/utilities/audio-language.model';
 
 describe('AudioLanguage model', () => {
   let audioLanguage: AudioLanguage;

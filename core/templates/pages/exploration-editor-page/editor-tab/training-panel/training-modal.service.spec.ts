@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for TrainingModalService.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { AlertsService } from 'services/alerts.service';
-import { TrainingModalService } from './training-modal.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { EventEmitter } from '@angular/core';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {AlertsService} from 'services/alerts.service';
+import {TrainingModalService} from './training-modal.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {EventEmitter} from '@angular/core';
 
 describe('Training Modal Service', () => {
   let trainingModalService: TrainingModalService;
@@ -36,12 +36,11 @@ describe('Training Modal Service', () => {
         TrainingModalService,
         AlertsService,
         ExternalSaveService,
-        NgbModal
-      ]
+        NgbModal,
+      ],
     });
 
-    trainingModalService = TestBed.inject(
-      TrainingModalService);
+    trainingModalService = TestBed.inject(TrainingModalService);
     alertsService = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
   });
@@ -50,28 +49,27 @@ describe('Training Modal Service', () => {
     let emitter = new EventEmitter<void>();
     let MockComponentInstance = {
       unhandledAnswer: 'unhandledAnswer',
-      finishTrainingCallback: emitter
+      finishTrainingCallback: emitter,
     };
 
     spyOn(trainingModalService.onFinishTrainingCallback, 'emit');
-    spyOn(alertsService, 'clearWarnings')
-      .and.stub();
+    spyOn(alertsService, 'clearWarnings').and.stub();
     spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
+      return {
         componentInstance: MockComponentInstance,
-        result: Promise.resolve()
-      } as NgbModalRef);
+        result: Promise.resolve(),
+      } as NgbModalRef;
     });
 
-    trainingModalService.openTrainUnresolvedAnswerModal(
-      'Test', 'textInput', 2);
+    trainingModalService.openTrainUnresolvedAnswerModal('Test', 'textInput', 2);
 
     emitter.emit();
     tick();
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
     expect(
-      trainingModalService.onFinishTrainingCallback.emit).toHaveBeenCalled();
+      trainingModalService.onFinishTrainingCallback.emit
+    ).toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
   }));
 });

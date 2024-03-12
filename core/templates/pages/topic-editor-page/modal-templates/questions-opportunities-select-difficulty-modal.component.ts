@@ -16,27 +16,29 @@
  * @fileoverview Component for questions opportunities select difficulty modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { Rubric } from 'domain/skill/rubric.model';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { ImageFile } from 'domain/utilities/image-file.model';
-import { ExtractImageFilenamesFromModelService } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
-import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Rubric} from 'domain/skill/rubric.model';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {ImageFile} from 'domain/utilities/image-file.model';
+import {ExtractImageFilenamesFromModelService} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
 @Component({
   selector: 'oppia-questions-opportunities-select-difficulty-modal',
   templateUrl:
-    './questions-opportunities-select-difficulty-modal.component.html'
+    './questions-opportunities-select-difficulty-modal.component.html',
 })
 export class QuestionsOpportunitiesSelectDifficultyModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -49,8 +51,7 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
   constructor(
     private alertsService: AlertsService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private extractImageFilenamesFromModelService:
-      ExtractImageFilenamesFromModelService,
+    private extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService,
     private imageLocalStorageService: ImageLocalStorageService,
     private ngbActiveModal: NgbActiveModal,
     private skillBackendApiService: SkillBackendApiService
@@ -59,10 +60,9 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
   }
 
   ngOnInit(): void {
-    this.instructionMessage = (
-      'Select the skill(s) to link the question to:');
-    this.skillBackendApiService.fetchSkillAsync(this.skillId)
-      .then((backendSkillObject) => {
+    this.instructionMessage = 'Select the skill(s) to link the question to:';
+    this.skillBackendApiService.fetchSkillAsync(this.skillId).then(
+      backendSkillObject => {
         this.skill = backendSkillObject.skill;
         // Skills have SubtitledHtml fields that can contain images. In
         // order to render them in the contributor dashboard, we parse the
@@ -71,13 +71,18 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
         // storage. The image components will use the data from the local
         // storage to render the image.
         let imageFileFetchPromises: Promise<ImageFile>[] = [];
-        let imageFilenames = (
+        let imageFilenames =
           this.extractImageFilenamesFromModelService.getImageFilenamesInSkill(
-            this.skill));
+            this.skill
+          );
         imageFilenames.forEach(imageFilename => {
-          imageFileFetchPromises.push(this.assetsBackendApiService.loadImage(
-            AppConstants.ENTITY_TYPE.SKILL, this.skillId,
-            imageFilename));
+          imageFileFetchPromises.push(
+            this.assetsBackendApiService.loadImage(
+              AppConstants.ENTITY_TYPE.SKILL,
+              this.skillId,
+              imageFilename
+            )
+          );
         });
         Promise.all(imageFileFetchPromises).then(files => {
           files.forEach(file => {
@@ -90,21 +95,24 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
           });
           this.linkedSkillsWithDifficulty = [
             SkillDifficulty.create(
-              this.skillId, this.skill.getDescription(),
-              AppConstants.DEFAULT_SKILL_DIFFICULTY)
+              this.skillId,
+              this.skill.getDescription(),
+              AppConstants.DEFAULT_SKILL_DIFFICULTY
+            ),
           ];
           this.skillIdToRubricsObject = {};
-          this.skillIdToRubricsObject[this.skillId] = (
-            this.skill.getRubrics());
+          this.skillIdToRubricsObject[this.skillId] = this.skill.getRubrics();
         });
-      }, (error) => {
-        this.alertsService.addWarning(
-          `Error populating skill: ${error}.`);
-      });
+      },
+      error => {
+        this.alertsService.addWarning(`Error populating skill: ${error}.`);
+      }
+    );
   }
 
   changeSkillWithDifficulty(
-      newSkillWithDifficulty: SkillDifficulty, idx: number
+    newSkillWithDifficulty: SkillDifficulty,
+    idx: number
   ): void {
     this.linkedSkillsWithDifficulty[idx] = newSkillWithDifficulty;
   }
@@ -112,8 +120,7 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
   startQuestionCreation(): void {
     const result = {
       skill: this.skill,
-      skillDifficulty:
-        this.linkedSkillsWithDifficulty[0].getDifficulty()
+      skillDifficulty: this.linkedSkillsWithDifficulty[0].getDifficulty(),
     };
     this.ngbActiveModal.close(result);
   }
