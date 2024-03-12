@@ -23,6 +23,7 @@ import { LoggedInUserFactory, ILoggedInUser } from '../user-utilities/logged-in-
 import { BlogAdminFactory, IBlogAdmin } from '../user-utilities/blog-admin-utils';
 import { QuestionAdminFactory } from '../user-utilities/question-admin-utils';
 import { BlogPostEditorFactory } from '../user-utilities/blog-post-editor-utils';
+import { ExplorationEditorFactory, IExplorationEditor } from '../user-utilities/exploration-editor-utils';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -128,9 +129,10 @@ export class UserFactory {
   >(
       username: string, email: string,
       roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-  ): Promise<ILoggedInUser & MultipleRoleIntersection<TRoles>> {
+  ): Promise<ILoggedInUser & IExplorationEditor &  MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRole(
-      BaseUserFactory(), LoggedInUserFactory());
+      UserFactory.composeUserWithRole(BaseUserFactory(), LoggedInUserFactory()), 
+      ExplorationEditorFactory())
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
