@@ -19,12 +19,12 @@ import { UserFactory } from
   '../../puppeteer-testing-utilities/user-factory';
 import testConstants from
   '../../puppeteer-testing-utilities/test-constants';
-import { IExplorationEditor } from '../../user-utilities/exploration-editor-utils';
+import { ExplorationEditor } from '../../user-utilities/exploration-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT: number = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Editor', function() {
-  let explorationEditor: IExplorationEditor;
+  let explorationEditor: ExplorationEditor;
 
   beforeAll(async function() {
     explorationEditor = await UserFactory.createNewUser(
