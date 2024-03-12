@@ -292,13 +292,10 @@ import { PencilCodeEditorValidationService } from
 import { FeatureFlagDummyBackendApiService } from
   'domain/feature-flag/feature-flag-dummy-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { PlatformFeatureAdminBackendApiService } from
-  'domain/platform_feature/platform-feature-admin-backend-api.service';
+import { PlatformParameterAdminBackendApiService } from
+  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
 import { FeatureFlagBackendApiService } from
   'domain/feature-flag/feature-flag-backend-api.service';
-import { PlayerCorrectnessFeedbackEnabledService } from
-  // eslint-disable-next-line max-len
-  'pages/exploration-player-page/services/player-correctness-feedback-enabled.service';
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
@@ -577,8 +574,6 @@ export class UpgradedServices {
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
-    upgradedServices['PlayerCorrectnessFeedbackEnabledService'] =
-      new PlayerCorrectnessFeedbackEnabledService();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -986,8 +981,8 @@ export class UpgradedServices {
       new FeatureFlagBackendApiService(
         upgradedServices['HttpClient']
       );
-    upgradedServices['PlatformFeatureAdminBackendApiService'] =
-      new PlatformFeatureAdminBackendApiService(
+    upgradedServices['PlatformParameterAdminBackendApiService'] =
+      new PlatformParameterAdminBackendApiService(
         upgradedServices['HttpClient']);
     upgradedServices['FeatureFlagDummyBackendApiService'] =
       new FeatureFlagDummyBackendApiService(

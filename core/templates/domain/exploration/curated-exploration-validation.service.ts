@@ -51,15 +51,6 @@ export class CuratedExplorationValidationService {
         });
   }
 
-  // Exploration must have correctness feedback enabled.
-  async isCorrectnessFeedbackEnabled(explorationId: string): Promise<boolean> {
-    return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null).then(
-        (response: FetchExplorationBackendResponse) => {
-          return response.correctness_feedback_enabled;
-        });
-  }
-
   // Exploration cannot be in a custom category.
   async isDefaultCategoryAsync(explorationId: string): Promise<boolean> {
     return this.explorationSummaryBackendApiService

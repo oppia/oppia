@@ -26,7 +26,6 @@ from core.controllers import base
 from core.domain import blog_domain
 from core.domain import blog_services
 from core.domain import change_domain
-from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import image_validation_services
 from core.domain import improvements_domain
@@ -78,39 +77,6 @@ def validate_suggestion_change(
     return obj
 
 
-def validate_new_config_property_values(
-    new_config_property: Mapping[str, config_domain.AllowedDefaultValueTypes]
-) -> Mapping[str, config_domain.AllowedDefaultValueTypes]:
-    """Validates new config property values.
-
-    Args:
-        new_config_property: dict. Data that needs to be validated.
-
-    Returns:
-        dict(str, *). Returns a dict for new config properties.
-
-    Raises:
-        Exception. The config property name is not a string.
-        Exception. The value corresponding to config property name
-            don't have any schema.
-    """
-    for (name, value) in new_config_property.items():
-        if not isinstance(name, str):
-            raise Exception(
-                'config property name should be a string, received'
-                ': %s' % name)
-        config_property = config_domain.Registry.get_config_property(name)
-        if config_property is None:
-            raise Exception('%s do not have any schema.' % name)
-
-        config_property.normalize(value)
-    # The new_config_property values do not represent a domain class directly
-    # and in the handler these dict values are used to set config properties
-    # individually. Hence conversion of dicts to domain objects is not required
-    # for new_config_properties.
-    return new_config_property
-
-
 def validate_platform_params_values_for_blog_admin(
     new_platform_parameter_values: Mapping[
         str, platform_parameter_domain.PlatformDataTypes]
@@ -159,7 +125,7 @@ def validate_platform_params_values_for_blog_admin(
 
         if (
             name ==
-            platform_parameter_list.ParamNames.
+            platform_parameter_list.ParamName.
             MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         ):
             assert isinstance(value, int)

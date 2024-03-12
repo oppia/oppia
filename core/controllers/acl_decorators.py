@@ -23,8 +23,8 @@ import logging
 import re
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.controllers import base
@@ -1245,7 +1245,7 @@ def can_access_contributor_dashboard_admin_page(
 
         new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
             self.user_id,
-            platform_feature_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
+            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
 
         if new_dashboard_enabled and (
             role_services

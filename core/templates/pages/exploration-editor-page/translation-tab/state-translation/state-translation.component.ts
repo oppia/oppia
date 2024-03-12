@@ -27,7 +27,6 @@ import { InteractionCustomizationArgs } from 'interactions/customization-args-de
 import { Rule } from 'domain/exploration/rule.model';
 import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationCorrectnessFeedbackService } from 'pages/exploration-editor-page/services/exploration-correctness-feedback.service';
 import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
 import { RouterService } from 'pages/exploration-editor-page/services/router.service';
 import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
@@ -98,8 +97,6 @@ export class StateTranslationComponent
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
-    private explorationCorrectnessFeedbackService:
-      ExplorationCorrectnessFeedbackService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private explorationStatesService: ExplorationStatesService,
     private routerService: RouterService,
@@ -142,6 +139,32 @@ export class StateTranslationComponent
     );
     if (!translationContent) {
       return subtitledHtml.html;
+    }
+
+    return translationContent.translation as string;
+  }
+
+  getRequiredUnicode(SubtitledUnicode: SubtitledUnicode): string {
+    if (this.translationTabActiveModeService.isTranslationModeActive()) {
+      return SubtitledUnicode.unicode;
+    }
+
+    let langCode = this.translationLanguageService.getActiveLanguageCode();
+    if (
+      !this.entityTranslationsService
+        .languageCodeToEntityTranslations.hasOwnProperty(langCode)
+    ) {
+      return SubtitledUnicode.unicode;
+    }
+
+    let translationContent = (
+      this.entityTranslationsService
+        .languageCodeToEntityTranslations[langCode].getWrittenTranslation(
+          SubtitledUnicode.contentId
+        )
+    );
+    if (!translationContent) {
+      return SubtitledUnicode.unicode;
     }
 
     return translationContent.translation as string;

@@ -60,11 +60,6 @@ module.exports = {
     }
   },
   entry: {
-    blog_dashboard:
-      commonPrefix + '/pages/blog-dashboard-page/blog-dashboard-page.import.ts',
-    classroom_admin:
-      commonPrefix + '/pages/classroom-admin-page/' +
-      'classroom-admin-page.import.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.import.ts',
@@ -78,15 +73,9 @@ module.exports = {
     contributor_dashboard:
       commonPrefix + '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    contributor_dashboard_admin:
-      commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-      'contributor-dashboard-admin-page.import.ts',
     diagnostic_test_player_page:
       commonPrefix + '/pages/diagnostic-test-player-page/' +
       'diagnostic-test-player-page.import.ts',
-    email_dashboard:
-      commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-page.import.ts',
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
@@ -96,18 +85,9 @@ module.exports = {
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
-    learner_dashboard:
-      commonPrefix + '/pages/learner-dashboard-page/' +
-      'learner-dashboard-page.import.ts',
     facilitator_dashboard:
       commonPrefix + '/pages/facilitator-dashboard-page/' +
       'facilitator-dashboard-page.import.ts',
-    learner_group_creator:
-      commonPrefix + '/pages/learner-group-pages/create-group/' +
-      'create-learner-group-page.import.ts',
-    learner_group_editor:
-      commonPrefix + '/pages/learner-group-pages/edit-group/' +
-      'edit-learner-group-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root:
@@ -158,24 +138,6 @@ module.exports = {
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
     }),
     new HtmlWebpackPlugin({
-      chunks: ['classroom_admin'],
-      filename: 'classroom-admin-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description: 'With Oppia, you can access free lessons on ' +
-          'math, physics, statistics, chemistry, music, history and ' +
-          'more from anywhere in the world. Oppia is a nonprofit ' +
-          'with the mission of providing high-quality ' +
-          'education to those who lack access to it.'
-      },
-      template:
-        commonPrefix + '/pages/classroom-admin-page/' +
-        'classroom-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['diagnostic_test_player_page'],
       filename: 'diagnostic-test-player-page.mainpage.html',
       hybrid: true,
@@ -192,17 +154,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/diagnostic-test-player-page/' +
         'diagnostic-test-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['blog_dashboard'],
-      filename: 'blog-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/blog-dashboard-page/' +
-        'blog-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -261,17 +212,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['contributor_dashboard_admin'],
-      filename: 'contributor-dashboard-admin-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/contributor-dashboard-admin-page/' +
-        'contributor-dashboard-admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['contributor_dashboard'],
       filename: 'contributor-dashboard-page.mainpage.html',
       hybrid: true,
@@ -279,17 +219,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/contributor-dashboard-page/' +
         'contributor-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['email_dashboard'],
-      filename: 'email-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template: (
-        commonPrefix +
-        '/pages/email-dashboard-pages/email-dashboard-page.mainpage.html'),
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -351,17 +280,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['learner_dashboard'],
-      filename: 'learner-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-dashboard-page/' +
-        'learner-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -491,28 +409,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/facilitator-dashboard-page/' +
         'facilitator-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['learner_group_creator'],
-      filename: 'create-learner-group-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-group-pages/create-group/' +
-        'create-learner-group-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['learner_group_editor'],
-      filename: 'edit-learner-group-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/learner-group-pages/edit-group/' +
-        'edit-learner-group-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

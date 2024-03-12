@@ -79,7 +79,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'after the interaction is created', async function() {
+    'after the interaction is created', async function() {
     await workflow.createExploration(true);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -120,7 +120,7 @@ describe('Enable correctness feedback and set correctness', function() {
   });
 
   it('should allow selecting correct feedback from the response editor ' +
-     'during set the interaction', async function() {
+    'during set the interaction', async function() {
     await workflow.createExploration(false);
     await explorationEditorPage.navigateToSettingsTab();
     await explorationEditorSettingsTab.setTitle(explorationTitle);
@@ -411,8 +411,45 @@ describe('Core exploration functionality', function() {
       await explorationPlayerPage.expectExplorationToBeOver();
     });
 
+  it('should not show self-loop warning when navigating between ' +
+    'different states', async function() {
+    // Setup initial state.
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('some content'));
+    await explorationEditorMainTab.setInteraction('NumericInput');
+    await explorationEditorMainTab.addResponse(
+      'NumericInput', async function(richTextEditor) {
+        await richTextEditor.appendBoldText('correct');
+      }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+    var firstResponseEditor = (
+      await explorationEditorMainTab.getResponseEditor(0));
+    await firstResponseEditor.markAsCorrect();
+    var defaultResponseEditor = (
+      await explorationEditorMainTab.getResponseEditor('default'));
+    await defaultResponseEditor.setFeedback(
+      await forms.toRichText('try again'));
+    await defaultResponseEditor.setDestination(null, false, null);
+
+    // Setup terminating state.
+    await explorationEditorMainTab.moveToState('final card');
+    await explorationEditorMainTab.setInteraction('EndExploration');
+    await explorationEditorPage.saveChanges();
+
+    // Test the flow.
+    await explorationEditorMainTab.moveToState('Introduction');
+    await explorationEditorPage.navigateToPreviewTab();
+    await explorationEditorPage.waitForPreviewTabToLoad();
+    await explorationPlayerPage.submitAnswer('NumericInput', 1);
+    await explorationPlayerPage.clickThroughToNextCard();
+    await explorationPlayerPage.waitForLessonCompletionMessageToDisappear();
+    await explorationEditorPage.navigateToMainTab();
+    await explorationEditorMainTab.moveToState('Introduction');
+    await (
+      explorationEditorMainTab.checkSelfLoopWarningIsNotShown());
+  });
+
   it('should skip the customization modal for interactions having no ' +
-      'customization options', async function() {
+    'customization options', async function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
@@ -427,7 +464,7 @@ describe('Core exploration functionality', function() {
   });
 
   it('should open appropriate modal on re-clicking an interaction to ' +
-     'customize it', async function() {
+    'customize it', async function() {
     await explorationEditorMainTab.setContent(
       await forms.toRichText('some content'));
 
@@ -465,7 +502,7 @@ describe('Core exploration functionality', function() {
     await action.click('Use Image Button', useImageBtn);
     var svgElem = $('.e2e-test-svg');
     await svgElem.moveTo(0, 0);
-    await svgElem.dragAndDrop({x: 1, y: 1});
+    await svgElem.dragAndDrop({ x: 1, y: 1 });
     await action.click('Save Interaction Button', saveInteractionBtn);
     var closeAddResponseButton = $('.e2e-test-close-add-response-modal');
     await action.click('Close Add Response Button', closeAddResponseButton);
@@ -559,7 +596,7 @@ describe('Core exploration functionality', function() {
     });
 
   it('should be able to create new category which is not' +
-  ' in the dropdown menu', async function() {
+    ' in the dropdown menu', async function() {
     await explorationEditorPage.navigateToSettingsTab();
 
     await explorationEditorSettingsTab.expectCategoryToBe('');

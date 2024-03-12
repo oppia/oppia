@@ -21,8 +21,8 @@ from __future__ import annotations
 import json
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -32,10 +32,8 @@ from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import question_services
@@ -980,14 +978,6 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
 
         math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
@@ -3321,15 +3311,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
         self
     ) -> None:
-        feature_flag_services.update_feature_flag(
-            platform_feature_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            True,
-            0,
-            []
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
@@ -3343,15 +3329,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_coordinator_can_access_new_cd_admin_page(
         self
     ) -> None:
-        feature_flag_services.update_feature_flag(
-            platform_feature_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            True,
-            0,
-            []
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
         self.login(self.user_email)

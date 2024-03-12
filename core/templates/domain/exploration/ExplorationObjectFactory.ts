@@ -53,7 +53,6 @@ import {FetchExplorationBackendResponse} from './read-only-exploration-backend-a
 
 export interface ExplorationBackendDict {
   'auto_tts_enabled': boolean;
-  'correctness_feedback_enabled': boolean;
   'draft_changes': ExplorationChange[];
   'is_version_of_draft_valid': boolean;
   'init_state_name': string;
@@ -236,8 +235,6 @@ export class ExplorationObjectFactory {
         Exploration {
     const explorationBackendDict: ExplorationBackendDict = {
       auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
-      correctness_feedback_enabled: explorationBackendResponse.
-        correctness_feedback_enabled,
       draft_changes: [],
       init_state_name: explorationBackendResponse.exploration.
         init_state_name,
