@@ -16,16 +16,19 @@
  * @fileoverview Unit tests for ExplorationPropertyService.
  */
 
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import {TestBed, waitForAsync} from '@angular/core/testing';
 
-import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import {ExplorationPropertyService} from 'pages/exploration-editor-page/services/exploration-property.service';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 
-import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
-import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ParamChange } from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {
+  ParamSpecs,
+  ParamSpecsObjectFactory,
+} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 
 describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
@@ -37,7 +40,7 @@ describe('Exploration Property Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     explorationPropertyService = TestBed.inject(ExplorationPropertyService);
@@ -47,11 +50,13 @@ describe('Exploration Property Service', () => {
     paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
 
     editExplorationPropertySpy = spyOn(
-      changeListService, 'editExplorationProperty').and.returnValue();
+      changeListService,
+      'editExplorationProperty'
+    ).and.returnValue();
   });
 
-  it('should create a new exploration properties object', function() {
-    expect(function() {
+  it('should create a new exploration properties object', function () {
+    expect(function () {
       explorationPropertyService.init('initial value');
     }).toThrowError('Exploration property name cannot be null.');
 
@@ -61,21 +66,25 @@ describe('Exploration Property Service', () => {
     expect(explorationPropertyService.hasChanged()).toBe(false);
   });
 
-  it('should overrides _normalize and _isValid methods', function() {
+  it('should overrides _normalize and _isValid methods', function () {
     let childToOverride = Object.create(explorationPropertyService);
 
-    childToOverride._isValid = function(value: string) {
+    childToOverride._isValid = function (value: string) {
       return !!value;
     };
 
-    childToOverride._normalize = function(value: string) {
+    childToOverride._normalize = function (value: string) {
       return value;
     };
 
-    let overrideIsValidSpy = spyOn(childToOverride, '_isValid').and
-      .callThrough();
-    let overrideNormalizeSpy = spyOn(childToOverride, '_normalize').and
-      .callThrough();
+    let overrideIsValidSpy = spyOn(
+      childToOverride,
+      '_isValid'
+    ).and.callThrough();
+    let overrideNormalizeSpy = spyOn(
+      childToOverride,
+      '_normalize'
+    ).and.callThrough();
 
     childToOverride.propertyName = 'property_1';
     childToOverride.saveDisplayedValue();
@@ -97,11 +106,11 @@ describe('Exploration Property Service', () => {
     explorationPropertyService.hasChanged();
   });
 
-  it('should not save the displayed value when it\'s empty', function() {
+  it("should not save the displayed value when it's empty", function () {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'property_1';
 
-    child._isValid = function(value: string) {
+    child._isValid = function (value: string) {
       if (!value) {
         throw new Error('this.displayed should have a valid value.');
       }
@@ -109,7 +118,7 @@ describe('Exploration Property Service', () => {
     };
 
     child.init();
-    expect(function() {
+    expect(function () {
       child.saveDisplayedValue();
     }).toThrowError('this.displayed should have a valid value.');
 
@@ -119,35 +128,39 @@ describe('Exploration Property Service', () => {
     expect(child.hasChanged()).toBe(false);
   });
 
-  it('should save displayed value when is ParamChanges object', function() {
+  it('should save displayed value when is ParamChanges object', function () {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'param_changes';
-    child._normalize = function(paramChanges: ParamChange[]) {
+    child._normalize = function (paramChanges: ParamChange[]) {
       // Changing paramChanges so hasChanged() turns to be true on line 87.
-      paramChanges.forEach(function(paramChange: ParamChange) {
+      paramChanges.forEach(function (paramChange: ParamChange) {
         paramChange.resetCustomizationArgs();
       });
       return paramChanges;
     };
 
-    let normalizeSpy = spyOn(child, '_normalize').and
-      .callThrough();
+    let normalizeSpy = spyOn(child, '_normalize').and.callThrough();
 
-    child.init(paramChangesObjectFactory.createFromBackendList([{
-      customization_args: {
-        parse_with_jinja: true,
-        value: ''
-      },
-      generator_id: 'Copier',
-      name: 'Param change 1'
-    }, {
-      customization_args: {
-        parse_with_jinja: true,
-        value: ''
-      },
-      generator_id: 'RandomSelector',
-      name: 'Param change 2'
-    }]));
+    child.init(
+      paramChangesObjectFactory.createFromBackendList([
+        {
+          customization_args: {
+            parse_with_jinja: true,
+            value: '',
+          },
+          generator_id: 'Copier',
+          name: 'Param change 1',
+        },
+        {
+          customization_args: {
+            parse_with_jinja: true,
+            value: '',
+          },
+          generator_id: 'RandomSelector',
+          name: 'Param change 2',
+        },
+      ])
+    );
     child.saveDisplayedValue();
 
     expect(normalizeSpy).toHaveBeenCalled();
@@ -155,27 +168,28 @@ describe('Exploration Property Service', () => {
     expect(child.hasChanged()).toBe(false);
   });
 
-  it('should save displayed value when is ParamSpecs object', function() {
+  it('should save displayed value when is ParamSpecs object', function () {
     let child = Object.create(explorationPropertyService);
     child.propertyName = 'param_specs';
-    child._normalize = function(paramSpecs: ParamSpecs) {
+    child._normalize = function (paramSpecs: ParamSpecs) {
       // Changing paramSpecs so hasChanged() turns to be true on line 87.
       let paramSpec = paramSpecObjectFactory.createDefault();
       paramSpecs.addParamIfNew('z', paramSpec);
       return paramSpecs;
     };
 
-    let normalizeSpy = spyOn(child, '_normalize').and
-      .callThrough();
+    let normalizeSpy = spyOn(child, '_normalize').and.callThrough();
 
-    child.init(paramSpecsObjectFactory.createFromBackendDict({
-      x: {
-        obj_type: 'UnicodeString'
-      },
-      y: {
-        obj_type: 'UnicodeString'
-      }
-    }));
+    child.init(
+      paramSpecsObjectFactory.createFromBackendDict({
+        x: {
+          obj_type: 'UnicodeString',
+        },
+        y: {
+          obj_type: 'UnicodeString',
+        },
+      })
+    );
     child.saveDisplayedValue();
 
     expect(normalizeSpy).toHaveBeenCalled();
@@ -183,25 +197,31 @@ describe('Exploration Property Service', () => {
     expect(child.hasChanged()).toBe(false);
   });
 
-  it('should return stream of observables when exploration' +
-    ' property is changed', () => {
-    let count = 0;
-    let subscription = explorationPropertyService.onExplorationPropertyChanged;
-    subscription
-      .subscribe((event) => {
+  it(
+    'should return stream of observables when exploration' +
+      ' property is changed',
+    () => {
+      let count = 0;
+      let subscription =
+        explorationPropertyService.onExplorationPropertyChanged;
+      subscription.subscribe(event => {
         expect(event).toBe(null);
         count++;
       });
 
-    explorationPropertyService._explorationPropertyChangedEventEmitter
-      .emit(null);
-    explorationPropertyService._explorationPropertyChangedEventEmitter
-      .emit(null);
-    explorationPropertyService._explorationPropertyChangedEventEmitter
-      .emit(null);
+      explorationPropertyService._explorationPropertyChangedEventEmitter.emit(
+        null
+      );
+      explorationPropertyService._explorationPropertyChangedEventEmitter.emit(
+        null
+      );
+      explorationPropertyService._explorationPropertyChangedEventEmitter.emit(
+        null
+      );
 
-    waitForAsync(() => {
-      expect(count).toBe(3);
-    });
-  });
+      waitForAsync(() => {
+        expect(count).toBe(3);
+      });
+    }
+  );
 });

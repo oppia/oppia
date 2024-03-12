@@ -16,14 +16,14 @@
  * @fileoverview Component for delete account modal.
  */
 
-import { Component } from '@angular/core';
-import { OnInit } from '@angular/core';
-import { UserService } from 'services/user.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {OnInit} from '@angular/core';
+import {UserService} from 'services/user.service';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-delete-account-modal',
-  templateUrl: './delete-account-modal.component.html'
+  templateUrl: './delete-account-modal.component.html',
 })
 export class DeleteAccountModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -33,11 +33,11 @@ export class DeleteAccountModalComponent implements OnInit {
   username!: string;
   constructor(
     private userService: UserService,
-    private ngbActiveModal: NgbActiveModal,
+    private ngbActiveModal: NgbActiveModal
   ) {}
 
   ngOnInit(): void {
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       const expectedUsername = userInfo.getUsername();
 
       if (expectedUsername === null) {

@@ -16,16 +16,21 @@
  * @fileoverview Unit tests for collection editor navbar breadcrumb component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, waitForAsync, ComponentFixture, fakeAsync } from '@angular/core/testing';
-import { CollectionEditorPageConstants } from '../collection-editor-page.constants';
-import { CollectionEditorNavbarBreadcrumbComponent } from './collection-editor-navbar-breadcrumb.component';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { Collection } from 'domain/collection/collection.model';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { CollectionPlaythrough } from 'domain/collection/collection-playthrough.model';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  TestBed,
+  waitForAsync,
+  ComponentFixture,
+  fakeAsync,
+} from '@angular/core/testing';
+import {CollectionEditorPageConstants} from '../collection-editor-page.constants';
+import {CollectionEditorNavbarBreadcrumbComponent} from './collection-editor-navbar-breadcrumb.component';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
+import {CollectionEditorRoutingService} from '../services/collection-editor-routing.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {Collection} from 'domain/collection/collection.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 
 describe('Collection editor navbar breadcrumb component', () => {
   let collectionEditorStateService: CollectionEditorStateService;
@@ -46,74 +51,85 @@ describe('Collection editor navbar breadcrumb component', () => {
     category: 'Collection Category',
     version: 0,
     schemaVersion: 1,
-    nodes: []
+    nodes: [],
   };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        CollectionEditorNavbarBreadcrumbComponent
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [CollectionEditorNavbarBreadcrumbComponent],
       providers: [
         CollectionEditorStateService,
         CollectionEditorRoutingService,
-        FocusManagerService
+        FocusManagerService,
       ],
-      schemas: [
-        NO_ERRORS_SCHEMA
-      ]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      CollectionEditorNavbarBreadcrumbComponent);
+      CollectionEditorNavbarBreadcrumbComponent
+    );
     component = fixture.componentInstance;
     collectionEditorStateService = TestBed.inject(CollectionEditorStateService);
     collectionEditorRoutingService = TestBed.inject(
-      CollectionEditorRoutingService);
+      CollectionEditorRoutingService
+    );
     focusManagerService = TestBed.inject(FocusManagerService);
   });
 
   beforeEach(() => {
     expectedCollection = new Collection(
-      collectionData.id, collectionData.title, collectionData.objective,
-      collectionData.languageCode, collectionData.tags,
-      collectionData.playthrough, collectionData.category,
-      collectionData.version, collectionData.schemaVersion,
-      collectionData.nodes);
+      collectionData.id,
+      collectionData.title,
+      collectionData.objective,
+      collectionData.languageCode,
+      collectionData.tags,
+      collectionData.playthrough,
+      collectionData.category,
+      collectionData.version,
+      collectionData.schemaVersion,
+      collectionData.nodes
+    );
   });
 
   beforeEach(() => {
     spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
-      expectedCollection);
+      expectedCollection
+    );
     spyOn(collectionEditorRoutingService, 'getActiveTabName').and.returnValue(
-      activeTab);
+      activeTab
+    );
     spyOn(focusManagerService, 'setFocus');
     component.ngOnInit();
   });
 
-  it('should load the component on opening collection editor page by clicking' +
-    'on create collection', () => {
-    expect(component.collection).toBe(expectedCollection);
-    expect(component.activeTabName).toBe(activeTab);
-  });
+  it(
+    'should load the component on opening collection editor page by clicking' +
+      'on create collection',
+    () => {
+      expect(component.collection).toBe(expectedCollection);
+      expect(component.activeTabName).toBe(activeTab);
+    }
+  );
 
   it('should get the current tab name in readable form', () => {
     expect(component.getCurrentTabName()).toBe('Edit');
   });
 
-  it('should change the active tab to settings when clicked on' +
-    'collection title if the title is empty', fakeAsync(() => {
-    expect(component.activeTabName).toBe(activeTab);
+  it(
+    'should change the active tab to settings when clicked on' +
+      'collection title if the title is empty',
+    fakeAsync(() => {
+      expect(component.activeTabName).toBe(activeTab);
 
-    component.editCollectionTitle();
+      component.editCollectionTitle();
 
-    expect(component.activeTabName).toBe('Settings');
-    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
-      CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-  }));
+      expect(component.activeTabName).toBe('Settings');
+      expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+        CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL
+      );
+    })
+  );
 });

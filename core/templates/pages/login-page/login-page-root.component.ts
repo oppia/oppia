@@ -16,16 +16,16 @@
  * @fileoverview Root component for login page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-login-page-root',
-  templateUrl: './login-page-root.component.html'
+  templateUrl: './login-page-root.component.html',
 })
 export class LoginPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -36,10 +36,12 @@ export class LoginPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.META
+    );
   }
 
   ngOnInit(): void {

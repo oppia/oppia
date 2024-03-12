@@ -16,14 +16,13 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { TakeBreakModalComponent } from 'pages/exploration-player-page/templates/take-break-modal.component';
-
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {TakeBreakModalComponent} from 'pages/exploration-player-page/templates/take-break-modal.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FatigueDetectionService {
   private submissionTimesMsec: number[] = [];
@@ -34,11 +33,10 @@ export class FatigueDetectionService {
   private windowStartTime!: number | undefined;
   private windowEndTime!: number;
 
-  constructor(
-    private ngbModal: NgbModal) { }
+  constructor(private ngbModal: NgbModal) {}
 
   recordSubmissionTimestamp(): void {
-    this.submissionTimesMsec.push((new Date()).getTime());
+    this.submissionTimesMsec.push(new Date().getTime());
   }
 
   isSubmittingTooFast(): boolean {
@@ -46,8 +44,10 @@ export class FatigueDetectionService {
       this.windowStartTime = this.submissionTimesMsec.shift();
       this.windowEndTime =
         this.submissionTimesMsec[this.submissionTimesMsec.length - 1];
-      if (this.windowStartTime !== undefined && (this.windowEndTime.valueOf() -
-        this.windowStartTime.valueOf() < this.SPAM_WINDOW_MSEC)
+      if (
+        this.windowStartTime !== undefined &&
+        this.windowEndTime.valueOf() - this.windowStartTime.valueOf() <
+          this.SPAM_WINDOW_MSEC
       ) {
         return true;
       }
@@ -56,15 +56,18 @@ export class FatigueDetectionService {
   }
 
   displayTakeBreakMessage(): void {
-    this.ngbModal.open(
-      TakeBreakModalComponent,
-      {
-        backdrop: 'static'
-      }).result.then(() => { }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    this.ngbModal
+      .open(TakeBreakModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        () => {},
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   reset(): void {
@@ -72,6 +75,9 @@ export class FatigueDetectionService {
   }
 }
 
-angular.module('oppia').factory(
-  'FatigueDetectionService',
-  downgradeInjectable(FatigueDetectionService));
+angular
+  .module('oppia')
+  .factory(
+    'FatigueDetectionService',
+    downgradeInjectable(FatigueDetectionService)
+  );

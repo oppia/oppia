@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Delete State Skill Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteStateSkillModalComponent } from './delete-state-skill-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteStateSkillModalComponent} from './delete-state-skill-modal.component';
 
 describe('Delete Topic Modal Component', () => {
   let fixture: ComponentFixture<DeleteStateSkillModalComponent>;
@@ -26,12 +26,8 @@ describe('Delete Topic Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteStateSkillModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [DeleteStateSkillModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

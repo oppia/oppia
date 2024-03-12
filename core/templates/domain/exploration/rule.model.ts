@@ -19,14 +19,17 @@
 
 import isEqual from 'lodash/isEqual';
 
-import { InteractionRuleInputs } from 'interactions/rule-input-defs';
-import { BaseTranslatableObject, TranslatableField } from 'domain/objects/BaseTranslatableObject.model';
+import {InteractionRuleInputs} from 'interactions/rule-input-defs';
+import {
+  BaseTranslatableObject,
+  TranslatableField,
+} from 'domain/objects/BaseTranslatableObject.model';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 export interface RuleBackendDict {
-  'inputs': RuleInputs;
-  'rule_type': string;
+  inputs: RuleInputs;
+  rule_type: string;
 }
 
 export interface RuleInputs {
@@ -69,32 +72,33 @@ export class Rule extends BaseTranslatableObject {
   toBackendDict(): RuleBackendDict {
     return {
       rule_type: this.type,
-      inputs: this.inputs
+      inputs: this.inputs,
     };
   }
 
   static createNew(
-      type: string, inputs: RuleInputs, inputTypes: RuleInputTypes
+    type: string,
+    inputs: RuleInputs,
+    inputTypes: RuleInputTypes
   ): Rule {
-    if (!isEqual(
-      new Set(Object.keys(inputs)),
-      new Set(Object.keys(inputTypes))
-    )) {
+    if (
+      !isEqual(new Set(Object.keys(inputs)), new Set(Object.keys(inputTypes)))
+    ) {
       throw new Error('The keys of inputs and inputTypes do not match.');
     }
     return new Rule(type, inputs, inputTypes);
   }
 
   static createFromBackendDict(
-      ruleDict: RuleBackendDict, interactionId: string
+    ruleDict: RuleBackendDict,
+    interactionId: string
   ): Rule {
     let ruleType = ruleDict.rule_type;
     let ruleInputTypes: RuleInputTypes = {};
     let ruleDescription = null;
 
-    ruleDescription = (
-      INTERACTION_SPECS[interactionId].rule_descriptions[ruleType]
-    );
+    ruleDescription =
+      INTERACTION_SPECS[interactionId].rule_descriptions[ruleType];
 
     const PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     while (ruleDescription.match(PATTERN)) {

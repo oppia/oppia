@@ -16,17 +16,21 @@
  * @fileoverview Component for the history tab of the collection editor.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'collection-history-tab',
   templateUrl: './collection-history-tab.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CollectionHistoryTabComponent {
   constructor() {}
 }
 
-angular.module('oppia').directive('collectionHistoryTab', downgradeComponent(
-  {component: CollectionHistoryTabComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'collectionHistoryTab',
+    downgradeComponent({component: CollectionHistoryTabComponent})
+  );

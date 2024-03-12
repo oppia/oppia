@@ -6,10 +6,10 @@ This vulnerability disclosure process describes how we accept and respond to sec
 
 Reporters should email [security@oppia.org](mailto:security@oppia.org) or open a [GitHub Security Vulnerability Report](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing/privately-reporting-a-security-vulnerability) with:
 
-* A description of the problem.
-* Steps we can follow to reproduce the problem.
-* Affected versions.
-* If known, mitigations for the problem.
+- A description of the problem.
+- Steps we can follow to reproduce the problem.
+- Affected versions.
+- If known, mitigations for the problem.
 
 We will respond within 3 days of the reporter's submission to acknowledge receipt of their report. Here is a template acknowledgement message:
 
@@ -27,27 +27,27 @@ $OPPIA_SECURITY_TEAM_MEMBER
 
 Immediately upon receiving a report of a security problem, a member of Oppia’s security team (the tech leads for now) will assemble a vulnerability response team (VRT). This team should:
 
-* Include an Oppia tech lead.
-* Include developers (most likely 1-2) with expertise in the part of the app affected by the problem.
-* Include as few developers as possible to avoid premature publication of the problem.
+- Include an Oppia tech lead.
+- Include developers (most likely 1-2) with expertise in the part of the app affected by the problem.
+- Include as few developers as possible to avoid premature publication of the problem.
 
 The tech lead will designate one VRT member as the VRT lead responsible for driving our response. The VRT lead will immediately (ideally within 24 hours) investigate the report and classify it as:
 
-* **Won’t fix**: The app is working as intended, the bug is not important enough for us to spend resources fixing, or the requested feature is not something we plan to implement.
+- **Won’t fix**: The app is working as intended, the bug is not important enough for us to spend resources fixing, or the requested feature is not something we plan to implement.
 
-* **Bug**: The problem identified is legitimate, but it is not a security issue. It will be resolved through our normal bug-fixing process.
+- **Bug**: The problem identified is legitimate, but it is not a security issue. It will be resolved through our normal bug-fixing process.
 
-* **Feature request**: The report identifies a new feature that should be implemented. It will be handled through our normal feature-development process.
+- **Feature request**: The report identifies a new feature that should be implemented. It will be handled through our normal feature-development process.
 
-* **Low-severity vulnerability**: The report identifies a security vulnerability that does not meet the high-severity criteria. It will be resolved through our normal bug-fixing process. A "security vulnerability" is unintended behavior with security implications. This is distinct from a feature request, which refers to cases where the code behaves as intended, but the reporter disagrees with that intention.
+- **Low-severity vulnerability**: The report identifies a security vulnerability that does not meet the high-severity criteria. It will be resolved through our normal bug-fixing process. A "security vulnerability" is unintended behavior with security implications. This is distinct from a feature request, which refers to cases where the code behaves as intended, but the reporter disagrees with that intention.
 
   For example, suppose we improperly sanitized user-provided data at the models layer such that user-provided code could be executed, but validation checks at the controller layer prevented an attacker from actually exploiting the vulnerability. This would be a security vulnerability because we do not intend for the models layer to allow user-provided code to execute, but it would be low-severity because the controllers layer would prevent exploitation.
 
-* **High-severity vulnerability**: The report identifies an exploitable security vulnerability that, if exploited, could result in any of the following:
+- **High-severity vulnerability**: The report identifies an exploitable security vulnerability that, if exploited, could result in any of the following:
 
-  * (Confidentiality) Unauthorized access to any sensitive data that shouldn't be made public. Here, "sensitive data" generally refers to both private user data, as well as information that could be used to gain access to private user data; if in doubt, consult the data owners.
-  * (Integrity) Unauthorized edits to any data.
-  * (Availability) Degraded system performance of the platform for users.
+  - (Confidentiality) Unauthorized access to any sensitive data that shouldn't be made public. Here, "sensitive data" generally refers to both private user data, as well as information that could be used to gain access to private user data; if in doubt, consult the data owners.
+  - (Integrity) Unauthorized edits to any data.
+  - (Availability) Degraded system performance of the platform for users.
 
 Note that while the VRT contains multiple individuals, it’s ultimately expected that the VRT lead drives the effort. This should be in collaboration with VRT members, but in cases of urgent vulnerabilities the VRT lead can operate authoritatively to mitigate or remediate the issue (i.e. they do not need VRT consensus or review, but they should leverage VRT team members as a source for information and help).
 
@@ -61,8 +61,8 @@ The rest of this document describes how we handle high-severity vulnerabilities.
 
 If the problem is confirmed as a high-severity vulnerability, the VRT will open a [GitHub security advisory](https://docs.github.com/en/code-security/repository-security-advisories/about-github-security-advisories-for-repositories) and, if both the VRT and reporter agree, add the reporter to the advisory so we can collaborate on it. We will coordinate work on the vulnerability via:
 
-* **The GitHub security advisory.** These advisories will let us collaborate in private, and they are appropriate in cases where disclosing the vulnerability prior to remediating it could put our users or developers at risk.
-* **(Optionally) An additional GitHub issue and pull request.** This will immediately disclose the vulnerability, and we will take this approach when immediate disclosure poses little risk to our users and developers. For example, when the vulnerability is already publicly known. Unlike security advisories, CI checks can run on these PRs.
+- **The GitHub security advisory.** These advisories will let us collaborate in private, and they are appropriate in cases where disclosing the vulnerability prior to remediating it could put our users or developers at risk.
+- **(Optionally) An additional GitHub issue and pull request.** This will immediately disclose the vulnerability, and we will take this approach when immediate disclosure poses little risk to our users and developers. For example, when the vulnerability is already publicly known. Unlike security advisories, CI checks can run on these PRs.
 
 Note that we will create a GitHub security advisory even if we choose to collaborate on a fix using an open issue or PR because we’ll want to publish the advisory when disclosing the vulnerability.
 

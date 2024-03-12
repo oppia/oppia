@@ -19,18 +19,17 @@
  * valid.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { AlertsService } from 'services/alerts.service';
-import { ChangeListService } from './change-list.service';
-import { LoggerService } from 'services/contextual/logger.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from './change-list.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class ExplorationInitStateNameService
-    extends ExplorationPropertyService {
+export class ExplorationInitStateNameService extends ExplorationPropertyService {
   // This property is initialized using init method and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -45,6 +44,9 @@ export class ExplorationInitStateNameService
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationInitStateNameService', downgradeInjectable(
-    ExplorationInitStateNameService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationInitStateNameService',
+    downgradeInjectable(ExplorationInitStateNameService)
+  );

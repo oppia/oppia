@@ -16,19 +16,24 @@
  * @fileoverview Component for tag misconception modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { MisconceptionUpdatedValues } from './question-misconception-editor.component';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {
+  Misconception,
+  MisconceptionSkillMap,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionUpdatedValues} from './question-misconception-editor.component';
 
 @Component({
   selector: 'oppia-tag-misconception-modal',
-  templateUrl: './tag-misconception-modal.component.html'
+  templateUrl: './tag-misconception-modal.component.html',
 })
 export class TagMisconceptionModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -49,27 +54,24 @@ export class TagMisconceptionModalComponent
   }
 
   ngOnInit(): void {
-    this.misconceptionsBySkill = (
-      this.stateEditorService.getMisconceptionsBySkill());
+    this.misconceptionsBySkill =
+      this.stateEditorService.getMisconceptionsBySkill();
     this.tempSelectedMisconception = null;
     this.tempSelectedMisconceptionSkillId = null;
     this.tempMisconceptionFeedbackIsUsed = true;
   }
 
   updateValues(newValues: MisconceptionUpdatedValues): void {
-    this.tempSelectedMisconception = (
-      newValues.misconception);
-    this.tempSelectedMisconceptionSkillId = (
-      newValues.skillId);
-    this.tempMisconceptionFeedbackIsUsed = (
-      newValues.feedbackIsUsed);
+    this.tempSelectedMisconception = newValues.misconception;
+    this.tempSelectedMisconceptionSkillId = newValues.skillId;
+    this.tempMisconceptionFeedbackIsUsed = newValues.feedbackIsUsed;
   }
 
   done(): void {
     this.ngbActiveModal.close({
       misconception: this.tempSelectedMisconception,
       misconceptionSkillId: this.tempSelectedMisconceptionSkillId,
-      feedbackIsUsed: this.tempMisconceptionFeedbackIsUsed
+      feedbackIsUsed: this.tempMisconceptionFeedbackIsUsed,
     });
   }
 }
