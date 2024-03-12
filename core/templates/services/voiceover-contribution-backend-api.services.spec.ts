@@ -18,7 +18,7 @@
 
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { VoiceoverContributionBackendApiService } from '../services/voiceover-contribution-backend-api-services';
+import { VoiceoverContributionBackendApiService } from '../services/voiceover-contribution-backend-api.services';
 
 describe('Voiceover contribution backend api service', () => {
   let voiceoverContributionBackendApiService:

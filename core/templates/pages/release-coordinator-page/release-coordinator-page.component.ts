@@ -22,7 +22,7 @@ import { downgradeComponent } from '@angular/upgrade/static';
 
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
 import { PlatformFeatureService } from 'services/platform-feature.service';
-import { VoiceoverContributionBackendApiService } from '../../services/voiceover-contribution-backend-api-services';
+import { VoiceoverContributionBackendApiService } from '../../services/voiceover-contribution-backend-api.services';
 
 
 import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';

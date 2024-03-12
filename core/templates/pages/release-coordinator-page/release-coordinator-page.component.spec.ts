@@ -20,7 +20,7 @@ import { TestBed, waitForAsync, ComponentFixture, fakeAsync, tick } from '@angul
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormBuilder } from '@angular/forms';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-import { VoiceoverContributionBackendApiService } from '../../services/voiceover-contribution-backend-api-services';
+import { VoiceoverContributionBackendApiService } from '../../services/voiceover-contribution-backend-api.services';
 import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';
 import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
 import { ReleaseCoordinatorPageComponent } from './release-coordinator-page.component';
