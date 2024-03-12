@@ -16,36 +16,40 @@
  * @fileoverview Unit tests for ConfirmOrCancelModalController.
  */
 
-describe('Confirm Or Cancel Modal Controller', function() {
+describe('Confirm Or Cancel Modal Controller', function () {
   var $scope = null;
   var $uibModalInstance = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector, $controller) {
-    var $rootScope = $injector.get('$rootScope');
+  beforeEach(
+    angular.mock.inject(function ($injector, $controller) {
+      var $rootScope = $injector.get('$rootScope');
 
-    $uibModalInstance = jasmine.createSpyObj(
-      '$uibModalInstance', ['close', 'dismiss']);
+      $uibModalInstance = jasmine.createSpyObj('$uibModalInstance', [
+        'close',
+        'dismiss',
+      ]);
 
-    $scope = $rootScope.$new();
-    $controller('ConfirmOrCancelModalController', {
-      $scope: $scope,
-      $uibModalInstance: $uibModalInstance,
-    });
-  }));
+      $scope = $rootScope.$new();
+      $controller('ConfirmOrCancelModalController', {
+        $scope: $scope,
+        $uibModalInstance: $uibModalInstance,
+      });
+    })
+  );
 
-  it('should close modal with the correct value', function() {
+  it('should close modal with the correct value', function () {
     var message = 'closing';
     $scope.confirm(message);
     expect($uibModalInstance.close).toHaveBeenCalledWith(message);
   });
 
-  it('should dismiss modal', function() {
+  it('should dismiss modal', function () {
     $scope.cancel();
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith('cancel');
   });
 
-  it('should dismiss modal with the correct value', function() {
+  it('should dismiss modal with the correct value', function () {
     var message = 'canceling';
     $scope.cancel(message);
     expect($uibModalInstance.dismiss).toHaveBeenCalledWith(message);

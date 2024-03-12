@@ -16,18 +16,18 @@
  * @fileoverview A data service that stores the exploration language code.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { AlertsService } from 'services/alerts.service';
-import { ChangeListService } from './change-list.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ContextService } from 'services/context.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from './change-list.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ContextService} from 'services/context.service';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationLanguageCodeService extends ExplorationPropertyService {
   propertyName: string = 'language_code';
@@ -59,12 +59,15 @@ export class ExplorationLanguageCodeService extends ExplorationPropertyService {
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   _isValid(value: string) {
-    return AppConstants.SUPPORTED_CONTENT_LANGUAGES.some((elt) => {
+    return AppConstants.SUPPORTED_CONTENT_LANGUAGES.some(elt => {
       return elt.code === value;
     });
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationLanguageCodeService', downgradeInjectable(
-    ExplorationLanguageCodeService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationLanguageCodeService',
+    downgradeInjectable(ExplorationLanguageCodeService)
+  );

@@ -16,19 +16,25 @@
  * @fileoverview Unit tests for FeedbackPopupComponent
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { FeedbackPopupComponent } from './feedback-popup.component';
-import { UserService } from 'services/user.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { PlayerPositionService } from '../services/player-position.service';
-import { BackgroundMaskService } from 'services/stateful/background-mask.service';
-import { FeedbackPopupBackendApiService } from '../services/feedback-popup-backend-api.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {FeedbackPopupComponent} from './feedback-popup.component';
+import {UserService} from 'services/user.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {PlayerPositionService} from '../services/player-position.service';
+import {BackgroundMaskService} from 'services/stateful/background-mask.service';
+import {FeedbackPopupBackendApiService} from '../services/feedback-popup-backend-api.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 describe('FeedbackPopupComponent', () => {
@@ -43,19 +49,16 @@ describe('FeedbackPopupComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        FeedbackPopupComponent,
-        MockTranslatePipe
-      ],
+      declarations: [FeedbackPopupComponent, MockTranslatePipe],
       providers: [
         NgbActiveModal,
         BackgroundMaskService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -64,13 +67,14 @@ describe('FeedbackPopupComponent', () => {
     playerPositionService = TestBed.get(PlayerPositionService);
     windowDimensionsService = TestBed.get(WindowDimensionsService);
     feedbackPopupBackendApiService = TestBed.get(
-      FeedbackPopupBackendApiService);
+      FeedbackPopupBackendApiService
+    );
     ngbActiveModal = TestBed.get(NgbActiveModal);
     fixture = TestBed.createComponent(FeedbackPopupComponent);
     component = fixture.componentInstance;
 
     spyOn(userService, 'getUserInfoAsync').and.resolveTo({
-      isLoggedIn: () => true
+      isLoggedIn: () => true,
     } as UserInfo);
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('Hola');
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
@@ -90,14 +94,17 @@ describe('FeedbackPopupComponent', () => {
 
     expect(component.isLoggedIn).toBe(true);
     expect(component.feedbackPopoverId).toContain('feedbackPopover');
-    expect(component.feedbackTitle)
-      .toBe('Feedback when the user was at card "Hola"');
+    expect(component.feedbackTitle).toBe(
+      'Feedback when the user was at card "Hola"'
+    );
   }));
 
   it('should save feedback submitted by user', fakeAsync(() => {
     component.feedbackText = 'Nice exploration!';
-    spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync')
-      .and.resolveTo();
+    spyOn(
+      feedbackPopupBackendApiService,
+      'submitFeedbackAsync'
+    ).and.resolveTo();
     spyOn(ngbActiveModal, 'close');
 
     expect(component.feedbackSubmitted).toBe(false);

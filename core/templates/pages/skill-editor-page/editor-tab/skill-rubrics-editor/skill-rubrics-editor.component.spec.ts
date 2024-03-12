@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for SkillRubricsEditorComponent
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {EventEmitter} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { SkillRubricsEditorComponent } from './skill-rubrics-editor.component';
-import { Rubric } from 'domain/skill/rubric.model';
-import { of } from 'rxjs';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
+import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {SkillRubricsEditorComponent} from './skill-rubrics-editor.component';
+import {Rubric} from 'domain/skill/rubric.model';
+import {of} from 'rxjs';
 
 describe('Skill Rubrics Editor Component', () => {
   let component: SkillRubricsEditorComponent;
@@ -43,9 +43,7 @@ describe('Skill Rubrics Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        SkillRubricsEditorComponent
-      ],
+      declarations: [SkillRubricsEditorComponent],
       providers: [
         SkillUpdateService,
         SkillEditorStateService,
@@ -53,11 +51,11 @@ describe('Skill Rubrics Editor Component', () => {
           provide: WindowDimensionsService,
           useValue: {
             isWindowNarrow: () => true,
-            getResizeEvent: () => of(resizeEvent)
-          }
-        }
+            getResizeEvent: () => of(resizeEvent),
+          },
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -79,9 +77,9 @@ describe('Skill Rubrics Editor Component', () => {
         voiceovers_mapping: {
           explanation: {},
           worked_example_1: {},
-          worked_example_2: {}
-        }
-      }
+          worked_example_2: {},
+        },
+      },
     };
 
     sampleSkill = skillObjectFactory.createFromBackendDict({
@@ -95,7 +93,7 @@ describe('Skill Rubrics Editor Component', () => {
       next_misconception_id: 6,
       superseding_skill_id: '2',
       all_questions_merged: false,
-      prerequisite_skill_ids: ['skill_1']
+      prerequisite_skill_ids: ['skill_1'],
     });
 
     fixture.detectChanges();
@@ -105,39 +103,43 @@ describe('Skill Rubrics Editor Component', () => {
     component.ngOnDestroy();
   });
 
-  describe('when user\'s window is narrow', () => {
+  describe("when user's window is narrow", () => {
     beforeEach(() => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
       spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
-      spyOnProperty(skillEditorStateService, 'onSkillChange')
-        .and.returnValue(mockEventEmitter);
+      spyOnProperty(skillEditorStateService, 'onSkillChange').and.returnValue(
+        mockEventEmitter
+      );
 
       component.ngOnInit();
     });
 
-    it('should initialise component when user open skill rubrics editor',
-      () => {
-        expect(component.skill).toEqual(sampleSkill);
-        expect(component.rubricsListIsShown).toBeFalse();
-      });
+    it('should initialise component when user open skill rubrics editor', () => {
+      expect(component.skill).toEqual(sampleSkill);
+      expect(component.rubricsListIsShown).toBeFalse();
+    });
 
     it('should fetch rubrics when skill changes', () => {
-      component.skill._rubrics = [Rubric.createFromBackendDict({
-        difficulty: 'Easy',
-        explanations: ['explanation'],
-      })];
+      component.skill._rubrics = [
+        Rubric.createFromBackendDict({
+          difficulty: 'Easy',
+          explanations: ['explanation'],
+        }),
+      ];
 
       expect(component.rubrics).toBeUndefined();
 
       mockEventEmitter.emit();
 
-      expect(component.rubrics).toEqual([Rubric.createFromBackendDict({
-        difficulty: 'Easy',
-        explanations: ['explanation'],
-      })]);
+      expect(component.rubrics).toEqual([
+        Rubric.createFromBackendDict({
+          difficulty: 'Easy',
+          explanations: ['explanation'],
+        }),
+      ]);
     });
 
-    it('should show toggle rubrics list when user\'s window is narrow', () => {
+    it("should show toggle rubrics list when user's window is narrow", () => {
       expect(component.rubricsListIsShown).toBeFalse();
 
       component.toggleRubricsList();
@@ -158,14 +160,14 @@ describe('Skill Rubrics Editor Component', () => {
       ]);
 
       expect(skillUpdateService.updateRubricForDifficulty).toHaveBeenCalledWith(
-        sampleSkill, 'Easy', [
-          'new explanation 1',
-          'new explanation 2',
-        ]);
+        sampleSkill,
+        'Easy',
+        ['new explanation 1', 'new explanation 2']
+      );
     });
   });
 
-  describe('when user\'s window is not narrow', () => {
+  describe("when user's window is not narrow", () => {
     beforeEach(() => {
       spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
       spyOn(skillEditorStateService, 'getSkill').and.returnValue(sampleSkill);
@@ -189,8 +191,7 @@ describe('Skill Rubrics Editor Component', () => {
 
   it('should toggle skill editor card on clicking', () => {
     component.skillEditorCardIsShown = true;
-    spyOn(windowDimensionsService, 'isWindowNarrow')
-      .and.returnValue(true);
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
 
     component.toggleSkillEditorCard();
 
@@ -204,7 +205,8 @@ describe('Skill Rubrics Editor Component', () => {
   it('should show Rubrics list when the window is narrow', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockEventEmitter);
+      mockEventEmitter
+    );
     component.windowIsNarrow = false;
 
     expect(component.rubricsListIsShown).toBe(false);

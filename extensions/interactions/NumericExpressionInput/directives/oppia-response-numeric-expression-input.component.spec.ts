@@ -16,28 +16,26 @@
  * @fileoverview Unit tests for the NumericExpressionInput response component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { ResponseNumericExpressionInput } from './oppia-response-numeric-expression-input.component';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {ResponseNumericExpressionInput} from './oppia-response-numeric-expression-input.component';
 
-describe('ResponseNumericExpressionInput', function() {
+describe('ResponseNumericExpressionInput', function () {
   let component: ResponseNumericExpressionInput;
   let fixture: ComponentFixture<ResponseNumericExpressionInput>;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        declarations: [ResponseNumericExpressionInput]
-      }).compileComponents();
+    TestBed.configureTestingModule({
+      declarations: [ResponseNumericExpressionInput],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      ResponseNumericExpressionInput);
+    fixture = TestBed.createComponent(ResponseNumericExpressionInput);
     component = fixture.componentInstance;
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
-  it('should correctly escape characters in the answer', function() {
+  it('should correctly escape characters in the answer', function () {
     component.ngOnInit();
     expect(component.displayAnswer).toBe('answer');
   });

@@ -16,22 +16,22 @@
  * @fileoverview Component for home tab in the Learner Dashboard page.
  */
 
-import { AppConstants } from 'app.constants';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {AppConstants} from 'app.constants';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Subscription} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 import './home-tab.component.css';
 
- @Component({
-   selector: 'oppia-home-tab',
-   templateUrl: './home-tab.component.html',
-   styleUrls: ['./home-tab.component.css']
- })
+@Component({
+  selector: 'oppia-home-tab',
+  templateUrl: './home-tab.component.html',
+  styleUrls: ['./home-tab.component.css'],
+})
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
@@ -56,11 +56,11 @@ export class HomeTabComponent {
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
-    this.width = this.widthConst * (this.currentGoals.length);
+    this.width = this.widthConst * this.currentGoals.length;
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
@@ -79,7 +79,8 @@ export class HomeTabComponent {
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-      }));
+      })
+    );
   }
 
   getTimeOfDay(): string {
@@ -100,8 +101,9 @@ export class HomeTabComponent {
   getClassroomLink(classroomUrlFragment: string): string {
     this.classroomUrlFragment = classroomUrlFragment;
     return this.urlInterpolationService.interpolateUrl(
-      this.CLASSROOM_LINK_URL_TEMPLATE, {
-        classroom_url_fragment: this.classroomUrlFragment
+      this.CLASSROOM_LINK_URL_TEMPLATE,
+      {
+        classroom_url_fragment: this.classroomUrlFragment,
       }
     );
   }
@@ -119,7 +121,7 @@ export class HomeTabComponent {
     /**
      * If there are 3 or more topics for each untrackedTopic, the total
      * width of the section will be 662px in mobile view to enable scrolling.
-    */
+     */
     if (length >= 3) {
       return 662;
     }
@@ -128,12 +130,13 @@ export class HomeTabComponent {
      * width of the section will be calculated by multiplying the addition of
      * number of topics and one classroom card with 164px in mobile view to
      * enable scrolling.
-    */
+     */
     return (length + 1) * 164;
   }
 
   changeActiveSection(): void {
     this.setActiveSection.emit(
-      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS);
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS
+    );
   }
 }

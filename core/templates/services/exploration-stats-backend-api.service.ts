@@ -17,35 +17,43 @@
  *    backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
 import {
   ExplorationStats,
-  ExplorationStatsBackendDict
+  ExplorationStatsBackendDict,
 } from 'domain/statistics/exploration-stats.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({providedIn: 'root'})
 export class ExplorationStatsBackendApiService {
   constructor(
-      private http: HttpClient,
-      private urlInterpolationService: UrlInterpolationService) {}
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async fetchExplorationStatsAsync(expId: string): Promise<ExplorationStats> {
-    return this.http.get<ExplorationStatsBackendDict>(
-      this.urlInterpolationService.interpolateUrl(
-        '/createhandler/statistics/<exploration_id>', {
-          exploration_id: expId
-        })).toPromise()
+    return this.http
+      .get<ExplorationStatsBackendDict>(
+        this.urlInterpolationService.interpolateUrl(
+          '/createhandler/statistics/<exploration_id>',
+          {
+            exploration_id: expId,
+          }
+        )
+      )
+      .toPromise()
       .then((dict: ExplorationStatsBackendDict) => {
         return ExplorationStats.createFromBackendDict(dict);
       });
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationStatsBackendApiService',
-  downgradeInjectable(ExplorationStatsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationStatsBackendApiService',
+    downgradeInjectable(ExplorationStatsBackendApiService)
+  );

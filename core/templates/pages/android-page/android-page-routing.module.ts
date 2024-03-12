@@ -16,24 +16,19 @@
  * @fileoverview Routing module for Android page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { AndroidPageRootComponent } from './android-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {AndroidPageRootComponent} from './android-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: AndroidPageRootComponent
-  }
+    component: AndroidPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class AndroidPageRoutingModule {}

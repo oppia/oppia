@@ -16,9 +16,18 @@
  * @fileoverview Wrapper angular component for code mirror.
  */
 
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 
 interface CodeMirrorMergeViewOptions {
   lineNumbers: boolean;
@@ -29,7 +38,7 @@ interface CodeMirrorMergeViewOptions {
 
 @Component({
   selector: 'oppia-codemirror',
-  templateUrl: './codemirror.component.html'
+  templateUrl: './codemirror.component.html',
 })
 export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   @Input() options!: CodeMirrorMergeViewOptions;
@@ -44,12 +53,13 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
   // fails to initialise the component, this can make the below
   // properties undefined.
   @ViewChild(CodemirrorComponent) codemirrorComponent:
-   CodemirrorComponent | undefined;
+    | CodemirrorComponent
+    | undefined;
 
   codemirror: CodeMirror.Editor | undefined;
   autoFocus = false;
 
-  constructor() { }
+  constructor() {}
 
   updateValue(val: string): void {
     this.value = val;
@@ -72,12 +82,16 @@ export class CodeMirrorComponent implements AfterViewInit, OnChanges {
     if (
       changes.refresh !== undefined &&
       changes.refresh.previousValue !== changes.refresh.currentValue &&
-      this.codemirror) {
+      this.codemirror
+    ) {
       this.codemirror.refresh();
     }
   }
 }
 
-angular.module('oppia').directive('oppiaCodemirror', downgradeComponent({
-  component: CodeMirrorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaCodemirror',
+  downgradeComponent({
+    component: CodeMirrorComponent,
+  }) as angular.IDirectiveFactory
+);

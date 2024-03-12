@@ -17,10 +17,10 @@
  * exploration.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { States } from 'domain/exploration/StatesObjectFactory';
+import {States} from 'domain/exploration/StatesObjectFactory';
 
 export interface GraphLink {
   source: string;
@@ -41,7 +41,7 @@ export interface GraphData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ComputeGraphService {
   _computeGraphData(initStateId: string, states: States): GraphData {
@@ -49,7 +49,7 @@ export class ComputeGraphService {
     let links: GraphLink[] = [];
     let finalStateIds = states.getFinalStateNames();
 
-    states.getStateNames().forEach(function(stateName) {
+    states.getStateNames().forEach(function (stateName) {
       let interaction = states.getState(stateName).interaction;
       nodes[stateName] = stateName;
       if (interaction.id) {
@@ -59,7 +59,7 @@ export class ComputeGraphService {
             source: stateName,
             target: groups[h].outcome.dest,
             linkProperty: null,
-            connectsDestIfStuck: false
+            connectsDestIfStuck: false,
           });
           if (groups[h].outcome.destIfReallyStuck) {
             links.push({
@@ -72,7 +72,7 @@ export class ComputeGraphService {
               // @ts-ignore
               target: groups[h].outcome.destIfReallyStuck,
               linkProperty: null,
-              connectsDestIfStuck: true
+              connectsDestIfStuck: true,
             });
           }
         }
@@ -82,14 +82,14 @@ export class ComputeGraphService {
             source: stateName,
             target: interaction.defaultOutcome.dest,
             linkProperty: null,
-            connectsDestIfStuck: false
+            connectsDestIfStuck: false,
           });
           if (interaction.defaultOutcome.destIfReallyStuck) {
             links.push({
               source: stateName,
               target: interaction.defaultOutcome.destIfReallyStuck,
               linkProperty: null,
-              connectsDestIfStuck: true
+              connectsDestIfStuck: true,
             });
           }
         }
@@ -99,12 +99,15 @@ export class ComputeGraphService {
       finalStateIds: finalStateIds,
       initStateId: initStateId,
       links: links,
-      nodes: nodes
+      nodes: nodes,
     };
   }
 
   _computeBfsTraversalOfStates(
-      initStateId: string, states: States, sourceStateName: string): string[] {
+    initStateId: string,
+    states: States,
+    sourceStateName: string
+  ): string[] {
     let stateGraph = this._computeGraphData(initStateId, states);
     let stateNamesInBfsOrder: string[] = [];
     let queue: string[] = [];
@@ -134,11 +137,18 @@ export class ComputeGraphService {
   }
 
   computeBfsTraversalOfStates(
-      initStateId: string, states: States, sourceStateName: string): string[] {
+    initStateId: string,
+    states: States,
+    sourceStateName: string
+  ): string[] {
     return this._computeBfsTraversalOfStates(
-      initStateId, states, sourceStateName);
+      initStateId,
+      states,
+      sourceStateName
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'ComputeGraphService', downgradeInjectable(ComputeGraphService));
+angular
+  .module('oppia')
+  .factory('ComputeGraphService', downgradeInjectable(ComputeGraphService));

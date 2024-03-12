@@ -16,21 +16,32 @@
  * @fileoverview Unit tests for RteHelperModalController.
  */
 
-import { TestBed, ComponentFixture, waitForAsync, fakeAsync, flush } from '@angular/core/testing';
-import { RteHelperModalComponent } from './rte-helper-modal.controller';
-import { ExternalRteSaveService } from './external-rte-save.service';
-import { AlertsService } from './alerts.service';
-import { ContextService } from './context.service';
-import { ImageLocalStorageService } from './image-local-storage.service';
-import { AssetsBackendApiService } from './assets-backend-api.service';
-import { ImageUploadHelperService } from './image-upload-helper.service';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DirectivesModule } from 'directives/directives.module';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
-import { TranslateFakeLoader, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import {
+  TestBed,
+  ComponentFixture,
+  waitForAsync,
+  fakeAsync,
+  flush,
+} from '@angular/core/testing';
+import {RteHelperModalComponent} from './rte-helper-modal.controller';
+import {ExternalRteSaveService} from './external-rte-save.service';
+import {AlertsService} from './alerts.service';
+import {ContextService} from './context.service';
+import {ImageLocalStorageService} from './image-local-storage.service';
+import {AssetsBackendApiService} from './assets-backend-api.service';
+import {ImageUploadHelperService} from './image-upload-helper.service';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {DirectivesModule} from 'directives/directives.module';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter} from '@angular/core';
+import {
+  TranslateFakeLoader,
+  TranslateLoader,
+  TranslateModule,
+  TranslateService,
+} from '@ngx-translate/core';
 
 describe('RteHelperModalComponent', () => {
   let component: RteHelperModalComponent;
@@ -51,9 +62,9 @@ describe('RteHelperModalComponent', () => {
         TranslateModule.forRoot({
           loader: {
             provide: TranslateLoader,
-            useClass: TranslateFakeLoader
-          }
-        })
+            useClass: TranslateFakeLoader,
+          },
+        }),
       ],
       declarations: [RteHelperModalComponent],
       providers: [
@@ -64,13 +75,13 @@ describe('RteHelperModalComponent', () => {
         ImageUploadHelperService,
         {
           provide: NgbActiveModal,
-          useValue: jasmine.createSpyObj('activeModal', ['close', 'dismiss'])
+          useValue: jasmine.createSpyObj('activeModal', ['close', 'dismiss']),
         },
         {
           provide: ExternalRteSaveService,
-          useValue: { onExternalRteSave: mockExternalRteSaveEventEmitter }
+          useValue: {onExternalRteSave: mockExternalRteSaveEventEmitter},
         },
-        TranslateService
+        TranslateService,
       ],
     }).compileComponents();
   }));
@@ -82,21 +93,23 @@ describe('RteHelperModalComponent', () => {
     activeModal = TestBed.inject(NgbActiveModal);
   });
 
-  describe('when customization args has a valid youtube video', function() {
-    var customizationArgSpecs = [{
-      name: 'heading',
-      default_value: 'default value'
-    }, {
-      name: 'video_id',
-      default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU'
-    }];
-
+  describe('when customization args has a valid youtube video', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'heading',
+        default_value: 'default value',
+      },
+      {
+        name: 'video_id',
+        default_value: 'https://www.youtube.com/watch?v=Ntcw0H0hwPU',
+      },
+    ];
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
       component.attrsCustomizationArgsDict = {
-        heading: 'This value is not default.'
+        heading: 'This value is not default.',
       };
       component.customizationArgSpecs = customizationArgSpecs;
     });
@@ -125,28 +138,32 @@ describe('RteHelperModalComponent', () => {
       expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
       expect(activeModal.close).toHaveBeenCalledWith({
         heading: 'This value is not default.',
-        video_id: 'Ntcw0H0hwPU'
+        video_id: 'Ntcw0H0hwPU',
       });
     }));
   });
-  describe('when there are validation errors in any form control', function() {
-    var customizationArgSpecs = [{
-      name: 'alt',
-      default_value: 'def',
-      schema: {
-        type: 'unicode',
-        validators: [{
-          id: 'has_length_at_least',
-          min_value: 5
-        }]
-      }
-    }];
+  describe('when there are validation errors in any form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'alt',
+        default_value: 'def',
+        schema: {
+          type: 'unicode',
+          validators: [
+            {
+              id: 'has_length_at_least',
+              min_value: 5,
+            },
+          ],
+        },
+      },
+    ];
 
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
       component.attrsCustomizationArgsDict = {
-        heading: 'This value is not default.'
+        heading: 'This value is not default.',
       };
       component.customizationArgSpecs = customizationArgSpecs;
     });

@@ -16,8 +16,8 @@
  * @fileoverview Service to help inserting script element into html page.
  */
 
-import { Injectable, Renderer2, RendererFactory2 } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable, Renderer2, RendererFactory2} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
@@ -25,7 +25,7 @@ export enum KNOWN_SCRIPTS {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class InsertScriptService {
   private loadedScripts: Set<string> = new Set<string>();
@@ -60,5 +60,6 @@ export class InsertScriptService {
   }
 }
 
-angular.module('oppia').factory(
-  'InsertScriptService', downgradeInjectable(InsertScriptService));
+angular
+  .module('oppia')
+  .factory('InsertScriptService', downgradeInjectable(InsertScriptService));

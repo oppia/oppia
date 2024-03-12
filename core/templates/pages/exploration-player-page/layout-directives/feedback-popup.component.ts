@@ -28,7 +28,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'oppia-feedback-popup',
-  templateUrl: './feedback-popup.component.html'
+  templateUrl: './feedback-popup.component.html',
 })
 export class FeedbackPopupComponent {
   // These properties below are initialized using Angular lifecycle hooks
@@ -55,14 +55,15 @@ export class FeedbackPopupComponent {
   ) {}
 
   ngOnInit(): void {
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.isLoggedIn = userInfo.isLoggedIn();
     });
-    this.feedbackPopoverId = (
-      'feedbackPopover' + Math.random().toString(36).slice(2));
-    this.feedbackTitle = (
+    this.feedbackPopoverId =
+      'feedbackPopover' + Math.random().toString(36).slice(2);
+    this.feedbackTitle =
       'Feedback when the user was at card "' +
-        this.playerPositionService.getCurrentStateName() + '"');
+      this.playerPositionService.getCurrentStateName() +
+      '"';
 
     if (this.windowDimensionsService.isWindowNarrow()) {
       this.backgroundMaskService.activateMask();
@@ -73,17 +74,19 @@ export class FeedbackPopupComponent {
 
   saveFeedback(): void {
     if (this.feedbackText) {
-      this.feedbackPopupBackendApiService.submitFeedbackAsync(
-        this.feedbackTitle,
-        this.feedbackText,
-        !this.isSubmitterAnonymized && this.isLoggedIn,
-        this.playerPositionService.getCurrentStateName()
-      ).then(() => {
-        this.feedbackSubmitted = true;
-        setTimeout(() => {
-          this.close();
-        }, 2000);
-      });
+      this.feedbackPopupBackendApiService
+        .submitFeedbackAsync(
+          this.feedbackTitle,
+          this.feedbackText,
+          !this.isSubmitterAnonymized && this.isLoggedIn,
+          this.playerPositionService.getCurrentStateName()
+        )
+        .then(() => {
+          this.feedbackSubmitted = true;
+          setTimeout(() => {
+            this.close();
+          }, 2000);
+        });
     }
   }
 

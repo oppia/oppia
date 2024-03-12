@@ -20,22 +20,29 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface StringValidatorSchema {
   type: string;
   items: {
     type: string;
   };
-  validators: { id: string }[];
+  validators: {id: string}[];
 }
 
 @Component({
   selector: 'set-of-unicode-string-editor',
   templateUrl: './list-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SetOfUnicodeStringEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -47,11 +54,13 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
   SCHEMA: StringValidatorSchema = {
     type: 'list',
     items: {
-      type: 'unicode'
+      type: 'unicode',
     },
-    validators: [{
-      id: 'is_uniquified'
-    }]
+    validators: [
+      {
+        id: 'is_uniquified',
+      },
+    ],
   };
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {}
@@ -78,6 +87,8 @@ export class SetOfUnicodeStringEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'setOfUnicodeStringEditor', downgradeComponent({
-    component: SetOfUnicodeStringEditorComponent
-  }) as angular.IDirectiveFactory);
+  'setOfUnicodeStringEditor',
+  downgradeComponent({
+    component: SetOfUnicodeStringEditorComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -12,28 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Service for converting state or metadata dicts into yaml during
  * version comparison in history tab.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
-import { YamlService } from 'services/yaml.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {State} from 'domain/state/StateObjectFactory';
+import {YamlService} from 'services/yaml.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HistoryTabYamlConversionService {
-  constructor(
-    private yamlService: YamlService
-  ) {}
+  constructor(private yamlService: YamlService) {}
 
   getYamlStringFromStateOrMetadata(
-      entity: (State | ExplorationMetadata) | null
+    entity: (State | ExplorationMetadata) | null
   ): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       // Note: the timeout is needed or the string will be sent
@@ -50,6 +47,9 @@ export class HistoryTabYamlConversionService {
   }
 }
 
-angular.module('oppia').factory(
-  'HistoryTabYamlConversionService',
-  downgradeInjectable(HistoryTabYamlConversionService));
+angular
+  .module('oppia')
+  .factory(
+    'HistoryTabYamlConversionService',
+    downgradeInjectable(HistoryTabYamlConversionService)
+  );
