@@ -37,11 +37,16 @@ export default {
       'http://localhost:8181/creator-dashboard?mode=create',
     Donate: 'http://localhost:8181/donate',
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
-    ExternalLink61MillionChildren: 'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education',
-    ExternalLinkEvenThoseWhoAreInSchool: 'https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
-    ExternalLinkSourceUnesco: 'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
-    ExternalLinkWatchAVideo: 'https://www.facebook.com/oppiaorg/videos/189487953721583/',
-    MobileExternalLinkWatchAVideo: 'https://m.facebook.com/oppiaorg/videos/189487953721583/',
+    ExternalLink61MillionChildren:
+      'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education',
+    ExternalLinkEvenThoseWhoAreInSchool:
+      'https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
+    ExternalLinkSourceUnesco:
+      'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
+    ExternalLinkWatchAVideo:
+      'https://www.facebook.com/oppiaorg/videos/189487953721583/',
+    MobileExternalLinkWatchAVideo:
+      'https://m.facebook.com/oppiaorg/videos/189487953721583/',
     Home: 'http://localhost:8181/',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
@@ -66,7 +71,7 @@ export default {
     BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
   } as const,
   Breakpoints: {
-    MOBILE: 768
+    MOBILE: 768,
   },
   images: {
     blogPostThumbnailImage: path.resolve(

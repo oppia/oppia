@@ -147,10 +147,7 @@ export class LoggedInUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      this.clickOn(button),
-    ]);
+    await Promise.all([this.page.waitForNavigation(), this.clickOn(button)]);
     if (this.page.url() !== expectedDestinationPageUrl) {
       throw new Error(
         'The ' +
@@ -184,8 +181,9 @@ export class LoggedInUser extends BaseUser {
    */
   async clickOnExpandGetInvolvedMenuButtonOnMobileSidebar(): Promise<void> {
     await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
-    await this.page.waitForSelector(
-      mobileSidebarGetInvolvedMenu, { visible: true });
+    await this.page.waitForSelector(mobileSidebarGetInvolvedMenu, {
+      visible: true,
+    });
   }
 
   /**
@@ -197,12 +195,18 @@ export class LoggedInUser extends BaseUser {
       await this.clickOnMobileNavbarButton();
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
-        'About Oppia button in the About Menu on mobile sidebar', aboutUrl, 'About');
+        'About Oppia button in the About Menu on mobile sidebar',
+        aboutUrl,
+        'About'
+      );
     } else {
       await this.clickOn(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabAboutButton,
-        'About Oppia button in the About Menu on navbar', aboutUrl, 'About');
+        'About Oppia button in the About Menu on navbar',
+        aboutUrl,
+        'About'
+      );
     }
   }
 
@@ -558,7 +562,10 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabBlogButton,
-        'Blog button in the About Menu on navbar', blogUrl, 'Blog');
+        'Blog button in the About Menu on navbar',
+        blogUrl,
+        'Blog'
+      );
     }
   }
 
@@ -573,13 +580,17 @@ export class LoggedInUser extends BaseUser {
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuPartnershipsButton,
         'School and Organizations in the Get Involved Menu on mobile sidebar',
-        partnershipsUrl, 'Partnerships');
+        partnershipsUrl,
+        'Partnerships'
+      );
     } else {
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabSchoolAndOrganizationsButton,
         'School and Organizations in the Get Involved Menu on navbar',
-        partnershipsUrl, 'Partnerships');
+        partnershipsUrl,
+        'Partnerships'
+      );
     }
   }
 
@@ -594,13 +605,17 @@ export class LoggedInUser extends BaseUser {
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuVolunteerButton,
         'Volunteer in the Get Involved Menu on mobile sidebar',
-        volunteerUrl, 'Volunteer');
+        volunteerUrl,
+        'Volunteer'
+      );
     } else {
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabVolunteerButton,
         'Volunteer in the Get Involved Menu on navbar',
-        volunteerUrl, 'Volunteer');
+        volunteerUrl,
+        'Volunteer'
+      );
     }
   }
 
@@ -615,12 +630,17 @@ export class LoggedInUser extends BaseUser {
       await this.clickButtonToNavigateToNewPage(
         mobileSidevbarGetInvolvedMenuDonateButton,
         'Donate in the Get Involved Menu on mobile sidebar',
-        donateUrl, 'Donate');
+        donateUrl,
+        'Donate'
+      );
     } else {
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabDonateButton,
-        'Donate in the Get Involved Menu on navbar', donateUrl, 'Donate');
+        'Donate in the Get Involved Menu on navbar',
+        donateUrl,
+        'Donate'
+      );
     }
   }
 
@@ -635,13 +655,17 @@ export class LoggedInUser extends BaseUser {
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuContactUsButton,
         'Contact Us in the Get Involved Menu on mobile sidebar',
-        contactUrl, 'Contact');
+        contactUrl,
+        'Contact'
+      );
     } else {
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabContactUsButton,
         'Contact Us in the Get Involved Menu on navbar',
-        contactUrl, 'Contact');
+        contactUrl,
+        'Contact'
+      );
     }
   }
 
@@ -652,7 +676,11 @@ export class LoggedInUser extends BaseUser {
   async clickDonateButtonOnNavbar(): Promise<void> {
     if (this.viewport.width >= BREAKPOINTS.MOBILE) {
       await this.clickButtonToNavigateToNewPage(
-        navbarDonateButton, 'Donate button on navbar', donateUrl, 'Donate');
+        navbarDonateButton,
+        'Donate button on navbar',
+        donateUrl,
+        'Donate'
+      );
     }
   }
 
@@ -678,17 +706,14 @@ export class LoggedInUser extends BaseUser {
       this.viewport.width < BREAKPOINTS.MOBILE &&
       url !== mobileWatchAVideoUrl
     ) {
-      throw new Error (
-        'The Watch A Video button does not open the right page!');
+      throw new Error('The Watch A Video button does not open the right page!');
     } else if (
       this.viewport.width >= BREAKPOINTS.MOBILE &&
       url !== watchAVideoUrl
     ) {
-      throw new Error (
-        'The Watch A Video button does not open the right page!');
+      throw new Error('The Watch A Video button does not open the right page!');
     }
-    showMessage(
-      'The Watch A Video button opens the right page.');
+    showMessage('The Watch A Video button opens the right page.');
   }
 
   /**

@@ -165,7 +165,8 @@ export class BlogPostEditor extends BaseUser {
       await this.clickOn(thumbnailPhotoBox);
       await this.uploadFile(blogPostThumbnailImage);
       await this.page.waitForSelector(
-        `${addThumbnailImageButton}:not([disabled])`);
+        `${addThumbnailImageButton}:not([disabled])`
+      );
       await this.clickOn(addThumbnailImageButton);
       await this.page.waitForSelector('body.modal-open', {hidden: true});
     }
@@ -198,7 +199,8 @@ export class BlogPostEditor extends BaseUser {
       await this.clickOn(thumbnailPhotoBox);
       await this.uploadFile(blogPostThumbnailImage);
       await this.page.waitForSelector(
-        `${addThumbnailImageButton}:not([disabled])`);
+        `${addThumbnailImageButton}:not([disabled])`
+      );
       await this.clickOn(addThumbnailImageButton);
       await this.page.waitForSelector('body.modal-open', {hidden: true});
     }

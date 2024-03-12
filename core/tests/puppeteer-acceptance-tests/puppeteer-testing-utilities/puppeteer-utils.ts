@@ -16,7 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, { Page, Browser, Viewport } from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport} from 'puppeteer';
 import testConstants from './test-constants';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
@@ -77,16 +77,17 @@ export class BaseUser {
             deviceScaleFactor: 2,
             isMobile: true,
             hasTouch: true,
-            isLandscape: false
+            isLandscape: false,
           });
           await this.page.setUserAgent(
             'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
-            'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
-            'Mobile/15A372 Safari/604.1');
+              'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+              'Mobile/15A372 Safari/604.1'
+          );
         } else {
           await this.page.setViewport({width: 1920, height: 1080});
         }
-        this.page.on('dialog', async(dialog) => {
+        this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
             await dialog.accept();
