@@ -190,6 +190,8 @@
 /.gitattributes @oppia/dev-workflow-reviewers
 /.gitignore @oppia/dev-workflow-reviewers
 /.isort.cfg @oppia/dev-workflow-reviewers
+/.prettierignore @oppia/dev-workflow-reviewers
+/.prettierrc.json @oppia/dev-workflow-reviewers
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
