@@ -16,23 +16,19 @@
  * @fileoverview Controller for Take a Break Modal.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'take-break-modal',
   templateUrl: './take-break-modal.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class TakeBreakModalComponent {
-  constructor(
-    private activeModal: NgbActiveModal
-  ) {}
+  constructor(private activeModal: NgbActiveModal) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   cancel(): void {
     this.activeModal.dismiss();
@@ -43,7 +39,9 @@ export class TakeBreakModalComponent {
   }
 }
 
-angular.module('oppia').factory(
-  'TakeBreakModalComponent',
-  downgradeComponent(
-    {component: TakeBreakModalComponent}));
+angular
+  .module('oppia')
+  .factory(
+    'TakeBreakModalComponent',
+    downgradeComponent({component: TakeBreakModalComponent})
+  );

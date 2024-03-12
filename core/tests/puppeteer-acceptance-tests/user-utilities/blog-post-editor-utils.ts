@@ -16,12 +16,9 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
@@ -41,39 +38,15 @@ const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
 
-export interface IBlogPostEditor extends IBaseUser {
-  addUserBioInBlogDashboard: () => Promise<void>;
-  navigateToBlogDashboardPage: () => Promise<void>;
-  createDraftBlogPostWithTitle:
-    (draftBlogPostTitle: string) => Promise<void>;
-  deleteDraftBlogPostWithTitle:
-    (draftBlogPostTitle: string) => Promise<void>;
-  expectPublishButtonToBeDisabled: () => Promise<void>;
-  publishNewBlogPostWithTitle:
-    (newBlogPostTitle: string) => Promise<void>;
-  createNewBlogPostWithTitle:
-    (newBlogPostTitle: string) => Promise<void>;
-  deletePublishedBlogPostWithTitle: (blogPostTitle: string) => Promise<void>;
-  expectUserUnableToPublishBlogPost:
-    (expectedWarningMessage: string) => Promise<void>;
-  expectNumberOfBlogPostsToBe: (number: number) => Promise<void>;
-  navigateToPublishTab: () => Promise<void>;
-  expectDraftBlogPostWithTitleToBePresent: (
-    checkDraftBlogPostByTitle: string) => Promise<void>;
-  expectPublishedBlogPostWithTitleToBePresent: (
-    blogPostTitle: string) => Promise<void>;
-  expectBlogDashboardAccessToBeUnauthorized: () => Promise<void>;
-  expectBlogDashboardAccessToBeAuthorized: () => Promise<void>;
-}
-
-class BlogPostEditor extends BaseUser implements IBlogPostEditor {
+export class BlogPostEditor extends BaseUser {
   /**
    * Function for adding blog post author bio in blog dashboard.
    */
   async addUserBioInBlogDashboard(): Promise<void> {
     await this.type(blogAuthorBioField, 'Dummy-User-Bio');
     await this.page.waitForSelector(
-      'button.e2e-test-save-author-details-button:not([disabled])');
+      'button.e2e-test-save-author-details-button:not([disabled])'
+    );
     await this.clickOn(LABEL_FOR_SAVE_BUTTON);
   }
 
@@ -89,7 +62,7 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
    * to be created.
    */
   async createDraftBlogPostWithTitle(
-      draftBlogPostTitle: string
+    draftBlogPostTitle: string
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
     /** Giving explicit timeout because we need to wait for small
@@ -104,7 +77,8 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
     await this.type(blogBodyInput, 'test blog post body content');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
     await this.page.waitForSelector(
-      'button.e2e-test-save-as-draft-button:not([disabled])');
+      'button.e2e-test-save-as-draft-button:not([disabled])'
+    );
     await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
 
     showMessage('Successfully created a draft blog post!');
@@ -115,18 +89,21 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
    * This function deletes a draft blog post with given title.
    */
   async deleteDraftBlogPostWithTitle(
-      draftBlogPostTitle: string
+    draftBlogPostTitle: string
   ): Promise<void> {
-    const allDraftBlogPosts =
-      await this.page.$$('.blog-dashboard-tile-content');
+    const allDraftBlogPosts = await this.page.$$(
+      '.blog-dashboard-tile-content'
+    );
     for (let i = 0; i < allDraftBlogPosts.length; i++) {
       let checkDraftBlogPostTitle = await allDraftBlogPosts[i].$eval(
         '.e2e-test-blog-post-title',
-        element => (element as HTMLElement).innerText);
+        element => (element as HTMLElement).innerText
+      );
       if (draftBlogPostTitle === checkDraftBlogPostTitle) {
         await allDraftBlogPosts[i].$eval(
           '.e2e-test-blog-post-edit-box',
-          element => (element as HTMLElement).click());
+          element => (element as HTMLElement).click()
+        );
         /** Giving explicit timeout because we need to wait for small
          * transition to complete. We cannot wait for the next element to click
          * using its selector as it is instantly loaded in the DOM but cannot
@@ -148,15 +125,19 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
   async expectPublishButtonToBeDisabled(): Promise<void> {
     await this.page.waitForSelector(publishBlogPostButton);
     const publishedButtonIsDisabled = await this.page.$eval(
-      publishBlogPostButton, button => (button as HTMLButtonElement).disabled);
+      publishBlogPostButton,
+      button => (button as HTMLButtonElement).disabled
+    );
     if (!publishedButtonIsDisabled) {
       throw new Error(
         'Published button is not disabled when the blog post data is not' +
-        ' completely filled');
+          ' completely filled'
+      );
     }
     showMessage(
       'Published button is disabled when blog post data is not completely' +
-      ' filled');
+        ' filled'
+    );
   }
 
   /**
@@ -178,7 +159,8 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
     await this.clickOn(thumbnailPhotoBox);
     await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
-      `${addThumbnailImageButton}:not([disabled])`);
+      `${addThumbnailImageButton}:not([disabled])`
+    );
     await this.clickOn(addThumbnailImageButton);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
@@ -188,8 +170,7 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
     await this.type(blogBodyInput, 'test blog post body content');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
-    await this.page.waitForSelector(
-      `${publishBlogPostButton}:not([disabled])`);
+    await this.page.waitForSelector(`${publishBlogPostButton}:not([disabled])`);
     await this.clickOn('PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
@@ -205,7 +186,8 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
     await this.clickOn(thumbnailPhotoBox);
     await this.uploadFile(blogPostThumbnailImage);
     await this.page.waitForSelector(
-      `${addThumbnailImageButton}:not([disabled])`);
+      `${addThumbnailImageButton}:not([disabled])`
+    );
     await this.clickOn(addThumbnailImageButton);
     await this.page.waitForSelector('body.modal-open', {hidden: true});
 
@@ -220,16 +202,19 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
    */
   async deletePublishedBlogPostWithTitle(blogPostTitle: string): Promise<void> {
     await this.clickOn('PUBLISHED');
-    const allPublishedBlogPosts =
-      await this.page.$$('.blog-dashboard-tile-content');
+    const allPublishedBlogPosts = await this.page.$$(
+      '.blog-dashboard-tile-content'
+    );
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
       let publishedBlogPostTitle = await allPublishedBlogPosts[i].$eval(
         '.e2e-test-blog-post-title',
-        element => (element as HTMLElement).innerText);
+        element => (element as HTMLElement).innerText
+      );
       if (publishedBlogPostTitle === blogPostTitle) {
         await allPublishedBlogPosts[i].$eval(
           '.e2e-test-blog-post-edit-box',
-          element => (element as HTMLElement).click());
+          element => (element as HTMLElement).click()
+        );
         /** Giving explicit timeout because we need to wait for small
          * transition to complete. We cannot wait for the next element to click
          * using its selector as it is instantly loaded in the DOM but cannot
@@ -240,7 +225,8 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
         await this.page.waitForSelector('button.e2e-test-confirm-button');
         await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
         showMessage(
-          'Published blog post with given title deleted successfully!');
+          'Published blog post with given title deleted successfully!'
+        );
         return;
       }
     }
@@ -250,15 +236,19 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
    * This function checks that the user is unable to publish a blog post.
    */
   async expectUserUnableToPublishBlogPost(
-      expectedWarningMessage: string
+    expectedWarningMessage: string
   ): Promise<void> {
     const toastMessageBox = await this.page.$(
-      'div.e2e-test-toast-warning-message');
+      'div.e2e-test-toast-warning-message'
+    );
     const toastMessageWarning = await this.page.evaluate(
-      (element: HTMLDivElement) => element.textContent, toastMessageBox);
+      (element: HTMLDivElement) => element.textContent,
+      toastMessageBox
+    );
     const isPublishButtonDisabled = await this.page.$eval(
       publishBlogPostButton,
-      button => (button as HTMLButtonElement).disabled);
+      button => (button as HTMLButtonElement).disabled
+    );
 
     if (!isPublishButtonDisabled) {
       throw new Error('User is able to publish the blog post');
@@ -266,23 +256,23 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
     if (expectedWarningMessage !== toastMessageWarning) {
       throw new Error(
         'Expected warning message is not same as the actual warning message\n' +
-        `Expected warning: ${expectedWarningMessage}\n` +
-        `Displayed warning: ${toastMessageWarning}\n`);
+          `Expected warning: ${expectedWarningMessage}\n` +
+          `Displayed warning: ${toastMessageWarning}\n`
+      );
     }
 
     showMessage(
-      'User is unable to publish the blog post because ' + toastMessageWarning);
+      'User is unable to publish the blog post because ' + toastMessageWarning
+    );
   }
 
   /**
    * This function checks the number of the blog posts in the blog dashboard.
    */
   async expectNumberOfBlogPostsToBe(number: number): Promise<void> {
-    const allBlogPosts = await this.page.$$(
-      '.blog-dashboard-tile-content');
+    const allBlogPosts = await this.page.$$('.blog-dashboard-tile-content');
     if (allBlogPosts.length !== number) {
-      throw new Error(
-        `Number of blog posts is not equal to ${number}`);
+      throw new Error(`Number of blog posts is not equal to ${number}`);
     }
 
     showMessage(`Number of blog posts is equal to ${number}`);
@@ -301,16 +291,18 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
    * This function checks a draft blog post to be created with the given title.
    */
   async expectDraftBlogPostWithTitleToBePresent(
-      checkDraftBlogPostByTitle: string
+    checkDraftBlogPostByTitle: string
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
-    const allDraftBlogPosts =
-      await this.page.$$('.blog-dashboard-tile-content');
+    const allDraftBlogPosts = await this.page.$$(
+      '.blog-dashboard-tile-content'
+    );
     let count = 0;
     for (let i = 0; i < allDraftBlogPosts.length; i++) {
       let draftBlogPostTitle = await allDraftBlogPosts[i].$eval(
         '.e2e-test-blog-post-title',
-        element => (element as HTMLElement).innerText);
+        element => (element as HTMLElement).innerText
+      );
       if (draftBlogPostTitle === checkDraftBlogPostByTitle) {
         count++;
       }
@@ -318,44 +310,48 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
     if (count === 0) {
       throw new Error(
         `Draft blog post with title ${checkDraftBlogPostByTitle} does not` +
-        ' exist!');
+          ' exist!'
+      );
     } else if (count > 1) {
       throw new Error(
         `Draft blog post with title ${checkDraftBlogPostByTitle} exists` +
-        ' more than once!');
+          ' more than once!'
+      );
     }
     showMessage(
-      `Draft blog post with title ${checkDraftBlogPostByTitle} exists!`);
+      `Draft blog post with title ${checkDraftBlogPostByTitle} exists!`
+    );
   }
 
   /**
    * This function checks if the blog post with given title is published.
    */
   async expectPublishedBlogPostWithTitleToBePresent(
-      blogPostTitle: string
+    blogPostTitle: string
   ): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
     const allPublishedBlogPosts = await this.page.$$(
-      '.blog-dashboard-tile-content');
+      '.blog-dashboard-tile-content'
+    );
     let count = 0;
     for (let i = 0; i < allPublishedBlogPosts.length; i++) {
       let publishedBlogPostTitle = await allPublishedBlogPosts[i].$eval(
         '.e2e-test-blog-post-title',
-        element => (element as HTMLElement).innerText);
+        element => (element as HTMLElement).innerText
+      );
       if (publishedBlogPostTitle === blogPostTitle) {
         count++;
       }
     }
     if (count === 0) {
-      throw new Error(
-        `Blog post with title ${blogPostTitle} does not exist!`);
+      throw new Error(`Blog post with title ${blogPostTitle} does not exist!`);
     } else if (count > 1) {
       throw new Error(
-        `Blog post with title ${blogPostTitle} exists more than once!`);
+        `Blog post with title ${blogPostTitle} exists more than once!`
+      );
     }
-    showMessage(
-      `Published blog post with title ${blogPostTitle} exists!`);
+    showMessage(`Published blog post with title ${blogPostTitle} exists!`);
   }
 
   /**
@@ -368,7 +364,8 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
       showMessage('User unauthorized to access blog dashboard!');
     } catch (err) {
       throw new Error(
-        'No unauthorization error on accessing the blog dashboard page!');
+        'No unauthorization error on accessing the blog dashboard page!'
+      );
     }
   }
 
@@ -390,4 +387,4 @@ class BlogPostEditor extends BaseUser implements IBlogPostEditor {
   }
 }
 
-export let BlogPostEditorFactory = (): IBlogPostEditor => new BlogPostEditor();
+export let BlogPostEditorFactory = (): BlogPostEditor => new BlogPostEditor();

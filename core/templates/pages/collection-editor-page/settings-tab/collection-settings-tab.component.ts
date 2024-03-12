@@ -16,17 +16,21 @@
  * @fileoverview Component for the settings tab of the collection editor.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'collection-settings-tab',
   templateUrl: './collection-settings-tab.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CollectionSettingsTabComponent {
   constructor() {}
 }
 
-angular.module('oppia').directive('collectionSettingsTab', downgradeComponent(
-  {component: CollectionSettingsTabComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'collectionSettingsTab',
+    downgradeComponent({component: CollectionSettingsTabComponent})
+  );

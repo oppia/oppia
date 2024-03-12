@@ -20,30 +20,30 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-
-var ExplorationPlayerPage =
-  require('../webdriverio_utils/ExplorationPlayerPage.js');
-var FeedbackUpdatesPage =
-  require('../webdriverio_utils/FeedbackUpdatesPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
+var FeedbackUpdatesPage = require('../webdriverio_utils/FeedbackUpdatesPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
-describe('Learner dashboard functionality', function() {
+describe('Learner dashboard functionality', function () {
   var explorationPlayerPage = null;
   var libraryPage = null;
   var feedbackUpdatesPage = null;
 
-  beforeAll(function() {
+  beforeAll(function () {
     libraryPage = new LibraryPage.LibraryPage();
     feedbackUpdatesPage = new FeedbackUpdatesPage.FeedbackUpdatesPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-
-  it('should display learner feedback threads', async function() {
+  it('should display learner feedback threads', async function () {
     await users.createUser(
-      'learner2@feedbackUpdates.com', 'learner2feedbackUpdates');
+      'learner2@feedbackUpdates.com',
+      'learner2feedbackUpdates'
+    );
     await users.createUser(
-      'feedbackAdm@feedbackUpdates.com', 'feedbackAdmfeedbackUpdates');
+      'feedbackAdm@feedbackUpdates.com',
+      'feedbackAdmfeedbackUpdates'
+    );
     await users.login('feedbackAdm@feedbackUpdates.com');
     await workflow.createAndPublishExploration(
       'BUS101',
@@ -55,8 +55,8 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
 
     await users.login('learner2@feedbackUpdates.com');
-    var feedback = 'A good exploration. Would love to see a few ' +
-      'more questions';
+    var feedback =
+      'A good exploration. Would love to see a few ' + 'more questions';
     await libraryPage.get();
     await libraryPage.findExploration('BUS101');
     await libraryPage.playExploration('BUS101');
@@ -70,7 +70,7 @@ describe('Learner dashboard functionality', function() {
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

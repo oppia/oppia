@@ -17,5 +17,5 @@
  */
 
 export const TopicEditorPageConstants = {
-  TOPIC_NAME_INPUT_FOCUS_LABEL: 'topicNameInputFocusLabel'
+  TOPIC_NAME_INPUT_FOCUS_LABEL: 'topicNameInputFocusLabel',
 } as const;

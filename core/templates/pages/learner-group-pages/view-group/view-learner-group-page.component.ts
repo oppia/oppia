@@ -16,35 +16,31 @@
  * @fileoverview Component for the view learner group page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { LoaderService } from 'services/loader.service';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupBackendApiService } from
-  'domain/learner_group/learner-group-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { LearnerGroupSyllabusBackendApiService } from
-  'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { UserService } from 'services/user.service';
-import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
-import { ExitLearnerGroupModalComponent } from
-  '../templates/exit-learner-group-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LearnerGroupPreferencesModalComponent } from
-  '../templates/learner-group-preferences-modal.component';
+import {LoaderService} from 'services/loader.service';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {UserService} from 'services/user.service';
+import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
+import {ExitLearnerGroupModalComponent} from '../templates/exit-learner-group-modal.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LearnerGroupPreferencesModalComponent} from '../templates/learner-group-preferences-modal.component';
 
 import './view-learner-group-page.component.css';
 
 @Component({
   selector: 'oppia-view-learner-group-page',
-  templateUrl: './view-learner-group-page.component.html'
+  templateUrl: './view-learner-group-page.component.html',
 })
 export class ViewLearnerGroupPageComponent implements OnInit {
-  VIEW_LEARNER_GROUP_TABS_I18N_IDS = (
-    LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS);
+  VIEW_LEARNER_GROUP_TABS_I18N_IDS =
+    LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS;
 
   activeTab!: string;
   learnerGroupId!: string;
@@ -60,8 +56,7 @@ export class ViewLearnerGroupPageComponent implements OnInit {
     private userService: UserService,
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
-    private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService
+    private learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -69,26 +64,25 @@ export class ViewLearnerGroupPageComponent implements OnInit {
     this.activeTab = this.VIEW_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW;
     if (this.learnerGroupId) {
       this.loaderService.showLoadingScreen('Loading');
-      this.learnerGroupBackendApiService.fetchLearnerGroupInfoAsync(
-        this.learnerGroupId
-      ).then(learnerGroupInfo => {
-        this.learnerGroup = learnerGroupInfo;
-        this.learnerGroupBackendApiService
-          .fetchProgressSharingPermissionOfLearnerAsync(this.learnerGroup.id)
-          .then(progressSharingPermission => {
-            this.progressSharingPermission = progressSharingPermission;
+      this.learnerGroupBackendApiService
+        .fetchLearnerGroupInfoAsync(this.learnerGroupId)
+        .then(learnerGroupInfo => {
+          this.learnerGroup = learnerGroupInfo;
+          this.learnerGroupBackendApiService
+            .fetchProgressSharingPermissionOfLearnerAsync(this.learnerGroup.id)
+            .then(progressSharingPermission => {
+              this.progressSharingPermission = progressSharingPermission;
+            });
+          this.userService.getUserInfoAsync().then(userInfo => {
+            this.username = userInfo.getUsername();
           });
-        this.userService.getUserInfoAsync().then(userInfo => {
-          this.username = userInfo.getUsername();
+          this.learnerGroupSyllabusBackendApiService
+            .fetchLearnerSpecificProgressInAssignedSyllabus(this.learnerGroupId)
+            .then(learnerProgress => {
+              this.learnerProgress = learnerProgress;
+              this.loaderService.hideLoadingScreen();
+            });
         });
-        this.learnerGroupSyllabusBackendApiService
-          .fetchLearnerSpecificProgressInAssignedSyllabus(
-            this.learnerGroupId
-          ).then(learnerProgress => {
-            this.learnerProgress = learnerProgress;
-            this.loaderService.hideLoadingScreen();
-          });
-      });
     }
   }
 
@@ -120,7 +114,8 @@ export class ViewLearnerGroupPageComponent implements OnInit {
   getMasteredSubtopicsCountOfLearner(): number {
     let masteredSubtopicsCount = 0;
     this.learnerProgress.subtopicsProgress.forEach(subtopicProgress => {
-      if (subtopicProgress.subtopicMastery &&
+      if (
+        subtopicProgress.subtopicMastery &&
         subtopicProgress.subtopicMastery >= 0.9
       ) {
         masteredSubtopicsCount += 1;
@@ -130,59 +125,64 @@ export class ViewLearnerGroupPageComponent implements OnInit {
   }
 
   exitLearnerGroup(): void {
-    let modalRef = this.ngbModal.open(
-      ExitLearnerGroupModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'exit-learner-group-modal'
-      }
-    );
+    let modalRef = this.ngbModal.open(ExitLearnerGroupModalComponent, {
+      backdrop: 'static',
+      windowClass: 'exit-learner-group-modal',
+    });
     modalRef.componentInstance.learnerGroupTitle = this.learnerGroup.title;
 
-    modalRef.result.then(() => {
-      if (this.username) {
-        this.loaderService.showLoadingScreen('Exiting Group');
-        this.learnerGroupBackendApiService.exitLearnerGroupAsync(
-          this.learnerGroup.id, this.username
-        ).then(() => {
-          this.windowRef.nativeWindow.location.href = (
-            '/learner-dashboard?active_tab=learner-groups');
-        });
+    modalRef.result.then(
+      () => {
+        if (this.username) {
+          this.loaderService.showLoadingScreen('Exiting Group');
+          this.learnerGroupBackendApiService
+            .exitLearnerGroupAsync(this.learnerGroup.id, this.username)
+            .then(() => {
+              this.windowRef.nativeWindow.location.href =
+                '/learner-dashboard?active_tab=learner-groups';
+            });
+        }
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    );
   }
 
   viewLearnerGroupPreferences(): void {
-    let modalRef = this.ngbModal.open(
-      LearnerGroupPreferencesModalComponent,
-      {
-        backdrop: 'static',
-        windowClass: 'learner-group-preferences-modal'
+    let modalRef = this.ngbModal.open(LearnerGroupPreferencesModalComponent, {
+      backdrop: 'static',
+      windowClass: 'learner-group-preferences-modal',
+    });
+    modalRef.componentInstance.learnerGroup = this.learnerGroup;
+    modalRef.componentInstance.progressSharingPermission =
+      this.progressSharingPermission;
+
+    modalRef.result.then(
+      data => {
+        this.learnerGroupBackendApiService
+          .updateProgressSharingPermissionAsync(
+            this.learnerGroup.id,
+            data.progressSharingPermission
+          )
+          .then(updatedProgressSharingPermission => {
+            this.progressSharingPermission = updatedProgressSharingPermission;
+          });
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       }
     );
-    modalRef.componentInstance.learnerGroup = this.learnerGroup;
-    modalRef.componentInstance.progressSharingPermission = (
-      this.progressSharingPermission);
-
-    modalRef.result.then((data) => {
-      this.learnerGroupBackendApiService
-        .updateProgressSharingPermissionAsync(
-          this.learnerGroup.id, data.progressSharingPermission
-        ).then((updatedProgressSharingPermission) => {
-          this.progressSharingPermission = updatedProgressSharingPermission;
-        });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaViewLearnerGroupPage',
-  downgradeComponent({component: ViewLearnerGroupPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaViewLearnerGroupPage',
+    downgradeComponent({component: ViewLearnerGroupPageComponent})
+  );

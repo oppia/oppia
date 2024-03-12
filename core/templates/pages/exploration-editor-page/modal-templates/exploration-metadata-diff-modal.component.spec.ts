@@ -16,13 +16,23 @@
  * @fileoverview Unit tests for ExplorationMetadataDiffModalComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
-import { ExplorationMetadataDiffModalComponent } from './exploration-metadata-diff-modal.component';
-import { ExplorationMetadata, ExplorationMetadataBackendDict, ExplorationMetadataObjectFactory } from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
+import {ExplorationMetadataDiffModalComponent} from './exploration-metadata-diff-modal.component';
+import {
+  ExplorationMetadata,
+  ExplorationMetadataBackendDict,
+  ExplorationMetadataObjectFactory,
+} from 'domain/exploration/ExplorationMetadataObjectFactory';
 
 describe('Exploration Metadata Diff Modal Component', () => {
   let explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
@@ -34,26 +44,17 @@ describe('Exploration Metadata Diff Modal Component', () => {
 
   let headers = {
     leftPane: 'header 1',
-    rightPane: 'header 2'
+    rightPane: 'header 2',
   };
   let newMetadata: ExplorationMetadata | null;
   let oldMetadata: ExplorationMetadata | null;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        ExplorationMetadataDiffModalComponent
-      ],
-      providers: [
-        NgbActiveModal,
-        HistoryTabYamlConversionService
-      ],
-      schemas: [
-        NO_ERRORS_SCHEMA
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [ExplorationMetadataDiffModalComponent],
+      providers: [NgbActiveModal, HistoryTabYamlConversionService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -61,9 +62,11 @@ describe('Exploration Metadata Diff Modal Component', () => {
     fixture = TestBed.createComponent(ExplorationMetadataDiffModalComponent);
     component = fixture.componentInstance;
     explorationMetadataObjectFactory = TestBed.inject(
-      ExplorationMetadataObjectFactory);
+      ExplorationMetadataObjectFactory
+    );
     historyTabYamlConversionService = TestBed.inject(
-      HistoryTabYamlConversionService);
+      HistoryTabYamlConversionService
+    );
   });
 
   beforeEach(() => {
@@ -80,7 +83,7 @@ describe('Exploration Metadata Diff Modal Component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      edits_allowed: true
+      edits_allowed: true,
     };
     newExplorationMetadataBackendDict = {
       title: 'Exploration',
@@ -95,13 +98,15 @@ describe('Exploration Metadata Diff Modal Component', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      edits_allowed: true
+      edits_allowed: true,
     };
 
-    newMetadata = explorationMetadataObjectFactory
-      .createFromBackendDict(newExplorationMetadataBackendDict);
-    oldMetadata = explorationMetadataObjectFactory
-      .createFromBackendDict(oldExplorationMetadataBackendDict);
+    newMetadata = explorationMetadataObjectFactory.createFromBackendDict(
+      newExplorationMetadataBackendDict
+    );
+    oldMetadata = explorationMetadataObjectFactory.createFromBackendDict(
+      oldExplorationMetadataBackendDict
+    );
 
     component.headers = headers;
     component.newMetadata = newMetadata;
@@ -110,7 +115,8 @@ describe('Exploration Metadata Diff Modal Component', () => {
 
   it('should evaluate yaml strings object', fakeAsync(() => {
     spyOn(
-      historyTabYamlConversionService, 'getYamlStringFromStateOrMetadata'
+      historyTabYamlConversionService,
+      'getYamlStringFromStateOrMetadata'
     ).and.resolveTo('Yaml data');
 
     expect(component.yamlStrs.leftPane).toBe('');

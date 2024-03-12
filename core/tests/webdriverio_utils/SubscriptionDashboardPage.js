@@ -19,58 +19,67 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 
-var SubscriptionDashboardPage = function() {
+var SubscriptionDashboardPage = function () {
   var subscriptionButton = $('.e2e-test-subscription-button');
   var subscribeLabel = $('.e2e-test-subscribe-label');
   var subscriptionNameElement = $('.e2e-test-subscription-name');
-  var subscriptionNameSelector = function() {
+  var subscriptionNameSelector = function () {
     return $$('.e2e-test-subscription-name');
   };
   var unsubscribeLabel = $('.e2e-test-unsubscribe-label');
 
-  this.navigateToUserSubscriptionPage = async function(userName) {
+  this.navigateToUserSubscriptionPage = async function (userName) {
     await browser.url('/profile/' + userName);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectSubscriptionFirstNameToMatch = async function(name) {
+  this.expectSubscriptionFirstNameToMatch = async function (name) {
     await waitFor.visibilityOf(
-      subscriptionNameElement, 'First Subscriber Name is not visible');
+      subscriptionNameElement,
+      'First Subscriber Name is not visible'
+    );
     var subscriptionName = await subscriptionNameSelector();
     var firstSubscriberNameElem = subscriptionName[0];
     expect(await firstSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionLastNameToMatch = async function(name) {
+  this.expectSubscriptionLastNameToMatch = async function (name) {
     await waitFor.visibilityOf(
-      subscriptionNameElement, 'Last Subscriber Name is not visible');
+      subscriptionNameElement,
+      'Last Subscriber Name is not visible'
+    );
     var subscriptionName = await subscriptionNameSelector();
     var lastElement = subscriptionName.length - 1;
     var lastSubscriberNameElem = subscriptionName[lastElement];
     expect(await lastSubscriberNameElem.getText()).toMatch(name);
   };
 
-  this.expectSubscriptionCountToEqual = async function(value) {
+  this.expectSubscriptionCountToEqual = async function (value) {
     await waitFor.visibilityOf(
       subscriptionNameElement,
-      'Subscriber Name Card takes too long to appear');
+      'Subscriber Name Card takes too long to appear'
+    );
     var subscriptionName = await subscriptionNameSelector();
     expect(subscriptionName.length).toEqual(value);
   };
 
-  this.clickSubscribeButton = async function() {
+  this.clickSubscribeButton = async function () {
     await waitFor.elementToBeClickable(
-      subscriptionButton, 'Subscription button is not clickable');
+      subscriptionButton,
+      'Subscription button is not clickable'
+    );
     var subscribeButtonStatusBeforeClick = await subscriptionButton.getText();
     await action.click('Subscription Button', subscriptionButton);
     if (subscribeButtonStatusBeforeClick === 'SUBSCRIBE') {
       await waitFor.visibilityOf(
         unsubscribeLabel,
-        'Unsubscribe button is not visible.');
+        'Unsubscribe button is not visible.'
+      );
     } else {
       await waitFor.visibilityOf(
         subscribeLabel,
-        'Subscribe button is not visible.');
+        'Subscribe button is not visible.'
+      );
     }
   };
 };

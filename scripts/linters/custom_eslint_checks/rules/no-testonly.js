@@ -23,31 +23,33 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'Functions with "testOnly" in their names should be only ' +
-        'called from "spec" files'),
+        'called from "spec" files',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      noTestOnlyAllowed: 'Please do not call a testOnly function from a ' +
-        'non-test file.'
-    }
+      noTestOnlyAllowed:
+        'Please do not call a testOnly function from a ' + 'non-test file.',
+    },
   },
-  create: function(context) {
+  create: function (context) {
     return {
       CallExpression(node) {
-        if (node.callee.type === 'Identifier' &&
-          node.callee.name.toLowerCase().includes('testonly')) {
+        if (
+          node.callee.type === 'Identifier' &&
+          node.callee.name.toLowerCase().includes('testonly')
+        ) {
           context.report({
             node,
             loc: node.loc,
-            messageId: 'noTestOnlyAllowed'
+            messageId: 'noTestOnlyAllowed',
           });
         }
-      }
+      },
     };
-  }
+  },
 };

@@ -27,6 +27,6 @@ export const ClassifiersExtensionConstants = {
     NUMBER: 'NUMBER',
     NAME: 'NAME',
     OP: 'OP',
-    ERRORTOKEN: 'ERRORTOKEN'
-  }
+    ERRORTOKEN: 'ERRORTOKEN',
+  },
 } as const;

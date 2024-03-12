@@ -20,9 +20,9 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 interface ClickRegion {
   clickPosition: number[];
   clickedRegions: string[];
@@ -30,7 +30,7 @@ interface ClickRegion {
 @Component({
   selector: 'oppia-response-image-click-input',
   templateUrl: './image-click-input-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseImageClickInput implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -43,14 +43,20 @@ export class ResponseImageClickInput implements OnInit {
 
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as ClickRegion;
-    this.clickRegionLabel = '(Clicks on ' + (
-      _answer.clickedRegions.length > 0 ?
-        '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+      this.answer
+    ) as ClickRegion;
+    this.clickRegionLabel =
+      '(Clicks on ' +
+      (_answer.clickedRegions.length > 0
+        ? "'" + _answer.clickedRegions[0] + "'"
+        : 'image') +
+      ')';
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaResponseImageClickInput', downgradeComponent({
-    component: ResponseImageClickInput
-  }) as angular.IDirectiveFactory);
+  'oppiaResponseImageClickInput',
+  downgradeComponent({
+    component: ResponseImageClickInput,
+  }) as angular.IDirectiveFactory
+);
