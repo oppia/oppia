@@ -51,11 +51,6 @@ describe('Learner Local Nav Component ', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let userService: UserService;
 
-  const MockNgbPopover = jasmine.createSpyObj('NgbPopover', [
-    'close',
-    'toggle',
-  ]);
-
   const explorationBackendResponse = {
     can_edit: true,
     draft_change_list_id: 0,
