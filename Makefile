@@ -119,6 +119,9 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
+run_tests.prettier: ## Formats the code using prettier.
+	docker compose run --no-deps --entrypoint "npx prettier --check ." dev-server
+
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server
 

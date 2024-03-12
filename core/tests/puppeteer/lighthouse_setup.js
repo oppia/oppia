@@ -472,7 +472,7 @@ const main = async function () {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
     headless: true,
-    args: ['--no-sandbox']
+    args: ['--no-sandbox'],
   });
   const page = await browser.newPage();
   await page.setViewport({
@@ -522,9 +522,10 @@ const main = async function () {
   fs.writeFileSync(
     'core/tests/puppeteer/.env',
     `exploration_id=${explorationId}\n` +
-    `story_id=${storyId}\n` +
-    `topic_id=${topicId}\n` +
-    `skill_id=${skillId}\n`);
+      `story_id=${storyId}\n` +
+      `topic_id=${topicId}\n` +
+      `skill_id=${skillId}\n`
+  );
 
   await process.stdout.write(
     [explorationEditorUrl, topicEditorUrl, storyEditorUrl, skillEditorUrl].join(
