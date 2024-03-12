@@ -26,18 +26,21 @@ RUN rm google-chrome.deb
 RUN pip install --upgrade pip==21.2.3
 RUN pip install pip-tools==6.6.2 setuptools==58.5.3 cmake
 
+WORKDIR /app/vm_deps
+
 # Installing google cloud sdk
-RUN wget -O gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz && \
+RUN wget -O /app/vm_deps/gcloud-sdk.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-364.0.0-linux-x86_64.tar.gz && \
     tar -xzf gcloud-sdk.tar.gz && \
     ./google-cloud-sdk/install.sh --quiet && \
+    ./google-cloud-sdk/bin/gcloud components install beta cloud-datastore-emulator app-engine-python app-engine-python-extras && \
     rm gcloud-sdk.tar.gz
 
 WORKDIR /app/oppia
 
 ENV BUF_LINUX_FILES="buf-Linux-x86_64 protoc-gen-buf-check-lint-Linux-x86_64 protoc-gen-buf-check-breaking-Linux-x86_64" \
     PROTOC_LINUX_FILE='protoc-3.13.0-linux-x86_64.zip' \
-    BUF_DIR='/app/buf-0.29.0' \
-    PROTOC_DIR='/app/buf-0.29.0/protoc' \
+    BUF_DIR='/app/vm_deps/buf-0.29.0' \
+    PROTOC_DIR='/app/vm_deps/buf-0.29.0/protoc' \
     BUF_BASE_URL='https://github.com/bufbuild/buf/releases/download/v0.29.0/' \
     PROTOC_URL='https://github.com/protocolbuffers/protobuf/releases/download/v3.13.0' \
     PROTOC_FILES_PATH='/app/oppia/third_party/oppia-ml-proto-0.0.0'
@@ -84,7 +87,7 @@ RUN python -m scripts.install_dependencies_json_packages
 
 # Compiling the protobuf files
 RUN mkdir /app/oppia/proto_files
-RUN /app/buf-0.29.0/protoc/bin/protoc \
+RUN /app/vm_deps/buf-0.29.0/protoc/bin/protoc \
     --plugin=protoc-gen-ts=/app/oppia/node_modules/.bin/protoc-gen-ts \
     --ts_out=/app/oppia/extensions/classifiers/proto/ \
     --js_out=import_style=commonjs,binary:/app/oppia/extensions/classifiers/proto/ \

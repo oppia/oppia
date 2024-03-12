@@ -16,17 +16,20 @@
  * @fileoverview Unit tests for CollectionRightsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { CollectionRightsBackendApiService } from
-  './collection-rights-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { CollectionRights, CollectionRightsBackendDict } from
-  'domain/collection/collection-rights.model';
+import {CollectionRightsBackendApiService} from './collection-rights-backend-api.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {
+  CollectionRights,
+  CollectionRightsBackendDict,
+} from 'domain/collection/collection-rights.model';
 
-describe('Collection rights backend API service', function() {
+describe('Collection rights backend API service', function () {
   let collectionRightsBackendApiService: CollectionRightsBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleDataResults: CollectionRightsBackendDict;
@@ -38,12 +41,13 @@ describe('Collection rights backend API service', function() {
     });
 
     httpTestingController = TestBed.get(HttpTestingController);
-    collectionRightsBackendApiService =
-      TestBed.get(CollectionRightsBackendApiService);
+    collectionRightsBackendApiService = TestBed.get(
+      CollectionRightsBackendApiService
+    );
     csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
-      return new Promise((resolve) => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
+      return new Promise(resolve => {
         resolve('sample-csrf-token');
       });
     });
@@ -55,7 +59,7 @@ describe('Collection rights backend API service', function() {
       can_edit: true,
       can_unpublish: false,
       is_private: true,
-      owner_names: ['A']
+      owner_names: ['A'],
     };
   });
 
@@ -68,11 +72,13 @@ describe('Collection rights backend API service', function() {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
 
-      collectionRightsBackendApiService.fetchCollectionRightsAsync('0')
+      collectionRightsBackendApiService
+        .fetchCollectionRightsAsync('0')
         .then(successHandler, failHandler);
 
-      let req = httpTestingController
-        .expectOne('/collection_editor_handler/rights/0');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/rights/0'
+      );
 
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
@@ -85,31 +91,36 @@ describe('Collection rights backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-    it('should not fetch collection rights when request failed',
-      fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let failHandler = jasmine.createSpy('fail');
+    it('should not fetch collection rights when request failed', fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.fetchCollectionRightsAsync('1')
-          .then(successHandler, failHandler);
+      collectionRightsBackendApiService
+        .fetchCollectionRightsAsync('1')
+        .then(successHandler, failHandler);
 
-        let req = httpTestingController
-          .expectOne('/collection_editor_handler/rights/1');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/rights/1'
+      );
 
-        expect(req.request.method).toEqual('GET');
-        req.flush({
-          error: 'Error fetching collection rights.'
-        }, {
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 'Error fetching collection rights.',
+        },
+        {
           status: 404,
-          statusText: 'Error fetching collection rights.'
-        });
+          statusText: 'Error fetching collection rights.',
+        }
+      );
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler)
-          .toHaveBeenCalledWith('Error fetching collection rights.');
-      }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error fetching collection rights.'
+      );
+    }));
   });
 
   describe('when .setCollectionPublicAsync is called', () => {
@@ -120,11 +131,13 @@ describe('Collection rights backend API service', function() {
       // TODO(bhenning): Figure out how to test the actual payload sent with the
       // PUT request. The typical expect() syntax with a passed-in object
       // payload does not seem to be working correctly.
-      collectionRightsBackendApiService.setCollectionPublicAsync('0', 1)
+      collectionRightsBackendApiService
+        .setCollectionPublicAsync('0', 1)
         .then(successHandler, failHandler);
 
-      let req = httpTestingController
-        .expectOne('/collection_editor_handler/publish/0');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/publish/0'
+      );
 
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleDataResults);
@@ -135,30 +148,34 @@ describe('Collection rights backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-    it('should call the provided fail handler on HTTP failure',
-      fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let failHandler = jasmine.createSpy('fail');
+    it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.setCollectionPublicAsync('0', 1)
-          .then(successHandler, failHandler);
+      collectionRightsBackendApiService
+        .setCollectionPublicAsync('0', 1)
+        .then(successHandler, failHandler);
 
-        let req = httpTestingController
-          .expectOne('/collection_editor_handler/publish/0');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/publish/0'
+      );
 
-        expect(req.request.method).toEqual('PUT');
-        req.flush({
-          error: 'Error loading collection 0.'
-        }, {
+      expect(req.request.method).toEqual('PUT');
+      req.flush(
+        {
+          error: 'Error loading collection 0.',
+        },
+        {
           status: 500,
-          statusText: 'Error loading collection 0.'
-        });
+          statusText: 'Error loading collection 0.',
+        }
+      );
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
-      }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
+    }));
   });
 
   describe('when .setCollectionPrivateAsync is called', () => {
@@ -169,11 +186,13 @@ describe('Collection rights backend API service', function() {
       // TODO(bhenning): Figure out how to test the actual payload sent with the
       // PUT request. The typical expect() syntax with a passed-in object
       // payload does not seem to be working correctly.
-      collectionRightsBackendApiService.setCollectionPrivateAsync('0', 1)
+      collectionRightsBackendApiService
+        .setCollectionPrivateAsync('0', 1)
         .then(successHandler, failHandler);
 
-      let req = httpTestingController
-        .expectOne('/collection_editor_handler/unpublish/0');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/unpublish/0'
+      );
 
       expect(req.request.method).toEqual('PUT');
       req.flush(sampleDataResults);
@@ -184,87 +203,89 @@ describe('Collection rights backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-    it('should call the provided fail handler on HTTP failure',
-      fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let failHandler = jasmine.createSpy('fail');
+    it('should call the provided fail handler on HTTP failure', fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-        collectionRightsBackendApiService.setCollectionPrivateAsync('0', 1)
-          .then(successHandler, failHandler);
+      collectionRightsBackendApiService
+        .setCollectionPrivateAsync('0', 1)
+        .then(successHandler, failHandler);
 
-        let req = httpTestingController
-          .expectOne('/collection_editor_handler/unpublish/0');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/unpublish/0'
+      );
 
-        expect(req.request.method).toEqual('PUT');
-        req.flush({
-          error: 'Error loading collection 0.'
-        }, {
+      expect(req.request.method).toEqual('PUT');
+      req.flush(
+        {
+          error: 'Error loading collection 0.',
+        },
+        {
           status: 500,
-          statusText: 'Error loading collection 0.'
-        });
+          statusText: 'Error loading collection 0.',
+        }
+      );
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
-      }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading collection 0.');
+    }));
   });
 
   describe('when .loadCollectionRightsAsync is called', () => {
-    it('should report a cached collection rights after caching it',
-      fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let failHandler = jasmine.createSpy('fail');
+    it('should report a cached collection rights after caching it', fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-        // The collection should not currently be cached.
-        expect(collectionRightsBackendApiService.isCached('0'))
-          .toBe(false);
+      // The collection should not currently be cached.
+      expect(collectionRightsBackendApiService.isCached('0')).toBe(false);
 
-        // Cache a collection.
-        let sampleCollectionRights =
-          CollectionRights.create(sampleDataResults);
-        collectionRightsBackendApiService.cacheCollectionRights(
-          '0', sampleCollectionRights);
+      // Cache a collection.
+      let sampleCollectionRights = CollectionRights.create(sampleDataResults);
+      collectionRightsBackendApiService.cacheCollectionRights(
+        '0',
+        sampleCollectionRights
+      );
 
-        // It should now be cached.
-        expect(collectionRightsBackendApiService.isCached('0'))
-          .toBe(true);
+      // It should now be cached.
+      expect(collectionRightsBackendApiService.isCached('0')).toBe(true);
 
-        // A new collection should not have been fetched from the backend. Also,
-        // the returned collection should match the expected collection object.
-        collectionRightsBackendApiService.loadCollectionRightsAsync('0')
-          .then(successHandler, failHandler);
+      // A new collection should not have been fetched from the backend. Also,
+      // the returned collection should match the expected collection object.
+      collectionRightsBackendApiService
+        .loadCollectionRightsAsync('0')
+        .then(successHandler, failHandler);
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).toHaveBeenCalledWith(sampleCollectionRights);
-        expect(failHandler).not.toHaveBeenCalled();
-      }));
+      expect(successHandler).toHaveBeenCalledWith(sampleCollectionRights);
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
 
-    it('should not report a cached collection rights if it\'s not cached',
-      fakeAsync(() => {
-        let successHandler = jasmine.createSpy('success');
-        let failHandler = jasmine.createSpy('fail');
+    it("should not report a cached collection rights if it's not cached", fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-        expect(collectionRightsBackendApiService.isCached('0'))
-          .toBe(false);
+      expect(collectionRightsBackendApiService.isCached('0')).toBe(false);
 
-        collectionRightsBackendApiService.loadCollectionRightsAsync('0')
-          .then(successHandler, failHandler);
+      collectionRightsBackendApiService
+        .loadCollectionRightsAsync('0')
+        .then(successHandler, failHandler);
 
-        let req = httpTestingController
-          .expectOne('/collection_editor_handler/rights/0');
+      let req = httpTestingController.expectOne(
+        '/collection_editor_handler/rights/0'
+      );
 
-        expect(req.request.method).toEqual('GET');
-        req.flush(sampleDataResults);
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(successHandler).toHaveBeenCalledWith(
-          CollectionRights.create(sampleDataResults)
-        );
-        expect(failHandler).not.toHaveBeenCalled();
-      }
-      ));
+      expect(successHandler).toHaveBeenCalledWith(
+        CollectionRights.create(sampleDataResults)
+      );
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
   });
 });

@@ -23,38 +23,37 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'Lint check to allow the use of HttpClient only in' +
-        ' *backend-api.services.ts files.'),
+        ' *backend-api.services.ts files.',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      disallowHttpClient: (
+      disallowHttpClient:
         'An instance of HttpClient is found in this file. You are not allowed' +
-        ' to create http requests from files that are not backend api services.'
-      )
+        ' to create http requests from files that are not backend api services.',
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var filename = context.getFilename();
 
-    var checkAndReportHttpClient = function(node) {
+    var checkAndReportHttpClient = function (node) {
       if (!filename.endsWith('backend-api.service.ts')) {
         context.report({
           node: node,
-          messageId: 'disallowHttpClient'
+          messageId: 'disallowHttpClient',
         });
       }
     };
 
     return {
-      'ImportSpecifier[imported.name=HttpClient]': function(node) {
+      'ImportSpecifier[imported.name=HttpClient]': function (node) {
         checkAndReportHttpClient(node);
-      }
+      },
     };
-  }
+  },
 };

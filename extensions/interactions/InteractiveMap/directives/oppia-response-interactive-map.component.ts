@@ -25,15 +25,15 @@
 // TODO(#16309): Fix relative imports.
 import '../../../../core/templates/third-party-imports/leaflet.import';
 
-import { Component, Input, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { icon, latLng, MapOptions, Marker, marker, tileLayer } from 'leaflet';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {icon, latLng, MapOptions, Marker, marker, tileLayer} from 'leaflet';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-response-interactive-map',
-  templateUrl: './interactive-map-response.component.html'
+  templateUrl: './interactive-map-response.component.html',
 })
 export class ResponseInteractiveMapComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -42,58 +42,61 @@ export class ResponseInteractiveMapComponent implements OnInit {
   @Input() answer!: string;
   mapOptions!: MapOptions;
   mapMarkers!: Marker;
-  private _attribution = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+  private _attribution =
+    '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
   private _optionsUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   optionsSpec = {
-    layers: [{ url: this._optionsUrl, attribution: this._attribution }],
-    zoom: 0
+    layers: [{url: this._optionsUrl, attribution: this._attribution}],
+    zoom: 0,
   };
 
   constructor(
     private htmlEscaperService: HtmlEscaperService,
     private urlInterpolationService: UrlInterpolationService
-  ) { }
+  ) {}
 
   private changeMarkerPosition(lat: number, lng: number) {
-    const newMarker = marker(
-      [lat, lng],
-      {
-        icon: icon({
-          iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
-            '/interactions/InteractiveMap/static/marker-icon.png'),
-          // The size of the icon image in pixels.
-          iconSize: [25, 41],
-          // The coordinates of the "tip" of the icon.
-          iconAnchor: [12, 41],
-          shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
-            '/interactions/InteractiveMap/static/marker-shadow.png'),
-          // The size of the shadow image in pixels.
-          shadowSize: [41, 41],
-          // The coordinates of the "tip" of the shadow.
-          shadowAnchor: [13, 41],
-          // The URL to a retina sized version of the icon image.
-          // Used for Retina screen devices.
-          iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
-            '/interactions/InteractiveMap/static/marker-icon-2x.png'),
-          shadowRetinaUrl: (
-            this.urlInterpolationService.getExtensionResourceUrl(
-              '/interactions/InteractiveMap/static/marker-shadow.png'))
-        })
-      }
-    );
+    const newMarker = marker([lat, lng], {
+      icon: icon({
+        iconUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-icon.png'
+        ),
+        // The size of the icon image in pixels.
+        iconSize: [25, 41],
+        // The coordinates of the "tip" of the icon.
+        iconAnchor: [12, 41],
+        shadowUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-shadow.png'
+        ),
+        // The size of the shadow image in pixels.
+        shadowSize: [41, 41],
+        // The coordinates of the "tip" of the shadow.
+        shadowAnchor: [13, 41],
+        // The URL to a retina sized version of the icon image.
+        // Used for Retina screen devices.
+        iconRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-icon-2x.png'
+        ),
+        shadowRetinaUrl: this.urlInterpolationService.getExtensionResourceUrl(
+          '/interactions/InteractiveMap/static/marker-shadow.png'
+        ),
+      }),
+    });
     this.mapMarkers = newMarker;
   }
 
   ngOnInit(): void {
     const answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as number[];
+      this.answer
+    ) as number[];
     this.mapOptions = {
-      layers: [tileLayer(
-        this.optionsSpec.layers[0].url,
-        { attribution: this.optionsSpec.layers[0].attribution }
-      )],
+      layers: [
+        tileLayer(this.optionsSpec.layers[0].url, {
+          attribution: this.optionsSpec.layers[0].attribution,
+        }),
+      ],
       zoom: 8,
-      center: latLng([answer[0], answer[1]])
+      center: latLng([answer[0], answer[1]]),
     };
     this.changeMarkerPosition(answer[0], answer[1]);
   }
@@ -102,5 +105,6 @@ export class ResponseInteractiveMapComponent implements OnInit {
 angular.module('oppia').directive(
   'oppiaResponseInteractiveMap',
   downgradeComponent({
-    component: ResponseInteractiveMapComponent
-  }));
+    component: ResponseInteractiveMapComponent,
+  })
+);

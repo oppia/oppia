@@ -16,13 +16,13 @@ window.MathJax = {
     useGlobalCache: false,
     linebreaks: {
       automatic: true,
-      width: '500px'
+      width: '500px',
     },
     scale: 91,
     showMathMenu: false,
-    useFontCache: false
+    useFontCache: false,
   },
   TeX: {
-    extensions: ['AMSmath.js', 'AMSsymbols.js', 'autoload-all.js']
-  }
+    extensions: ['AMSmath.js', 'AMSsymbols.js', 'autoload-all.js'],
+  },
 };

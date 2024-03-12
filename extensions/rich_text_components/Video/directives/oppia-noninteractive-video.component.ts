@@ -34,12 +34,19 @@
  * value.
  */
 
-import { Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AutoplayedVideosService } from 'services/autoplayed-videos.service';
-import { ContextService } from 'services/context.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ServicesConstants } from 'services/services.constants';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AutoplayedVideosService} from 'services/autoplayed-videos.service';
+import {ContextService} from 'services/context.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ServicesConstants} from 'services/services.constants';
 
 /**
  * The "apiLoaded" variable only changes once during the lifetime of
@@ -55,7 +62,7 @@ let apiLoaded = false;
 @Component({
   selector: 'oppia-noninteractive-video',
   templateUrl: './video.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class NoninteractiveVideo implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
@@ -73,7 +80,7 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
 
   playerVars = {
     autoplay: 0,
-    origin: 'http://localhost:8181'
+    origin: 'http://localhost:8181',
   };
 
   constructor(
@@ -102,17 +109,21 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
       apiLoaded = true;
     }
     const start = this.htmlEscaperService.escapedJsonToObj(
-      this.startWithValue) as string;
+      this.startWithValue
+    ) as string;
     const end = this.htmlEscaperService.escapedJsonToObj(
-      this.endWithValue) as string;
+      this.endWithValue
+    ) as string;
     this.start = Number(start);
     this.end = Number(end);
     this.videoId = this.htmlEscaperService.escapedJsonToObj(
-      this.videoIdWithValue) as string;
+      this.videoIdWithValue
+    ) as string;
 
     // Check whether creator wants to autoplay this video or not.
     const autoplayVal = this.htmlEscaperService.escapedJsonToObj(
-      this.autoplayWithValue);
+      this.autoplayWithValue
+    );
 
     // This code helps in visibility of video. It checks whether
     // mid point of video frame is in the view or not.
@@ -120,20 +131,23 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
     const clientHeight = window.innerHeight;
     const clientWidth = window.innerWidth;
     this.width = this.elementRed.nativeElement.width;
-    const isVisible = (
+    const isVisible =
       (rect.left + rect.right) / 2 < clientWidth &&
-      (rect.top + rect.bottom) / 2 < clientHeight) &&
-      (rect.left > 0 && rect.right > 0);
+      (rect.top + rect.bottom) / 2 < clientHeight &&
+      rect.left > 0 &&
+      rect.right > 0;
 
     // Autoplay if user is in learner view and creator has specified
     // to autoplay given video.
-    if (this.contextService.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER && autoplayVal
+    if (
+      this.contextService.getPageContext() ===
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER &&
+      autoplayVal
     ) {
       // If it has been autoplayed then do not autoplay again.
       if (
-        !this.autoplayedVideosService.hasVideoBeenAutoplayed(
-          this.videoId) && isVisible
+        !this.autoplayedVideosService.hasVideoBeenAutoplayed(this.videoId) &&
+        isVisible
       ) {
         this.playerVars.autoplay = 1;
         this.autoplayedVideosService.addAutoplayedVideo(this.videoId);
@@ -164,6 +178,8 @@ export class NoninteractiveVideo implements OnInit, OnChanges {
 }
 
 angular.module('oppia').directive(
-  'oppiaNoninteractiveVideo', downgradeComponent({
-    component: NoninteractiveVideo
-  }) as angular.IDirectiveFactory);
+  'oppiaNoninteractiveVideo',
+  downgradeComponent({
+    component: NoninteractiveVideo,
+  }) as angular.IDirectiveFactory
+);

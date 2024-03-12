@@ -16,44 +16,51 @@
  * @fileoverview Component containing the exploration material to be translated.
  */
 
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { AppConstants } from 'app.constants';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { TRANSLATION_DATA_FORMAT_HTML, TRANSLATION_DATA_FORMAT_UNICODE, TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING, TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { Rule } from 'domain/exploration/rule.model';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { TranslationStatusService } from '../services/translation-status.service';
-import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
-import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {AppConstants} from 'app.constants';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {
+  TRANSLATION_DATA_FORMAT_HTML,
+  TRANSLATION_DATA_FORMAT_UNICODE,
+  TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+  TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+} from 'domain/exploration/WrittenTranslationObjectFactory';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {Rule} from 'domain/exploration/rule.model';
+import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import {
+  AnswerChoice,
+  StateEditorService,
+} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {TranslationStatusService} from '../services/translation-status.service';
+import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
+import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { BaseTranslatableObject } from 'interactions/rule-input-defs';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
-import { TranslationLanguageService } from '../services/translation-language.service';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {BaseTranslatableObject} from 'interactions/rule-input-defs';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslationLanguageService} from '../services/translation-language.service';
 
 @Component({
   selector: 'oppia-state-translation',
-  templateUrl: './state-translation.component.html'
+  templateUrl: './state-translation.component.html',
 })
-export class StateTranslationComponent
-  implements OnInit, OnDestroy {
+export class StateTranslationComponent implements OnInit, OnDestroy {
   @Input() isTranslationTabBusy: boolean;
 
   directiveSubscriptions = new Subscription();
@@ -87,12 +94,14 @@ export class StateTranslationComponent
   initActiveContentId: string | null;
   initActiveIndex: number;
   interactionRuleTranslatableContents: {
-    rule: Rule; inputName: string; contentId: string;
+    rule: Rule;
+    inputName: string;
+    contentId: string;
   }[];
 
   interactionCustomizationArgTranslatableContent: {
     name: string;
-    content: (SubtitledUnicode | SubtitledHtml);
+    content: SubtitledUnicode | SubtitledHtml;
   }[];
 
   constructor(
@@ -104,18 +113,17 @@ export class StateTranslationComponent
     private entityTranslationsService: EntityTranslationsService,
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
-    private translationTabActiveContentIdService:
-      TranslationTabActiveContentIdService,
+    private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private ConvertToPlainTextPipe: ConvertToPlainTextPipe,
     private truncatePipe: TruncatePipe,
     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
-    private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
-  ) { }
+    private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe
+  ) {}
 
   isVoiceoverModeActive(): boolean {
-    return (this.translationTabActiveModeService.isVoiceoverModeActive());
+    return this.translationTabActiveModeService.isVoiceoverModeActive();
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
@@ -125,18 +133,17 @@ export class StateTranslationComponent
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService
-        .languageCodeToEntityTranslations.hasOwnProperty(langCode)
+      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+        langCode
+      )
     ) {
       return subtitledHtml.html;
     }
 
-    let translationContent = (
-      this.entityTranslationsService
-        .languageCodeToEntityTranslations[langCode].getWrittenTranslation(
-          subtitledHtml.contentId
-        )
-    );
+    let translationContent =
+      this.entityTranslationsService.languageCodeToEntityTranslations[
+        langCode
+      ].getWrittenTranslation(subtitledHtml.contentId);
     if (!translationContent) {
       return subtitledHtml.html;
     }
@@ -151,18 +158,17 @@ export class StateTranslationComponent
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService
-        .languageCodeToEntityTranslations.hasOwnProperty(langCode)
+      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+        langCode
+      )
     ) {
       return SubtitledUnicode.unicode;
     }
 
-    let translationContent = (
-      this.entityTranslationsService
-        .languageCodeToEntityTranslations[langCode].getWrittenTranslation(
-          SubtitledUnicode.contentId
-        )
-    );
+    let translationContent =
+      this.entityTranslationsService.languageCodeToEntityTranslations[
+        langCode
+      ].getWrittenTranslation(SubtitledUnicode.contentId);
     if (!translationContent) {
       return SubtitledUnicode.unicode;
     }
@@ -174,14 +180,15 @@ export class StateTranslationComponent
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
       return (
         'The translation for this section has not been created yet. ' +
-        'Switch to translation mode to add a text translation.');
+        'Switch to translation mode to add a text translation.'
+      );
     } else {
       return 'There is no text available to translate.';
     }
   }
 
   isActive(tabId: string): boolean {
-    return (this.activatedTabId === tabId);
+    return this.activatedTabId === tabId;
   }
 
   navigateToState(stateName: string): void {
@@ -218,23 +225,19 @@ export class StateTranslationComponent
     } else if (tabId === this.TAB_ID_FEEDBACK) {
       this.activeAnswerGroupIndex = this.initActiveIndex;
       if (this.stateAnswerGroups.length > 0) {
-        activeContentId = (
-          this.stateAnswerGroups[0].outcome.feedback.contentId);
+        activeContentId = this.stateAnswerGroups[0].outcome.feedback.contentId;
       } else {
-        activeContentId = (
-          this.stateDefaultOutcome.feedback.contentId);
+        activeContentId = this.stateDefaultOutcome.feedback.contentId;
       }
     } else if (tabId === this.TAB_ID_HINTS) {
       this.activeHintIndex = this.initActiveIndex;
-      activeContentId = (
-        this.stateHints[0].hintContent.contentId);
+      activeContentId = this.stateHints[0].hintContent.contentId;
     } else if (tabId === this.TAB_ID_SOLUTION) {
       activeContentId = (this.stateSolution as Solution).explanation.contentId;
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
       this.activeCustomizationArgContentIndex = this.initActiveIndex;
-      const activeContent = (
-        this.interactionCustomizationArgTranslatableContent[0].content
-      );
+      const activeContent =
+        this.interactionCustomizationArgTranslatableContent[0].content;
       activeContentId = activeContent.contentId;
       if (activeContent instanceof SubtitledUnicode) {
         activeDataFormat = TRANSLATION_DATA_FORMAT_UNICODE;
@@ -242,21 +245,23 @@ export class StateTranslationComponent
     } else if (tabId === this.TAB_ID_RULE_INPUTS) {
       if (this.interactionRuleTranslatableContents.length === 0) {
         throw new Error(
-          'Accessed rule input translation tab when there are no rules');
+          'Accessed rule input translation tab when there are no rules'
+        );
       }
 
       // Note that only 'TextInput' and 'SetInput' have translatable rule
       // types. The rules tab is disabled for other interactions.
-      const {
-        rule, inputName, contentId
-      } = this.interactionRuleTranslatableContents[0];
+      const {rule, inputName, contentId} =
+        this.interactionRuleTranslatableContents[0];
       activeContentId = contentId;
       const inputType = rule.inputTypes[inputName];
       activeDataFormat = this.RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
       this.activeRuleContentIndex = 0;
     }
     this.translationTabActiveContentIdService.setActiveContent(
-      activeContentId, activeDataFormat);
+      activeContentId,
+      activeDataFormat
+    );
     this.activatedTabId = tabId;
     this.updateTranslatedContent();
   }
@@ -264,34 +269,36 @@ export class StateTranslationComponent
   updateTranslatedContent(): void {
     if (!this.translationTabActiveModeService.isVoiceoverModeActive()) {
       let langCode = this.translationLanguageService.getActiveLanguageCode();
-      const entityTranslations = (
+      const entityTranslations =
         this.entityTranslationsService.languageCodeToEntityTranslations[
-          langCode]
-      );
+          langCode
+        ];
       if (entityTranslations) {
         this.activeTranslatedContent = entityTranslations.getWrittenTranslation(
-          this.translationTabActiveContentIdService.getActiveContentId());
+          this.translationTabActiveContentIdService.getActiveContentId()
+        );
       }
     }
   }
 
   getHumanReadableRuleInputValues(
-      inputValue: { normalizedStrSet: string[]; unicodeStrSet: string[] },
-      inputType: string): string {
+    inputValue: {normalizedStrSet: string[]; unicodeStrSet: string[]},
+    inputType: string
+  ): string {
     if (inputType === 'TranslatableSetOfNormalizedString') {
-      return ('[' + inputValue.normalizedStrSet.join(', ') + ']');
+      return '[' + inputValue.normalizedStrSet.join(', ') + ']';
     } else if (inputType === 'TranslatableSetOfUnicodeString') {
-      return ('[' + inputValue.unicodeStrSet.join(', ') + ']');
+      return '[' + inputValue.unicodeStrSet.join(', ') + ']';
     } else {
       throw new Error(`The ${inputType} type is not implemented.`);
     }
   }
 
   summarizeDefaultOutcome(
-      defaultOutcome: Outcome,
-      interactionId: string,
-      answerGroupCount: number,
-      shortenRule: string
+    defaultOutcome: Outcome,
+    interactionId: string,
+    answerGroupCount: number,
+    shortenRule: string
   ): string {
     if (!defaultOutcome) {
       return '';
@@ -301,8 +308,7 @@ export class StateTranslationComponent
     let hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
     if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
-      summary =
-        INTERACTION_SPECS[interactionId].default_outcome_heading;
+      summary = INTERACTION_SPECS[interactionId].default_outcome_heading;
     } else if (answerGroupCount > 0) {
       summary = 'All other answers';
     } else {
@@ -311,23 +317,26 @@ export class StateTranslationComponent
 
     if (hasFeedback && shortenRule) {
       summary = this.wrapTextWithEllipsisPipe.transform(
-        summary, AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+        summary,
+        AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT
+      );
     }
     summary = '[' + summary + '] ';
 
     if (hasFeedback) {
       summary += this.ConvertToPlainTextPipe.transform(
-        defaultOutcome.feedback.html);
+        defaultOutcome.feedback.html
+      );
     }
 
     return summary;
   }
 
   summarizeAnswerGroup(
-      answerGroup: AnswerGroup,
-      interactionId: string,
-      answerChoices: AnswerChoice[],
-      shortenRule: boolean
+    answerGroup: AnswerGroup,
+    interactionId: string,
+    answerChoices: AnswerChoice[],
+    shortenRule: boolean
   ): string {
     let summary = '';
     let outcome = answerGroup.outcome;
@@ -336,21 +345,26 @@ export class StateTranslationComponent
     if (answerGroup.rules) {
       let firstRule = this.ConvertToPlainTextPipe.transform(
         this.parameterizeRuleDescriptionPipe.transform(
-          answerGroup.rules[0], interactionId, answerChoices));
+          answerGroup.rules[0],
+          interactionId,
+          answerChoices
+        )
+      );
       summary = 'Answer ' + firstRule;
 
       if (hasFeedback && shortenRule) {
         summary = this.wrapTextWithEllipsisPipe.transform(
-          summary, AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+          summary,
+          AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT
+        );
       }
       summary = '[' + summary + '] ';
     }
 
     if (hasFeedback) {
-      summary += (
-        shortenRule ?
-          this.truncatePipe.transform(outcome.feedback.html, 30) :
-          this.ConvertToPlainTextPipe.transform(outcome.feedback.html));
+      summary += shortenRule
+        ? this.truncatePipe.transform(outcome.feedback.html, 30)
+        : this.ConvertToPlainTextPipe.transform(outcome.feedback.html);
     }
     return summary;
   }
@@ -365,11 +379,10 @@ export class StateTranslationComponent
     // translatable customization arguments -- e.g. Continue
     // interaction's placeholder.
     if (
-      tabId !== this.TAB_ID_CUSTOMIZATION_ARGS && (
-        !this.stateInteractionId ||
+      tabId !== this.TAB_ID_CUSTOMIZATION_ARGS &&
+      (!this.stateInteractionId ||
         INTERACTION_SPECS[this.stateInteractionId].is_linear ||
-        INTERACTION_SPECS[this.stateInteractionId].is_terminal
-      )
+        INTERACTION_SPECS[this.stateInteractionId].is_terminal)
     ) {
       return true;
     } else if (tabId === this.TAB_ID_FEEDBACK) {
@@ -391,8 +404,7 @@ export class StateTranslationComponent
         return false;
       }
     } else if (tabId === this.TAB_ID_CUSTOMIZATION_ARGS) {
-      return (
-        this.interactionCustomizationArgTranslatableContent.length === 0);
+      return this.interactionCustomizationArgTranslatableContent.length === 0;
     } else if (tabId === this.TAB_ID_RULE_INPUTS) {
       return this.interactionRuleTranslatableContents.length === 0;
     }
@@ -409,10 +421,11 @@ export class StateTranslationComponent
     }
 
     this.activeHintIndex = newIndex;
-    let activeContentId = (
-      this.stateHints[newIndex].hintContent.contentId);
+    let activeContentId = this.stateHints[newIndex].hintContent.contentId;
     this.translationTabActiveContentIdService.setActiveContent(
-      activeContentId, TRANSLATION_DATA_FORMAT_HTML);
+      activeContentId,
+      TRANSLATION_DATA_FORMAT_HTML
+    );
     this.updateTranslatedContent();
   }
 
@@ -424,15 +437,16 @@ export class StateTranslationComponent
     if (this.activeRuleContentIndex === newIndex) {
       return;
     }
-    const {
-      rule, inputName, contentId
-    } = this.interactionRuleTranslatableContents[newIndex];
+    const {rule, inputName, contentId} =
+      this.interactionRuleTranslatableContents[newIndex];
     const activeContentId = contentId;
     const inputType = rule.inputTypes[inputName];
     const activeDataFormat = this.RULE_INPUT_TYPES_TO_DATA_FORMATS[inputType];
 
     this.translationTabActiveContentIdService.setActiveContent(
-      activeContentId, activeDataFormat);
+      activeContentId,
+      activeDataFormat
+    );
     this.activeRuleContentIndex = newIndex;
     this.updateTranslatedContent();
   }
@@ -447,10 +461,8 @@ export class StateTranslationComponent
       return;
     }
 
-    const activeContent = (
-      this.interactionCustomizationArgTranslatableContent[
-        newIndex].content
-    );
+    const activeContent =
+      this.interactionCustomizationArgTranslatableContent[newIndex].content;
     const activeContentId = activeContent.contentId;
     let activeDataFormat = null;
 
@@ -461,7 +473,9 @@ export class StateTranslationComponent
     }
 
     this.translationTabActiveContentIdService.setActiveContent(
-      activeContentId, activeDataFormat);
+      activeContentId,
+      activeDataFormat
+    );
     this.activeCustomizationArgContentIndex = newIndex;
     this.updateTranslatedContent();
   }
@@ -476,49 +490,54 @@ export class StateTranslationComponent
       let activeContentId = null;
       this.activeAnswerGroupIndex = newIndex;
       if (newIndex === this.stateAnswerGroups.length) {
-        activeContentId = (
-          this.stateDefaultOutcome.feedback.contentId);
+        activeContentId = this.stateDefaultOutcome.feedback.contentId;
       } else {
-        activeContentId = (
-          this.stateAnswerGroups[newIndex]
-            .outcome.feedback.contentId);
+        activeContentId =
+          this.stateAnswerGroups[newIndex].outcome.feedback.contentId;
       }
 
       this.translationTabActiveContentIdService.setActiveContent(
-        activeContentId, TRANSLATION_DATA_FORMAT_HTML);
+        activeContentId,
+        TRANSLATION_DATA_FORMAT_HTML
+      );
     }
     this.updateTranslatedContent();
   }
 
   tabStatusColorStyle(tabId: string): object {
     if (!this.isDisabled(tabId)) {
-      let color = this.translationStatusService
-        .getActiveStateComponentStatusColor(tabId);
-      return { 'border-top-color': color };
+      let color =
+        this.translationStatusService.getActiveStateComponentStatusColor(tabId);
+      return {'border-top-color': color};
     }
   }
 
   tabNeedUpdatesStatus(tabId: string): boolean {
     if (!this.isDisabled(tabId)) {
-      return this.translationStatusService
-        .getActiveStateComponentNeedsUpdateStatus(tabId);
+      return this.translationStatusService.getActiveStateComponentNeedsUpdateStatus(
+        tabId
+      );
     }
   }
 
   contentIdNeedUpdates(contentId: string): boolean {
-    return this.translationStatusService
-      .getActiveStateContentIdNeedsUpdateStatus(contentId);
+    return this.translationStatusService.getActiveStateContentIdNeedsUpdateStatus(
+      contentId
+    );
   }
 
   contentIdStatusColorStyle(contentId: string): object {
-    let color = this.translationStatusService
-      .getActiveStateContentIdStatusColor(contentId);
+    let color =
+      this.translationStatusService.getActiveStateContentIdStatusColor(
+        contentId
+      );
 
-    return { 'border-left': '3px solid ' + color };
+    return {'border-left': '3px solid ' + color};
   }
 
   getSubtitledContentSummary(
-      subtitledContent: SubtitledHtml | SubtitledUnicode): string {
+    subtitledContent: SubtitledHtml | SubtitledUnicode
+  ): string {
     if (subtitledContent instanceof SubtitledHtml) {
       return this.formatRtePreviewPipe.transform(subtitledContent.html);
     } else if (subtitledContent instanceof SubtitledUnicode) {
@@ -527,10 +546,13 @@ export class StateTranslationComponent
   }
 
   getInteractionRuleTranslatableContents(): {
-    rule: Rule; inputName: string; contentId: string;
+    rule: Rule;
+    inputName: string;
+    contentId: string;
   }[] {
-    const allRules = this.stateAnswerGroups.map(
-      answerGroup => answerGroup.rules).flat();
+    const allRules = this.stateAnswerGroups
+      .map(answerGroup => answerGroup.rules)
+      .flat();
 
     const interactionRuleTranslatableContent = [];
     allRules.forEach(rule => {
@@ -542,7 +564,9 @@ export class StateTranslationComponent
         if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
           const contentId = (ruleInput as BaseTranslatableObject).contentId;
           interactionRuleTranslatableContent.push({
-            rule, inputName, contentId
+            rule,
+            inputName,
+            contentId,
           });
         }
       });
@@ -552,11 +576,11 @@ export class StateTranslationComponent
   }
 
   getInteractionCustomizationArgTranslatableContents(
-      customizationArgs: InteractionCustomizationArgs
-  ): { name: string; content: SubtitledUnicode | SubtitledHtml }[] {
+    customizationArgs: InteractionCustomizationArgs
+  ): {name: string; content: SubtitledUnicode | SubtitledHtml}[] {
     const translatableContents = [];
 
-    const camelCaseToSentenceCase = (s) => {
+    const camelCaseToSentenceCase = s => {
       // Lowercase the first letter (edge case for UpperCamelCase).
       s = s.charAt(0).toLowerCase() + s.slice(1);
       // Add a space in front of capital letters.
@@ -567,24 +591,24 @@ export class StateTranslationComponent
     };
 
     const traverseValueAndRetrieveSubtitledContent = (
-        name: string,
-        value: Object[] | Object,
+      name: string,
+      value: Object[] | Object
     ): void => {
-      if (value instanceof SubtitledUnicode ||
-        value instanceof SubtitledHtml
-      ) {
+      if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         translatableContents.push({
-          name, content: value
+          name,
+          content: value,
         });
       } else if (value instanceof Array) {
-        value.forEach(
-          (element, index) => traverseValueAndRetrieveSubtitledContent(
+        value.forEach((element, index) =>
+          traverseValueAndRetrieveSubtitledContent(
             `${name} (${index})`,
-            element)
+            element
+          )
         );
       } else if (value instanceof Object) {
-        Object.keys(value).forEach(
-          key => traverseValueAndRetrieveSubtitledContent(
+        Object.keys(value).forEach(key =>
+          traverseValueAndRetrieveSubtitledContent(
             `${name} > ${camelCaseToSentenceCase(key)}`,
             value[key]
           )
@@ -592,22 +616,24 @@ export class StateTranslationComponent
       }
     };
 
-    Object.keys(customizationArgs).forEach(
-      caName => traverseValueAndRetrieveSubtitledContent(
+    Object.keys(customizationArgs).forEach(caName =>
+      traverseValueAndRetrieveSubtitledContent(
         camelCaseToSentenceCase(caName),
-        customizationArgs[caName].value));
+        customizationArgs[caName].value
+      )
+    );
 
     return translatableContents;
   }
 
   getActiveTab(): string {
-    this.initActiveContentId = this.stateEditorService.
-      getInitActiveContentId();
+    this.initActiveContentId = this.stateEditorService.getInitActiveContentId();
     if (!this.initActiveContentId) {
       return null;
     }
-    const tabName = this.stateEditorService.getInitActiveContentId().
-      split('_')[0];
+    const tabName = this.stateEditorService
+      .getInitActiveContentId()
+      .split('_')[0];
     return tabName === 'default' ? this.TAB_ID_FEEDBACK : tabName;
   }
 
@@ -619,69 +645,84 @@ export class StateTranslationComponent
     const tabName = this.activeTab;
     switch (tabName) {
       case this.TAB_ID_FEEDBACK:
-        return this.stateAnswerGroups.findIndex (
-          card => card.outcome.feedback.contentId === this.
-            initActiveContentId);
+        return this.stateAnswerGroups.findIndex(
+          card => card.outcome.feedback.contentId === this.initActiveContentId
+        );
       case this.TAB_ID_HINTS:
         return this.stateHints.findIndex(
-          card => card.hintContent.contentId === this.
-            initActiveContentId);
+          card => card.hintContent.contentId === this.initActiveContentId
+        );
       case this.TAB_ID_CUSTOMIZATION_ARGS:
-        return (
-          this.interactionCustomizationArgTranslatableContent
-            .findIndex(card => card.content.contentId === (
-              this.initActiveContentId)));
+        return this.interactionCustomizationArgTranslatableContent.findIndex(
+          card => card.content.contentId === this.initActiveContentId
+        );
       default:
         return 0;
     }
   }
 
-
   initStateTranslation(): void {
     this.stateName = this.stateEditorService.getActiveStateName();
-    this.stateContent = this.explorationStatesService
-      .getStateContentMemento(this.stateName);
-    this.stateSolution = this.explorationStatesService
-      .getSolutionMemento(this.stateName);
-    this.stateHints = this.explorationStatesService
-      .getHintsMemento(this.stateName);
-    this.stateAnswerGroups = this.explorationStatesService
-      .getInteractionAnswerGroupsMemento(this.stateName);
-    this.stateDefaultOutcome = this.explorationStatesService
-      .getInteractionDefaultOutcomeMemento(this.stateName);
-    this.stateInteractionId = this.explorationStatesService
-      .getInteractionIdMemento(this.stateName);
-    this.stateInteractionCustomizationArgs = this.explorationStatesService
-      .getInteractionCustomizationArgsMemento(this.stateName);
+    this.stateContent = this.explorationStatesService.getStateContentMemento(
+      this.stateName
+    );
+    this.stateSolution = this.explorationStatesService.getSolutionMemento(
+      this.stateName
+    );
+    this.stateHints = this.explorationStatesService.getHintsMemento(
+      this.stateName
+    );
+    this.stateAnswerGroups =
+      this.explorationStatesService.getInteractionAnswerGroupsMemento(
+        this.stateName
+      );
+    this.stateDefaultOutcome =
+      this.explorationStatesService.getInteractionDefaultOutcomeMemento(
+        this.stateName
+      );
+    this.stateInteractionId =
+      this.explorationStatesService.getInteractionIdMemento(this.stateName);
+    this.stateInteractionCustomizationArgs =
+      this.explorationStatesService.getInteractionCustomizationArgsMemento(
+        this.stateName
+      );
     this.activeHintIndex = null;
     this.activeAnswerGroupIndex = null;
-    let currentCustomizationArgs = this.explorationStatesService
-      .getInteractionCustomizationArgsMemento(this.stateName);
+    let currentCustomizationArgs =
+      this.explorationStatesService.getInteractionCustomizationArgsMemento(
+        this.stateName
+      );
     this.answerChoices = this.stateEditorService.getAnswerChoices(
-      this.stateInteractionId, currentCustomizationArgs);
-    this.interactionPreviewHtml = (
-      this.stateInteractionId ? (
-        this.explorationHtmlFormatterService.getInteractionHtml(
-          this.stateInteractionId,
-          this.stateInteractionCustomizationArgs, false, null, null)
-      ) : '');
-    this.interactionCustomizationArgTranslatableContent = (
-      this.getInteractionCustomizationArgTranslatableContents(
-        this.stateInteractionCustomizationArgs)
+      this.stateInteractionId,
+      currentCustomizationArgs
     );
-    this.interactionRuleTranslatableContents = (
-      this.getInteractionRuleTranslatableContents());
+    this.interactionPreviewHtml = this.stateInteractionId
+      ? this.explorationHtmlFormatterService.getInteractionHtml(
+          this.stateInteractionId,
+          this.stateInteractionCustomizationArgs,
+          false,
+          null,
+          null
+        )
+      : '';
+    this.interactionCustomizationArgTranslatableContent =
+      this.getInteractionCustomizationArgTranslatableContents(
+        this.stateInteractionCustomizationArgs
+      );
+    this.interactionRuleTranslatableContents =
+      this.getInteractionRuleTranslatableContents();
 
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
-      this.needsUpdateTooltipMessage = 'Audio needs update to ' +
-        'match text. Please record new audio.';
+      this.needsUpdateTooltipMessage =
+        'Audio needs update to ' + 'match text. Please record new audio.';
     } else {
-      this.needsUpdateTooltipMessage = 'Translation needs update ' +
+      this.needsUpdateTooltipMessage =
+        'Translation needs update ' +
         'to match text. Please re-translate the content.';
     }
-    this.isDisabled(this.activeTab) || !this.activeTab ?
-    this.onTabClick(this.TAB_ID_CONTENT) : this.onTabClick(this.activeTab);
-
+    this.isDisabled(this.activeTab) || !this.activeTab
+      ? this.onTabClick(this.TAB_ID_CONTENT)
+      : this.onTabClick(this.activeTab);
 
     this.updateTranslatedContent();
   }
@@ -690,10 +731,10 @@ export class StateTranslationComponent
     // A map from translatable rule input types to their corresponding data
     // formats.
     this.RULE_INPUT_TYPES_TO_DATA_FORMATS = {
-      TranslatableSetOfNormalizedString: (
-        TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING),
-      TranslatableSetOfUnicodeString: (
-        TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING),
+      TranslatableSetOfNormalizedString:
+        TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+      TranslatableSetOfUnicodeString:
+        TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
     };
 
     // Define tab constants.
@@ -702,8 +743,8 @@ export class StateTranslationComponent
     this.TAB_ID_HINTS = AppConstants.COMPONENT_NAME_HINT;
     this.TAB_ID_RULE_INPUTS = AppConstants.COMPONENT_NAME_RULE_INPUT;
     this.TAB_ID_SOLUTION = AppConstants.COMPONENT_NAME_SOLUTION;
-    this.TAB_ID_CUSTOMIZATION_ARGS = (
-      AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS);
+    this.TAB_ID_CUSTOMIZATION_ARGS =
+      AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS;
 
     // Activates Content tab by default.
     this.activatedTabId = this.TAB_ID_CONTENT;
@@ -713,8 +754,9 @@ export class StateTranslationComponent
     this.activeTab = this.getActiveTab();
 
     this.directiveSubscriptions.add(
-      this.stateEditorService.onRefreshStateTranslation.subscribe(
-        () => this.initStateTranslation())
+      this.stateEditorService.onRefreshStateTranslation.subscribe(() =>
+        this.initStateTranslation()
+      )
     );
 
     this.initStateTranslation();
@@ -727,7 +769,9 @@ export class StateTranslationComponent
   }
 }
 
-angular.module('oppia').directive('oppiaStateTranslation',
+angular.module('oppia').directive(
+  'oppiaStateTranslation',
   downgradeComponent({
-    component: StateTranslationComponent
-  }) as angular.IDirectiveFactory);
+    component: StateTranslationComponent,
+  }) as angular.IDirectiveFactory
+);

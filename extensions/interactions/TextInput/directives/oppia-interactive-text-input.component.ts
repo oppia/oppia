@@ -20,17 +20,17 @@
  * followed by the name of the arg.
  */
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TextInputAnswer } from 'interactions/answer-defs';
-import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { TextInputRulesService } from './text-input-rules.service';
+import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TextInputAnswer} from 'interactions/answer-defs';
+import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {TextInputRulesService} from './text-input-rules.service';
 
 interface TextInputSchema {
   type: string;
-  'ui_config': {
+  ui_config: {
     placeholder: string;
     rows: number;
     catchMisspellings: boolean;
@@ -39,7 +39,7 @@ interface TextInputSchema {
 
 @Component({
   selector: 'oppia-interactive-text-input',
-  templateUrl: './text-input-interaction.component.html'
+  templateUrl: './text-input-interaction.component.html',
 })
 export class InteractiveTextInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -60,16 +60,15 @@ export class InteractiveTextInputComponent implements OnInit {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private currentInteractionService: CurrentInteractionService,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService,
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private textInputRulesService: TextInputRulesService
-  ) { }
+  ) {}
 
   private _getAttrs() {
     return {
       placeholderWithValue: this.placeholderWithValue,
       rowsWithValue: this.rowsWithValue,
-      catchMisspellingsWithValue: this.catchMisspellingsWithValue
+      catchMisspellingsWithValue: this.catchMisspellingsWithValue,
     };
   }
 
@@ -78,28 +77,23 @@ export class InteractiveTextInputComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const {
-      placeholder,
-      rows,
-      catchMisspellings
-    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'TextInput', this._getAttrs()
-    ) as TextInputCustomizationArgs;
+    const {placeholder, rows, catchMisspellings} =
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        'TextInput',
+        this._getAttrs()
+      ) as TextInputCustomizationArgs;
     this.placeholder = placeholder.value.unicode;
     this.rows = rows.value;
     this.catchMisspellings = catchMisspellings.value;
-    this.answer = (
-      this.savedSolution !== undefined ?
-      this.savedSolution : ''
-    );
+    this.answer = this.savedSolution !== undefined ? this.savedSolution : '';
 
     this.schema = {
       type: 'unicode',
       ui_config: {
         placeholder: 'Placeholder text',
         rows: 1,
-        catchMisspellings: false
-      }
+        catchMisspellings: false,
+      },
     };
     if (this.placeholder) {
       this.schema.ui_config.placeholder = this.placeholder;
@@ -111,7 +105,9 @@ export class InteractiveTextInputComponent implements OnInit {
       this.schema.ui_config.catchMisspellings = this.catchMisspellings;
     }
     this.currentInteractionService.registerCurrentInteraction(
-      () => this.submitAnswer(this.answer), () => this.validityCheckFn());
+      () => this.submitAnswer(this.answer),
+      () => this.validityCheckFn()
+    );
   }
 
   getSchema(): TextInputSchema {
@@ -129,8 +125,7 @@ export class InteractiveTextInputComponent implements OnInit {
       }
       return;
     }
-    this.currentInteractionService.onSubmit(
-      answer, this.textInputRulesService);
+    this.currentInteractionService.onSubmit(answer, this.textInputRulesService);
   }
 
   updateAnswer(answer: string): void {
@@ -147,6 +142,6 @@ export class InteractiveTextInputComponent implements OnInit {
 angular.module('oppia').directive(
   'oppiaInteractiveTextInput',
   downgradeComponent({
-    component: InteractiveTextInputComponent
+    component: InteractiveTextInputComponent,
   })
 );

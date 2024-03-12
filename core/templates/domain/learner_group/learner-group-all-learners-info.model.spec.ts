@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { LearnerGroupAllLearnersInfo } from './learner-group-all-learners-info.model';
+import {LearnerGroupAllLearnersInfo} from './learner-group-all-learners-info.model';
 
 /**
  * @fileoverview Tests for learner group all learners info model.
@@ -21,27 +21,34 @@ import { LearnerGroupAllLearnersInfo } from './learner-group-all-learners-info.m
 describe('Learner Group All Learners Info', () => {
   it('should correctly convert backend dict to object', () => {
     const sampleLearnerGroupAllLearnersInfoDict = {
-      learners_info: [{
-        username: 'user1',
-        error: 'some error message'
-      }],
-      invited_learners_info: [{
-        username: 'user2',
-        error: 'some error message'
-      }]
+      learners_info: [
+        {
+          username: 'user1',
+          error: 'some error message',
+        },
+      ],
+      invited_learners_info: [
+        {
+          username: 'user2',
+          error: 'some error message',
+        },
+      ],
     };
 
-    const sampleAllLearnersInfo = (
+    const sampleAllLearnersInfo =
       LearnerGroupAllLearnersInfo.createFromBackendDict(
-        sampleLearnerGroupAllLearnersInfoDict)
-    );
+        sampleLearnerGroupAllLearnersInfoDict
+      );
 
     expect(sampleAllLearnersInfo.learnersInfo[0].username).toEqual('user1');
     expect(sampleAllLearnersInfo.learnersInfo[0].error).toEqual(
-      'some error message');
+      'some error message'
+    );
     expect(sampleAllLearnersInfo.invitedLearnersInfo[0].username).toEqual(
-      'user2');
+      'user2'
+    );
     expect(sampleAllLearnersInfo.invitedLearnersInfo[0].error).toEqual(
-      'some error message');
+      'some error message'
+    );
   });
 });

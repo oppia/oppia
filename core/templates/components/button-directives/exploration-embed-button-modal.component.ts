@@ -16,14 +16,14 @@
  * @fileoverview Controller for embed exploration modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 @Component({
   selector: 'exploration-embed-button-modal',
   templateUrl: './exploration-embed-button-modal.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ExplorationEmbedButtonModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -34,7 +34,8 @@ export class ExplorationEmbedButtonModalComponent implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private siteAnalyticsService: SiteAnalyticsService) {}
+    private siteAnalyticsService: SiteAnalyticsService
+  ) {}
 
   ngOnInit(): void {
     this.siteAnalyticsService.registerOpenEmbedInfoEvent(this.explorationId);

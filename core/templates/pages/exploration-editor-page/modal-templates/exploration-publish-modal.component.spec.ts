@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for ExplorationPublishModalComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationPublishModalComponent } from './exploration-publish-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationPublishModalComponent} from './exploration-publish-modal.component';
 
 describe('Editor Reloading Modal', () => {
   let fixture: ComponentFixture<ExplorationPublishModalComponent>;
@@ -26,15 +26,9 @@ describe('Editor Reloading Modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NgbModalModule
-      ],
-      declarations: [
-        ExplorationPublishModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      imports: [NgbModalModule],
+      declarations: [ExplorationPublishModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

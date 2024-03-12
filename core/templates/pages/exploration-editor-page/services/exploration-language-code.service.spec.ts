@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for the ExplorationLanguageCodeService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ContextService } from 'services/context.service';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ExplorationLanguageCodeService } from './exploration-language-code.service';
+import {TestBed} from '@angular/core/testing';
+import {ContextService} from 'services/context.service';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ExplorationLanguageCodeService} from './exploration-language-code.service';
 
 describe('Exploration Language Code Service', () => {
   let elcs: ExplorationLanguageCodeService;
@@ -29,9 +29,7 @@ describe('Exploration Language Code Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        ExplorationPropertyService
-      ]
+      providers: [ExplorationPropertyService],
     });
 
     elcs = TestBed.inject(ExplorationLanguageCodeService);

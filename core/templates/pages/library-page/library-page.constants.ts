@@ -24,16 +24,15 @@ export const LibraryPageConstants = {
   LIBRARY_PAGE_MODES: {
     GROUP: 'group',
     INDEX: 'index',
-    SEARCH: 'search'
+    SEARCH: 'search',
   },
 
   LIBRARY_PATHS_TO_MODES: {
     '/community-library': 'index',
     '/community-library/top-rated': 'group',
     '/community-library/recently-published': 'group',
-    '/search/find': 'search'
+    '/search/find': 'search',
   },
 
-  SEARCH_EXPLORATION_URL_TEMPLATE:
-    '/exploration/metadata_search?q=<query>'
+  SEARCH_EXPLORATION_URL_TEMPLATE: '/exploration/metadata_search?q=<query>',
 } as const;

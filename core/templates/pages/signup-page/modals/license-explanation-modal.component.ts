@@ -16,18 +16,19 @@
  * @fileoverview Component for license explanation modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-license-explanation-modal',
-  templateUrl: './license-explanation-modal.component.html'
+  templateUrl: './license-explanation-modal.component.html',
 })
 export class LicenseExplanationModalComponent extends ConfirmOrCancelModal {
   SITE_NAME = AppConstants.SITE_NAME;
-  LICENSE_LINK = '<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA v4.0</a>';
+  LICENSE_LINK =
+    '<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA v4.0</a>';
 
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);

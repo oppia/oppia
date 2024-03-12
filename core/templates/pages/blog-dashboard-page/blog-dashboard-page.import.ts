@@ -22,26 +22,29 @@ import 'zone.js';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', uiValidate
+  require('angular-cookies'),
+  'ngAnimate',
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  uiValidate,
 ]);
 
 require('Polyfills.ts');
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require(
-  'pages/blog-dashboard-page/blog-dashboard-page.module.ts');
+require('pages/blog-dashboard-page/blog-dashboard-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
+require('pages/blog-dashboard-page/' + 'blog-dashboard-page.component.ts');
 require(
-  'pages/blog-dashboard-page/' +
-  'blog-dashboard-page.component.ts'
+  'pages/blog-dashboard-page/navbar/' +
+    'navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component.ts'
 );
 require(
   'pages/blog-dashboard-page/navbar/' +
-  'navbar-breadcrumb/blog-dashboard-navbar-breadcrumb.component.ts');
-require(
-  'pages/blog-dashboard-page/navbar/' +
-  'navbar-pre-logo-action/blog-post-editor-pre-logo-action.component.ts');
+    'navbar-pre-logo-action/blog-post-editor-pre-logo-action.component.ts'
+);

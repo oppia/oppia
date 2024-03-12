@@ -16,36 +16,36 @@
  * @fileoverview Service related to the learner playlist.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { AlertsService } from 'services/alerts.service';
-import { HttpClient } from '@angular/common/http';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import {AppConstants} from 'app.constants';
+import {AlertsService} from 'services/alerts.service';
+import {HttpClient} from '@angular/common/http';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import {RemoveActivityModalComponent} from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
 
 interface LearnerPlaylistResponseObject {
-  'belongs_to_completed_or_incomplete_list': boolean;
-  'belongs_to_subscribed_activities': boolean;
-  'is_super_admin': boolean;
-  'playlist_limit_exceeded': boolean;
-  'user_email': string;
-  'username': string;
-  }
+  belongs_to_completed_or_incomplete_list: boolean;
+  belongs_to_subscribed_activities: boolean;
+  is_super_admin: boolean;
+  playlist_limit_exceeded: boolean;
+  user_email: string;
+  username: string;
+}
 
 interface LearnerGoalsResponseObject {
-  'belongs_to_learnt_list': boolean;
-  'is_super_admin': boolean;
-  'goals_limit_exceeded': boolean;
-  'user_email': string;
-  'username': string;
-  }
+  belongs_to_learnt_list: boolean;
+  is_super_admin: boolean;
+  goals_limit_exceeded: boolean;
+  user_email: string;
+  username: string;
+}
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LearnerDashboardActivityBackendApiService {
   // These properties are initialized using Angular lifecycle hooks
@@ -60,84 +60,102 @@ export class LearnerDashboardActivityBackendApiService {
     private alertsService: AlertsService,
     private http: HttpClient,
     private ngbModal: NgbModal,
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   async addToLearnerPlaylist(
-      activityId: string, activityType: string): Promise<boolean> {
+    activityId: string,
+    activityType: string
+  ): Promise<boolean> {
     this.successfullyAdded = true;
-    this.addToLearnerPlaylistUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
-          activityType: activityType,
-          activityId: activityId
-        }));
-    let response = await this.http.post<LearnerPlaylistResponseObject>(
-      this.addToLearnerPlaylistUrl, {}).toPromise();
+    this.addToLearnerPlaylistUrl = this.urlInterpolationService.interpolateUrl(
+      '/learnerplaylistactivityhandler/<activityType>/<activityId>',
+      {
+        activityType: activityType,
+        activityId: activityId,
+      }
+    );
+    let response = await this.http
+      .post<LearnerPlaylistResponseObject>(this.addToLearnerPlaylistUrl, {})
+      .toPromise();
     if (response.belongs_to_completed_or_incomplete_list) {
       this.successfullyAdded = false;
       this.alertsService.addInfoMessage(
-        'You have already completed or are completing this ' +
-        'activity.');
+        'You have already completed or are completing this ' + 'activity.'
+      );
     }
     if (response.belongs_to_subscribed_activities) {
       this.successfullyAdded = false;
       this.alertsService.addInfoMessage(
-        'This is present in your creator dashboard');
+        'This is present in your creator dashboard'
+      );
     }
     if (response.playlist_limit_exceeded) {
       this.successfullyAdded = false;
       this.alertsService.addInfoMessage(
-        'Your \'Play Later\' list is full!  Either you can ' +
-        'complete some or you can head to the learner dashboard ' +
-        'and remove some.');
+        "Your 'Play Later' list is full!  Either you can " +
+          'complete some or you can head to the learner dashboard ' +
+          'and remove some.'
+      );
     }
     if (this.successfullyAdded) {
       this.alertsService.addSuccessMessage(
-        'Successfully added to your \'Play Later\' list.');
+        "Successfully added to your 'Play Later' list."
+      );
     }
     return this.successfullyAdded;
   }
 
   removeFromLearnerPlaylist(
-      activityId: string, activityType: string,
-      learnerDashboardActivityIds: LearnerDashboardActivityIds,
-      playlistUrl: string): void {
+    activityId: string,
+    activityType: string,
+    learnerDashboardActivityIds: LearnerDashboardActivityIds,
+    playlistUrl: string
+  ): void {
     this.http.delete<void>(playlistUrl).toPromise();
     if (activityType === AppConstants.ACTIVITY_TYPE_EXPLORATION) {
       learnerDashboardActivityIds.removeFromExplorationLearnerPlaylist(
-        activityId);
+        activityId
+      );
     } else if (activityType === AppConstants.ACTIVITY_TYPE_COLLECTION) {
       learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
-        activityId);
+        activityId
+      );
     }
   }
 
   async addToLearnerGoals(
-      activityId: string, activityType: string): Promise<boolean> {
+    activityId: string,
+    activityType: string
+  ): Promise<boolean> {
     this.successfullyAdded = true;
-    this.addToLearnerGoalsUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        '/learnergoalshandler/<activityType>/<activityId>', {
-          activityType: activityType,
-          activityId: activityId
-        }));
-    var response = await this.http.post<LearnerGoalsResponseObject>(
-      this.addToLearnerGoalsUrl, {}).toPromise();
+    this.addToLearnerGoalsUrl = this.urlInterpolationService.interpolateUrl(
+      '/learnergoalshandler/<activityType>/<activityId>',
+      {
+        activityType: activityType,
+        activityId: activityId,
+      }
+    );
+    var response = await this.http
+      .post<LearnerGoalsResponseObject>(this.addToLearnerGoalsUrl, {})
+      .toPromise();
     if (response.belongs_to_learnt_list) {
       this.successfullyAdded = false;
       this.alertsService.addInfoMessage(
-        'You have already learnt this activity.');
+        'You have already learnt this activity.'
+      );
     }
     if (response.goals_limit_exceeded) {
       this.successfullyAdded = false;
       this.alertsService.addInfoMessage(
-        'Your \'Current Goals\' list is full! Please finish existing ' +
-        'goals or remove some to add new goals to your list.');
+        "Your 'Current Goals' list is full! Please finish existing " +
+          'goals or remove some to add new goals to your list.'
+      );
     }
     if (this.successfullyAdded) {
       this.alertsService.addSuccessMessage(
-        'Successfully added to your \'Current Goals\' list.');
+        "Successfully added to your 'Current Goals' list."
+      );
     }
     return this.successfullyAdded;
   }
@@ -147,23 +165,30 @@ export class LearnerDashboardActivityBackendApiService {
   // or remove a topic from the 'Current Goals' or 'In Progress'
   // in Learner Dashboard Page.
   async removeActivityModalAsync(
-      sectionNameI18nId: string, subsectionName: string,
-      activityId: string, activityTitle: string): Promise<void> {
-    const modelRef = this.ngbModal.open(
-      RemoveActivityModalComponent, {backdrop: true});
+    sectionNameI18nId: string,
+    subsectionName: string,
+    activityId: string,
+    activityTitle: string
+  ): Promise<void> {
+    const modelRef = this.ngbModal.open(RemoveActivityModalComponent, {
+      backdrop: true,
+    });
     modelRef.componentInstance.sectionNameI18nId = sectionNameI18nId;
     modelRef.componentInstance.subsectionName = subsectionName;
     modelRef.componentInstance.activityId = activityId;
     modelRef.componentInstance.activityTitle = activityTitle;
-    await modelRef.result.then((playlistUrl) => {
-      this.http.delete<void>(playlistUrl).toPromise();
-      this.removeActivityModalStatus = 'removed';
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-      this.removeActivityModalStatus = 'canceled';
-    });
+    await modelRef.result.then(
+      playlistUrl => {
+        this.http.delete<void>(playlistUrl).toPromise();
+        this.removeActivityModalStatus = 'removed';
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+        this.removeActivityModalStatus = 'canceled';
+      }
+    );
 
     return new Promise((resolve, reject) => {
       if (this.removeActivityModalStatus === 'removed') {
@@ -173,7 +198,9 @@ export class LearnerDashboardActivityBackendApiService {
   }
 }
 
-angular.module('oppia').factory(
-  'LearnerDashboardActivityBackendApiService',
-  downgradeInjectable(LearnerDashboardActivityBackendApiService)
-);
+angular
+  .module('oppia')
+  .factory(
+    'LearnerDashboardActivityBackendApiService',
+    downgradeInjectable(LearnerDashboardActivityBackendApiService)
+  );

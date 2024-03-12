@@ -1,4 +1,3 @@
-
 // Copyright 2022 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +17,11 @@
  * confetti component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { EndChapterConfettiComponent } from './end-chapter-confetti.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
-describe('End chapter confetti component', function() {
+describe('End chapter confetti component', function () {
   let component: EndChapterConfettiComponent;
   let fixture: ComponentFixture<EndChapterConfettiComponent>;
 
@@ -35,10 +34,12 @@ describe('End chapter confetti component', function() {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [EndChapterConfettiComponent],
-      providers: [{
-        provide: UrlInterpolationService,
-        useClass: MockUrlInterpolationService
-      }]
+      providers: [
+        {
+          provide: UrlInterpolationService,
+          useClass: MockUrlInterpolationService,
+        },
+      ],
     }).compileComponents();
   }));
 
