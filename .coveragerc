@@ -16,7 +16,6 @@ omit =
     */scripts/setup.py
     */scripts/setup_gae.py
 
-
 # The 'exclude_lines' is used to skip a particular clause in coverage.
 # We exclude any line with a comment of “pragma: no cover” as this is the default option
 # provided by the coverage library.
