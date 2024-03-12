@@ -127,7 +127,7 @@ run_tests.lint: ## Runs the linter tests
 run_tests.backend: ## Runs the backend tests
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-	$(MAKE) start-devserver
+	docker compose up datastore dev-server redis firebase -d --no-deps || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
