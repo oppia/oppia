@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-datastore_cmd="/google-cloud-sdk/bin/gcloud beta emulators datastore start \
+datastore_cmd="/app/vm_deps/google-cloud-sdk/bin/gcloud beta emulators datastore start \
 --project=dev-project-id \
 --data-dir=/app/cloud_datastore_emulator_cache \
 --host-port=0.0.0.0:8089 \

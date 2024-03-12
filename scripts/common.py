@@ -86,9 +86,14 @@ OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = (
-    '/google-cloud-sdk' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
-        OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk'
-    ))
+    '/app/vm_deps/google-cloud-sdk'
+    if feconf.OPPIA_IS_DOCKERIZED
+    else os.path.join(
+        OPPIA_TOOLS_DIR_ABS_PATH,
+        'google-cloud-sdk-364.0.0',
+        'google-cloud-sdk'
+    )
+)
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')

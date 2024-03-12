@@ -122,13 +122,17 @@ class StartTests(test_utils.GenericTestBase):
         swap_build = self.swap_with_checks(
             build, 'main', lambda **unused_kwargs: None,
             expected_kwargs=[{'args': []}])
+        swap_check_port_in_use = self.swap_with_checks(
+            common, 'is_port_in_use', lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
         with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_create_server, self.swap_webpack_compiler:
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:
                         with self.swap_firebase_auth_emulator, self.swap_print:
                             with self.swap_mock_set_constants_to_default:
-                                start.main(args=[])
+                                with swap_check_port_in_use:
+                                    start.main(args=[])
 
         self.assertIn(
             [
@@ -147,11 +151,14 @@ class StartTests(test_utils.GenericTestBase):
         swap_build = self.swap_with_checks(
             build, 'main', lambda **unused_kwargs: None,
             expected_kwargs=[{'args': ['--prod_env']}])
+        swap_check_port_in_use = self.swap_with_checks(
+            common, 'is_port_in_use', lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
         with self.swap_cloud_datastore_emulator, self.swap_create_server:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
                     with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_print:
+                        with self.swap_print, swap_check_port_in_use:
                             with self.swap_mock_set_constants_to_default:
                                 start.main(args=['--prod_env'])
 
@@ -174,13 +181,17 @@ class StartTests(test_utils.GenericTestBase):
             expected_kwargs=[{
                 'args': ['--maintenance_mode']
             }])
+        swap_check_port_in_use = self.swap_with_checks(
+            common, 'is_port_in_use', lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),))
         with self.swap_cloud_datastore_emulator, swap_build, self.swap_ng_build:
             with self.swap_elasticsearch_dev_server, self.swap_redis_server:
                 with self.swap_create_server, self.swap_webpack_compiler:
                     with self.swap_extend_index_yaml, self.swap_dev_appserver:
                         with self.swap_firebase_auth_emulator, self.swap_print:
                             with self.swap_mock_set_constants_to_default:
-                                start.main(args=['--maintenance_mode'])
+                                with swap_check_port_in_use:
+                                    start.main(args=['--maintenance_mode'])
 
         self.assertIn(
             [

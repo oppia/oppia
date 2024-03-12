@@ -23,4 +23,3 @@ RUN yarn install --pure-lockfile
 # Set the ownership of the Yarn cache directory to the 'node' user and group.
 # This action guarantees that the yarn cache is owned by the node user.
 RUN chown -R node:node /home/node/.yarn-cache
-USER node:node
