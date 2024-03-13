@@ -43,8 +43,13 @@ export class SuperAdmin extends BaseUser {
         allRoles[i]
       );
       if (roleText.toLowerCase() === role) {
-        await allRoles[i].click();
-        await this.page.waitForNetworkIdle();
+        await Promise.all([
+          this.page.waitForNetworkIdle(),
+          this.page.waitForSelector('div.e2e-test-progress-spinner', {
+            hidden: true,
+          }),
+          allRoles[i].click(),
+        ]);
         return;
       }
     }
