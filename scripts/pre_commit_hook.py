@@ -42,6 +42,7 @@ from typing import Final, List, Optional, Tuple
 # we migrate to Python 3.8.
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip # pylint: disable=wrong-import-position
+from core import feconf  # isort:skip # pylint: disable=wrong-import-position
 from core import utils  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
