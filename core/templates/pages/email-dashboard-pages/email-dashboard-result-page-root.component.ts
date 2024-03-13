@@ -16,10 +16,10 @@
  * @fileoverview Root component for Email dashboard result Page.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-email-dashboard-result-page-root',
-  templateUrl: './email-dashboard-result-page-root.component.html'
+  templateUrl: './email-dashboard-result-page-root.component.html',
 })
 export class EmailDashboardResultPageRootComponent {}

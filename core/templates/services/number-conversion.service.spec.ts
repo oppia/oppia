@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for NumberConversionService.
  */
 
-import { NumberConversionService } from './number-conversion.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { TestBed } from '@angular/core/testing';
+import {NumberConversionService} from './number-conversion.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {TestBed} from '@angular/core/testing';
 
 describe('NumberConversionService', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -26,14 +26,13 @@ describe('NumberConversionService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [NumberConversionService,
-        I18nLanguageCodeService]
+      providers: [NumberConversionService, I18nLanguageCodeService],
     });
     numberConversionService = TestBed.inject(NumberConversionService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
   });
 
-  it('should get the decimal separator depending on the page context', ()=>{
+  it('should get the decimal separator depending on the page context', () => {
     i18nLanguageCodeService.setI18nLanguageCode('en');
     expect(numberConversionService.currentDecimalSeparator()).toEqual('.');
 
@@ -44,39 +43,55 @@ describe('NumberConversionService', () => {
     expect(numberConversionService.currentDecimalSeparator()).toEqual(',');
   });
 
-  it('should convert a number string to the English decimal number', ()=>{
+  it('should convert a number string to the English decimal number', () => {
     let number1 = '-1.22';
     let number2 = '1,5';
     let number3 = '1,31e1';
     let number4 = 'abc';
     let number5 = 'e';
     let number6 = '';
-    spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValues('.', ',', ',', '.', ',', '.');
+    spyOn(numberConversionService, 'currentDecimalSeparator').and.returnValues(
+      '.',
+      ',',
+      ',',
+      '.',
+      ',',
+      '.'
+    );
 
-    expect(numberConversionService.convertToEnglishDecimal(number1))
-      .toEqual(-1.22);
-    expect(numberConversionService.convertToEnglishDecimal(number2))
-      .toEqual(1.5);
-    expect(numberConversionService.convertToEnglishDecimal(number3))
-      .toEqual(13.1);
-    expect(numberConversionService.convertToEnglishDecimal(number4))
-      .toEqual(null);
-    expect(numberConversionService.convertToEnglishDecimal(number5))
-      .toEqual(null);
-    expect(numberConversionService.convertToEnglishDecimal(number6))
-      .toEqual(null);
+    expect(numberConversionService.convertToEnglishDecimal(number1)).toEqual(
+      -1.22
+    );
+    expect(numberConversionService.convertToEnglishDecimal(number2)).toEqual(
+      1.5
+    );
+    expect(numberConversionService.convertToEnglishDecimal(number3)).toEqual(
+      13.1
+    );
+    expect(numberConversionService.convertToEnglishDecimal(number4)).toEqual(
+      null
+    );
+    expect(numberConversionService.convertToEnglishDecimal(number5)).toEqual(
+      null
+    );
+    expect(numberConversionService.convertToEnglishDecimal(number6)).toEqual(
+      null
+    );
   });
 
-  it('should convert a number to the local format', ()=>{
+  it('should convert a number to the local format', () => {
     let number = -198.234;
 
-    spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValues('.', ',');
+    spyOn(numberConversionService, 'currentDecimalSeparator').and.returnValues(
+      '.',
+      ','
+    );
 
-    expect(numberConversionService.convertToLocalizedNumber(number))
-      .toEqual('-198.234');
-    expect(numberConversionService.convertToLocalizedNumber(number))
-      .toEqual('-198,234');
+    expect(numberConversionService.convertToLocalizedNumber(number)).toEqual(
+      '-198.234'
+    );
+    expect(numberConversionService.convertToLocalizedNumber(number)).toEqual(
+      '-198,234'
+    );
   });
 });

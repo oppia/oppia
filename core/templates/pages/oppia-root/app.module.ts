@@ -16,34 +16,43 @@
  * @fileoverview Module for the about page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 
 // Modules.
-import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppRoutingModule } from './routing/app.routing.module';
+import {
+  BrowserModule,
+  HammerGestureConfig,
+  HAMMER_GESTURE_CONFIG,
+} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {AppRoutingModule} from './routing/app.routing.module';
 
 // Components.
-import { OppiaRootComponent } from './oppia-root.component';
+import {OppiaRootComponent} from './oppia-root.component';
 
 // Miscellaneous.
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { CookieModule } from 'ngx-cookie';
-import { ToastrModule } from 'ngx-toastr';
-import { AngularFireAuth, AngularFireAuthModule, USE_EMULATOR } from '@angular/fire/auth';
-import { AngularFireModule } from '@angular/fire';
-import { AuthService } from 'services/auth.service';
+import {
+  platformFeatureInitFactory,
+  PlatformFeatureService,
+} from 'services/platform-feature.service';
+import {RequestInterceptor} from 'services/request-interceptor.service';
+import {CookieModule} from 'ngx-cookie';
+import {ToastrModule} from 'ngx-toastr';
+import {
+  AngularFireAuth,
+  AngularFireAuthModule,
+  USE_EMULATOR,
+} from '@angular/fire/auth';
+import {AngularFireModule} from '@angular/fire';
+import {AuthService} from 'services/auth.service';
 // This throws "TS2307". We need to
 // suppress this error because hammer come from hammerjs
 // dependency. We can't import it directly.
 // @ts-ignore
 import * as hammer from 'hammerjs';
-import { AppErrorHandlerProvider } from './app-error-handler';
-import { I18nModule } from 'i18n/i18n.module';
-
+import {AppErrorHandlerProvider} from './app-error-handler';
+import {I18nModule} from 'i18n/i18n.module';
 
 // Config for ToastrModule (helps in flashing messages and alerts).
 export const toastrConfig = {
@@ -52,26 +61,26 @@ export const toastrConfig = {
     error: 'toast-error',
     info: 'toast-info',
     success: 'toast-success',
-    warning: 'toast-warning'
+    warning: 'toast-warning',
   },
   positionClass: 'toast-bottom-right',
   messageClass: 'toast-message e2e-test-toast-message',
   progressBar: false,
   tapToDismiss: true,
-  titleClass: 'toast-title'
+  titleClass: 'toast-title',
 };
 
 export class MyHammerConfig extends HammerGestureConfig {
   overrides = {
-    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
-    pinch: { enable: false },
-    rotate: { enable: false },
+    swipe: {direction: hammer.DIRECTION_HORIZONTAL},
+    pinch: {enable: false},
+    rotate: {enable: false},
   };
 
   options = {
     cssProps: {
-      userSelect: true
-    }
+      userSelect: true,
+    },
   };
 }
 
@@ -85,37 +94,33 @@ export class MyHammerConfig extends HammerGestureConfig {
     AngularFireAuthModule,
     AppRoutingModule,
     I18nModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
-  declarations: [
-    OppiaRootComponent,
-  ],
-  entryComponents: [
-    OppiaRootComponent,
-  ],
+  declarations: [OppiaRootComponent],
+  entryComponents: [OppiaRootComponent],
   providers: [
     AngularFireAuth,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
+      multi: true,
     },
     {
       provide: USE_EMULATOR,
-      useValue: AuthService.firebaseEmulatorConfig
+      useValue: AuthService.firebaseEmulatorConfig,
     },
     AppErrorHandlerProvider,
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    }
+      useClass: MyHammerConfig,
+    },
   ],
-  bootstrap: [OppiaRootComponent]
+  bootstrap: [OppiaRootComponent],
 })
 export class AppModule {}

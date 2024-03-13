@@ -16,27 +16,20 @@
  * @fileoverview Module for the topic landing page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TopicLandingPageComponent } from
-  'pages/landing-pages/topic-landing-page/topic-landing-page.component';
-import { TopicLandingPageRootComponent } from './topic-landing-page-root.component';
-import { CommonModule } from '@angular/common';
-import { TopicLandingPageRoutingModule } from './topic-landing-page-routing.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {TopicLandingPageComponent} from 'pages/landing-pages/topic-landing-page/topic-landing-page.component';
+import {TopicLandingPageRootComponent} from './topic-landing-page-root.component';
+import {CommonModule} from '@angular/common';
+import {TopicLandingPageRoutingModule} from './topic-landing-page-routing.module';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    TopicLandingPageRoutingModule
+    TopicLandingPageRoutingModule,
   ],
-  declarations: [
-    TopicLandingPageComponent,
-    TopicLandingPageRootComponent
-  ],
-  entryComponents: [
-    TopicLandingPageComponent,
-    TopicLandingPageRootComponent
-  ]
+  declarations: [TopicLandingPageComponent, TopicLandingPageRootComponent],
+  entryComponents: [TopicLandingPageComponent, TopicLandingPageRootComponent],
 })
 export class TopicLandingPageModule {}

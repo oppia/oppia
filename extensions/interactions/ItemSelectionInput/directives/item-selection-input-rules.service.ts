@@ -15,62 +15,76 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
-import { RemoveDuplicatesInArrayPipe } from
-  'filters/remove-duplicates-in-array.pipe';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {RemoveDuplicatesInArrayPipe} from 'filters/remove-duplicates-in-array.pipe';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { ItemSelectionAnswer } from 'interactions/answer-defs';
-import { ItemSelectionRuleInputs } from 'interactions/rule-input-defs';
+import {ItemSelectionAnswer} from 'interactions/answer-defs';
+import {ItemSelectionRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ItemSelectionInputRulesService {
-  private removeDuplicatesInArrayPipe: RemoveDuplicatesInArrayPipe = (
-    new RemoveDuplicatesInArrayPipe());
+  private removeDuplicatesInArrayPipe: RemoveDuplicatesInArrayPipe =
+    new RemoveDuplicatesInArrayPipe();
 
   Equals(
-      answer: ItemSelectionAnswer,
-      inputs: ItemSelectionRuleInputs): boolean {
+    answer: ItemSelectionAnswer,
+    inputs: ItemSelectionRuleInputs
+  ): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
     const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
-      inputs.x);
-    return normalizedAnswer.length === normalizedInput.length &&
-    normalizedAnswer.every(val => normalizedInput.includes(val));
+      inputs.x
+    );
+    return (
+      normalizedAnswer.length === normalizedInput.length &&
+      normalizedAnswer.every(val => normalizedInput.includes(val))
+    );
   }
 
   ContainsAtLeastOneOf(
-      answer: ItemSelectionAnswer,
-      inputs: ItemSelectionRuleInputs): boolean {
+    answer: ItemSelectionAnswer,
+    inputs: ItemSelectionRuleInputs
+  ): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
     const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
-      inputs.x);
+      inputs.x
+    );
     return normalizedAnswer.some(val => normalizedInput.includes(val));
   }
 
   DoesNotContainAtLeastOneOf(
-      answer: ItemSelectionAnswer,
-      inputs: ItemSelectionRuleInputs): boolean {
+    answer: ItemSelectionAnswer,
+    inputs: ItemSelectionRuleInputs
+  ): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
     const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
-      inputs.x);
+      inputs.x
+    );
     return normalizedInput.some(val => !normalizedAnswer.includes(val));
   }
 
   // This function checks if the answer
   // given by the user is a subset of the correct answers.
   IsProperSubsetOf(
-      answer: ItemSelectionAnswer,
-      inputs: ItemSelectionRuleInputs): boolean {
+    answer: ItemSelectionAnswer,
+    inputs: ItemSelectionRuleInputs
+  ): boolean {
     const normalizedAnswer = this.removeDuplicatesInArrayPipe.transform(answer);
     const normalizedInput = this.removeDuplicatesInArrayPipe.transform(
-      inputs.x);
-    return normalizedAnswer.length < normalizedInput.length &&
-    normalizedAnswer.every(val => normalizedInput.includes(val));
+      inputs.x
+    );
+    return (
+      normalizedAnswer.length < normalizedInput.length &&
+      normalizedAnswer.every(val => normalizedInput.includes(val))
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'ItemSelectionInputRulesService',
-  downgradeInjectable(ItemSelectionInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'ItemSelectionInputRulesService',
+    downgradeInjectable(ItemSelectionInputRulesService)
+  );

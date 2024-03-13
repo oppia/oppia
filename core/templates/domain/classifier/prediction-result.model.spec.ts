@@ -15,7 +15,7 @@
 /**
  * @fileoverview Unit tests for the PredictionResult model.
  */
-import { PredictionResult } from 'domain/classifier/prediction-result.model';
+import {PredictionResult} from 'domain/classifier/prediction-result.model';
 
 describe('Prediction Result model', () => {
   it('should create a new result object', () => {

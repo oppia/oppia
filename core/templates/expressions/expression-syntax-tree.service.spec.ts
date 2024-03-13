@@ -15,14 +15,14 @@
 /**
  * @fileoverview Unit tests for expression-syntax-tree.service.ts
  */
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
 import {
   ExpressionSyntaxTreeService,
   ExpressionError,
   ExprUndefinedVarError,
   ExprWrongArgTypeError,
-  ExprWrongNumArgsError
+  ExprWrongNumArgsError,
 } from 'expressions/expression-syntax-tree.service';
 
 describe('Expression syntax tree service', () => {
@@ -34,17 +34,18 @@ describe('Expression syntax tree service', () => {
     });
 
     it('should throw if environment is not found', () => {
-      expect(() => expressionSyntaxTreeService.lookupEnvs('test', [{}]))
-        .toThrowMatching(
-          // Jasmine has no built-in matcher for classes derived from Error.
-          e => e.toString() === 'ExprUndefinedVarError: test not found in [{}]'
-        );
+      expect(() =>
+        expressionSyntaxTreeService.lookupEnvs('test', [{}])
+      ).toThrowMatching(
+        // Jasmine has no built-in matcher for classes derived from Error.
+        e => e.toString() === 'ExprUndefinedVarError: test not found in [{}]'
+      );
     });
 
     it('should return the correct environment if exists', () => {
       const expected = 'bar';
       const actual = expressionSyntaxTreeService.lookupEnvs('foo', [
-        {foo: 'bar'}
+        {foo: 'bar'},
       ]) as string;
 
       expect(expected).toBe(actual);

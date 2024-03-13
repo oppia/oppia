@@ -18,16 +18,21 @@
 
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'pencil-code-editor-rules.service.ts');
+    'pencil-code-editor-rules.service.ts'
+);
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'pencil-code-editor-validation.service.ts');
+    'pencil-code-editor-validation.service.ts'
+);
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-interactive-pencil-code-editor.component.ts');
+    'oppia-interactive-pencil-code-editor.component.ts'
+);
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-response-pencil-code-editor.component.ts');
+    'oppia-response-pencil-code-editor.component.ts'
+);
 require(
   'interactions/PencilCodeEditor/directives/' +
-  'oppia-short-response-pencil-code-editor.component.ts');
+    'oppia-short-response-pencil-code-editor.component.ts'
+);

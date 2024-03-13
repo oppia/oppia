@@ -16,40 +16,46 @@
  * @fileoverview Frontend Model for high bounce-rate improvements task.
  */
 
-import { ExplorationImprovementsConfig } from
-  'domain/improvements/exploration-improvements-config.model';
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
-import { ExplorationStats } from
-  'domain/statistics/exploration-stats.model';
-import { TaskEntryBackendDict, TaskEntry } from
-  'domain/improvements/task-entry.model';
+import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
+import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
+import {
+  TaskEntryBackendDict,
+  TaskEntry,
+} from 'domain/improvements/task-entry.model';
 
 export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   constructor(backendDict: TaskEntryBackendDict<'high_bounce_rate'>) {
-    if (backendDict.entity_type !==
-            ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
+    if (
+      backendDict.entity_type !==
+      ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION
+    ) {
       throw new Error(
         `backend dict has entity_type "${backendDict.entity_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`);
+          `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`
+      );
     }
-    if (backendDict.task_type !==
-            ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE) {
+    if (
+      backendDict.task_type !== ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE
+    ) {
       throw new Error(
         `backend dict has task_type "${backendDict.task_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE}"`);
+          `but expected "${ImprovementsConstants.TASK_TYPE_HIGH_BOUNCE_RATE}"`
+      );
     }
-    if (backendDict.target_type !==
-            ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
+    if (
+      backendDict.target_type !== ImprovementsConstants.TASK_TARGET_TYPE_STATE
+    ) {
       throw new Error(
         `backend dict has target_type "${backendDict.target_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`);
+          `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`
+      );
     }
     super(backendDict);
   }
 
   static createFromBackendDict(
-      backendDict: TaskEntryBackendDict<'high_bounce_rate'>
+    backendDict: TaskEntryBackendDict<'high_bounce_rate'>
   ): HighBounceRateTask {
     return new HighBounceRateTask(backendDict);
   }
@@ -59,16 +65,20 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   }
 
   public refreshStatus(
-      expStats: ExplorationStats,
-      numEarlyQuitPlaythroughs: number,
-      config: ExplorationImprovementsConfig): void {
-    if (expStats.expId !== this.entityId ||
-        expStats.expVersion !== this.entityVersion) {
+    expStats: ExplorationStats,
+    numEarlyQuitPlaythroughs: number,
+    config: ExplorationImprovementsConfig
+  ): void {
+    if (
+      expStats.expId !== this.entityId ||
+      expStats.expVersion !== this.entityVersion
+    ) {
       throw new Error(
-        'Expected stats for exploration ' + (
-          'id="' + this.entityId + '" v' + this.entityVersion) +
-        ' but given stats are for exploration ' + (
-          'id="' + expStats.expId + '" v' + expStats.expVersion));
+        'Expected stats for exploration ' +
+          ('id="' + this.entityId + '" v' + this.entityVersion) +
+          ' but given stats are for exploration ' +
+          ('id="' + expStats.expId + '" v' + expStats.expVersion)
+      );
     }
     const expStarts = expStats.numStarts;
     if (expStarts < config.highBounceRateTaskMinimumExplorationStarts) {
@@ -87,24 +97,30 @@ export class HighBounceRateTask extends TaskEntry<'high_bounce_rate'> {
   }
 
   private meetsCreationConditions(
-      bounceRate: number, numEarlyQuitPlaythroughs: number,
-      config: ExplorationImprovementsConfig): boolean {
+    bounceRate: number,
+    numEarlyQuitPlaythroughs: number,
+    config: ExplorationImprovementsConfig
+  ): boolean {
     return (
       this.isObsolete() &&
       numEarlyQuitPlaythroughs > 0 &&
-      bounceRate >= config.highBounceRateTaskStateBounceRateCreationThreshold);
+      bounceRate >= config.highBounceRateTaskStateBounceRateCreationThreshold
+    );
   }
 
   private meetsObsoletionConditions(
-      bounceRate: number, config: ExplorationImprovementsConfig): boolean {
+    bounceRate: number,
+    config: ExplorationImprovementsConfig
+  ): boolean {
     return (
       this.isOpen() &&
-      bounceRate < config.highBounceRateTaskStateBounceRateObsoletionThreshold);
+      bounceRate < config.highBounceRateTaskStateBounceRateObsoletionThreshold
+    );
   }
 
   private generateIssueDescription(bounceRate: number): void {
     const bounceRateAsPercentString = Math.round(100 * bounceRate) + '%';
-    this.issueDescription = (
-      bounceRateAsPercentString + ' of learners had dropped off at this card.');
+    this.issueDescription =
+      bounceRateAsPercentString + ' of learners had dropped off at this card.';
   }
 }

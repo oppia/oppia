@@ -19,13 +19,13 @@
 export const ClassroomDomainConstants = {
   CLASSROOOM_DATA_URL_TEMPLATE:
     '/classroom_data_handler/<classroom_url_fragment>',
-  TOPIC_VIEWER_URL_TEMPLATE: (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>'),
-  TOPIC_VIEWER_REVISION_URL_TEMPLATE: (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision'),
-  TOPIC_VIEWER_STORY_URL_TEMPLATE: (
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>/story'),
+  TOPIC_VIEWER_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>',
+  TOPIC_VIEWER_REVISION_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision',
+  TOPIC_VIEWER_STORY_URL_TEMPLATE:
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/story',
   CLASSROOM_HANDLER_URL_TEMPLATE: '/classroom/<classroom_id>',
   NEW_CLASSROOM_ID_HANDLER_URL_TEMPLATE: '/new_classroom_id_handler',
-  CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE: '/classroom_id_to_name_handler'
+  CLASSROOM_ID_TO_NAME_HANDLER_URL_TEMPLATE: '/classroom_id_to_name_handler',
 } as const;

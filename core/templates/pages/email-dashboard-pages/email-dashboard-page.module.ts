@@ -17,14 +17,14 @@
  */
 
 import {NgModule} from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { EmailDashboardPageComponent } from './email-dashboard-page.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { EmailDashboardAuthGuard } from './email-dashboard-auth.guard';
-import { EmailDashboardPageRootComponent } from './email-dashboard-page-root.component';
-import { CommonModule } from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {EmailDashboardPageComponent} from './email-dashboard-page.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {EmailDashboardAuthGuard} from './email-dashboard-auth.guard';
+import {EmailDashboardPageRootComponent} from './email-dashboard-page-root.component';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
   imports: [
@@ -39,12 +39,7 @@ import { CommonModule } from '@angular/common';
       },
     ]),
   ],
-  declarations: [
-    EmailDashboardPageRootComponent,
-    EmailDashboardPageComponent
-  ],
-  entryComponents: [
-    EmailDashboardPageComponent
-  ],
+  declarations: [EmailDashboardPageRootComponent, EmailDashboardPageComponent],
+  entryComponents: [EmailDashboardPageComponent],
 })
 export class EmailDashboardPageModule {}

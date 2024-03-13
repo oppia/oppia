@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the Continue button response.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { OppiaShortResponseContinueComponent } from './oppia-short-response-continue.component';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {OppiaShortResponseContinueComponent} from './oppia-short-response-continue.component';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 describe('OppiaShortResponseContinueComponent', () => {
   let component: OppiaShortResponseContinueComponent;
@@ -36,9 +36,9 @@ describe('OppiaShortResponseContinueComponent', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
-      ]
+          useClass: mockHtmlEscaperService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -49,7 +49,7 @@ describe('OppiaShortResponseContinueComponent', () => {
 
   // Note: The users response is the same as the Continue button placeholder
   // text.
-  it('should display user\'s response', () => {
+  it("should display user's response", () => {
     component.answer = 'Continue button text';
 
     expect(component.escapedAnswer).toBe('');

@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for CreatorExplorationSummary.
  */
 
-import { CreatorExplorationSummary } from
-  'domain/summary/creator-exploration-summary.model';
+import {CreatorExplorationSummary} from 'domain/summary/creator-exploration-summary.model';
 
 describe('Creator Exploration summary model', () => {
   it('should correctly convert backend dict to exp summary object', () => {
@@ -37,7 +36,7 @@ describe('Creator Exploration summary model', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       status: 'public',
       tags: [],
@@ -45,7 +44,7 @@ describe('Creator Exploration summary model', () => {
       category: 'Algebra',
       title: 'Test Title',
       num_total_threads: 0,
-      num_open_threads: 0
+      num_open_threads: 0,
     };
 
     let expSummaryObject =
@@ -66,7 +65,7 @@ describe('Creator Exploration summary model', () => {
       2: 0,
       3: 0,
       4: 0,
-      5: 0
+      5: 0,
     });
     expect(expSummaryObject.status).toEqual('public');
     expect(expSummaryObject.tags).toEqual([]);

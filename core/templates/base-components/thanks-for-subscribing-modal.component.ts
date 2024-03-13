@@ -16,17 +16,15 @@
  * @fileoverview Controller for the thanks-for-subscribing-modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'thanks-for-subscribing-modal',
   templateUrl: './thanks-for-subscribing-modal.component.html',
 })
 export class ThanksForSubscribingModalComponent {
-  constructor(
-    private activeModal: NgbActiveModal
-  ) {}
+  constructor(private activeModal: NgbActiveModal) {}
 
   dismiss(): void {
     this.activeModal.dismiss();
