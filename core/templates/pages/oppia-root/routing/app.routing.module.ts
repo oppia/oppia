@@ -378,16 +378,18 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/blog-post-page/blog-post-page.module')
-      .then(m => m.BlogPostPageModule)
+    loadChildren: () =>
+      import('pages/blog-post-page/blog-post-page.module').then(
+        m => m.BlogPostPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
     loadChildren: () =>
-      import('pages/topic-editor-page/topic-editor-page.module')
-        .then(m => m.TopicEditorPageModule),
-    canActivate: [IsLoggedInGuard]
+      import('pages/topic-editor-page/topic-editor-page.module').then(
+        m => m.TopicEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
 ];
 
