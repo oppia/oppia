@@ -410,7 +410,7 @@ class SkillEditorPageAccessValidationHandler(
             skill_id: str. The skill ID.
 
         Raises:
-            Exception. The skill with the given id doesn't exist.
+            Exception. The skill with the given ID doesn't exist.
         """
         skill_domain.Skill.require_valid_skill_id(skill_id)
 

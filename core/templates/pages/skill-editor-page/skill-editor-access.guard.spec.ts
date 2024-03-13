@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SKillEditorAccessGuard.
+ * @fileoverview Tests for SkillEditorAccessGuard.
  */
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
