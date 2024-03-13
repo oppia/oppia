@@ -94,6 +94,9 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating exploration intro text.
    */
   async updateExplorationIntroText(Introtext: string): Promise<void> {
+    await this.page.waitForSelector('.e2e-test-edit-content-pencil-button', {
+      visible: true,
+    });
     await this.clickOn('.e2e-test-edit-content-pencil-button');
     await this.page.waitForSelector('.e2e-test-rte', {visible: true});
     await this.type('.e2e-test-rte', Introtext);
