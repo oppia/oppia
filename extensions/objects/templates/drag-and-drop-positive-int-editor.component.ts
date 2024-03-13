@@ -16,18 +16,18 @@
  * @fileoverview Component for drag and drop positive int editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'drag-and-drop-positive-int-editor',
-  templateUrl: './drag-and-drop-positive-int-editor.component.html'
+  templateUrl: './drag-and-drop-positive-int-editor.component.html',
 })
 export class DragAndDropPositiveIntEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() initArgs!: { choices: string[] };
+  @Input() initArgs!: {choices: string[]};
   @Input() value!: string | number;
   @Output() valueChanged = new EventEmitter();
   selectedRank!: string;
@@ -55,6 +55,8 @@ export class DragAndDropPositiveIntEditorComponent implements OnInit {
   }
 }
 angular.module('oppia').directive(
-  'dragAndDropPositiveIntEditor', downgradeComponent({
-    component: DragAndDropPositiveIntEditorComponent
-  }) as angular.IDirectiveFactory);
+  'dragAndDropPositiveIntEditor',
+  downgradeComponent({
+    component: DragAndDropPositiveIntEditorComponent,
+  }) as angular.IDirectiveFactory
+);

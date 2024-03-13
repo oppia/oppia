@@ -19,7 +19,7 @@
 
 import {
   RecordedVoiceovers,
-  RecordedVoiceOverBackendDict
+  RecordedVoiceOverBackendDict,
 } from 'domain/exploration/recorded-voiceovers.model';
 import {
   SubtitledHtml,
@@ -27,13 +27,13 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 import {
   WorkedExample,
-  WorkedExampleBackendDict
+  WorkedExampleBackendDict,
 } from 'domain/skill/worked-example.model';
 
 export interface ConceptCardBackendDict {
-  'explanation': SubtitledHtmlBackendDict;
-  'worked_examples': WorkedExampleBackendDict[];
-  'recorded_voiceovers': RecordedVoiceOverBackendDict;
+  explanation: SubtitledHtmlBackendDict;
+  worked_examples: WorkedExampleBackendDict[];
+  recorded_voiceovers: RecordedVoiceOverBackendDict;
 }
 
 export class ConceptCard {
@@ -42,8 +42,10 @@ export class ConceptCard {
   _recordedVoiceovers: RecordedVoiceovers;
 
   constructor(
-      explanation: SubtitledHtml, workedExamples: WorkedExample[],
-      recordedVoiceovers: RecordedVoiceovers) {
+    explanation: SubtitledHtml,
+    workedExamples: WorkedExample[],
+    recordedVoiceovers: RecordedVoiceovers
+  ) {
     this._explanation = explanation;
     this._workedExamples = workedExamples;
     this._recordedVoiceovers = recordedVoiceovers;
@@ -55,22 +57,25 @@ export class ConceptCard {
       worked_examples: this._workedExamples.map(
         (workedExample: WorkedExample) => {
           return workedExample.toBackendDict();
-        }),
-      recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
+        }
+      ),
+      recorded_voiceovers: this._recordedVoiceovers.toBackendDict(),
     };
   }
 
   _getElementsInFirstSetButNotInSecond(
-      setA: Set<string>,
-      setB: Set<string>): string[] {
-    let diffList = Array.from(setA).filter((element) => {
+    setA: Set<string>,
+    setB: Set<string>
+  ): string[] {
+    let diffList = Array.from(setA).filter(element => {
       return !setB.has(element);
     });
     return diffList;
   }
 
   _extractAvailableContentIdsFromWorkedExamples(
-      workedExamples: WorkedExample[]): Set<string> {
+    workedExamples: WorkedExample[]
+  ): Set<string> {
     let contentIds: Set<string> = new Set();
     workedExamples.forEach((workedExample: WorkedExample) => {
       let question = workedExample.getQuestion();
@@ -99,17 +104,23 @@ export class ConceptCard {
 
   setWorkedExamples(workedExamples: WorkedExample[]): void {
     let oldContentIds = this._extractAvailableContentIdsFromWorkedExamples(
-      this._workedExamples);
+      this._workedExamples
+    );
 
     this._workedExamples = workedExamples.slice();
 
     let newContentIds = this._extractAvailableContentIdsFromWorkedExamples(
-      this._workedExamples);
+      this._workedExamples
+    );
 
     let contentIdsToDelete = this._getElementsInFirstSetButNotInSecond(
-      oldContentIds, newContentIds);
+      oldContentIds,
+      newContentIds
+    );
     let contentIdsToAdd = this._getElementsInFirstSetButNotInSecond(
-      newContentIds, oldContentIds);
+      newContentIds,
+      oldContentIds
+    );
 
     for (let i = 0; i < contentIdsToDelete.length; i++) {
       this._recordedVoiceovers.deleteContentId(contentIdsToDelete[i]);
@@ -124,21 +135,24 @@ export class ConceptCard {
   }
 
   static _generateWorkedExamplesFromBackendDict(
-      workedExampleDicts: WorkedExampleBackendDict[]): WorkedExample[] {
-    return workedExampleDicts.map(workedExampleDict=> {
-      return WorkedExample.createFromBackendDict(
-        workedExampleDict);
+    workedExampleDicts: WorkedExampleBackendDict[]
+  ): WorkedExample[] {
+    return workedExampleDicts.map(workedExampleDict => {
+      return WorkedExample.createFromBackendDict(workedExampleDict);
     });
   }
 
   static createFromBackendDict(
-      conceptCardBackendDict: ConceptCardBackendDict): ConceptCard {
+    conceptCardBackendDict: ConceptCardBackendDict
+  ): ConceptCard {
     return new ConceptCard(
-      SubtitledHtml.createFromBackendDict(
-        conceptCardBackendDict.explanation),
+      SubtitledHtml.createFromBackendDict(conceptCardBackendDict.explanation),
       this._generateWorkedExamplesFromBackendDict(
-        conceptCardBackendDict.worked_examples),
+        conceptCardBackendDict.worked_examples
+      ),
       RecordedVoiceovers.createFromBackendDict(
-        conceptCardBackendDict.recorded_voiceovers));
+        conceptCardBackendDict.recorded_voiceovers
+      )
+    );
   }
 }

@@ -17,10 +17,10 @@
  * editor.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 
 interface Choice {
   id: string;
@@ -30,11 +30,12 @@ interface Choice {
 @Component({
   selector: 'list-of-sets-of-translatable-html-content-ids-editor',
   // eslint-disable-next-line max-len
-  templateUrl: './list-of-sets-of-translatable-html-content-ids-editor.component.html',
-  styleUrls: []
+  templateUrl:
+    './list-of-sets-of-translatable-html-content-ids-editor.component.html',
+  styleUrls: [],
 })
 export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
-  @Output() valueChanged = new EventEmitter;
+  @Output() valueChanged = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -63,8 +64,8 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
 
   selectItem(choiceListIndex: number): void {
     const choiceContentId = this.choices[choiceListIndex].val;
-    const selectedRank = parseInt(
-      this.choices[choiceListIndex].selectedRank) - 1;
+    const selectedRank =
+      parseInt(this.choices[choiceListIndex].selectedRank) - 1;
     this.errorMessage = '';
     let choiceIdHasBeenAdded = false;
 
@@ -94,8 +95,10 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
       this.valueChanged.emit(this.value);
     }
     // Removing any empty arrays from the end.
-    while (this.value.length > 0 && (
-      this.value[this.value.length - 1].length === 0)) {
+    while (
+      this.value.length > 0 &&
+      this.value[this.value.length - 1].length === 0
+    ) {
       this.value.pop();
       this.valueChanged.emit(this.value);
     }
@@ -116,32 +119,39 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
     selectedRankList.sort();
 
     if (selectedRankList[0] !== 1) {
-      this.errorMessage = ('Please assign some choice at position 1.');
-      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-        value: true,
-        modalId: this.modalId
-      }));
+      this.errorMessage = 'Please assign some choice at position 1.';
+      this.eventBusGroup.emit(
+        new ObjectFormValidityChangeEvent({
+          value: true,
+          modalId: this.modalId,
+        })
+      );
       this.validOrdering = false;
       return;
     }
     for (let i = 1; i < selectedRankList.length; i++) {
       if (selectedRankList[i] - selectedRankList[i - 1] > 1) {
-        this.errorMessage = (
+        this.errorMessage =
           'Please assign some choice at position ' +
-          String(selectedRankList[i - 1] + 1) + '.');
-        this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-          value: true,
-          modalId: this.modalId
-        }));
+          String(selectedRankList[i - 1] + 1) +
+          '.';
+        this.eventBusGroup.emit(
+          new ObjectFormValidityChangeEvent({
+            value: true,
+            modalId: this.modalId,
+          })
+        );
         this.validOrdering = false;
         return;
       }
     }
     this.errorMessage = '';
-    this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-      value: false,
-      modalId: this.modalId
-    }));
+    this.eventBusGroup.emit(
+      new ObjectFormValidityChangeEvent({
+        value: false,
+        modalId: this.modalId,
+      })
+    );
     this.validOrdering = true;
     return;
   }
@@ -177,6 +187,8 @@ export class ListOfSetsOfTranslatableHtmlContentIdsEditorComponent {
 }
 
 angular.module('oppia').directive(
-  'listOfSetsOfTranslatableHtmlContentIdsEditor', downgradeComponent({
-    component: ListOfSetsOfTranslatableHtmlContentIdsEditorComponent
-  }) as angular.IDirectiveFactory);
+  'listOfSetsOfTranslatableHtmlContentIdsEditor',
+  downgradeComponent({
+    component: ListOfSetsOfTranslatableHtmlContentIdsEditorComponent,
+  }) as angular.IDirectiveFactory
+);

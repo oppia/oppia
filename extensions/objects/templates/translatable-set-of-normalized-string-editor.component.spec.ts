@@ -17,9 +17,9 @@
  * editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslatableSetOfNormalizedStringEditorComponent } from './translatable-set-of-normalized-string-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {TranslatableSetOfNormalizedStringEditorComponent} from './translatable-set-of-normalized-string-editor.component';
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
@@ -29,7 +29,7 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TranslatableSetOfNormalizedStringEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     component = TestBed.createComponent(
       TranslatableSetOfNormalizedStringEditorComponent
@@ -39,7 +39,7 @@ describe('TranslatableSetOfNormalizedStringEditor', () => {
   }));
 
   it('should initialize the schema', fakeAsync(() => {
-    component.value = { normalizedStrSet: 'random val' };
+    component.value = {normalizedStrSet: 'random val'};
     tick();
 
     component.updateValue('random val');

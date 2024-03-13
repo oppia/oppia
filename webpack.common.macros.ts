@@ -19,7 +19,7 @@
 const loaderUtils = require('loader-utils');
 var path = require('path');
 
-const objExtend = function(args, obj) {
+const objExtend = function (args, obj) {
   args = Array.prototype.slice.call(args);
   const _a = args.slice(1);
   _a.unshift(Object.assign(obj, args[0]));
@@ -27,21 +27,25 @@ const objExtend = function(args, obj) {
 };
 
 module.exports = {
-  load: function(resourcePath, args) {
+  load: function (resourcePath, args) {
     resourcePath = `/${resourcePath}`;
     const root = path.resolve(__dirname, 'core/templates');
-    const argsExpr = args ? `(${objExtend})(arguments,
-      ${JSON.stringify(args)})` : 'arguments';
-    const resourceURL = JSON.stringify(loaderUtils.urlToRequest(
-      resourcePath, root));
+    const argsExpr = args
+      ? `(${objExtend})(arguments,
+      ${JSON.stringify(args)})`
+      : 'arguments';
+    const resourceURL = JSON.stringify(
+      loaderUtils.urlToRequest(resourcePath, root)
+    );
     return `require(${resourceURL}).apply(null,${argsExpr})`;
   },
 
-  loadExtensions: function(resourcePath) {
+  loadExtensions: function (resourcePath) {
     resourcePath = `/${resourcePath}`;
     const root = path.resolve(__dirname, 'extensions');
-    const resourceURL = JSON.stringify(loaderUtils.urlToRequest(
-      resourcePath, root));
+    const resourceURL = JSON.stringify(
+      loaderUtils.urlToRequest(resourcePath, root)
+    );
     return `require(${resourceURL})()`;
   },
 };

@@ -17,10 +17,10 @@
  * visualization.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { OppiaVisualizationFrequencyTableComponent } from './oppia-visualization-frequency-table.directive';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {OppiaVisualizationFrequencyTableComponent} from './oppia-visualization-frequency-table.directive';
 
 describe('Oppia visualization frequency table', () => {
   let component: OppiaVisualizationFrequencyTableComponent;
@@ -29,21 +29,20 @@ describe('Oppia visualization frequency table', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        OppiaVisualizationFrequencyTableComponent
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [OppiaVisualizationFrequencyTableComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      OppiaVisualizationFrequencyTableComponent);
+      OppiaVisualizationFrequencyTableComponent
+    );
     component = fixture.componentInstance;
 
     component.options = {
       title: 'options',
-      column_headers: ['column_headers0', 'column_headers1']
+      column_headers: ['column_headers0', 'column_headers1'],
     };
 
     fixture.detectChanges();

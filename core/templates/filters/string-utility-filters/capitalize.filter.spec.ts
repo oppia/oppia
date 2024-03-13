@@ -18,29 +18,36 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import {UpgradedServices} from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('filters/string-utility-filters/capitalize.filter.ts');
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   var filterName = 'capitalize';
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia',
-    function($provide: { value: (arg0: string, arg1: string) => void }) {
-      var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-        $provide.value(key, value as string);
+  beforeEach(
+    angular.mock.module(
+      'oppia',
+      function ($provide: {value: (arg0: string, arg1: string) => void}) {
+        var ugs = new UpgradedServices();
+        for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+          $provide.value(key, value as string);
+        }
       }
-    }));
+    )
+  );
 
-  it('should have all expected filters', angular.mock.inject(function($filter) {
-    expect($filter(filterName)).not.toEqual(null);
-  }));
+  it(
+    'should have all expected filters',
+    angular.mock.inject(function ($filter) {
+      expect($filter(filterName)).not.toEqual(null);
+    })
+  );
 
-  it('should correctly capitalize strings', angular.mock.inject(
-    function($filter) {
+  it(
+    'should correctly capitalize strings',
+    angular.mock.inject(function ($filter) {
       var filter = $filter('capitalize');
 
       expect(filter('')).toEqual('');
@@ -56,7 +63,8 @@ describe('Testing filters', function() {
       expect(filter('  a  b ')).toEqual('A  b');
       expect(filter('  ab c ')).toEqual('Ab c');
       expect(filter('  only First lettEr is  Affected ')).toEqual(
-        'Only First lettEr is  Affected');
-    }
-  ));
+        'Only First lettEr is  Affected'
+      );
+    })
+  );
 });

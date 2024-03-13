@@ -16,16 +16,16 @@
  * @fileoverview Root component for Logout Page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-logout-page-root',
-  templateUrl: './logout-page-root.component.html'
+  templateUrl: './logout-page-root.component.html',
 })
 export class LogoutPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -36,10 +36,12 @@ export class LogoutPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.META
+    );
   }
 
   ngOnInit(): void {

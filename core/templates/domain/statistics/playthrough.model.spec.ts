@@ -16,33 +16,38 @@
  * @fileoverview Unit tests for the Playthrough model.
  */
 
-
-import { LearnerAction, LearnerActionType } from
-  'domain/statistics/learner-action.model';
-import { Playthrough } from
-  'domain/statistics/playthrough.model';
-import {PlaythroughIssueType} from
-  'domain/statistics/playthrough-issue.model';
+import {
+  LearnerAction,
+  LearnerActionType,
+} from 'domain/statistics/learner-action.model';
+import {Playthrough} from 'domain/statistics/playthrough.model';
+import {PlaythroughIssueType} from 'domain/statistics/playthrough-issue.model';
 
 describe('Playthrough Model Class', () => {
   it('should create a new playthrough', () => {
-    let actions = [LearnerAction.createNewExplorationStartAction({
-      state_name: {
-        value: 'state'
-      }
-    })];
+    let actions = [
+      LearnerAction.createNewExplorationStartAction({
+        state_name: {
+          value: 'state',
+        },
+      }),
+    ];
     let playthroughObject = Playthrough.createNewEarlyQuitPlaythrough(
-      'expId1', 1, {
+      'expId1',
+      1,
+      {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000},
-      }, actions);
+      },
+      actions
+    );
 
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual(PlaythroughIssueType.EarlyQuit);
     expect(playthroughObject.issueCustomizationArgs).toEqual({
       state_name: {value: 'state'},
-      time_spent_in_exp_in_msecs: {value: 30000}
+      time_spent_in_exp_in_msecs: {value: 30000},
     });
     expect(playthroughObject.actions).toEqual(actions);
   });
@@ -54,124 +59,135 @@ describe('Playthrough Model Class', () => {
       issue_type: PlaythroughIssueType.CyclicStateTransitions,
       issue_customization_args: {
         state_names: {
-          value: ['state1', 'state2']
-        }
+          value: ['state1', 'state2'],
+        },
       },
-      actions: []
+      actions: [],
     });
 
-    var playthroughObject = Playthrough
-      .createNewCyclicStateTransitionsPlaythrough(
-        'expId1', 1, {
+    var playthroughObject =
+      Playthrough.createNewCyclicStateTransitionsPlaythrough(
+        'expId1',
+        1,
+        {
           state_names: {
-            value: ['state1', 'state2']
-          }
-        }, []);
+            value: ['state1', 'state2'],
+          },
+        },
+        []
+      );
 
     expect(playthroughDictObject).toEqual(playthroughObject);
   });
 
   it('should create a new playthrough from a backend dict', () => {
-    let playthroughObject = Playthrough.createFromBackendDict(
-      {
-        exp_id: 'expId1',
-        exp_version: 1,
-        issue_type: PlaythroughIssueType.EarlyQuit,
-        issue_customization_args: {
-          state_name: {
-            value: 'state'
-          },
-          time_spent_in_exp_in_msecs: {
-            value: 1.2
-          }
+    let playthroughObject = Playthrough.createFromBackendDict({
+      exp_id: 'expId1',
+      exp_version: 1,
+      issue_type: PlaythroughIssueType.EarlyQuit,
+      issue_customization_args: {
+        state_name: {
+          value: 'state',
         },
-        actions: [{
+        time_spent_in_exp_in_msecs: {
+          value: 1.2,
+        },
+      },
+      actions: [
+        {
           action_type: LearnerActionType.AnswerSubmit,
           action_customization_args: {
             state_name: {
-              value: 'state'
+              value: 'state',
             },
             dest_state_name: {
-              value: 'dest_state'
+              value: 'dest_state',
             },
             interaction_id: {
-              value: 'interaction_id'
+              value: 'interaction_id',
             },
             submitted_answer: {
-              value: 'answer'
+              value: 'answer',
             },
             feedback: {
-              value: 'feedback'
+              value: 'feedback',
             },
             time_spent_state_in_msecs: {
-              value: 2
-            }
+              value: 2,
+            },
           },
-          schema_version: 1
-        }]
-      }
-    );
+          schema_version: 1,
+        },
+      ],
+    });
 
     expect(playthroughObject.expId).toEqual('expId1');
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual(PlaythroughIssueType.EarlyQuit);
     expect(playthroughObject.issueCustomizationArgs).toEqual({
       state_name: {
-        value: 'state'
+        value: 'state',
       },
       time_spent_in_exp_in_msecs: {
-        value: 1.2
-      }
+        value: 1.2,
+      },
     });
-    expect(playthroughObject.actions).toEqual(
-      [LearnerAction.createNewAnswerSubmitAction({
+    expect(playthroughObject.actions).toEqual([
+      LearnerAction.createNewAnswerSubmitAction({
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         dest_state_name: {
-          value: 'dest_state'
+          value: 'dest_state',
         },
         interaction_id: {
-          value: 'interaction_id'
+          value: 'interaction_id',
         },
         submitted_answer: {
-          value: 'answer'
+          value: 'answer',
         },
         feedback: {
-          value: 'feedback'
+          value: 'feedback',
         },
         time_spent_state_in_msecs: {
-          value: 2
-        }
-      })]);
+          value: 2,
+        },
+      }),
+    ]);
   });
 
   it('should convert a playthrough to a backend dict', () => {
-    let actions = [LearnerAction.createNewAnswerSubmitAction({
-      state_name: {
-        value: 'state'
-      },
-      dest_state_name: {
-        value: 'dest_state'
-      },
-      interaction_id: {
-        value: 'interaction_id'
-      },
-      submitted_answer: {
-        value: 'answer'
-      },
-      feedback: {
-        value: 'feedback'
-      },
-      time_spent_state_in_msecs: {
-        value: 2
-      }
-    })];
+    let actions = [
+      LearnerAction.createNewAnswerSubmitAction({
+        state_name: {
+          value: 'state',
+        },
+        dest_state_name: {
+          value: 'dest_state',
+        },
+        interaction_id: {
+          value: 'interaction_id',
+        },
+        submitted_answer: {
+          value: 'answer',
+        },
+        feedback: {
+          value: 'feedback',
+        },
+        time_spent_state_in_msecs: {
+          value: 2,
+        },
+      }),
+    ];
     let playthroughObject = Playthrough.createNewEarlyQuitPlaythrough(
-      'expId1', 1, {
+      'expId1',
+      1,
+      {
         state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000}
-      }, actions);
+        time_spent_in_exp_in_msecs: {value: 30000},
+      },
+      actions
+    );
 
     let playthroughDict = playthroughObject.toBackendDict();
     expect(playthroughDict).toEqual({
@@ -180,32 +196,34 @@ describe('Playthrough Model Class', () => {
       issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {value: 'state'},
-        time_spent_in_exp_in_msecs: {value: 30000}
+        time_spent_in_exp_in_msecs: {value: 30000},
       },
-      actions: [{
-        action_type: LearnerActionType.AnswerSubmit,
-        action_customization_args: {
-          state_name: {
-            value: 'state'
+      actions: [
+        {
+          action_type: LearnerActionType.AnswerSubmit,
+          action_customization_args: {
+            state_name: {
+              value: 'state',
+            },
+            dest_state_name: {
+              value: 'dest_state',
+            },
+            interaction_id: {
+              value: 'interaction_id',
+            },
+            submitted_answer: {
+              value: 'answer',
+            },
+            feedback: {
+              value: 'feedback',
+            },
+            time_spent_state_in_msecs: {
+              value: 2,
+            },
           },
-          dest_state_name: {
-            value: 'dest_state'
-          },
-          interaction_id: {
-            value: 'interaction_id'
-          },
-          submitted_answer: {
-            value: 'answer'
-          },
-          feedback: {
-            value: 'feedback'
-          },
-          time_spent_state_in_msecs: {
-            value: 2
-          }
+          schema_version: 1,
         },
-        schema_version: 1
-      }]
+      ],
     });
   });
 
@@ -217,45 +235,59 @@ describe('Playthrough Model Class', () => {
       issue_type: 'InvalidType',
       issue_customization_args: {
         state_names: {
-          value: ['state1', 'state2']
-        }
+          value: ['state1', 'state2'],
+        },
       },
-      actions: []
+      actions: [],
     };
 
-    // This throws "Type 'string' is not assignable to type
-    // '"CyclicStateTransitions"'.". We need to suppress this error because
-    // 'playthroughDict' has an invalid value of 'issue_type' property. We need
-    // to do that in order to test validations.
-    // @ts-expect-error
-    expect(() => Playthrough.createFromBackendDict(playthroughDict))
-      .toThrowError(
-        'Backend dict does not match any known issue type: ' +
-      JSON.stringify(playthroughDict));
+    expect(() =>
+      // This throws "Type 'string' is not assignable to type
+      // '"CyclicStateTransitions"'.". We need to suppress this error because
+      // 'playthroughDict' has an invalid value of 'issue_type' property. We need
+      // to do that in order to test validations.
+      // @ts-expect-error
+      Playthrough.createFromBackendDict(playthroughDict)
+    ).toThrowError(
+      'Backend dict does not match any known issue type: ' +
+        JSON.stringify(playthroughDict)
+    );
   });
 
   it('should identify the problematic state', () => {
     let eqPlaythrough = Playthrough.createNewEarlyQuitPlaythrough(
-      'expId1', 1, {
+      'expId1',
+      1,
+      {
         state_name: {value: 'state'},
         time_spent_in_exp_in_msecs: {value: 30000},
-      }, []);
+      },
+      []
+    );
     expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
 
-    var misPlaythrough = Playthrough
-      .createNewMultipleIncorrectSubmissionsPlaythrough(
-        'expId1', 1, {
+    var misPlaythrough =
+      Playthrough.createNewMultipleIncorrectSubmissionsPlaythrough(
+        'expId1',
+        1,
+        {
           state_name: {value: 'state'},
           num_times_answered_incorrectly: {value: 10},
-        }, []);
+        },
+        []
+      );
     expect(misPlaythrough.getStateNameWithIssue()).toEqual('state');
 
     var cstPlaythrough = Playthrough.createNewCyclicStateTransitionsPlaythrough(
-      'expId1', 1, {
+      'expId1',
+      1,
+      {
         state_names: {
-          value: ['state1', 'state2']
-        }
-      }, []);
+          value: ['state1', 'state2'],
+        },
+      },
+      []
+    );
     expect(cstPlaythrough.getStateNameWithIssue()).toEqual('state2');
   });
 });

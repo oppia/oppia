@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for multiple choice input rules.
  */
 
-import { MultipleChoiceInputRulesService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
+import {MultipleChoiceInputRulesService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 
 describe('Multiple choice input rules service', () => {
   let mcirs: MultipleChoiceInputRulesService;
@@ -24,12 +24,16 @@ describe('Multiple choice input rules service', () => {
     mcirs = new MultipleChoiceInputRulesService();
   });
 
-  it('should have a correct \'equals\' rule', () => {
-    expect(mcirs.Equals(3, {
-      x: 3
-    })).toBe(true);
-    expect(mcirs.Equals(3, {
-      x: 4
-    })).toBe(false);
+  it("should have a correct 'equals' rule", () => {
+    expect(
+      mcirs.Equals(3, {
+        x: 3,
+      })
+    ).toBe(true);
+    expect(
+      mcirs.Equals(3, {
+        x: 4,
+      })
+    ).toBe(false);
   });
 });

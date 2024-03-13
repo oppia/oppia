@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for oppia ng init directive.
  */
 
-import { Component } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgInitDirective } from './ng-init.directive';
+import {Component} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgInitDirective} from './ng-init.directive';
 
 @Component({
   selector: 'mock-comp-a',
-  template: '<div (oppiaNgInit)="divInitialized()"></div>'
+  template: '<div (oppiaNgInit)="divInitialized()"></div>',
 })
 class MockCompA {
   divInitialized(): void {
@@ -35,15 +35,14 @@ describe('OppiaNgInit', () => {
   let fixture: ComponentFixture<MockCompA>;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MockCompA, NgInitDirective]
+      declarations: [MockCompA, NgInitDirective],
     }).compileComponents();
   }));
-  it('should run divInitialized when the tag is initialized', waitForAsync(
-    () => {
-      fixture = TestBed.createComponent(MockCompA);
-      component = fixture.componentInstance;
-      const initSpy = spyOn(component, 'divInitialized');
-      fixture.detectChanges();
-      expect(initSpy).toHaveBeenCalled();
-    }));
+  it('should run divInitialized when the tag is initialized', waitForAsync(() => {
+    fixture = TestBed.createComponent(MockCompA);
+    component = fixture.componentInstance;
+    const initSpy = spyOn(component, 'divInitialized');
+    fixture.detectChanges();
+    expect(initSpy).toHaveBeenCalled();
+  }));
 });

@@ -17,38 +17,46 @@
  * exploration.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { RefresherExplorationConfirmationModal } from '../modals/refresher-exploration-confirmation-modal.component';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {RefresherExplorationConfirmationModal} from '../modals/refresher-exploration-confirmation-modal.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RefresherExplorationConfirmationModalService {
-  constructor(
-    private ngbModal: NgbModal
-  ) {}
+  constructor(private ngbModal: NgbModal) {}
 
   displayRedirectConfirmationModal(
-      refresherExplorationId: string,
-      redirectConfirmationCallback: () => void): void {
+    refresherExplorationId: string,
+    redirectConfirmationCallback: () => void
+  ): void {
     let modalRef: NgbModalRef = this.ngbModal.open(
-      RefresherExplorationConfirmationModal, {
-        backdrop: 'static'
-      });
+      RefresherExplorationConfirmationModal,
+      {
+        backdrop: 'static',
+      }
+    );
     modalRef.componentInstance.confirmRedirectEventEmitter.subscribe(() => {
       redirectConfirmationCallback();
     });
     modalRef.componentInstance.refresherExplorationId = refresherExplorationId;
 
-    modalRef.result.then(() => {}, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    modalRef.result.then(
+      () => {},
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 }
 
-angular.module('oppia').factory('RefresherExplorationConfirmationModalService',
-  downgradeInjectable(RefresherExplorationConfirmationModalService));
+angular
+  .module('oppia')
+  .factory(
+    'RefresherExplorationConfirmationModalService',
+    downgradeInjectable(RefresherExplorationConfirmationModalService)
+  );

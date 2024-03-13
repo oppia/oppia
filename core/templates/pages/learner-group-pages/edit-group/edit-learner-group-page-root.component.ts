@@ -16,19 +16,18 @@
  * @fileoverview Learner Group Editor page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-edit-learner-group-page-root',
   templateUrl: './edit-learner-group-page-root.component.html',
 })
 export class EditLearnerGroupPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.
-    PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.TITLE;
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.TITLE;
 
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .LEARNER_GROUP_EDITOR.META as unknown as Readonly<MetaTagData>[];
 }
