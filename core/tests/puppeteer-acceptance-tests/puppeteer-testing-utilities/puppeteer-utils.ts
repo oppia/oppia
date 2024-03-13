@@ -66,7 +66,6 @@ export class BaseUser {
          * every test passes on both modes. */
         headless,
         args,
-        devtools: true,
       })
       .then(async browser => {
         this.browserObject = browser;
