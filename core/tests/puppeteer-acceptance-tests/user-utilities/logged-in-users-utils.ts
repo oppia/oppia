@@ -93,8 +93,6 @@ const mobileSidebarAboutFoundationButton =
   'a.e2e-mobile-test-about-foundation-button';
 const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
-const mobileSidebarGetInvolvedMenu =
-  'div.e2e-mobile-test-sidebar-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-partnerships-button';
 const mobileSidebarGetInvolvedMenuVolunteerButton =
@@ -168,26 +166,12 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to click on the mobile sidebar button.
-   */
-  async clickOnMobileNavbarButton(): Promise<void> {
-    await this.clickOn(mobileNavbarOpenSidebarButton);
-  }
-
-  /**
-   * Function to expand the Get Involved Menu on mobile sidebar.
-   */
-  async clickOnExpandGetInvolvedMenuButtonOnMobileSidebar(): Promise<void> {
-    await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
-  }
-
-  /**
    * Function to click the About button in the About Menu on navbar
    * and check if it opens the About page.
    */
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.viewport.width < BREAKPOINTS.MOBILE) {
-      await this.clickOnMobileNavbarButton();
+      await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
         'About Oppia button in the About Menu on mobile sidebar',
@@ -308,7 +292,7 @@ export class LoggedInUser extends BaseUser {
    */
   async clickAboutFoundationButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.viewport.width < BREAKPOINTS.MOBILE) {
-      await this.clickOnMobileNavbarButton();
+      await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarAboutFoundationButton);
     } else {
       await this.clickOn(navbarAboutTab);
@@ -570,8 +554,8 @@ export class LoggedInUser extends BaseUser {
    */
   async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.viewport.width < BREAKPOINTS.MOBILE) {
-      await this.clickOnMobileNavbarButton();
-      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuPartnershipsButton,
         'School and Organizations in the Get Involved Menu on mobile sidebar',
@@ -595,8 +579,8 @@ export class LoggedInUser extends BaseUser {
    */
   async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.viewport.width < BREAKPOINTS.MOBILE) {
-      await this.clickOnMobileNavbarButton();
-      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuVolunteerButton,
         'Volunteer in the Get Involved Menu on mobile sidebar',
@@ -620,8 +604,8 @@ export class LoggedInUser extends BaseUser {
    */
   async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.viewport.width < BREAKPOINTS.MOBILE) {
-      await this.clickOnMobileNavbarButton();
-      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidevbarGetInvolvedMenuDonateButton,
         'Donate in the Get Involved Menu on mobile sidebar',
@@ -645,8 +629,8 @@ export class LoggedInUser extends BaseUser {
    */
   async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.viewport.width < BREAKPOINTS.MOBILE) {
-      await this.clickOnMobileNavbarButton();
-      await this.clickOnExpandGetInvolvedMenuButtonOnMobileSidebar();
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuContactUsButton,
         'Contact Us in the Get Involved Menu on mobile sidebar',
