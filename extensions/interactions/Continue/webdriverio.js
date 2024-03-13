@@ -19,28 +19,29 @@
 
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 
-
-var customizeInteraction = async function(elem, buttonText) {
+var customizeInteraction = async function (elem, buttonText) {
   if (buttonText) {
-    await objects.UnicodeStringEditor(
-      elem.$('<schema-based-unicode-editor>')
-    ).setValue(buttonText);
+    await objects
+      .UnicodeStringEditor(elem.$('<schema-based-unicode-editor>'))
+      .setValue(buttonText);
   }
 };
 
-var expectInteractionDetailsToMatch = async function(elem, buttonText) {
+var expectInteractionDetailsToMatch = async function (elem, buttonText) {
   var continueButton = $('.e2e-test-continue-button');
   expect(await continueButton.getText()).toBe(buttonText.toUpperCase());
 };
 
-var submitAnswer = async function() {
+var submitAnswer = async function () {
   var continueButton = $('.e2e-test-continue-button');
   await waitFor.elementToBeClickable(
-    continueButton, 'Continue button is not clickable');
+    continueButton,
+    'Continue button is not clickable'
+  );
   await action.click('Continue Button', continueButton);
 };
 

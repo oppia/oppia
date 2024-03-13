@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for TranslationTabBusyModalController.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslationTabBusyModalComponent } from './translation-tab-busy-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslationTabBusyModalComponent} from './translation-tab-busy-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -36,14 +36,14 @@ describe('Translation Tab Busy Modal Component ', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TranslationTabBusyModalComponent
+      declarations: [TranslationTabBusyModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -58,8 +58,7 @@ describe('Translation Tab Busy Modal Component ', () => {
   // Confirm and cancel functions tested in ConfirmOrCancelModal spec file.
   // So only Component is defined need to be tested in this file.
 
-  it('should initialize component properties when component is initialized',
-    function() {
-      expect(component).toBeDefined();
-    });
+  it('should initialize component properties when component is initialized', function () {
+    expect(component).toBeDefined();
+  });
 });

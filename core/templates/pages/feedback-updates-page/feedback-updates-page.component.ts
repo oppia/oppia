@@ -12,34 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for the feedback Updates page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { trigger, state, style, transition,
-  animate, group } from '@angular/animations';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+  group,
+} from '@angular/animations';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { FeedbackThreadSummary, FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
-import { FeedbackMessageSummary } from 'domain/feedback_message/feedback-message-summary.model';
-import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { FeedbackUpdatesPageConstants } from 'pages/feedback-updates-page/feedback-updates-page.constants';
-import { AlertsService } from 'services/alerts.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PageTitleService } from 'services/page-title.service';
-import { UrlService } from 'services/contextual/url.service';
+import {AppConstants} from 'app.constants';
+import {
+  FeedbackThreadSummary,
+  FeedbackThreadSummaryBackendDict,
+} from 'domain/feedback_thread/feedback-thread-summary.model';
+import {FeedbackMessageSummary} from 'domain/feedback_message/feedback-message-summary.model';
+import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import {FeedbackUpdatesPageConstants} from 'pages/feedback-updates-page/feedback-updates-page.constants';
+import {AlertsService} from 'services/alerts.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PageTitleService} from 'services/page-title.service';
+import {UrlService} from 'services/contextual/url.service';
 
 import './feedback-updates-page.component.css';
 
@@ -49,46 +57,75 @@ import './feedback-updates-page.component.css';
   styleUrls: ['./feedback-updates-page.component.css'],
   animations: [
     trigger('slideInOut', [
-      state('true', style({
-        'max-height': '500px', opacity: '1', visibility: 'visible'
-      })),
-      state('false', style({
-        'max-height': '0px', opacity: '0', visibility: 'hidden'
-      })),
-      transition('true => false', [group([
-        animate('500ms ease-in-out', style({
-          opacity: '0'
-        })),
-        animate('500ms ease-in-out', style({
-          'max-height': '0px'
-        })),
-        animate('500ms ease-in-out', style({
-          visibility: 'hidden'
-        }))
-      ]
-      )]),
-      transition('false => true', [group([
-        animate('500ms ease-in-out', style({
-          visibility: 'visible'
-        })),
-        animate('500ms ease-in-out', style({
-          'max-height': '500px'
-        })),
-        animate('500ms ease-in-out', style({
-          opacity: '1'
-        }))
-      ]
-      )])
-    ])
-  ]
+      state(
+        'true',
+        style({
+          'max-height': '500px',
+          opacity: '1',
+          visibility: 'visible',
+        })
+      ),
+      state(
+        'false',
+        style({
+          'max-height': '0px',
+          opacity: '0',
+          visibility: 'hidden',
+        })
+      ),
+      transition('true => false', [
+        group([
+          animate(
+            '500ms ease-in-out',
+            style({
+              opacity: '0',
+            })
+          ),
+          animate(
+            '500ms ease-in-out',
+            style({
+              'max-height': '0px',
+            })
+          ),
+          animate(
+            '500ms ease-in-out',
+            style({
+              visibility: 'hidden',
+            })
+          ),
+        ]),
+      ]),
+      transition('false => true', [
+        group([
+          animate(
+            '500ms ease-in-out',
+            style({
+              visibility: 'visible',
+            })
+          ),
+          animate(
+            '500ms ease-in-out',
+            style({
+              'max-height': '500px',
+            })
+          ),
+          animate(
+            '500ms ease-in-out',
+            style({
+              opacity: '1',
+            })
+          ),
+        ]),
+      ]),
+    ]),
+  ],
 })
 export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
-  FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
-    FeedbackUpdatesPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+  FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS =
+    FeedbackUpdatesPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS;
 
   username: string = '';
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
 
@@ -107,7 +144,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
   newMessage!: {
-    'text': string | null;
+    text: string | null;
   };
 
   loadingFeedback!: boolean;
@@ -117,8 +154,8 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   threadId!: string;
   messageSummaries!: FeedbackMessageSummary[];
   threadSummary!: FeedbackThreadSummary;
-  communityLibraryUrl = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+  communityLibraryUrl =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
   loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
@@ -133,8 +170,7 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     private dateTimeFormatService: DateTimeFormatService,
     private focusManagerService: FocusManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private feedbackUpdatesBackendApiService:
-      FeedbackUpdatesBackendApiService,
+    private feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService,
     private loaderService: LoaderService,
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private urlInterpolationService: UrlInterpolationService,
@@ -152,43 +188,46 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
       const username = userInfo.getUsername();
       if (username) {
         this.username = username;
-        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-          this.userService.getProfileImageDataUrl(username));
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
+          this.userService.getProfileImageDataUrl(username);
       } else {
-        this.profilePictureWebpDataUrl = (
+        this.profilePictureWebpDataUrl =
           this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-        this.profilePicturePngDataUrl = (
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+          );
+        this.profilePicturePngDataUrl =
           this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+          );
       }
     });
 
     this.fetchFeedbackUpdates();
 
-    Promise.all([
-      userInfoPromise,
-    ]).then(() => {
-      setTimeout(() => {
-        this.loaderService.hideLoadingScreen();
-        // This focus is applied after the loading screen has disappeared.
-        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-      }, 0);
-    }).catch(errorResponse => {
-      // This is placed here in order to satisfy Unit tests.
-    });
+    Promise.all([userInfoPromise])
+      .then(() => {
+        setTimeout(() => {
+          this.loaderService.hideLoadingScreen();
+          // This focus is applied after the loading screen has disappeared.
+          this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
+        }, 0);
+      })
+      .catch(errorResponse => {
+        // This is placed here in order to satisfy Unit tests.
+      });
 
     this.loadingFeedback = false;
 
     this.newMessage = {
-      text: ''
+      text: '',
     };
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-      }));
+      })
+    );
     this.directiveSubscriptions.add(
       this.translateService.onLangChange.subscribe(() => {
         this.setPageTitle();
@@ -201,49 +240,48 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   }
 
   getauthorPicturePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
-      username);
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
     return pngImageUrl;
   }
 
   getauthorPictureWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
-      username);
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
     return webpImageUrl;
   }
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_FEEDBACK_UPDATES_PAGE_TITLE');
+      'I18N_FEEDBACK_UPDATES_PAGE_TITLE'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   fetchFeedbackUpdates(): void {
     this.loadingIndicatorIsShown = true;
-    let dashboardFeedbackUpdatesDataPromise = (
-      this.feedbackUpdatesBackendApiService
-        .fetchFeedbackUpdatesDataAsync(
-          this.paginatedThreadsList));
+    let dashboardFeedbackUpdatesDataPromise =
+      this.feedbackUpdatesBackendApiService.fetchFeedbackUpdatesDataAsync(
+        this.paginatedThreadsList
+      );
     dashboardFeedbackUpdatesDataPromise.then(
       responseData => {
         this.isCurrentFeedbackSortDescending = true;
-        this.currentFeedbackThreadsSortType = (
-          FeedbackUpdatesPageConstants
-            .FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
+        this.currentFeedbackThreadsSortType =
+          FeedbackUpdatesPageConstants.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key;
         this.threadSummaries = [
-          ... this.threadSummaries,
-          ... responseData.threadSummaries];
+          ...this.threadSummaries,
+          ...responseData.threadSummaries,
+        ];
         this.paginatedThreadsList = responseData.paginatedThreadsList;
-        this.numberOfUnreadThreads =
-          responseData.numberOfUnreadThreads;
+        this.numberOfUnreadThreads = responseData.numberOfUnreadThreads;
         this.feedbackThreadActive = false;
         this.loadingIndicatorIsShown = false;
-      }, errorResponseStatus => {
+      },
+      errorResponseStatus => {
         this.loadingIndicatorIsShown = false;
         if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1) {
-          this.alertsService.addWarning(
-            'Failed to get feedback updates data');
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+        ) {
+          this.alertsService.addWarning('Failed to get feedback updates data');
         }
       }
     );
@@ -266,8 +304,8 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
 
   setFeedbackSortingOptions(sortType: string): void {
     if (sortType === this.currentFeedbackThreadsSortType) {
-      this.isCurrentFeedbackSortDescending = (
-        !this.isCurrentFeedbackSortDescending);
+      this.isCurrentFeedbackSortDescending =
+        !this.isCurrentFeedbackSortDescending;
     } else {
       this.currentFeedbackThreadsSortType = sortType;
     }
@@ -281,13 +319,18 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   }
 
   onClickThread(
-      threadStatus: string, explorationId: string,
-      threadId: string, explorationTitle: string): void {
+    threadStatus: string,
+    explorationId: string,
+    threadId: string,
+    explorationTitle: string
+  ): void {
     this.loadingFeedback = true;
     let threadDataUrl = this.urlInterpolationService.interpolateUrl(
-      '/feedbackupdatesthreadhandler/<threadId>', {
-        threadId: threadId
-      });
+      '/feedbackupdatesthreadhandler/<threadId>',
+      {
+        threadId: threadId,
+      }
+    );
     this.explorationTitle = explorationTitle;
     this.feedbackThreadActive = true;
     this.threadStatus = threadStatus;
@@ -305,14 +348,17 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.feedbackUpdatesBackendApiService.onClickThreadAsync(threadDataUrl)
-      .then((messageSummaryList) => {
+    this.feedbackUpdatesBackendApiService
+      .onClickThreadAsync(threadDataUrl)
+      .then(messageSummaryList => {
         let messageSummaryDicts = messageSummaryList;
         this.messageSummaries = [];
         for (let index = 0; index < messageSummaryDicts.length; index++) {
           this.messageSummaries.push(
             FeedbackMessageSummary.createFromBackendDict(
-              messageSummaryDicts[index]));
+              messageSummaryDicts[index]
+            )
+          );
         }
         this.loadingFeedback = false;
       });
@@ -324,26 +370,29 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
 
   addNewMessage(threadId: string, newMessage: string): void {
     let url = this.urlInterpolationService.interpolateUrl(
-      '/threadhandler/<threadId>', {
-        threadId: threadId
-      });
+      '/threadhandler/<threadId>',
+      {
+        threadId: threadId,
+      }
+    );
     let payload = {
       updated_status: false,
       updated_subject: null,
-      text: newMessage
+      text: newMessage,
     };
     this.messageSendingInProgress = true;
     this.feedbackUpdatesBackendApiService
-      .addNewMessageAsync(url, payload).then(() => {
+      .addNewMessageAsync(url, payload)
+      .then(() => {
         this.threadSummary = this.threadSummaries[this.threadIndex];
-        this.threadSummary.appendNewMessage(
-          newMessage, this.username);
+        this.threadSummary.appendNewMessage(newMessage, this.username);
         this.messageSendingInProgress = false;
         this.newMessage.text = null;
-        let newMessageSummary = (
-          FeedbackMessageSummary.createNewMessage(
-            this.threadSummary.totalMessageCount, newMessage,
-            this.username));
+        let newMessageSummary = FeedbackMessageSummary.createNewMessage(
+          this.threadSummary.totalMessageCount,
+          newMessage,
+          this.username
+        );
         this.messageSummaries.push(newMessageSummary);
       });
   }
@@ -358,7 +407,8 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
 
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-      millisSinceEpoch);
+      millisSinceEpoch
+    );
   }
 
   decodePngURIData(base64ImageData: string): string {
@@ -366,7 +416,9 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaFeedbackUpdatesPage',
+angular.module('oppia').directive(
+  'oppiaFeedbackUpdatesPage',
   downgradeComponent({
-    component: FeedbackUpdatesPageComponent
-  }) as angular.IDirectiveFactory);
+    component: FeedbackUpdatesPageComponent,
+  }) as angular.IDirectiveFactory
+);

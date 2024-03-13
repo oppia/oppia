@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the position of terms component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { PositionOfTermsEditorComponent } from './position-of-terms-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {PositionOfTermsEditorComponent} from './position-of-terms-editor.component';
 
 describe('PositionOfTerms', () => {
   let fixture: ComponentFixture<PositionOfTermsEditorComponent>;
@@ -27,11 +27,11 @@ describe('PositionOfTerms', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PositionOfTermsEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
-  beforeEach(waitForAsync(()=> {
+  beforeEach(waitForAsync(() => {
     fixture = TestBed.createComponent(PositionOfTermsEditorComponent);
     component = fixture.componentInstance;
     component.ngOnInit();
@@ -48,14 +48,14 @@ describe('PositionOfTerms', () => {
     expect(component.value).toBe('both');
 
     // Changing localValue should change ctrl.value.
-    component.localValue = (
+    component.localValue =
       // This throws "Type object is not assignable to type
       // 'PositionOfTerm'." We need to suppress this error
       // because of the need to test validations. This error
       // is thrown because the type of localValue is PositionOfTerm
       // and we are assigning a string to it.
       // @ts-ignore
-      component.positionOfTerms[0]);
+      component.positionOfTerms[0];
     component.onChangePosition('lhs');
     expect(component.value).toBe('lhs');
   });

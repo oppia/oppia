@@ -16,25 +16,24 @@
  * @fileoverview Unit tests for stateTranslationEditor.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { TranslationLanguageService } from '../services/translation-language.service';
-import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
-import { StateTranslationEditorComponent } from './state-translation-editor.component';
-import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { TranslationStatusService } from '../services/translation-status.service';
-
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {State, StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {TranslationLanguageService} from '../services/translation-language.service';
+import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
+import {StateTranslationEditorComponent} from './state-translation-editor.component';
+import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {TranslationStatusService} from '../services/translation-status.service';
 
 class MockNgbModalRef {
   result: Promise<void> = Promise.resolve();
@@ -57,8 +56,7 @@ describe('State Translation Editor Component', () => {
   let stateObjectFactory: StateObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let externalSaveService: ExternalSaveService;
-  let translationTabActiveContentIdService:
-    TranslationTabActiveContentIdService;
+  let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationStatusService: TranslationStatusService;
   let state: State;
 
@@ -70,15 +68,15 @@ describe('State Translation Editor Component', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         StateTranslationEditorComponent,
-        MarkAudioAsNeedingUpdateModalComponent
+        MarkAudioAsNeedingUpdateModalComponent,
       ],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -92,28 +90,40 @@ describe('State Translation Editor Component', () => {
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     externalSaveService = TestBed.inject(ExternalSaveService);
     translationTabActiveContentIdService = TestBed.inject(
-      TranslationTabActiveContentIdService);
+      TranslationTabActiveContentIdService
+    );
     editabilityService = TestBed.inject(EditabilityService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     translationStatusService = TestBed.inject(TranslationStatusService);
 
     state = stateObjectFactory.createDefaultState(
-      '', 'content1', 'default_outcome');
+      '',
+      'content1',
+      'default_outcome'
+    );
     state.content.html = 'This is a html text1';
     spyOn(explorationStatesService, 'getState').and.returnValue(state);
 
-    spyOn(translationTabActiveContentIdService, 'getActiveContentId').and
-      .returnValue('content1');
+    spyOn(
+      translationTabActiveContentIdService,
+      'getActiveContentId'
+    ).and.returnValue('content1');
     // SpyOn(editabilityService, 'isEditable').and.returnValue(true);
-    spyOn(translationLanguageService, 'getActiveLanguageDirection')
-      .and.returnValue('left');
-    spyOnProperty(translationLanguageService, 'onActiveLanguageChanged')
-      .and.returnValue(mockActiveLanguageChangedEventEmitter);
-    spyOn(translationLanguageService, 'getActiveLanguageCode')
-      .and.returnValue('hi');
+    spyOn(
+      translationLanguageService,
+      'getActiveLanguageDirection'
+    ).and.returnValue('left');
     spyOnProperty(
-      translationTabActiveContentIdService, 'onActiveContentIdChanged'
+      translationLanguageService,
+      'onActiveLanguageChanged'
+    ).and.returnValue(mockActiveLanguageChangedEventEmitter);
+    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+      'hi'
+    );
+    spyOnProperty(
+      translationTabActiveContentIdService,
+      'onActiveContentIdChanged'
     ).and.returnValue(mockActiveLanguageIdChangedEventEmitter);
     entityTranslationsService.languageCodeToEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
@@ -125,20 +135,20 @@ describe('State Translation Editor Component', () => {
           content1: {
             content_value: 'This is a html text1 in hindi',
             needs_update: false,
-            content_format: 'html'
+            content_format: 'html',
           },
           content2: {
             content_value: 'This is a html text2 in hindi',
             needs_update: false,
-            content_format: 'html'
+            content_format: 'html',
           },
           content3: {
             content_value: 'This is a html text3 in hindi',
             needs_update: false,
-            content_format: 'html'
+            content_format: 'html',
           },
-        }
-      })
+        },
+      }),
     };
 
     component.ngOnInit();
@@ -159,19 +169,21 @@ describe('State Translation Editor Component', () => {
               filename: 'filename1.mp3',
               file_size_bytes: 100,
               needs_update: false,
-              duration_secs: 10
-            }
-          }
-        }
+              duration_secs: 10,
+            },
+          },
+        },
       });
       spyOn(ngbModal, 'open').and.callThrough();
 
       component.onSaveTranslationButtonClicked();
 
       expect(ngbModal.open).toHaveBeenCalledWith(
-        MarkAudioAsNeedingUpdateModalComponent, {
-          backdrop: 'static'
-        });
+        MarkAudioAsNeedingUpdateModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
     });
 
     it('should not open the modal if voiceover already needs update', () => {
@@ -182,10 +194,10 @@ describe('State Translation Editor Component', () => {
               filename: 'filename1.mp3',
               file_size_bytes: 100,
               needs_update: true,
-              duration_secs: 10
-            }
-          }
-        }
+              duration_secs: 10,
+            },
+          },
+        },
       });
       spyOn(ngbModal, 'open');
 
@@ -202,10 +214,10 @@ describe('State Translation Editor Component', () => {
               filename: 'filename1.mp3',
               file_size_bytes: 100,
               needs_update: false,
-              duration_secs: 10
-            }
-          }
-        }
+              duration_secs: 10,
+            },
+          },
+        },
       });
       const mockNgbModalRef = new MockNgbModalRef();
       mockNgbModalRef.result = Promise.reject();
@@ -214,7 +226,9 @@ describe('State Translation Editor Component', () => {
       component.onSaveTranslationButtonClicked();
 
       expect(ngbModal.open).toHaveBeenCalledWith(
-        MarkAudioAsNeedingUpdateModalComponent, {backdrop: 'static'});
+        MarkAudioAsNeedingUpdateModalComponent,
+        {backdrop: 'static'}
+      );
     });
 
     it('should add editTranslation changes to draft change list', () => {
@@ -223,9 +237,7 @@ describe('State Translation Editor Component', () => {
       expect(changeListService.editTranslation).toHaveBeenCalled();
     });
 
-    it('should update the translation with edited translation', () => {
-
-    });
+    it('should update the translation with edited translation', () => {});
 
     it('should refresh the translation status', () => {
       spyOn(translationStatusService, 'refresh');
@@ -251,7 +263,8 @@ describe('State Translation Editor Component', () => {
         component.dataFormat = 'html';
         component.openTranslationEditor();
         expect(component.activeWrittenTranslation).toEqual(
-          TranslatedContent.createNew('html'));
+          TranslatedContent.createNew('html')
+        );
       });
     });
 
@@ -306,18 +319,22 @@ describe('State Translation Editor Component', () => {
     expect(component.initEditor).toHaveBeenCalled();
   });
 
-  it('should init editor and update data ' +
-     'format on active content id change', () => {
-    component.dataFormat = 'html';
-    spyOn(component, 'initEditor');
+  it(
+    'should init editor and update data ' +
+      'format on active content id change',
+    () => {
+      component.dataFormat = 'html';
+      spyOn(component, 'initEditor');
 
-    translationTabActiveContentIdService
-      .onActiveContentIdChanged.emit('unicode');
-    fixture.detectChanges();
+      translationTabActiveContentIdService.onActiveContentIdChanged.emit(
+        'unicode'
+      );
+      fixture.detectChanges();
 
-    expect(component.dataFormat).toEqual('unicode');
-    expect(component.initEditor).toHaveBeenCalled();
-  });
+      expect(component.dataFormat).toEqual('unicode');
+      expect(component.initEditor).toHaveBeenCalled();
+    }
+  );
 
   it('should save translation if translation editor is open', () => {
     component.translationEditorIsOpen = true;

@@ -16,16 +16,18 @@
  * @fileoverview Unit tests for EmailDashboardBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { EmailDashboardBackendApiService, QueryData } from
-  'domain/email-dashboard/email-dashboard-backend-api.service';
-import { EmailDashboardQuery } from
-  'domain/email-dashboard/email-dashboard-query.model';
-import { EmailDashboardQueryResults } from
-  'domain/email-dashboard/email-dashboard-query-results.model';
+import {
+  EmailDashboardBackendApiService,
+  QueryData,
+} from 'domain/email-dashboard/email-dashboard-backend-api.service';
+import {EmailDashboardQuery} from 'domain/email-dashboard/email-dashboard-query.model';
+import {EmailDashboardQueryResults} from 'domain/email-dashboard/email-dashboard-query-results.model';
 
 describe('Email dashboard backend api service', () => {
   let httpTestingController: HttpTestingController;
@@ -36,12 +38,12 @@ describe('Email dashboard backend api service', () => {
     created_at_least_n_exps: 0,
     created_fewer_than_n_exps: 0,
     edited_at_least_n_exps: 0,
-    edited_fewer_than_n_exps: 0
+    edited_fewer_than_n_exps: 0,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     httpTestingController = TestBed.get(HttpTestingController);
@@ -61,49 +63,52 @@ describe('Email dashboard backend api service', () => {
           status: 'processing',
           submitter_username: 'testUser',
           id: 'buQW4Qhoxpjg',
-          num_qualified_users: 0
-        }
-      ]
+          num_qualified_users: 0,
+        },
+      ],
     };
 
-    let expectedObject = EmailDashboardQueryResults.createFromBackendDict(
-      backendResponse);
+    let expectedObject =
+      EmailDashboardQueryResults.createFromBackendDict(backendResponse);
 
-    edbas.fetchQueriesPageAsync(10, 'test').then((queryResults) => {
+    edbas.fetchQueriesPageAsync(10, 'test').then(queryResults => {
       expect(queryResults).toEqual(expectedObject);
     });
 
-    let req = httpTestingController.expectOne(
-      req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
+    let req = httpTestingController.expectOne(req =>
+      /.*?emaildashboarddatahandler?.*/g.test(req.url)
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(backendResponse);
 
     flushMicrotasks();
   }));
 
-  it('should use the rejection handler if the backend request failed.',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend request failed.', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      edbas.fetchQueriesPageAsync(10, 'test').then(
-        successHandler, failHandler);
+    edbas.fetchQueriesPageAsync(10, 'test').then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+    let req = httpTestingController.expectOne(req =>
+      /.*?emaildashboarddatahandler?.*/g.test(req.url)
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
 
   it('should correctly fetch query.', fakeAsync(() => {
     let backendResponse = {
@@ -112,47 +117,51 @@ describe('Email dashboard backend api service', () => {
         status: 'processing',
         submitter_username: 'testUser',
         id: 'buQW4Qhoxpjg',
-        num_qualified_users: 0
-      }
+        num_qualified_users: 0,
+      },
     };
 
-    let expectedObject = EmailDashboardQuery.createFromBackendDict(
-      backendResponse);
+    let expectedObject =
+      EmailDashboardQuery.createFromBackendDict(backendResponse);
 
-    edbas.fetchQueryAsync('q1').then((query) => {
+    edbas.fetchQueryAsync('q1').then(query => {
       expect(query).toEqual(expectedObject);
     });
 
-    let req = httpTestingController.expectOne(
-      req => (/.*?querystatuscheck?.*/g).test(req.url));
+    let req = httpTestingController.expectOne(req =>
+      /.*?querystatuscheck?.*/g.test(req.url)
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(backendResponse);
 
     flushMicrotasks();
   }));
 
-  it('should use the rejection handler if the backend request for query failed',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend request for query failed', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      edbas.fetchQueryAsync('q1').then(successHandler, failHandler);
+    edbas.fetchQueryAsync('q1').then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        req => (/.*?querystatuscheck?.*/g).test(req.url));
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+    let req = httpTestingController.expectOne(req =>
+      /.*?querystatuscheck?.*/g.test(req.url)
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
 
   it('should correctly submit query.', fakeAsync(() => {
     var postData = defaultData;
@@ -164,48 +173,52 @@ describe('Email dashboard backend api service', () => {
         status: 'processing',
         submitter_username: 'testUser',
         id: 'buQW4Qhoxpjg',
-        num_qualified_users: 0
-      }
+        num_qualified_users: 0,
+      },
     };
 
-    let expectedObject = EmailDashboardQuery.createFromBackendDict(
-      backendResponse);
+    let expectedObject =
+      EmailDashboardQuery.createFromBackendDict(backendResponse);
 
-    edbas.submitQueryAsync(postData).then((query) => {
+    edbas.submitQueryAsync(postData).then(query => {
       expect(query).toEqual(expectedObject);
     });
 
-    let req = httpTestingController.expectOne(
-      req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
+    let req = httpTestingController.expectOne(req =>
+      /.*?emaildashboarddatahandler?.*/g.test(req.url)
+    );
     expect(req.request.method).toEqual('POST');
     req.flush(backendResponse);
 
     flushMicrotasks();
   }));
 
-  it('should use the rejection handler if the query submission failed.',
-    fakeAsync(() => {
-      var postData = defaultData;
-      postData.inactive_in_last_n_days = 10;
+  it('should use the rejection handler if the query submission failed.', fakeAsync(() => {
+    var postData = defaultData;
+    postData.inactive_in_last_n_days = 10;
 
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      edbas.submitQueryAsync(postData).then(successHandler, failHandler);
+    edbas.submitQueryAsync(postData).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
-      expect(req.request.method).toEqual('POST');
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+    let req = httpTestingController.expectOne(req =>
+      /.*?emaildashboarddatahandler?.*/g.test(req.url)
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
 });

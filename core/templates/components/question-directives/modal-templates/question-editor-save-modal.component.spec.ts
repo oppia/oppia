@@ -17,22 +17,20 @@
  * component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { QuestionEditorSaveModalComponent } from './question-editor-save-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {QuestionEditorSaveModalComponent} from './question-editor-save-modal.component';
 
-describe('Question Editor Save Modal Component', function() {
+describe('Question Editor Save Modal Component', function () {
   let component: QuestionEditorSaveModalComponent;
   let fixture: ComponentFixture<QuestionEditorSaveModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        QuestionEditorSaveModalComponent
-      ],
+      declarations: [QuestionEditorSaveModalComponent],
       providers: [NgbActiveModal],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

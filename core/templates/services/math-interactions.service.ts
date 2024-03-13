@@ -16,15 +16,15 @@
  * @fileoverview Service for providing helper functions for math interactions.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MathInteractionsService {
   private warningText = '';
@@ -32,7 +32,9 @@ export class MathInteractionsService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   private cleanErrorMessage(
-      errorMessage: string, expressionString: string): string {
+    errorMessage: string,
+    expressionString: string
+  ): string {
     // The error thrown by nerdamer includes the index of the violation which
     // starts with a colon. That part needs to be removed before displaying
     // the error to the end user. Same rationale applies for stripping the
@@ -57,13 +59,14 @@ export class MathInteractionsService {
       errorMessage += '.';
     }
     if (errorMessage === 'Division by zero not allowed.') {
-      errorMessage = 'Your answer includes a division by zero, which is ' +
-        'not valid.';
+      errorMessage =
+        'Your answer includes a division by zero, which is ' + 'not valid.';
     }
     if (errorMessage.indexOf('is not a valid postfix operator.') !== -1) {
-      errorMessage = (
+      errorMessage =
         'Your answer seems to be missing a variable/number after the "' +
-        errorMessage[0] + '".');
+        errorMessage[0] +
+        '".';
     }
     if (errorMessage === 'A prefix operator was expected.') {
       let symbol1, symbol2;
@@ -75,14 +78,17 @@ export class MathInteractionsService {
           }
         }
       }
-      errorMessage = (
-        'Your answer has two symbols next to each other: "' + symbol1 +
-        '" and "' + symbol2 + '".');
+      errorMessage =
+        'Your answer has two symbols next to each other: "' +
+        symbol1 +
+        '" and "' +
+        symbol2 +
+        '".';
     }
     if (
-      errorMessage === 'Cannot read property \'column\' of undefined.' ||
-      errorMessage === 'Cannot read properties of undefined ' +
-        '(reading \'column\').'
+      errorMessage === "Cannot read property 'column' of undefined." ||
+      errorMessage ===
+        'Cannot read properties of undefined ' + "(reading 'column')."
     ) {
       let emptyFunctionNames = [];
       for (let functionName of this.mathFunctionNames) {
@@ -90,17 +96,18 @@ export class MathInteractionsService {
           emptyFunctionNames.push(functionName);
         }
       }
-      errorMessage = (
-        'The ' + emptyFunctionNames.join(', ') +
-        ' function(s) cannot be empty. Please enter a variable/number in it.');
+      errorMessage =
+        'The ' +
+        emptyFunctionNames.join(', ') +
+        ' function(s) cannot be empty. Please enter a variable/number in it.';
     }
     return errorMessage;
   }
 
   isParenRedundant(
-      expressionString: string,
-      openingInd: number,
-      closingInd: number
+    expressionString: string,
+    openingInd: number,
+    closingInd: number
   ): boolean {
     /*
     Assumes that expressionString is syntactically valid.
@@ -108,31 +115,32 @@ export class MathInteractionsService {
     Multiple consecutive parens are considered redundant. eg: for ((a - b))
     the outer pair of parens are considered as redundant.
     */
-    if ((closingInd + 2 < expressionString.length &&
+    if (
+      (closingInd + 2 < expressionString.length &&
         expressionString[closingInd + 2] === '^') ||
-        (openingInd - 2 >= 0 &&
-        expressionString[openingInd - 2] === '^')) {
+      (openingInd - 2 >= 0 && expressionString[openingInd - 2] === '^')
+    ) {
       // Guppy adds redundant parens while using exponents, so we need to ignore
       // them.
       return false;
     }
-    let leftParenIsRedundant = (
-      openingInd - 1 >= 0 && expressionString[openingInd - 1] === '(');
-    let rightParenIsRedundant = (
+    let leftParenIsRedundant =
+      openingInd - 1 >= 0 && expressionString[openingInd - 1] === '(';
+    let rightParenIsRedundant =
       closingInd + 1 < expressionString.length &&
-      expressionString[closingInd + 1] === ')');
+      expressionString[closingInd + 1] === ')';
     return leftParenIsRedundant && rightParenIsRedundant;
   }
 
   /**
-  * This function checks if an expression contains redundant params. It assumes
-  * that the expression will be syntactically valid.
-  * @param expressionString The math expression to be validated.
-  *
-  * @returns [boolean, string]. The boolean represents if the given expression
-  * contains any redundant params, and the string is the substring of the
-  * expression that contains redundant params.
-  */
+   * This function checks if an expression contains redundant params. It assumes
+   * that the expression will be syntactically valid.
+   * @param expressionString The math expression to be validated.
+   *
+   * @returns [boolean, string]. The boolean represents if the given expression
+   * contains any redundant params, and the string is the substring of the
+   * expression that contains redundant params.
+   */
   containsRedundantParens(expressionString: string): [boolean, string] {
     let stack: number[] = [];
 
@@ -148,8 +156,10 @@ export class MathInteractionsService {
         }
       } else if (char === ')') {
         let openingInd = stack.pop() || 0;
-        if (openingInd !== -1 && this.isParenRedundant(
-          expressionString, openingInd, i)) {
+        if (
+          openingInd !== -1 &&
+          this.isParenRedundant(expressionString, openingInd, i)
+        ) {
           return [true, expressionString.slice(openingInd - 1, i + 2)];
         }
       }
@@ -162,59 +172,65 @@ export class MathInteractionsService {
     if (expressionString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
       return false;
-    } else if (expressionString.indexOf('=') !== -1 || expressionString.indexOf(
-      '<') !== -1 || expressionString.indexOf('>') !== -1) {
-      this.warningText = 'Please remove the equal sign to make ' +
-      'your answer an expression.';
+    } else if (
+      expressionString.indexOf('=') !== -1 ||
+      expressionString.indexOf('<') !== -1 ||
+      expressionString.indexOf('>') !== -1
+    ) {
+      this.warningText =
+        'Please remove the equal sign to make ' + 'your answer an expression.';
       return false;
     } else if (expressionString.indexOf('_') !== -1) {
       this.warningText = 'Your answer contains an invalid character: "_".';
       return false;
     }
     if (expressionString.match(/(\+$)|(\+\))/g)) {
-      this.warningText = (
-        'Your answer seems to be missing a variable/number after the "+".');
+      this.warningText =
+        'Your answer seems to be missing a variable/number after the "+".';
       return false;
     }
     let invalidIntegers = expressionString.match(
-      /(\d*\.\d*\.\d*)|(\d+\.\D)|(\D\.\d+)|(\d+\.$)/g);
+      /(\d*\.\d*\.\d*)|(\d+\.\D)|(\D\.\d+)|(\d+\.$)/g
+    );
     if (invalidIntegers !== null) {
-      this.warningText = (
-        'Your answer contains an invalid term: ' + invalidIntegers[0]);
+      this.warningText =
+        'Your answer contains an invalid term: ' + invalidIntegers[0];
       return false;
     }
     let invalidMultiTerms = expressionString.match(/([a-zA-Z]+\d+)/g);
     if (invalidMultiTerms !== null) {
       let firstNumberIndex = invalidMultiTerms[0].search(/\d/);
-      let correctString = (
+      let correctString =
         invalidMultiTerms[0].slice(firstNumberIndex) +
-        invalidMultiTerms[0].slice(0, firstNumberIndex));
-      this.warningText = (
+        invalidMultiTerms[0].slice(0, firstNumberIndex);
+      this.warningText =
         'When multiplying, the variable should come after the number: ' +
-        correctString + '. Please update your answer and try again.'
-      );
+        correctString +
+        '. Please update your answer and try again.';
       return false;
     }
 
     try {
       expressionString = this.insertMultiplicationSigns(expressionString);
       nerdamer(expressionString);
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
     } catch (err: unknown) {
       if (err instanceof Error) {
-        this.warningText = (
-          this.cleanErrorMessage(err.message, expressionString));
+        this.warningText = this.cleanErrorMessage(
+          err.message,
+          expressionString
+        );
       }
       return false;
     }
 
     if (expressionString.match(/\w\^((\w+\^)|(\(.*\^.*\)))/g)) {
-      this.warningText = (
+      this.warningText =
         'Your expression contains an exponent in an exponent ' +
-        'which is not supported.');
+        'which is not supported.';
       return false;
     }
 
@@ -223,19 +239,18 @@ export class MathInteractionsService {
       for (let exponent of exponents) {
         exponent = exponent.replace(/^\^/g, '');
         if (nerdamer(exponent).gt('5')) {
-          this.warningText = (
+          this.warningText =
             'Your expression contains an exponent with value greater than 5 ' +
-            'which is not supported.');
+            'which is not supported.';
           return false;
         }
       }
     }
 
-    let [expressionContainsRedundantParens, errorString] = (
-      this.containsRedundantParens(expressionString));
+    let [expressionContainsRedundantParens, errorString] =
+      this.containsRedundantParens(expressionString);
     if (expressionContainsRedundantParens) {
-      this.warningText = (
-        `Your expression contains redundant parentheses: ${errorString}.`);
+      this.warningText = `Your expression contains redundant parentheses: ${errorString}.`;
       return false;
     }
 
@@ -244,7 +259,9 @@ export class MathInteractionsService {
   }
 
   validateAlgebraicExpression(
-      expressionString: string, validVariablesList: string[]): boolean {
+    expressionString: string,
+    validVariablesList: string[]
+  ): boolean {
     if (!this._validateExpression(expressionString)) {
       return false;
     }
@@ -258,8 +275,8 @@ export class MathInteractionsService {
     if (expressionString.match(/(^|[^a-zA-Z])pi($|[^a-zA-Z])/g)) {
       variablesList.push('pi');
     }
-    const greekNameToSymbolMap: { [greekName: string]: string } = (
-      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+    const greekNameToSymbolMap: {[greekName: string]: string} =
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS;
 
     // Replacing greek names with symbols.
     for (let i = 0; i < variablesList.length; i++) {
@@ -271,10 +288,12 @@ export class MathInteractionsService {
     if (validVariablesList.length !== 0) {
       for (let variable of variablesList) {
         if (validVariablesList.indexOf(variable) === -1) {
-          this.warningText = (
-            'You have entered an invalid variable: ' + variable +
-            '. Please use only the variables ' + validVariablesList.join() +
-            ' in your answer.');
+          this.warningText =
+            'You have entered an invalid variable: ' +
+            variable +
+            '. Please use only the variables ' +
+            validVariablesList.join() +
+            ' in your answer.';
           return false;
         }
       }
@@ -288,10 +307,13 @@ export class MathInteractionsService {
     }
     for (let functionName of this.mathFunctionNames) {
       expressionString = expressionString.replace(
-        new RegExp(functionName, 'g'), '');
+        new RegExp(functionName, 'g'),
+        ''
+      );
     }
     if (/[a-zA-Z]/.test(expressionString)) {
-      this.warningText = 'It looks like you have entered some variables. ' +
+      this.warningText =
+        'It looks like you have entered some variables. ' +
         'Please enter numbers only.';
       return false;
     }
@@ -299,18 +321,24 @@ export class MathInteractionsService {
   }
 
   validateEquation(
-      equationString: string, validVariablesList: string[]): boolean {
+    equationString: string,
+    validVariablesList: string[]
+  ): boolean {
     equationString = equationString.replace(/\s/g, '');
     if (equationString.length === 0) {
       this.warningText = 'Please enter an answer before submitting.';
       return false;
-    } else if (equationString.indexOf(
-      '<') !== -1 || equationString.indexOf('>') !== -1) {
-      this.warningText = 'It looks like you have entered an ' +
+    } else if (
+      equationString.indexOf('<') !== -1 ||
+      equationString.indexOf('>') !== -1
+    ) {
+      this.warningText =
+        'It looks like you have entered an ' +
         'inequality. Please enter an equation instead.';
       return false;
     } else if (equationString.indexOf('=') === -1) {
-      this.warningText = 'It looks like you have entered an ' +
+      this.warningText =
+        'It looks like you have entered an ' +
         'expression. Please enter an equation instead.';
       return false;
     } else if (equationString.indexOf('=') === 0) {
@@ -325,11 +353,16 @@ export class MathInteractionsService {
       this.warningText = 'Your equation contains multiple = signs.';
       return false;
     }
-    let lhsString = splitString[0], rhsString = splitString[1];
+    let lhsString = splitString[0],
+      rhsString = splitString[1];
     let lhsIsAlgebraicallyValid = this.validateAlgebraicExpression(
-      lhsString, validVariablesList);
+      lhsString,
+      validVariablesList
+    );
     let rhsIsAlgebraicallyValid = this.validateAlgebraicExpression(
-      rhsString, validVariablesList);
+      rhsString,
+      validVariablesList
+    );
     let lhsIsNumericallyValid = this.validateNumericExpression(lhsString);
     let rhsIsNumericallyValid = this.validateNumericExpression(rhsString);
 
@@ -339,9 +372,11 @@ export class MathInteractionsService {
       this.warningText = 'The equation must contain at least one variable.';
       return false;
     }
-    if (lhsIsAlgebraicallyValid && rhsIsAlgebraicallyValid ||
-      lhsIsAlgebraicallyValid && rhsIsNumericallyValid ||
-      lhsIsNumericallyValid && rhsIsAlgebraicallyValid) {
+    if (
+      (lhsIsAlgebraicallyValid && rhsIsAlgebraicallyValid) ||
+      (lhsIsAlgebraicallyValid && rhsIsNumericallyValid) ||
+      (lhsIsNumericallyValid && rhsIsAlgebraicallyValid)
+    ) {
       this.warningText = '';
       return true;
     }
@@ -359,10 +394,10 @@ export class MathInteractionsService {
   }
 
   insertMultiplicationSigns(expressionString: string): string {
-    let greekLetters = Object.keys(
-      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+    let greekLetters = Object.keys(AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
     let greekSymbols = Object.values(
-      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+      AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS
+    );
     let greekLettersAndSymbols = [];
     for (let i = 0; i < greekLetters.length; i++) {
       greekLettersAndSymbols.push([greekLetters[i], greekSymbols[i]]);
@@ -372,8 +407,8 @@ export class MathInteractionsService {
     // ['alpha', 'beta'] and not ['alpha', 'b', 'eta'].
     greekLettersAndSymbols.sort((a, b) => b[0].length - a[0].length);
 
-    let greekLetterToSymbol: { [letter: string]: string } = {};
-    let greekSymbolToLetter: { [symbol: string]: string } = {};
+    let greekLetterToSymbol: {[letter: string]: string} = {};
+    let greekSymbolToLetter: {[symbol: string]: string} = {};
     for (let letterAndSymbol of greekLettersAndSymbols) {
       greekLetterToSymbol[letterAndSymbol[0]] = letterAndSymbol[1];
       greekSymbolToLetter[letterAndSymbol[1]] = letterAndSymbol[0];
@@ -382,7 +417,9 @@ export class MathInteractionsService {
     // Temporarily replacing letters with symbols.
     for (let letter in greekLetterToSymbol) {
       expressionString = expressionString.replace(
-        new RegExp(letter, 'g'), greekLetterToSymbol[letter]);
+        new RegExp(letter, 'g'),
+        greekLetterToSymbol[letter]
+      );
     }
 
     expressionString = expressionString.replace(/\s/g, '');
@@ -396,25 +433,33 @@ export class MathInteractionsService {
     for (let variable of variables) {
       let separatedVariables = variable.split('').join('*');
       expressionString = expressionString.replace(
-        new RegExp(variable, 'g'), separatedVariables);
+        new RegExp(variable, 'g'),
+        separatedVariables
+      );
     }
     // Reverting the temporary replacement of letters.
     for (let symbol in greekSymbolToLetter) {
       expressionString = expressionString.replace(
-        new RegExp(symbol, 'g'), greekSymbolToLetter[symbol]);
+        new RegExp(symbol, 'g'),
+        greekSymbolToLetter[symbol]
+      );
     }
 
     // Inserting multiplication signs before functions. For eg. 5sqrt(x) should
     // be treated as 5*sqrt(x).
     for (let functionName of this.mathFunctionNames) {
-      expressionString = expressionString.replace(new RegExp(
-        '([a-zA-Z0-9\\)])' + functionName, 'g'), '$1*' + functionName);
+      expressionString = expressionString.replace(
+        new RegExp('([a-zA-Z0-9\\)])' + functionName, 'g'),
+        '$1*' + functionName
+      );
     }
 
     // Inserting multiplication signs between digit and variable.
     // For eg. 5w - z => 5*w - z.
-    expressionString = expressionString.replace(new RegExp(
-      '([0-9])([a-zA-Z])', 'g'), '$1*$2');
+    expressionString = expressionString.replace(
+      new RegExp('([0-9])([a-zA-Z])', 'g'),
+      '$1*$2'
+    );
 
     // Inserting multiplication signs after closing parens.
     expressionString = expressionString.replace(/\)([^\*\+\/\-\^\)])/g, ')*$1');
@@ -423,10 +468,14 @@ export class MathInteractionsService {
     // functions, for eg., we want to convert a(b) to a*(b) but not sqrt(4) to
     // sqrt*(4).
     expressionString = expressionString.replace(
-      /([^\*|\+|\/|\-|\^|\(])\(/g, '$1*(');
+      /([^\*|\+|\/|\-|\^|\(])\(/g,
+      '$1*('
+    );
     // Removing the '*' added before math function parens.
-    expressionString = expressionString.replace(new RegExp(
-      '(' + this.mathFunctionNames.join('|') + ')\\*\\(', 'g'), '$1(');
+    expressionString = expressionString.replace(
+      new RegExp('(' + this.mathFunctionNames.join('|') + ')\\*\\(', 'g'),
+      '$1('
+    );
 
     return expressionString;
   }
@@ -458,7 +507,7 @@ export class MathInteractionsService {
     let currentTerm: string = '';
     let bracketBalance: number = 0;
     let shouldModifyNextTerm: boolean = false;
-    let modifyTerm = function(termString: string): string {
+    let modifyTerm = function (termString: string): string {
       // If the shouldModifyNextTerm flag is set to true, we add the '-' sign,
       // or raise the term to a power of -1. This ensures that when the final
       // list is joined by the '+'/'*' sign, it matches with the original
@@ -491,13 +540,15 @@ export class MathInteractionsService {
     for (let i = 0; i < expressionString.length; i++) {
       let currentVal = expressionString[i];
       if (currentVal === '(' || currentVal === ')') {
-        bracketBalance += (currentVal === '(') ? 1 : -1;
+        bracketBalance += currentVal === '(' ? 1 : -1;
       }
 
       // Split term only if we are not inside a set of parens and the current
       // value is a delimiter.
-      if (bracketBalance === 0 && (
-        currentVal === primaryDelimiter || currentVal === secondaryDelimiter)) {
+      if (
+        bracketBalance === 0 &&
+        (currentVal === primaryDelimiter || currentVal === secondaryDelimiter)
+      ) {
         if (currentTerm.length !== 0) {
           if (shouldModifyNextTerm) {
             currentTerm = modifyTerm(currentTerm);
@@ -527,7 +578,9 @@ export class MathInteractionsService {
   }
 
   replaceConstantsWithVariables(
-      expressionString: string, replaceZero = true): string {
+    expressionString: string,
+    replaceZero = true
+  ): string {
     // Multiple instances of the same constant will be replaced by the same
     // variable.
 
@@ -537,7 +590,9 @@ export class MathInteractionsService {
       // We need to do this differently since const3.4 would be
       // an invalid variable.
       expressionString = expressionString.replace(
-        /([0-9]+)\.([0-9]+)/g, 'const$1point$2');
+        /([0-9]+)\.([0-9]+)/g,
+        'const$1point$2'
+      );
 
       // Replacing integers with variables.
       // Eg: 2 + x * 4 + 2 => const2 + x * const4 + const2
@@ -545,7 +600,9 @@ export class MathInteractionsService {
       expressionString = expressionString.replace(/([0-9]+)/g, 'const$1');
     } else {
       expressionString = expressionString.replace(
-        /([1-9]+)\.([1-9]+)/g, 'const$1point$2');
+        /([1-9]+)\.([1-9]+)/g,
+        'const$1point$2'
+      );
       expressionString = expressionString.replace(/([1-9]+)/g, 'const$1');
     }
     return expressionString;
@@ -586,8 +643,10 @@ export class MathInteractionsService {
   }
 
   expressionMatchWithPlaceholders(
-      expressionWithPlaceholders: string, inputExpression: string,
-      placeholders: string[]): boolean {
+    expressionWithPlaceholders: string,
+    inputExpression: string,
+    placeholders: string[]
+  ): boolean {
     // Check if inputExpression contains any placeholders.
     for (let variable of nerdamer(inputExpression).variables()) {
       if (placeholders.includes(variable)) {
@@ -612,18 +671,22 @@ export class MathInteractionsService {
         let divisionCondition;
         // Try catch block is meant to catch division by zero errors.
         try {
-          let variablesAfterDivision = nerdamer(termWithPlaceholders).divide(
-            termWithoutPlaceholders).variables();
-          divisionCondition = variablesAfterDivision.every(
-            variable => placeholders.includes(variable));
+          let variablesAfterDivision = nerdamer(termWithPlaceholders)
+            .divide(termWithoutPlaceholders)
+            .variables();
+          divisionCondition = variablesAfterDivision.every(variable =>
+            placeholders.includes(variable)
+          );
         } catch (e) {
           divisionCondition = true;
         }
 
-        let variablesAfterSubtraction = nerdamer(termWithPlaceholders).subtract(
-          termWithoutPlaceholders).variables();
-        let subtractionCondition = variablesAfterSubtraction.every(
-          variable => placeholders.includes(variable));
+        let variablesAfterSubtraction = nerdamer(termWithPlaceholders)
+          .subtract(termWithoutPlaceholders)
+          .variables();
+        let subtractionCondition = variablesAfterSubtraction.every(variable =>
+          placeholders.includes(variable)
+        );
 
         // If only placeholders are left in the term after dividing/subtracting
         // them, then the terms are said to match.
@@ -664,6 +727,9 @@ export class MathInteractionsService {
   }
 }
 
-angular.module('oppia').factory(
-  'MathInteractionsService',
-  downgradeInjectable(MathInteractionsService));
+angular
+  .module('oppia')
+  .factory(
+    'MathInteractionsService',
+    downgradeInjectable(MathInteractionsService)
+  );

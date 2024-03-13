@@ -16,49 +16,63 @@
  * @fileoverview Tests for FeedbackThreadSummary model.
  */
 
-import { FeedbackThreadSummary } from
-  'domain/feedback_thread/feedback-thread-summary.model';
+import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
 
 describe('Feedback thread model', () => {
-  it('should update the summary of the thread on addition of a ' +
-     'message', () => {
-    var feedbackThreadSummary = new FeedbackThreadSummary(
-      'open', 'Test user 1', new Date().getTime(), 'last message', 2, false,
-      false, 'Test user 2', 'Test user 2', 'Test exploration name', '0',
-      'thread_id');
+  it(
+    'should update the summary of the thread on addition of a ' + 'message',
+    () => {
+      var feedbackThreadSummary = new FeedbackThreadSummary(
+        'open',
+        'Test user 1',
+        new Date().getTime(),
+        'last message',
+        2,
+        false,
+        false,
+        'Test user 2',
+        'Test user 2',
+        'Test exploration name',
+        '0',
+        'thread_id'
+      );
 
-    feedbackThreadSummary.appendNewMessage(
-      'Looks good!', 'Test user 3');
-    expect(feedbackThreadSummary.authorLastMessage).toEqual('Test user 3');
-    expect(feedbackThreadSummary.lastMessageText).toEqual('Looks good!');
-    expect(feedbackThreadSummary.totalMessageCount).toEqual(3);
-  });
+      feedbackThreadSummary.appendNewMessage('Looks good!', 'Test user 3');
+      expect(feedbackThreadSummary.authorLastMessage).toEqual('Test user 3');
+      expect(feedbackThreadSummary.lastMessageText).toEqual('Looks good!');
+      expect(feedbackThreadSummary.totalMessageCount).toEqual(3);
+    }
+  );
 
-  it('should fetch the feedback thread domain object from the backend ' +
-     'summary dict', () => {
-    var threadSummary = {
-      status: 'open',
-      original_author_id: 'Test user 1',
-      last_updated_msecs: 1000,
-      last_message_text: 'last message',
-      total_message_count: 2,
-      last_message_is_read: false,
-      second_last_message_is_read: true,
-      author_last_message: 'Test user 2',
-      author_second_last_message: 'Test user 1',
-      exploration_title: 'Sample exploration 1',
-      exploration_id: '0',
-      thread_id: 'thread_id_1'
-    };
+  it(
+    'should fetch the feedback thread domain object from the backend ' +
+      'summary dict',
+    () => {
+      var threadSummary = {
+        status: 'open',
+        original_author_id: 'Test user 1',
+        last_updated_msecs: 1000,
+        last_message_text: 'last message',
+        total_message_count: 2,
+        last_message_is_read: false,
+        second_last_message_is_read: true,
+        author_last_message: 'Test user 2',
+        author_second_last_message: 'Test user 1',
+        exploration_title: 'Sample exploration 1',
+        exploration_id: '0',
+        thread_id: 'thread_id_1',
+      };
 
-    var feedbackThreadSummary = (
-      FeedbackThreadSummary.createFromBackendDict(threadSummary));
+      var feedbackThreadSummary =
+        FeedbackThreadSummary.createFromBackendDict(threadSummary);
 
-    expect(feedbackThreadSummary.explorationTitle).toEqual(
-      'Sample exploration 1');
-    expect(feedbackThreadSummary.originalAuthorId).toEqual('Test user 1');
-    expect(feedbackThreadSummary.lastMessageText).toEqual('last message');
-    expect(feedbackThreadSummary.lastUpdatedMsecs).toEqual(1000);
-    expect(feedbackThreadSummary.totalMessageCount).toEqual(2);
-  });
+      expect(feedbackThreadSummary.explorationTitle).toEqual(
+        'Sample exploration 1'
+      );
+      expect(feedbackThreadSummary.originalAuthorId).toEqual('Test user 1');
+      expect(feedbackThreadSummary.lastMessageText).toEqual('last message');
+      expect(feedbackThreadSummary.lastUpdatedMsecs).toEqual(1000);
+      expect(feedbackThreadSummary.totalMessageCount).toEqual(2);
+    }
+  );
 });
