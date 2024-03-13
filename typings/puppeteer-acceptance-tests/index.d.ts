@@ -15,8 +15,3 @@
 /**
  * @fileoverview Puppeteer acceptance test type definitions.
  */
-
-type Uppercase<S extends string> = S;
-type Lowercase<S extends string> = S;
-type Capitalize<S extends string> = S;
-type Uncapitalize<S extends string> = S;
