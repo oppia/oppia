@@ -16,15 +16,23 @@
  * @fileoverview Tests for Admin config tab component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
 
-import { AdminBackendApiService, AdminPageData } from 'domain/admin/admin-backend-api.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { AdminTaskManagerService } from '../services/admin-task-manager.service';
-import { AdminConfigTabComponent } from './admin-config-tab.component';
+import {
+  AdminBackendApiService,
+  AdminPageData,
+} from 'domain/admin/admin-backend-api.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {AdminTaskManagerService} from '../services/admin-task-manager.service';
+import {AdminConfigTabComponent} from './admin-config-tab.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -36,11 +44,11 @@ class MockWindowRef {
       href: 'href',
       pathname: 'pathname',
       search: 'search',
-      hash: 'hash'
+      hash: 'hash',
     },
     open() {
       return;
-    }
+    },
   };
 }
 
@@ -52,24 +60,16 @@ describe('Admin config tab component ', () => {
   let adminTaskManagerService: AdminTaskManagerService;
   let mockWindowRef: MockWindowRef;
 
-
   let statusMessageSpy: jasmine.Spy;
   let confirmSpy: jasmine.Spy;
 
   const adminPageData: AdminPageData = {
     demoExplorationIds: ['expId'],
-    demoExplorations: [
-      [
-        '0',
-        'welcome.yaml'
-      ]
-    ],
-    demoCollections: [
-      ['collectionId']
-    ],
+    demoExplorations: [['0', 'welcome.yaml']],
+    demoCollections: [['collectionId']],
     updatableRoles: ['MODERATOR'],
     roleToActions: {
-      Admin: ['Accept any suggestion', 'Access creator dashboard']
+      Admin: ['Accept any suggestion', 'Access creator dashboard'],
     },
     configProperties: {
       configProperty1: {
@@ -78,7 +78,7 @@ describe('Admin config tab component ', () => {
           type: 'custom',
           obj_type: 'CustomType',
         },
-        value: 'val1'
+        value: 'val1',
       },
       configProperty2: {
         description: 'description2',
@@ -86,7 +86,7 @@ describe('Admin config tab component ', () => {
           type: 'custom',
           obj_type: 'CustomType',
         },
-        value: 'val2'
+        value: 'val2',
       },
       configProperty3: {
         description: 'description3',
@@ -94,34 +94,31 @@ describe('Admin config tab component ', () => {
           type: 'custom',
           obj_type: 'CustomType',
         },
-        value: 'val3'
-      }
+        value: 'val3',
+      },
     },
     viewableRoles: ['MODERATOR'],
     humanReadableRoles: {
-      MODERATOR: 'moderator'
+      MODERATOR: 'moderator',
     },
     topicSummaries: [],
-    platformParameters: []
+    platformParameters: [],
   };
 
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule
-      ],
+      imports: [HttpClientTestingModule, FormsModule],
       declarations: [AdminConfigTabComponent],
       providers: [
         AdminBackendApiService,
         AdminTaskManagerService,
         {
           provide: WindowRef,
-          useValue: mockWindowRef
-        }
+          useValue: mockWindowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminConfigTabComponent);
@@ -132,8 +129,10 @@ describe('Admin config tab component ', () => {
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     adminTaskManagerService = TestBed.inject(AdminTaskManagerService);
 
-    statusMessageSpy = spyOn(component.setStatusMessage, 'emit')
-      .and.callThrough();
+    statusMessageSpy = spyOn(
+      component.setStatusMessage,
+      'emit'
+    ).and.callThrough();
     spyOn(adminTaskManagerService, 'startTask').and.callThrough();
     spyOn(adminTaskManagerService, 'finishTask').and.callThrough();
     spyOn(adminBackendApiService, 'getDataAsync').and.resolveTo(adminPageData);
@@ -149,117 +148,154 @@ describe('Admin config tab component ', () => {
     expect(component.configProperties).toEqual(adminPageData.configProperties);
   }));
 
-  it('should check whether an object is non empty when calling ' +
-    '\'isNonemptyObject\'', () => {
-    let result = component.isNonemptyObject({});
-    expect(result).toBe(false);
+  it(
+    'should check whether an object is non empty when calling ' +
+      "'isNonemptyObject'",
+    () => {
+      let result = component.isNonemptyObject({});
+      expect(result).toBe(false);
 
-    result = component.isNonemptyObject({description: 'description'});
-    expect(result).toBe(true);
-  });
+      result = component.isNonemptyObject({description: 'description'});
+      expect(result).toBe(true);
+    }
+  );
 
-  it('should return schema callback when calling ' +
-    '\'getSchemaCallback\'', () => {
-    let result = component.getSchemaCallback({type: 'bool'});
-    expect(result()).toEqual({type: 'bool'});
-  });
+  it(
+    'should return schema callback when calling ' + "'getSchemaCallback'",
+    () => {
+      let result = component.getSchemaCallback({type: 'bool'});
+      expect(result()).toEqual({type: 'bool'});
+    }
+  );
 
   describe('when clicking on revert to default button ', () => {
-    it('should revert to default config property ' +
-      'successfully', fakeAsync(() => {
-      // Setting confirm button clicked to be true.
-      confirmSpy.and.returnValue(true);
-      spyOn(adminBackendApiService, 'revertConfigPropertyAsync')
-        .and.returnValue(Promise.resolve());
+    it(
+      'should revert to default config property ' + 'successfully',
+      fakeAsync(() => {
+        // Setting confirm button clicked to be true.
+        confirmSpy.and.returnValue(true);
+        spyOn(
+          adminBackendApiService,
+          'revertConfigPropertyAsync'
+        ).and.returnValue(Promise.resolve());
 
-      component.revertToDefaultConfigPropertyValue('configId1');
-      tick();
+        component.revertToDefaultConfigPropertyValue('configId1');
+        tick();
 
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Config property reverted successfully.');
-    }));
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Config property reverted successfully.'
+        );
+      })
+    );
 
-    it('should not revert to default config property ' +
-      'in case of backend error', fakeAsync(() => {
-      // Setting confirm button clicked to be true.
-      confirmSpy.and.returnValue(true);
-      spyOn(adminBackendApiService, 'revertConfigPropertyAsync')
-        .and.returnValue(Promise.reject('Internal Server Error.'));
+    it(
+      'should not revert to default config property ' +
+        'in case of backend error',
+      fakeAsync(() => {
+        // Setting confirm button clicked to be true.
+        confirmSpy.and.returnValue(true);
+        spyOn(
+          adminBackendApiService,
+          'revertConfigPropertyAsync'
+        ).and.returnValue(Promise.reject('Internal Server Error.'));
 
-      component.revertToDefaultConfigPropertyValue('configId1');
-      tick();
+        component.revertToDefaultConfigPropertyValue('configId1');
+        tick();
 
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
 
-    it('should not request backend to revert to default config property ' +
-      'if cancel button is clicked in the alert', fakeAsync(() => {
-      // Setting confirm button clicked to be false.
-      confirmSpy.and.returnValue(false);
-      let revertConfigSpy = spyOn(
-        adminBackendApiService, 'revertConfigPropertyAsync');
+    it(
+      'should not request backend to revert to default config property ' +
+        'if cancel button is clicked in the alert',
+      fakeAsync(() => {
+        // Setting confirm button clicked to be false.
+        confirmSpy.and.returnValue(false);
+        let revertConfigSpy = spyOn(
+          adminBackendApiService,
+          'revertConfigPropertyAsync'
+        );
 
-      component.revertToDefaultConfigPropertyValue('configId1');
-      tick();
+        component.revertToDefaultConfigPropertyValue('configId1');
+        tick();
 
-      expect(revertConfigSpy).not.toHaveBeenCalled();
-    }));
+        expect(revertConfigSpy).not.toHaveBeenCalled();
+      })
+    );
   });
 
   describe('when clicking on save button ', () => {
     it('should save config properties successfully', fakeAsync(() => {
       // Setting confirm button clicked to be true.
       confirmSpy.and.returnValue(true);
-      spyOn(adminBackendApiService, 'saveConfigPropertiesAsync')
-        .and.returnValue(Promise.resolve());
+      spyOn(
+        adminBackendApiService,
+        'saveConfigPropertiesAsync'
+      ).and.returnValue(Promise.resolve());
 
       component.configProperties = adminPageData.configProperties;
       component.saveConfigProperties();
       tick();
 
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Data saved successfully.');
+      expect(statusMessageSpy).toHaveBeenCalledWith('Data saved successfully.');
     }));
 
-    it('should not save config properties ' +
-      'in case of backend error', fakeAsync(() => {
-      // Setting confirm button clicked to be true.
-      confirmSpy.and.returnValue(true);
-      spyOn(adminBackendApiService, 'saveConfigPropertiesAsync')
-        .and.returnValue(Promise.reject('Internal Server Error.'));
+    it(
+      'should not save config properties ' + 'in case of backend error',
+      fakeAsync(() => {
+        // Setting confirm button clicked to be true.
+        confirmSpy.and.returnValue(true);
+        spyOn(
+          adminBackendApiService,
+          'saveConfigPropertiesAsync'
+        ).and.returnValue(Promise.reject('Internal Server Error.'));
 
-      component.saveConfigProperties();
-      tick();
+        component.saveConfigProperties();
+        tick();
 
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Server error: Internal Server Error.');
-    }));
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error.'
+        );
+      })
+    );
 
-    it('should not save config properties ' +
-      'if a task is still running in the queue', fakeAsync(() => {
-      // Setting task is still running to be true.
-      spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
-      let saveConfigSpy = spyOn(
-        adminBackendApiService, 'saveConfigPropertiesAsync');
+    it(
+      'should not save config properties ' +
+        'if a task is still running in the queue',
+      fakeAsync(() => {
+        // Setting task is still running to be true.
+        spyOn(adminTaskManagerService, 'isTaskRunning').and.returnValue(true);
+        let saveConfigSpy = spyOn(
+          adminBackendApiService,
+          'saveConfigPropertiesAsync'
+        );
 
-      component.saveConfigProperties();
-      tick();
+        component.saveConfigProperties();
+        tick();
 
-      expect(saveConfigSpy).not.toHaveBeenCalled();
-    }));
+        expect(saveConfigSpy).not.toHaveBeenCalled();
+      })
+    );
 
-    it('should not request backend to save config properties ' +
-      'if cancel button is clicked in the alert', fakeAsync(() => {
-      // Setting confirm button clicked to be false.
-      confirmSpy.and.returnValue(false);
-      let saveConfigSpy = spyOn(
-        adminBackendApiService, 'saveConfigPropertiesAsync');
+    it(
+      'should not request backend to save config properties ' +
+        'if cancel button is clicked in the alert',
+      fakeAsync(() => {
+        // Setting confirm button clicked to be false.
+        confirmSpy.and.returnValue(false);
+        let saveConfigSpy = spyOn(
+          adminBackendApiService,
+          'saveConfigPropertiesAsync'
+        );
 
-      component.saveConfigProperties();
-      tick();
+        component.saveConfigProperties();
+        tick();
 
-      expect(saveConfigSpy).not.toHaveBeenCalled();
-    }));
+        expect(saveConfigSpy).not.toHaveBeenCalled();
+      })
+    );
   });
 });

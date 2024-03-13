@@ -16,11 +16,11 @@
  * @fileoverview FormatRtePreview pipe for Oppia.
  */
 
-import { Injectable } from '@angular/core';
-import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
+import {Injectable} from '@angular/core';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 /* The following filter replaces each RTE element occurrence in the input html
    by its corresponding name in square brackets and returns a string
@@ -32,14 +32,15 @@ export class FormatRtePreviewPipe {
   constructor(private capitalizePipe: CapitalizePipe) {}
 
   transform(html: string): string {
-    html = html.replace(/&nbsp;/ig, ' ');
-    html = html.replace(/&quot;/ig, '');
+    html = html.replace(/&nbsp;/gi, ' ');
+    html = html.replace(/&quot;/gi, '');
     // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
     html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
 
     let formattedOutput = html.replace(/(<([^>]+)>)/g, rteTag => {
-      let replaceString = (
-        this.capitalizePipe.transform(rteTag.split('-')[2].split(' ')[0]));
+      let replaceString = this.capitalizePipe.transform(
+        rteTag.split('-')[2].split(' ')[0]
+      );
 
       if (replaceString[replaceString.length - 1] === '>') {
         replaceString = replaceString.slice(0, -1);

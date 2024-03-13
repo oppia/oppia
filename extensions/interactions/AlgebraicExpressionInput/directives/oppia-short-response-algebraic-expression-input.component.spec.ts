@@ -17,28 +17,28 @@
  * component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { ShortResponseAlgebraicExpressionInputComponent } from './oppia-short-response-algebraic-expression-input.component';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {ShortResponseAlgebraicExpressionInputComponent} from './oppia-short-response-algebraic-expression-input.component';
 
-describe('AlgebraicExpressionInputShortResponse', function() {
+describe('AlgebraicExpressionInputShortResponse', function () {
   let component: ShortResponseAlgebraicExpressionInputComponent;
   let fixture: ComponentFixture<ShortResponseAlgebraicExpressionInputComponent>;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        declarations: [ShortResponseAlgebraicExpressionInputComponent]
-      }).compileComponents();
+    TestBed.configureTestingModule({
+      declarations: [ShortResponseAlgebraicExpressionInputComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      ShortResponseAlgebraicExpressionInputComponent);
+      ShortResponseAlgebraicExpressionInputComponent
+    );
     component = fixture.componentInstance;
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
-  it('should correctly escape characters in the answer', function() {
+  it('should correctly escape characters in the answer', function () {
     component.ngOnInit();
     expect(component.escapedAnswer).toBe('answer');
   });

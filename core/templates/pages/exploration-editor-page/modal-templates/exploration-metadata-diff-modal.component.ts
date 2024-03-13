@@ -17,12 +17,12 @@
  * exploration versions.
  */
 
-import { Input, OnInit } from '@angular/core';
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { HistoryTabYamlConversionService } from '../services/history-tab-yaml-conversion.service';
+import {Input, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 
 interface headersAndYamlStrs {
   leftPane: string;
@@ -41,7 +41,9 @@ interface mergeviewOptions {
   templateUrl: './exploration-metadata-diff-modal.component.html',
 })
 export class ExplorationMetadataDiffModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -53,14 +55,14 @@ export class ExplorationMetadataDiffModalComponent
   @Input() headers!: headersAndYamlStrs;
   yamlStrs: headersAndYamlStrs = {
     leftPane: '',
-    rightPane: ''
+    rightPane: '',
   };
 
   CODEMIRROR_MERGEVIEW_OPTIONS: mergeviewOptions = {
     lineNumbers: true,
     readOnly: true,
     mode: 'yaml',
-    viewportMargin: 100
+    viewportMargin: 100,
   };
 
   constructor(
@@ -73,13 +75,13 @@ export class ExplorationMetadataDiffModalComponent
   ngOnInit(): void {
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.oldMetadata)
-      .then((result) => {
+      .then(result => {
         this.yamlStrs.leftPane = result;
       });
 
     this.historyTabYamlConversionService
       .getYamlStringFromStateOrMetadata(this.newMetadata)
-      .then((result) => {
+      .then(result => {
         this.yamlStrs.rightPane = result;
       });
   }

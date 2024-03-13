@@ -21,38 +21,28 @@ let users = require('../webdriverio_utils/users.js');
 let general = require('../webdriverio_utils/general.js');
 let waitFor = require('../webdriverio_utils/waitFor.js');
 
-let ReleaseCoordinatorPage = require(
-  '../webdriverio_utils/ReleaseCoordinatorPage.js');
+let ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 let AdminPage = require('../webdriverio_utils/AdminPage.js');
 let forms = require('../webdriverio_utils/forms.js');
-let ContributorDashboardPage = require(
-  '../webdriverio_utils/ContributorDashboardPage.js');
-let ContributorDashboardAdminPage = require(
-  '../webdriverio_utils/ContributorDashboardAdminPage.js');
-let TopicsAndSkillsDashboardPage = require(
-  '../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
-let SkillEditorPage = require(
-  '../webdriverio_utils/SkillEditorPage.js');
-let ExplorationEditorPage = require(
-  '../webdriverio_utils/ExplorationEditorPage.js');
+let ContributorDashboardPage = require('../webdriverio_utils/ContributorDashboardPage.js');
+let ContributorDashboardAdminPage = require('../webdriverio_utils/ContributorDashboardAdminPage.js');
+let TopicsAndSkillsDashboardPage = require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+let SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
+let ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 let StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
 let workflow = require('../webdriverio_utils/workflow.js');
 let TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
-let CreatorDashboardPage = require(
-  '../webdriverio_utils/CreatorDashboardPage.js'
-);
+let CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 let Constants = require('../webdriverio_utils/WebdriverioConstants.js');
 let DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
-
-describe('Contributor Admin Dashboard', function() {
-  const TOPIC_NAMES = [
-    'Topic 0 for contribution', 'Topic 1 for contribution'];
+describe('Contributor Admin Dashboard', function () {
+  const TOPIC_NAMES = ['Topic 0 for contribution', 'Topic 1 for contribution'];
   const SKILL_DESCRIPTIONS = [
-    'Skill 0 for suggestion', 'Skill 1 for suggestion'];
-  const REVIEW_MATERIALS = [
-    'Review Material 0',
-    'Review Material 1'];
+    'Skill 0 for suggestion',
+    'Skill 1 for suggestion',
+  ];
+  const REVIEW_MATERIALS = ['Review Material 0', 'Review Material 1'];
   const QUESTION_ADMIN_USERNAME = 'user4321';
   const TRANSLATION_COORDINATOR_EMAIL = 'translation@coordinator.com';
   const QUESTION_COORDINATOR_EMAIL = 'question@coordinator.com';
@@ -73,18 +63,18 @@ describe('Contributor Admin Dashboard', function() {
   let storyEditorPage = null;
   let contributorDashboardTranslateTextTab = null;
 
-  beforeAll(async function() {
-    contributorDashboardPage = (
-      new ContributorDashboardPage.ContributorDashboardPage());
-    contributorDashboardTranslateTextTab = (
-      contributorDashboardPage.getTranslateTextTab());
+  beforeAll(async function () {
+    contributorDashboardPage =
+      new ContributorDashboardPage.ContributorDashboardPage();
+    contributorDashboardTranslateTextTab =
+      contributorDashboardPage.getTranslateTextTab();
     adminPage = new AdminPage.AdminPage();
-    releaseCoordinatorPage = (
-      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
-    contributorDashboardAdminPage = (
-      new ContributorDashboardAdminPage.ContributorDashboardAdminPage());
-    topicsAndSkillsDashboardPage = (
-      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage());
+    releaseCoordinatorPage =
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
+    contributorDashboardAdminPage =
+      new ContributorDashboardAdminPage.ContributorDashboardAdminPage();
+    topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     skillEditorPage = new SkillEditorPage.SkillEditorPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -115,9 +105,13 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardAdminPage.assignQuestionContributor('user1');
     await contributorDashboardAdminPage.assignQuestionReviewer('user1');
     await contributorDashboardAdminPage.assignTranslationReviewer(
-      'user1', 'shqip (Albanian)');
+      'user1',
+      'shqip (Albanian)'
+    );
     await contributorDashboardAdminPage.assignTranslationReviewer(
-      'user1', 'English');
+      'user1',
+      'English'
+    );
     await users.logout();
 
     // Populating Dashboard.
@@ -126,13 +120,19 @@ describe('Contributor Admin Dashboard', function() {
     await users.login(ADMIN_EMAIL);
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createTopic(
-      TOPIC_NAMES[0], 'community-topic-one', 'Topic description 1', false);
+      TOPIC_NAMES[0],
+      'community-topic-one',
+      'Topic description 1',
+      false
+    );
     const URL = await browser.getUrl();
     // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
     const TOPIC_ID_URL_PART = URL.split('/')[4];
     // We have to remove the ending "#".
     const TOPIC_ID = TOPIC_ID_URL_PART.substring(
-      0, TOPIC_ID_URL_PART.length - 1);
+      0,
+      TOPIC_ID_URL_PART.length - 1
+    );
 
     // Add topic to classroom to make it available for question contributions.
     await browser.url('/classroom-admin/');
@@ -141,10 +141,15 @@ describe('Contributor Admin Dashboard', function() {
     await diagnosticTestPage.addTopicIdToClassroomConfig(TOPIC_ID, 0);
 
     await workflow.createSkillAndAssignTopic(
-      SKILL_DESCRIPTIONS[0], REVIEW_MATERIALS[0], TOPIC_NAMES[0]);
+      SKILL_DESCRIPTIONS[0],
+      REVIEW_MATERIALS[0],
+      TOPIC_NAMES[0]
+    );
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      SKILL_DESCRIPTIONS[1], REVIEW_MATERIALS[1]);
+      SKILL_DESCRIPTIONS[1],
+      REVIEW_MATERIALS[1]
+    );
 
     await adminPage.get();
     await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
@@ -152,12 +157,13 @@ describe('Contributor Admin Dashboard', function() {
     // Creating an exploration with an image.
     await creatorDashboardPage.get();
     await workflow.createExploration(true);
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
+    await explorationEditorMainTab.setContent(async function (richTextEditor) {
       await richTextEditor.addRteComponent(
         'Image',
         'create',
         ['rectangle', 'bezier', 'piechart', 'svgupload'],
-        'An svg diagram.');
+        'An svg diagram.'
+      );
     }, true);
     await explorationEditorMainTab.setInteraction('EndExploration');
     let explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
@@ -179,31 +185,39 @@ describe('Contributor Admin Dashboard', function() {
     await topicsAndSkillsDashboardPage.waitForTopicsToLoad();
     await topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     await topicEditorPage.createStory(
-      'Story Title', 'topicandstoryeditorone', 'Story description',
-      Constants.TEST_SVG_PATH);
+      'Story Title',
+      'topicandstoryeditorone',
+      'Story description',
+      Constants.TEST_SVG_PATH
+    );
     await storyEditorPage.createNewChapter(
-      'Chapter 1', dummyExplorationId, Constants.TEST_SVG_PATH);
+      'Chapter 1',
+      dummyExplorationId,
+      Constants.TEST_SVG_PATH
+    );
     await storyEditorPage.updateMetaTagContent('story meta tag');
     await storyEditorPage.saveStory('Saving Story');
     await storyEditorPage.publishStory();
 
     let opportunityActionButtonCss = $(
-      '.e2e-test-opportunity-list-item-button');
+      '.e2e-test-opportunity-list-item-button'
+    );
     await contributorDashboardPage.get();
     await waitFor.pageToFullyLoad();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(
-      'shqip (Albanian)');
+      'shqip (Albanian)'
+    );
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await action.click('Opportunity button', opportunityActionButtonCss);
     let image = $('.e2e-test-image');
-    await waitFor.visibilityOf(
-      image,
-      'Test image taking too long to appear.');
+    await waitFor.visibilityOf(image, 'Test image taking too long to appear.');
     let images = await $$('.e2e-test-image');
     expect(images.length).toEqual(1);
     await contributorDashboardAdminPage.copyElementWithClassName(
-      'image', images[0]);
+      'image',
+      images[0]
+    );
 
     // Accept suggestion as user1.
     await users.login(USER_EMAILS[1]);
@@ -213,10 +227,14 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.selectReviewLanguage('shqip (Albanian)');
 
     await contributorDashboardPage.clickOpportunityActionButton(
-      'Chapter 1', 'Topic 0 for contribution - Story Title');
+      'Chapter 1',
+      'Topic 0 for contribution - Story Title'
+    );
 
     await contributorDashboardPage.clickOpportunityActionButton(
-      '[Image]', 'Topic 0 for contribution / Story Title / Chapter 1');
+      '[Image]',
+      'Topic 0 for contribution / Story Title / Chapter 1'
+    );
 
     await contributorDashboardAdminPage.acceptTranslation();
     await users.logout();
@@ -227,18 +245,31 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.navigateToSubmitQuestionTab();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectOpportunityWithPropertiesToExist(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0], null, '(0%)');
+      SKILL_DESCRIPTIONS[0],
+      TOPIC_NAMES[0],
+      null,
+      '(0%)'
+    );
 
     // Submit suggestion as user0.
     await contributorDashboardPage.clickOpportunityActionButton(
-      SKILL_DESCRIPTIONS[0], TOPIC_NAMES[0]);
+      SKILL_DESCRIPTIONS[0],
+      TOPIC_NAMES[0]
+    );
     await skillEditorPage.confirmSkillDifficulty();
     await explorationEditorMainTab.setContent(
-      await forms.toRichText('Question 1'), true);
+      await forms.toRichText('Question 1'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('Correct Answer'), null, false,
-      'FuzzyEquals', ['correct']);
+      'TextInput',
+      await forms.toRichText('Correct Answer'),
+      null,
+      false,
+      'FuzzyEquals',
+      ['correct']
+    );
     await (await explorationEditorMainTab.getResponseEditor(0)).markAsCorrect();
     await (
       await explorationEditorMainTab.getResponseEditor('default')
@@ -246,7 +277,7 @@ describe('Contributor Admin Dashboard', function() {
     await explorationEditorMainTab.addHint('Hint 1');
     await explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'correct',
-      explanation: 'It is correct'
+      explanation: 'It is correct',
     });
     await skillEditorPage.saveQuestion();
     await users.logout();
@@ -257,9 +288,10 @@ describe('Contributor Admin Dashboard', function() {
     await contributorDashboardPage.waitForOpportunitiesToLoad();
 
     await contributorDashboardPage.clickOpportunityActionButton(
-      'Question 1', SKILL_DESCRIPTIONS[0]);
-    await (
-      contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear());
+      'Question 1',
+      SKILL_DESCRIPTIONS[0]
+    );
+    await contributorDashboardPage.waitForQuestionSuggestionReviewModalToAppear();
     await contributorDashboardPage.clickAcceptQuestionSuggestionButton();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.expectEmptyOpportunityAvailabilityMessage();
@@ -271,15 +303,14 @@ describe('Contributor Admin Dashboard', function() {
     // They should be removed after the cd_admin_dashboard_new_ui flag is
     // deprecated.
     await releaseCoordinatorPage.getFeaturesTab();
-    let CdAdminDashboardNewUiFlag = (
-      await releaseCoordinatorPage.getCdAdminDashboardNewUiFeatureElement());
-    await releaseCoordinatorPage.enableFeature(
-      CdAdminDashboardNewUiFlag);
+    let CdAdminDashboardNewUiFlag =
+      await releaseCoordinatorPage.getCdAdminDashboardNewUiFeatureElement();
+    await releaseCoordinatorPage.enableFeature(CdAdminDashboardNewUiFlag);
 
     await users.logout();
   });
 
-  it('should allow question coordinator to view dashboard', async function() {
+  it('should allow question coordinator to view dashboard', async function () {
     await users.login(QUESTION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 
@@ -296,28 +327,27 @@ describe('Contributor Admin Dashboard', function() {
     await users.logout();
   });
 
-  it('should allow translation coordinator to view dashboard',
-    async function() {
-      await users.login(TRANSLATION_COORDINATOR_EMAIL);
-      await contributorDashboardAdminPage.get();
+  it('should allow translation coordinator to view dashboard', async function () {
+    await users.login(TRANSLATION_COORDINATOR_EMAIL);
+    await contributorDashboardAdminPage.get();
 
-      await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
-      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectNoStatsElement();
+    await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+    await contributorDashboardAdminPage.expectNoStatsElement();
 
-      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
-      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-      await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
+    await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
-      await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
-      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
-      await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
+    await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+    await contributorDashboardAdminPage.expectStatsRowsAreExpanded();
 
-      await contributorDashboardAdminPage.switchLanguage('English');
-      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectNoStatsElement();
-      await users.logout();
-    });
+    await contributorDashboardAdminPage.switchLanguage('English');
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+    await contributorDashboardAdminPage.expectNoStatsElement();
+    await users.logout();
+  });
 });

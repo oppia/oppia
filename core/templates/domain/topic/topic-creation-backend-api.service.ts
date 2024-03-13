@@ -17,36 +17,37 @@
  * topic_id.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { ImageData } from 'domain/skill/skill-creation-backend-api.service';
-import { NewlyCreatedTopic } from
-  'domain/topics_and_skills_dashboard/newly-created-topic.model';
+import {ImageData} from 'domain/skill/skill-creation-backend-api.service';
+import {NewlyCreatedTopic} from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
 interface TopicCreationResponse {
   topicId: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TopicCreationBackendApiService {
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   _createTopic(
-      successCallback: (value: TopicCreationResponse) => void,
-      errorCallback: (reason: string) => void,
-      topic: NewlyCreatedTopic, imagesData: ImageData[],
-      bgColor: string): void {
+    successCallback: (value: TopicCreationResponse) => void,
+    errorCallback: (reason: string) => void,
+    topic: NewlyCreatedTopic,
+    imagesData: ImageData[],
+    bgColor: string
+  ): void {
     let postData = {
       name: topic.name,
       description: topic.description,
       thumbnailBgColor: bgColor,
       filename: imagesData[0].filename,
       url_fragment: topic.urlFragment,
-      page_title_fragment: topic.pageTitleFragment
+      page_title_fragment: topic.pageTitleFragment,
     };
 
     let body = new FormData();
@@ -56,29 +57,39 @@ export class TopicCreationBackendApiService {
     }
     body.append('image', imagesData[0].imageBlob);
 
-    this.http.post<TopicCreationResponse>(
-      '/topic_editor_handler/create_new', body).toPromise()
-      .then(response => {
-        if (successCallback) {
-          successCallback({
-            topicId: response.topicId
-          });
+    this.http
+      .post<TopicCreationResponse>('/topic_editor_handler/create_new', body)
+      .toPromise()
+      .then(
+        response => {
+          if (successCallback) {
+            successCallback({
+              topicId: response.topicId,
+            });
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
         }
-      }, (errorResponse) => {
-        if (errorCallback) {
-          errorCallback(errorResponse.error.error);
-        }
-      });
+      );
   }
 
   async createTopicAsync(
-      topic: NewlyCreatedTopic, imagesData: ImageData[],
-      bgColor: string): Promise<TopicCreationResponse> {
+    topic: NewlyCreatedTopic,
+    imagesData: ImageData[],
+    bgColor: string
+  ): Promise<TopicCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createTopic(resolve, reject, topic, imagesData, bgColor);
     });
   }
 }
 
-angular.module('oppia').factory('TopicCreationBackendApiService',
-  downgradeInjectable(TopicCreationBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'TopicCreationBackendApiService',
+    downgradeInjectable(TopicCreationBackendApiService)
+  );

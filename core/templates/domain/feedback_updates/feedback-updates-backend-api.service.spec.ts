@@ -16,17 +16,19 @@
  * @fileoverview Unit tests for FeedbackUpdatesBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { AddMessagePayload, FeedbackUpdatesBackendApiService } from
-  'domain/feedback_updates/feedback-updates-backend-api.service';
-
+import {
+  AddMessagePayload,
+  FeedbackUpdatesBackendApiService,
+} from 'domain/feedback_updates/feedback-updates-backend-api.service';
 
 describe('Feedback Updates Backend API Service', () => {
-  let feedbackUpdatesBackendApiService:
-  FeedbackUpdatesBackendApiService;
+  let feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService;
   let httpTestingController: HttpTestingController;
 
   const sampleFeedbackUpdatesDataResults = {
@@ -45,22 +47,22 @@ describe('Feedback Updates Backend API Service', () => {
         original_author_id: 'uid_oijrdjajpkgegqmqqttxsxbbiobexugg',
         exploration_title: 'What is a negative number?',
         second_last_message_is_read: false,
-        total_message_count: 1
-      }
-    ]
+        total_message_count: 1,
+      },
+    ],
   };
 
-  const FEEDBACK_UPDATES_DATA_URL = (
-    '/feedbackupdateshandler/data');
+  const FEEDBACK_UPDATES_DATA_URL = '/feedbackupdateshandler/data';
   const ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [FeedbackUpdatesBackendApiService]
+      providers: [FeedbackUpdatesBackendApiService],
     });
     feedbackUpdatesBackendApiService = TestBed.get(
-      FeedbackUpdatesBackendApiService);
+      FeedbackUpdatesBackendApiService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -68,184 +70,199 @@ describe('Feedback Updates Backend API Service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch learner dashboard feedback updates data ' +
-    'from the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should successfully fetch learner dashboard feedback updates data ' +
+      'from the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    feedbackUpdatesBackendApiService
-      .fetchFeedbackUpdatesDataAsync()
-      .then(successHandler, failHandler);
+      feedbackUpdatesBackendApiService
+        .fetchFeedbackUpdatesDataAsync()
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      FEEDBACK_UPDATES_DATA_URL);
-    expect(req.request.method).toEqual('POST');
-    req.flush(sampleFeedbackUpdatesDataResults);
+      let req = httpTestingController.expectOne(FEEDBACK_UPDATES_DATA_URL);
+      expect(req.request.method).toEqual('POST');
+      req.flush(sampleFeedbackUpdatesDataResults);
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
+  it(
+    'should use rejection handler if learner dashboard feedback updates ' +
+      'data backend request failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-  it('should use rejection handler if learner dashboard feedback updates ' +
-    'data backend request failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+      feedbackUpdatesBackendApiService
+        .fetchFeedbackUpdatesDataAsync()
+        .then(successHandler, failHandler);
 
-    feedbackUpdatesBackendApiService
-      .fetchFeedbackUpdatesDataAsync()
-      .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(FEEDBACK_UPDATES_DATA_URL);
+      expect(req.request.method).toEqual('POST');
+      req.flush(
+        {
+          error: 'Error loading dashboard data.',
+        },
+        {
+          status: ERROR_STATUS_CODE,
+          statusText: 'Invalid Request',
+        }
+      );
 
-    let req = httpTestingController.expectOne(
-      FEEDBACK_UPDATES_DATA_URL);
-    expect(req.request.method).toEqual('POST');
-    req.flush({
-      error: 'Error loading dashboard data.'
-    }, {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
+      flushMicrotasks();
 
-    flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(400);
+    })
+  );
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(400);
-  }
-  ));
+  it(
+    'should add current message to the feedback updates thread' +
+      ' when calling addNewMessageAsync',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
+      let updatedStatus = true;
+      let updatedSubject = 'Updated Subject';
+      let text = 'Sending message';
+      let url = '/threadhandler/exploration.4.Wfafsafd';
+      let payload: AddMessagePayload = {
+        updated_status: updatedStatus,
+        updated_subject: updatedSubject,
+        text: text,
+      };
 
-  it('should add current message to the feedback updates thread' +
-    ' when calling addNewMessageAsync', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+      feedbackUpdatesBackendApiService
+        .addNewMessageAsync(url, payload)
+        .then(successHandler, failHandler);
 
-    let updatedStatus = true;
-    let updatedSubject = 'Updated Subject';
-    let text = 'Sending message';
-    let url = '/threadhandler/exploration.4.Wfafsafd';
-    let payload: AddMessagePayload = {
-      updated_status: updatedStatus,
-      updated_subject: updatedSubject,
-      text: text
-    };
+      let req = httpTestingController.expectOne(
+        '/threadhandler/exploration.4.Wfafsafd'
+      );
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
 
-    feedbackUpdatesBackendApiService.addNewMessageAsync(
-      url, payload
-    ).then(successHandler, failHandler);
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
 
-    let req = httpTestingController.expectOne(
-      '/threadhandler/exploration.4.Wfafsafd');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-    req.flush(
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
+  it(
+    'should fail to add current message to the feedback updates thread' +
+      ' when calling addNewMessageAsync',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      let updatedStatus = true;
+      let updatedSubject = 'Updated Subject';
+      let text = 'Sending message';
+      let invalidUrl = '/invalidUrl';
+      let payload: AddMessagePayload = {
+        updated_status: updatedStatus,
+        updated_subject: updatedSubject,
+        text: text,
+      };
+      feedbackUpdatesBackendApiService
+        .addNewMessageAsync(invalidUrl, payload)
+        .then(successHandler, failHandler);
 
+      let req = httpTestingController.expectOne('/invalidUrl');
+      expect(req.request.method).toEqual('POST');
+      expect(req.request.body).toEqual(payload);
 
-  it('should fail to add current message to the feedback updates thread' +
-    ' when calling addNewMessageAsync', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+      req.flush(
+        {error: 'Given URL is invalid.'},
+        {status: 500, statusText: 'Internal Server Error'}
+      );
+      flushMicrotasks();
 
-    let updatedStatus = true;
-    let updatedSubject = 'Updated Subject';
-    let text = 'Sending message';
-    let invalidUrl = '/invalidUrl';
-    let payload: AddMessagePayload = {
-      updated_status: updatedStatus,
-      updated_subject: updatedSubject,
-      text: text
-    };
-    feedbackUpdatesBackendApiService.addNewMessageAsync(
-      invalidUrl, payload
-    ).then(successHandler, failHandler);
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Given URL is invalid.');
+    })
+  );
 
-    let req = httpTestingController.expectOne(
-      '/invalidUrl');
-    expect(req.request.method).toEqual('POST');
-    expect(req.request.body).toEqual(payload);
+  it(
+    'should get the data of current feedback updates thread' +
+      ' when calling addNewMessageAsync',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    req.flush(
-      { error: 'Given URL is invalid.'},
-      { status: 500, statusText: 'Internal Server Error'});
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Given URL is invalid.');
-  }
-  ));
-
-  it('should get the data of current feedback updates thread' +
-    ' when calling addNewMessageAsync', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    let url = '/threadhandler/exploration.4.Wfafsafd';
-    let result = [{
-      author_username: 'User',
-      created_on_msecs: 1617712024611.706,
-      message_id: 1,
-      text: 'test',
-      updated_status: null
-    }];
-
-    feedbackUpdatesBackendApiService.onClickThreadAsync(
-      url
-    ).then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/threadhandler/exploration.4.Wfafsafd');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(
-      {
-        message_summary_list: [{
+      let url = '/threadhandler/exploration.4.Wfafsafd';
+      let result = [
+        {
           author_username: 'User',
           created_on_msecs: 1617712024611.706,
           message_id: 1,
           text: 'test',
-          updated_status: null
-        }]
-      },
-      { status: 200, statusText: 'Success.'});
-    flushMicrotasks();
+          updated_status: null,
+        },
+      ];
 
-    expect(successHandler).toHaveBeenCalledWith(result);
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      feedbackUpdatesBackendApiService
+        .onClickThreadAsync(url)
+        .then(successHandler, failHandler);
 
-  it('should fail to get the data of current feedback updates thread' +
-    ' when calling addNewMessageAsync', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+      let req = httpTestingController.expectOne(
+        '/threadhandler/exploration.4.Wfafsafd'
+      );
+      expect(req.request.method).toEqual('GET');
 
-    let invalidUrl = '/invalidUrl';
-    feedbackUpdatesBackendApiService.onClickThreadAsync(
-      invalidUrl
-    ).then(successHandler, failHandler);
+      req.flush(
+        {
+          message_summary_list: [
+            {
+              author_username: 'User',
+              created_on_msecs: 1617712024611.706,
+              message_id: 1,
+              text: 'test',
+              updated_status: null,
+            },
+          ],
+        },
+        {status: 200, statusText: 'Success.'}
+      );
+      flushMicrotasks();
 
-    let req = httpTestingController.expectOne(
-      '/invalidUrl');
-    expect(req.request.method).toEqual('GET');
+      expect(successHandler).toHaveBeenCalledWith(result);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-    req.flush(
-      { error: 'Given URL is invalid.'},
-      { status: 500, statusText: 'Internal Server Error'});
-    flushMicrotasks();
+  it(
+    'should fail to get the data of current feedback updates thread' +
+      ' when calling addNewMessageAsync',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      'Given URL is invalid.');
-  }
-  ));
+      let invalidUrl = '/invalidUrl';
+      feedbackUpdatesBackendApiService
+        .onClickThreadAsync(invalidUrl)
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne('/invalidUrl');
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(
+        {error: 'Given URL is invalid.'},
+        {status: 500, statusText: 'Internal Server Error'}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Given URL is invalid.');
+    })
+  );
 });

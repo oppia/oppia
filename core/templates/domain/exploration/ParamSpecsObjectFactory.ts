@@ -18,11 +18,14 @@
  * which defines them (represented as ParamSpec objects).
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { ParamSpecBackendDict, ParamSpec, ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory';
+import {
+  ParamSpecBackendDict,
+  ParamSpec,
+  ParamSpecObjectFactory,
+} from 'domain/exploration/ParamSpecObjectFactory';
 
 export interface ParamSpecsBackendDict {
   [paramName: string]: ParamSpecBackendDict;
@@ -42,7 +45,9 @@ export class ParamSpecs {
    *    for this object will hold.
    */
   constructor(
-      paramDict: ParamDict, paramSpecObjectFactory: ParamSpecObjectFactory) {
+    paramDict: ParamDict,
+    paramSpecObjectFactory: ParamSpecObjectFactory
+  ) {
     /** @member {Object.<String, ParamSpec>} */
     this._paramDict = paramDict;
     this._paramSpecObjectFactory = paramSpecObjectFactory;
@@ -91,7 +96,7 @@ export class ParamSpecs {
    */
   forEach(callback: Function): void {
     var that = this;
-    this.getParamNames().forEach((paramName) => {
+    this.getParamNames().forEach(paramName => {
       callback(paramName, that.getParamSpec(paramName));
     });
   }
@@ -102,16 +107,15 @@ export class ParamSpecs {
    */
   toBackendDict(): ParamSpecsBackendDict {
     var paramSpecsBackendDict: ParamSpecsBackendDict = {};
-    this.forEach(
-      (paramName: string, paramSpec: ParamSpec) => {
-        paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
-      });
+    this.forEach((paramName: string, paramSpec: ParamSpec) => {
+      paramSpecsBackendDict[paramName] = paramSpec.toBackendDict();
+    });
     return paramSpecsBackendDict;
   }
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParamSpecsObjectFactory {
   constructor(private paramSpecObjectFactory: ParamSpecObjectFactory) {}
@@ -123,15 +127,21 @@ export class ParamSpecsObjectFactory {
    *    dict.
    */
   createFromBackendDict(
-      paramSpecsBackendDict: ParamSpecsBackendDict): ParamSpecs {
+    paramSpecsBackendDict: ParamSpecsBackendDict
+  ): ParamSpecs {
     var paramDict: ParamDict = {};
-    Object.keys(paramSpecsBackendDict).forEach((paramName) => {
+    Object.keys(paramSpecsBackendDict).forEach(paramName => {
       paramDict[paramName] = this.paramSpecObjectFactory.createFromBackendDict(
-        paramSpecsBackendDict[paramName]);
+        paramSpecsBackendDict[paramName]
+      );
     });
     return new ParamSpecs(paramDict, this.paramSpecObjectFactory);
   }
 }
 
-angular.module('oppia').factory(
-  'ParamSpecsObjectFactory', downgradeInjectable(ParamSpecsObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'ParamSpecsObjectFactory',
+    downgradeInjectable(ParamSpecsObjectFactory)
+  );

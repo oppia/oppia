@@ -15,10 +15,10 @@
 /**
  * @fileoverview Unit tests for the MultipleChoiceInput response.
  */
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseMultipleChoiceInputComponent } from './oppia-response-multiple-choice-input.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseMultipleChoiceInputComponent} from './oppia-response-multiple-choice-input.component';
 
 describe('ResponseMultipleChoiceInputComponent', () => {
   let component: ResponseMultipleChoiceInputComponent;
@@ -36,10 +36,10 @@ describe('ResponseMultipleChoiceInputComponent', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
+          useClass: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -47,19 +47,20 @@ describe('ResponseMultipleChoiceInputComponent', () => {
     fixture = TestBed.createComponent(ResponseMultipleChoiceInputComponent);
     component = fixture.componentInstance;
     component.answer = '1';
-    component.choices = '[{' +
+    component.choices =
+      '[{' +
       '"_html": "opt1",' +
       '"contentId": "ca_choices_9"' +
-    '}, {' +
+      '}, {' +
       '"_html": "opt2",' +
       '"contentId": "ca_choices_10"' +
-    '}, {' +
+      '}, {' +
       '"_html": "opt3",' +
       '"contentId": "ca_choices_11"' +
-    '}, {' +
+      '}, {' +
       '"_html": "opt4",' +
       '"contentId": "ca_choices_12"' +
-    '}]';
+      '}]';
   });
 
   it('should initialise component when user submits answer', () => {

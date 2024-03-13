@@ -16,23 +16,30 @@
  * @fileoverview Component for question suggestion review modal.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { Misconception, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { Question, QuestionBackendDict, QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { State } from 'domain/state/StateObjectFactory';
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { QuestionSuggestionEditorModalComponent } from './question-suggestion-editor-modal.component';
-import { ContextService } from 'services/context.service';
-import { ContributionOpportunitiesService } from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
-import { ParamDict } from 'services/suggestion-modal.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { SuggestionModalService } from 'services/suggestion-modal.service';
-import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {
+  Misconception,
+  MisconceptionSkillMap,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {
+  Question,
+  QuestionBackendDict,
+  QuestionObjectFactory,
+} from 'domain/question/QuestionObjectFactory';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {State} from 'domain/state/StateObjectFactory';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {QuestionSuggestionEditorModalComponent} from './question-suggestion-editor-modal.component';
+import {ContextService} from 'services/context.service';
+import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
+import {ParamDict} from 'services/suggestion-modal.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SuggestionModalService} from 'services/suggestion-modal.service';
+import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 
 interface QuestionSuggestionModalValue {
   suggestionId: string;
@@ -49,9 +56,9 @@ interface SkillRubrics {
 interface ActiveContributionDetailsDict {
   skill_description: string;
   skill_rubrics: SkillRubrics[];
-  'chapter_title': string;
-  'story_title': string;
-  'topic_name': string;
+  chapter_title: string;
+  story_title: string;
+  topic_name: string;
 }
 
 interface SuggestionChangeValue {
@@ -59,46 +66,48 @@ interface SuggestionChangeValue {
 }
 
 interface SuggestionChangeDict {
-  'skill_difficulty': number;
-  'question_dict': QuestionBackendDict;
-  'new_value': SuggestionChangeValue;
-  'old_value': SuggestionChangeValue;
-  'skill_id'?: string;
-  'cmd': string;
-  'content_html': string | string[];
-  'content_id': string;
-  'data_format': string;
-  'language_code': string;
-  'state_name': string;
-  'translation_html': string;
+  skill_difficulty: number;
+  question_dict: QuestionBackendDict;
+  new_value: SuggestionChangeValue;
+  old_value: SuggestionChangeValue;
+  skill_id?: string;
+  cmd: string;
+  content_html: string | string[];
+  content_id: string;
+  data_format: string;
+  language_code: string;
+  state_name: string;
+  translation_html: string;
 }
 
 interface ActiveSuggestionDict {
-  'author_name': string;
-  'change_cmd': SuggestionChangeDict;
-  'exploration_content_html': string | string[] | null;
-  'language_code': string;
-  'last_updated_msecs': number;
-  'status': string;
-  'suggestion_id': string;
-  'suggestion_type': string;
-  'target_id': string;
-  'target_type': string;
+  author_name: string;
+  change_cmd: SuggestionChangeDict;
+  exploration_content_html: string | string[] | null;
+  language_code: string;
+  last_updated_msecs: number;
+  status: string;
+  suggestion_id: string;
+  suggestion_type: string;
+  target_id: string;
+  target_type: string;
 }
 
 interface ActiveContributionDict {
-  'details': ActiveContributionDetailsDict;
-  'suggestion': ActiveSuggestionDict;
+  details: ActiveContributionDetailsDict;
+  suggestion: ActiveSuggestionDict;
 }
 
 @Component({
   selector: 'oppia-question-suggestion-review-modal',
-  templateUrl: './question-suggestion-review.component.html'
+  templateUrl: './question-suggestion-review.component.html',
 })
 export class QuestionSuggestionReviewModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
-  @Output() editSuggestionEmitter = (
-    new EventEmitter<QuestionSuggestionModalValue>());
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
+  @Output() editSuggestionEmitter =
+    new EventEmitter<QuestionSuggestionModalValue>();
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -143,7 +152,7 @@ export class QuestionSuggestionReviewModalComponent
     private skillBackendApiService: SkillBackendApiService,
     private suggestionModalService: SuggestionModalService,
     private threadDataBackendApiService: ThreadDataBackendApiService,
-    private questionObjectFactory: QuestionObjectFactory,
+    private questionObjectFactory: QuestionObjectFactory
   ) {
     super(ngbActiveModal);
   }
@@ -158,79 +167,86 @@ export class QuestionSuggestionReviewModalComponent
     if (!skillId) {
       throw new Error('Skill ID is null.');
     }
-    this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+    this.skillBackendApiService.fetchSkillAsync(skillId).then(skillDict => {
       const modalRef = this.ngbModal.open(
-        QuestionSuggestionEditorModalComponent, {
+        QuestionSuggestionEditorModalComponent,
+        {
           size: 'lg',
           backdrop: 'static',
           keyboard: false,
-        });
+        }
+      );
 
       modalRef.componentInstance.suggestionId = this.suggestionId;
       modalRef.componentInstance.question = this.question;
       modalRef.componentInstance.questionId = '';
-      modalRef.componentInstance.questionStateData = (
-        this.question.getStateData());
+      modalRef.componentInstance.questionStateData =
+        this.question.getStateData();
       modalRef.componentInstance.skill = skillDict.skill;
       modalRef.componentInstance.skillDifficulty = this.skillDifficulty;
 
-      modalRef.result.then((change) => {
-        // When the question suggestion editor modal is closed, the changes made
-        // in that modal should also be reflected in the question suggestion
-        // review modal. Then, the reviewers can see the changes they have made
-        // and know that their changes have been saved successfully.
-        this.allContributions[this.suggestionId].suggestion.change_cmd
-          .question_dict = change.questionDict;
-        this.allContributions[this.suggestionId].suggestion.change_cmd
-          .skill_difficulty = change.skillDifficulty;
-        this.refreshContributionState();
-        this.editSuggestionEmitter.emit(
-          {
+      modalRef.result.then(
+        change => {
+          // When the question suggestion editor modal is closed, the changes made
+          // in that modal should also be reflected in the question suggestion
+          // review modal. Then, the reviewers can see the changes they have made
+          // and know that their changes have been saved successfully.
+          this.allContributions[
+            this.suggestionId
+          ].suggestion.change_cmd.question_dict = change.questionDict;
+          this.allContributions[
+            this.suggestionId
+          ].suggestion.change_cmd.skill_difficulty = change.skillDifficulty;
+          this.refreshContributionState();
+          this.editSuggestionEmitter.emit({
             suggestionId: this.suggestionId,
             suggestion: this.suggestion,
             reviewable: this.reviewable,
-            question: this.question
+            question: this.question,
           });
-      }, () => {
-        this.contextService.resetImageSaveDestination();
-        this.editSuggestionEmitter.emit({
-          suggestionId: this.suggestionId,
-          suggestion: this.suggestion,
-          reviewable: this.reviewable,
-          question: undefined
-        });
-      });
+        },
+        () => {
+          this.contextService.resetImageSaveDestination();
+          this.editSuggestionEmitter.emit({
+            suggestionId: this.suggestionId,
+            suggestion: this.suggestion,
+            reviewable: this.reviewable,
+            question: undefined,
+          });
+        }
+      );
     });
   }
 
   reject(): void {
-    this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-      [this.suggestionId]);
+    this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
+      this.suggestionId,
+    ]);
     this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
-      'Question');
-    this.suggestionModalService.rejectSuggestion(
-      this.ngbActiveModal, {
-        action: AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage: this.reviewMessage
-      } as ParamDict);
+      'Question'
+    );
+    this.suggestionModalService.rejectSuggestion(this.ngbActiveModal, {
+      action: AppConstants.ACTION_REJECT_SUGGESTION,
+      reviewMessage: this.reviewMessage,
+    } as ParamDict);
   }
 
   accept(): void {
-    this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit(
-      [this.suggestionId]);
+    this.contributionOpportunitiesService.removeOpportunitiesEventEmitter.emit([
+      this.suggestionId,
+    ]);
     this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
-      'Question');
-    this.suggestionModalService.acceptSuggestion(
-      this.ngbActiveModal, {
-        action: AppConstants.ACTION_ACCEPT_SUGGESTION,
-        reviewMessage: this.reviewMessage,
-        skillDifficulty: this.skillDifficulty
-      });
+      'Question'
+    );
+    this.suggestionModalService.acceptSuggestion(this.ngbActiveModal, {
+      action: AppConstants.ACTION_ACCEPT_SUGGESTION,
+      reviewMessage: this.reviewMessage,
+      skillDifficulty: this.skillDifficulty,
+    });
   }
 
   refreshActiveContributionState(): void {
-    const nextContribution = this.allContributions[
-      this.currentSuggestionId];
+    const nextContribution = this.allContributions[this.currentSuggestionId];
     this.suggestion = nextContribution.suggestion;
 
     this.isLastItem = this.remainingContributionIdStack.length === 0;
@@ -243,7 +259,7 @@ export class QuestionSuggestionReviewModalComponent
 
     const skillId = this.suggestion.change_cmd.skill_id;
     if (skillId) {
-      this.skillBackendApiService.fetchSkillAsync(skillId).then((skillDict) => {
+      this.skillBackendApiService.fetchSkillAsync(skillId).then(skillDict => {
         let misconceptionsBySkill: Record<string, Misconception[]> = {};
         const skill = skillDict.skill;
         misconceptionsBySkill[skill.getId()] = skill.getMisconceptions();
@@ -298,7 +314,8 @@ export class QuestionSuggestionReviewModalComponent
 
   getSkillDifficultyLabel(): string {
     const skillDifficultyFloatToLabel = this.invertMap(
-      AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT);
+      AppConstants.SKILL_DIFFICULTY_LABEL_TO_FLOAT
+    );
     return skillDifficultyFloatToLabel[this.skillDifficulty];
   }
 
@@ -313,15 +330,16 @@ export class QuestionSuggestionReviewModalComponent
   }
 
   _getThreadMessagesAsync(threadId: string): Promise<void | string[]> {
-    return this.threadDataBackendApiService.fetchMessagesAsync(
-      threadId).then((response) => {
-      const threadMessageBackendDicts = response.messages;
-      const reviewThreadMessage = ThreadMessage.createFromBackendDict(
-        threadMessageBackendDicts[1]
-      );
-      this.reviewMessage = reviewThreadMessage.text;
-      this.reviewer = reviewThreadMessage.authorUsername;
-    });
+    return this.threadDataBackendApiService
+      .fetchMessagesAsync(threadId)
+      .then(response => {
+        const threadMessageBackendDicts = response.messages;
+        const reviewThreadMessage = ThreadMessage.createFromBackendDict(
+          threadMessageBackendDicts[1]
+        );
+        this.reviewMessage = reviewThreadMessage.text;
+        this.reviewer = reviewThreadMessage.authorUsername;
+      });
   }
 
   questionChanged(): void {
@@ -329,29 +347,30 @@ export class QuestionSuggestionReviewModalComponent
   }
 
   refreshContributionState(): void {
-    this.suggestion = (
-      this.allContributions[this.currentSuggestionId].suggestion);
+    this.suggestion =
+      this.allContributions[this.currentSuggestionId].suggestion;
     this.question = this.questionObjectFactory.createFromBackendDict(
-      this.suggestion.change_cmd.question_dict);
+      this.suggestion.change_cmd.question_dict
+    );
     this.authorName = this.suggestion.author_name;
     this.contentHtml = this.question.getStateData().content.html;
-    this.questionHeader = (
-      this.allContributions[
-        this.currentSuggestionId].details.skill_description);
-    this.skillRubrics = (
-      this.allContributions[
-        this.currentSuggestionId].details.skill_rubrics);
+    this.questionHeader =
+      this.allContributions[this.currentSuggestionId].details.skill_description;
+    this.skillRubrics =
+      this.allContributions[this.currentSuggestionId].details.skill_rubrics;
     this.questionStateData = this.question.getStateData();
     this.questionId = this.question.getId();
     this.canEditQuestion = false;
     this.skillDifficulty = this.suggestion.change_cmd.skill_difficulty;
     this.skillDifficultyLabel = this.getSkillDifficultyLabel();
     this.skillRubricExplanations = this.getRubricExplanation(
-      this.skillDifficultyLabel);
+      this.skillDifficultyLabel
+    );
     this.suggestionIsRejected = this.suggestion.status === 'rejected';
     if (this.reviewable) {
-      this.siteAnalyticsService
-        .registerContributorDashboardViewSuggestionForReview('Question');
+      this.siteAnalyticsService.registerContributorDashboardViewSuggestionForReview(
+        'Question'
+      );
     } else {
       this.reviewMessage = ''; // Reset for next/prev.
       this.reviewer = '';
@@ -382,7 +401,9 @@ export class QuestionSuggestionReviewModalComponent
   }
 }
 
-angular.module('oppia').directive('oppiaQuestionSuggestionReviewModal',
+angular.module('oppia').directive(
+  'oppiaQuestionSuggestionReviewModal',
   downgradeComponent({
-    component: QuestionSuggestionReviewModalComponent
-  }) as angular.IDirectiveFactory);
+    component: QuestionSuggestionReviewModalComponent,
+  }) as angular.IDirectiveFactory
+);

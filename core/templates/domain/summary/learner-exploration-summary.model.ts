@@ -16,7 +16,7 @@
  * @fileoverview Frontend Model for learner exploration summary.
  */
 
-import { HumanReadableContributorsSummary } from 'domain/summary/creator-exploration-summary.model';
+import {HumanReadableContributorsSummary} from 'domain/summary/creator-exploration-summary.model';
 
 export interface ExplorationRatings {
   '1': number;
@@ -27,57 +27,64 @@ export interface ExplorationRatings {
 }
 
 export interface LearnerExplorationSummaryBackendDict {
-  'category': string;
-  'community_owned': boolean;
-  'activity_type': string;
-  'last_updated_msec': number;
-  'ratings': ExplorationRatings;
-  'id': string;
-  'created_on_msec': number;
-  'human_readable_contributors_summary': HumanReadableContributorsSummary;
-  'language_code': string;
-  'num_views': number;
-  'objective': string;
-  'status': string;
-  'tags': string[];
-  'thumbnail_bg_color': string;
-  'thumbnail_icon_url': string;
-  'title': string;
+  category: string;
+  community_owned: boolean;
+  activity_type: string;
+  last_updated_msec: number;
+  ratings: ExplorationRatings;
+  id: string;
+  created_on_msec: number;
+  human_readable_contributors_summary: HumanReadableContributorsSummary;
+  language_code: string;
+  num_views: number;
+  objective: string;
+  status: string;
+  tags: string[];
+  thumbnail_bg_color: string;
+  thumbnail_icon_url: string;
+  title: string;
 }
 
 export class LearnerExplorationSummary {
   constructor(
-      public category: string,
-      public communityOwned: boolean,
-      public id: string,
-      public languageCode: string,
-      public numViews: number,
-      public objective: string,
-      public status: string,
-      public tags: string[],
-      public thumbnailBgColor: string,
-      public thumbnailIconUrl: string,
-      public title: string,
-      public activityType: string,
-      public lastUpdatedMsec: number,
-      public createdOnMsec: number,
-      public ratings: ExplorationRatings,
-      public humanReadableContributorsSummary:
-      HumanReadableContributorsSummary) {}
+    public category: string,
+    public communityOwned: boolean,
+    public id: string,
+    public languageCode: string,
+    public numViews: number,
+    public objective: string,
+    public status: string,
+    public tags: string[],
+    public thumbnailBgColor: string,
+    public thumbnailIconUrl: string,
+    public title: string,
+    public activityType: string,
+    public lastUpdatedMsec: number,
+    public createdOnMsec: number,
+    public ratings: ExplorationRatings,
+    public humanReadableContributorsSummary: HumanReadableContributorsSummary
+  ) {}
 
   static createFromBackendDict(
-      expSummaryBacknedDict: LearnerExplorationSummaryBackendDict):
-      LearnerExplorationSummary {
+    expSummaryBacknedDict: LearnerExplorationSummaryBackendDict
+  ): LearnerExplorationSummary {
     return new LearnerExplorationSummary(
-      expSummaryBacknedDict.category, expSummaryBacknedDict.community_owned,
-      expSummaryBacknedDict.id, expSummaryBacknedDict.language_code,
-      expSummaryBacknedDict.num_views, expSummaryBacknedDict.objective,
-      expSummaryBacknedDict.status, expSummaryBacknedDict.tags,
+      expSummaryBacknedDict.category,
+      expSummaryBacknedDict.community_owned,
+      expSummaryBacknedDict.id,
+      expSummaryBacknedDict.language_code,
+      expSummaryBacknedDict.num_views,
+      expSummaryBacknedDict.objective,
+      expSummaryBacknedDict.status,
+      expSummaryBacknedDict.tags,
       expSummaryBacknedDict.thumbnail_bg_color,
-      expSummaryBacknedDict.thumbnail_icon_url, expSummaryBacknedDict.title,
+      expSummaryBacknedDict.thumbnail_icon_url,
+      expSummaryBacknedDict.title,
       expSummaryBacknedDict.activity_type,
       expSummaryBacknedDict.last_updated_msec,
-      expSummaryBacknedDict.created_on_msec, expSummaryBacknedDict.ratings,
-      expSummaryBacknedDict.human_readable_contributors_summary);
+      expSummaryBacknedDict.created_on_msec,
+      expSummaryBacknedDict.ratings,
+      expSummaryBacknedDict.human_readable_contributors_summary
+    );
   }
 }
