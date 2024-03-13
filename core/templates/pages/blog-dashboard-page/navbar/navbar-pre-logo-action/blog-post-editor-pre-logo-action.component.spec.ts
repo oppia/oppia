@@ -16,12 +16,17 @@
  * @fileoverview Unit tests for the blog post editor navbar pre logo action.
  */
 
-import { ComponentFixture, TestBed, fakeAsync, waitForAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { BlogPostEditorNavbarPreLogoActionComponent } from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
-import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  waitForAsync,
+  tick,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {BlogPostEditorNavbarPreLogoActionComponent} from 'pages/blog-dashboard-page/navbar/navbar-pre-logo-action/blog-post-editor-pre-logo-action.component';
+import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Blog Dashboard Page Component', () => {
   let blogDashboardPageService: BlogDashboardPageService;
@@ -34,9 +39,9 @@ describe('Blog Dashboard Page Component', () => {
       location: {
         href: '',
         hash: '/',
-        _hashChange: null
+        _hashChange: null,
       },
-      open: (url: string) => { },
+      open: (url: string) => {},
       onhashchange() {
         return this.location._hashChange;
       },
@@ -45,17 +50,13 @@ describe('Blog Dashboard Page Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      declarations: [
-        BlogPostEditorNavbarPreLogoActionComponent,
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [BlogPostEditorNavbarPreLogoActionComponent],
       providers: [
         BlogDashboardPageService,
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
       ],
     }).compileComponents();
@@ -63,7 +64,8 @@ describe('Blog Dashboard Page Component', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      BlogPostEditorNavbarPreLogoActionComponent);
+      BlogPostEditorNavbarPreLogoActionComponent
+    );
     component = fixture.componentInstance;
     mockWindowRef = TestBed.inject(WindowRef) as unknown as MockWindowRef;
     blogDashboardPageService = TestBed.inject(BlogDashboardPageService);
@@ -72,7 +74,6 @@ describe('Blog Dashboard Page Component', () => {
   afterEach(() => {
     component.ngOnDestroy();
   });
-
 
   it('should create', () => {
     expect(component).toBeDefined();
@@ -94,7 +95,8 @@ describe('Blog Dashboard Page Component', () => {
 
     component.ngOnInit();
 
-    expect(blogDashboardPageService.updateViewEventEmitter.subscribe)
-      .toHaveBeenCalled();
+    expect(
+      blogDashboardPageService.updateViewEventEmitter.subscribe
+    ).toHaveBeenCalled();
   });
 });

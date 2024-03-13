@@ -16,14 +16,24 @@
  * @fileoverview Component for the solution explanation editor.
  */
 
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { ContextService } from 'services/context.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {ContextService} from 'services/context.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {
+  CALCULATION_TYPE_CHARACTER,
+  HtmlLengthService,
+} from 'services/html-length.service';
 
 interface ExplanationFormSchema {
   type: string;
@@ -32,10 +42,9 @@ interface ExplanationFormSchema {
 
 @Component({
   selector: 'oppia-solution-explanation-editor',
-  templateUrl: './solution-explanation-editor.component.html'
+  templateUrl: './solution-explanation-editor.component.html',
 })
-export class SolutionExplanationEditor
-  implements OnDestroy, OnInit {
+export class SolutionExplanationEditor implements OnDestroy, OnInit {
   @Output() saveSolution: EventEmitter<Solution> = new EventEmitter();
 
   // These properties are initialized using Angular lifecycle hooks
@@ -50,7 +59,8 @@ export class SolutionExplanationEditor
     private contextService: ContextService,
     private editabilityService: EditabilityService,
     private externalSaveService: ExternalSaveService,
-    private stateSolutionService: StateSolutionService
+    private stateSolutionService: StateSolutionService,
+    private htmlLengthService: HtmlLengthService
   ) {}
 
   updateExplanationHtml(newHtmlString: string): void {
@@ -74,9 +84,12 @@ export class SolutionExplanationEditor
     if (this.stateSolutionService.displayed === null) {
       throw new Error('Solution is undefined');
     }
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return (
-      this.stateSolutionService.displayed.explanation.html.length > 100000);
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        this.stateSolutionService.displayed.explanation.html,
+        CALCULATION_TYPE_CHARACTER
+      ) > 3000
+    );
   }
 
   saveThisExplanation(): void {
@@ -114,14 +127,16 @@ export class SolutionExplanationEditor
     this.EXPLANATION_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
-        hide_complex_extensions: (
-          this.contextService.getEntityType() === 'question')
-      }
+        hide_complex_extensions:
+          this.contextService.getEntityType() === 'question',
+      },
     };
   }
 }
 
-angular.module('oppia').directive('oppiaSolutionExplanationEditor',
+angular.module('oppia').directive(
+  'oppiaSolutionExplanationEditor',
   downgradeComponent({
-    component: SolutionExplanationEditor
-  }) as angular.IDirectiveFactory);
+    component: SolutionExplanationEditor,
+  }) as angular.IDirectiveFactory
+);

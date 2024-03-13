@@ -31,8 +31,6 @@ from core.domain import blog_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import collection_services
-from core.domain import config_domain
-from core.domain import config_services
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -175,10 +173,6 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     collection_id: Optional[str]
     num_dummy_exps_to_generate: Optional[int]
     num_dummy_exps_to_publish: Optional[int]
-    new_config_property_values: Optional[
-        Dict[str, AllowedAdminConfigPropertyValueTypes]
-    ]
-    config_property_id: Optional[str]
     data: Optional[str]
     topic_id: Optional[str]
     platform_param_name: Optional[str]
@@ -209,7 +203,6 @@ class AdminHandler(
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
-                        'save_config_properties', 'revert_config_property',
                         'upload_topic_similarities',
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
@@ -242,20 +235,6 @@ class AdminHandler(
             'num_dummy_exps_to_publish': {
                 'schema': {
                     'type': 'int'
-                },
-                'default_value': None
-            },
-            'new_config_property_values': {
-                'schema': {
-                    'type': 'object_dict',
-                    'validation_method': (
-                        validation_method.validate_new_config_property_values)
-                },
-                'default_value': None
-            },
-            'config_property_id': {
-                'schema': {
-                    'type': 'basestring'
                 },
                 'default_value': None
             },
@@ -346,10 +325,11 @@ class AdminHandler(
             )
         ]
 
-        config_properties = config_domain.Registry.get_config_property_schemas()
-
+        # TODO(#19810): Remove the ``config_properties`` key-value pair from
+        # this dict, once the classroom configuration and new platform parameter
+        # tabs are prepared for onboarding the existing field.
         self.render_json({
-            'config_properties': config_properties,
+            'config_properties': {},
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,
@@ -377,10 +357,6 @@ class AdminHandler(
                 the action is generate_dummy_explorations.
             InvalidInputException. Generate count cannot be less than publish
                 count.
-            Exception. The new_config_property_values must be provided
-                when the action is save_config_properties.
-            Exception. The config_property_id must be provided when the
-                action is revert_config_property.
             Exception. The data must be provided when the action is
                 upload_topic_similarities.
             Exception. The topic_id must be provided when the action is
@@ -456,32 +432,6 @@ class AdminHandler(
                 self._generate_dummy_skill_and_questions()
             elif action == 'generate_dummy_classroom':
                 self._generate_dummy_classroom()
-            elif action == 'save_config_properties':
-                new_config_property_values = self.normalized_payload.get(
-                    'new_config_property_values')
-                if new_config_property_values is None:
-                    raise Exception(
-                        'The \'new_config_property_values\' must be provided'
-                        ' when the action is save_config_properties.'
-                    )
-                logging.info(
-                    '[ADMIN] %s saved config property values: %s' %
-                    (self.user_id, new_config_property_values))
-                for (name, value) in new_config_property_values.items():
-                    config_services.set_property(self.user_id, name, value)
-            elif action == 'revert_config_property':
-                config_property_id = self.normalized_payload.get(
-                    'config_property_id')
-                if config_property_id is None:
-                    raise Exception(
-                        'The \'config_property_id\' must be provided'
-                        ' when the action is revert_config_property.'
-                    )
-                logging.info(
-                    '[ADMIN] %s reverted config property: %s' %
-                    (self.user_id, config_property_id))
-                config_services.revert_property(
-                    self.user_id, config_property_id)
             elif action == 'upload_topic_similarities':
                 data = self.normalized_payload.get('data')
                 if data is None:
@@ -1281,22 +1231,6 @@ class AdminHandler(
 
             classroom_config_services.update_or_create_classroom_model(
                 classroom_1)
-
-            classroom_pages_data = [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'course_details': '',
-                'topic_list_intro': '',
-                'topic_ids': [
-                    topic_id_1,
-                    topic_id_2,
-                    topic_id_3,
-                    topic_id_4,
-                    topic_id_5
-                ],
-            }]
-            config_services.set_property(
-                self.user_id, 'classroom_pages_data', classroom_pages_data)
         else:
             raise Exception('Cannot generate dummy classroom in production.')
 

@@ -16,29 +16,32 @@
  * @fileoverview Unit tests for for CollectionSummaryTileComponent.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from
-  '@angular/core/testing';
-import { Component, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {Component, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CollectionSummaryTileComponent } from './collection-summary-tile.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { of } from 'rxjs';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {CollectionSummaryTileComponent} from './collection-summary-tile.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {of} from 'rxjs';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {UserService} from 'services/user.service';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 @Component({selector: 'learner-dashboard-icons', template: ''})
-class LearnerDashboardIconsComponentStub {
-}
+class LearnerDashboardIconsComponentStub {}
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -73,8 +76,16 @@ describe('Collection Summary Tile Component', () => {
   let windowDimensionsService: MockWindowDimensionsService;
 
   let userInfo: UserInfo = new UserInfo(
-    ['USER_ROLE'], true, false, false, false, true,
-    'en', 'username1', 'tester@example.com', true
+    ['USER_ROLE'],
+    true,
+    false,
+    false,
+    false,
+    true,
+    'en',
+    'username1',
+    'tester@example.com',
+    true
   );
 
   beforeEach(async(() => {
@@ -83,13 +94,13 @@ describe('Collection Summary Tile Component', () => {
         BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
       declarations: [
         CollectionSummaryTileComponent,
         MockTruncteAndCapitalizePipe,
         LearnerDashboardIconsComponentStub,
-        MockTranslatePipe
+        MockTranslatePipe,
       ],
       providers: [
         WindowRef,
@@ -98,14 +109,14 @@ describe('Collection Summary Tile Component', () => {
         UserService,
         {
           provide: UrlService,
-          useClass: MockUrlService
+          useClass: MockUrlService,
         },
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
-        }
+          useClass: MockWindowDimensionsService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -135,10 +146,13 @@ describe('Collection Summary Tile Component', () => {
 
   it('should intialize the component and set values', fakeAsync(() => {
     const userServiceSpy = spyOn(
-      userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfo));
+      userService,
+      'getUserInfoAsync'
+    ).and.returnValue(Promise.resolve(userInfo));
     const windowResizeSpy = spyOn(
-      windowDimensionsService, 'getResizeEvent').and.callThrough();
+      windowDimensionsService,
+      'getResizeEvent'
+    ).and.callThrough();
     component.mobileCutoffPx = 536;
 
     component.ngOnInit();
@@ -152,41 +166,48 @@ describe('Collection Summary Tile Component', () => {
     expect(component.resizeSubscription).not.toBe(undefined);
   }));
 
-  it('should remove all subscriptions when ngOnDestroy is called',
-    fakeAsync(()=> {
-      component.resizeSubscription = of(new Event('resize')).subscribe();
-      tick();
-      fixture.detectChanges();
-
-      component.ngOnDestroy();
-
-      tick();
-      fixture.detectChanges();
-      expect(component.resizeSubscription.closed).toBe(true);
-    }));
-
-  it('should set mobileCutoffPx to 0 if it is not ' +
-    'specified', fakeAsync(() => {
-    const userServiceSpy = spyOn(
-      userService, 'getUserInfoAsync')
-      .and.returnValue(Promise.resolve(userInfo));
-    const windowResizeSpy = spyOn(
-      windowDimensionsService, 'getResizeEvent').and.callThrough();
-
-    component.ngOnInit();
+  it('should remove all subscriptions when ngOnDestroy is called', fakeAsync(() => {
+    component.resizeSubscription = of(new Event('resize')).subscribe();
     tick();
     fixture.detectChanges();
 
-    expect(userServiceSpy).toHaveBeenCalled();
-    expect(windowResizeSpy).toHaveBeenCalled();
-    expect(component.mobileCutoffPx).toBe(0);
+    component.ngOnDestroy();
+
+    tick();
+    fixture.detectChanges();
+    expect(component.resizeSubscription.closed).toBe(true);
   }));
 
+  it(
+    'should set mobileCutoffPx to 0 if it is not ' + 'specified',
+    fakeAsync(() => {
+      const userServiceSpy = spyOn(
+        userService,
+        'getUserInfoAsync'
+      ).and.returnValue(Promise.resolve(userInfo));
+      const windowResizeSpy = spyOn(
+        windowDimensionsService,
+        'getResizeEvent'
+      ).and.callThrough();
+
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(userServiceSpy).toHaveBeenCalled();
+      expect(windowResizeSpy).toHaveBeenCalled();
+      expect(component.mobileCutoffPx).toBe(0);
+    })
+  );
+
   it('should check if mobile card should be shown', () => {
-    const urlServiceSpy = spyOn(urlService, 'getPathname').and
-      .returnValue('/community-library');
+    const urlServiceSpy = spyOn(urlService, 'getPathname').and.returnValue(
+      '/community-library'
+    );
     const windowWidthSpy = spyOn(
-      windowDimensionsService, 'getWidth').and.returnValue(530);
+      windowDimensionsService,
+      'getWidth'
+    ).and.returnValue(530);
     component.mobileCutoffPx = 537;
 
     component.checkIfMobileCardToBeShown();
@@ -204,8 +225,9 @@ describe('Collection Summary Tile Component', () => {
 
   it('should get the last updated Date & time', () => {
     const dateTimeSpy = spyOn(
-      dateTimeFormatService, 'getLocaleAbbreviatedDatetimeString')
-      .and.returnValue('1:30 am');
+      dateTimeFormatService,
+      'getLocaleAbbreviatedDatetimeString'
+    ).and.returnValue('1:30 am');
 
     component.getLastUpdatedDatetime();
     fixture.detectChanges();
@@ -214,8 +236,10 @@ describe('Collection Summary Tile Component', () => {
   });
 
   it('should get relative last updated Date & time', () => {
-    const dateTimeSpy = spyOn(dateTimeFormatService, 'getRelativeTimeFromNow')
-      .and.returnValue('a few seconds ago');
+    const dateTimeSpy = spyOn(
+      dateTimeFormatService,
+      'getRelativeTimeFromNow'
+    ).and.returnValue('a few seconds ago');
 
     // Date.now() returns the current time in milliseconds since the
     // Epoch.
@@ -242,8 +266,9 @@ describe('Collection Summary Tile Component', () => {
 
   it('should get the collection link url for editor page', () => {
     const urlSpy = spyOn(
-      urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('/collection_editor/create/1');
+      urlInterpolationService,
+      'interpolateUrl'
+    ).and.returnValue('/collection_editor/create/1');
 
     component.getCollectionLink();
     fixture.detectChanges();
@@ -253,8 +278,9 @@ describe('Collection Summary Tile Component', () => {
 
   it('should get the collection link url for viewer page', () => {
     const urlSpy = spyOn(
-      urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('/collection/1');
+      urlInterpolationService,
+      'interpolateUrl'
+    ).and.returnValue('/collection/1');
 
     component.isLinkedToEditorPage = false;
     fixture.detectChanges();
@@ -267,8 +293,9 @@ describe('Collection Summary Tile Component', () => {
 
   it('should get the thumbnail url', () => {
     const urlSpy = spyOn(
-      urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('thumbnailUrl');
+      urlInterpolationService,
+      'getStaticImageUrl'
+    ).and.returnValue('thumbnailUrl');
 
     component.getThumbnailIconUrl = 'thumbnailUrl';
     component.getCompleteThumbnailIconUrl();
@@ -279,8 +306,9 @@ describe('Collection Summary Tile Component', () => {
 
   it('should get the image url', () => {
     const urlSpy = spyOn(
-      urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('imageUrl');
+      urlInterpolationService,
+      'getStaticImageUrl'
+    ).and.returnValue('imageUrl');
 
     component.getCompleteThumbnailIconUrl();
     fixture.detectChanges();

@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Save Pending Changes Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SavePendingChangesModalComponent } from './save-pending-changes-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {SavePendingChangesModalComponent} from './save-pending-changes-modal.component';
 
 describe('Save pending changes modal', () => {
   let componentInstance: SavePendingChangesModalComponent;
@@ -27,9 +27,7 @@ describe('Save pending changes modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [SavePendingChangesModalComponent],
-      providers: [
-        NgbActiveModal
-      ]
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 
