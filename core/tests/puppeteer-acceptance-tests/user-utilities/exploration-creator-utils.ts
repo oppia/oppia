@@ -199,7 +199,7 @@ export class ExplorationCreator extends BaseUser {
       throw new Error('Category dropdown not found.');
     }
     await categoryDropdown.click();
-
+    await this.page.waitForSelector('#mat-option-69', {visible: true});
     const selectedCategory = await this.page.evaluate(() => {
       return (document.querySelector('#mat-option-69') as HTMLElement)
         .innerText;
