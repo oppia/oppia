@@ -56,7 +56,7 @@ export default function isElementClickable(element: Element): boolean {
     return overlappingElements;
   };
 
-  const isOverlappingElementsMatch = (
+  const isOverlappingElementsMatching = (
     targetElement: Element,
     elements: Element[]
   ): boolean => {
@@ -86,7 +86,7 @@ export default function isElementClickable(element: Element): boolean {
       return false;
     }
 
-    return isOverlappingElementsMatch(targetElement, shadowElements);
+    return isOverlappingElementsMatching(targetElement, shadowElements);
   };
 
   const isElementInViewport = (element: Element): boolean => {
@@ -111,14 +111,21 @@ export default function isElementClickable(element: Element): boolean {
     return (
       (element as HTMLButtonElement).disabled !== true &&
       isElementInViewport(element) &&
-      isOverlappingElementsMatch(element, getOverlappingElements(element))
+      isOverlappingElementsMatching(element, getOverlappingElements(element))
     );
   };
 
+  // Here we check if the element is clickable and if not, we scroll it into view
+  // and check again. We do this twice to ensure that the element is centered and
+  // not blocked.
   if (!isClickable(element)) {
-    element.scrollIntoView(true);
+    element.scrollIntoView({block: 'center', inline: 'center'});
 
-    return false;
+    if (!isClickable(element)) {
+      element.scrollIntoView({block: 'center', inline: 'center'});
+
+      return isClickable(element);
+    }
   }
 
   return true;
