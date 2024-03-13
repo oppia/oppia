@@ -131,7 +131,7 @@ run_tests.third_party_size_check: ## Runs the third party size check
 run_tests.backend: ## Runs the backend tests
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-	docker compose up datastore dev-server redis firebase -d --no-deps || $(MAKE) stop
+	docker compose up datastore dev-server redis firebase -d --no-deps 
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
@@ -181,7 +181,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 		rm -rf ./core/tests/puppeteer-acceptance-tests/build; \
 	fi
 	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/spec/$(suite).spec.js || $(MAKE) stop && exit 1
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/spec/$(suite).spec.js
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -212,7 +212,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false} || $(MAKE) stop && exit 1
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false}
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
@@ -247,7 +247,7 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 	else \
 		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
 	fi
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096 || $(MAKE) stop && exit 1
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
@@ -275,7 +275,7 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	else \
 		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
 	fi
-	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
+	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
