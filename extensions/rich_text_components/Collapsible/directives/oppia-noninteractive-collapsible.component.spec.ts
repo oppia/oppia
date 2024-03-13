@@ -16,21 +16,21 @@
  * @fileoverview Directive for the Collapsible rich-text component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { SimpleChanges } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NoninteractiveCollapsible } from './oppia-noninteractive-collapsible.component';
-import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {SimpleChanges} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NoninteractiveCollapsible} from './oppia-noninteractive-collapsible.component';
+import {NgbAccordionModule} from '@ng-bootstrap/ng-bootstrap';
 
 describe('NoninteractiveCollapsible', () => {
   let component: NoninteractiveCollapsible;
   let fixture: ComponentFixture<NoninteractiveCollapsible>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: string) {
+    escapedJsonToObj: function (answer: string) {
       return answer;
-    }
+    },
   };
 
   beforeEach(async(() => {
@@ -40,10 +40,10 @@ describe('NoninteractiveCollapsible', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }
+          useValue: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -55,13 +55,16 @@ describe('NoninteractiveCollapsible', () => {
     component.contentWithValue = 'content';
   });
 
-  it('should initialise when user add collapsible section to the ' +
-  'rich text editor', () => {
-    component.ngOnInit();
+  it(
+    'should initialise when user add collapsible section to the ' +
+      'rich text editor',
+    () => {
+      component.ngOnInit();
 
-    expect(component.heading).toBe('heading');
-    expect(component.content).toBe('content');
-  });
+      expect(component.heading).toBe('heading');
+      expect(component.content).toBe('content');
+    }
+  );
 
   it('should update values when user makes changes', () => {
     let changes: SimpleChanges = {
@@ -69,8 +72,8 @@ describe('NoninteractiveCollapsible', () => {
         currentValue: 'new heading',
         previousValue: 'heading',
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.headingWithValue = 'new heading';
 
@@ -79,13 +82,12 @@ describe('NoninteractiveCollapsible', () => {
     expect(component.heading).toBe('new heading');
   });
 
-  it('should not update values if heading or content don\'t have a value',
-    () => {
-      component.headingWithValue = '';
+  it("should not update values if heading or content don't have a value", () => {
+    component.headingWithValue = '';
 
-      component.ngOnInit();
+    component.ngOnInit();
 
-      expect(component.heading).toBe('');
-      expect(component.content).toBe('');
-    });
+    expect(component.heading).toBe('');
+    expect(component.content).toBe('');
+  });
 });

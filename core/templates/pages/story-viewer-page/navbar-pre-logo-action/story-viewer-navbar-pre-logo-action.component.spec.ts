@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the story viewer pre logo action
  */
 
-import { ComponentFixture, TestBed, fakeAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StoryViewerNavbarPreLogoActionComponent } from './story-viewer-navbar-pre-logo-action.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { StoryViewerBackendApiService } from 'domain/story_viewer/story-viewer-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
-import { StoryPlaythrough } from 'domain/story_viewer/story-playthrough.model';
+import {ComponentFixture, TestBed, fakeAsync} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {StoryViewerNavbarPreLogoActionComponent} from './story-viewer-navbar-pre-logo-action.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
+import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -51,8 +51,8 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
         {
           provide: StoryViewerBackendApiService,
           useValue: {
-            fetchStoryDataAsync: async() => (
-              new Promise((resolve) => {
+            fetchStoryDataAsync: async () =>
+              new Promise(resolve => {
                 resolve(
                   StoryPlaythrough.createFromBackendDict({
                     story_id: 'id',
@@ -60,13 +60,13 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
                     story_title: 'title',
                     story_description: 'description',
                     topic_name: 'topic_1',
-                    meta_tag_content: 'this is a meta tag content'
-                  }));
-              })
-            )
-          }
+                    meta_tag_content: 'this is a meta tag content',
+                  })
+                );
+              }),
+          },
         },
-        { provide: UrlService, useClass: MockUrlService },
+        {provide: UrlService, useClass: MockUrlService},
         UrlInterpolationService,
       ],
     }).compileComponents();
@@ -92,8 +92,9 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
   }));
 
   it('should throw error if story url fragment is not present', () => {
-    spyOn(
-      urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(null);
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      null
+    );
 
     expect(() => {
       component.ngOnInit();
@@ -102,7 +103,6 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
 
   it('should get topic url after component is initialized', () => {
     component.ngOnInit();
-    expect(component.getTopicUrl()).toBe(
-      '/learn/classroom_1/topic_1/story');
+    expect(component.getTopicUrl()).toBe('/learn/classroom_1/topic_1/story');
   });
 });

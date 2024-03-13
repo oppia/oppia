@@ -16,49 +16,65 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { baseInteractionValidationService, Warning } from 'interactions/base-interaction-validation.service';
-import { PencilCodeEditorCustomizationArgs } from 'extensions/interactions/customization-args-defs';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  baseInteractionValidationService,
+  Warning,
+} from 'interactions/base-interaction-validation.service';
+import {PencilCodeEditorCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PencilCodeEditorValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance:
-      baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: PencilCodeEditorCustomizationArgs): Warning[] {
+    customizationArgs: PencilCodeEditorCustomizationArgs
+  ): Warning[] {
     var warningsList = [];
-    this.baseInteractionValidationServiceInstance
-      .requireCustomizationArguments(customizationArgs, ['initialCode']);
+    this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+      customizationArgs,
+      ['initialCode']
+    );
 
     var initialCode = customizationArgs.initialCode.value;
     if (!(typeof initialCode === 'string')) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: 'The initialCode must be a string.'
+        message: 'The initialCode must be a string.',
       });
     }
     return warningsList;
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: PencilCodeEditorCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    stateName: string,
+    customizationArgs: PencilCodeEditorCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome
+  ): Warning[] {
     return this.getCustomizationArgsWarnings(customizationArgs).concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+        answerGroups,
+        defaultOutcome,
+        stateName
+      )
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'PencilCodeEditorValidationService',
-  downgradeInjectable(PencilCodeEditorValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'PencilCodeEditorValidationService',
+    downgradeInjectable(PencilCodeEditorValidationService)
+  );

@@ -106,24 +106,24 @@ export type SetInputAnswer = string[];
 
 export type TextInputAnswer = string;
 
-export type InteractionAnswer = (
-  AlgebraicExpressionAnswer |
-  CodeReplAnswer |
-  ContinueAnswer |
-  DragAndDropAnswer |
-  FractionAnswer |
-  GraphAnswer |
-  ImageClickAnswer |
-  InteractiveMapAnswer |
-  ItemSelectionAnswer |
-  MultipleChoiceAnswer |
-  MusicNotesAnswer |
-  NumericExpressionAnswer |
-  NumberWithUnitsAnswer |
-  NumericInputAnswer |
-  PencilCodeEditorAnswer |
-  RatioInputAnswer |
-  SetInputAnswer |
-  TextInputAnswer |
-  MusicNotesAnswer[] |
-  MathEquationAnswer);
+export type InteractionAnswer =
+  | AlgebraicExpressionAnswer
+  | CodeReplAnswer
+  | ContinueAnswer
+  | DragAndDropAnswer
+  | FractionAnswer
+  | GraphAnswer
+  | ImageClickAnswer
+  | InteractiveMapAnswer
+  | ItemSelectionAnswer
+  | MultipleChoiceAnswer
+  | MusicNotesAnswer
+  | NumericExpressionAnswer
+  | NumberWithUnitsAnswer
+  | NumericInputAnswer
+  | PencilCodeEditorAnswer
+  | RatioInputAnswer
+  | SetInputAnswer
+  | TextInputAnswer
+  | MusicNotesAnswer[]
+  | MathEquationAnswer;

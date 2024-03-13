@@ -18,10 +18,9 @@
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslatableSetOfUnicodeStringEditorComponent } from './translatable-set-of-unicode-string-editor.component';
-
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslatableSetOfUnicodeStringEditorComponent} from './translatable-set-of-unicode-string-editor.component';
 
 // TODO(#11014): Add more extensive front end tests for object editors that rely
 // on schema editors.
@@ -31,7 +30,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TranslatableSetOfUnicodeStringEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
     component = TestBed.createComponent(
       TranslatableSetOfUnicodeStringEditorComponent
@@ -41,7 +40,7 @@ describe('TranslatableSetOfUnicodeStringEditor', () => {
   }));
 
   it('should initialize the schema', () => {
-    component.value = { unicodeStrSet: 'random val' };
+    component.value = {unicodeStrSet: 'random val'};
     component.updateValue('random val');
     component.getSchema();
     component.updateValue('abc');

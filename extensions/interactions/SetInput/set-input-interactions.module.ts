@@ -18,37 +18,36 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { InteractiveSetInputComponent } from './directives/oppia-interactive-set-input.component';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { ResponseSetInputComponent } from './directives/oppia-response-set-input.component';
-import { ShortResponseSetInputComponent } from './directives/oppia-short-response-set-input.component';
-import { TranslateModule } from '@ngx-translate/core';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {InteractiveSetInputComponent} from './directives/oppia-interactive-set-input.component';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {ResponseSetInputComponent} from './directives/oppia-response-set-input.component';
+import {ShortResponseSetInputComponent} from './directives/oppia-short-response-set-input.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedFormsModule,
     SharedPipesModule,
-    TranslateModule
+    TranslateModule,
   ],
   declarations: [
     InteractiveSetInputComponent,
     ResponseSetInputComponent,
-    ShortResponseSetInputComponent
+    ShortResponseSetInputComponent,
   ],
   entryComponents: [
     InteractiveSetInputComponent,
     ResponseSetInputComponent,
-    ShortResponseSetInputComponent
+    ShortResponseSetInputComponent,
   ],
   exports: [
     InteractiveSetInputComponent,
     ResponseSetInputComponent,
-    ShortResponseSetInputComponent
+    ShortResponseSetInputComponent,
   ],
 })
-
-export class SetInputInteractionModule { }
+export class SetInputInteractionModule {}

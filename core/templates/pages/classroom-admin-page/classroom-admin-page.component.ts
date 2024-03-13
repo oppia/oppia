@@ -17,21 +17,28 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { AlertsService } from 'services/alerts.service';
-import { AppConstants } from 'app.constants';
-import { ClassroomBackendApiService, ClassroomBackendDict, ClassroomDict } from '../../domain/classroom/classroom-backend-api.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ClassroomEditorConfirmModalComponent } from './modals/classroom-editor-confirm-modal.component';
-import { DeleteClassroomConfirmModalComponent } from './modals/delete-classroom-confirm-modal.component';
-import { CreateNewClassroomModalComponent } from './modals/create-new-classroom-modal.component';
-import { DeleteTopicFromClassroomModalComponent } from './modals/delete-topic-from-classroom-modal.component';
-import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-backend-api.service';
-import { TopicsDependencyGraphModalComponent } from './modals/topic-dependency-graph-viz-modal.component';
-import { ExistingClassroomData, TopicIdToPrerequisiteTopicIds, TopicIdToTopicName } from './existing-classroom.model';
-import { ClassroomAdminDataService } from './services/classroom-admin-data.service';
-
+import {Component, OnInit} from '@angular/core';
+import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
+import {AlertsService} from 'services/alerts.service';
+import {AppConstants} from 'app.constants';
+import {
+  ClassroomBackendApiService,
+  ClassroomBackendDict,
+  ClassroomDict,
+} from '../../domain/classroom/classroom-backend-api.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {ClassroomEditorConfirmModalComponent} from './modals/classroom-editor-confirm-modal.component';
+import {DeleteClassroomConfirmModalComponent} from './modals/delete-classroom-confirm-modal.component';
+import {CreateNewClassroomModalComponent} from './modals/create-new-classroom-modal.component';
+import {DeleteTopicFromClassroomModalComponent} from './modals/delete-topic-from-classroom-modal.component';
+import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
+import {TopicsDependencyGraphModalComponent} from './modals/topic-dependency-graph-viz-modal.component';
+import {
+  ExistingClassroomData,
+  TopicIdToPrerequisiteTopicIds,
+  TopicIdToTopicName,
+} from './existing-classroom.model';
+import {ClassroomAdminDataService} from './services/classroom-admin-data.service';
 
 export interface TopicNameToPrerequisiteTopicNames {
   [topicName: string]: string[];
@@ -93,23 +100,23 @@ export class ClassroomAdminPageComponent implements OnInit {
     for (let topicName of topicNames) {
       if (
         topicName !== currentTopicName &&
-          this.topicNameToPrerequisiteTopicNames[currentTopicName]
-            .indexOf(topicName) === -1
+        this.topicNameToPrerequisiteTopicNames[currentTopicName].indexOf(
+          topicName
+        ) === -1
       ) {
         this.eligibleTopicNamesForPrerequisites.push(topicName);
       }
     }
-    this.tempEligibleTopicNamesForPrerequisites = (
-      this.eligibleTopicNamesForPrerequisites);
+    this.tempEligibleTopicNamesForPrerequisites =
+      this.eligibleTopicNamesForPrerequisites;
     this.currentTopicOnEdit = currentTopicName;
   }
 
   onPrerequisiteInputChange(): void {
-    this.tempEligibleTopicNamesForPrerequisites = (
-      this.eligibleTopicNamesForPrerequisites.filter(
-        option => option.includes(this.prerequisiteInput)
-      )
-    );
+    this.tempEligibleTopicNamesForPrerequisites =
+      this.eligibleTopicNamesForPrerequisites.filter(option =>
+        option.includes(this.prerequisiteInput)
+      );
   }
 
   getClassroomData(classroomId: string): void {
@@ -118,8 +125,8 @@ export class ClassroomAdminPageComponent implements OnInit {
     }
 
     if (
-      this.tempClassroomData && (
-        this.tempClassroomData.getClassroomId() === classroomId) &&
+      this.tempClassroomData &&
+      this.tempClassroomData.getClassroomId() === classroomId &&
       this.classroomViewerMode
     ) {
       this.classroomDetailsIsShown = false;
@@ -132,41 +139,49 @@ export class ClassroomAdminPageComponent implements OnInit {
     this.classroomBackendApiService.getClassroomDataAsync(classroomId).then(
       response => {
         this.classroomData = ExistingClassroomData.createClassroomFromDict(
-          cloneDeep(response.classroomDict));
+          cloneDeep(response.classroomDict)
+        );
         this.tempClassroomData = ExistingClassroomData.createClassroomFromDict(
-          cloneDeep(response.classroomDict));
+          cloneDeep(response.classroomDict)
+        );
 
         this.classroomDataIsChanged = false;
 
-        this.existingClassroomNames = (
-          Object.values(this.classroomIdToClassroomName));
+        this.existingClassroomNames = Object.values(
+          this.classroomIdToClassroomName
+        );
         const index = this.existingClassroomNames.indexOf(
-          this.tempClassroomData.getClassroomName());
+          this.tempClassroomData.getClassroomName()
+        );
         this.existingClassroomNames.splice(index, 1);
 
         this.classroomDetailsIsShown = true;
         this.classroomViewerMode = true;
 
-        this.classroomAdminDataService.existingClassroomNames = (
-          this.existingClassroomNames);
+        this.classroomAdminDataService.existingClassroomNames =
+          this.existingClassroomNames;
 
         this.classroomAdminDataService.validateClassroom(
-          this.tempClassroomData, this.classroomData);
+          this.tempClassroomData,
+          this.classroomData
+        );
 
         this.setTopicDependencyByTopicName(
-          this.tempClassroomData.getTopicIdToPrerequisiteTopicId());
-      }, (errorResponse) => {
-        if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(
-            errorResponse) !== -1) {
+          this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
+        );
+      },
+      errorResponse => {
+        if (AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse) !== -1) {
           this.alertsService.addWarning('Failed to get classroom data');
         }
-      });
+      }
+    );
   }
 
   getAllClassroomIdToClassroomName(): void {
     this.classroomBackendApiService
-      .getAllClassroomIdToClassroomNameDictAsync().then(response => {
+      .getAllClassroomIdToClassroomNameDictAsync()
+      .then(response => {
         this.pageIsInitialized = true;
         this.classroomIdToClassroomName = response;
         this.classroomCount = Object.keys(response).length;
@@ -174,28 +189,23 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   updateClassroomField(): void {
-    const classroomNameIsChanged = (
+    const classroomNameIsChanged =
       this.tempClassroomData.getClassroomName() !==
-      this.classroomData.getClassroomName()
-    );
-    const classroomUrlIsChanged = (
+      this.classroomData.getClassroomName();
+    const classroomUrlIsChanged =
       this.tempClassroomData.getClassroomUrlFragment() !==
-      this.classroomData.getClassroomUrlFragment()
-    );
-    const classroomTopicListIntroIsChanged = (
+      this.classroomData.getClassroomUrlFragment();
+    const classroomTopicListIntroIsChanged =
       this.tempClassroomData.getTopicListIntro() !==
-      this.classroomData.getTopicListIntro()
-    );
-    const classroomCourseDetailsIsChanged = (
+      this.classroomData.getTopicListIntro();
+    const classroomCourseDetailsIsChanged =
       this.tempClassroomData.getCourseDetails() !==
-      this.classroomData.getCourseDetails()
-    );
-    const topicDependencyIsChanged = (
+      this.classroomData.getCourseDetails();
+    const topicDependencyIsChanged =
       JSON.stringify(
-        this.tempClassroomData.getTopicIdToPrerequisiteTopicId()) !==
-      JSON.stringify(
-        this.classroomData.getTopicIdToPrerequisiteTopicId())
-    );
+        this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
+      ) !==
+      JSON.stringify(this.classroomData.getTopicIdToPrerequisiteTopicId());
 
     if (
       classroomNameIsChanged ||
@@ -211,57 +221,69 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   convertClassroomDictToBackendForm(
-      classroomDict: ClassroomDict): ClassroomBackendDict {
+    classroomDict: ClassroomDict
+  ): ClassroomBackendDict {
     return {
       classroom_id: classroomDict.classroomId,
       name: classroomDict.name,
       url_fragment: classroomDict.urlFragment,
       course_details: classroomDict.courseDetails,
       topic_list_intro: classroomDict.topicListIntro,
-      topic_id_to_prerequisite_topic_ids: (
-        classroomDict.topicIdToPrerequisiteTopicIds)
+      topic_id_to_prerequisite_topic_ids:
+        classroomDict.topicIdToPrerequisiteTopicIds,
     };
   }
 
   saveClassroomData(classroomId: string): void {
     this.classroomDataSaveInProgress = true;
     const backendDict = this.convertClassroomDictToBackendForm(
-      this.tempClassroomData.getClassroomDict());
+      this.tempClassroomData.getClassroomDict()
+    );
 
     this.openClassroomInViewerMode();
     this.classroomDataIsChanged = false;
 
-    this.classroomBackendApiService.updateClassroomDataAsync(
-      classroomId, backendDict).then(() => {
-      this.classroomIdToClassroomName[
-        this.tempClassroomData.getClassroomId()] = (
-        this.tempClassroomData.getClassroomName()
+    this.classroomBackendApiService
+      .updateClassroomDataAsync(classroomId, backendDict)
+      .then(
+        () => {
+          this.classroomIdToClassroomName[
+            this.tempClassroomData.getClassroomId()
+          ] = this.tempClassroomData.getClassroomName();
+          this.classroomData = cloneDeep(this.tempClassroomData);
+          this.classroomDataSaveInProgress = false;
+        },
+        () => {
+          this.tempClassroomData = cloneDeep(this.classroomData);
+          this.setTopicDependencyByTopicName(
+            this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
+          );
+        }
       );
-      this.classroomData = cloneDeep(this.tempClassroomData);
-      this.classroomDataSaveInProgress = false;
-    }, () => {
-      this.tempClassroomData = cloneDeep(this.classroomData);
-      this.setTopicDependencyByTopicName(
-        this.tempClassroomData.getTopicIdToPrerequisiteTopicId());
-    });
   }
 
   deleteClassroom(classroomId: string): void {
-    let modalRef: NgbModalRef = this.ngbModal.
-      open(DeleteClassroomConfirmModalComponent, {
-        backdrop: 'static'
-      });
-    modalRef.result.then(() => {
-      this.classroomBackendApiService.deleteClassroomAsync(classroomId).then(
-        () => {
-          delete this.classroomIdToClassroomName[classroomId];
-          this.classroomCount--;
-        });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
-    });
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      DeleteClassroomConfirmModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalRef.result.then(
+      () => {
+        this.classroomBackendApiService
+          .deleteClassroomAsync(classroomId)
+          .then(() => {
+            delete this.classroomIdToClassroomName[classroomId];
+            this.classroomCount--;
+          });
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
   }
 
   openClassroomInEditorMode(): void {
@@ -276,23 +298,29 @@ export class ClassroomAdminPageComponent implements OnInit {
 
   closeClassroomConfigEditor(): void {
     if (this.classroomDataIsChanged) {
-      let modalRef: NgbModalRef = this.ngbModal.
-        open(ClassroomEditorConfirmModalComponent, {
-          backdrop: 'static'
-        });
-      modalRef.result.then(() => {
-        this.tempClassroomData = cloneDeep(this.classroomData);
-        this.setTopicDependencyByTopicName(
-          this.tempClassroomData.getTopicIdToPrerequisiteTopicId());
+      let modalRef: NgbModalRef = this.ngbModal.open(
+        ClassroomEditorConfirmModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      modalRef.result.then(
+        () => {
+          this.tempClassroomData = cloneDeep(this.classroomData);
+          this.setTopicDependencyByTopicName(
+            this.tempClassroomData.getTopicIdToPrerequisiteTopicId()
+          );
 
-        this.classroomDataIsChanged = false;
-        this.classroomAdminDataService.reinitializeErrorMsgs();
-        this.openClassroomInViewerMode();
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is
-        // clicked. No further action is needed.
-      });
+          this.classroomDataIsChanged = false;
+          this.classroomAdminDataService.reinitializeErrorMsgs();
+          this.openClassroomInViewerMode();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is
+          // clicked. No further action is needed.
+        }
+      );
     } else {
       this.openClassroomInViewerMode();
     }
@@ -302,20 +330,25 @@ export class ClassroomAdminPageComponent implements OnInit {
   createNewClassroom(): void {
     this.classroomViewerMode = false;
     this.classroomDetailsIsShown = false;
-    let modalRef: NgbModalRef = this.ngbModal.
-      open(CreateNewClassroomModalComponent, {
-        backdrop: 'static'
-      });
-    modalRef.componentInstance.existingClassroomNames = (
-      Object.values(this.classroomIdToClassroomName)
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      CreateNewClassroomModalComponent,
+      {
+        backdrop: 'static',
+      }
     );
-    modalRef.result.then((classroomDict) => {
-      this.classroomIdToClassroomName[classroomDict.classroom_id] = (
-        classroomDict.name);
-      this.classroomCount++;
-    }, () => {
-      this.classroomAdminDataService.reinitializeErrorMsgs();
-    });
+    modalRef.componentInstance.existingClassroomNames = Object.values(
+      this.classroomIdToClassroomName
+    );
+    modalRef.result.then(
+      classroomDict => {
+        this.classroomIdToClassroomName[classroomDict.classroom_id] =
+          classroomDict.name;
+        this.classroomCount++;
+      },
+      () => {
+        this.classroomAdminDataService.reinitializeErrorMsgs();
+      }
+    );
   }
 
   ngOnInit(): void {
@@ -323,57 +356,61 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   setTopicDependencyByTopicName(
-      topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
+    topicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds
   ): void {
     this.topicDependencyIsLoaded = false;
     let topicIds = Object.keys(topicIdToPrerequisiteTopicIds);
 
-    this.editableTopicBackendApiService.getTopicIdToTopicNameAsync(
-      topicIds).then(topicIdsToTopicName => {
-      this.topicNameToPrerequisiteTopicNames = {};
+    this.editableTopicBackendApiService
+      .getTopicIdToTopicNameAsync(topicIds)
+      .then(topicIdsToTopicName => {
+        this.topicNameToPrerequisiteTopicNames = {};
 
-      for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
-        let currentTopicName = topicIdsToTopicName[currentTopicId];
+        for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
+          let currentTopicName = topicIdsToTopicName[currentTopicId];
 
-        let prerequisiteTopicIds = (
-          topicIdToPrerequisiteTopicIds[currentTopicId]);
-        let prerequisiteTopicNames = [];
+          let prerequisiteTopicIds =
+            topicIdToPrerequisiteTopicIds[currentTopicId];
+          let prerequisiteTopicNames = [];
 
-        for (let topicId of prerequisiteTopicIds) {
-          prerequisiteTopicNames.push(
-            topicIdsToTopicName[topicId]);
+          for (let topicId of prerequisiteTopicIds) {
+            prerequisiteTopicNames.push(topicIdsToTopicName[topicId]);
+          }
+
+          this.tempClassroomData._topicIdToTopicName = topicIdsToTopicName;
+
+          this.topicNameToPrerequisiteTopicNames[currentTopicName] =
+            prerequisiteTopicNames;
+          this.topicIdsToTopicName = topicIdsToTopicName;
+          this.topicNames = Object.values(this.topicIdsToTopicName);
+          this.topicDependencyIsLoaded = true;
         }
-
-        this.tempClassroomData._topicIdToTopicName = topicIdsToTopicName;
-
-        this.topicNameToPrerequisiteTopicNames[currentTopicName] = (
-          prerequisiteTopicNames);
-        this.topicIdsToTopicName = topicIdsToTopicName;
-        this.topicNames = Object.values(this.topicIdsToTopicName);
-        this.topicDependencyIsLoaded = true;
-      }
-    });
+      });
   }
 
   addTopicId(topicId: string): void {
-    this.editableTopicBackendApiService.getTopicIdToTopicNameAsync(
-      [topicId]).then(topicIdToTopicName => {
-      const topicName = topicIdToTopicName[topicId];
+    this.editableTopicBackendApiService
+      .getTopicIdToTopicNameAsync([topicId])
+      .then(
+        topicIdToTopicName => {
+          const topicName = topicIdToTopicName[topicId];
 
-      this.topicIdsToTopicName[topicId] = topicName;
-      this.tempClassroomData.addNewTopicId(topicId);
-      this.topicNameToPrerequisiteTopicNames[topicName] = [];
-      this.topicNames.push(topicName);
-      this.topicDependencyIsLoaded = true;
+          this.topicIdsToTopicName[topicId] = topicName;
+          this.tempClassroomData.addNewTopicId(topicId);
+          this.topicNameToPrerequisiteTopicNames[topicName] = [];
+          this.topicNames.push(topicName);
+          this.topicDependencyIsLoaded = true;
 
-      this.classroomDataIsChanged = true;
-      this.newTopicCanBeAdded = false;
-      this.topicWithGivenIdExists = true;
+          this.classroomDataIsChanged = true;
+          this.newTopicCanBeAdded = false;
+          this.topicWithGivenIdExists = true;
 
-      this.newTopicId = '';
-    }, () => {
-      this.topicWithGivenIdExists = false;
-    });
+          this.newTopicId = '';
+        },
+        () => {
+          this.topicWithGivenIdExists = false;
+        }
+      );
   }
 
   showNewTopicInputField(): void {
@@ -404,45 +441,60 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   addDependencyForTopic(
-      currentTopicName: string, prerequisiteTopicName: string): void {
+    currentTopicName: string,
+    prerequisiteTopicName: string
+  ): void {
     let prerequisiteTopicNames = cloneDeep(
-      this.topicNameToPrerequisiteTopicNames[currentTopicName]);
+      this.topicNameToPrerequisiteTopicNames[currentTopicName]
+    );
     let currentTopicId = this.getTopicIdFromTopicName(currentTopicName);
     let prerequisiteTopicId = this.getTopicIdFromTopicName(
-      prerequisiteTopicName);
+      prerequisiteTopicName
+    );
 
     if (prerequisiteTopicNames.indexOf(prerequisiteTopicName) !== -1) {
       return;
     }
 
     this.topicNameToPrerequisiteTopicNames[currentTopicName].push(
-      prerequisiteTopicName);
+      prerequisiteTopicName
+    );
     this.topicNameToPrerequisiteTopicNames[currentTopicName].sort();
     this.tempClassroomData.addPrerequisiteTopicId(
-      currentTopicId, prerequisiteTopicId);
+      currentTopicId,
+      prerequisiteTopicId
+    );
 
     this.classroomAdminDataService.validateClassroom(
-      this.tempClassroomData, this.classroomData);
+      this.tempClassroomData,
+      this.classroomData
+    );
     this.updateClassroomField();
   }
 
   removeDependencyFromTopic(
-      currentTopicName: string, prerequisiteTopicName: string
+    currentTopicName: string,
+    prerequisiteTopicName: string
   ): void {
     let currentTopicId = this.getTopicIdFromTopicName(currentTopicName);
     let prerequisiteTopicId = this.getTopicIdFromTopicName(
-      prerequisiteTopicName);
+      prerequisiteTopicName
+    );
 
     this.tempClassroomData.removeDependency(
-      currentTopicId, prerequisiteTopicId);
+      currentTopicId,
+      prerequisiteTopicId
+    );
 
-    let prerequisiteTopicNames = (
-      this.topicNameToPrerequisiteTopicNames[currentTopicName]);
+    let prerequisiteTopicNames =
+      this.topicNameToPrerequisiteTopicNames[currentTopicName];
     const index = prerequisiteTopicNames.indexOf(prerequisiteTopicName);
     prerequisiteTopicNames.splice(index, 1);
 
     this.classroomAdminDataService.validateClassroom(
-      this.tempClassroomData, this.classroomData);
+      this.tempClassroomData,
+      this.classroomData
+    );
     this.updateClassroomField();
   }
 
@@ -464,36 +516,42 @@ export class ClassroomAdminPageComponent implements OnInit {
       }
     }
 
-    let modalRef: NgbModalRef = this.ngbModal.
-      open(DeleteTopicFromClassroomModalComponent, {
-        backdrop: 'static'
-      });
-    modalRef.componentInstance.prerequisiteTopics = (
-      Object.values(childTopicNodes)
-    );
-    modalRef.componentInstance.topicName = topicNameToDelete;
-    modalRef.result.then(() => {
-      const topicId = this.getTopicIdFromTopicName(topicNameToDelete);
-      this.tempClassroomData.removeTopic(topicId);
-
-      delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
-      delete this.topicIdsToTopicName[topicId];
-
-      this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
-
-      this.classroomAdminDataService.validateClassroom(
-        this.tempClassroomData, this.classroomData);
-
-      this.classroomDataIsChanged = true;
-
-      if (this.tempClassroomData.getTopicsCount() === 0) {
-        this.topicDependencyIsLoaded = false;
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      DeleteTopicFromClassroomModalComponent,
+      {
+        backdrop: 'static',
       }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
-    });
+    );
+    modalRef.componentInstance.prerequisiteTopics =
+      Object.values(childTopicNodes);
+    modalRef.componentInstance.topicName = topicNameToDelete;
+    modalRef.result.then(
+      () => {
+        const topicId = this.getTopicIdFromTopicName(topicNameToDelete);
+        this.tempClassroomData.removeTopic(topicId);
+
+        delete this.topicNameToPrerequisiteTopicNames[topicNameToDelete];
+        delete this.topicIdsToTopicName[topicId];
+
+        this.topicNames = Object.keys(this.topicNameToPrerequisiteTopicNames);
+
+        this.classroomAdminDataService.validateClassroom(
+          this.tempClassroomData,
+          this.classroomData
+        );
+
+        this.classroomDataIsChanged = true;
+
+        if (this.tempClassroomData.getTopicsCount() === 0) {
+          this.topicDependencyIsLoaded = false;
+        }
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
   }
 
   drop(event: CdkDragDrop<string[]>): void {
@@ -502,39 +560,45 @@ export class ClassroomAdminPageComponent implements OnInit {
     let tempTopicIdToPrerequisiteTopicIds: TopicIdToPrerequisiteTopicIds = {};
 
     for (let topicName of this.topicNames) {
-      const prerequisiteTopicNames = (
-        this.topicNameToPrerequisiteTopicNames[topicName]);
+      const prerequisiteTopicNames =
+        this.topicNameToPrerequisiteTopicNames[topicName];
       const topicId = this.getTopicIdFromTopicName(topicName);
 
       let prerequisiteTopicIds = [];
       for (let prerequisiteTopicName of prerequisiteTopicNames) {
-        prerequisiteTopicIds.push(this.getTopicIdFromTopicName(
-          prerequisiteTopicName));
+        prerequisiteTopicIds.push(
+          this.getTopicIdFromTopicName(prerequisiteTopicName)
+        );
       }
       tempTopicIdToPrerequisiteTopicIds[topicId] = prerequisiteTopicIds;
     }
 
     this.tempClassroomData.setTopicIdToPrerequisiteTopicId(
-      tempTopicIdToPrerequisiteTopicIds);
+      tempTopicIdToPrerequisiteTopicIds
+    );
     this.updateClassroomField();
   }
 
   viewGraph(): void {
-    let modalRef: NgbModalRef = this.ngbModal.
-      open(TopicsDependencyGraphModalComponent, {
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      TopicsDependencyGraphModalComponent,
+      {
         backdrop: true,
-        windowClass: 'oppia-large-modal-window'
-      });
-    modalRef.componentInstance.topicIdToPrerequisiteTopicIds = (
-      this.tempClassroomData.getTopicIdToPrerequisiteTopicId());
+        windowClass: 'oppia-large-modal-window',
+      }
+    );
+    modalRef.componentInstance.topicIdToPrerequisiteTopicIds =
+      this.tempClassroomData.getTopicIdToPrerequisiteTopicId();
     modalRef.componentInstance.topicIdToTopicName = this.topicIdsToTopicName;
 
-    modalRef.result.then(() => {
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is
-      // clicked. No further action is needed.
-    });
+    modalRef.result.then(
+      () => {},
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
   }
 
   getPrerequisiteLength(topicName: string): number {

@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for stale tab information component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { StaleTabInfoModalComponent } from './stale-tab-info-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {StaleTabInfoModalComponent} from './stale-tab-info-modal.component';
 
 describe('Stale tab info modal component', () => {
   let component: StaleTabInfoModalComponent;
@@ -27,12 +27,8 @@ describe('Stale tab info modal component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        StaleTabInfoModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [StaleTabInfoModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

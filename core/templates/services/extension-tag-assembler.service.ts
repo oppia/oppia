@@ -17,32 +17,30 @@
  * the learner and editor views.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 import {
   InteractionCustomizationArgs,
-  InteractionCustomizationArgsBackendDict
-} from
-  'interactions/customization-args-defs';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+  InteractionCustomizationArgsBackendDict,
+} from 'interactions/customization-args-defs';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 // Service for assembling extension tags (for interactions).
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExtensionTagAssemblerService {
   constructor(
     private htmlEscaperService: HtmlEscaperService,
-    private camelCaseToHyphens: CamelCaseToHyphensPipe) {}
+    private camelCaseToHyphens: CamelCaseToHyphensPipe
+  ) {}
 
   _convertCustomizationArgsToBackendDict(
-      customizationArgs: InteractionCustomizationArgs
+    customizationArgs: InteractionCustomizationArgs
   ): InteractionCustomizationArgsBackendDict {
     // Because of issues with circular dependencies, we cannot import
     // Interaction from InteractionObjectFactory in this file.
@@ -50,13 +48,14 @@ export class ExtensionTagAssemblerService {
     // here to avoid the circular dependency.
 
     const traverseSchemaAndConvertSubtitledToDicts = (
-        value: Object[] | Object
+      value: Object[] | Object
     ): Object[] | Object => {
       if (value instanceof SubtitledUnicode || value instanceof SubtitledHtml) {
         return value.toBackendDict();
       } else if (value instanceof Array) {
-        return value.map(
-          element => traverseSchemaAndConvertSubtitledToDicts(element));
+        return value.map(element =>
+          traverseSchemaAndConvertSubtitledToDicts(element)
+        );
       } else if (value instanceof Object) {
         type KeyOfValue = keyof typeof value;
         let _result: Record<KeyOfValue, Object> = {};
@@ -73,8 +72,7 @@ export class ExtensionTagAssemblerService {
     const customizationArgsBackendDict: Record<string, Object> = {};
     Object.entries(customizationArgs).forEach(([caName, caValue]) => {
       customizationArgsBackendDict[caName] = {
-        value: traverseSchemaAndConvertSubtitledToDicts(
-          caValue.value)
+        value: traverseSchemaAndConvertSubtitledToDicts(caValue.value),
       };
     });
 
@@ -82,21 +80,26 @@ export class ExtensionTagAssemblerService {
   }
 
   formatCustomizationArgAttrs(
-      element: HTMLElement, customizationArgs: InteractionCustomizationArgs
+    element: HTMLElement,
+    customizationArgs: InteractionCustomizationArgs
   ): HTMLElement {
-    const caBackendDict = (
-      this._convertCustomizationArgsToBackendDict(customizationArgs)
+    const caBackendDict = this._convertCustomizationArgsToBackendDict(
+      customizationArgs
     ) as Record<string, Record<string, Object>>;
     for (const caName in customizationArgs) {
       const caBackendDictValue = caBackendDict[caName].value;
       element.setAttribute(
         this.camelCaseToHyphens.transform(caName) + '-with-value',
-        this.htmlEscaperService.objToEscapedJson(caBackendDictValue));
+        this.htmlEscaperService.objToEscapedJson(caBackendDictValue)
+      );
     }
     return element;
   }
 }
 
-angular.module('oppia').factory(
-  'ExtensionTagAssemblerService',
-  downgradeInjectable(ExtensionTagAssemblerService));
+angular
+  .module('oppia')
+  .factory(
+    'ExtensionTagAssemblerService',
+    downgradeInjectable(ExtensionTagAssemblerService)
+  );

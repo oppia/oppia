@@ -190,6 +190,8 @@
 /.gitattributes @oppia/dev-workflow-reviewers
 /.gitignore @oppia/dev-workflow-reviewers
 /.isort.cfg @oppia/dev-workflow-reviewers
+/.prettierignore @oppia/dev-workflow-reviewers
+/.prettierrc.json @oppia/dev-workflow-reviewers
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
@@ -423,7 +425,6 @@
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
 /core/domain/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/diagnostic_test_player*.py @oppia/lace-backend-reviewers
-/core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers
 /core/templates/components/concept-card/ @oppia/lace-frontend-reviewers

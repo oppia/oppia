@@ -16,30 +16,29 @@
  * @fileoverview Module for the learner dashboard page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
 
-import { LearnerStorySummaryTileComponent } from 'components/summary-tile/learner-story-summary-tile.component';
-import { LearnerTopicGoalsSummaryTileComponent } from 'components/summary-tile/learner-topic-goals-summary-tile.component';
-import { ProgressTabComponent } from './progress-tab.component';
-import { GoalsTabComponent } from './goals-tab.component';
-import { CommunityLessonsTabComponent } from './community-lessons-tab.component';
-import { LearnerTopicSummaryTileComponent } from 'components/summary-tile/learner-topic-summary-tile.component';
-import { HomeTabComponent } from './home-tab.component';
-import { LearnerGroupsTabComponent } from './learner-groups-tab.component';
-import { LearnerDashboardPageComponent } from './learner-dashboard-page.component';
-import { LearnerDashboardPageRootComponent } from './learner-dashboard-page-root.component';
-import { RemoveActivityModalComponent } from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
-import { DeclineInvitationModalComponent } from './modal-templates/decline-invitaiton-modal.component';
-import { ViewLearnerGroupInvitationModalComponent } from './modal-templates/view-learner-group-invitation-modal.component';
-import { LearnerDashboardSuggestionModalComponent } from './suggestion-modal/learner-dashboard-suggestion-modal.component';
-import { ViewLearnerGroupDetailsModalComponent } from './modal-templates/view-learner-group-details-modal.component';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { ToastrModule } from 'ngx-toastr';
-import { LearnerDashboardActivityBackendApiService } from
-  'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {LearnerStorySummaryTileComponent} from 'components/summary-tile/learner-story-summary-tile.component';
+import {LearnerTopicGoalsSummaryTileComponent} from 'components/summary-tile/learner-topic-goals-summary-tile.component';
+import {ProgressTabComponent} from './progress-tab.component';
+import {GoalsTabComponent} from './goals-tab.component';
+import {CommunityLessonsTabComponent} from './community-lessons-tab.component';
+import {LearnerTopicSummaryTileComponent} from 'components/summary-tile/learner-topic-summary-tile.component';
+import {HomeTabComponent} from './home-tab.component';
+import {LearnerGroupsTabComponent} from './learner-groups-tab.component';
+import {LearnerDashboardPageComponent} from './learner-dashboard-page.component';
+import {LearnerDashboardPageRootComponent} from './learner-dashboard-page-root.component';
+import {RemoveActivityModalComponent} from 'pages/learner-dashboard-page/modal-templates/remove-activity-modal.component';
+import {DeclineInvitationModalComponent} from './modal-templates/decline-invitaiton-modal.component';
+import {ViewLearnerGroupInvitationModalComponent} from './modal-templates/view-learner-group-invitation-modal.component';
+import {LearnerDashboardSuggestionModalComponent} from './suggestion-modal/learner-dashboard-suggestion-modal.component';
+import {ViewLearnerGroupDetailsModalComponent} from './modal-templates/view-learner-group-details-modal.component';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {ToastrModule} from 'ngx-toastr';
+import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 
 @NgModule({
   imports: [
@@ -52,7 +51,6 @@ import { LearnerDashboardActivityBackendApiService } from
         component: LearnerDashboardPageRootComponent,
       },
     ]),
-
   ],
   declarations: [
     LearnerDashboardPageComponent,
@@ -69,7 +67,7 @@ import { LearnerDashboardActivityBackendApiService } from
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
-    ViewLearnerGroupDetailsModalComponent
+    ViewLearnerGroupDetailsModalComponent,
   ],
   entryComponents: [
     LearnerDashboardPageComponent,
@@ -85,10 +83,8 @@ import { LearnerDashboardActivityBackendApiService } from
     LearnerDashboardSuggestionModalComponent,
     DeclineInvitationModalComponent,
     ViewLearnerGroupInvitationModalComponent,
-    ViewLearnerGroupDetailsModalComponent
+    ViewLearnerGroupDetailsModalComponent,
   ],
-  providers: [
-    LearnerDashboardActivityBackendApiService
-  ]
+  providers: [LearnerDashboardActivityBackendApiService],
 })
 export class LearnerDashboardPageModule {}

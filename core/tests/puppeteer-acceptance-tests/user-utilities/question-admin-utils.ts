@@ -16,14 +16,11 @@
  * @fileoverview Question admin users utility file.
  */
 
-const baseUser = require(
-  '../puppeteer-testing-utilities/puppeteer-utils.js');
-const testConstants = require(
-  '../puppeteer-testing-utilities/test-constants.js');
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
-const { showMessage } = require(
-  '../puppeteer-testing-utilities/show-message-utils.js');
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const reviewQuestionRightValue = 'question';
 const submitQuestionRightValue = 'submit_question';
@@ -33,27 +30,21 @@ const roleMethodValue = 'role';
 // "View Contributor Dashboard Users" form elements.
 const viewContributorFilterMethodSelector =
   'select#view-contributor-filter-method-select';
-const viewContributerUsernameInput =
-  'input#view-contributor-username-input';
+const viewContributerUsernameInput = 'input#view-contributor-username-input';
 const viewContributorCategorySelector =
   'select#view-contributor-category-select';
-const viewContributorSubmitButton =
-  'button#view-contributor-submit-button';
+const viewContributorSubmitButton = 'button#view-contributor-submit-button';
 
-const viewContributorReviewQuestionsResult =
-  '.e2e-test-question-reviewer';
-const viewContributorSubmitQuestionResult =
-  '.e2e-test-question-contributor';
-const viewRoleUserResult =
-  '.e2e-test-reviewer-roles-result';
+const viewContributorReviewQuestionsResult = '.e2e-test-question-reviewer';
+const viewContributorSubmitQuestionResult = '.e2e-test-question-contributor';
+const viewRoleUserResult = '.e2e-test-reviewer-roles-result';
 
 // "Add Contribution Rights" form elements.
-const addContributorUsernameInput =
-  'input#add-contribution-rights-user-input';
+const addContributorUsernameInput = 'input#add-contribution-rights-user-input';
 const addContributonRightsCategorySelector =
   'select#add-contribution-rights-category-select';
 const addContributionRightsSubmitButton =
-   'button#add-contribution-rights-submit-button';
+  'button#add-contribution-rights-submit-button';
 
 // "Remove Contribution Rights" form elements.
 const removeContributorUsernameInput =
@@ -63,22 +54,23 @@ const removeContributonRightsCategorySelector =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
-module.exports = class QuestionAdmin extends baseUser {
+export class QuestionAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
-  async navigateToContributorDashboardAdminPage() {
+  async navigateToContributorDashboardAdminPage(): Promise<void> {
     await this.goto(contributorDashboardAdminUrl);
   }
 
   /**
    * Function for adding a right of reviewing questions to a user.
-   * @param {string} username - the username of the user.
    */
-  async addReviewQuestionRights(username) {
+  async addReviewQuestionRights(username: string): Promise<void> {
     await this.type(addContributorUsernameInput, username);
     await this.select(
-      addContributonRightsCategorySelector, reviewQuestionRightValue);
+      addContributonRightsCategorySelector,
+      reviewQuestionRightValue
+    );
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -86,12 +78,13 @@ module.exports = class QuestionAdmin extends baseUser {
 
   /**
    * Function for adding a right of submitting questions to a user.
-   * @param {string} username - the username of the user.
    */
-  async addSubmitQuestionRights(username) {
+  async addSubmitQuestionRights(username: string): Promise<void> {
     await this.type(addContributorUsernameInput, username);
     await this.select(
-      addContributonRightsCategorySelector, submitQuestionRightValue);
+      addContributonRightsCategorySelector,
+      submitQuestionRightValue
+    );
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -99,12 +92,13 @@ module.exports = class QuestionAdmin extends baseUser {
 
   /**
    * Function for removng a right of reviewing questions to a user.
-   * @param {string} username - the username of the user.
    */
-  async removeReviewQuestionRights(username) {
+  async removeReviewQuestionRights(username: string): Promise<void> {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
-      removeContributonRightsCategorySelector, reviewQuestionRightValue);
+      removeContributonRightsCategorySelector,
+      reviewQuestionRightValue
+    );
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -112,12 +106,13 @@ module.exports = class QuestionAdmin extends baseUser {
 
   /**
    * Function for removing a right of reviewing questions to a user.
-   * @param {string} username - the username of the user.
    */
-  async removeSubmitQuestionRights(username) {
+  async removeSubmitQuestionRights(username: string): Promise<void> {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
-      removeContributonRightsCategorySelector, submitQuestionRightValue);
+      removeContributonRightsCategorySelector,
+      submitQuestionRightValue
+    );
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -125,52 +120,65 @@ module.exports = class QuestionAdmin extends baseUser {
 
   /**
    * Function to return the list of question reviewers
-   * @returns {string[]} displayedUsers - list of strings of all username
    */
-  async getDisplayedListOfQuestionReviewers() {
+  async getDisplayedListOfQuestionReviewers(): Promise<string[]> {
     await this.select(viewContributorFilterMethodSelector, roleMethodValue);
     await this.select(
-      viewContributorCategorySelector, reviewQuestionRightValue);
+      viewContributorCategorySelector,
+      reviewQuestionRightValue
+    );
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
 
     await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
+    const displayedUsersText = await this.page.$eval(
       viewRoleUserResult,
-      element => element.innerText
+      element => (element as HTMLElement).innerText
     );
+    const displayedUsers = displayedUsersText
+      .replace('Usernames:', '')
+      .trim()
+      .replace('[', '')
+      .replace(']', '')
+      .split(',');
     return displayedUsers;
   }
 
   /**
    * Function to return the list of question reviewers
-   * @returns {string[]} displayedUsers - list of strings of all username
    */
-  async getDisplayedListOfQuestionSubmitters() {
+  async getDisplayedListOfQuestionSubmitters(): Promise<string[]> {
     await this.select(viewContributorFilterMethodSelector, roleMethodValue);
     await this.select(
-      viewContributorCategorySelector, submitQuestionRightValue);
+      viewContributorCategorySelector,
+      submitQuestionRightValue
+    );
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
 
     await this.page.waitForSelector(viewRoleUserResult);
-    const displayedUsers = await this.page.$eval(
+    const displayedUsersText = await this.page.$eval(
       viewRoleUserResult,
-      element => element.innerText
+      element => (element as HTMLElement).innerText
     );
+    const displayedUsers = displayedUsersText
+      .replace('Usernames:', '')
+      .trim()
+      .replace('[', '')
+      .replace(']', '')
+      .split(',');
     return displayedUsers;
   }
 
   /**
    * Function to return the contribution rights status for the user.
-   * @param {string} username - the username of the user.
-   * @param {string} contribution - the css element of
-   * the result of contribution status to check
-   * @returns {string} contributionStatusForUser - the string of the result
    */
-  async getContributionStatusForUser(username, contribution) {
+  async getContributionStatusForUser(
+    username: string,
+    contribution: string
+  ): Promise<string> {
     await this.select(viewContributorFilterMethodSelector, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
@@ -180,131 +188,126 @@ module.exports = class QuestionAdmin extends baseUser {
     await this.page.waitForSelector(contribution);
     const contributionStatusForUser = await this.page.$eval(
       contribution,
-      element => element.innerText);
+      element => (element as HTMLElement).innerText
+    );
     return contributionStatusForUser;
   }
 
   /**
    * Function to check if the user has the right to review questions
-   * @param {string} username - the username of the user to view.
    */
-  async verifyUserCanReviewQuestions(username) {
-    const questionReviewStatusForUser = await
-    this.getContributionStatusForUser(
-      username, viewContributorReviewQuestionsResult);
+  async verifyUserCanReviewQuestions(username: string): Promise<void> {
+    const questionReviewStatusForUser = await this.getContributionStatusForUser(
+      username,
+      viewContributorReviewQuestionsResult
+    );
 
     if (questionReviewStatusForUser === 'Not-allowed') {
       throw new Error(
-        `${username} does not have rights for reviewing questions!`);
+        `${username} does not have rights for reviewing questions!`
+      );
     } else {
-      showMessage(
-        `${username} has rights for reviewing questions.`);
+      showMessage(`${username} has rights for reviewing questions.`);
     }
   }
 
   /**
    * Function to check if the user has the right to submit questions
-   * @param {string} username - the username of the user to view.
    */
-  async verifyUserCanSubmitQuestions(username) {
-    const questionSubmitStatusForUser = await
-    this.getContributionStatusForUser(
-      username, viewContributorSubmitQuestionResult);
+  async verifyUserCanSubmitQuestions(username: string): Promise<void> {
+    const questionSubmitStatusForUser = await this.getContributionStatusForUser(
+      username,
+      viewContributorSubmitQuestionResult
+    );
 
     if (questionSubmitStatusForUser === 'Not-allowed') {
       throw new Error(
-        `${username} does not have rights for submitting questions!`);
+        `${username} does not have rights for submitting questions!`
+      );
     } else {
-      showMessage(
-        `${username} has rights for submitting questions.`);
+      showMessage(`${username} has rights for submitting questions.`);
     }
   }
 
   /**
    * Function to check if the user doesn't have the right to review questions
-   * @param {string} username - the username of the user to view.
    */
-  async verifyUserCannotReviewQuestions(username) {
-    const questionReviewStatusForUser = await
-    this.getContributionStatusForUser(
-      username, viewContributorReviewQuestionsResult);
+  async verifyUserCannotReviewQuestions(username: string): Promise<void> {
+    const questionReviewStatusForUser = await this.getContributionStatusForUser(
+      username,
+      viewContributorReviewQuestionsResult
+    );
 
     if (questionReviewStatusForUser === 'Allowed') {
-      throw new Error(
-        `${username} has rights for reviewing questions!`);
+      throw new Error(`${username} has rights for reviewing questions!`);
     } else {
-      showMessage(
-        `${username} doesn't have rights for reviewing questions.`);
+      showMessage(`${username} doesn't have rights for reviewing questions.`);
     }
   }
 
   /**
    * Function to check if the user doesn't have the right to submit questions
-   * @param {string} username - the username of the user to view.
    */
-  async verifyUserCannotSubmitQuestions(username) {
-    const questionSubmitStatusForUser = await
-    this.getContributionStatusForUser(
-      username, viewContributorSubmitQuestionResult);
+  async verifyUserCannotSubmitQuestions(username: string): Promise<void> {
+    const questionSubmitStatusForUser = await this.getContributionStatusForUser(
+      username,
+      viewContributorSubmitQuestionResult
+    );
 
     if (questionSubmitStatusForUser === 'Allowed') {
-      throw new Error(
-        `${username} has rights for submitting questions!`);
+      throw new Error(`${username} has rights for submitting questions!`);
     } else {
-      showMessage(
-        `${username} doesn't have rights for submitting questions.`);
+      showMessage(`${username} doesn't have rights for submitting questions.`);
     }
   }
 
   /**
    * Function to check if the user is displayed as a question reviewer
-   * @param {string} username - the user expected to be displayed.
    */
-  async verifyQuestionReviewersIncludeUser(username) {
+  async verifyQuestionReviewersIncludeUser(username: string): Promise<void> {
     const displayedUsers = await this.getDisplayedListOfQuestionReviewers();
 
     if (!displayedUsers.includes(username)) {
       throw new Error(
-        `${username} does not have rights for reviewing questions!`);
+        `${username} does not have rights for reviewing questions!`
+      );
     }
   }
 
   /**
    * Function to check if the user is displayed as a question submitter
-   * @param {string} username - the user expected to be displayed.
    */
-  async verifyQuestionSubmittersIncludeUser(username) {
+  async verifyQuestionSubmittersIncludeUser(username: string): Promise<void> {
     const displayedUsers = await this.getDisplayedListOfQuestionSubmitters();
 
     if (!displayedUsers.includes(username)) {
       throw new Error(
-        `${username} does not have rights for submitting questions!`);
+        `${username} does not have rights for submitting questions!`
+      );
     }
   }
 
   /**
    * Function check if the user is not displayed as a question reviewer
-   * @param {string} username - the user expected to not be displayed.
    */
-  async verifyQuestionReviewersExcludeUser(username) {
+  async verifyQuestionReviewersExcludeUser(username: string): Promise<void> {
     const displayedUsers = await this.getDisplayedListOfQuestionReviewers();
 
     if (displayedUsers.includes(username)) {
-      throw new Error(
-        `${username} has the right to review questions!`);
+      throw new Error(`${username} has the right to review questions!`);
     }
   }
 
   /**
    * Function to check if the user is not displayed as a question submitter
-   * @param {string} username - the user expected to not be displayed.
    */
-  async verifyQuestionSubmittersExcludeUser(username) {
+  async verifyQuestionSubmittersExcludeUser(username: string): Promise<void> {
     const displayedUsers = await this.getDisplayedListOfQuestionSubmitters();
 
     if (displayedUsers.includes(username)) {
-      throw new Error(
-        `${username} has the right to submit questions!`);
+      throw new Error(`${username} has the right to submit questions!`);
     }
   }
-};
+}
+
+export let QuestionAdminFactory = (): QuestionAdmin => new QuestionAdmin();

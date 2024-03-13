@@ -16,22 +16,25 @@
  * @fileoverview Component for the state translation editor.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { MarkAudioAsNeedingUpdateModalComponent } from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { EditabilityService } from 'services/editability.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { TranslationLanguageService } from '../services/translation-language.service';
-import { TranslationStatusService } from '../services/translation-status.service';
-import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { DataFormatToDefaultValuesKey, TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {EditabilityService} from 'services/editability.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {TranslationLanguageService} from '../services/translation-language.service';
+import {TranslationStatusService} from '../services/translation-status.service';
+import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {
+  DataFormatToDefaultValuesKey,
+  TranslatedContent,
+} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 
 interface HTMLSchema {
   type: string;
@@ -43,16 +46,15 @@ interface HTMLSchema {
 
 interface ListSchema {
   type: 'list';
-  items: { type: string };
-  validators: { id: string }[];
+  items: {type: string};
+  validators: {id: string}[];
 }
 
 @Component({
   selector: 'oppia-state-translation-editor',
-  templateUrl: './state-translation-editor.component.html'
+  templateUrl: './state-translation-editor.component.html',
 })
-export class StateTranslationEditorComponent
-  implements OnInit, OnDestroy {
+export class StateTranslationEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   contentId: string = '';
@@ -60,18 +62,20 @@ export class StateTranslationEditorComponent
   activeWrittenTranslation: TranslatedContent | null = null;
   translationEditorIsOpen: boolean = false;
   dataFormat: DataFormatToDefaultValuesKey | string = '';
-  UNICODE_SCHEMA: { type: string } = {
-    type: 'unicode'
+  UNICODE_SCHEMA: {type: string} = {
+    type: 'unicode',
   };
 
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
     items: {
-      type: 'unicode'
+      type: 'unicode',
     },
-    validators: [{
-      id: 'is_uniquified'
-    }]
+    validators: [
+      {
+        id: 'is_uniquified',
+      },
+    ],
   };
 
   HTML_SCHEMA: HTMLSchema | null = null;
@@ -87,36 +91,45 @@ export class StateTranslationEditorComponent
     private stateEditorService: StateEditorService,
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
-    private translationTabActiveContentIdService:
-      TranslationTabActiveContentIdService,
-  ) { }
+    private translationTabActiveContentIdService: TranslationTabActiveContentIdService
+  ) {}
 
   showMarkAudioAsNeedingUpdateModalIfRequired(
-      contentId: string, languageCode: string): void {
+    contentId: string,
+    languageCode: string
+  ): void {
     let stateName = this.stateEditorService.getActiveStateName() as string;
     let state = this.explorationStatesService.getState(stateName);
     let recordedVoiceovers = state.recordedVoiceovers;
-    let availableAudioLanguages = (
-      recordedVoiceovers.getLanguageCodes(contentId));
+    let availableAudioLanguages =
+      recordedVoiceovers.getLanguageCodes(contentId);
     if (availableAudioLanguages.indexOf(languageCode) !== -1) {
-      let voiceover = recordedVoiceovers.getVoiceover(
-        contentId, languageCode);
+      let voiceover = recordedVoiceovers.getVoiceover(contentId, languageCode);
       if (voiceover.needsUpdate) {
         return;
       }
 
-      this.ngbModal.open(MarkAudioAsNeedingUpdateModalComponent, {
-        backdrop: 'static'
-      }).result.then(() => {
-        recordedVoiceovers.toggleNeedsUpdateAttribute(
-          contentId, languageCode);
-        this.explorationStatesService.saveRecordedVoiceovers(
-          stateName, recordedVoiceovers);
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+      this.ngbModal
+        .open(MarkAudioAsNeedingUpdateModalComponent, {
+          backdrop: 'static',
+        })
+        .result.then(
+          () => {
+            recordedVoiceovers.toggleNeedsUpdateAttribute(
+              contentId,
+              languageCode
+            );
+            this.explorationStatesService.saveRecordedVoiceovers(
+              stateName,
+              recordedVoiceovers
+            );
+          },
+          () => {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
+          }
+        );
     }
   }
 
@@ -126,23 +139,23 @@ export class StateTranslationEditorComponent
 
   initEditor(): void {
     this.translationEditorIsOpen = false;
-    this.contentId = (
-      this.translationTabActiveContentIdService.getActiveContentId() as string);
+    this.contentId =
+      this.translationTabActiveContentIdService.getActiveContentId() as string;
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
 
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
         language: this.languageCode,
-        languageDirection: (
-          this.translationLanguageService.getActiveLanguageDirection())
-      }
+        languageDirection:
+          this.translationLanguageService.getActiveLanguageDirection(),
+      },
     };
 
-    const entityTranslations = (
+    const entityTranslations =
       this.entityTranslationsService.languageCodeToEntityTranslations[
-        this.languageCode]
-    );
+        this.languageCode
+      ];
     if (entityTranslations) {
       this.activeWrittenTranslation = entityTranslations.getWrittenTranslation(
         this.translationTabActiveContentIdService.getActiveContentId() as string
@@ -151,16 +164,21 @@ export class StateTranslationEditorComponent
   }
 
   saveTranslation(): void {
-    this.contentId = (
-      this.translationTabActiveContentIdService.getActiveContentId() as string);
+    this.contentId =
+      this.translationTabActiveContentIdService.getActiveContentId() as string;
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
 
     this.showMarkAudioAsNeedingUpdateModalIfRequired(
-      this.contentId, this.languageCode);
-    this.activeWrittenTranslation = (
-      this.activeWrittenTranslation as TranslatedContent);
+      this.contentId,
+      this.languageCode
+    );
+    this.activeWrittenTranslation = this
+      .activeWrittenTranslation as TranslatedContent;
     this.changeListService.editTranslation(
-      this.contentId, this.languageCode, this.activeWrittenTranslation);
+      this.contentId,
+      this.languageCode,
+      this.activeWrittenTranslation
+    );
     this.entityTranslationsService.languageCodeToEntityTranslations[
       this.languageCode
     ].updateTranslation(this.contentId, this.activeWrittenTranslation);
@@ -177,15 +195,16 @@ export class StateTranslationEditorComponent
     if (this.isEditable()) {
       this.translationEditorIsOpen = true;
       if (!this.activeWrittenTranslation) {
-        this.activeWrittenTranslation = (
-          TranslatedContent.createNew(this.dataFormat));
+        this.activeWrittenTranslation = TranslatedContent.createNew(
+          this.dataFormat
+        );
       }
     }
   }
 
   onSaveTranslationButtonClicked(): void {
-    this.activeWrittenTranslation = (
-      this.activeWrittenTranslation as TranslatedContent);
+    this.activeWrittenTranslation = this
+      .activeWrittenTranslation as TranslatedContent;
     this.activeWrittenTranslation.needsUpdate = false;
     this.saveTranslation();
   }
@@ -195,35 +214,36 @@ export class StateTranslationEditorComponent
   }
 
   markAsNeedingUpdate(): void {
-    let contentId = (
-      this.translationTabActiveContentIdService.getActiveContentId() as string);
+    let contentId =
+      this.translationTabActiveContentIdService.getActiveContentId() as string;
     let languageCode = this.translationLanguageService.getActiveLanguageCode();
-    this.activeWrittenTranslation = (
-      this.activeWrittenTranslation as TranslatedContent);
+    this.activeWrittenTranslation = this
+      .activeWrittenTranslation as TranslatedContent;
     this.activeWrittenTranslation.markAsNeedingUpdate();
     this.changeListService.editTranslation(
-      contentId, languageCode, this.activeWrittenTranslation);
+      contentId,
+      languageCode,
+      this.activeWrittenTranslation
+    );
     this.translationStatusService.refresh();
   }
 
   ngOnInit(): void {
-    this.dataFormat = (
-      this.translationTabActiveContentIdService.getActiveDataFormat() as string
+    this.dataFormat =
+      this.translationTabActiveContentIdService.getActiveDataFormat() as string;
+
+    this.directiveSubscriptions.add(
+      this.translationTabActiveContentIdService.onActiveContentIdChanged.subscribe(
+        dataFormat => {
+          this.dataFormat = dataFormat;
+          this.initEditor();
+        }
+      )
     );
 
     this.directiveSubscriptions.add(
-      this.translationTabActiveContentIdService.onActiveContentIdChanged.
-        subscribe(
-          (dataFormat) => {
-            this.dataFormat = dataFormat;
-            this.initEditor();
-          }
-        )
-    );
-
-    this.directiveSubscriptions.add(
-      this.translationLanguageService.onActiveLanguageChanged.subscribe(
-        () => this.initEditor()
+      this.translationLanguageService.onActiveLanguageChanged.subscribe(() =>
+        this.initEditor()
       )
     );
 
@@ -234,7 +254,8 @@ export class StateTranslationEditorComponent
         if (this.translationEditorIsOpen) {
           this.saveTranslation();
         }
-      }));
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -242,7 +263,9 @@ export class StateTranslationEditorComponent
   }
 }
 
-angular.module('oppia').directive('oppiaStateTranslationEditor',
+angular.module('oppia').directive(
+  'oppiaStateTranslationEditor',
   downgradeComponent({
-    component: StateTranslationEditorComponent
-  }) as angular.IDirectiveFactory);
+    component: StateTranslationEditorComponent,
+  }) as angular.IDirectiveFactory
+);

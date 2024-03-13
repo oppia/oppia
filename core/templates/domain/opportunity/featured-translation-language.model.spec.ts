@@ -18,9 +18,8 @@
 
 import {
   FeaturedTranslationLanguage,
-  FeaturedTranslationLanguageBackendDict
-} from
-  'domain/opportunity/featured-translation-language.model';
+  FeaturedTranslationLanguageBackendDict,
+} from 'domain/opportunity/featured-translation-language.model';
 
 describe('Featured Translation Language model', () => {
   let sampleFTL: FeaturedTranslationLanguage;
@@ -28,15 +27,17 @@ describe('Featured Translation Language model', () => {
   beforeEach(() => {
     let sampleFTLDict: FeaturedTranslationLanguageBackendDict = {
       language_code: 'en',
-      explanation: 'English'
+      explanation: 'English',
     };
-    sampleFTL = FeaturedTranslationLanguage
-      .createFromBackendDict(sampleFTLDict);
+    sampleFTL =
+      FeaturedTranslationLanguage.createFromBackendDict(sampleFTLDict);
   });
 
-  it('should correctly evaluate all the values based on backend' +
-     ' dict', function() {
-    expect(sampleFTL.languageCode).toBe('en');
-    expect(sampleFTL.explanation).toBe('English');
-  });
+  it(
+    'should correctly evaluate all the values based on backend' + ' dict',
+    function () {
+      expect(sampleFTL.languageCode).toBe('en');
+      expect(sampleFTL.explanation).toBe('English');
+    }
+  );
 });

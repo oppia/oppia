@@ -25,26 +25,22 @@ var ruleTester = new RuleTester();
 ruleTester.run('e2e-action', rule, {
   valid: [
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         action.click("Element", elem);
       });`,
     },
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         action.sendKeys("Element", elem, "keys");
       });`,
     },
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         console.log(elem.click);
       });`,
     },
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         console.log(elem.sendKeys);
       });`,
     },
@@ -52,48 +48,53 @@ ruleTester.run('e2e-action', rule, {
 
   invalid: [
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         elem.click();
       });`,
-      errors: [{
-        message: 'elem.click() is called instead of using action.click()',
-        type: 'MemberExpression',
-      }],
+      errors: [
+        {
+          message: 'elem.click() is called instead of using action.click()',
+          type: 'MemberExpression',
+        },
+      ],
     },
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         elem.sendKeys("keys");
       });`,
-      errors: [{
-        message: 'elem.sendKeys() is called instead of using action.sendKeys()',
-        type: 'MemberExpression',
-      }],
+      errors: [
+        {
+          message:
+            'elem.sendKeys() is called instead of using action.sendKeys()',
+          type: 'MemberExpression',
+        },
+      ],
     },
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         element(by.css('.e2e-test')).click();
       });`,
-      errors: [{
-        message: (
-          '(some expression).click() is called instead of using ' +
-          'action.click()'),
-        type: 'MemberExpression',
-      }],
+      errors: [
+        {
+          message:
+            '(some expression).click() is called instead of using ' +
+            'action.click()',
+          type: 'MemberExpression',
+        },
+      ],
     },
     {
-      code:
-      `it('should test a feature', function() {
+      code: `it('should test a feature', function() {
         element(by.css('.e2e-test')).sendKeys("keys");
       });`,
-      errors: [{
-        message: (
-          '(some expression).sendKeys() is called instead of using ' +
-          'action.sendKeys()'),
-        type: 'MemberExpression',
-      }],
+      errors: [
+        {
+          message:
+            '(some expression).sendKeys() is called instead of using ' +
+            'action.sendKeys()',
+          type: 'MemberExpression',
+        },
+      ],
     },
-  ]
+  ],
 });

@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for ConfirmDeleteStateModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmDeleteStateModalComponent } from './confirm-delete-state-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmDeleteStateModalComponent} from './confirm-delete-state-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -31,21 +31,21 @@ class MockActiveModal {
   }
 }
 
-describe('Confirm Delete State Modal Component', function() {
+describe('Confirm Delete State Modal Component', function () {
   let component: ConfirmDeleteStateModalComponent;
   let fixture: ComponentFixture<ConfirmDeleteStateModalComponent>;
   let deleteStateName = 'Introduction';
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ConfirmDeleteStateModalComponent
+      declarations: [ConfirmDeleteStateModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -59,6 +59,7 @@ describe('Confirm Delete State Modal Component', function() {
 
   it('should initialize properties after component is initialized', () => {
     expect(component.deleteStateWarningText).toBe(
-      'Are you sure you want to delete the card "Introduction"?');
+      'Are you sure you want to delete the card "Introduction"?'
+    );
   });
 });

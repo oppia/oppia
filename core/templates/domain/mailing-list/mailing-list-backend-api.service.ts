@@ -16,9 +16,9 @@
  * @fileoverview Backend api service for android email updates.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 export interface MailingListReturnStatusData {
   status: boolean;
@@ -30,38 +30,47 @@ export interface MailingListPayload {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MailingListBackendApiService {
   constructor(private http: HttpClient) {}
 
   private async _putRequestAsync(
-      handlerUrl: string, payload: MailingListPayload
+    handlerUrl: string,
+    payload: MailingListPayload
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.http.put<MailingListReturnStatusData>(
-        handlerUrl, payload).toPromise()
-        .then(response => {
-          resolve(response.status);
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+      this.http
+        .put<MailingListReturnStatusData>(handlerUrl, payload)
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.status);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async subscribeUserToMailingList(
-      email: string, name: string | null, tag: string
+    email: string,
+    name: string | null,
+    tag: string
   ): Promise<boolean> {
     let payload = {
       email: email,
       tag: tag,
-      name: name
+      name: name,
     };
-    return this._putRequestAsync(
-      '/mailinglistsubscriptionhandler', payload);
+    return this._putRequestAsync('/mailinglistsubscriptionhandler', payload);
   }
 }
 
-angular.module('oppia').factory(
-  'MailingListBackendApiService',
-  downgradeInjectable(MailingListBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'MailingListBackendApiService',
+    downgradeInjectable(MailingListBackendApiService)
+  );
