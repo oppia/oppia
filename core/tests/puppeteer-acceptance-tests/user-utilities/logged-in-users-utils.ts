@@ -314,34 +314,32 @@ export class LoggedInUser extends BaseUser {
       showMessage('The 61 Million Children link opens the right page.');
     }
   }
-
   /**
    * Function to click the even those who are in school link
    * in the About Foundation page and check if it opens the right page.
    */
   async clickEvenThoseWhoAreInSchoolLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(millionsOfContentId);
+    const anchorElementSelector = `${millionsOfContentId} a:nth-child(2)`;
     const buttonText = await this.page.$eval(
-      millionsOfContentId,
-      element => element.getElementsByTagName('a')[1].textContent
+      anchorElementSelector,
+      element => element.textContent
     );
     if (buttonText !== 'even those who are in school') {
       throw new Error(
         'The Even Those Who Are In School button does not exist!'
       );
     }
-    await this.page.$eval(millionsOfContentId, element =>
-      element.getElementsByTagName('a')[1].click()
-    );
-    if (this.page.url() !== evenThoseWhoAreInSchoolUrl) {
-      throw new Error(
-        'The Even Those Who Are In School link does not open ' +
-          'the right page!'
+    try {
+      await this.openExternalPdfLink(
+        anchorElementSelector,
+        evenThoseWhoAreInSchoolUrl
       );
-    } else {
       showMessage(
         'The Even Those Who Are In School link opens the right page.'
       );
+    } catch (error) {
+      throw new Error(error);
     }
   }
 

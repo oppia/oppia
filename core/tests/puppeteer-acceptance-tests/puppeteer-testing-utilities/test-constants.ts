@@ -40,7 +40,7 @@ export default {
     ExternalLink61MillionChildren:
       'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education',
     ExternalLinkEvenThoseWhoAreInSchool:
-      'https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
+      'http://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
     ExternalLinkSourceUnesco:
       'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
     ExternalLinkWatchAVideo:

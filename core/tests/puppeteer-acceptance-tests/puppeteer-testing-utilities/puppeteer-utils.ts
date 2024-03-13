@@ -180,11 +180,12 @@ export class BaseUser {
    * headless mode, does not natively support opening of external PDFs.
    */
   async openExternalPdfLink(
-      selector: string, expectedUrl: string): Promise<void> {
+    selector: string,
+    expectedUrl: string
+  ): Promise<void> {
     await this.page.waitForSelector(selector);
-    const href = await this.page.$eval(
-      selector,
-      element => element.getAttribute('href')
+    const href = await this.page.$eval(selector, element =>
+      element.getAttribute('href')
     );
     if (href === null) {
       throw new Error(`The ${selector} is not an anchor tag!`);
@@ -192,7 +193,8 @@ export class BaseUser {
     if (href !== expectedUrl) {
       throw new Error(
         `The ${selector} does not open the expected URL!
-         Actual: ${href}, Expected: ${expectedUrl}`);
+         Actual: ${href}, Expected: ${expectedUrl}`
+      );
     }
   }
 
