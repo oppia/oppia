@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the continue button component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { ContinueButtonComponent } from './continue-button.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {ContinueButtonComponent} from './continue-button.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   isCurrentLanguageRTL() {
@@ -35,17 +35,14 @@ describe('Continue Button Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ContinueButtonComponent,
-        MockTranslatePipe
-      ],
+      declarations: [ContinueButtonComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        }
+          useClass: MockI18nLanguageCodeService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

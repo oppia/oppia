@@ -18,11 +18,11 @@
 
 import {
   ExplorationStats,
-  ExplorationStatsBackendDict
+  ExplorationStatsBackendDict,
 } from 'domain/statistics/exploration-stats.model';
-import { StateStats } from 'domain/statistics/state-stats-model';
+import {StateStats} from 'domain/statistics/state-stats-model';
 
-describe('Exploration stats model', function() {
+describe('Exploration stats model', function () {
   it('should derive values from the backend dict', () => {
     const explorationStatsBackendDict: ExplorationStatsBackendDict = {
       exp_id: 'eid',
@@ -33,9 +33,8 @@ describe('Exploration stats model', function() {
       state_stats_mapping: {},
     };
 
-    const explorationStats: ExplorationStats = (
-      ExplorationStats.createFromBackendDict(
-        explorationStatsBackendDict));
+    const explorationStats: ExplorationStats =
+      ExplorationStats.createFromBackendDict(explorationStatsBackendDict);
 
     expect(explorationStats.expId).toEqual('eid');
     expect(explorationStats.expVersion).toEqual(1);
@@ -96,12 +95,14 @@ describe('Exploration stats model', function() {
 
     it('should return array of included state names', () => {
       expect(explorationStats.getStateNames()).toEqual(
-        jasmine.arrayWithExactContents(['Introduction', 'Middle', 'End']));
+        jasmine.arrayWithExactContents(['Introduction', 'Middle', 'End'])
+      );
     });
 
     it('should throw an error if state stats do not exist', () => {
-      expect(() => explorationStats.getStateStats('Prelude'))
-        .toThrowError('no stats exist for state: Prelude');
+      expect(() => explorationStats.getStateStats('Prelude')).toThrowError(
+        'no stats exist for state: Prelude'
+      );
     });
 
     it('should calculate bounce rate of state compared to exploration', () => {
@@ -111,32 +112,37 @@ describe('Exploration stats model', function() {
       expect(introductionStats.numCompletions).toEqual(1);
       expect(explorationStats.numStarts).toEqual(100);
 
-      expect(explorationStats.getBounceRate('Introduction'))
-        .toBeCloseTo((10 - 1) / 100);
+      expect(explorationStats.getBounceRate('Introduction')).toBeCloseTo(
+        (10 - 1) / 100
+      );
     });
 
-    it('should throw an error when trying to calculate bounce rate of an ' +
-      'unplayed exploration', () => {
-      explorationStats = ExplorationStats.createFromBackendDict({
-        exp_id: 'eid',
-        exp_version: 0,
-        num_starts: 0,
-        num_actual_starts: 0,
-        num_completions: 0,
-        state_stats_mapping: {
-          Introduction: {
-            total_answers_count: 0,
-            useful_feedback_count: 0,
-            total_hit_count: 0,
-            first_hit_count: 0,
-            num_times_solution_viewed: 0,
-            num_completions: 0,
+    it(
+      'should throw an error when trying to calculate bounce rate of an ' +
+        'unplayed exploration',
+      () => {
+        explorationStats = ExplorationStats.createFromBackendDict({
+          exp_id: 'eid',
+          exp_version: 0,
+          num_starts: 0,
+          num_actual_starts: 0,
+          num_completions: 0,
+          state_stats_mapping: {
+            Introduction: {
+              total_answers_count: 0,
+              useful_feedback_count: 0,
+              total_hit_count: 0,
+              first_hit_count: 0,
+              num_times_solution_viewed: 0,
+              num_completions: 0,
+            },
           },
-        },
-      });
-      expect(() => explorationStats.getBounceRate('Introduction'))
-        .toThrowError('Can not get bounce rate of an unplayed exploration');
-    });
+        });
+        expect(() =>
+          explorationStats.getBounceRate('Introduction')
+        ).toThrowError('Can not get bounce rate of an unplayed exploration');
+      }
+    );
   });
 
   describe('Deriving new exploration stats', () => {
@@ -193,8 +199,9 @@ describe('Exploration stats model', function() {
       let copy = original.createNewWithStateRenamed('Introduction', 'Prologue');
       expect(copy.hasStateStates('Introduction')).toBeFalse();
       expect(original.hasStateStates('Prologue')).toBeFalse();
-      expect(copy.getStateStats('Prologue'))
-        .toEqual(original.getStateStats('Introduction'));
+      expect(copy.getStateStats('Prologue')).toEqual(
+        original.getStateStats('Introduction')
+      );
     });
   });
 });

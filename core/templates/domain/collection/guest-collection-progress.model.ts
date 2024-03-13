@@ -26,7 +26,8 @@ export class GuestCollectionProgress {
   }
 
   static createFromJson(
-      collectionProgressJson: string): GuestCollectionProgress {
+    collectionProgressJson: string
+  ): GuestCollectionProgress {
     if (collectionProgressJson) {
       return new GuestCollectionProgress(JSON.parse(collectionProgressJson));
     } else {
@@ -54,9 +55,10 @@ export class GuestCollectionProgress {
   // context of the specified collection. Returns whether that exploration ID
   // was not previously registered as completed for the collection.
   addCompletedExplorationId(
-      collectionId: string, explorationId: string): boolean {
-    var completedExplorationIds = this.getCompletedExplorationIds(
-      collectionId);
+    collectionId: string,
+    explorationId: string
+  ): boolean {
+    var completedExplorationIds = this.getCompletedExplorationIds(collectionId);
     if (completedExplorationIds.indexOf(explorationId) === -1) {
       completedExplorationIds.push(explorationId);
       this._completedExplorationsMap[collectionId] = completedExplorationIds;

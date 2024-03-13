@@ -16,7 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, { Page, Browser, WaitForSelectorOptions } from 'puppeteer';
+import puppeteer, {Page, Browser} from 'puppeteer';
 import testConstants from './test-constants';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
@@ -26,7 +26,7 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
-  'This action is irreversible. Are you sure?'
+  'This action is irreversible. Are you sure?',
 ];
 
 interface IUserProperties {
@@ -47,7 +47,7 @@ export interface IBaseUser extends IUserProperties {
     selector,
     beforeOpened,
     whenOpened,
-    afterClosing
+    afterClosing,
   }: ModalCoordination) => Promise<void>;
   clickOn: (selector: string) => Promise<void>;
   type: (selector: string, text: string) => Promise<void>;
@@ -68,12 +68,12 @@ export interface ModalCoordination {
 export type ModalUserInteractions = (
   _this: IBaseUser,
   container: string
-) => Promise<void>
+) => Promise<void>;
 
 export interface DebugTools {
   capturePageConsoleLogs: () => void;
   setupClickLogger: () => Promise<void>;
-  logClickEventsFrom: (string) => Promise<void>;
+  logClickEventsFrom: (selector: string) => Promise<void>;
 }
 
 export class BaseUser implements IBaseUser {
@@ -83,66 +83,73 @@ export class BaseUser implements IBaseUser {
   email: string = '';
   username: string = '';
   debug: DebugTools = {
-      startTime: -1,
+    startTime: -1,
 
-      /**
-       * This function prints all of the page's console logs to the
-       * terminal.
-       *
-       * Any time this.page object is replaced, this function must be called
-       * again to continue printing console logs.
-       */
-      capturePageConsoleLogs(): void {
+    /**
+     * This function prints all of the page's console logs to the
+     * terminal.
+     *
+     * Any time this.page object is replaced, this function must be called
+     * again to continue printing console logs.
+     */
+    capturePageConsoleLogs(): void {
+      // eslint-disable-next-line no-console
+      this.page.on('console', message =>
+        console.log('PAGE: ' + message.text())
+      );
+    },
+
+    /**
+     * This function sets up a click logger that logs click events to the
+     * terminal.
+     *
+     * Any time this.page object is replaced, this function must be called
+     * again before it start logging clicks again.
+     */
+    async setupClickLogger(): Promise<void> {
+      await this.page.exposeFunction('logClick', ({position: {x, y}, time}) => {
         // eslint-disable-next-line no-console
-        this.page.on('console', (message) => console.log(
-          'PAGE: ' + message.text()));
-      },
+        console.log(
+          `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
+            'of the viewport'
+        );
+        // eslint-disable-next-line no-console
+        console.log(
+          `- Click occurred ${time - this.startTime} ms into the test`
+        );
+      });
+    },
 
-      /**
-       * This function sets up a click logger that logs click events to the
-       * terminal.
-       *
-       * Any time this.page object is replaced, this function must be called
-       * again before it start logging clicks again.
-       */
-      async setupClickLogger(): Promise<void> {
-        await this.page.exposeFunction(
-          'logClick', ({ position: { x, y }, time }) => {
-            // eslint-disable-next-line no-console
-            console.log(
-              `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
-              'of the viewport');
-            // eslint-disable-next-line no-console
-            console.log(
-              `- Click occurred ${time - this.startTime} ms into the test`);
-          });
-      },
-
-      /**
-       * This function logs click events from all enabled elements selected by
-       * a given selector.
-       *
-       * The selector must be present in the document when called.
-       *
-       * this.setupClickLogger() must be called once before it can log click
-       * events from the elements.
-       */
-      async logClickEventsFrom(selector: string): Promise<void> {
-        await this.page.$$eval(selector, (elements, selector) => {
+    /**
+     * This function logs click events from all enabled elements selected by
+     * a given selector.
+     *
+     * The selector must be present in the document when called.
+     *
+     * this.setupClickLogger() must be called once before it can log click
+     * events from the elements.
+     */
+    async logClickEventsFrom(selector: string): Promise<void> {
+      await this.page.$$eval(
+        selector,
+        (elements, selector) => {
           for (const element of elements) {
-            element.addEventListener('click', (e) => {
+            element.addEventListener('click', e => {
               // eslint-disable-next-line no-console
               console.log(
-                `DEBUG-ACCEPTANCE-TEST: User clicked on ${selector}:`);
+                `DEBUG-ACCEPTANCE-TEST: User clicked on ${selector}:`
+              );
               window.logClick({
-                position: { x: e.clientX, y: e.clientY },
-                time: Date.now()
+                position: {x: e.clientX, y: e.clientY},
+                time: Date.now(),
               });
             });
           }
-        }, selector);
-      }
-    };
+        },
+        selector
+      );
+    },
+  };
 
   constructor() {}
 
@@ -152,7 +159,7 @@ export class BaseUser implements IBaseUser {
   async openBrowser(): Promise<Page> {
     const args: string[] = [
       '--start-fullscreen',
-      '--use-fake-ui-for-media-stream'
+      '--use-fake-ui-for-media-stream',
     ];
 
     const headless = process.env.HEADLESS === 'true';
@@ -172,14 +179,14 @@ export class BaseUser implements IBaseUser {
          * every test passes on both modes. */
         headless,
         args,
-        defaultViewport: null
+        defaultViewport: null,
       })
-      .then(async(browser) => {
+      .then(async browser => {
         this.debug.startTime = Date.now();
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({ width: 1920, height: 1080 });
-        this.page.on('dialog', async(dialog) => {
+        await this.page.setViewport({width: 1920, height: 1080});
+        this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
             await dialog.accept();
@@ -225,7 +232,8 @@ export class BaseUser implements IBaseUser {
     await this.type('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])');
+      'button.e2e-test-register-user:not([disabled])'
+    );
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
 
@@ -245,9 +253,11 @@ export class BaseUser implements IBaseUser {
    * interacting with an element on the current page.
    */
   async switchToPageOpenedByElementInteraction(): Promise<void> {
-    const newPage: Page = await (await this.browserObject.waitForTarget(
-      target => target.opener() === this.page.target()
-    )).page();
+    const newPage: Page = await (
+      await this.browserObject.waitForTarget(
+        target => target.opener() === this.page.target()
+      )
+    ).page();
     this.page = newPage;
     this._setupDebugTools();
   }
@@ -257,15 +267,13 @@ export class BaseUser implements IBaseUser {
    */
   async withinModal({
     selector,
-    beforeOpened = async(_this, container) => {
-      await _this.page.waitForSelector(
-        container, { visible: true });
+    beforeOpened = async (_this, container) => {
+      await _this.page.waitForSelector(container, {visible: true});
     },
     whenOpened,
-    afterClosing = async(_this, container) => {
-      await _this.page.waitForSelector(
-        container, { hidden: true });
-    }
+    afterClosing = async (_this, container) => {
+      await _this.page.waitForSelector(container, {hidden: true});
+    },
   }: ModalCoordination): Promise<void> {
     await beforeOpened(this, selector);
     await whenOpened(this, selector);
@@ -284,7 +292,8 @@ export class BaseUser implements IBaseUser {
        * Check the documentation for the normalize-space function here :
        * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
       const [button] = await this.page.$x(
-        `\/\/*[contains(text(), normalize-space('${selector}'))]`);
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`
+      );
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector, waitForSelectorOptions);
@@ -351,4 +360,4 @@ export class BaseUser implements IBaseUser {
   }
 }
 
-export const BaseUserFactory = (): IBaseUser => new BaseUser();
+export const BaseUserFactory = (): BaseUser => new BaseUser();

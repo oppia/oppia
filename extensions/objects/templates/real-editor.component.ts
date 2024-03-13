@@ -15,27 +15,40 @@
 /**
  * @fileoverview Directive for real editor.
  */
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  ValidationErrors,
+  Validator,
+} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 interface RealSchema {
   type: string;
 }
 @Component({
   selector: 'real-editor',
   templateUrl: './real-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class RealEditorComponent
-    implements OnInit, ControlValueAccessor, Validator {
+  implements OnInit, ControlValueAccessor, Validator
+{
   // These property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: number | string;
   @Output() valueChanged = new EventEmitter();
   schema: RealSchema = {
-    type: 'float'
+    type: 'float',
   };
 
   onChange: (_: SchemaDefaultValue) => void = () => {};
@@ -72,7 +85,8 @@ export class RealEditorComponent
   updateValue(newValue: number | string): void {
     if (
       this.value === newValue ||
-      (newValue === '' || newValue === null) && this.value === 0.0) {
+      ((newValue === '' || newValue === null) && this.value === 0.0)
+    ) {
       return;
     }
     if (newValue === '' || newValue === null) {
@@ -94,6 +108,9 @@ export class RealEditorComponent
     }
   }
 }
-angular.module('oppia').directive('realEditor', downgradeComponent({
-  component: RealEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'realEditor',
+  downgradeComponent({
+    component: RealEditorComponent,
+  }) as angular.IDirectiveFactory
+);

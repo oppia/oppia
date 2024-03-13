@@ -16,21 +16,25 @@
  * @fileoverview Unit tests for for GoalsTabComponent.
  */
 
-import { async, ComponentFixture, fakeAsync, TestBed } from
-  '@angular/core/testing';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { LearnerDashboardIdsBackendApiService } from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import { LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
-import { GoalsTabComponent } from './goals-tab.component';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+} from '@angular/core/testing';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {LearnerDashboardIdsBackendApiService} from 'domain/learner_dashboard/learner-dashboard-ids-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {GoalsTabComponent} from './goals-tab.component';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 class MockRemoveActivityNgbModalRef {
   componentInstance = {
@@ -44,8 +48,7 @@ class MockRemoveActivityNgbModalRef {
 describe('Goals tab Component', () => {
   let component: GoalsTabComponent;
   let fixture: ComponentFixture<GoalsTabComponent>;
-  let learnerDashboardActivityBackendApiService:
-    LearnerDashboardActivityBackendApiService;
+  let learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
   let ngbModal: NgbModal;
   let windowDimensionsService: WindowDimensionsService;
@@ -58,12 +61,9 @@ describe('Goals tab Component', () => {
         BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
-      declarations: [
-        GoalsTabComponent,
-        MockTranslatePipe
-      ],
+      declarations: [GoalsTabComponent, MockTranslatePipe],
       providers: [
         LearnerDashboardActivityBackendApiService,
         LearnerDashboardIdsBackendApiService,
@@ -73,18 +73,19 @@ describe('Goals tab Component', () => {
           useValue: {
             isWindowNarrow: () => true,
             getResizeEvent: () => mockResizeEmitter,
-          }
+          },
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(GoalsTabComponent);
     component = fixture.componentInstance;
-    learnerDashboardActivityBackendApiService =
-      TestBed.inject(LearnerDashboardActivityBackendApiService);
+    learnerDashboardActivityBackendApiService = TestBed.inject(
+      LearnerDashboardActivityBackendApiService
+    );
     ngbModal = TestBed.inject(NgbModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -94,7 +95,7 @@ describe('Goals tab Component', () => {
       title: 'subtopic_name',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#F8BF74',
-      url_fragment: 'subtopic-name'
+      url_fragment: 'subtopic-name',
     };
 
     let nodeDict = {
@@ -113,7 +114,7 @@ describe('Goals tab Component', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
     const learnerTopicSummaryBackendDict1 = {
       id: 'sample_topic_id',
@@ -127,28 +128,30 @@ describe('Goals tab Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [nodeDict],
+        },
+      ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
     const learnerTopicSummaryBackendDict2 = {
       id: 'sample_topic_2',
@@ -162,28 +165,30 @@ describe('Goals tab Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: []
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [],
+        },
+      ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
     const learnerTopicSummaryBackendDict3 = {
       id: 'sample_topic_3',
@@ -197,44 +202,60 @@ describe('Goals tab Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [nodeDict],
+        },
+      ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
-    component.currentGoals = [LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1),
-    LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict2)];
-    component.editGoals = [LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict1),
-    LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict2),
-    LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict3)];
-    component.completedGoals = [LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict3)];
+    component.currentGoals = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1
+      ),
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict2
+      ),
+    ];
+    component.editGoals = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict1
+      ),
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict2
+      ),
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict3
+      ),
+    ];
+    component.completedGoals = [
+      LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDict3
+      ),
+    ];
     component.partiallyLearntTopicsList = [
       LearnerTopicSummary.createFromBackendDict(
-        learnerTopicSummaryBackendDict1)];
+        learnerTopicSummaryBackendDict1
+      ),
+    ];
     component.untrackedTopics = {};
     component.learntToPartiallyLearntTopics = [];
     component.currentGoalsStoryIsShown = [];
@@ -280,16 +301,15 @@ describe('Goals tab Component', () => {
     expect(topicBelongsTo).toEqual(1);
   });
 
-  it('should check if the topicName belongs to learntToPartiallyLearntTopics',
-    () => {
-      component.learntToPartiallyLearntTopics = ['topic', 'topic2', 'topic3'];
+  it('should check if the topicName belongs to learntToPartiallyLearntTopics', () => {
+    component.learntToPartiallyLearntTopics = ['topic', 'topic2', 'topic3'];
 
-      let topicBelongsTo = (
-        component.doesTopicBelongToLearntToPartiallyLearntTopics('topic'));
-      fixture.detectChanges();
+    let topicBelongsTo =
+      component.doesTopicBelongToLearntToPartiallyLearntTopics('topic');
+    fixture.detectChanges();
 
-      expect(topicBelongsTo).toEqual(true);
-    });
+    expect(topicBelongsTo).toEqual(true);
+  });
 
   it('should toggle story', () => {
     component.currentGoalsStoryIsShown = [true];
@@ -304,8 +324,9 @@ describe('Goals tab Component', () => {
     component.topicIdsInCurrentGoals.length = 0;
     component.topicIdsInCompletedGoals = ['1', '2'];
     const learnerGoalsSpy = spyOn(
-      learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
-      .and.returnValue(Promise.resolve(true));
+      learnerDashboardActivityBackendApiService,
+      'addToLearnerGoals'
+    ).and.returnValue(Promise.resolve(true));
     component.untrackedTopics = {math: [component.editGoals[0]]};
     component.addToLearnerGoals(component.editGoals[0], 'sample_topic_id', 1);
     fixture.detectChanges();
@@ -316,8 +337,9 @@ describe('Goals tab Component', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
     const learnerGoalsSpy = spyOn(
-      learnerDashboardActivityBackendApiService, 'addToLearnerGoals')
-      .and.returnValue(Promise.resolve(true));
+      learnerDashboardActivityBackendApiService,
+      'addToLearnerGoals'
+    ).and.returnValue(Promise.resolve(true));
     const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
 
     component.addToLearnerGoals(component.editGoals[0], '2', 1);
@@ -333,24 +355,33 @@ describe('Goals tab Component', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockRemoveActivityNgbModalRef,
-          result: Promise.resolve('success')
-        }) as NgbModalRef;
+      return {
+        componentInstance: MockRemoveActivityNgbModalRef,
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
     });
 
     component.removeFromLearnerGoals(
-      component.editGoals[0], '1', 'topicName', 0);
+      component.editGoals[0],
+      '1',
+      'topicName',
+      0
+    );
     component.removeFromLearnerGoals(
-      component.editGoals[1], '2', 'topicName', 0);
+      component.editGoals[1],
+      '2',
+      'topicName',
+      0
+    );
 
     expect(modalSpy).toHaveBeenCalled();
   });
 
   it('should get static image url', () => {
     const urlSpy = spyOn(
-      urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('/assets/images/learner_dashboard/star.svg');
+      urlInterpolationService,
+      'getStaticImageUrl'
+    ).and.returnValue('/assets/images/learner_dashboard/star.svg');
 
     component.getStaticImageUrl('/learner_dashboard/star.svg');
     fixture.detectChanges();
@@ -370,10 +401,9 @@ describe('Goals tab Component', () => {
       expect(component.showThreeDotsDropdown[i]).toBe(true);
 
       let fakeClickAwayEvent = new MouseEvent('click');
-      Object.defineProperty(
-        fakeClickAwayEvent,
-        'target',
-        {value: document.createElement('div')});
+      Object.defineProperty(fakeClickAwayEvent, 'target', {
+        value: document.createElement('div'),
+      });
       component.onDocumentClick(fakeClickAwayEvent);
       fixture.detectChanges();
       expect(component.showThreeDotsDropdown[i]).toBe(false);

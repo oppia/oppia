@@ -16,23 +16,22 @@
  * @fileoverview Root Component for partnerships page.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-partnerships-page-root',
-  templateUrl: './partnerships-page-root.component.html'
+  templateUrl: './partnerships-page-root.component.html',
 })
 export class PartnershipsPageRootComponent {
-  constructor(
-    private pageHeadService: PageHeadService
-  ) {}
+  constructor(private pageHeadService: PageHeadService) {}
 
   ngOnInit(): void {
     this.pageHeadService.updateTitleAndMetaTags(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.META
+    );
   }
 }

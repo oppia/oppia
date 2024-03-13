@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for unicode string editor.
  */
 
-import { EventEmitter, SimpleChanges } from '@angular/core';
-import { ExternalSaveService } from 'services/external-save.service';
-import { FormsModule } from '@angular/forms';
-import { UnicodeStringEditorComponent } from './unicode-string-editor.component';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {EventEmitter, SimpleChanges} from '@angular/core';
+import {ExternalSaveService} from 'services/external-save.service';
+import {FormsModule} from '@angular/forms';
+import {UnicodeStringEditorComponent} from './unicode-string-editor.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 describe('UnicodeStringEditorComponent', () => {
   let component: UnicodeStringEditorComponent;
@@ -32,7 +32,7 @@ describe('UnicodeStringEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [UnicodeStringEditorComponent]
+      declarations: [UnicodeStringEditorComponent],
     }).compileComponents();
   }));
 
@@ -42,7 +42,8 @@ describe('UnicodeStringEditorComponent', () => {
     component = fixture.componentInstance;
     externalSaveService = TestBed.get(ExternalSaveService);
     spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
-      externalSaveEventEmitter);
+      externalSaveEventEmitter
+    );
     component.alwaysEditable = false;
     component.value = 'random value';
   });
@@ -64,7 +65,8 @@ describe('UnicodeStringEditorComponent', () => {
 
     expect(component.componentSubscriptions.add).toHaveBeenCalled();
     expect(externalSaveService.onExternalSave).toEqual(
-      externalSaveEventEmitter);
+      externalSaveEventEmitter
+    );
     // Subscription.add is called only if the text input is not always editable.
     // Therefore, we verify that the value of alwaysEditable is false before
     // checking subscription.add.
@@ -94,33 +96,38 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.active).toBe(true);
   });
 
-  it('should update value after broadcasting ' +
-  'externalSave event when closing modal', () => {
-    component.active = true;
-    component.ngOnInit();
-    spyOn(component, 'closeEditor').and.callThrough();
-    // After execution of component.ngOnInit();, component.active is set to
-    // false. To test the subscribed observable, it needs to be set to true
-    // to call the closeEditor function.
-    component.active = true;
+  it(
+    'should update value after broadcasting ' +
+      'externalSave event when closing modal',
+    () => {
+      component.active = true;
+      component.ngOnInit();
+      spyOn(component, 'closeEditor').and.callThrough();
+      // After execution of component.ngOnInit();, component.active is set to
+      // false. To test the subscribed observable, it needs to be set to true
+      // to call the closeEditor function.
+      component.active = true;
 
-    // Pre-check.
-    expect(component.active).toBe(true);
+      // Pre-check.
+      expect(component.active).toBe(true);
 
-    externalSaveEventEmitter.emit();
+      externalSaveEventEmitter.emit();
 
-    expect(component.closeEditor).toHaveBeenCalled();
-    expect(component.active).toBe(false);
-  });
+      expect(component.closeEditor).toHaveBeenCalled();
+      expect(component.active).toBe(false);
+    }
+  );
 
-  it('should replace old value when new value is entered in' +
-  'the text box', () => {
-    expect(component.value).toBe('random value');
+  it(
+    'should replace old value when new value is entered in' + 'the text box',
+    () => {
+      expect(component.value).toBe('random value');
 
-    component.updateLocalValue('new random value');
+      component.updateLocalValue('new random value');
 
-    expect(component.value).toBe('new random value');
-  });
+      expect(component.value).toBe('new random value');
+    }
+  );
 
   it('should become active when editor is opened', () => {
     component.active = false;
@@ -142,32 +149,35 @@ describe('UnicodeStringEditorComponent', () => {
     expect(component.active).toBe(false);
   });
 
-  it('should replace old value when new value is entered' +
-  ' in the input field', () => {
-    component.active = true;
+  it(
+    'should replace old value when new value is entered' +
+      ' in the input field',
+    () => {
+      component.active = true;
 
-    // Pre-Check.
-    expect(component.value).toBe('random value');
-    expect(component.active).toBe(true);
+      // Pre-Check.
+      expect(component.value).toBe('random value');
+      expect(component.active).toBe(true);
 
-    component.replaceValue('new random value');
+      component.replaceValue('new random value');
 
-    expect(component.value).toBe('new random value');
-    expect(component.active).toBe(false);
-  });
+      expect(component.value).toBe('new random value');
+      expect(component.active).toBe(false);
+    }
+  );
 
   it('should make largeInput true when large input is entered', () => {
     const changes: SimpleChanges = {
       initArgs: {
         previousValue: {
-          largeInput: false
+          largeInput: false,
         },
         currentValue: {
-          largeInput: true
+          largeInput: true,
         },
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.largeInput = false;
 
@@ -183,14 +193,14 @@ describe('UnicodeStringEditorComponent', () => {
     const changes: SimpleChanges = {
       initArgs: {
         previousValue: {
-          largeInput: true
+          largeInput: true,
         },
         currentValue: {
-          largeInput: true
+          largeInput: true,
         },
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.largeInput = false;
 
@@ -201,7 +211,6 @@ describe('UnicodeStringEditorComponent', () => {
 
     expect(component.largeInput).toBe(false);
   });
-
 
   it('should unsubscribe when component is destroyed', () => {
     spyOn(component.componentSubscriptions, 'unsubscribe').and.callThrough();

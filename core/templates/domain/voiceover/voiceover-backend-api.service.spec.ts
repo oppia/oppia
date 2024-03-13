@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for VoiceoverBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { VoiceoverBackendApiService } from
-  '../../domain/voiceover/voiceover-backend-api.service';
-import { VoiceoverDomainConstants } from './voiceover-domain.constants';
+import {VoiceoverBackendApiService} from '../../domain/voiceover/voiceover-backend-api.service';
+import {VoiceoverDomainConstants} from './voiceover-domain.constants';
 
-describe('Voiceover backend API service', function() {
+describe('Voiceover backend API service', function () {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let httpTestingController: HttpTestingController;
 
@@ -33,45 +34,46 @@ describe('Voiceover backend API service', function() {
       'en-US': 'English (United State)',
     },
     hi: {
-      'hi-IN': 'Hindi (India)'
-    }
+      'hi-IN': 'Hindi (India)',
+    },
   };
   let languageCodesMapping = {
     en: {
-      'en-US': true
+      'en-US': true,
     },
     hi: {
-      'hi-IN': false
-    }
+      'hi-IN': false,
+    },
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
   });
 
-
   it('should be able to get voiceover admin page data', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
-      successHandler, failHandler);
+    voiceoverBackendApiService
+      .fetchVoiceoverAdminDataAsync()
+      .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
-      VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL);
+      VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL
+    );
     expect(req.request.method).toEqual('GET');
 
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
-      languageCodesMapping: languageCodesMapping
+      languageCodesMapping: languageCodesMapping,
     };
 
     req.flush({
       language_accent_master_list: languageAccentMasterList,
-      language_codes_mapping: languageCodesMapping
+      language_codes_mapping: languageCodesMapping,
     });
 
     flushMicrotasks();
@@ -80,28 +82,28 @@ describe('Voiceover backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should handle error callback while getting voiceover admin page data',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should handle error callback while getting voiceover admin page data', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      voiceoverBackendApiService.fetchVoiceoverAdminDataAsync().then(
-        successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL);
-      expect(req.request.method).toEqual('GET');
+    voiceoverBackendApiService
+      .fetchVoiceoverAdminDataAsync()
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL
+    );
+    expect(req.request.method).toEqual('GET');
 
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 
   it('should be able to update language codes mapping', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
@@ -109,25 +111,26 @@ describe('Voiceover backend API service', function() {
 
     let languageCodesMapping = {
       en: {
-        'en-US': true
+        'en-US': true,
       },
       hi: {
-        'hi-IN': false
-      }
+        'hi-IN': false,
+      },
     };
     let payload = {
-      language_codes_mapping: languageCodesMapping
+      language_codes_mapping: languageCodesMapping,
     };
-    voiceoverBackendApiService.updateVoiceoverLanguageCodesMappingAsync(
-      languageCodesMapping).then(successHandler, failHandler);
+    voiceoverBackendApiService
+      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping)
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/voiceover_language_codes_mapping');
+      '/voiceover_language_codes_mapping'
+    );
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual(payload);
 
-    req.flush(
-      { status: 200, statusText: 'Success.'});
+    req.flush({status: 200, statusText: 'Success.'});
 
     flushMicrotasks();
 
@@ -135,39 +138,39 @@ describe('Voiceover backend API service', function() {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it(
-    'should be able to handle error callback while updaing language codes',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should be able to handle error callback while updaing language codes', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      let languageCodesMapping = {
-        en: {
-          'en-US': true
-        },
-        hi: {
-          'hi-IN': false
-        }
-      };
-      let payload = {
-        language_codes_mapping: languageCodesMapping
-      };
-      voiceoverBackendApiService.updateVoiceoverLanguageCodesMappingAsync(
-        languageCodesMapping).then(successHandler, failHandler);
+    let languageCodesMapping = {
+      en: {
+        'en-US': true,
+      },
+      hi: {
+        'hi-IN': false,
+      },
+    };
+    let payload = {
+      language_codes_mapping: languageCodesMapping,
+    };
+    voiceoverBackendApiService
+      .updateVoiceoverLanguageCodesMappingAsync(languageCodesMapping)
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/voiceover_language_codes_mapping');
-      expect(req.request.method).toEqual('PUT');
-      expect(req.request.body).toEqual(payload);
+    let req = httpTestingController.expectOne(
+      '/voiceover_language_codes_mapping'
+    );
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
 
-      req.flush('Invalid request', {
-        status: 400,
-        statusText: 'Invalid request'
-      });
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

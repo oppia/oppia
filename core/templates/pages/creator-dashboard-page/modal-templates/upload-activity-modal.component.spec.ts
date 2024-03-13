@@ -16,11 +16,16 @@
  * @fileoverview Unit tests for UploadActivityModalComponent.
  */
 
-import { AlertsService } from 'services/alerts.service';
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UploadActivityModalComponent } from './upload-activity-modal.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {AlertsService} from 'services/alerts.service';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UploadActivityModalComponent} from './upload-activity-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 class MockActiveModal {
   dismiss(): void {
@@ -51,18 +56,19 @@ describe('Upload Activity Modal Component', () => {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: AlertsService,
-          useClass: MockAlertsService
-        }
-      ]
-    }).compileComponents().then(() => {
-      fixture = TestBed.createComponent(
-        UploadActivityModalComponent);
-      component = fixture.componentInstance;
-    });
+          useClass: MockAlertsService,
+        },
+      ],
+    })
+      .compileComponents()
+      .then(() => {
+        fixture = TestBed.createComponent(UploadActivityModalComponent);
+        component = fixture.componentInstance;
+      });
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     alertsService = TestBed.inject(AlertsService);
   }));
@@ -72,7 +78,7 @@ describe('Upload Activity Modal Component', () => {
 
     let file = {
       size: 100,
-      name: 'file.mp3'
+      name: 'file.mp3',
     };
     // TODO(#10113): Refactor the code to not use the DOM methods.
 
@@ -85,12 +91,12 @@ describe('Upload Activity Modal Component', () => {
     // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(() => {
       return {
-        files: [file]
+        files: [file],
       };
     });
     component.save();
     expect(dismissSpy).toHaveBeenCalledWith({
-      yamlFile: file
+      yamlFile: file,
     });
   }));
 
@@ -108,13 +114,14 @@ describe('Upload Activity Modal Component', () => {
     // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(() => {
       return {
-        files: []
+        files: [],
       };
     });
     component.save();
     flushMicrotasks();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Empty file detected.');
+      'Empty file detected.'
+    );
     expect(dismissSpy).not.toHaveBeenCalled();
   }));
 
@@ -144,7 +151,7 @@ describe('Upload Activity Modal Component', () => {
     // @ts-expect-error
     spyOn(document, 'getElementById').and.callFake(() => {
       return {
-        files: null
+        files: null,
       };
     });
     expect(() => {

@@ -17,12 +17,12 @@
  * domain object.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { BaseUndoRedo } from 'domain/editor/undo_redo/base-undo-redo.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {BaseUndoRedo} from 'domain/editor/undo_redo/base-undo-redo.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class QuestionUndoRedoService extends BaseUndoRedo {
   constructor() {
@@ -30,5 +30,9 @@ export class QuestionUndoRedoService extends BaseUndoRedo {
   }
 }
 
-angular.module('oppia').factory('QuestionUndoRedoService',
-  downgradeInjectable(QuestionUndoRedoService));
+angular
+  .module('oppia')
+  .factory(
+    'QuestionUndoRedoService',
+    downgradeInjectable(QuestionUndoRedoService)
+  );

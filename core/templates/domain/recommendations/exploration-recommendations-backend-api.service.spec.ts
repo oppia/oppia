@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for ExplorationRecommendationsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ExplorationRecommendationsBackendApiService } from
-  'domain/recommendations/exploration-recommendations-backend-api.service';
-import { LearnerExplorationSummary } from
-  'domain/summary/learner-exploration-summary.model';
+import {ExplorationRecommendationsBackendApiService} from 'domain/recommendations/exploration-recommendations-backend-api.service';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Exploration recommendations backend api service', () => {
   let httpTestingController: HttpTestingController;
@@ -31,7 +31,7 @@ describe('Exploration recommendations backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     httpTestingController = TestBed.get(HttpTestingController);
@@ -44,43 +44,54 @@ describe('Exploration recommendations backend api service', () => {
 
   it('should correctly fetch recommended explorations', fakeAsync(() => {
     let backendResponse = {
-      summaries: [{
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {
-          1: 0,
-          2: 0,
-          3: 0,
-          4: 0,
-          5: 0
+      summaries: [
+        {
+          last_updated_msec: 1591296737470.528,
+          community_owned: false,
+          objective: 'Test Objective',
+          id: '44LKoKLlIbGe',
+          num_views: 0,
+          thumbnail_icon_url: '/subjects/Algebra.svg',
+          human_readable_contributors_summary: {},
+          language_code: 'en',
+          thumbnail_bg_color: '#cc4b00',
+          created_on_msec: 1591296635736.666,
+          ratings: {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+          },
+          status: 'public',
+          tags: [],
+          activity_type: 'exploration',
+          category: 'Algebra',
+          title: 'Test Title',
         },
-        status: 'public',
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-        title: 'Test Title'
-      }]
+      ],
     };
 
     let expectedObject = backendResponse.summaries.map(
-      LearnerExplorationSummary.createFromBackendDict);
+      LearnerExplorationSummary.createFromBackendDict
+    );
 
-    erbas.getRecommendedSummaryDictsAsync(
-      ['0'], 'false', 'collectionId', 'storyId', 'nodeId', 'expId').then((
-        expSummaries) => {
-      expect(expSummaries).toEqual(expectedObject);
-    });
+    erbas
+      .getRecommendedSummaryDictsAsync(
+        ['0'],
+        'false',
+        'collectionId',
+        'storyId',
+        'nodeId',
+        'expId'
+      )
+      .then(expSummaries => {
+        expect(expSummaries).toEqual(expectedObject);
+      });
 
-    let req = httpTestingController.expectOne(
-      req => (/.*?explorehandler\/recommendations?.*/g).test(req.url));
+    let req = httpTestingController.expectOne(req =>
+      /.*?explorehandler\/recommendations?.*/g.test(req.url)
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(backendResponse);
 

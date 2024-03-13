@@ -18,18 +18,22 @@
  */
 
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
-var customizeComponent = async function(modal, heading, contentInstructions) {
-  await forms.UnicodeEditor(
-    await modal.$('<schema-based-unicode-editor>')
-  ).setValue(heading);
+var customizeComponent = async function (modal, heading, contentInstructions) {
+  await forms
+    .UnicodeEditor(await modal.$('<schema-based-unicode-editor>'))
+    .setValue(heading);
   var richTextEditor = await forms.RichTextEditor(
-    await modal.$('<schema-based-html-editor>'));
+    await modal.$('<schema-based-html-editor>')
+  );
   await richTextEditor.clear();
   await contentInstructions(richTextEditor);
 };
 
-var expectComponentDetailsToMatch = async function(
-    elem, heading, contentInstructions) {
+var expectComponentDetailsToMatch = async function (
+  elem,
+  heading,
+  contentInstructions
+) {
   var headerElement = elem.$('.e2e-test-collapsible-heading');
   expect(await headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.

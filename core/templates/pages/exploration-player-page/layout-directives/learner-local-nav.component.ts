@@ -16,23 +16,26 @@
  * @fileoverview Component for the local navigation in the learner view.
  */
 
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal, NgbPopover } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { AttributionService } from 'services/attribution.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { ExplorationSuccessfullyFlaggedModalComponent } from '../modals/exploration-successfully-flagged-modal.component';
-import { FlagExplorationModalComponent, FlagExplorationModalResult } from '../modals/flag-exploration-modal.component';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { LearnerLocalNavBackendApiService } from '../services/learner-local-nav-backend-api.service';
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {AttributionService} from 'services/attribution.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {ExplorationSuccessfullyFlaggedModalComponent} from '../modals/exploration-successfully-flagged-modal.component';
+import {
+  FlagExplorationModalComponent,
+  FlagExplorationModalResult,
+} from '../modals/flag-exploration-modal.component';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {LearnerLocalNavBackendApiService} from '../services/learner-local-nav-backend-api.service';
 
 @Component({
   selector: 'oppia-learner-local-nav',
-  templateUrl: './learner-local-nav.component.html'
+  templateUrl: './learner-local-nav.component.html',
 })
 export class LearnerLocalNavComponent implements OnInit {
   canEdit: boolean = false;
@@ -49,35 +52,46 @@ export class LearnerLocalNavComponent implements OnInit {
     private attributionService: AttributionService,
     private explorationEngineService: ExplorationEngineService,
     private loaderService: LoaderService,
-    private readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private userService: UserService,
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService
   ) {}
 
   showFlagExplorationModal(): void {
-    this.ngbModal.open(FlagExplorationModalComponent, {
-      backdrop: 'static'
-    }).result.then((result: FlagExplorationModalResult) => {
-      this.learnerLocalNavBackendApiService
-        .postReportAsync(this.explorationId, result).then(
-          () => {},
-          (error) => {
-            this.alertsService.addWarning(error);
-          });
+    this.ngbModal
+      .open(FlagExplorationModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        (result: FlagExplorationModalResult) => {
+          this.learnerLocalNavBackendApiService
+            .postReportAsync(this.explorationId, result)
+            .then(
+              () => {},
+              error => {
+                this.alertsService.addWarning(error);
+              }
+            );
 
-      this.ngbModal.open(ExplorationSuccessfullyFlaggedModalComponent, {
-        backdrop: true
-      }).result.then(() => {}, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+          this.ngbModal
+            .open(ExplorationSuccessfullyFlaggedModalComponent, {
+              backdrop: true,
+            })
+            .result.then(
+              () => {},
+              () => {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              }
+            );
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 
   toggleAttributionModal(): void {
@@ -94,12 +108,12 @@ export class LearnerLocalNavComponent implements OnInit {
     if (version) {
       this.readOnlyExplorationBackendApiService
         .loadExplorationAsync(this.explorationId, version)
-        .then((exploration) => {
+        .then(exploration => {
           this.canEdit = exploration.can_edit;
         });
     }
     this.loaderService.showLoadingScreen('Loading');
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.username = userInfo.getUsername();
       if (
         this.username === null &&
@@ -120,7 +134,9 @@ export class LearnerLocalNavComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaLearnerLocalNav',
+angular.module('oppia').directive(
+  'oppiaLearnerLocalNav',
   downgradeComponent({
-    component: LearnerLocalNavComponent
-  }) as angular.IDirectiveFactory);
+    component: LearnerLocalNavComponent,
+  }) as angular.IDirectiveFactory
+);

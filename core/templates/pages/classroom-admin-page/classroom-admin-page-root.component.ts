@@ -16,9 +16,9 @@
  * @fileoverview Classroom admin page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-classroom-admin-page-root',
@@ -28,7 +28,6 @@ export class ClassroomAdminPageRootComponent extends BaseRootComponent {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.TITLE;
 
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .CURRICULUM_ADMIN.META as unknown as Readonly<MetaTagData>[];
 }

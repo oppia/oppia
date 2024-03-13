@@ -16,16 +16,15 @@
  * @fileoverview Unit tests for ExplorationRecommendationsService.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, TestBed } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {async, TestBed} from '@angular/core/testing';
 
-import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-import { ExplorationRecommendationsService } from 'pages/exploration-player-page/services/exploration-recommendations.service';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { ServicesConstants } from 'services/services.constants';
-
+import {ExplorationRecommendationsBackendApiService} from 'domain/recommendations/exploration-recommendations-backend-api.service';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {ExplorationRecommendationsService} from 'pages/exploration-player-page/services/exploration-recommendations.service';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {ServicesConstants} from 'services/services.constants';
 
 describe('Exploration Recommendations Service', () => {
   let expRecsService: ExplorationRecommendationsService;
@@ -39,12 +38,8 @@ describe('Exploration Recommendations Service', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      providers: [
-        ExplorationRecommendationsService,
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [ExplorationRecommendationsService],
     });
   }));
 
@@ -53,11 +48,12 @@ describe('Exploration Recommendations Service', () => {
     contextService = TestBed.inject(ContextService);
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
-      COLLECTION_ID);
+      COLLECTION_ID
+    );
 
     spyOn(urlService, 'getUrlParams').and.returnValue({
       story_id: STORY_ID,
-      node_id: NODE_ID
+      node_id: NODE_ID,
     });
 
     spyOn(contextService, 'getExplorationId').and.returnValue(EXPLORATION_ID);
@@ -120,12 +116,12 @@ describe('Exploration Recommendations Service', () => {
     beforeEach(() => {
       systemRecommendations = [
         new MockExplorationSummary('system_rec_1') as LearnerExplorationSummary,
-        new MockExplorationSummary('system_rec_2') as LearnerExplorationSummary
+        new MockExplorationSummary('system_rec_2') as LearnerExplorationSummary,
       ];
 
       authorRecommendations = [
         new MockExplorationSummary('author_rec_1') as LearnerExplorationSummary,
-        new MockExplorationSummary('author_rec_2') as LearnerExplorationSummary
+        new MockExplorationSummary('author_rec_2') as LearnerExplorationSummary,
       ];
 
       expRecsBackendApiService = TestBed.inject(
@@ -134,13 +130,14 @@ describe('Exploration Recommendations Service', () => {
 
       spyOn(
         expRecsBackendApiService,
-        'getRecommendedSummaryDictsAsync').and.callFake(
-        async(_, includeSystemRecommendations: string) => {
-          return Promise.resolve(
-            includeSystemRecommendations === 'true' ?
-            systemRecommendations.concat(authorRecommendations) :
-            authorRecommendations);
-        });
+        'getRecommendedSummaryDictsAsync'
+      ).and.callFake(async (_, includeSystemRecommendations: string) => {
+        return Promise.resolve(
+          includeSystemRecommendations === 'true'
+            ? systemRecommendations.concat(authorRecommendations)
+            : authorRecommendations
+        );
+      });
     });
 
     describe('when used in other page context', () => {
@@ -153,20 +150,24 @@ describe('Exploration Recommendations Service', () => {
 
       it('should include author recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true,
-          (expSummaries) => {
+          AUTHOR_REC_IDS,
+          true,
+          expSummaries => {
             expect(expSummaries).toEqual(
-              jasmine.arrayContaining(authorRecommendations));
+              jasmine.arrayContaining(authorRecommendations)
+            );
           }
         );
       });
 
       it('should include system recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true,
-          (expSummaries) => {
+          AUTHOR_REC_IDS,
+          true,
+          expSummaries => {
             expect(expSummaries).toEqual(
-              jasmine.arrayContaining(systemRecommendations));
+              jasmine.arrayContaining(systemRecommendations)
+            );
           }
         );
       });
@@ -182,20 +183,24 @@ describe('Exploration Recommendations Service', () => {
 
       it('should include author recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true,
-          (expSummaries) => {
+          AUTHOR_REC_IDS,
+          true,
+          expSummaries => {
             expect(expSummaries).toEqual(
-              jasmine.arrayContaining(authorRecommendations));
+              jasmine.arrayContaining(authorRecommendations)
+            );
           }
         );
       });
 
       it('should not include system recommendations', () => {
         expRecsService.getRecommendedSummaryDicts(
-          AUTHOR_REC_IDS, true,
-          (expSummaries) => {
+          AUTHOR_REC_IDS,
+          true,
+          expSummaries => {
             expect(expSummaries).not.toEqual(
-              jasmine.arrayContaining(systemRecommendations));
+              jasmine.arrayContaining(systemRecommendations)
+            );
           }
         );
       });

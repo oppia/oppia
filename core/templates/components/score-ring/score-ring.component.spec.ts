@@ -16,11 +16,16 @@
  * @fileoverview Unit tests for Score Ring Component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ScoreRingComponent } from './score-ring.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ScoreRingComponent} from './score-ring.component';
 
 describe('Score Ring Component', () => {
   let fixture: ComponentFixture<ScoreRingComponent>;
@@ -28,15 +33,10 @@ describe('Score Ring Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        ScoreRingComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [ScoreRingComponent, MockTranslatePipe],
       providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -72,9 +72,9 @@ describe('Score Ring Component', () => {
         // @ts-expect-error
         style: {
           strokeDasharray: '',
-          strokeDashoffset: ''
-        }
-      }
+          strokeDashoffset: '',
+        },
+      },
     };
 
     component.ngAfterViewInit();
@@ -86,26 +86,30 @@ describe('Score Ring Component', () => {
     component.score = 35;
     component.testIsPassed = true;
 
-    expect(component.getScoreRingColor())
-      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR);
+    expect(component.getScoreRingColor()).toEqual(
+      component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR
+    );
 
     component.testIsPassed = false;
 
-    expect(component.getScoreRingColor())
-      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR);
+    expect(component.getScoreRingColor()).toEqual(
+      component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR
+    );
   });
 
   it('should get score outer ring color', () => {
     component.score = 35;
     component.testIsPassed = true;
 
-    expect(component.getScoreOuterRingColor())
-      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER);
+    expect(component.getScoreOuterRingColor()).toEqual(
+      component.COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER
+    );
 
     component.testIsPassed = false;
 
-    expect(component.getScoreOuterRingColor())
-      .toEqual(component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER);
+    expect(component.getScoreOuterRingColor()).toEqual(
+      component.COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER
+    );
   });
 
   it('should set the new score if it changes', fakeAsync(() => {
@@ -114,8 +118,8 @@ describe('Score Ring Component', () => {
         currentValue: 75,
         previousValue: 35,
         firstChange: true,
-        isFirstChange: () => true
-      }
+        isFirstChange: () => true,
+      },
     };
     component.scoreRingElement = {
       nativeElement: {
@@ -141,9 +145,9 @@ describe('Score Ring Component', () => {
         // @ts-expect-error
         style: {
           strokeDasharray: '',
-          strokeDashoffset: ''
-        }
-      }
+          strokeDashoffset: '',
+        },
+      },
     };
 
     expect(component.score).toEqual(35);
@@ -152,7 +156,8 @@ describe('Score Ring Component', () => {
     component.ngOnChanges(changes);
     tick(2000);
 
-    expect(Math.round(parseFloat(component.circle.style.strokeDashoffset)))
-      .toEqual(196);
+    expect(
+      Math.round(parseFloat(component.circle.style.strokeDashoffset))
+    ).toEqual(196);
   }));
 });

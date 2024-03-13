@@ -16,14 +16,14 @@
  * @fileoverview Component for Assign Skill To Topic Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 
 @Component({
   selector: 'oppia-assign-skill-to-topic-modal',
-  templateUrl: './assign-skill-to-topic-modal.component.html'
+  templateUrl: './assign-skill-to-topic-modal.component.html',
 })
 export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
   // This property is initialized using component interactions
@@ -32,9 +32,7 @@ export class AssignSkillToTopicModalComponent extends ConfirmOrCancelModal {
   topicSummaries!: CreatorTopicSummary[];
   selectedTopicIds: string[] = [];
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

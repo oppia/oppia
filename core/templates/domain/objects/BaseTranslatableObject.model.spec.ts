@@ -16,11 +16,17 @@
  * @fileoverview Tests for BaseTranslatableObject model.
  */
 
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import { EntityTranslation } from 'domain/translation/EntityTranslationObjectFactory';
-import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
-import { BaseTranslatableObject, TranslatableField } from './BaseTranslatableObject.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {
+  TranslatableSetOfNormalizedString,
+  TranslatableSetOfUnicodeString,
+} from 'interactions/rule-input-defs';
+import {
+  BaseTranslatableObject,
+  TranslatableField,
+} from './BaseTranslatableObject.model';
 
 class DerivedTranslatableObject extends BaseTranslatableObject {
   htmlField: SubtitledHtml;
@@ -34,11 +40,11 @@ class DerivedTranslatableObject extends BaseTranslatableObject {
     this.unicodeField = new SubtitledUnicode('Unicode content', 'content_1');
     this.setOfNormalizedStringsField = {
       normalizedStrSet: ['String 1', 'String 2'],
-      contentId: 'content_2'
+      contentId: 'content_2',
     };
     this.setOfUnicodeStringsField = {
       unicodeStrSet: ['String 1', 'String 2'],
-      contentId: 'content_3'
+      contentId: 'content_3',
     };
   }
 
@@ -47,7 +53,7 @@ class DerivedTranslatableObject extends BaseTranslatableObject {
       this.htmlField,
       this.unicodeField,
       this.setOfNormalizedStringsField,
-      this.setOfUnicodeStringsField
+      this.setOfUnicodeStringsField,
     ];
   }
 }
@@ -57,9 +63,12 @@ describe('Base Translatable Object model', () => {
     it('should return correct html', () => {
       let expectedHtml = '<p>Html string</p>';
       let translatableHtmlContent = new SubtitledHtml(
-        expectedHtml, 'content_id_1');
+        expectedHtml,
+        'content_id_1'
+      );
       let observedContentValue = BaseTranslatableObject.getContentValue(
-        translatableHtmlContent);
+        translatableHtmlContent
+      );
 
       expect(observedContentValue).toBe(expectedHtml);
     });
@@ -67,35 +76,42 @@ describe('Base Translatable Object model', () => {
     it('should return correct unicode string', () => {
       let expectedUnicode = 'Unicode string';
       let translatableUnicodeContent = new SubtitledUnicode(
-        expectedUnicode, 'content_id_1');
+        expectedUnicode,
+        'content_id_1'
+      );
       let observedContentValue = BaseTranslatableObject.getContentValue(
-        translatableUnicodeContent);
+        translatableUnicodeContent
+      );
 
       expect(observedContentValue).toBe(expectedUnicode);
     });
 
     it('should return correct set of normalized string', () => {
       let expectedSetOfNormalizedString = [
-        'SetOfNormalizedString1', 'SetOfNormalizedString2'];
+        'SetOfNormalizedString1',
+        'SetOfNormalizedString2',
+      ];
       let translatableContent: TranslatableSetOfNormalizedString = {
         normalizedStrSet: expectedSetOfNormalizedString,
-        contentId: 'content_id_1'
+        contentId: 'content_id_1',
       };
-      let observedContentValue = BaseTranslatableObject.getContentValue(
-        translatableContent);
+      let observedContentValue =
+        BaseTranslatableObject.getContentValue(translatableContent);
 
       expect(observedContentValue).toBe(expectedSetOfNormalizedString);
     });
 
     it('should return correct set of unicode string', () => {
       let expectedSetOfUnicodeString = [
-        'SetOfUnicodeString1', 'SetOfUnicodeString2'];
+        'SetOfUnicodeString1',
+        'SetOfUnicodeString2',
+      ];
       let translatableContent: TranslatableSetOfUnicodeString = {
         unicodeStrSet: expectedSetOfUnicodeString,
-        contentId: 'content_id_1'
+        contentId: 'content_id_1',
       };
-      let observedContentValue = BaseTranslatableObject.getContentValue(
-        translatableContent);
+      let observedContentValue =
+        BaseTranslatableObject.getContentValue(translatableContent);
 
       expect(observedContentValue).toBe(expectedSetOfUnicodeString);
     });
@@ -112,9 +128,9 @@ describe('Base Translatable Object model', () => {
           content_0: {
             content_format: 'html',
             content_value: 'Translation',
-            needs_update: false
-          }
-        }
+            needs_update: false,
+          },
+        },
       });
       let derivedTranslatableObject = new DerivedTranslatableObject();
       expect(derivedTranslatableObject.htmlField.html).toEqual('Html content');
@@ -134,9 +150,9 @@ describe('Base Translatable Object model', () => {
           content_1: {
             content_format: 'unicode',
             content_value: 'Translation',
-            needs_update: false
-          }
-        }
+            needs_update: false,
+          },
+        },
       });
       let derivedTranslatableObject = new DerivedTranslatableObject();
       expect(derivedTranslatableObject.unicodeField.unicode).toEqual(
@@ -160,9 +176,9 @@ describe('Base Translatable Object model', () => {
           content_2: {
             content_format: 'set_of_normalized_string',
             content_value: ['Translation 1', 'Translation 2'],
-            needs_update: false
-          }
-        }
+            needs_update: false,
+          },
+        },
       });
       let derivedTranslatableObject = new DerivedTranslatableObject();
       expect(
@@ -173,11 +189,8 @@ describe('Base Translatable Object model', () => {
 
       expect(
         derivedTranslatableObject.setOfNormalizedStringsField.normalizedStrSet
-      ).toEqual(
-        ['Translation 1', 'Translation 2']
-      );
+      ).toEqual(['Translation 1', 'Translation 2']);
     });
-
 
     it('should swap set of unicode string field', () => {
       let entityTranslation = EntityTranslation.createFromBackendDict({
@@ -189,9 +202,9 @@ describe('Base Translatable Object model', () => {
           content_3: {
             content_format: 'set_of_unicode_string',
             content_value: ['Translation 1', 'Translation 2'],
-            needs_update: false
-          }
-        }
+            needs_update: false,
+          },
+        },
       });
       let derivedTranslatableObject = new DerivedTranslatableObject();
       expect(
@@ -202,9 +215,7 @@ describe('Base Translatable Object model', () => {
 
       expect(
         derivedTranslatableObject.setOfUnicodeStringsField.unicodeStrSet
-      ).toEqual(
-        ['Translation 1', 'Translation 2']
-      );
+      ).toEqual(['Translation 1', 'Translation 2']);
     });
   });
 });

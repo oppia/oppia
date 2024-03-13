@@ -12,40 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Service for handling all http calls
  * with the exploration editor backend.
  */
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
-import { Observable } from 'rxjs';
-import { DraftAutoSaveResponse } from './exploration-data.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {Observable} from 'rxjs';
+import {DraftAutoSaveResponse} from './exploration-data.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationDataBackendApiService {
   constructor(private httpClient: HttpClient) {}
 
   discardDraft(url: string): Observable<void> {
-    return this.httpClient.post<void>(
-      url, {});
+    return this.httpClient.post<void>(url, {});
   }
 
   saveChangeList(
-      url: string,
-      changeList: ExplorationChange[],
-      version: number): Observable<DraftAutoSaveResponse> {
-    return this.httpClient.put<DraftAutoSaveResponse>(
-      url, {
-        change_list: changeList,
-        version: version
-      });
+    url: string,
+    changeList: ExplorationChange[],
+    version: number
+  ): Observable<DraftAutoSaveResponse> {
+    return this.httpClient.put<DraftAutoSaveResponse>(url, {
+      change_list: changeList,
+      version: version,
+    });
   }
 }
 
-angular.module('oppia').factory('ExplorationDataBackendApiService',
-  downgradeInjectable(ExplorationDataBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationDataBackendApiService',
+    downgradeInjectable(ExplorationDataBackendApiService)
+  );
