@@ -152,40 +152,118 @@ describe('Number with Units rules service', () => {
         REAL_RULE_INPUT
       )
     ).toBe(true);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1),
-      [{unit: 'kg', exponent: 1}, {unit: 'meter', exponent: -2}])
-    , REAL_RULE_INPUT)
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'real',
+          2,
+          createFractionDict(false, 0, 0, 1),
+          [
+            {unit: 'kg', exponent: 1},
+            {unit: 'meter', exponent: -2},
+          ]
+        ),
+        REAL_RULE_INPUT
+      )
     ).toBe(true);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2000, createFractionDict(false, 0, 0, 1),
-      [{unit: 'g', exponent: 1}, {unit: 'meter', exponent: -2}])
-    , REAL_RULE_INPUT)
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'real',
+          2000,
+          createFractionDict(false, 0, 0, 1),
+          [
+            {unit: 'g', exponent: 1},
+            {unit: 'meter', exponent: -2},
+          ]
+        ),
+        REAL_RULE_INPUT
+      )
     ).toBe(false);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 2, 1),
-      [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]),
-    REAL_RULE_INPUT)).toBe(false);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 2, 3),
-      [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]),
-    FRACTION_RULE_INPUT)).toBe(true);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 20, 30),
-      [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: -2}]),
-    FRACTION_RULE_INPUT)).toBe(false);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 2, 3),
-      [{unit: 'kg', exponent: 1}, {unit: 'm', exponent: 2}]),
-    FRACTION_RULE_INPUT)).toBe(false);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1),
-      [{unit: 'dollar', exponent: 1}, {unit: 'm', exponent: -2}]),
-    CURRENCY_RULE_INPUT)).toBe(true);
-    expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1),
-      [{unit: 'cent', exponent: 1}, {unit: 'm', exponent: -2}]),
-    CURRENCY_RULE_INPUT)).toBe(false);
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'fraction',
+          0,
+          createFractionDict(false, 0, 2, 1),
+          [
+            {unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: -2},
+          ]
+        ),
+        REAL_RULE_INPUT
+      )
+    ).toBe(false);
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'fraction',
+          0,
+          createFractionDict(false, 0, 2, 3),
+          [
+            {unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: -2},
+          ]
+        ),
+        FRACTION_RULE_INPUT
+      )
+    ).toBe(true);
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'fraction',
+          0,
+          createFractionDict(false, 0, 20, 30),
+          [
+            {unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: -2},
+          ]
+        ),
+        FRACTION_RULE_INPUT
+      )
+    ).toBe(false);
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'fraction',
+          0,
+          createFractionDict(false, 0, 2, 3),
+          [
+            {unit: 'kg', exponent: 1},
+            {unit: 'm', exponent: 2},
+          ]
+        ),
+        FRACTION_RULE_INPUT
+      )
+    ).toBe(false);
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'real',
+          2,
+          createFractionDict(false, 0, 0, 1),
+          [
+            {unit: 'dollar', exponent: 1},
+            {unit: 'm', exponent: -2},
+          ]
+        ),
+        CURRENCY_RULE_INPUT
+      )
+    ).toBe(true);
+    expect(
+      nurs.IsEqualTo(
+        createNumberWithUnitsDict(
+          'real',
+          2,
+          createFractionDict(false, 0, 0, 1),
+          [
+            {unit: 'cent', exponent: 1},
+            {unit: 'm', exponent: -2},
+          ]
+        ),
+        CURRENCY_RULE_INPUT
+      )
+    ).toBe(false);
   });
 
   it("should have a correct 'equivalent to' rule", () => {

@@ -76,7 +76,7 @@ export const ObjectsDomainConstants = {
     // Length.
     m: 'm',
     meter: 'm',
-    'in': 'in',
+    in: 'in',
     inch: 'in',
     ft: 'ft',
     foot: 'ft',
@@ -257,7 +257,7 @@ export const ObjectsDomainConstants = {
     b: 'b',
     bit: 'bit',
     B: 'B',
-    'byte': 'B',
+    byte: 'B',
 
     // Currency.
     $: 'dollar',
@@ -278,5 +278,5 @@ export const ObjectsDomainConstants = {
     cents: 'Cent',
     Paisa: 'Paisa',
     paise: 'Paisa',
-  } as { [key: string]: string }
+  } as {[key: string]: string},
 } as const;

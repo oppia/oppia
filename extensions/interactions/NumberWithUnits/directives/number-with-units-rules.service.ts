@@ -57,7 +57,8 @@ export class NumberWithUnitsRulesService {
       numericalValuesAreEqual = answerObject.real === inputsObject.real;
     } else {
       numericalValuesAreEqual = this.utilsService.isEquivalent(
-        answerObject.fraction, inputsObject.fraction
+        answerObject.fraction,
+        inputsObject.fraction
       );
     }
 

@@ -38,11 +38,16 @@ angular
   .module('oppia')
   .constant('CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);
 
-angular.module('oppia').constant(
-  'UNIT_TO_NORMALIZED_UNIT_MAPPING',
-  ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
-);
+angular
+  .module('oppia')
+  .constant(
+    'UNIT_TO_NORMALIZED_UNIT_MAPPING',
+    ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
+  );
 
-angular.module('oppia').constant(
-  'RATIO_PARSING_ERROR_I18N_KEYS',
-  ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS);
+angular
+  .module('oppia')
+  .constant(
+    'RATIO_PARSING_ERROR_I18N_KEYS',
+    ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS
+  );
