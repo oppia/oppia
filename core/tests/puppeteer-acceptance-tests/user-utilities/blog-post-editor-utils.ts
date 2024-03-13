@@ -67,12 +67,6 @@ export class BlogPostEditor extends BaseUser {
     draftBlogPostTitle: string
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(500);
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.type(blogTitleInput, draftBlogPostTitle);
     await this.page.keyboard.press('Tab');
@@ -106,12 +100,6 @@ export class BlogPostEditor extends BaseUser {
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click()
         );
-        /** Giving explicit timeout because we need to wait for small
-         * transition to complete. We cannot wait for the next element to click
-         * using its selector as it is instantly loaded in the DOM but cannot
-         * be clicked until the transition is completed.
-         */
-        await this.page.waitForTimeout(100);
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
         await this.page.waitForSelector('div.modal-dialog');
         await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
@@ -147,12 +135,6 @@ export class BlogPostEditor extends BaseUser {
    */
   async publishNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(500);
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
 
     await this.expectPublishButtonToBeDisabled();
@@ -228,12 +210,6 @@ export class BlogPostEditor extends BaseUser {
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click()
         );
-        /** Giving explicit timeout because we need to wait for small
-         * transition to complete. We cannot wait for the next element to click
-         * using its selector as it is instantly loaded in the DOM but cannot
-         * be clicked until the transition is completed.
-         */
-        await this.page.waitForTimeout(100);
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
         await this.page.waitForSelector('button.e2e-test-confirm-button');
         await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);

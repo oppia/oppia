@@ -17,6 +17,10 @@
  */
 
 export default function isElementClickable(element: Element): boolean {
+  /**
+   * This function gets the element that is overlapping the given element
+   * by getting the element at the center of the given element.
+   */
   const getOverlappingElement = (
     element: Element,
     parent: ShadowRoot | Document = document
@@ -28,6 +32,11 @@ export default function isElementClickable(element: Element): boolean {
     return parent.elementFromPoint(x, y);
   };
 
+  /**
+   * This function also gets the element that is overlapping the given element
+   * but using the center of the first client rectangle of the element. Which
+   * is applicable in special cases where the text is multiline.
+   */
   const getOverlappingRect = (
     element: Element,
     parent: ShadowRoot | Document = document
@@ -40,6 +49,10 @@ export default function isElementClickable(element: Element): boolean {
     return parent.elementFromPoint(x, y);
   };
 
+  /**
+   * This function combines the overlapping element and overlapping rect
+   * to get all the overlapping elements.
+   */
   const getOverlappingElements = (
     element: Element,
     parent: ShadowRoot | Document = document
@@ -56,6 +69,11 @@ export default function isElementClickable(element: Element): boolean {
     return overlappingElements;
   };
 
+  /**
+   * This function is recursive and checks if the target element is the only
+   * overlapping element meaning there are no other elements blocking
+   * the target element.
+   */
   const isOverlappingElementsMatching = (
     targetElement: Element,
     elements: Element[]
@@ -89,6 +107,9 @@ export default function isElementClickable(element: Element): boolean {
     return isOverlappingElementsMatching(targetElement, shadowElements);
   };
 
+  /**
+   * This function checks if the given element is in the viewport.
+   */
   const isElementInViewport = (element: Element): boolean => {
     const elementDimensions = element.getBoundingClientRect();
 
@@ -107,6 +128,10 @@ export default function isElementClickable(element: Element): boolean {
     return verticalInView && horizontalInView;
   };
 
+  /**
+   * This function checks if the element is clickable, by checking if it is
+   * not disabled, in the viewport and not blocked by any other element.
+   */
   const isClickable = (element: Element): boolean => {
     return (
       (element as HTMLButtonElement).disabled !== true &&
