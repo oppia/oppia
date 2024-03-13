@@ -172,8 +172,6 @@ export class LoggedInUser extends BaseUser {
    */
   async clickOnMobileNavbarButton(): Promise<void> {
     await this.clickOn(mobileNavbarOpenSidebarButton);
-    // Here we wait for the mobile sidebar animation to finish.
-    await this.page.waitForTimeout(600);
   }
 
   /**
@@ -181,9 +179,6 @@ export class LoggedInUser extends BaseUser {
    */
   async clickOnExpandGetInvolvedMenuButtonOnMobileSidebar(): Promise<void> {
     await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
-    await this.page.waitForSelector(mobileSidebarGetInvolvedMenu, {
-      visible: true,
-    });
   }
 
   /**

@@ -16,7 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser, Viewport} from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../functions/is-element-clickable';
 
@@ -140,26 +140,34 @@ export class BaseUser {
   }
 
   /**
-   * This function waits for an element to be clickable.
+   * This function waits for an element to be clickable either by its CSS selector or
+   * by the ElementHandle.
    */
-  async waitForClickable(selector: string): Promise<void> {
-    const element = await this.page.waitForSelector(selector);
-    await this.page.waitForFunction(isElementClickable, {}, element);
+  async waitForClickable(
+    selector: string | ElementHandle<Element>
+  ): Promise<void> {
+    if (typeof selector === 'string') {
+      const element = await this.page.waitForSelector(selector);
+      await this.page.waitForFunction(isElementClickable, {}, element);
+    } else {
+      await this.page.waitForFunction(isElementClickable, {}, selector);
+    }
   }
 
   /**
    * The function clicks the element using the text on the button.
    */
   async clickOn(selector: string): Promise<void> {
-    try {
-      /** Normalize-space is used to remove the extra spaces in the text.
-       * Check the documentation for the normalize-space function here :
-       * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-      const textSelector = `\/\/*[contains(text(), normalize-space('${selector}'))]`;
-      const [button] = await this.page.$x(textSelector);
-      await this.waitForClickable(textSelector);
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    if (button !== undefined) {
+      await this.waitForClickable(button);
       await button.click();
-    } catch (error) {
+    } else {
       await this.waitForClickable(selector);
       await this.page.click(selector);
     }
