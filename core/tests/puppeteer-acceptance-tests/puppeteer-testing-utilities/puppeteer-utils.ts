@@ -66,10 +66,12 @@ export class BaseUser {
          * every test passes on both modes. */
         headless,
         args,
+        devtools: true,
       })
       .then(async browser => {
         this.browserObject = browser;
         this.page = await browser.newPage();
+
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
           await this.page.setViewport({
@@ -146,11 +148,15 @@ export class BaseUser {
   async waitForClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
-    if (typeof selector === 'string') {
-      const element = await this.page.waitForSelector(selector);
-      await this.page.waitForFunction(isElementClickable, {}, element);
-    } else {
-      await this.page.waitForFunction(isElementClickable, {}, selector);
+    try {
+      if (typeof selector === 'string') {
+        const element = await this.page.waitForSelector(selector);
+        await this.page.waitForFunction(isElementClickable, {}, element);
+      } else {
+        await this.page.waitForFunction(isElementClickable, {}, selector);
+      }
+    } catch (error) {
+      throw new Error(`Element ${selector} took too long to be clickable.`);
     }
   }
 
