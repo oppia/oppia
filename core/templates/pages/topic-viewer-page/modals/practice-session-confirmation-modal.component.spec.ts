@@ -16,19 +16,19 @@
  * @fileoverview Unit tests for practice session confirmation modal component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { PracticeSessionConfirmationModal } from './practice-session-confirmation-modal.component';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {PracticeSessionConfirmationModal} from './practice-session-confirmation-modal.component';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
-describe('Practice session confirmation modal component', function() {
+describe('Practice session confirmation modal component', function () {
   let component: PracticeSessionConfirmationModal;
   let fixture: ComponentFixture<PracticeSessionConfirmationModal>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PracticeSessionConfirmationModal, MockTranslatePipe],
-      providers: [NgbActiveModal]
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

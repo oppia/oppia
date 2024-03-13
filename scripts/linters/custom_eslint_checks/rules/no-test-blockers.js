@@ -23,37 +23,37 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'Lint check to disallow usage of ddescribe, fdescribe,' +
-        'xdescribe, fit, xit'),
+        'xdescribe, fit, xit',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      disallowMessage: (
+      disallowMessage:
         'Please use "{{allowedFunctionName}}" instead of ' +
-        '"{{disallowedFunctionName}}".')
+        '"{{disallowedFunctionName}}".',
     },
   },
 
-  create: function(context) {
-    var selector = (
+  create: function (context) {
+    var selector =
       'CallExpression[callee.name=' +
-      '/^(xdescribe|fdescribe|ddescribe|xit|fit|iit)$/]');
+      '/^(xdescribe|fdescribe|ddescribe|xit|fit|iit)$/]';
 
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         context.report({
           node: node,
           messageId: 'disallowMessage',
           data: {
             allowedFunctionName: node.callee.name.slice(1),
-            disallowedFunctionName: node.callee.name
-          }
+            disallowedFunctionName: node.callee.name,
+          },
         });
-      }
+      },
     };
-  }
+  },
 };

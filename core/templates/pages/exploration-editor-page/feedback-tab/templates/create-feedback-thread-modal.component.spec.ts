@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for CreateFeedbackThreadModalComponent.
  */
 
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsService } from 'services/alerts.service';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { CreateFeedbackThreadModalComponent } from './create-feedback-thread-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AlertsService} from 'services/alerts.service';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {CreateFeedbackThreadModalComponent} from './create-feedback-thread-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 class MockActiveModal {
   close(): void {
@@ -32,7 +32,7 @@ class MockActiveModal {
   }
 }
 
-describe('Create Feedback Thread Modal Controller', function() {
+describe('Create Feedback Thread Modal Controller', function () {
   let component: CreateFeedbackThreadModalComponent;
   let fixture: ComponentFixture<CreateFeedbackThreadModalComponent>;
   let alertsService: AlertsService;
@@ -40,16 +40,14 @@ describe('Create Feedback Thread Modal Controller', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CreateFeedbackThreadModalComponent
-      ],
+      declarations: [CreateFeedbackThreadModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
+          useClass: MockActiveModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -63,13 +61,12 @@ describe('Create Feedback Thread Modal Controller', function() {
     fixture.detectChanges();
   });
 
-  it('should initialize properties after component is initialized',
-    function() {
-      expect(component.newThreadSubject).toEqual('');
-      expect(component.newThreadText).toEqual('');
-    });
+  it('should initialize properties after component is initialized', function () {
+    expect(component.newThreadSubject).toEqual('');
+    expect(component.newThreadText).toEqual('');
+  });
 
-  it('should not close modal when new thread subject is empty', function() {
+  it('should not close modal when new thread subject is empty', function () {
     spyOn(alertsService, 'addWarning').and.callThrough();
     spyOn(ngbActiveModal, 'close').and.callThrough();
 
@@ -78,11 +75,12 @@ describe('Create Feedback Thread Modal Controller', function() {
     component.create(newThreadSubject, newThreadText);
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Please specify a thread subject.');
+      'Please specify a thread subject.'
+    );
     expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
-  it('should not close modal when new thread text is empty', function() {
+  it('should not close modal when new thread text is empty', function () {
     spyOn(alertsService, 'addWarning').and.callThrough();
     spyOn(ngbActiveModal, 'close').and.callThrough();
 
@@ -91,21 +89,25 @@ describe('Create Feedback Thread Modal Controller', function() {
     component.create(newThreadSubject, newThreadText);
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Please specify a message.');
+      'Please specify a message.'
+    );
     expect(ngbActiveModal.close).not.toHaveBeenCalled();
   });
 
-  it('should close modal when both new thread subject and new thread text are' +
-      ' valid', function() {
-    spyOn(ngbActiveModal, 'close').and.callThrough();
+  it(
+    'should close modal when both new thread subject and new thread text are' +
+      ' valid',
+    function () {
+      spyOn(ngbActiveModal, 'close').and.callThrough();
 
-    let newThreadSubject = 'subject';
-    let newThreadText = 'text';
-    component.create(newThreadSubject, newThreadText);
+      let newThreadSubject = 'subject';
+      let newThreadText = 'text';
+      component.create(newThreadSubject, newThreadText);
 
-    expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      newThreadSubject: 'subject',
-      newThreadText: 'text'
-    });
-  });
+      expect(ngbActiveModal.close).toHaveBeenCalledWith({
+        newThreadSubject: 'subject',
+        newThreadText: 'text',
+      });
+    }
+  );
 });

@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
-import { ParamSpecs, ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {
+  ParamSpecs,
+  ParamSpecsObjectFactory,
+} from 'domain/exploration/ParamSpecsObjectFactory';
 
 describe('ParamSpecs', () => {
   let paramSpecsObjectFactory: ParamSpecsObjectFactory;
@@ -29,7 +32,7 @@ describe('ParamSpecs', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ParamSpecsObjectFactory]
+      providers: [ParamSpecsObjectFactory],
     });
 
     paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
@@ -68,18 +71,19 @@ describe('ParamSpecs', () => {
   it('should convert a param specs to backend dict correctly', () => {
     const paramSpec = paramSpecObjectFactory.createDefault();
     const expectedParamSpecBackendDict = {
-      [paramName]: paramSpec.toBackendDict()
+      [paramName]: paramSpec.toBackendDict(),
     };
     emptyParamSpecs.addParamIfNew(paramName, paramSpec);
 
     expect(emptyParamSpecs.toBackendDict()).toEqual(
-      expectedParamSpecBackendDict);
+      expectedParamSpecBackendDict
+    );
   });
 
   it('should create a non empty param specs', () => {
     const paramSpec = paramSpecObjectFactory.createDefault();
     const nonEmptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({
-      [paramName]: paramSpec.toBackendDict()
+      [paramName]: paramSpec.toBackendDict(),
     });
 
     expect(nonEmptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(false);

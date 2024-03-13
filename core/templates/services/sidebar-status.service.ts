@@ -17,13 +17,12 @@
  * hamburger-menu sidebar.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SidebarStatusService {
   constructor(private wds: WindowDimensionsService) {}
@@ -84,5 +83,6 @@ export class SidebarStatusService {
   }
 }
 
-angular.module('oppia').factory(
-  'SidebarStatusService', downgradeInjectable(SidebarStatusService));
+angular
+  .module('oppia')
+  .factory('SidebarStatusService', downgradeInjectable(SidebarStatusService));

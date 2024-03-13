@@ -16,86 +16,104 @@
  * @fileoverview Service to send changes to skill mastery to the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
+import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
 import {
   SkillMastery,
-  SkillMasteryBackendDict
+  SkillMasteryBackendDict,
 } from 'domain/skill/skill-mastery.model';
 
 export interface SkillMasteryBackendResponse {
-  'degrees_of_mastery': SkillMasteryBackendDict;
+  degrees_of_mastery: SkillMasteryBackendDict;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkillMasteryBackendApiService {
-  constructor(
-    private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
   _fetchSkillMasteryDegrees(
-      skillIds: string[],
-      successCallback: (value: SkillMastery) => void,
-      errorCallback: (reason: string) => void): void {
-    this.httpClient.get<SkillMasteryBackendResponse>(
-      SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, {
-        params: {
-          selected_skill_ids: JSON.stringify(skillIds)
+    skillIds: string[],
+    successCallback: (value: SkillMastery) => void,
+    errorCallback: (reason: string) => void
+  ): void {
+    this.httpClient
+      .get<SkillMasteryBackendResponse>(
+        SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE,
+        {
+          params: {
+            selected_skill_ids: JSON.stringify(skillIds),
+          },
         }
-      }).toPromise().then(response => {
-      if (successCallback) {
-        let skillMastery = (
-          SkillMastery.createFromBackendDict(
-            response.degrees_of_mastery));
-        successCallback(skillMastery);
-      }
-    }, (errorResponse) =>{
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
+      )
+      .toPromise()
+      .then(
+        response => {
+          if (successCallback) {
+            let skillMastery = SkillMastery.createFromBackendDict(
+              response.degrees_of_mastery
+            );
+            successCallback(skillMastery);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        }
+      );
   }
 
   _updateSkillMasteryDegrees(
-      masteryPerSkillMapping: {[key: string]: number},
-      successCallback: () => void,
-      errorCallback: (reason: string) => void): void {
+    masteryPerSkillMapping: {[key: string]: number},
+    successCallback: () => void,
+    errorCallback: (reason: string) => void
+  ): void {
     let putData = {
-      mastery_change_per_skill: masteryPerSkillMapping
+      mastery_change_per_skill: masteryPerSkillMapping,
     };
 
-    this.httpClient.put(
-      SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, putData
-    ).toPromise().then(() => {
-      if (successCallback) {
-        successCallback();
-      }
-    }, (errorResponse) => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
+    this.httpClient
+      .put(SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, putData)
+      .toPromise()
+      .then(
+        () => {
+          if (successCallback) {
+            successCallback();
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        }
+      );
   }
 
-  async fetchSkillMasteryDegreesAsync(skillIds: string[]):
-   Promise<SkillMastery> {
+  async fetchSkillMasteryDegreesAsync(
+    skillIds: string[]
+  ): Promise<SkillMastery> {
     return new Promise((resolve, reject) => {
       this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
     });
   }
 
-  async updateSkillMasteryDegreesAsync(
-      masteryPerSkillMapping: {[key: string]: number}): Promise<void> {
+  async updateSkillMasteryDegreesAsync(masteryPerSkillMapping: {
+    [key: string]: number;
+  }): Promise<void> {
     return new Promise((resolve, reject) => {
       this._updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);
     });
   }
 }
 
-angular.module('oppia').factory(
-  'SkillMasteryBackendApiService',
-  downgradeInjectable(SkillMasteryBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'SkillMasteryBackendApiService',
+    downgradeInjectable(SkillMasteryBackendApiService)
+  );

@@ -16,14 +16,11 @@
  * @fileoverview Translation admin role utility file.
  */
 
-import { IBaseUser, BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
 const ContributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const translationRightValue = 'translation';
 const usernameMethodValue = 'username';
@@ -32,28 +29,21 @@ const roleMethodValue = 'role';
 // "View Contributor Dashboard Users" form elements.
 const viewContributorFilterMethodSelect =
   'select#view-contributor-filter-method-select';
-const viewContributerUsernameInput =
-  'input#view-contributor-username-input';
-const viewContributorCategorySelect =
-  'select#view-contributor-category-select';
-const viewContributorLanguageSelect =
-  'select#view-contributor-language-select';
-const viewContributorSubmitButton =
-  'button#view-contributor-submit-button';
-const viewContributorLanguageResult =
-  '.e2e-test-translation-reviewer-language';
-const viewLanguageRoleUserResult =
-  '.e2e-test-reviewer-roles-result';
+const viewContributerUsernameInput = 'input#view-contributor-username-input';
+const viewContributorCategorySelect = 'select#view-contributor-category-select';
+const viewContributorLanguageSelect = 'select#view-contributor-language-select';
+const viewContributorSubmitButton = 'button#view-contributor-submit-button';
+const viewContributorLanguageResult = '.e2e-test-translation-reviewer-language';
+const viewLanguageRoleUserResult = '.e2e-test-reviewer-roles-result';
 
 // "Add Contribution Rights" form elements.
-const addContributorUsernameInput =
-  'input#add-contribution-rights-user-input';
+const addContributorUsernameInput = 'input#add-contribution-rights-user-input';
 const addContributonRightsCategorySelect =
   'select#add-contribution-rights-category-select';
 const addContributonRightsLanguageDropdown =
   'select#add-contribution-rights-language-select';
 const addContributionRightsSubmitButton =
-   'button#add-contribution-rights-submit-button';
+  'button#add-contribution-rights-submit-button';
 
 // "Remove Contribution Rights" form elements.
 const removeContributorUsernameInput =
@@ -65,21 +55,7 @@ const removeContributonRightsLanguageSelect =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
-export interface ITranslationAdmin extends IBaseUser {
-  navigateToContributorDashboardAdminPage: () => Promise<void>;
-  addTranslationLanguageReviewRights: (
-    username: string, languageCode: string) => Promise<void>;
-  removeTranslationLanguageReviewRights: (
-    username: string, languageCode: string) => Promise<void>;
-  viewContributionRightsForUser: (username: string) => Promise<void>;
-  viewContributorTranslationRightsByLanguageCode: (
-    languageCode: string) => Promise<void>;
-  expectDisplayedLanguagesToContain: (language: string) => Promise<void>;
-  expectUserToBeDisplayed: (username: string) => Promise<void>;
-  expectUserToNotBeDisplayed: (username: string) => Promise<void>;
-}
-
-class TranslationAdmin extends BaseUser implements ITranslationAdmin {
+export class TranslationAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -92,14 +68,15 @@ class TranslationAdmin extends BaseUser implements ITranslationAdmin {
    */
 
   async addTranslationLanguageReviewRights(
-      username: string,
-      languageCode: string
+    username: string,
+    languageCode: string
   ): Promise<void> {
     await this.type(addContributorUsernameInput, username);
     await this.select(
-      addContributonRightsCategorySelect, translationRightValue);
-    await this.select(
-      addContributonRightsLanguageDropdown, languageCode);
+      addContributonRightsCategorySelect,
+      translationRightValue
+    );
+    await this.select(addContributonRightsLanguageDropdown, languageCode);
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -109,14 +86,15 @@ class TranslationAdmin extends BaseUser implements ITranslationAdmin {
    * Function for removing a translation right from a user.
    */
   async removeTranslationLanguageReviewRights(
-      username: string,
-      languageCode: string
+    username: string,
+    languageCode: string
   ): Promise<void> {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
-      removeContributonRightsCategorySelect, translationRightValue);
-    await this.select(
-      removeContributonRightsLanguageSelect, languageCode);
+      removeContributonRightsCategorySelect,
+      translationRightValue
+    );
+    await this.select(removeContributonRightsLanguageSelect, languageCode);
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -137,7 +115,7 @@ class TranslationAdmin extends BaseUser implements ITranslationAdmin {
    * Function to display translation rights by language.
    */
   async viewContributorTranslationRightsByLanguageCode(
-      languageCode: string
+    languageCode: string
   ): Promise<void> {
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
@@ -154,13 +132,16 @@ class TranslationAdmin extends BaseUser implements ITranslationAdmin {
     await this.page.waitForSelector(viewContributorLanguageResult);
     const displayedLanguage = await this.page.$eval(
       viewContributorLanguageResult,
-      element => (element as HTMLElement).innerText);
+      element => (element as HTMLElement).innerText
+    );
     if (!displayedLanguage.includes(language)) {
       throw new Error(
-        `Selected user does not have translation rights for ${language}!`);
+        `Selected user does not have translation rights for ${language}!`
+      );
     } else {
       showMessage(
-        `Selected user has translation rights for ${displayedLanguage}`);
+        `Selected user has translation rights for ${displayedLanguage}`
+      );
     }
   }
 
@@ -175,7 +156,8 @@ class TranslationAdmin extends BaseUser implements ITranslationAdmin {
     );
     if (!displayedUsers.includes(username)) {
       throw new Error(
-        `${username} does not have translation rights for selected language!`);
+        `${username} does not have translation rights for selected language!`
+      );
     }
   }
 
@@ -190,10 +172,11 @@ class TranslationAdmin extends BaseUser implements ITranslationAdmin {
     );
     if (displayedUsers.includes(username)) {
       throw new Error(
-        `${username} has translation rights for selected language!`);
+        `${username} has translation rights for selected language!`
+      );
     }
   }
 }
 
-export let TranslationAdminFactory =
-  (): ITranslationAdmin => new TranslationAdmin();
+export let TranslationAdminFactory = (): TranslationAdmin =>
+  new TranslationAdmin();

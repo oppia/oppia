@@ -16,17 +16,19 @@
  * @fileoverview Component for skill mastery modal.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-skill-mastery-modal',
-  templateUrl: './skill-mastery-modal.component.html'
+  templateUrl: './skill-mastery-modal.component.html',
 })
 export class SkillMasteryModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   @Input() skillId: string = '';
   @Input() userIsLoggedIn: boolean = false;
   @Input() masteryPerSkillMapping: {
@@ -37,9 +39,7 @@ export class SkillMasteryModalComponent
 
   masteryChange: number = 0;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
@@ -49,13 +49,14 @@ export class SkillMasteryModalComponent
 
   ngOnInit(): void {
     if (this.userIsLoggedIn) {
-      this.masteryChange = this.masteryPerSkillMapping[(
-        this.skillId as string)];
+      this.masteryChange = this.masteryPerSkillMapping[this.skillId as string];
     }
   }
 }
 
-angular.module('oppia').directive('oppiaSkillMasteryModal',
+angular.module('oppia').directive(
+  'oppiaSkillMasteryModal',
   downgradeComponent({
-    component: SkillMasteryModalComponent
-  }) as angular.IDirectiveFactory);
+    component: SkillMasteryModalComponent,
+  }) as angular.IDirectiveFactory
+);

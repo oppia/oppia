@@ -27,15 +27,18 @@
  * https://cran.r-project.org/web/packages/hexbin/vignettes/hexagon_binning.pdf
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { hexbin, HexbinBin } from 'd3-hexbin';
-import { max, sum } from 'd3-array';
-import { RGBColor, rgb } from 'd3-color';
-import { ScaleLinear, scaleLinear } from 'd3-scale';
-import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {hexbin, HexbinBin} from 'd3-hexbin';
+import {max, sum} from 'd3-array';
+import {RGBColor, rgb} from 'd3-color';
+import {ScaleLinear, scaleLinear} from 'd3-scale';
+import {
+  ImageDimensions,
+  ImagePreloaderService,
+} from 'pages/exploration-player-page/services/image-preloader.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ContextService} from 'services/context.service';
 
 import './oppia-visualization-click-hexbins.directive.css';
 
@@ -81,12 +84,12 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
     private imagePreloaderService: ImagePreloaderService
-  ) { }
+  ) {}
 
   getTooltipStyle(): object {
     return {
       left: this.tooltipTarget.x + 'px',
-      top: this.tooltipTarget.y + 'px'
+      top: this.tooltipTarget.y + 'px',
     };
   }
 
@@ -121,15 +124,21 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   ngOnInit(): void {
     this.imagePath = this.interactionArgs.imageAndRegions.value.imagePath;
     this.imageSize = this.imagePreloaderService.getDimensionsOfImage(
-      this.imagePath);
+      this.imagePath
+    );
     const imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-      this.contextService.getEntityType(), this.contextService.getEntityId(),
-      this.imagePath);
+      this.contextService.getEntityType(),
+      this.contextService.getEntityId(),
+      this.imagePath
+    );
 
     const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
-    const wrapperHeight = this.imageSize.width === 0 ?
-     this.imageSize.height :
-       Math.round(wrapperWidth * this.imageSize.height / this.imageSize.width);
+    const wrapperHeight =
+      this.imageSize.width === 0
+        ? this.imageSize.height
+        : Math.round(
+            (wrapperWidth * this.imageSize.height) / this.imageSize.width
+          );
 
     const hexbinGenerator = hexbin<ClickOnImageAnswer>()
       .x(a => a.answer.clickPosition[0] * wrapperWidth)
@@ -149,7 +158,9 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaVisualizationClickHexbins',
-   downgradeComponent({
-     component: OppiaVisualizationClickHexbinsComponent
-   }) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaVisualizationClickHexbins',
+  downgradeComponent({
+    component: OppiaVisualizationClickHexbinsComponent,
+  }) as angular.IDirectiveFactory
+);

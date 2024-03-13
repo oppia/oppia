@@ -17,16 +17,16 @@
  * check mark component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { EndChapterCheckMarkComponent } from './end-chapter-check-mark.component';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {EndChapterCheckMarkComponent} from './end-chapter-check-mark.component';
 
-describe('End chapter check mark component', function() {
+describe('End chapter check mark component', function () {
   let component: EndChapterCheckMarkComponent;
   let fixture: ComponentFixture<EndChapterCheckMarkComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [EndChapterCheckMarkComponent]
+      declarations: [EndChapterCheckMarkComponent],
     }).compileComponents();
   }));
 

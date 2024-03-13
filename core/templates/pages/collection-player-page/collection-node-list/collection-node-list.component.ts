@@ -18,13 +18,12 @@
  */
 import { Component, Input } from '@angular/core';
 
-import { CollectionNode } from
-  'domain/collection/collection-node.model';
+import {CollectionNode} from 'domain/collection/collection-node.model';
 
 @Component({
   selector: 'collection-node-list',
   templateUrl: './collection-node-list.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CollectionNodeListComponent {
   // These properties are initialized using Angular lifecycle hooks

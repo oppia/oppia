@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for PreviewSummaryTileModalController.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationCategoryService } from 'pages/exploration-editor-page/services/exploration-category.service';
-import { ExplorationObjectiveService } from 'pages/exploration-editor-page/services/exploration-objective.service';
-import { ExplorationTitleService } from 'pages/exploration-editor-page/services/exploration-title.service';
-import { PreviewSummaryTileModalComponent } from './preview-summary-tile-modal.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationCategoryService} from 'pages/exploration-editor-page/services/exploration-category.service';
+import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
+import {ExplorationTitleService} from 'pages/exploration-editor-page/services/exploration-title.service';
+import {PreviewSummaryTileModalComponent} from './preview-summary-tile-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 class MockActiveModal {
   close(): void {
@@ -35,7 +35,7 @@ class MockActiveModal {
   }
 }
 
-describe('Preview Summary Tile Modal Controller', function() {
+describe('Preview Summary Tile Modal Controller', function () {
   let component: PreviewSummaryTileModalComponent;
   let fixture: ComponentFixture<PreviewSummaryTileModalComponent>;
   let explorationCategoryService: ExplorationCategoryService;
@@ -44,20 +44,18 @@ describe('Preview Summary Tile Modal Controller', function() {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        PreviewSummaryTileModalComponent
-      ],
+      declarations: [PreviewSummaryTileModalComponent],
       imports: [HttpClientTestingModule],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         ExplorationCategoryService,
         ExplorationObjectiveService,
-        ExplorationTitleService
+        ExplorationTitleService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
   beforeEach(() => {
@@ -70,32 +68,32 @@ describe('Preview Summary Tile Modal Controller', function() {
     fixture.detectChanges();
   });
 
-  it('should get exploration title', function() {
+  it('should get exploration title', function () {
     explorationTitleService.init('Exploration Title');
     expect(component.getExplorationTitle()).toBe('Exploration Title');
   });
 
-  it('should get exploration objective', function() {
+  it('should get exploration objective', function () {
     explorationObjectiveService.init('Exploration Objective');
     expect(component.getExplorationObjective()).toBe('Exploration Objective');
   });
 
-  it('should get exploration category', function() {
+  it('should get exploration category', function () {
     explorationCategoryService.init('Exploration Category');
     expect(component.getExplorationCategory()).toBe('Exploration Category');
   });
 
-  it('should get thumbnail icon url', function() {
+  it('should get thumbnail icon url', function () {
     explorationCategoryService.init('Astrology');
     expect(component.getThumbnailIconUrl()).toBe('/subjects/Lightbulb.svg');
   });
 
-  it('should get thumbnail bg color if category is listed', function() {
+  it('should get thumbnail bg color if category is listed', function () {
     explorationCategoryService.init('Algebra');
     expect(component.getThumbnailBgColor()).toBe('#cc4b00');
   });
 
-  it('should get thumbnail bg color if category is not listed', function() {
+  it('should get thumbnail bg color if category is not listed', function () {
     explorationCategoryService.init('Astrology');
     expect(component.getThumbnailBgColor()).toBe('#a33f40');
   });

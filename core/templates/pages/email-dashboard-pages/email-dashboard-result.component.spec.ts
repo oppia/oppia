@@ -16,24 +16,29 @@
  * @fileoverview Unit tests for emailDashboardResultPage.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { EmailDashboardResultBackendApiService } from './email-dashboard-result-backend-api.service';
-import { EmailDashboardResultComponent } from './email-dashboard-result.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {EmailDashboardResultBackendApiService} from './email-dashboard-result-backend-api.service';
+import {EmailDashboardResultComponent} from './email-dashboard-result.component';
 
 describe('Email Dashboard Result Component', () => {
   let fixture: ComponentFixture<EmailDashboardResultComponent>;
   let componentInstance: EmailDashboardResultComponent;
-  let emailDashboardResultBackendApiService:
-  EmailDashboardResultBackendApiService;
+  let emailDashboardResultBackendApiService: EmailDashboardResultBackendApiService;
 
   class MockWindowRef {
     nativeWindow = {
       location: {
-        pathname: ''
-      }
+        pathname: '',
+      },
     };
   }
 
@@ -41,20 +46,16 @@ describe('Email Dashboard Result Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        EmailDashboardResultComponent
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [EmailDashboardResultComponent],
       providers: [
         EmailDashboardResultBackendApiService,
         {
           provide: WindowRef,
-          useValue: windowRef
-        }
+          useValue: windowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -62,7 +63,8 @@ describe('Email Dashboard Result Component', () => {
     fixture = TestBed.createComponent(EmailDashboardResultComponent);
     componentInstance = fixture.componentInstance;
     emailDashboardResultBackendApiService = TestBed.inject(
-      EmailDashboardResultBackendApiService);
+      EmailDashboardResultBackendApiService
+    );
   });
 
   it('should create', () => {
@@ -84,15 +86,19 @@ describe('Email Dashboard Result Component', () => {
 
   it('should submit email', fakeAsync(() => {
     spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
-      true);
+      true
+    );
     componentInstance.emailOption = 'not_custom';
-    spyOn(emailDashboardResultBackendApiService, 'submitEmailAsync')
-      .and.returnValue(Promise.resolve({}));
+    spyOn(
+      emailDashboardResultBackendApiService,
+      'submitEmailAsync'
+    ).and.returnValue(Promise.resolve({}));
     componentInstance.submitEmail();
     tick();
     tick(4500);
-    expect(emailDashboardResultBackendApiService.submitEmailAsync)
-      .toHaveBeenCalled();
+    expect(
+      emailDashboardResultBackendApiService.submitEmailAsync
+    ).toHaveBeenCalled();
     expect(componentInstance.invalid.subject).toBeFalse();
     expect(componentInstance.invalid.body).toBeFalse();
     expect(componentInstance.invalid.maxRecipients).toBeFalse();
@@ -102,23 +108,26 @@ describe('Email Dashboard Result Component', () => {
     componentInstance.emailOption = 'custom';
     componentInstance.maxRecipients = 0;
     spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
-      true);
+      true
+    );
     componentInstance.submitEmail();
     expect(componentInstance.invalid.maxRecipients).toBeTrue();
   });
 
-  it('should acknowledge error when request fails while submitting email',
-    fakeAsync(() => {
-      spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
-        true);
-      componentInstance.emailOption = 'not_custom';
-      spyOn(emailDashboardResultBackendApiService, 'submitEmailAsync')
-        .and.returnValue(Promise.reject({}));
-      componentInstance.submitEmail();
-      tick();
-      expect(componentInstance.errorHasOccurred).toBeTrue();
-      expect(componentInstance.submitIsInProgress).toBeFalse();
-    }));
+  it('should acknowledge error when request fails while submitting email', fakeAsync(() => {
+    spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
+      true
+    );
+    componentInstance.emailOption = 'not_custom';
+    spyOn(
+      emailDashboardResultBackendApiService,
+      'submitEmailAsync'
+    ).and.returnValue(Promise.reject({}));
+    componentInstance.submitEmail();
+    tick();
+    expect(componentInstance.errorHasOccurred).toBeTrue();
+    expect(componentInstance.submitIsInProgress).toBeFalse();
+  }));
 
   it('should reset form', () => {
     componentInstance.resetForm();
@@ -128,29 +137,35 @@ describe('Email Dashboard Result Component', () => {
   });
 
   it('should cancel email', fakeAsync(() => {
-    spyOn(emailDashboardResultBackendApiService, 'cancelEmailAsync')
-      .and.returnValue(Promise.resolve({}));
+    spyOn(
+      emailDashboardResultBackendApiService,
+      'cancelEmailAsync'
+    ).and.returnValue(Promise.resolve({}));
     componentInstance.cancelEmail();
     tick();
     tick(4500);
     expect(componentInstance.emailCancelled).toBeTrue();
   }));
 
-  it('should handler error when http call to cancel email fails',
-    fakeAsync(() => {
-      spyOn(emailDashboardResultBackendApiService, 'cancelEmailAsync')
-        .and.returnValue(Promise.reject({}));
-      componentInstance.cancelEmail();
-      tick();
-      expect(componentInstance.errorHasOccurred).toBeTrue();
-      expect(componentInstance.submitIsInProgress).toBeFalse();
-    }));
+  it('should handler error when http call to cancel email fails', fakeAsync(() => {
+    spyOn(
+      emailDashboardResultBackendApiService,
+      'cancelEmailAsync'
+    ).and.returnValue(Promise.reject({}));
+    componentInstance.cancelEmail();
+    tick();
+    expect(componentInstance.errorHasOccurred).toBeTrue();
+    expect(componentInstance.submitIsInProgress).toBeFalse();
+  }));
 
   it('should send test email', fakeAsync(() => {
     spyOn(componentInstance, 'validateEmailSubjectAndBody').and.returnValue(
-      true);
-    spyOn(emailDashboardResultBackendApiService, 'sendTestEmailAsync')
-      .and.returnValue(Promise.resolve({}));
+      true
+    );
+    spyOn(
+      emailDashboardResultBackendApiService,
+      'sendTestEmailAsync'
+    ).and.returnValue(Promise.resolve({}));
     componentInstance.sendTestEmail();
     tick();
     expect(componentInstance.testEmailSentSuccesfully).toBeTrue();

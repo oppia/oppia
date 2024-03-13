@@ -18,22 +18,25 @@
  */
 
 export interface NonExistentCollectionsBackendDict {
-  'incomplete_collections': number;
-  'completed_collections': number;
-  'collection_playlist': number;
+  incomplete_collections: number;
+  completed_collections: number;
+  collection_playlist: number;
 }
 
 export class NonExistentCollections {
   constructor(
     public incompleteCollections: number,
     public completedCollections: number,
-    public collectionPlaylist: number) { }
+    public collectionPlaylist: number
+  ) {}
 
   static createFromBackendDict(
-      backendDict: NonExistentCollectionsBackendDict): NonExistentCollections {
+    backendDict: NonExistentCollectionsBackendDict
+  ): NonExistentCollections {
     return new NonExistentCollections(
       backendDict.incomplete_collections,
       backendDict.completed_collections,
-      backendDict.collection_playlist);
+      backendDict.collection_playlist
+    );
   }
 }

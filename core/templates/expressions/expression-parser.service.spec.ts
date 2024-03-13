@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Expression Parser Service.
  */
 
-import { ExpressionParserService } from 'expressions/expression-parser.service';
+import {ExpressionParserService} from 'expressions/expression-parser.service';
 
 describe('Expression parser service', () => {
   let eps: ExpressionParserService;
@@ -32,49 +32,41 @@ describe('Expression parser service', () => {
       [0.001, '1e-3'],
       [0.35, '.35'],
       ['abc', '"abc"'],
-      ['a\'b\'c', '"a\'b\'c"'],
+      ["a'b'c", '"a\'b\'c"'],
       [null, 'null'],
       [true, 'true'],
       [false, 'false'],
 
-      [['#', 'abc'],
-        'abc'],
-      [['#', 'あいうえお'],
-        'あいうえお'],
-      [['abc'],
-        'abc()'],
-      [['abc', 1],
-        'abc(1)'],
-      [['abc', 1, 2],
-        'abc(1, 2)'],
-      [[[['abc', 1, 2]], 3],
-        'abc(1, 2)()(3)'],
+      [['#', 'abc'], 'abc'],
+      [['#', 'あいうえお'], 'あいうえお'],
+      [['abc'], 'abc()'],
+      [['abc', 1], 'abc(1)'],
+      [['abc', 1, 2], 'abc(1, 2)'],
+      [[[['abc', 1, 2]], 3], 'abc(1, 2)()(3)'],
 
-      [['+', 10],
-        '+10'],
-      [['-', ['#', 'abc']],
-        '-abc'],
+      [['+', 10], '+10'],
+      [['-', ['#', 'abc']], '-abc'],
       [['-', 0.35], '-.35'],
 
       [['+', 1, 2], '1     +    2'],
       // There is a double width space after '+'.
       [['+', 1, 2], '\t1 +　2 '],
 
-      [['*', ['/', 3, 4], 5],
-        '3 / 4 * 5'],
-      [['-', ['+', 2, ['*', ['/', 3, 4], 5]], 6],
-        '2 + 3 / 4 * 5 - 6'],
+      [['*', ['/', 3, 4], 5], '3 / 4 * 5'],
+      [['-', ['+', 2, ['*', ['/', 3, 4], 5]], 6], '2 + 3 / 4 * 5 - 6'],
 
-      [['||', ['&&', ['<', 2, 3], ['==', 4, 6]], true],
-        '2 < 3 && 4 == 6 || true'],
+      [
+        ['||', ['&&', ['<', 2, 3], ['==', 4, 6]], true],
+        '2 < 3 && 4 == 6 || true',
+      ],
 
       // Expected to produce parser error.
       [undefined, 'a1a-'],
       [undefined, '0.3.4'],
       [undefined, 'abc()('],
       [undefined, '()'],
-      [undefined, '*100']
-    ].forEach((test) => {
+      [undefined, '*100'],
+    ].forEach(test => {
       // 'expected' should be either a JavaScript primitive value that would be
       //   the result of evaluating 'expression', or undefined (which means
       //   that the parser is expected to fail).

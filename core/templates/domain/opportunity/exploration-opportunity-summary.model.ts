@@ -21,15 +21,15 @@ export interface TranslationCountsDict {
 }
 
 export interface ExplorationOpportunitySummaryBackendDict {
-  'id': string;
-  'topic_name': string;
-  'story_title': string;
-  'chapter_title': string;
-  'content_count': number;
-  'translation_counts': TranslationCountsDict;
-  'translation_in_review_counts': TranslationCountsDict;
-  'language_code': string;
-  'is_pinned': boolean;
+  id: string;
+  topic_name: string;
+  story_title: string;
+  chapter_title: string;
+  content_count: number;
+  translation_counts: TranslationCountsDict;
+  translation_in_review_counts: TranslationCountsDict;
+  language_code: string;
+  is_pinned: boolean;
 }
 
 export class ExplorationOpportunitySummary {
@@ -44,11 +44,16 @@ export class ExplorationOpportunitySummary {
   isPinned: boolean;
 
   constructor(
-      expId: string, topicName: string, storyTitle: string,
-      chapterTitle: string, contentCount: number,
-      translationCounts: TranslationCountsDict,
-      translationInReviewCount: TranslationCountsDict,
-      languageCode: string, isPinned: boolean) {
+    expId: string,
+    topicName: string,
+    storyTitle: string,
+    chapterTitle: string,
+    contentCount: number,
+    translationCounts: TranslationCountsDict,
+    translationInReviewCount: TranslationCountsDict,
+    languageCode: string,
+    isPinned: boolean
+  ) {
     this.id = expId;
     this.topicName = topicName;
     this.storyTitle = storyTitle;
@@ -61,13 +66,19 @@ export class ExplorationOpportunitySummary {
   }
 
   static createFromBackendDict(
-      backendDict: ExplorationOpportunitySummaryBackendDict):
-      ExplorationOpportunitySummary {
+    backendDict: ExplorationOpportunitySummaryBackendDict
+  ): ExplorationOpportunitySummary {
     return new ExplorationOpportunitySummary(
-      backendDict.id, backendDict.topic_name, backendDict.story_title,
-      backendDict.chapter_title, backendDict.content_count,
-      backendDict.translation_counts, backendDict.translation_in_review_counts,
-      backendDict.language_code, backendDict.is_pinned);
+      backendDict.id,
+      backendDict.topic_name,
+      backendDict.story_title,
+      backendDict.chapter_title,
+      backendDict.content_count,
+      backendDict.translation_counts,
+      backendDict.translation_in_review_counts,
+      backendDict.language_code,
+      backendDict.is_pinned
+    );
   }
 
   getExplorationId(): string {
@@ -79,7 +90,7 @@ export class ExplorationOpportunitySummary {
   }
 
   getOpportunitySubheading(): string {
-    return (this.topicName + ' - ' + this.storyTitle);
+    return this.topicName + ' - ' + this.storyTitle;
   }
 
   getContentCount(): number {
@@ -88,10 +99,12 @@ export class ExplorationOpportunitySummary {
 
   getTranslationProgressPercentage(languageCode: string): number {
     let progressPercentage = 0;
-    if (this.translationCounts.hasOwnProperty(languageCode) && (
-      this.contentCount > 0)) {
-      progressPercentage = (
-        (this.translationCounts[languageCode] / this.contentCount) * 100);
+    if (
+      this.translationCounts.hasOwnProperty(languageCode) &&
+      this.contentCount > 0
+    ) {
+      progressPercentage =
+        (this.translationCounts[languageCode] / this.contentCount) * 100;
     }
     return progressPercentage;
   }
@@ -99,18 +112,18 @@ export class ExplorationOpportunitySummary {
   getTranslationsInReviewCount(languageCode: string): number {
     let inReviewCount = 0;
     if (this.translationInReviewCount.hasOwnProperty(languageCode)) {
-      inReviewCount = (
-        this.translationInReviewCount[languageCode]);
+      inReviewCount = this.translationInReviewCount[languageCode];
     }
     return inReviewCount;
   }
 
   getTranslationsCount(languageCode: string): number {
     let translationsCount = 0;
-    if (this.translationCounts.hasOwnProperty(languageCode) && (
-      this.contentCount > 0)) {
-      translationsCount = (
-        this.translationCounts[languageCode]);
+    if (
+      this.translationCounts.hasOwnProperty(languageCode) &&
+      this.contentCount > 0
+    ) {
+      translationsCount = this.translationCounts[languageCode];
     }
     return translationsCount;
   }
