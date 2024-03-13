@@ -19,18 +19,21 @@
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { RevertChangeList, ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import {
+  RevertChangeList,
+  ExplorationChange,
+} from 'domain/exploration/exploration-draft.model';
 
 export interface ExplorationSnapshot {
-  'commit_message': string;
-  'committer_id': string;
-  'commit_type': string;
-  'version_number': number;
-  'created_on_ms': number;
-  'commit_cmds': ExplorationChange[];
+  commit_message: string;
+  committer_id: string;
+  commit_type: string;
+  version_number: number;
+  created_on_ms: number;
+  commit_cmds: ExplorationChange[];
 }
 
 interface ExplorationSnapshots {
@@ -38,7 +41,7 @@ interface ExplorationSnapshots {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VersionTreeService {
   // These properties are initialized using init method
@@ -61,12 +64,17 @@ export class VersionTreeService {
     for (var versionNum = 2; versionNum <= numberOfVersions; versionNum++) {
       if (this._snapshots[versionNum].commit_type === 'revert') {
         for (
-          var i = 0; i < this._snapshots[versionNum].commit_cmds.length; i++) {
-          if (this._snapshots[versionNum].commit_cmds[i].cmd ===
-              'AUTO_revert_version_number') {
-            this._treeParents[versionNum] =
-              (this._snapshots[versionNum].commit_cmds[i] as RevertChangeList)
-                .version_number;
+          var i = 0;
+          i < this._snapshots[versionNum].commit_cmds.length;
+          i++
+        ) {
+          if (
+            this._snapshots[versionNum].commit_cmds[i].cmd ===
+            'AUTO_revert_version_number'
+          ) {
+            this._treeParents[versionNum] = (
+              this._snapshots[versionNum].commit_cmds[i] as RevertChangeList
+            ).version_number;
           }
         }
       } else {
@@ -158,5 +166,6 @@ export class VersionTreeService {
   }
 }
 
-angular.module('oppia').factory(
-  'VersionTreeService', downgradeInjectable(VersionTreeService));
+angular
+  .module('oppia')
+  .factory('VersionTreeService', downgradeInjectable(VersionTreeService));

@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for QuestionSummaryModel.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
 import {
   QuestionSummaryForOneSkillBackendDict,
-  QuestionSummaryForOneSkill
+  QuestionSummaryForOneSkill,
 } from 'domain/question/question-summary-for-one-skill-object.model';
 
 describe('Question summary for one skill object factory', () => {
@@ -29,7 +29,7 @@ describe('Question summary for one skill object factory', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [QuestionSummaryForOneSkill]
+        providers: [QuestionSummaryForOneSkill],
       });
 
       backendDict = {
@@ -40,15 +40,14 @@ describe('Question summary for one skill object factory', () => {
           id: 'question_id',
           question_content: 'Question 1',
           interaction_id: 'TextInput',
-          misconception_ids: []
-        }
+          misconception_ids: [],
+        },
       };
     });
 
     it('should create a new question summary for one skill object', () => {
       var questionSummaryForOneSkill =
-        QuestionSummaryForOneSkill.createFromBackendDict(
-          backendDict);
+        QuestionSummaryForOneSkill.createFromBackendDict(backendDict);
       expect(
         questionSummaryForOneSkill.getQuestionSummary().getQuestionId()
       ).toEqual('question_id');
@@ -56,10 +55,10 @@ describe('Question summary for one skill object factory', () => {
         questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()
       ).toEqual('Question 1');
       expect(questionSummaryForOneSkill.getSkillId()).toEqual('skill_id');
-      expect(
-        questionSummaryForOneSkill.getSkillDescription()).toEqual('Skill 1');
-      expect(
-        questionSummaryForOneSkill.getSkillDifficulty()).toEqual(0.6);
+      expect(questionSummaryForOneSkill.getSkillDescription()).toEqual(
+        'Skill 1'
+      );
+      expect(questionSummaryForOneSkill.getSkillDifficulty()).toEqual(0.6);
     });
   });
 });

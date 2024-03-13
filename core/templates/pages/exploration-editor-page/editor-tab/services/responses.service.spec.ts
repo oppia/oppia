@@ -16,28 +16,35 @@
  * @fileoverview Unit tests for ResponsesService.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { EventEmitter } from '@angular/core';
-import { fakeAsync, TestBed } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {EventEmitter} from '@angular/core';
+import {fakeAsync, TestBed} from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AlertsService } from 'services/alerts.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { LoggerService } from 'services/contextual/logger.service';
-import { Outcome, OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AlertsService} from 'services/alerts.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {
+  Interaction,
+  InteractionObjectFactory,
+} from 'domain/exploration/InteractionObjectFactory';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
+import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {
   StateEditorService,
   // eslint-disable-next-line max-len
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {
-  SubtitledHtml,
-} from 'domain/exploration/subtitled-html.model';
-import { Rule } from 'domain/exploration/rule.model';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {Rule} from 'domain/exploration/rule.model';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService;
@@ -56,7 +63,7 @@ describe('Responses Service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     answerGroupObjectFactory = TestBed.get(AnswerGroupObjectFactory);
     alertsService = TestBed.get(AlertsService);
@@ -72,7 +79,9 @@ describe('Responses Service', () => {
     stateSolutionService = TestBed.get(StateSolutionService);
 
     savedMemento = new Solution(
-      explorationHtmlFormatterService, true, 'This is the correct answer',
+      explorationHtmlFormatterService,
+      true,
+      'This is the correct answer',
       new SubtitledHtml('', 'tesster')
     );
 
@@ -118,8 +127,8 @@ describe('Responses Service', () => {
           value: 1,
         },
         catchMisspellings: {
-          value: false
-        }
+          value: false,
+        },
       },
       hints: [],
       solution: {
@@ -182,8 +191,8 @@ describe('Responses Service', () => {
           value: 1,
         },
         catchMisspellings: {
-          value: false
-        }
+          value: false,
+        },
       },
       hints: [],
       solution: {
@@ -262,17 +271,26 @@ describe('Responses Service', () => {
     stateEditorService.setInteraction(interactionData);
 
     const updatedAnswerGroup = new AnswerGroup(
-      [new Rule(
-        'Contains', {
-          x: {
-            contentId: 'rule_input_Contains',
-            normalizedStrSet: ['correct']
+      [
+        new Rule(
+          'Contains',
+          {
+            x: {
+              contentId: 'rule_input_Contains',
+              normalizedStrSet: ['correct'],
+            },
           },
-        }, {})],
+          {}
+        ),
+      ],
       new Outcome(
-        'State', null,
+        'State',
+        null,
         new SubtitledHtml('', 'This is a new feedback text'),
-        true, [], 'test', 'test_skill_id'
+        true,
+        [],
+        'test',
+        'test_skill_id'
       ),
       ['This is training data text'],
       ''
@@ -294,7 +312,7 @@ describe('Responses Service', () => {
     stateEditorService.setInteraction(interactionData);
 
     const updatedAnswerGroup = {
-      rules: [new Rule('Contains', { x: 'correct'}, {})],
+      rules: [new Rule('Contains', {x: 'correct'}, {})],
       outcome: {
         dest: 'State',
         feedback: new SubtitledHtml('', 'This is a new feedback text'),
@@ -426,7 +444,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is ItemSelectionInput' +
-    ' and choices has its positions changed',
+      ' and choices has its positions changed',
     () => {
       responsesService.init(interactionDataWithRules);
       stateEditorService.setInteraction(interactionDataWithRules);
@@ -481,7 +499,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is ItemSelectionInput' +
-    ' and choices has its values changed',
+      ' and choices has its values changed',
     () => {
       responsesService.init(interactionDataWithRules);
       stateEditorService.setInteraction(interactionDataWithRules);
@@ -533,8 +551,8 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and rule type is' +
-    ' HasElementXAtPositionY',
+      ' DragAndDropSortInput and rule type is' +
+      ' HasElementXAtPositionY',
     () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       interactionDataWithRules.answerGroups[0].rules[0].type =
@@ -585,8 +603,8 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and rule type is' +
-    ' HasElementXBeforeElementY',
+      ' DragAndDropSortInput and rule type is' +
+      ' HasElementXBeforeElementY',
     () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       interactionDataWithRules.answerGroups[0].rules[0].type =
@@ -642,7 +660,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and choices had changed',
+      ' DragAndDropSortInput and choices had changed',
     () => {
       interactionDataWithRules.id = 'DragAndDropSortInput';
       // Any other method from DragAndDropSortInputRulesService.
@@ -699,7 +717,7 @@ describe('Responses Service', () => {
 
   it(
     'should update answer choices when savedMemento is' +
-    ' DragAndDropSortInput and choices has its positions changed',
+      ' DragAndDropSortInput and choices has its positions changed',
     () => {
       responsesService.init(interactionDataWithRules);
       stateEditorService.setInteraction(interactionDataWithRules);
@@ -771,20 +789,19 @@ describe('Responses Service', () => {
     );
   });
 
-  it('should change interaction when id does not exist in any answer group',
-    () => {
-      responsesService.init(interactionData);
-      stateEditorService.setInteraction(interactionData);
+  it('should change interaction when id does not exist in any answer group', () => {
+    responsesService.init(interactionData);
+    stateEditorService.setInteraction(interactionData);
 
-      const newInteractionId = 'Continue';
-      const callbackSpy = jasmine.createSpy('callback');
-      responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
+    const newInteractionId = 'Continue';
+    const callbackSpy = jasmine.createSpy('callback');
+    responsesService.onInteractionIdChanged(newInteractionId, callbackSpy);
 
-      expect(callbackSpy).toHaveBeenCalledWith(
-        [],
-        interactionData.defaultOutcome
-      );
-    });
+    expect(callbackSpy).toHaveBeenCalledWith(
+      [],
+      interactionData.defaultOutcome
+    );
+  });
 
   it('should change interaction', () => {
     stateInteractionIdService.init('stateName', 'TextInput');
@@ -819,7 +836,7 @@ describe('Responses Service', () => {
 
   it(
     "should change interaction id when interaction is terminal and it's" +
-    ' not cached',
+      ' not cached',
     () => {
       responsesService.init(interactionData);
       stateEditorService.setInteraction(interactionData);

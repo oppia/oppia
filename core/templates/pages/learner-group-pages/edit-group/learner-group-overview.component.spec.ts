@@ -16,22 +16,23 @@
  * @fileoverview Unit tests for learner group overview component.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from
-  '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { TranslateService } from '@ngx-translate/core';
-import { LearnerGroupOverviewComponent } from
-  './learner-group-overview.component';
-import { LearnerGroupSyllabusBackendApiService } from
-  'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupUserProgress } from
-  'domain/learner_group/learner-group-user-progress.model';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
-import { UserService } from 'services/user.service';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {TranslateService} from '@ngx-translate/core';
+import {LearnerGroupOverviewComponent} from './learner-group-overview.component';
+import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
+import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
+import {UserService} from 'services/user.service';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -44,8 +45,7 @@ class MockTranslateService {
 describe('LearnerGroupOverviewComponent', () => {
   let component: LearnerGroupOverviewComponent;
   let fixture: ComponentFixture<LearnerGroupOverviewComponent>;
-  let learnerGroupSyllabusBackendApiService:
-    LearnerGroupSyllabusBackendApiService;
+  let learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService;
   let userService: UserService;
 
   const sampleLearnerGroupSubtopicSummaryDict = {
@@ -55,7 +55,7 @@ describe('LearnerGroupOverviewComponent', () => {
     parent_topic_name: 'parentTopicName',
     thumbnail_filename: 'thumbnailFilename',
     thumbnail_bg_color: 'red',
-    subtopic_mastery: 0.5
+    subtopic_mastery: 0.5,
   };
 
   let nodeDict = {
@@ -74,7 +74,7 @@ describe('LearnerGroupOverviewComponent', () => {
     planned_publication_date_msecs: 100,
     last_modified_msecs: 100,
     first_publication_date_msecs: 200,
-    unpublishing_reason: null
+    unpublishing_reason: null,
   };
   const sampleStorySummaryBackendDict = {
     id: 'sample_story_id',
@@ -89,23 +89,23 @@ describe('LearnerGroupOverviewComponent', () => {
     all_node_dicts: [nodeDict],
     topic_name: 'Topic one',
     topic_url_fragment: 'topic-one',
-    classroom_url_fragment: 'math'
+    classroom_url_fragment: 'math',
   };
 
   const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username2',
-    error: ''
+    error: '',
   });
   const sampleLearnerGroupUserProgDict = {
     username: 'username2',
     progress_sharing_is_turned_on: true,
     stories_progress: [sampleStorySummaryBackendDict],
-    subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
+    subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict],
   };
-  const sampleLearnerGroupUserProg = (
+  const sampleLearnerGroupUserProg =
     LearnerGroupUserProgress.createFromBackendDict(
-      sampleLearnerGroupUserProgDict)
-  );
+      sampleLearnerGroupUserProgDict
+    );
 
   const learnerGroupBackendDict = {
     id: 'groupId',
@@ -115,38 +115,39 @@ describe('LearnerGroupOverviewComponent', () => {
     learner_usernames: ['username2'],
     invited_learner_usernames: ['username1'],
     subtopic_page_ids: ['topicId1:1'],
-    story_ids: ['sample_story_id']
+    story_ids: ['sample_story_id'],
   };
   const learnerGroup = LearnerGroupData.createFromBackendDict(
-    learnerGroupBackendDict);
+    learnerGroupBackendDict
+  );
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        LearnerGroupOverviewComponent,
-        MockTranslatePipe
-      ],
+      declarations: [LearnerGroupOverviewComponent, MockTranslatePipe],
       providers: [
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
   beforeEach(() => {
     learnerGroupSyllabusBackendApiService = TestBed.inject(
-      LearnerGroupSyllabusBackendApiService);
+      LearnerGroupSyllabusBackendApiService
+    );
     fixture = TestBed.createComponent(LearnerGroupOverviewComponent);
     userService = TestBed.inject(UserService);
     component = fixture.componentInstance;
 
     component.learnerGroup = learnerGroup;
-    spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-      ['default-image-url-png', 'default-image-url-webp']);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      'default-image-url-png',
+      'default-image-url-webp',
+    ]);
   });
 
   it('should initialize', fakeAsync(() => {
@@ -162,7 +163,8 @@ describe('LearnerGroupOverviewComponent', () => {
 
     expect(component.activeTab).toEqual(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-        .SKILLS_ANALYSIS);
+        .SKILLS_ANALYSIS
+    );
     expect(component.learnerGroup).toEqual(learnerGroup);
     expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
   }));
@@ -170,25 +172,30 @@ describe('LearnerGroupOverviewComponent', () => {
   it('should check whether the given tab is active successfully', () => {
     component.setActiveTab(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-        .SKILLS_ANALYSIS);
+        .SKILLS_ANALYSIS
+    );
 
     let tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-        .SKILLS_ANALYSIS);
+        .SKILLS_ANALYSIS
+    );
     expect(tabIsActive).toBeTrue();
 
     tabIsActive = component.isTabActive(
       LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-        .PROGRESS_IN_STORIES);
+        .PROGRESS_IN_STORIES
+    );
     expect(tabIsActive).toBeFalse();
   });
 
   it('should set active tab correctly', () => {
     component.setActiveTab(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS
+    );
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS);
+      LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS.LEARNERS_PROGRESS
+    );
   });
 
   it('should get story completions info correctly', fakeAsync(() => {
@@ -204,38 +211,38 @@ describe('LearnerGroupOverviewComponent', () => {
 
     expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
 
-    const storyCompletionsInfo = component.getStoryCompletionsInfo(
-      'sample_story_id');
+    const storyCompletionsInfo =
+      component.getStoryCompletionsInfo('sample_story_id');
     expect(storyCompletionsInfo).toEqual([userInfo]);
   }));
 
-  it('should get info of learners struggling with subtopics correctly',
-    fakeAsync(() => {
-      spyOn(
-        learnerGroupSyllabusBackendApiService,
-        'fetchLearnersProgressInAssignedSyllabus'
-      ).and.returnValue(Promise.resolve([sampleLearnerGroupUserProg]));
+  it('should get info of learners struggling with subtopics correctly', fakeAsync(() => {
+    spyOn(
+      learnerGroupSyllabusBackendApiService,
+      'fetchLearnersProgressInAssignedSyllabus'
+    ).and.returnValue(Promise.resolve([sampleLearnerGroupUserProg]));
 
-      component.learnerGroup = learnerGroup;
+    component.learnerGroup = learnerGroup;
 
-      component.ngOnInit();
-      tick(100);
+    component.ngOnInit();
+    tick(100);
 
-      expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
+    expect(component.learnersProgress).toEqual([sampleLearnerGroupUserProg]);
 
-      const strugglingLearnersInfo = (
-        component.getStrugglingLearnersInfoInSubtopics('topicId1:1'));
-      expect(strugglingLearnersInfo).toEqual([userInfo]);
-    })
-  );
+    const strugglingLearnersInfo =
+      component.getStrugglingLearnersInfoInSubtopics('topicId1:1');
+    expect(strugglingLearnersInfo).toEqual([userInfo]);
+  }));
 
   it('should get user profile image png data url correctly', () => {
     expect(component.getProfileImagePngDataUrl('username')).toBe(
-      'default-image-url-png');
+      'default-image-url-png'
+    );
   });
 
   it('should get user profile image webp data url correctly', () => {
     expect(component.getProfileImageWebpDataUrl('username')).toBe(
-      'default-image-url-webp');
+      'default-image-url-webp'
+    );
   });
 });

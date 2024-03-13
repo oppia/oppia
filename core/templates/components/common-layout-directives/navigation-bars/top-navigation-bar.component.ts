@@ -18,30 +18,36 @@
  * the editor pages).
  */
 
-import { Subscription } from 'rxjs';
-import { ContextService } from 'services/context.service';
-import { ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { SidebarStatusService } from 'services/sidebar-status.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
+import {Subscription} from 'rxjs';
+import {ContextService} from 'services/context.service';
+import {
+  ChangeDetectorRef,
+  Component,
+  Input,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
+import {SidebarStatusService} from 'services/sidebar-status.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
 import debounce from 'lodash/debounce';
-import { AlertsService } from 'services/alerts.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { SearchService } from 'services/search.service';
-import { EventToCodes, NavigationService } from 'services/navigation.service';
-import { AppConstants } from 'app.constants';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { I18nService } from 'i18n/i18n.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
-import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import { FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
+import {AlertsService} from 'services/alerts.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {SearchService} from 'services/search.service';
+import {EventToCodes, NavigationService} from 'services/navigation.service';
+import {AppConstants} from 'app.constants';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {I18nService} from 'i18n/i18n.service';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
 
 import './top-navigation-bar.component.css';
 
@@ -53,7 +59,7 @@ interface LanguageInfo {
 @Component({
   selector: 'oppia-top-navigation-bar',
   templateUrl: './top-navigation-bar.component.html',
-  styleUrls: ['./top-navigation-bar.component.css']
+  styleUrls: ['./top-navigation-bar.component.css'],
 })
 export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // These properties are initialized using Angular lifecycle hooks
@@ -89,18 +95,18 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   ACTION_CLOSE!: string;
   KEYBOARD_EVENT_TO_KEY_CODES!: {
     enter: {
-        shiftKeyIsPressed: boolean;
-        keyCode: number;
-        };
+      shiftKeyIsPressed: boolean;
+      keyCode: number;
+    };
     tab: {
-        shiftKeyIsPressed: boolean;
-        keyCode: number;
-        };
+      shiftKeyIsPressed: boolean;
+      keyCode: number;
+    };
     shiftTab: {
       shiftKeyIsPressed: boolean;
       keyCode: number;
-      };
     };
+  };
 
   labelForClearingFocus!: string;
   sidebarIsShown: boolean = false;
@@ -109,7 +115,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   profilePictureWebpDataUrl!: string;
   unreadThreadsCount: number = 0;
   paginatedThreadsList: FeedbackThreadSummaryBackendDict[][] = [];
-
 
   // The 'username', 'profilePageUrl' properties
   // are set using the asynchronous method getUserInfoAsync()
@@ -128,26 +133,37 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   NAV_MODE_SIGNUP = 'signup';
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
-    'create', 'explore', 'lesson', 'collection', 'collection_editor',
-    'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
-    'story_editor', 'blog-dashboard'];
+    'create',
+    'explore',
+    'lesson',
+    'collection',
+    'collection_editor',
+    'topics_and_skills_dashboard',
+    'topic_editor',
+    'skill_editor',
+    'story_editor',
+    'blog-dashboard',
+  ];
 
   currentWindowWidth = this.windowDimensionsService.getWidth();
   // The order of the elements in this array specifies the order in
   // which they will be hidden. Earlier elements will be hidden first.
   NAV_ELEMENTS_ORDER = [
-    'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_LEARN',
-    'I18N_TOPNAV_ABOUT', 'I18N_TOPNAV_LIBRARY',
-    'I18N_TOPNAV_HOME'];
+    'I18N_TOPNAV_DONATE',
+    'I18N_TOPNAV_LEARN',
+    'I18N_TOPNAV_ABOUT',
+    'I18N_TOPNAV_LIBRARY',
+    'I18N_TOPNAV_HOME',
+  ];
 
   LEARNER_GROUPS_FEATURE_IS_ENABLED = false;
   FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED = false;
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
-    '/google_signin_buttons/google_signin.svg');
+    '/google_signin_buttons/google_signin.svg'
+  );
 
   navElementsVisibilityStatus: Record<string, boolean> = {};
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -155,8 +171,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
     private alertsService: AlertsService,
-    private feedbackUpdatesBackendApiService:
-    FeedbackUpdatesBackendApiService,
+    private feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService,
     private sidebarStatusService: SidebarStatusService,
     private urlInterpolationService: UrlInterpolationService,
     private navigationService: NavigationService,
@@ -177,18 +192,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.url = new URL(this.windowRef.nativeWindow.location.toString());
     this.labelForClearingFocus = AppConstants.LABEL_FOR_CLEARING_FOCUS;
     this.focusManagerService.setFocus(this.labelForClearingFocus);
-    this.userMenuIsShown = (this.currentUrl !== this.NAV_MODE_SIGNUP);
+    this.userMenuIsShown = this.currentUrl !== this.NAV_MODE_SIGNUP;
     this.inClassroomPage = false;
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
       (languageInfo: LanguageInfo) => {
         return languageInfo;
       }
     );
-    this.showLanguageSelector = (
-      !this.contextService.getPageContext().endsWith('editor'));
+    this.showLanguageSelector = !this.contextService
+      .getPageContext()
+      .endsWith('editor');
 
-    this.standardNavIsShown = (
-      this.NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(this.currentUrl) === -1);
+    this.standardNavIsShown =
+      this.NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(this.currentUrl) === -1;
     if (this.currentUrl === 'learn') {
       this.inClassroomPage = true;
     }
@@ -198,13 +214,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
-    this.learnerGroupBackendApiService.isLearnerGroupFeatureEnabledAsync()
-      .then((featureIsEnabled) => {
+    this.learnerGroupBackendApiService
+      .isLearnerGroupFeatureEnabledAsync()
+      .then(featureIsEnabled => {
         this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
       });
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
-    this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
+      this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
 
     // Inside a setTimeout function call, 'this' points to the global object.
     // To access the context in which the setTimeout call is made, we need to
@@ -213,18 +230,16 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     let that = this;
 
     this.directiveSubscriptions.add(
-      this.searchService.onSearchBarLoaded.subscribe(
-        () => {
-          setTimeout(function() {
-            that.truncateNavbar();
-          }, 100);
-        }
-      )
+      this.searchService.onSearchBarLoaded.subscribe(() => {
+        setTimeout(function () {
+          that.truncateNavbar();
+        }, 100);
+      })
     );
 
     this.i18nService.updateViewToUserPreferredSiteLanguage();
 
-    this.userService.getUserInfoAsync().then((userInfo) => {
+    this.userService.getUserInfoAsync().then(userInfo => {
       this.isModerator = userInfo.isModerator();
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
@@ -234,20 +249,21 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.userIsLoggedIn = userInfo.isLoggedIn();
       let usernameFromUserInfo = userInfo.getUsername();
       if (this.userIsLoggedIn) {
-        let feedbackUpdatesDataPromise = (
-          this.feedbackUpdatesBackendApiService
-            .fetchFeedbackUpdatesDataAsync(
-              this.paginatedThreadsList));
+        let feedbackUpdatesDataPromise =
+          this.feedbackUpdatesBackendApiService.fetchFeedbackUpdatesDataAsync(
+            this.paginatedThreadsList
+          );
         feedbackUpdatesDataPromise.then(
           responseData => {
-            this.unreadThreadsCount =
-              responseData.numberOfUnreadThreads;
-          }, errorResponseStatus => {
+            this.unreadThreadsCount = responseData.numberOfUnreadThreads;
+          },
+          errorResponseStatus => {
             if (
-              AppConstants.FATAL_ERROR_CODES.
-                indexOf(errorResponseStatus) !== -1) {
+              AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+            ) {
               this.alertsService.addWarning(
-                'Failed to get number of unread thread of feedback updates');
+                'Failed to get number of unread thread of feedback updates'
+              );
             }
           }
         );
@@ -255,18 +271,22 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       if (usernameFromUserInfo) {
         this.username = usernameFromUserInfo;
         this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
-          '/profile/<username>', {
-            username: this.username
-          });
-        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-          this.userService.getProfileImageDataUrl(this.username));
+          '/profile/<username>',
+          {
+            username: this.username,
+          }
+        );
+        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
+          this.userService.getProfileImageDataUrl(this.username);
       } else {
-        this.profilePicturePngDataUrl = (
+        this.profilePicturePngDataUrl =
           this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
-        this.profilePictureWebpDataUrl = (
+            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+          );
+        this.profilePictureWebpDataUrl =
           this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
+            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+          );
       }
     });
 
@@ -279,12 +299,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
         // If window is resized larger, try displaying the hidden
         // elements.
-        if (
-          this.currentWindowWidth < this.windowDimensionsService.getWidth()) {
+        if (this.currentWindowWidth < this.windowDimensionsService.getWidth()) {
           for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
-            if (
-              !this.navElementsVisibilityStatus[
-                this.NAV_ELEMENTS_ORDER[i]]) {
+            if (!this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]]) {
               this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]] =
                 true;
             }
@@ -301,18 +318,17 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
-        (code) => {
-          if (this.currentLanguageCode !== code) {
-            this.currentLanguageCode = code;
-            this.supportedSiteLanguages.forEach(element => {
-              if (element.id === this.currentLanguageCode) {
-                this.currentLanguageText = element.text;
-              }
-            });
-            this.changeDetectorRef.detectChanges();
-          }
-        })
+      this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(code => {
+        if (this.currentLanguageCode !== code) {
+          this.currentLanguageCode = code;
+          this.supportedSiteLanguages.forEach(element => {
+            if (element.id === this.currentLanguageCode) {
+              this.currentLanguageText = element.text;
+            }
+          });
+          this.changeDetectorRef.detectChanges();
+        }
+      })
     );
 
     let langCode = this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
@@ -332,18 +348,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     // will check if i18n is complete and set a new timeout if it is
     // not. Since a timeout of 0 works for at least one browser,
     // it is used here.
-    setTimeout(function() {
+    setTimeout(function () {
       that.truncateNavbar();
     }, 0);
   }
 
   ngAfterViewChecked(): void {
-    this.getInvolvedMenuOffset = this
-      .getDropdownOffset('.get-involved', 574);
-    this.donateMenuOffset = this
-      .getDropdownOffset('.donate-tab', 286);
-    this.learnDropdownOffset = this.getDropdownOffset(
-      '.learn-tab', 688);
+    this.getInvolvedMenuOffset = this.getDropdownOffset('.get-involved', 574);
+    this.donateMenuOffset = this.getDropdownOffset('.donate-tab', 286);
+    this.learnDropdownOffset = this.getDropdownOffset('.learn-tab', 688);
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     this.changeDetectorRef.detectChanges();
   }
@@ -358,7 +371,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     if (learnTab) {
       let leftOffset = learnTab.getBoundingClientRect().left;
       let space = window.innerWidth - leftOffset;
-      return (space < width) ? (Math.round(space - width)) : 0;
+      return space < width ? Math.round(space - width) : 0;
     }
     return 0;
   }
@@ -380,23 +393,22 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   onLoginButtonClicked(): void {
-    this.userService.getLoginUrlAsync().then(
-      (loginUrl) => {
-        if (loginUrl) {
-          this.siteAnalyticsService.registerStartLoginEvent('loginButton');
-          setTimeout(() => {
-            this.windowRef.nativeWindow.location.href = loginUrl;
-          }, 150);
-        } else {
-          this.windowRef.nativeWindow.location.reload();
-        }
+    this.userService.getLoginUrlAsync().then(loginUrl => {
+      if (loginUrl) {
+        this.siteAnalyticsService.registerStartLoginEvent('loginButton');
+        setTimeout(() => {
+          this.windowRef.nativeWindow.location.href = loginUrl;
+        }, 150);
+      } else {
+        this.windowRef.nativeWindow.location.reload();
       }
-    );
+    });
   }
 
   onLogoutButtonClicked(): void {
     this.windowRef.nativeWindow.localStorage.removeItem(
-      'last_uploaded_audio_lang');
+      'last_uploaded_audio_lang'
+    );
   }
 
   /**
@@ -433,10 +445,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
    *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
    */
   onMenuKeypress(
-      evt: KeyboardEvent, menuName: string,
-      eventsTobeHandled: EventToCodes): void {
-    this.navigationService.onMenuKeypress(
-      evt, menuName, eventsTobeHandled);
+    evt: KeyboardEvent,
+    menuName: string,
+    eventsTobeHandled: EventToCodes
+  ): void {
+    this.navigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
     this.activeMenuName = this.navigationService.activeMenuName;
   }
 
@@ -493,7 +506,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     let that = this;
     // If i18n hasn't completed, retry after 100ms.
     if (!this.checkIfI18NCompleted()) {
-      setTimeout(function() {
+      setTimeout(function () {
         that.truncateNavbar();
       }, 100);
       return;
@@ -506,17 +519,15 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     let navbar = document.querySelector('div.collapse.navbar-collapse');
     if (navbar && navbar.clientHeight > 60) {
       for (var i = 0; i < this.NAV_ELEMENTS_ORDER.length; i++) {
-        if (
-          this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]]) {
+        if (this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]]) {
           // Hide one element, then check again after 50ms.
           // This gives the browser time to render the visibility
           // change.
-          this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]] =
-                        false;
+          this.navElementsVisibilityStatus[this.NAV_ELEMENTS_ORDER[i]] = false;
           // Force a digest cycle to hide element immediately.
           // Otherwise it would be hidden after the next call.
           // This is due to setTimeout use in debounce.
-          setTimeout(function() {
+          setTimeout(function () {
             that.truncateNavbar();
           }, 50);
           return;
@@ -538,13 +549,14 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
-    return (
-      this.platformFeatureService.status.
-        ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled);
+    return this.platformFeatureService.status
+      .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaTopNavigationBar', downgradeComponent({
-    component: TopNavigationBarComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaTopNavigationBar',
+  downgradeComponent({
+    component: TopNavigationBarComponent,
+  }) as angular.IDirectiveFactory
+);

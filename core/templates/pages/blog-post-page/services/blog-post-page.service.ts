@@ -16,11 +16,11 @@
  * @fileoverview Service that handles data on blog post page.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BlogPostPageService {
   private _blogPostId: string = '';
@@ -36,5 +36,6 @@ export class BlogPostPageService {
   }
 }
 
-angular.module('oppia').factory('BlogPostPageService',
-  downgradeInjectable(BlogPostPageService));
+angular
+  .module('oppia')
+  .factory('BlogPostPageService', downgradeInjectable(BlogPostPageService));

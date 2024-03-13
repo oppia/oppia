@@ -25,18 +25,18 @@ var ruleTester = new RuleTester();
 ruleTester.run('no-bypass-security-phrase', rule, {
   valid: [
     {
-      code:
-      'SecurityTrustResourceUrl()'
-    }
+      code: 'SecurityTrustResourceUrl()',
+    },
   ],
 
   invalid: [
     {
-      code:
-      'this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData)',
-      errors: [{
-        message: 'Please do not use phrase "bypassSecurity"'
-      }],
-    }
-  ]
+      code: 'this.sanitizer.bypassSecurityTrustResourceUrl(base64ImageData)',
+      errors: [
+        {
+          message: 'Please do not use phrase "bypassSecurity"',
+        },
+      ],
+    },
+  ],
 });

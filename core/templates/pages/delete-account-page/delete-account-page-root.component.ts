@@ -16,18 +16,18 @@
  * @fileoverview Root component for delete account page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-delete-account-page-root',
-  templateUrl: './delete-account-page-root.component.html'
+  templateUrl: './delete-account-page-root.component.html',
 })
 export class DeleteAccountPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -35,8 +35,7 @@ export class DeleteAccountPageRootComponent implements OnDestroy {
   errorPageIsShown: boolean = false;
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private translateService: TranslateService
@@ -44,10 +43,12 @@ export class DeleteAccountPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.META
+    );
   }
 
   ngOnInit(): void {
@@ -58,12 +59,17 @@ export class DeleteAccountPageRootComponent implements OnDestroy {
     );
 
     this.loaderService.showLoadingScreen('Loading');
-    this.accessValidationBackendApiService.validateCanManageOwnAccount()
+    this.accessValidationBackendApiService
+      .validateCanManageOwnAccount()
+      .then(
+        () => {
+          this.pageIsShown = true;
+        },
+        err => {
+          this.errorPageIsShown = true;
+        }
+      )
       .then(() => {
-        this.pageIsShown = true;
-      }, (err) => {
-        this.errorPageIsShown = true;
-      }).then(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

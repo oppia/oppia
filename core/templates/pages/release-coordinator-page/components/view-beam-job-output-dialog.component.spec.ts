@@ -16,26 +16,30 @@
  * @fileoverview Component for viewing the output of an Apache Beam job.
  */
 
-import { ClipboardModule } from '@angular/cdk/clipboard';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatTabsModule } from '@angular/material/tabs';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
-import { marbles } from 'rxjs-marbles';
+import {ClipboardModule} from '@angular/cdk/clipboard';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatButtonModule} from '@angular/material/button';
+import {
+  MatDialogModule,
+  MatDialogRef,
+  MAT_DIALOG_DATA,
+} from '@angular/material/dialog';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {MatTabsModule} from '@angular/material/tabs';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
+import {of, throwError} from 'rxjs';
+import {marbles} from 'rxjs-marbles';
 
-import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { ViewBeamJobOutputDialogComponent } from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {ViewBeamJobOutputDialogComponent} from 'pages/release-coordinator-page/components/view-beam-job-output-dialog.component';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {MatIconModule} from '@angular/material/icon';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('View beam job output dialog', () => {
   const beamJobRun = new BeamJobRun('123', 'FooJob', 'DONE', 0, 0, false);
@@ -46,13 +50,11 @@ describe('View beam job output dialog', () => {
   let backendApiService: ReleaseCoordinatorBackendApiService;
   let alertsService: AlertsService;
 
-  beforeEach(waitForAsync(async() => {
-    const mockDialogRef = { disableClose: false, close: () => {} };
+  beforeEach(waitForAsync(async () => {
+    const mockDialogRef = {disableClose: false, close: () => {}};
 
     TestBed.configureTestingModule({
-      declarations: [
-        ViewBeamJobOutputDialogComponent,
-      ],
+      declarations: [ViewBeamJobOutputDialogComponent],
       imports: [
         HttpClientTestingModule,
         BrowserDynamicTestingModule,
@@ -67,18 +69,16 @@ describe('View beam job output dialog', () => {
         NoopAnimationsModule,
       ],
       providers: [
-        { provide: MAT_DIALOG_DATA, useValue: beamJobRun },
-        { provide: MatDialogRef, useValue: mockDialogRef },
+        {provide: MAT_DIALOG_DATA, useValue: beamJobRun},
+        {provide: MatDialogRef, useValue: mockDialogRef},
         ReleaseCoordinatorBackendApiService,
       ],
     });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [
-          ViewBeamJobOutputDialogComponent,
-        ],
-      }
+        entryComponents: [ViewBeamJobOutputDialogComponent],
+      },
     });
     await TestBed.compileComponents();
 
@@ -89,35 +89,39 @@ describe('View beam job output dialog', () => {
     component = fixture.componentInstance;
   }));
 
-  it('should unsubscribe when ngOnDestroy() is called', marbles(m => {
-    // We will call ngOnDestroy() on frame 2, at which point an unsubscription
-    // should occur. "Frames" are units of time in marble diagrams. There are
-    // two kinds of marble diagrams: for Observables and for Subscriptions.
-    //
-    // In Observable marble diagrams, frame 0 is the '^' character, and each
-    // non-whitespace character is 1 frame "later" in time. We use '-' to
-    // move frames forward in time without taking action. The '|' character
-    // represents the completion of the stream.
-    //
-    // In Subscription marble diagrams, the '^' represents the beginning of a
-    // subscription and the '!' character represents its unsubscription. The '-'
-    // characters hold the same meaning.
-    const output = m.hot('        ^---|');
-    const expectedSubscription = '^-!  ';
-    m.scheduler.schedule(() => component.ngOnDestroy(), 2);
+  it(
+    'should unsubscribe when ngOnDestroy() is called',
+    marbles(m => {
+      // We will call ngOnDestroy() on frame 2, at which point an unsubscription
+      // should occur. "Frames" are units of time in marble diagrams. There are
+      // two kinds of marble diagrams: for Observables and for Subscriptions.
+      //
+      // In Observable marble diagrams, frame 0 is the '^' character, and each
+      // non-whitespace character is 1 frame "later" in time. We use '-' to
+      // move frames forward in time without taking action. The '|' character
+      // represents the completion of the stream.
+      //
+      // In Subscription marble diagrams, the '^' represents the beginning of a
+      // subscription and the '!' character represents its unsubscription. The '-'
+      // characters hold the same meaning.
+      const output = m.hot('        ^---|');
+      const expectedSubscription = '^-!  ';
+      m.scheduler.schedule(() => component.ngOnDestroy(), 2);
 
-    spyOn(backendApiService, 'getBeamJobRunOutput').and.returnValue(output);
+      spyOn(backendApiService, 'getBeamJobRunOutput').and.returnValue(output);
 
-    fixture.detectChanges();
+      fixture.detectChanges();
 
-    m.expect(output).toHaveSubscriptions(expectedSubscription);
-  }));
+      m.expect(output).toHaveSubscriptions(expectedSubscription);
+    })
+  );
 
   it('should resolve the result and assign it to the output', () => {
     const result = new BeamJobRunResult('abc', '123');
-    const getBeamJobRunOutputSpy = (
-      spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(result)));
+    const getBeamJobRunOutputSpy = spyOn(
+      backendApiService,
+      'getBeamJobRunOutput'
+    ).and.returnValue(of(result));
 
     fixture.detectChanges();
 
@@ -126,9 +130,10 @@ describe('View beam job output dialog', () => {
   });
 
   it('should use the output corresponding to the selected tab', () => {
-    const getBeamJobRunOutputSpy = (
-      spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(new BeamJobRunResult('abc', '123'))));
+    const getBeamJobRunOutputSpy = spyOn(
+      backendApiService,
+      'getBeamJobRunOutput'
+    ).and.returnValue(of(new BeamJobRunResult('abc', '123')));
 
     fixture.detectChanges();
 
@@ -147,9 +152,10 @@ describe('View beam job output dialog', () => {
   });
 
   it('should show stderr when stdout is empty', () => {
-    const getBeamJobRunOutputSpy = (
-      spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(new BeamJobRunResult('', '123'))));
+    const getBeamJobRunOutputSpy = spyOn(
+      backendApiService,
+      'getBeamJobRunOutput'
+    ).and.returnValue(of(new BeamJobRunResult('', '123')));
 
     fixture.detectChanges();
 
@@ -158,9 +164,10 @@ describe('View beam job output dialog', () => {
   });
 
   it('should show stdout when stderr is empty', () => {
-    const getBeamJobRunOutputSpy = (
-      spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(of(new BeamJobRunResult('abc', ''))));
+    const getBeamJobRunOutputSpy = spyOn(
+      backendApiService,
+      'getBeamJobRunOutput'
+    ).and.returnValue(of(new BeamJobRunResult('abc', '')));
 
     fixture.detectChanges();
 
@@ -168,11 +175,12 @@ describe('View beam job output dialog', () => {
     expect(component.getOutput()).toEqual('abc');
   });
 
-  it('should show the error dialog if the operation failed', async() => {
+  it('should show the error dialog if the operation failed', async () => {
     const error = new Error();
-    const getBeamJobRunOutputSpy = (
-      spyOn(backendApiService, 'getBeamJobRunOutput')
-        .and.returnValue(throwError(error)));
+    const getBeamJobRunOutputSpy = spyOn(
+      backendApiService,
+      'getBeamJobRunOutput'
+    ).and.returnValue(throwError(error));
     const addWarningSpy = spyOn(alertsService, 'addWarning').and.stub();
 
     fixture.detectChanges();

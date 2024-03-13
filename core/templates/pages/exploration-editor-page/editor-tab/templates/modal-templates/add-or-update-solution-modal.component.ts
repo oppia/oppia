@@ -16,20 +16,30 @@
  * @fileoverview Component for add or update solution modal.
  */
 
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { ContextService } from 'services/context.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
+import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {ContextService} from 'services/context.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {
+  Solution,
+  SolutionObjectFactory,
+} from 'domain/exploration/SolutionObjectFactory';
+import {
+  InteractionSpecsConstants,
+  InteractionSpecsKey,
+} from 'pages/interaction-specs.constants';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {
+  CALCULATION_TYPE_CHARACTER,
+  HtmlLengthService,
+} from 'services/html-length.service';
 
 interface HtmlFormSchema {
   type: 'html';
@@ -51,10 +61,12 @@ interface SolutionInterface {
 
 @Component({
   selector: 'oppia-add-or-update-solution-modal',
-  templateUrl: './add-or-update-solution-modal.component.html'
+  templateUrl: './add-or-update-solution-modal.component.html',
 })
 export class AddOrUpdateSolutionModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -68,15 +80,15 @@ export class AddOrUpdateSolutionModalComponent
   tempAnsOption!: string;
   COMPONENT_NAME_SOLUTION: string = AppConstants.COMPONENT_NAME_SOLUTION;
 
-  SOLUTION_EDITOR_FOCUS_LABEL: string = (
-    'currentCorrectAnswerEditorHtmlForSolutionEditor');
+  SOLUTION_EDITOR_FOCUS_LABEL: string =
+    'currentCorrectAnswerEditorHtmlForSolutionEditor';
 
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
-      hide_complex_extensions: (
-        this.contextService.getEntityType() === 'question')
-    }
+      hide_complex_extensions:
+        this.contextService.getEntityType() === 'question',
+    },
   };
 
   constructor(
@@ -89,7 +101,8 @@ export class AddOrUpdateSolutionModalComponent
     private solutionObjectFactory: SolutionObjectFactory,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateSolutionService: StateSolutionService
+    private stateSolutionService: StateSolutionService,
+    private htmlLengthService: HtmlLengthService
   ) {
     super(ngbActiveModal);
   }
@@ -99,21 +112,24 @@ export class AddOrUpdateSolutionModalComponent
   }
 
   shouldAdditionalSubmitButtonBeShown(): boolean {
-    let interactionId = (
-      this.stateInteractionIdService.savedMemento as InteractionSpecsKey);
-    const interactionSpec = (
-      InteractionSpecsConstants.INTERACTION_SPECS[interactionId]);
+    let interactionId = this.stateInteractionIdService
+      .savedMemento as InteractionSpecsKey;
+    const interactionSpec =
+      InteractionSpecsConstants.INTERACTION_SPECS[interactionId];
     return interactionSpec.show_generic_submit_button;
   }
 
-  isSolutionExplanationLengthExceeded(
-      solExplanation: string): boolean {
-    // TODO(#13764): Edit this check after appropriate limits are found.
-    return Boolean(solExplanation.length > 3000);
+  isSolutionExplanationLengthExceeded(solExplanation: string): boolean {
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        solExplanation,
+        CALCULATION_TYPE_CHARACTER
+      ) > 3000
+    );
   }
 
   onAnswerChange(): void {
-    this.data.answerIsExclusive = (this.tempAnsOption === this.ansOptions[0]);
+    this.data.answerIsExclusive = this.tempAnsOption === this.ansOptions[0];
   }
 
   isSubmitButtonDisabled(): boolean {
@@ -132,7 +148,8 @@ export class AddOrUpdateSolutionModalComponent
           this.data.answerIsExclusive,
           this.data.correctAnswer,
           this.data.explanationHtml,
-          this.data.explanationContentId)
+          this.data.explanationContentId
+        ),
       });
     } else {
       throw new Error('Cannot save invalid solution');
@@ -142,26 +159,25 @@ export class AddOrUpdateSolutionModalComponent
   ngOnInit(): void {
     this.solutionType = this.stateSolutionService.savedMemento;
     if (this.solutionType) {
-      this.savedSolution = (
-        this.solutionType.correctAnswer);
+      this.savedSolution = this.solutionType.correctAnswer;
     } else {
       this.savedSolution = null;
     }
-    this.correctAnswerEditorHtml = (
+    this.correctAnswerEditorHtml =
       this.explorationHtmlFormatterService.getInteractionHtml(
         this.stateInteractionIdService.savedMemento,
         this.stateCustomizationArgsService.savedMemento,
         false,
         this.SOLUTION_EDITOR_FOCUS_LABEL,
-        this.savedSolution ? 'savedSolution' : null)
-    );
+        this.savedSolution ? 'savedSolution' : null
+      );
     this.answerIsValid = false;
     if (this.solutionType) {
       this.data = {
         answerIsExclusive: this.solutionType.answerIsExclusive,
         correctAnswer: undefined,
         explanationHtml: this.solutionType.explanation.html,
-        explanationContentId: this.solutionType.explanation.contentId
+        explanationContentId: this.solutionType.explanation.contentId,
       };
     } else {
       this.data = {
@@ -169,13 +185,15 @@ export class AddOrUpdateSolutionModalComponent
         correctAnswer: undefined,
         explanationHtml: '',
         explanationContentId: this.generateContentIdService.getNextStateId(
-          this.COMPONENT_NAME_SOLUTION)
+          this.COMPONENT_NAME_SOLUTION
+        ),
       };
     }
     this.currentInteractionService.setOnSubmitFn(
       (answer: InteractionAnswer) => {
         this.data.correctAnswer = answer;
-      });
+      }
+    );
     this.ansOptions = ['The only', 'One'];
     this.tempAnsOption = this.ansOptions[1];
   }

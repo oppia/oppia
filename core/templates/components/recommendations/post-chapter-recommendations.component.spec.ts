@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the post chapter recommendations component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { PostChapterRecommendationsComponent } from './post-chapter-recommendations.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { UrlService } from 'services/contextual/url.service';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {PostChapterRecommendationsComponent} from './post-chapter-recommendations.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UrlService} from 'services/contextual/url.service';
 
-describe('End chapter check mark component', function() {
+describe('End chapter check mark component', function () {
   let component: PostChapterRecommendationsComponent;
   let fixture: ComponentFixture<PostChapterRecommendationsComponent>;
   let urlInterpolationService: UrlInterpolationService;
@@ -43,44 +43,53 @@ describe('End chapter check mark component', function() {
   });
 
   it('should get static image url', () => {
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue('image_url');
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      'image_url'
+    );
 
-    expect(component.getStaticImageUrl('practice_session_image_path'))
-      .toBe('image_url');
+    expect(component.getStaticImageUrl('practice_session_image_path')).toBe(
+      'image_url'
+    );
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
-      'practice_session_image_path');
+      'practice_session_image_path'
+    );
   });
 
   it('should get practice tab url', () => {
-    spyOn(urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('topic_page');
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'topic_page'
+    );
     spyOn(urlService, 'getUrlParams').and.returnValue({
       topic_url_fragment: 'topic_url_fragment',
-      classroom_url_fragment: 'classroom_url_fragment'
+      classroom_url_fragment: 'classroom_url_fragment',
     });
 
     expect(component.getPracticeTabUrl()).toBe('topic_page/practice');
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
-      '/learn/<classroom_url_fragment>/<topic_url_fragment>', {
+      '/learn/<classroom_url_fragment>/<topic_url_fragment>',
+      {
         topic_url_fragment: 'topic_url_fragment',
-        classroom_url_fragment: 'classroom_url_fragment'
-      });
+        classroom_url_fragment: 'classroom_url_fragment',
+      }
+    );
   });
 
   it('should get revision tab url', () => {
-    spyOn(urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('topic_page');
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      'topic_page'
+    );
     spyOn(urlService, 'getUrlParams').and.returnValue({
       topic_url_fragment: 'topic_url_fragment',
-      classroom_url_fragment: 'classroom_url_fragment'
+      classroom_url_fragment: 'classroom_url_fragment',
     });
 
     expect(component.getRevisionTabUrl()).toBe('topic_page/revision');
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
-      '/learn/<classroom_url_fragment>/<topic_url_fragment>', {
+      '/learn/<classroom_url_fragment>/<topic_url_fragment>',
+      {
         topic_url_fragment: 'topic_url_fragment',
-        classroom_url_fragment: 'classroom_url_fragment'
-      });
+        classroom_url_fragment: 'classroom_url_fragment',
+      }
+    );
   });
 });

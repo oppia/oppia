@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for Subtitled Html editor.
  */
 
-import { ChangeDetectorRef } from '@angular/core';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledHtmlEditorComponent } from './subtitled-html-editor.component';
+import {ChangeDetectorRef} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SubtitledHtmlEditorComponent} from './subtitled-html-editor.component';
 
 describe('SubtitledHtmlEditorComponent', () => {
   let component: SubtitledHtmlEditorComponent;
@@ -30,7 +30,7 @@ describe('SubtitledHtmlEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SubtitledHtmlEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -42,9 +42,9 @@ describe('SubtitledHtmlEditorComponent', () => {
       replacement_ui_config: {
         html: {
           hide_complex_extensions: true,
-          placeholder: 'Enter an option for the learner to select'
-        }
-      }
+          placeholder: 'Enter an option for the learner to select',
+        },
+      },
     };
   });
 
@@ -56,9 +56,9 @@ describe('SubtitledHtmlEditorComponent', () => {
       ui_config: {
         html: {
           hide_complex_extensions: true,
-          placeholder: 'Enter an option for the learner to select'
-        }
-      }
+          placeholder: 'Enter an option for the learner to select',
+        },
+      },
     });
   });
 
@@ -68,9 +68,9 @@ describe('SubtitledHtmlEditorComponent', () => {
       ui_config: {
         html: {
           hide_complex_extensions: true,
-          placeholder: 'Enter an option for the learner to select'
-        }
-      }
+          placeholder: 'Enter an option for the learner to select',
+        },
+      },
     };
 
     expect(component.getSchema()).toEqual({
@@ -78,26 +78,26 @@ describe('SubtitledHtmlEditorComponent', () => {
       ui_config: {
         html: {
           hide_complex_extensions: true,
-          placeholder: 'Enter an option for the learner to select'
-        }
-      }
+          placeholder: 'Enter an option for the learner to select',
+        },
+      },
     });
   });
 
   it('should update the value when user edits a text', () => {
     spyOn(component.valueChanged, 'emit');
     const changeDetectorRef =
-    fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
 
     component.value = mockValue;
 
     component.updateValue('<p>new test</p>');
 
-    expect(component.value).toEqual(
-      new SubtitledHtml('<p>new test</p>', null)
-    );
+    expect(component.value).toEqual(new SubtitledHtml('<p>new test</p>', null));
     expect(component.valueChanged.emit).toHaveBeenCalledWith(mockValue);
     expect(detectChangesSpy).toHaveBeenCalled();
   });
@@ -105,9 +105,11 @@ describe('SubtitledHtmlEditorComponent', () => {
   it('should not replace value when user did not change it', () => {
     spyOn(component.valueChanged, 'emit');
     const changeDetectorRef =
-    fixture.debugElement.injector.get(ChangeDetectorRef);
-    const detectChangesSpy =
-      spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
+      fixture.debugElement.injector.get(ChangeDetectorRef);
+    const detectChangesSpy = spyOn(
+      changeDetectorRef.constructor.prototype,
+      'detectChanges'
+    );
     component.value = mockValue;
     component.value._html = '<p>test</p>';
 

@@ -20,13 +20,13 @@
  * followed by the name of the arg.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, OnInit, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-math-equation-input',
-  templateUrl: './math-equation-input-short-response.component.html'
+  templateUrl: './math-equation-input-short-response.component.html',
 })
 export class ShortResponseMathEquationInput implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -35,9 +35,7 @@ export class ShortResponseMathEquationInput implements OnInit {
   @Input() answer!: string;
   displayAnswer!: Object;
 
-  constructor(
-    private htmlEscaperService: HtmlEscaperService
-  ) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     this.displayAnswer = this.htmlEscaperService.escapedJsonToObj(this.answer);
@@ -45,7 +43,8 @@ export class ShortResponseMathEquationInput implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseMathEquationInput', downgradeComponent({
-    component: ShortResponseMathEquationInput
+  'oppiaShortResponseMathEquationInput',
+  downgradeComponent({
+    component: ShortResponseMathEquationInput,
   }) as angular.IDirectiveFactory
 );

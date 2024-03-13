@@ -16,24 +16,19 @@
  * @fileoverview Routing module for blog author page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { BlogAuthorProfilePageRootComponent } from './blog-author-profile-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {BlogAuthorProfilePageRootComponent} from './blog-author-profile-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: BlogAuthorProfilePageRootComponent
-  }
+    component: BlogAuthorProfilePageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class BlogAuthorProfilePageRoutingModule {}

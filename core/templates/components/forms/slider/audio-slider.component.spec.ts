@@ -16,9 +16,14 @@
  * @fileoverview Unit tests for audio slider component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { AudioSliderComponent } from './audio-slider.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {AudioSliderComponent} from './audio-slider.component';
 
 describe('Audio Slider Component', () => {
   let fixture: ComponentFixture<AudioSliderComponent>;
@@ -27,7 +32,7 @@ describe('Audio Slider Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AudioSliderComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -38,7 +43,7 @@ describe('Audio Slider Component', () => {
 
   it('should emit value when slider value changes', fakeAsync(() => {
     const valueChangeSpy = spyOn(component.valueChange, 'emit');
-    const eventPayload = { value: 5 };
+    const eventPayload = {value: 5};
     component.setDuration(eventPayload);
     expect(valueChangeSpy).toHaveBeenCalledWith(eventPayload);
   }));

@@ -17,8 +17,8 @@
  * if the user is not a valid facilitator.
  */
 
-import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import {Location} from '@angular/common';
+import {Injectable} from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivate,
@@ -26,33 +26,34 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CreateLearnerGroupPageAuthGuard implements CanActivate {
   constructor(
-    private accessValidationBackendApiService:
-    AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
     private location: Location
   ) {}
 
   async canActivate(
-      route: ActivatedRouteSnapshot,
-      state: RouterStateSnapshot
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>(resolve => {
       this.accessValidationBackendApiService
         .validateAccessToLearnerGroupCreatorPage()
         .then(() => {
           resolve(true);
         })
-        .catch((err) => {
-          this.router.navigate(
-            [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`])
+        .catch(err => {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+            ])
             .then(() => {
               this.location.replaceState(state.url);
               resolve(false);

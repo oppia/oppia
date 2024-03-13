@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for NonExistentExplorations.
  */
 
-import { NonExistentExplorations } from
-  'domain/learner_dashboard/non-existent-explorations.model';
+import {NonExistentExplorations} from 'domain/learner_dashboard/non-existent-explorations.model';
 
 describe('Non existent explorations model', () => {
   it('should correctly convert backend dict to object', () => {

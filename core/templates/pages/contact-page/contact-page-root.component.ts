@@ -16,16 +16,16 @@
  * @fileoverview Root component for contact page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-contact-page-root',
-  templateUrl: './contact-page-root.component.html'
+  templateUrl: './contact-page-root.component.html',
 })
 export class ContactPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -36,10 +36,12 @@ export class ContactPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT.META
+    );
   }
 
   ngOnInit(): void {

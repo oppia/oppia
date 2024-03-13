@@ -16,8 +16,8 @@
  * @fileoverview Component for the header of items in a list.
  */
 
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 interface DeleteSummaryEventData {
   index: number;
@@ -26,7 +26,7 @@ interface DeleteSummaryEventData {
 
 @Component({
   selector: 'oppia-summary-list-header',
-  templateUrl: './summary-list-header.component.html'
+  templateUrl: './summary-list-header.component.html',
 })
 export class SummaryListHeaderComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -37,8 +37,8 @@ export class SummaryListHeaderComponent {
   @Input() summary!: string;
   @Input() shortSummary!: string;
   @Input() isActive: boolean = false;
-  @Output() summaryDelete:
-    EventEmitter<DeleteSummaryEventData> = (new EventEmitter());
+  @Output() summaryDelete: EventEmitter<DeleteSummaryEventData> =
+    new EventEmitter();
 
   @Input() isDeleteAvailable: boolean = false;
   @Input() numItems!: number;
@@ -46,11 +46,15 @@ export class SummaryListHeaderComponent {
   deleteItem(evt: Event): void {
     let eventData = {
       index: this.index,
-      event: evt
+      event: evt,
     };
     this.summaryDelete.emit(eventData);
   }
 }
 
-angular.module('oppia').directive('oppiaSummaryListHeader',
-  downgradeComponent({ component: SummaryListHeaderComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaSummaryListHeader',
+    downgradeComponent({component: SummaryListHeaderComponent})
+  );

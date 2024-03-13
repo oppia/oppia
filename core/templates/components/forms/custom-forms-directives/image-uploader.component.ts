@@ -16,13 +16,20 @@
  * @fileoverview Component for uploading images.
  */
 
-import { Component, ElementRef, Input, Output, EventEmitter, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { IdGenerationService } from 'services/id-generation.service';
+import {
+  Component,
+  ElementRef,
+  Input,
+  Output,
+  EventEmitter,
+  ViewChild,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import {ContextService} from 'services/context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {IdGenerationService} from 'services/id-generation.service';
 
 interface ImageTypeMapping {
   [key: string]: {
@@ -33,7 +40,7 @@ interface ImageTypeMapping {
 
 @Component({
   selector: 'oppia-image-uploader',
-  templateUrl: './image-uploader.component.html'
+  templateUrl: './image-uploader.component.html',
 })
 export class ImageUploaderComponent {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
@@ -54,19 +61,20 @@ export class ImageUploaderComponent {
     public blogDashboardPageService: BlogDashboardPageService,
     private idGenerationService: IdGenerationService,
     private windowRef: WindowRef,
-    private contextService: ContextService,
-  ) { }
+    private contextService: ContextService
+  ) {}
 
   ngOnInit(): void {
     // We generate a random class name to distinguish this input from
     // others in the DOM.
-    this.fileInputClassName = (
-      'image-uploader-file-input' + this.idGenerationService.generateNewId());
+    this.fileInputClassName =
+      'image-uploader-file-input' + this.idGenerationService.generateNewId();
   }
 
   ngAfterViewInit(): void {
     this.dropAreaRef.nativeElement.addEventListener(
-      'drop', (event: DragEvent) => {
+      'drop',
+      (event: DragEvent) => {
         this.onDragEnd(event);
         if (event.dataTransfer !== null) {
           let file = event.dataTransfer.files[0];
@@ -76,16 +84,21 @@ export class ImageUploaderComponent {
             this.fileChanged.emit(file);
           }
         }
-      });
+      }
+    );
 
-    this.dropAreaRef.nativeElement
-      .addEventListener('dragover', (event: Event) => {
+    this.dropAreaRef.nativeElement.addEventListener(
+      'dragover',
+      (event: Event) => {
         event.preventDefault();
         this.backgroundWhileUploading = true;
-      });
+      }
+    );
 
-    this.dropAreaRef.nativeElement
-      .addEventListener('dragleave', this.onDragEnd.bind(this));
+    this.dropAreaRef.nativeElement.addEventListener(
+      'dragleave',
+      this.onDragEnd.bind(this)
+    );
 
     // If the user accidentally drops an image outside of the image-uploader
     // we want to prevent the browser from applying normal drag-and-drop
@@ -106,8 +119,9 @@ export class ImageUploaderComponent {
 
   handleFile(): void {
     let file: File = this.imageInputRef.nativeElement.files[0];
-    let filename: string = this.imageInputRef.nativeElement.value.split(
-      /(\\|\/)/g).pop();
+    let filename: string = this.imageInputRef.nativeElement.value
+      .split(/(\\|\/)/g)
+      .pop();
     this.errorMessage = this.validateUploadedFile(file, filename);
     if (!this.errorMessage) {
       // Only fire this event if validation pass.
@@ -144,7 +158,7 @@ export class ImageUploaderComponent {
       svg: {
         format: 'image/svg\\+xml',
         fileExtension: /\.svg$/,
-      }
+      },
     };
 
     let imageHasInvalidFormat: boolean = true;
@@ -152,17 +166,12 @@ export class ImageUploaderComponent {
     for (let i = 0; i < this.allowedImageFormats.length; i++) {
       let imageType: string = this.allowedImageFormats[i];
       if (!imageTypeMapping.hasOwnProperty(imageType)) {
-        return (
-          imageType + ' is not in the list of allowed image formats.'
-        );
+        return imageType + ' is not in the list of allowed image formats.';
       }
       if (file.type.match(imageTypeMapping[imageType].format)) {
         imageHasInvalidFormat = false;
-        if (
-          !file.name.match(imageTypeMapping[imageType].fileExtension)) {
-          return (
-            'This image format does not match the filename extension.'
-          );
+        if (!file.name.match(imageTypeMapping[imageType].fileExtension)) {
+          return 'This image format does not match the filename extension.';
         }
       }
     }
@@ -186,14 +195,21 @@ export class ImageUploaderComponent {
     }
     if (file.size > maxAllowedFileSize) {
       let currentSize: string = (
-        (file.size * 100 / maxAllowedFileSize).toFixed(1)
+        (file.size * 100) /
+        maxAllowedFileSize
+      ).toFixed(1);
+      return (
+        `The maximum allowed file size is ${maxAllowedFileSize / 1024}` +
+        ` KB (${currentSize} ${fileSizeUnit} given).`
       );
-      return `The maximum allowed file size is ${maxAllowedFileSize / 1024}` +
-        ` KB (${currentSize} ${fileSizeUnit} given).`;
     }
     return null;
   }
 }
 
-angular.module('oppia').directive('oppiaImageUploader',
-  downgradeComponent({ component: ImageUploaderComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaImageUploader',
+    downgradeComponent({component: ImageUploaderComponent})
+  );

@@ -16,17 +16,17 @@
  * @fileoverview Unit tests for the signup page root component.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { PageHeadService } from 'services/page-head.service';
-import { PageTitleService } from 'services/page-title.service';
+import {AppConstants} from 'app.constants';
+import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
+import {PageHeadService} from 'services/page-head.service';
+import {PageTitleService} from 'services/page-title.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { SignupPageRootComponent } from './signup-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SignupPageRootComponent} from './signup-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -43,19 +43,16 @@ describe('Signup Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        SignupPageRootComponent,
-        MockTranslatePipe
-      ],
+      declarations: [SignupPageRootComponent, MockTranslatePipe],
       providers: [
         PageTitleService,
         MetaTagCustomizationService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -66,10 +63,9 @@ describe('Signup Page Root', () => {
     translateService = TestBed.inject(TranslateService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize and subscribe to onLangChange', () => {
     spyOn(translateService.onLangChange, 'subscribe');
@@ -95,10 +91,12 @@ describe('Signup Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.TITLE
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.META
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

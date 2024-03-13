@@ -16,14 +16,17 @@
  * @fileoverview Unit tests for ParamMetadata model.
  */
 
-import { ParamMetadata } from 'domain/exploration/param-metadata.model';
+import {ParamMetadata} from 'domain/exploration/param-metadata.model';
 
 describe('ParameterMetadata model', () => {
   let parameterMetadata: ParamMetadata;
 
   it('should have correct metadata for SET action', () => {
     parameterMetadata = ParamMetadata.createWithSetAction(
-      'answer', 'param_changes', '1');
+      'answer',
+      'param_changes',
+      '1'
+    );
     expect(parameterMetadata.action).toEqual('set');
     expect(parameterMetadata.paramName).toEqual('answer');
     expect(parameterMetadata.source).toEqual('param_changes');

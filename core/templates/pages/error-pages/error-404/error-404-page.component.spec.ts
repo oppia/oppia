@@ -15,16 +15,15 @@
 /**
  * @fileoverview Unit tests for error page.
  */
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, TestBed, ComponentFixture } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, TestBed, ComponentFixture} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { Error404PageComponent } from './error-404-page.component';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PageTitleService } from 'services/page-title.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {Error404PageComponent} from './error-404-page.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PageTitleService} from 'services/page-title.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   codeChangeEventEmiiter = new EventEmitter<string>();
@@ -57,16 +56,16 @@ describe('Error page', () => {
       providers: [
         {
           provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
+          useClass: MockI18nLanguageCodeService,
         },
         UrlInterpolationService,
         PageTitleService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -78,23 +77,26 @@ describe('Error page', () => {
     fixture.detectChanges();
   });
 
-  it('should set images and subscribe to onLangChange upon initialization',
-    () => {
-      spyOn(translateService.onLangChange, 'subscribe');
-      component.ngOnInit();
-      expect(component.getStaticImageUrl('/general/oops_mint.webp'))
-        .toBe('/assets/images/general/oops_mint.webp');
-      expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
-    });
-
-  it('should obtain translated page title whenever the selected' +
-  'language changes', () => {
+  it('should set images and subscribe to onLangChange upon initialization', () => {
+    spyOn(translateService.onLangChange, 'subscribe');
     component.ngOnInit();
-    spyOn(component, 'setPageTitle');
-    translateService.onLangChange.emit();
-
-    expect(component.setPageTitle).toHaveBeenCalled();
+    expect(component.getStaticImageUrl('/general/oops_mint.webp')).toBe(
+      '/assets/images/general/oops_mint.webp'
+    );
+    expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   });
+
+  it(
+    'should obtain translated page title whenever the selected' +
+      'language changes',
+    () => {
+      component.ngOnInit();
+      spyOn(component, 'setPageTitle');
+      translateService.onLangChange.emit();
+
+      expect(component.setPageTitle).toHaveBeenCalled();
+    }
+  );
 
   it('should set new page title', () => {
     spyOn(translateService, 'instant').and.callThrough();
@@ -102,9 +104,11 @@ describe('Error page', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_ERROR_PAGE_TITLE_404');
+      'I18N_ERROR_PAGE_TITLE_404'
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_ERROR_PAGE_TITLE_404');
+      'I18N_ERROR_PAGE_TITLE_404'
+    );
   });
 
   it('should unsubscribe on component destruction', () => {
