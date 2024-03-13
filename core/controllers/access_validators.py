@@ -78,11 +78,10 @@ class ClassroomAccessValidationHandler(
             raise self.PageNotFoundException
 
 
-class CollectionPageAccessValidationHandler(
+class CollectionViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Validates access to collection page.
-    """
+    """Validates access to collection page."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

@@ -44,7 +44,7 @@ describe('CollectionPlayerPageRootComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have correct title', () => {
+  it('should have correct title and meta tag', () => {
     expect(component.title)
       .toEqual(
         AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.TITLE);

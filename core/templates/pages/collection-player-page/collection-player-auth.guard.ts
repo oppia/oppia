@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Guard that redirects user to 401 error page
- * if the user is not validated to access the collection player page.
+ * @fileoverview Guard that checks if the user has access to the
+ * collection player page.
  */
 
 import { Location } from '@angular/common';
