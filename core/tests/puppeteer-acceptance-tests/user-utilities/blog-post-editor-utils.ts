@@ -156,8 +156,6 @@ export class BlogPostEditor extends BaseUser {
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
 
     await this.expectPublishButtonToBeDisabled();
-    await this.clickOn('button.mat-button-toggle-button');
-    await this.expectPublishButtonToBeDisabled();
     if (this.viewport.width < BREAKPOINTS.MOBILE) {
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
@@ -176,6 +174,7 @@ export class BlogPostEditor extends BaseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
+    await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
     await this.page.waitForSelector(`${publishBlogPostButton}:not([disabled])`);

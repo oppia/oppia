@@ -45,9 +45,6 @@ export class SuperAdmin extends BaseUser {
       if (roleText.toLowerCase() === role) {
         await Promise.all([
           this.page.waitForNetworkIdle(),
-          this.page.waitForSelector('div.e2e-test-progress-spinner', {
-            hidden: true,
-          }),
           allRoles[i].click(),
         ]);
         return;
