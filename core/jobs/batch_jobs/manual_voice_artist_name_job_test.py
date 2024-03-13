@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.manual_voice_artist_names_job."""
+"""Unit tests for jobs.batch_jobs.manual_voice_artist_name_job."""
 
 from __future__ import annotations
 
@@ -27,7 +27,7 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import manual_voice_artist_names_job
+from core.jobs.batch_jobs import manual_voice_artist_name_job
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
@@ -767,13 +767,15 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         self.publish_exploration(self.owner_id, exploration_3.id)
 
 
-class AuditVoiceArtistNamesFromExplorationJobTests(
+class CreateVoiceArtistMetadataModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
 
     JOB_CLASS: Type[
-        manual_voice_artist_names_job.AuditVoiceArtistNamesFromExplorationJob
+        manual_voice_artist_name_job.
+        CreateVoiceArtistMetadataModelsJob
     ] = (
-        manual_voice_artist_names_job.AuditVoiceArtistNamesFromExplorationJob)
+        manual_voice_artist_name_job.
+        CreateVoiceArtistMetadataModelsJob)
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -791,77 +793,42 @@ class AuditVoiceArtistNamesFromExplorationJobTests(
                 self.CURATED_EXPLORATION_ID_2, stderr=''),
             job_run_result.JobRunResult(
                 stdout='Generated exploration voice artist link for %s.' %
-                self.CURATED_EXPLORATION_ID_4, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_2, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_4, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_1, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_3, stderr='')
+                self.CURATED_EXPLORATION_ID_4, stderr='')
         ])
 
-        total_voice_artist_metadata_models = len(
-            voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+        total_exploration_voice_artist_link_models = len(
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
+
+        self.assertEqual(total_exploration_voice_artist_link_models, 3)
+
+
+class AuditVoiceArtistMetadataModelsJobTests(
+    VoiceArtistMetadataModelsTestsBaseClass):
+
+    JOB_CLASS: Type[manual_voice_artist_name_job.AuditVoiceArtistNamesJob] = (
+        manual_voice_artist_name_job.AuditVoiceArtistNamesJob)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_version_is_added_after_running_job(self) -> None:
+        self._create_curated_explorations()
+        self._create_non_curated_exploration()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Generated exploration voice artist link for %s.' %
+                self.CURATED_EXPLORATION_ID_1, stderr=''),
+            job_run_result.JobRunResult(
+                stdout='Generated exploration voice artist link for %s.' %
+                self.CURATED_EXPLORATION_ID_2, stderr=''),
+            job_run_result.JobRunResult(
+                stdout='Generated exploration voice artist link for %s.' %
+                self.CURATED_EXPLORATION_ID_4, stderr='')
+        ])
+
         total_exploration_voice_artist_link_models = len(
             voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
 
         # No models are being saved in the datastore since this is an audit job.
-        self.assertEqual(total_voice_artist_metadata_models, 0)
         self.assertEqual(total_exploration_voice_artist_link_models, 0)
-
-
-class CreateVoiceArtistMetadataModelsFromExplorationsJobTests(
-    VoiceArtistMetadataModelsTestsBaseClass):
-
-    JOB_CLASS: Type[
-        manual_voice_artist_names_job.
-        CreateVoiceArtistMetadataModelsFromExplorationsJob
-    ] = (
-        manual_voice_artist_names_job.
-        CreateVoiceArtistMetadataModelsFromExplorationsJob)
-
-    def test_empty_storage(self) -> None:
-        self.assert_job_output_is_empty()
-
-    def test_version_is_added_after_running_job(self) -> None:
-        self._create_curated_explorations()
-        self._create_non_curated_exploration()
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout='Generated exploration voice artist link for %s.' %
-                self.CURATED_EXPLORATION_ID_1, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated exploration voice artist link for %s.' %
-                self.CURATED_EXPLORATION_ID_2, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated exploration voice artist link for %s.' %
-                self.CURATED_EXPLORATION_ID_4, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_2, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_4, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_1, stderr=''),
-            job_run_result.JobRunResult(
-                stdout='Generated voice artist data for %s.' %
-                self.editor_id_3, stderr='')
-        ])
-
-        total_voice_artist_metadata_models = len(
-            voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
-        total_exploration_voice_artist_link_models = len(
-            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
-
-        self.assertEqual(total_voice_artist_metadata_models, 4)
-        self.assertEqual(total_exploration_voice_artist_link_models, 3)
-
