@@ -18,17 +18,29 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { ContributorDashboardAdminPageConstants as PageConstants } from './contributor-dashboard-admin-page.constants';
+import {ContributorDashboardAdminPageConstants as PageConstants} from './contributor-dashboard-admin-page.constants';
 
-angular.module('oppia').constant(
-  'CONTRIBUTION_RIGHTS_HANDLER_URL',
-  PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL);
-angular.module('oppia').constant(
-  'CONTRIBUTION_RIGHTS_DATA_HANDLER_URL',
-  PageConstants.CONTRIBUTION_RIGHTS_DATA_HANDLER_URL);
-angular.module('oppia').constant(
-  'GET_CONTRIBUTOR_USERS_HANDLER_URL',
-  PageConstants.GET_CONTRIBUTOR_USERS_HANDLER_URL);
-angular.module('oppia').constant(
-  'TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL',
-  PageConstants.TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL);
+angular
+  .module('oppia')
+  .constant(
+    'CONTRIBUTION_RIGHTS_HANDLER_URL',
+    PageConstants.CONTRIBUTION_RIGHTS_HANDLER_URL
+  );
+angular
+  .module('oppia')
+  .constant(
+    'CONTRIBUTION_RIGHTS_DATA_HANDLER_URL',
+    PageConstants.CONTRIBUTION_RIGHTS_DATA_HANDLER_URL
+  );
+angular
+  .module('oppia')
+  .constant(
+    'GET_CONTRIBUTOR_USERS_HANDLER_URL',
+    PageConstants.GET_CONTRIBUTOR_USERS_HANDLER_URL
+  );
+angular
+  .module('oppia')
+  .constant(
+    'TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL',
+    PageConstants.TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL
+  );

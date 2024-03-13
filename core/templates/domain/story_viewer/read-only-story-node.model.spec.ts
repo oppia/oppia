@@ -16,10 +16,8 @@
  * @fileoverview Tests for ReadOnlyStoryNodeModel.
  */
 
-import { ReadOnlyStoryNode } from
-  'domain/story_viewer/read-only-story-node.model';
-import { LearnerExplorationSummary } from
-  'domain/summary/learner-exploration-summary.model';
+import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Read only story node model', () => {
   var _sampleStoryNode: ReadOnlyStoryNode;
@@ -53,21 +51,22 @@ describe('Read only story node model', () => {
           2: 0,
           3: 0,
           4: 0,
-          5: 0
+          5: 0,
         },
         tags: [],
         activity_type: 'exploration',
-        category: 'Algebra'
+        category: 'Algebra',
       },
       completed: true,
       thumbnail_bg_color: '#a33f40',
-      thumbnail_filename: 'image.png'
+      thumbnail_filename: 'image.png',
     };
     _sampleStoryNode = ReadOnlyStoryNode.createFromBackendDict(
-      sampleReadOnlyStoryNodeBackendDict);
+      sampleReadOnlyStoryNodeBackendDict
+    );
   });
 
-  it('should correctly return all the values', function() {
+  it('should correctly return all the values', function () {
     expect(_sampleStoryNode.getId()).toEqual('node_1');
     expect(_sampleStoryNode.getTitle()).toEqual('Title 1');
     expect(_sampleStoryNode.getDescription()).toEqual('Description');
@@ -92,12 +91,13 @@ describe('Read only story node model', () => {
           2: 0,
           3: 0,
           4: 0,
-          5: 0
+          5: 0,
         },
         tags: [],
         activity_type: 'exploration',
-        category: 'Algebra'
-      }));
+        category: 'Algebra',
+      })
+    );
     expect(_sampleStoryNode.getOutline()).toEqual('Outline');
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);
     expect(_sampleStoryNode.getOutlineStatus()).toEqual(false);

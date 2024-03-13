@@ -16,32 +16,28 @@
  * @fileoverview Module for the signup page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { RegistrationSessionExpiredModalComponent } from './modals/registration-session-expired-modal.component';
-import { LicenseExplanationModalComponent } from './modals/license-explanation-modal.component';
-import { SignupPageRootComponent } from './signup-page-root.component';
-import { SignupPageComponent } from './signup-page.component';
-import { CommonModule } from '@angular/common';
-import { SignupPageRoutingModule } from './signup-page-routing.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {RegistrationSessionExpiredModalComponent} from './modals/registration-session-expired-modal.component';
+import {LicenseExplanationModalComponent} from './modals/license-explanation-modal.component';
+import {SignupPageRootComponent} from './signup-page-root.component';
+import {SignupPageComponent} from './signup-page.component';
+import {CommonModule} from '@angular/common';
+import {SignupPageRoutingModule} from './signup-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    SignupPageRoutingModule
-  ],
+  imports: [CommonModule, SharedComponentsModule, SignupPageRoutingModule],
   declarations: [
     SignupPageComponent,
     SignupPageRootComponent,
     RegistrationSessionExpiredModalComponent,
-    LicenseExplanationModalComponent
+    LicenseExplanationModalComponent,
   ],
   entryComponents: [
     SignupPageComponent,
     SignupPageRootComponent,
     RegistrationSessionExpiredModalComponent,
-    LicenseExplanationModalComponent
-  ]
+    LicenseExplanationModalComponent,
+  ],
 })
 export class SignupPageModule {}

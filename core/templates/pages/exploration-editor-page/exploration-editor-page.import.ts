@@ -27,10 +27,16 @@ import 'third-party-imports/skulpt.import';
 import 'third-party-imports/ui-tree.import';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
+  require('angular-cookies'),
+  'ngAnimate',
   'ngMaterial',
-  'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', 'ui-leaflet', 'ui.tree', uiValidate,
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  'ui-leaflet',
+  'ui.tree',
+  uiValidate,
 ]);
 
 require('Polyfills.ts');
@@ -43,12 +49,15 @@ require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navbar-breadcrumb.component.ts');
+    'editor-navbar-breadcrumb.component.ts'
+);
 require(
   'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.component.ts');
+    'editor-navigation.component.ts'
+);
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.component.ts');
+    'exploration-save-and-publish-buttons.component.ts'
+);
 require('pages/exploration-editor-page/exploration-editor-page.component.ts');
 require('base-components/base-content.component.ts');

@@ -16,41 +16,46 @@
  * @fileoverview Component for the about page.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 import './about-page.component.css';
 
 @Component({
   selector: 'about-page',
   templateUrl: './about-page.component.html',
-  styleUrls: ['./about-page.component.css']
+  styleUrls: ['./about-page.component.css'],
 })
 export class AboutPageComponent {
-  features = [{
-    i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
-    imageFilename: '/about/cc.svg',
-  }, {
-    i18nDescription: 'I18N_ABOUT_PAGE_LESSON_FEATURE',
-    imageFilename: '/about/lesson_icon.svg'
-  }, {
-    i18nDescription: 'I18N_ABOUT_PAGE_MOBILE_FEATURE',
-    imageFilename: '/about/mobile_alt_solid.svg'
-  }, {
-    i18nDescription: 'I18N_ABOUT_PAGE_WIFI_FEATURE',
-    imageFilename: '/about/wifi_solid.svg'
-  }, {
-    i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
-    imageFilename: '/about/language_icon.svg'
-  }];
+  features = [
+    {
+      i18nDescription: 'I18N_ABOUT_PAGE_AUDIO_SUBTITLES_FEATURE',
+      imageFilename: '/about/cc.svg',
+    },
+    {
+      i18nDescription: 'I18N_ABOUT_PAGE_LESSON_FEATURE',
+      imageFilename: '/about/lesson_icon.svg',
+    },
+    {
+      i18nDescription: 'I18N_ABOUT_PAGE_MOBILE_FEATURE',
+      imageFilename: '/about/mobile_alt_solid.svg',
+    },
+    {
+      i18nDescription: 'I18N_ABOUT_PAGE_WIFI_FEATURE',
+      imageFilename: '/about/wifi_solid.svg',
+    },
+    {
+      i18nDescription: 'I18N_ABOUT_PAGE_LANGUAGE_FEATURE',
+      imageFilename: '/about/language_icon.svg',
+    },
+  ];
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private siteAnalyticsService: SiteAnalyticsService,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   getStaticImageUrl(imagePath: string): string {
@@ -69,5 +74,6 @@ export class AboutPageComponent {
     this.siteAnalyticsService.registerCreateLessonButtonEvent();
   }
 }
-angular.module('oppia').directive(
-  'aboutPage', downgradeComponent({component: AboutPageComponent}));
+angular
+  .module('oppia')
+  .directive('aboutPage', downgradeComponent({component: AboutPageComponent}));

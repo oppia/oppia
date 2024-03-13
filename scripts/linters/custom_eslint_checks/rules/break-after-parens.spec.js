@@ -34,17 +34,19 @@ ruleTester.run('break-after-parens', rule, {
     `angular.module('oppia').constant('default',
     false);`,
     `var a = (
-      true);`
+      true);`,
   ],
 
   invalid: [
     {
       code: `var a = (true ||
         true);`,
-      errors: [{
-        message: 'Expected newline after \'(\'.',
-        type: 'Program'
-      }]
-    }
-  ]
+      errors: [
+        {
+          message: "Expected newline after '('.",
+          type: 'Program',
+        },
+      ],
+    },
+  ],
 });

@@ -16,17 +16,15 @@
  * @fileoverview Unit tests for SkillEditorRoutingService.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { SkillEditorRoutingService } from 'pages/skill-editor-page/services/skill-editor-routing.service';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 
 describe('Skill Editor Routing Service', () => {
   let sers: SkillEditorRoutingService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        SkillEditorRoutingService
-      ]
+      providers: [SkillEditorRoutingService],
     });
 
     sers = TestBed.inject(SkillEditorRoutingService);
@@ -50,26 +48,25 @@ describe('Skill Editor Routing Service', () => {
     expect(sers.getTabStatuses()).toBe('main');
   }));
 
-  it('should toggle between main tab, questions and preview tab',
-    fakeAsync(() => {
-      sers.navigateToQuestionsTab();
-      tick();
+  it('should toggle between main tab, questions and preview tab', fakeAsync(() => {
+    sers.navigateToQuestionsTab();
+    tick();
 
-      expect(sers.getActiveTabName()).toBe('questions');
-      expect(sers.getTabStatuses()).toBe('questions');
+    expect(sers.getActiveTabName()).toBe('questions');
+    expect(sers.getTabStatuses()).toBe('questions');
 
-      sers.navigateToPreviewTab();
-      tick();
+    sers.navigateToPreviewTab();
+    tick();
 
-      expect(sers.getActiveTabName()).toBe('preview');
-      expect(sers.getTabStatuses()).toBe('preview');
+    expect(sers.getActiveTabName()).toBe('preview');
+    expect(sers.getTabStatuses()).toBe('preview');
 
-      sers.navigateToMainTab();
-      tick();
+    sers.navigateToMainTab();
+    tick();
 
-      expect(sers.getActiveTabName()).toBe('main');
-      expect(sers.getTabStatuses()).toBe('main');
-    }));
+    expect(sers.getActiveTabName()).toBe('main');
+    expect(sers.getTabStatuses()).toBe('main');
+  }));
 
   it('should open the question-editor directly', fakeAsync(() => {
     sers.creatingNewQuestion(true);

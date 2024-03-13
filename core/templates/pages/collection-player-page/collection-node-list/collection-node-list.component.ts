@@ -16,16 +16,15 @@
  * @fileoverview Component for creating a list of collection nodes which link to
  * playing the exploration in each node.
  */
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { CollectionNode } from
-  'domain/collection/collection-node.model';
+import {CollectionNode} from 'domain/collection/collection-node.model';
 
 @Component({
   selector: 'collection-node-list',
   templateUrl: './collection-node-list.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CollectionNodeListComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -36,6 +35,9 @@ export class CollectionNodeListComponent {
   constructor() {}
 }
 
-angular.module('oppia').directive(
-  'collectionNodeList', downgradeComponent(
-    {component: CollectionNodeListComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'collectionNodeList',
+    downgradeComponent({component: CollectionNodeListComponent})
+  );

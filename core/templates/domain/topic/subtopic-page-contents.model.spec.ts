@@ -16,32 +16,29 @@
  * @fileoverview Tests for SubtopicPageContents Model.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { SubtopicPageContents } from
-  'domain/topic/subtopic-page-contents.model';
-import { RecordedVoiceovers } from
-  'domain/exploration/recorded-voiceovers.model';
-import { SubtitledHtml } from
-  'domain/exploration/subtitled-html.model';
+import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 describe('Subtopic page contents object factory', () => {
   const expectedDefaultObject = {
     subtitled_html: {
       html: '',
-      content_id: 'content'
+      content_id: 'content',
     },
     recorded_voiceovers: {
       voiceovers_mapping: {
-        content: {}
-      }
-    }
+        content: {},
+      },
+    },
   };
 
   const backendDict = {
     subtitled_html: {
       html: 'test content',
-      content_id: 'content'
+      content_id: 'content',
     },
     recorded_voiceovers: {
       voiceovers_mapping: {
@@ -50,16 +47,16 @@ describe('Subtopic page contents object factory', () => {
             filename: 'test.mp3',
             file_size_bytes: 100,
             needs_update: false,
-            duration_secs: 0.2
-          }
-        }
-      }
-    }
+            duration_secs: 0.2,
+          },
+        },
+      },
+    },
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SubtopicPageContents]
+      providers: [SubtopicPageContents],
     });
   });
 
@@ -69,74 +66,89 @@ describe('Subtopic page contents object factory', () => {
   });
 
   it('should convert from a backend dictionary', () => {
-    const sampleSubtopicPageContents = (
-      SubtopicPageContents.createFromBackendDict(backendDict));
+    const sampleSubtopicPageContents =
+      SubtopicPageContents.createFromBackendDict(backendDict);
 
-    expect(sampleSubtopicPageContents.getSubtitledHtml().html)
-      .toEqual('test content');
+    expect(sampleSubtopicPageContents.getSubtitledHtml().html).toEqual(
+      'test content'
+    );
     expect(sampleSubtopicPageContents.getHtml()).toEqual('test content');
-    expect(sampleSubtopicPageContents.getSubtitledHtml().contentId)
-      .toEqual('content');
-    expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
-      'content', 'en').toBackendDict()).toEqual({
+    expect(sampleSubtopicPageContents.getSubtitledHtml().contentId).toEqual(
+      'content'
+    );
+    expect(
+      sampleSubtopicPageContents
+        .getRecordedVoiceovers()
+        .getVoiceover('content', 'en')
+        .toBackendDict()
+    ).toEqual({
       filename: 'test.mp3',
       file_size_bytes: 100,
       needs_update: false,
-      duration_secs: 0.2
+      duration_secs: 0.2,
     });
   });
 
   it('should convert from a backend dictionary', () => {
-    const sampleSubtopicPageContents = (
-      SubtopicPageContents.createFromBackendDict(backendDict));
+    const sampleSubtopicPageContents =
+      SubtopicPageContents.createFromBackendDict(backendDict);
     expect(sampleSubtopicPageContents.toBackendDict()).toEqual(backendDict);
   });
 
   it('should change html from subtitleHtml property in object', () => {
-    const sampleSubtopicPageContents = (
-      SubtopicPageContents.createFromBackendDict(backendDict));
+    const sampleSubtopicPageContents =
+      SubtopicPageContents.createFromBackendDict(backendDict);
 
-    expect(sampleSubtopicPageContents.getSubtitledHtml().html)
-      .toEqual('test content');
+    expect(sampleSubtopicPageContents.getSubtitledHtml().html).toEqual(
+      'test content'
+    );
     expect(sampleSubtopicPageContents.getHtml()).toEqual('test content');
 
     sampleSubtopicPageContents.setHtml('new html content');
 
-    expect(sampleSubtopicPageContents.getSubtitledHtml().html)
-      .toEqual('new html content');
+    expect(sampleSubtopicPageContents.getSubtitledHtml().html).toEqual(
+      'new html content'
+    );
     expect(sampleSubtopicPageContents.getHtml()).toEqual('new html content');
   });
 
   it('should change subtitled html in object', () => {
-    const sampleSubtopicPageContents = (
-      SubtopicPageContents.createFromBackendDict(backendDict));
+    const sampleSubtopicPageContents =
+      SubtopicPageContents.createFromBackendDict(backendDict);
 
     expect(sampleSubtopicPageContents.getSubtitledHtml()).toEqual(
       SubtitledHtml.createFromBackendDict({
         html: 'test content',
-        content_id: 'content'
-      }));
+        content_id: 'content',
+      })
+    );
 
     sampleSubtopicPageContents.setSubtitledHtml(
-      SubtitledHtml.createDefault('new html content', 'new id'));
+      SubtitledHtml.createDefault('new html content', 'new id')
+    );
 
     expect(sampleSubtopicPageContents.getSubtitledHtml()).toEqual(
       SubtitledHtml.createFromBackendDict({
         html: 'new html content',
-        content_id: 'new id'
-      }));
+        content_id: 'new id',
+      })
+    );
   });
 
   it('should change recorded voiceovers in object', () => {
-    const sampleSubtopicPageContents = (
-      SubtopicPageContents.createFromBackendDict(backendDict));
+    const sampleSubtopicPageContents =
+      SubtopicPageContents.createFromBackendDict(backendDict);
 
-    expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
-      'content', 'en').toBackendDict()).toEqual({
+    expect(
+      sampleSubtopicPageContents
+        .getRecordedVoiceovers()
+        .getVoiceover('content', 'en')
+        .toBackendDict()
+    ).toEqual({
       filename: 'test.mp3',
       file_size_bytes: 100,
       needs_update: false,
-      duration_secs: 0.2
+      duration_secs: 0.2,
     });
 
     sampleSubtopicPageContents.setRecordedVoiceovers(
@@ -147,18 +159,23 @@ describe('Subtopic page contents object factory', () => {
               filename: 'new_file.mp3',
               file_size_bytes: 300,
               needs_update: false,
-              duration_secs: 0.6
-            }
-          }
-        }
-      }));
+              duration_secs: 0.6,
+            },
+          },
+        },
+      })
+    );
 
-    expect(sampleSubtopicPageContents.getRecordedVoiceovers().getVoiceover(
-      'content', 'en').toBackendDict()).toEqual({
+    expect(
+      sampleSubtopicPageContents
+        .getRecordedVoiceovers()
+        .getVoiceover('content', 'en')
+        .toBackendDict()
+    ).toEqual({
       filename: 'new_file.mp3',
       file_size_bytes: 300,
       needs_update: false,
-      duration_secs: 0.6
+      duration_secs: 0.6,
     });
   });
 });
