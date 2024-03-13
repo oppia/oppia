@@ -37,6 +37,7 @@ export enum FeatureNames {
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled',
   CdAdminDashboardNewUi = 'cd_admin_dashboard_new_ui',
   NewLessonPlayer = 'new_lesson_player',
+  UndoTranslationStatus = 'undo_translation_status',
 }
 
 export interface FeatureStatusSummaryBackendDict {

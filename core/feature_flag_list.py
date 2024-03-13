@@ -49,6 +49,7 @@ class FeatureNames(enum.Enum):
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     NEW_LESSON_PLAYER = 'new_lesson_player'
+    UNDO_TRANSLATION_STATUS = 'undo_translation_status'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -73,7 +74,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.NEW_LESSON_PLAYER
+    FeatureNames.NEW_LESSON_PLAYER,
+    FeatureNames.UNDO_TRANSLATION_STATUS
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -192,6 +194,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.NEW_LESSON_PLAYER.value: (
         (
             'This flag is to enable the exploration player redesign.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.UNDO_TRANSLATION_STATUS.value: (
+        (
+            'This flag to let translation reviewers undo the status '
+            'of translation reviews.',
             feature_flag_domain.ServerMode.DEV
         )
     )
