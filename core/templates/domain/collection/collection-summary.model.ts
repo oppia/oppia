@@ -17,18 +17,18 @@
  */
 
 export interface CollectionSummaryBackendDict {
-  'category': string;
-  'community_owned': boolean;
-  'last_updated_msec': number;
-  'id': string;
-  'created_on': number;
-  'language_code': string;
-  'objective': string;
-  'status': string;
-  'thumbnail_bg_color': string;
-  'thumbnail_icon_url': string;
-  'title': string;
-  'node_count': number;
+  category: string;
+  community_owned: boolean;
+  last_updated_msec: number;
+  id: string;
+  created_on: number;
+  language_code: string;
+  objective: string;
+  status: string;
+  thumbnail_bg_color: string;
+  thumbnail_icon_url: string;
+  title: string;
+  node_count: number;
 }
 
 export class CollectionSummary {
@@ -44,10 +44,12 @@ export class CollectionSummary {
     public thumbnailBgColor: string,
     public thumbnailIconUrl: string,
     public title: string,
-    public nodeCount: number) {}
+    public nodeCount: number
+  ) {}
 
   static createFromBackendDict(
-      collectionSummaryDict: CollectionSummaryBackendDict): CollectionSummary {
+    collectionSummaryDict: CollectionSummaryBackendDict
+  ): CollectionSummary {
     return new CollectionSummary(
       collectionSummaryDict.category,
       collectionSummaryDict.community_owned,
@@ -60,6 +62,7 @@ export class CollectionSummary {
       collectionSummaryDict.thumbnail_bg_color,
       collectionSummaryDict.thumbnail_icon_url,
       collectionSummaryDict.title,
-      collectionSummaryDict.node_count);
+      collectionSummaryDict.node_count
+    );
   }
 }

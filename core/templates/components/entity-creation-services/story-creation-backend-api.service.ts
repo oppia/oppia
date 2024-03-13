@@ -16,24 +16,24 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { CreateNewStoryModalComponent } from 'pages/topic-editor-page/modal-templates/create-new-story-modal.component';
-import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
-import { AlertsService } from 'services/alerts.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { LoaderService } from 'services/loader.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CreateNewStoryModalComponent} from 'pages/topic-editor-page/modal-templates/create-new-story-modal.component';
+import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
+import {AlertsService} from 'services/alerts.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {LoaderService} from 'services/loader.service';
 
 interface StoryCreationResponse {
   storyId: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StoryCreationBackendApiService {
   constructor(
@@ -52,25 +52,34 @@ export class StoryCreationBackendApiService {
   storyCreationInProgress = false;
 
   private _createStory(
-      createStoryUrl: string, body: FormData,
-      successCallback: (value: StoryCreationResponse) => void,
-      errorCallback: (reason: string) => void): void {
-    this.http.post<StoryCreationResponse>(
-      createStoryUrl, body).toPromise().then((response) => {
-      if (successCallback) {
-        successCallback({
-          storyId: response.storyId
-        });
-      }
-    }, errorResponse => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
+    createStoryUrl: string,
+    body: FormData,
+    successCallback: (value: StoryCreationResponse) => void,
+    errorCallback: (reason: string) => void
+  ): void {
+    this.http
+      .post<StoryCreationResponse>(createStoryUrl, body)
+      .toPromise()
+      .then(
+        response => {
+          if (successCallback) {
+            successCallback({
+              storyId: response.storyId,
+            });
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        }
+      );
   }
 
   async createStoryAsync(
-      createStoryUrl: string, body: FormData): Promise<StoryCreationResponse> {
+    createStoryUrl: string,
+    body: FormData
+  ): Promise<StoryCreationResponse> {
     return new Promise((resolve, reject) => {
       this._createStory(createStoryUrl, body, resolve, reject);
     });
@@ -81,56 +90,66 @@ export class StoryCreationBackendApiService {
       return;
     }
 
-    const modalRef = this.ngbModal.open(
-      CreateNewStoryModalComponent, {
-        backdrop: 'static',
-      });
-    modalRef.result.then((newlyCreatedStory) => {
-      if (!newlyCreatedStory.isValid()) {
-        throw new Error('Story fields cannot be empty');
-      }
-      this.storyCreationInProgress = true;
-      this.alertsService.clearWarnings();
-      let topic = this.topicEditorStateService.getTopic();
-      this.loaderService.showLoadingScreen('Creating story');
-      let createStoryUrl = this.urlInterpolationService.interpolateUrl(
-        this.STORY_CREATOR_URL_TEMPLATE, {
-          topic_id: topic.getId()
-        }
-      );
-      let imagesData = this.imageLocalStorageService.getStoredImagesData();
-      let bgColor = this.imageLocalStorageService.getThumbnailBgColor();
-      let postData = {
-        title: newlyCreatedStory.title,
-        description: newlyCreatedStory.description,
-        story_url_fragment: newlyCreatedStory.urlFragment,
-        thumbnailBgColor: bgColor,
-        filename: imagesData[0].filename
-      };
-
-      let body = new FormData();
-      body.append('payload', JSON.stringify(postData));
-      body.append('image', imagesData[0].imageBlob);
-
-      this.createStoryAsync(createStoryUrl, body).then((response) => {
-        this.windowRef.nativeWindow.location.href = (
-          this.urlInterpolationService.interpolateUrl(
-            this.STORY_EDITOR_URL_TEMPLATE, {
-              story_id: response.storyId
-            }
-          ));
-      }, () => {
-        this.loaderService.hideLoadingScreen();
-        this.imageLocalStorageService.flushStoredImagesData();
-      });
-    }, () =>{
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
+    const modalRef = this.ngbModal.open(CreateNewStoryModalComponent, {
+      backdrop: 'static',
     });
+    modalRef.result.then(
+      newlyCreatedStory => {
+        if (!newlyCreatedStory.isValid()) {
+          throw new Error('Story fields cannot be empty');
+        }
+        this.storyCreationInProgress = true;
+        this.alertsService.clearWarnings();
+        let topic = this.topicEditorStateService.getTopic();
+        this.loaderService.showLoadingScreen('Creating story');
+        let createStoryUrl = this.urlInterpolationService.interpolateUrl(
+          this.STORY_CREATOR_URL_TEMPLATE,
+          {
+            topic_id: topic.getId(),
+          }
+        );
+        let imagesData = this.imageLocalStorageService.getStoredImagesData();
+        let bgColor = this.imageLocalStorageService.getThumbnailBgColor();
+        let postData = {
+          title: newlyCreatedStory.title,
+          description: newlyCreatedStory.description,
+          story_url_fragment: newlyCreatedStory.urlFragment,
+          thumbnailBgColor: bgColor,
+          filename: imagesData[0].filename,
+        };
+
+        let body = new FormData();
+        body.append('payload', JSON.stringify(postData));
+        body.append('image', imagesData[0].imageBlob);
+
+        this.createStoryAsync(createStoryUrl, body).then(
+          response => {
+            this.windowRef.nativeWindow.location.href =
+              this.urlInterpolationService.interpolateUrl(
+                this.STORY_EDITOR_URL_TEMPLATE,
+                {
+                  story_id: response.storyId,
+                }
+              );
+          },
+          () => {
+            this.loaderService.hideLoadingScreen();
+            this.imageLocalStorageService.flushStoredImagesData();
+          }
+        );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'StoryCreationBackendApiService',
-  downgradeInjectable(StoryCreationBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'StoryCreationBackendApiService',
+    downgradeInjectable(StoryCreationBackendApiService)
+  );

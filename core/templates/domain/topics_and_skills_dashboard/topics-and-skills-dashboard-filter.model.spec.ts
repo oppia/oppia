@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for TopicsAndSkillsDashboardFilter model.
  */
 
-import { ETopicPublishedOptions, ETopicSortOptions } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import {
+  ETopicPublishedOptions,
+  ETopicSortOptions,
+} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
-import { TopicsAndSkillsDashboardFilter } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
+import {TopicsAndSkillsDashboardFilter} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-filter.model';
 
 describe('Topics And Skills Dashboard Filter Model', () => {
   let filter: TopicsAndSkillsDashboardFilter;

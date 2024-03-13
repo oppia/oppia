@@ -18,35 +18,30 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
 
-import { MaterialModule } from 'modules/material.module';
-import { ShortResponseNumericExpressionInput } from './directives/oppia-short-response-numeric-expression-input.component';
-import { ResponseNumericExpressionInput } from './directives/oppia-response-numeric-expression-input.component';
-import { InteractiveNumericExpressionInput } from './directives/oppia-interactive-numeric-expression-input.component';
-
+import {MaterialModule} from 'modules/material.module';
+import {ShortResponseNumericExpressionInput} from './directives/oppia-short-response-numeric-expression-input.component';
+import {ResponseNumericExpressionInput} from './directives/oppia-response-numeric-expression-input.component';
+import {InteractiveNumericExpressionInput} from './directives/oppia-interactive-numeric-expression-input.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MaterialModule
-  ],
+  imports: [CommonModule, MaterialModule],
   declarations: [
     ResponseNumericExpressionInput,
     ShortResponseNumericExpressionInput,
-    InteractiveNumericExpressionInput
+    InteractiveNumericExpressionInput,
   ],
   entryComponents: [
     ResponseNumericExpressionInput,
     ShortResponseNumericExpressionInput,
-    InteractiveNumericExpressionInput
+    InteractiveNumericExpressionInput,
   ],
   exports: [
     ResponseNumericExpressionInput,
     ShortResponseNumericExpressionInput,
-    InteractiveNumericExpressionInput
+    InteractiveNumericExpressionInput,
   ],
 })
-
 export class NumericExpressionInputModule {}

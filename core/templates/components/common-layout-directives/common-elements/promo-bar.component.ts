@@ -18,15 +18,15 @@
  * dismissible.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
 
 @Component({
   selector: 'oppia-promo-bar',
-  templateUrl: './promo-bar.component.html'
+  templateUrl: './promo-bar.component.html',
 })
 export class PromoBarComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -42,11 +42,10 @@ export class PromoBarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.promoBarBackendApiService.getPromoBarDataAsync()
-      .then((promoBar) => {
-        this.promoBarIsEnabled = promoBar.promoBarEnabled;
-        this.promoBarMessage = promoBar.promoBarMessage;
-      });
+    this.promoBarBackendApiService.getPromoBarDataAsync().then(promoBar => {
+      this.promoBarIsEnabled = promoBar.promoBarEnabled;
+      this.promoBarMessage = promoBar.promoBarMessage;
+    });
     this.promoIsVisible = !this.isPromoDismissed();
   }
 
@@ -56,7 +55,7 @@ export class PromoBarComponent implements OnInit {
     }
     let promoIsDismissed =
       this.windowRef.nativeWindow.sessionStorage.promoIsDismissed;
-    if (typeof (promoIsDismissed) !== 'undefined') {
+    if (typeof promoIsDismissed !== 'undefined') {
       return JSON.parse(promoIsDismissed);
     }
     return false;
@@ -89,6 +88,9 @@ export class PromoBarComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaPromoBar', downgradeComponent(
-    {component: PromoBarComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaPromoBar',
+    downgradeComponent({component: PromoBarComponent})
+  );

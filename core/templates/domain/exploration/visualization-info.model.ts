@@ -16,30 +16,28 @@
  * @fileoverview Frontend model for visualization info.
  */
 
-import { AnswerStats } from
-  'domain/exploration/answer-stats.model';
-import { InteractionAnswer } from
-  'interactions/answer-defs';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 export interface AnswerStatsBackendDict {
-  'answer': InteractionAnswer;
-  'frequency': number;
+  answer: InteractionAnswer;
+  frequency: number;
 
   // N/A when the visualization can not present addressed answers.
   //
   // For example, for SetInput interactions the individual answer elements are
   // not generally intended to be used as a single response to SetInput
   // interactions, so we omit addressed information entirely.
-  'is_addressed': boolean;
+  is_addressed: boolean;
 }
 
 export type Option = string | string[];
 
 export interface VisualizationInfoBackendDict {
-  'addressed_info_is_supported': boolean;
-  'data': AnswerStatsBackendDict[];
-  'id': string;
-  'options': {
+  addressed_info_is_supported: boolean;
+  data: AnswerStatsBackendDict[];
+  id: string;
+  options: {
     [name: string]: Option;
   };
 }
@@ -53,8 +51,11 @@ export class VisualizationInfo {
   };
 
   constructor(
-      addressedInfoIsSupported: boolean, data: AnswerStats[], id: string,
-      options: { [name: string]: Object }) {
+    addressedInfoIsSupported: boolean,
+    data: AnswerStats[],
+    id: string,
+    options: {[name: string]: Object}
+  ) {
     this.addressedInfoIsSupported = addressedInfoIsSupported;
     this.data = data;
     this.id = id;
@@ -62,19 +63,29 @@ export class VisualizationInfo {
   }
 
   static createFromBackendDict(
-      backendDict: VisualizationInfoBackendDict): VisualizationInfo {
+    backendDict: VisualizationInfoBackendDict
+  ): VisualizationInfo {
     let answerStatsDicts = backendDict.data;
-    let answerStatsObjects = answerStatsDicts.map((
-        answerStatsDict: AnswerStatsBackendDict) => {
-      let answerHtml = (typeof answerStatsDict.answer === 'string') ?
-      answerStatsDict.answer : JSON.stringify(answerStatsDict.answer);
-      return new AnswerStats(
-        answerStatsDict.answer, answerHtml, answerStatsDict.frequency,
-        answerStatsDict.is_addressed);
-    });
+    let answerStatsObjects = answerStatsDicts.map(
+      (answerStatsDict: AnswerStatsBackendDict) => {
+        let answerHtml =
+          typeof answerStatsDict.answer === 'string'
+            ? answerStatsDict.answer
+            : JSON.stringify(answerStatsDict.answer);
+        return new AnswerStats(
+          answerStatsDict.answer,
+          answerHtml,
+          answerStatsDict.frequency,
+          answerStatsDict.is_addressed
+        );
+      }
+    );
 
     return new VisualizationInfo(
-      backendDict.addressed_info_is_supported, answerStatsObjects,
-      backendDict.id, backendDict.options);
+      backendDict.addressed_info_is_supported,
+      answerStatsObjects,
+      backendDict.id,
+      backendDict.options
+    );
   }
 }

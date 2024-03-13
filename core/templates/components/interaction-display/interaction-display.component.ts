@@ -16,13 +16,18 @@
  * @fileoverview Component for dynamically building and showing interactions.
  */
 
-import { ChangeDetectorRef, Component, ComponentFactoryResolver, Input,
+import {
+  ChangeDetectorRef,
+  Component,
+  ComponentFactoryResolver,
+  Input,
   SimpleChange,
-  ViewChild, ViewContainerRef }
-  from '@angular/core';
+  ViewChild,
+  ViewContainerRef,
+} from '@angular/core';
 import camelCaseFromHyphen from 'utility/string-utility';
 
-import { TAG_TO_INTERACTION_MAPPING } from 'interactions/tag-to-interaction-mapping';
+import {TAG_TO_INTERACTION_MAPPING} from 'interactions/tag-to-interaction-mapping';
 
 @Component({
   selector: 'oppia-interaction-display',
@@ -41,7 +46,9 @@ export class InteractionDisplayComponent {
   @Input() parentScope!: unknown;
 
   @ViewChild('interactionContainer', {
-    read: ViewContainerRef}) viewContainerRef!: ViewContainerRef;
+    read: ViewContainerRef,
+  })
+  viewContainerRef!: ViewContainerRef;
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -57,22 +64,22 @@ export class InteractionDisplayComponent {
       let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
 
-      if (dom.body.firstElementChild &&
-        TAG_TO_INTERACTION_MAPPING[
-          dom.body.firstElementChild.tagName]) {
-        let interaction = TAG_TO_INTERACTION_MAPPING[
-          dom.body.firstElementChild.tagName];
+      if (
+        dom.body.firstElementChild &&
+        TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName]
+      ) {
+        let interaction =
+          TAG_TO_INTERACTION_MAPPING[dom.body.firstElementChild.tagName];
 
-        const componentFactory = this.componentFactoryResolver
-          .resolveComponentFactory(interaction);
-        const componentRef = this.viewContainerRef.createComponent(
-          componentFactory);
+        const componentFactory =
+          this.componentFactoryResolver.resolveComponentFactory(interaction);
+        const componentRef =
+          this.viewContainerRef.createComponent(componentFactory);
 
         let attributes = dom.body.firstElementChild.attributes;
 
         Array.from(attributes).forEach(attribute => {
-          let attributeNameInCamelCase = camelCaseFromHyphen(
-            attribute.name);
+          let attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
 
           let attributeValue = attribute.value;
 
@@ -91,7 +98,9 @@ export class InteractionDisplayComponent {
             }
           } else {
             componentRef.location.nativeElement.setAttribute(
-              attribute.name, attributeValue);
+              attribute.name,
+              attributeValue
+            );
           }
 
           componentRef.instance[attributeNameInCamelCase] = attributeValue;
@@ -103,9 +112,11 @@ export class InteractionDisplayComponent {
     }
   }
 
-  ngOnChanges(changes: { htmlData: SimpleChange }): void {
-    if (changes.htmlData.currentValue !== changes.htmlData.previousValue &&
-      this.viewContainerRef) {
+  ngOnChanges(changes: {htmlData: SimpleChange}): void {
+    if (
+      changes.htmlData.currentValue !== changes.htmlData.previousValue &&
+      this.viewContainerRef
+    ) {
       this.viewContainerRef.clear();
       this.buildInteraction();
     }

@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for admin navbar component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { APP_BASE_HREF } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { UserInfo } from 'domain/user/user-info.model';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {APP_BASE_HREF} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {UserInfo} from 'domain/user/user-info.model';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
-import { UserService } from 'services/user.service';
-import { AdminRouterService } from '../services/admin-router.service';
-import { AdminNavbarComponent } from './admin-navbar.component';
+import {UserService} from 'services/user.service';
+import {AdminRouterService} from '../services/admin-router.service';
+import {AdminNavbarComponent} from './admin-navbar.component';
 
 describe('Admin Navbar component', () => {
   let component: AdminNavbarComponent;
@@ -36,7 +42,7 @@ describe('Admin Navbar component', () => {
   let userInfo = {
     isModerator: () => true,
     getUsername: () => 'username1',
-    isSuperAdmin: () => true
+    isSuperAdmin: () => true,
   };
   let imagePath = '/path/to/image.png';
   let profileUrl = '/profile/username1';
@@ -49,13 +55,15 @@ describe('Admin Navbar component', () => {
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
         SmartRouterModule,
-        RouterModule.forRoot([])
+        RouterModule.forRoot([]),
       ],
       declarations: [AdminNavbarComponent],
-      providers: [{
-        provide: APP_BASE_HREF,
-        useValue: '/'
-      }]
+      providers: [
+        {
+          provide: APP_BASE_HREF,
+          useValue: '/',
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminNavbarComponent);
@@ -64,13 +72,14 @@ describe('Admin Navbar component', () => {
     adminRouterService = TestBed.get(AdminRouterService);
     fixture.detectChanges();
 
-    spyOn(userService, 'getProfileImageDataUrl')
-      .and.returnValue([userProfilePngImage, userProfileWebpImage]);
+    spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+      userProfilePngImage,
+      userProfileWebpImage,
+    ]);
   }));
 
   it('should initialize component properties correctly', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -78,7 +87,8 @@ describe('Admin Navbar component', () => {
     expect(component.profilePicturePngDataUrl).toBe(userProfilePngImage);
     expect(component.profilePictureWebpDataUrl).toBe(userProfileWebpImage);
     expect(component.getStaticImageUrl(imagePath)).toBe(
-      '/assets/images/path/to/image.png');
+      '/assets/images/path/to/image.png'
+    );
     expect(component.username).toBe('username1');
     expect(component.isModerator).toBe(true);
     expect(component.isSuperAdmin).toBe(true);
@@ -92,10 +102,9 @@ describe('Admin Navbar component', () => {
     let userInfo = {
       isModerator: () => true,
       getUsername: () => null,
-      isSuperAdmin: () => true
+      isSuperAdmin: () => true,
     };
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     expect(() => {
       component.ngOnInit();
@@ -104,8 +113,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should be routed to the activities tab by default', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -118,8 +126,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should be routed to the config tab', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -140,8 +147,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should be routed to the platform params tab', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -162,8 +168,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should be routed to the roles tab', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -184,8 +189,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should be routed to the misc tab', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -206,8 +210,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should set profileDropdownIsActive to true', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -220,8 +223,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should set profileDropdownIsActive to false', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -236,8 +238,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should set dropdownMenuIsActive to true', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();
@@ -250,8 +251,7 @@ describe('Admin Navbar component', () => {
   }));
 
   it('should set dropdownMenuIsActive to false', fakeAsync(() => {
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     component.ngOnInit();
     tick();

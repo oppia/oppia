@@ -20,30 +20,30 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { GuppyConfigurationService } from 'services/guppy-configuration.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { AlgebraicExpressionInputRulesService } from './algebraic-expression-input-rules.service';
-import { AppConstants } from 'app.constants';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { TranslateService } from '@ngx-translate/core';
+import {Component, Input, OnInit, OnDestroy} from '@angular/core';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {GuppyConfigurationService} from 'services/guppy-configuration.service';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {AlgebraicExpressionInputRulesService} from './algebraic-expression-input-rules.service';
+import {AppConstants} from 'app.constants';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {TranslateService} from '@ngx-translate/core';
 
 interface FocusObj {
   focused: boolean;
 }
 
-
 @Component({
   selector: 'oppia-interactive-algebraic-expression-input',
   templateUrl: './algebraic-expression-input-interaction.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class AlgebraicExpressionInputInteractionComponent
-    implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -56,29 +56,32 @@ export class AlgebraicExpressionInputInteractionComponent
   warningText: string = '';
 
   constructor(
-    private algebraicExpressionInputRulesService:
-      AlgebraicExpressionInputRulesService,
+    private algebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
     private currentInteractionService: CurrentInteractionService,
     private guppyConfigurationService: GuppyConfigurationService,
     private guppyInitializationService: GuppyInitializationService,
     private htmlEscaperService: HtmlEscaperService,
     private mathInteractionsService: MathInteractionsService,
-    private translateService: TranslateService,
+    private translateService: TranslateService
   ) {}
 
   isCurrentAnswerValid(checkForTouched = true): boolean {
-    const activeGuppyObject = (
-      this.guppyInitializationService.findActiveGuppyObject());
+    const activeGuppyObject =
+      this.guppyInitializationService.findActiveGuppyObject();
     if (
       (!checkForTouched || this.hasBeenTouched) &&
-      activeGuppyObject === undefined) {
+      activeGuppyObject === undefined
+    ) {
       // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
       // is not compatible with nerdamer or with the backend validations.
       this.value = this.mathInteractionsService.replaceAbsSymbolWithText(
-        this.value);
-      let answerIsValid = (
+        this.value
+      );
+      let answerIsValid =
         this.mathInteractionsService.validateAlgebraicExpression(
-          this.value, this.guppyInitializationService.getAllowedVariables()));
+          this.value,
+          this.guppyInitializationService.getAllowedVariables()
+        );
       this.warningText = this.mathInteractionsService.getWarningText();
       return answerIsValid;
     }
@@ -92,12 +95,14 @@ export class AlgebraicExpressionInputInteractionComponent
       return;
     }
     this.currentInteractionService.onSubmit(
-      this.value, this.algebraicExpressionInputRulesService);
+      this.value,
+      this.algebraicExpressionInputRulesService
+    );
   }
 
   onAnswerChange(focusObj: FocusObj): void {
-    const activeGuppyObject = (
-      this.guppyInitializationService.findActiveGuppyObject());
+    const activeGuppyObject =
+      this.guppyInitializationService.findActiveGuppyObject();
     if (activeGuppyObject !== undefined) {
       this.hasBeenTouched = true;
       this.value = activeGuppyObject.guppyInstance.asciimath();
@@ -113,17 +118,20 @@ export class AlgebraicExpressionInputInteractionComponent
     this.viewIsDestroyed = false;
     this.guppyConfigurationService.init();
     this.guppyConfigurationService.changeDivSymbol(
-      JSON.parse(this.useFractionForDivisionWithValue || 'false'));
+      JSON.parse(this.useFractionForDivisionWithValue || 'false')
+    );
     this.guppyInitializationService.setAllowedVariables(
       this.htmlEscaperService.escapedJsonToObj(
-        this.allowedVariablesWithValue) as string[]
+        this.allowedVariablesWithValue
+      ) as string[]
     );
     let translatedPlaceholder = this.translateService.instant(
-      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput
+    );
     this.guppyInitializationService.init(
       'guppy-div-learner',
       translatedPlaceholder,
-      this.savedSolution !== undefined ? this.savedSolution as string : ''
+      this.savedSolution !== undefined ? (this.savedSolution as string) : ''
     );
 
     Guppy.event('change', this.onAnswerChange.bind(this));
@@ -137,7 +145,9 @@ export class AlgebraicExpressionInputInteractionComponent
     });
 
     this.currentInteractionService.registerCurrentInteraction(
-      this.submitAnswer.bind(this), this.isCurrentAnswerValid.bind(this));
+      this.submitAnswer.bind(this),
+      this.isCurrentAnswerValid.bind(this)
+    );
   }
 
   ngOnDestroy(): void {
@@ -152,8 +162,7 @@ export class AlgebraicExpressionInputInteractionComponent
 
 angular.module('oppia').directive(
   'oppiaInteractiveAlgebraicExpressionInput',
-  downgradeComponent(
-    {
-      component: AlgebraicExpressionInputInteractionComponent
-    }
-  ) as angular.IDirectiveFactory);
+  downgradeComponent({
+    component: AlgebraicExpressionInputInteractionComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,20 +16,19 @@
  * @fileoverview Contributor Dashboard Admin page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-contributor-dashboard-admin-page-root',
   templateUrl: './contributor-dashboard-admin-page-root.component.html',
 })
-export class ContributorDashboardAdminPageRootComponent
-  extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .CONTRIBUTOR_DASHBOARD_ADMIN.TITLE;
+export class ContributorDashboardAdminPageRootComponent extends BaseRootComponent {
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD_ADMIN
+      .TITLE;
 
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN
+    .META as unknown as Readonly<MetaTagData>[];
 }

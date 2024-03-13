@@ -16,10 +16,9 @@
  * @fileoverview Tests for UnderscoresToCamelCasePipe for Oppia.
  */
 
-import { UnderscoresToCamelCasePipe } from
-  'filters/string-utility-filters/underscores-to-camel-case.pipe';
+import {UnderscoresToCamelCasePipe} from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let underscoresToCamelCase: UnderscoresToCamelCasePipe;
   beforeEach(() => {
     underscoresToCamelCase = new UnderscoresToCamelCasePipe();
@@ -33,17 +32,21 @@ describe('Testing filters', function() {
     expect(underscoresToCamelCase.transform('Test')).toEqual('Test');
     expect(underscoresToCamelCase.transform('test')).toEqual('test');
     expect(underscoresToCamelCase.transform('test_app')).toEqual('testApp');
-    expect(underscoresToCamelCase.transform('Test_App_Two'))
-      .toEqual('TestAppTwo');
-    expect(underscoresToCamelCase.transform('test_App_Two'))
-      .toEqual('testAppTwo');
-    expect(underscoresToCamelCase.transform('test_app_two'))
-      .toEqual('testAppTwo');
+    expect(underscoresToCamelCase.transform('Test_App_Two')).toEqual(
+      'TestAppTwo'
+    );
+    expect(underscoresToCamelCase.transform('test_App_Two')).toEqual(
+      'testAppTwo'
+    );
+    expect(underscoresToCamelCase.transform('test_app_two')).toEqual(
+      'testAppTwo'
+    );
     expect(underscoresToCamelCase.transform('test__App')).toEqual('testApp');
     // Trailing underscores at the beginning and end should never happen --
     // they will give weird results.
     expect(underscoresToCamelCase.transform('_test_App')).toEqual('TestApp');
-    expect(underscoresToCamelCase.transform('__Test_ App_'))
-      .toEqual('Test App_');
+    expect(underscoresToCamelCase.transform('__Test_ App_')).toEqual(
+      'Test App_'
+    );
   });
 });

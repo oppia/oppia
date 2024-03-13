@@ -14,15 +14,14 @@
 
 /**
  * @fileoverview Unit tests for PopulateRuleContentIdsService.
-*/
+ */
 
-import { TestBed } from '@angular/core/testing';
-import { Rule } from 'domain/exploration/rule.model';
-import { TranslatableSetOfNormalizedString } from 'interactions/rule-input-defs';
+import {TestBed} from '@angular/core/testing';
+import {Rule} from 'domain/exploration/rule.model';
+import {TranslatableSetOfNormalizedString} from 'interactions/rule-input-defs';
 
-import { PopulateRuleContentIdsService } from
-  'pages/exploration-editor-page/services/populate-rule-content-ids.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
+import {PopulateRuleContentIdsService} from 'pages/exploration-editor-page/services/populate-rule-content-ids.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 describe('Populate Rule Content Ids Service', () => {
   let populateRuleContentIdsService: PopulateRuleContentIdsService;
@@ -31,17 +30,22 @@ describe('Populate Rule Content Ids Service', () => {
   beforeEach(() => {
     populateRuleContentIdsService = TestBed.get(PopulateRuleContentIdsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
+    generateContentIdService.init(
+      () => 0,
+      () => {}
+    );
   });
 
   it('should populate null content ids on save', () => {
     let rule = new Rule(
-      'Equals', {
+      'Equals',
+      {
         x: {
           contentId: null,
-          normalizedStrSet: []
-        }
-      }, { x: 'TranslatableSetOfNormalizedString' },
+          normalizedStrSet: [],
+        },
+      },
+      {x: 'TranslatableSetOfNormalizedString'}
     );
     let content = rule.inputs.x as TranslatableSetOfNormalizedString;
     expect(content.contentId).toBeNull();
@@ -52,10 +56,13 @@ describe('Populate Rule Content Ids Service', () => {
   it('should not populate non-null content ids on save', () => {
     const ruleInput = {
       contentId: 'rule_input',
-      normalizedStrSet: []
+      normalizedStrSet: [],
     };
     let rule = new Rule(
-      'Equals', { x: ruleInput }, { x: 'TranslatableSetOfNormalizedString' });
+      'Equals',
+      {x: ruleInput},
+      {x: 'TranslatableSetOfNormalizedString'}
+    );
 
     let content = rule.inputs.x as TranslatableSetOfNormalizedString;
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
@@ -64,7 +71,10 @@ describe('Populate Rule Content Ids Service', () => {
 
   it('should not populate content ids if input does not need one', () => {
     let rule = new Rule(
-      'HasNumberOfTermsEqualTo', { y: 1 }, { y: 'NonnegativeInt' });
+      'HasNumberOfTermsEqualTo',
+      {y: 1},
+      {y: 'NonnegativeInt'}
+    );
 
     populateRuleContentIdsService.populateNullRuleContentIds(rule);
     expect(rule.inputs).toEqual({y: 1});
