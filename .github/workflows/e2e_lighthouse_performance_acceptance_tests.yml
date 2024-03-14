@@ -155,6 +155,7 @@ jobs:
   acceptance_test:
       runs-on:  ${{ matrix.os }}
       strategy:
+        fail-fast: false
         matrix:
           os: [ubuntu-22.04]
           suite:
