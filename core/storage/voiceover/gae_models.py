@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, List, TypedDict, Union
+from typing import Dict, Final, List, Tuple, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -54,6 +54,12 @@ VoiceoversAndContentsMappingType = Dict[
         ]
     ]
 ]
+
+ContentIdToVoiceoverMappingType = Dict[
+    str, Dict[str, Tuple[str, VoiceoverDict]]
+]
+
+VoiceoverMappingType = Dict[str, Dict[str, VoiceoverDict]]
 
 
 class EntityVoiceoversModel(base_models.BaseModel):
@@ -351,8 +357,12 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
     artist ID who contributed voiceovers in the given language code.
     Instances of this class are keyed by the exploration ID.
     """
-    content_id_to_voice_artists = datastore_services.JsonProperty(required=True)
 
+    # A dictionary with content IDs as keys and nested dicts as values. Each
+    # nested dict contains language codes as keys and a 2-tuple as values. The
+    # 2-tuple contains voice artist ID as the first element and VoiceoverDict
+    # as the second element.
+    content_id_to_voice_artists = datastore_services.JsonProperty(required=True)
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
