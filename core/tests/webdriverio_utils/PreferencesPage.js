@@ -97,7 +97,7 @@ var PreferencesPage = function() {
   };
 
   /**
-   * Appends gievn text to the existing user bio in the preferences page.
+   * Appends given text to the existing user bio in the preferences page.
    *
    * @param {string} bio - The text to append to the existing user bio.
    */
@@ -126,6 +126,20 @@ var PreferencesPage = function() {
     await action.click('system language selector', languageSelector);
     var dropdownSelectorString = '#mat-select-0-panel';
     var dropdownOption = $(`.mat-option-text=${language}`);
+
+    /*
+      The 'click' method of WebDriverIO sometimes fails to click the elements
+      which are not 'fully' visible in the viewport. Refer http://v4.webdriver.io/api/action/click.html.
+      In our case 'English' option might be partially hidden under the 'Search'
+      input field in the mat-select component as WebdriverIO doesn't scroll the
+      required dropdown 'fully' into the viewport before clicking it.
+      Note: the 'Search' input field is sticky to the top of the dropdown.
+      Refer the Known Problems section in the link https://www.npmjs.com/package/ngx-mat-select-search#known-problems
+
+      To ensure that options like 'English' are correctly clicked at all times,
+      we scroll the dropdown  programmatically until the required option is
+      fully displayed in the viewport unlike in the other cases.
+    */
 
     await browser.execute((selector)=>{
       var element = document.querySelector(`${selector}`);
