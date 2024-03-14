@@ -107,7 +107,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveContentButton);
   }
 
-  async addAnInteractionToTheExploration(interactionTOAdd: string) {
+  async addAnInteractionToTheExploration(
+    interactionTOAdd: string
+  ): Promise<void> {
     await this.page.waitForSelector(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(endInteractionSelector, {visible: true});
@@ -355,14 +357,14 @@ export class ExplorationEditor extends BaseUser {
         `Exploration state changes are reflected in the ${property}.`
       );
     } else {
-      throw new Error(`No changes detected in the exploration state.`);
+      throw new Error('No changes detected in the exploration state.');
     }
     await this.clickOn(closeStateModal);
     await this.page.waitForSelector(resetGraphButton);
     await this.clickOn(resetGraphButton);
   }
 
-  async downloadRevision() {
+  async downloadRevision(): Promise<void> {
     await this.page.waitForTimeout(1000);
     await this.clickOn(firstVersionOptionsButton);
     await this.page.waitForTimeout(1000);
@@ -370,7 +372,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(downloadVersionButton);
   }
 
-  async revertRevison() {
+  async revertRevison(): Promise<void> {
     await this.clickOn(secondVersionOptionsButton);
     await this.page.waitForTimeout(1000);
     await this.clickOn(revertVersionButton);
@@ -462,7 +464,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveContentButton);
   }
 
-  async addAnInteractionToTheCard(interaction: string) {
+  async addAnInteractionToTheCard(interaction: string): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {visible: true});
     await this.clickOn(addInteractionButton);
     await this.clickOn(interaction);
@@ -507,7 +509,6 @@ export class ExplorationEditor extends BaseUser {
       element => element.textContent,
       element
     );
-    console.log(introMessage);
     if (introMessage === text) {
       showMessage('Exploration is loading correctly in preview tab');
     } else {
@@ -550,9 +551,10 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async expectTheExplorationToRestart(text: string): Promise<void> {
-    /*An explicit timeout is set because the page reloads when the
-     *exploration restart button is clicked, and it takes approximately
-     *0.4-0.5 seconds to load properly
+    /**
+     * An explicit timeout is set because the page reloads when the
+     * exploration restart button is clicked, and it takes approximately
+     * 0.4-0.5 seconds to load properly
      */
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(explorationConversationContent);
