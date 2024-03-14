@@ -42,9 +42,7 @@ build: ## Builds the all docker setup.
 	docker compose build
 
 run-devserver: ## Runs the dev-server
-# Explicit creation sets proper ownership pre-container start before.
 # TODO(#19888): Implement a more efficient method for connecting the folders rather than resorting to copying using docker cp.
-	mkdir -p node_modules
 	docker compose up angular-build -d
 	$(MAKE) update.package
 	docker cp oppia-angular-build:/app/oppia/node_modules .
@@ -73,7 +71,10 @@ start-devserver: ## Starts the development server
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
 
-init: build run-devserver ## Initializes the build and runs dev-server.
+init: install-hooks build run-devserver ## Initializes the build and runs dev-server.
+
+install-hooks:  ## Install required hooks
+	bash ./docker/pre_push_hook.sh --install
 
 clean: ## Cleans the docker containers and volumes.
 	docker compose down --rmi all --volumes
