@@ -202,8 +202,7 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
 
 def update_voice_artist_metadata(
     voice_artist_id: str,
-    voiceovers_and_contents_mapping: (
-        voiceover_models.VoiceoversAndContentsMappingType)
+    language_code_to_accent: Dict[str, str]
 ) -> None:
     """The method updates or creates metadata for a voice artist in the
     VoiceArtistMetadataModel.
@@ -211,9 +210,9 @@ def update_voice_artist_metadata(
     Args:
         voice_artist_id: str. The ID of the voice artist for which metadata
             needs to be updated.
-        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType. A
-            dict representing the updated metadata information for the
-            given voice artist.
+        language_code_to_accent: dict(str, str). A dict representing the
+            language accent codes as keys and accent codes as their
+            corresponding value.
     """
     voice_artist_metadata_model = (
         voiceover_models.VoiceArtistMetadataModel.get(
@@ -221,28 +220,26 @@ def update_voice_artist_metadata(
 
     if voice_artist_metadata_model is None:
         voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id, voiceovers_and_contents_mapping)
+            voice_artist_id, language_code_to_accent)
     else:
-        voice_artist_metadata_model.voiceovers_and_contents_mapping = (
-            voiceovers_and_contents_mapping)
+        voice_artist_metadata_model.language_code_to_accent = (
+            language_code_to_accent)
         voice_artist_metadata_model.update_timestamps()
         voice_artist_metadata_model.put()
 
 
 def create_voice_artist_metadata_model_instance(
     voice_artist_id: str,
-    language_code_to_accent: (
-        voiceover_models.VoiceoversAndContentsMappingType),
-    language_code_to_voiceovers
+    language_code_to_accent: Dict[str, str]
 ) -> voiceover_models.VoiceArtistMetadataModel:
     """The method creates a VoiceArtistMetadataModel instance.
 
     Args:
-        voice_artist_id: str. The ID of the voice artist for which metadata
-            needs to be updated.
-        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType. A
-            dict representing the updated metadata information for the
-            given voice artist.
+        voice_artist_id: str. The ID of the voice artist for which new model
+            will be created.
+        language_code_to_accent: dict(str, str). A dict representing the
+            language accent codes as keys and accent codes as their
+            corresponding value.
 
     Returns:
         VoiceArtistMetadataModel. A newly created VoiceArtistMetadataModel
@@ -250,8 +247,7 @@ def create_voice_artist_metadata_model_instance(
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
         id=voice_artist_id,
-        language_code_to_accent=language_code_to_accent,
-        language_code_to_voiceovers=language_code_to_voiceovers)
+        language_code_to_accent=language_code_to_accent)
     voice_artist_metadata_model.update_timestamps()
 
     return voice_artist_metadata_model
@@ -259,12 +255,28 @@ def create_voice_artist_metadata_model_instance(
 
 def create_exploration_voice_artists_link_model_instance(
     exploration_id,
-    content_id_to_voice_artists
-):
+    content_id_to_voiceovers_mapping: (
+        voiceover_models.ContentIdToVoiceoverMappingType)
+) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
+    """The method creates a ExplorationVoiceArtistsLinkModel instance.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which new model will
+            be created.
+        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. A
+            dictionary with content IDs as keys and nested dicts as values. Each
+            nested dict contains language codes as keys and a 2-tuple as values.
+            The 2-tuple contains voice artist ID as the first element and
+            VoiceoverDict as the second element.
+
+    Returns:
+        ExplorationVoiceArtistsLinkModel. A newly created
+        ExplorationVoiceArtistsLinkModel instance.
+    """
     exploration_voice_artists_link_model = (
         voiceover_models.ExplorationVoiceArtistsLinkModel(
             id=exploration_id,
-            content_id_to_voice_artists=content_id_to_voice_artists
+            content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping
         )
     )
     exploration_voice_artists_link_model.update_timestamps()

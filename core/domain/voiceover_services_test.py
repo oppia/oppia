@@ -252,40 +252,10 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.voiceover1: voiceover_models.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-        self.voiceover2: voiceover_models.VoiceoverDict = {
-            'filename': 'filename2.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.9
-        }
-        self.voiceover3: voiceover_models.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0
-        }
         self.voice_artist_id = 'voice_artist_id'
-        self.voiceovers_and_contents_mapping: (
-            voiceover_models.VoiceoversAndContentsMappingType) = {
-            'en': {
-                'language_accent_code': 'en-US',
-                'exploration_id_to_content_ids': {
-                    'exp_1': ['content_1', 'content_2', 'content_3']
-                },
-                'exploration_id_to_voiceovers': {
-                    'exp_1': [
-                        self.voiceover1,
-                        self.voiceover2,
-                        self.voiceover3
-                    ]
-                }
-            }
+        self.language_code_to_accent = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
         }
 
     def test_should_create_and_put_new_voice_artist_model(self) -> None:
@@ -295,7 +265,7 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
 
         voiceover_services.update_voice_artist_metadata(
             self.voice_artist_id,
-            self.voiceovers_and_contents_mapping
+            self.language_code_to_accent
         )
 
         final_retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
@@ -310,17 +280,18 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
         assert retrieved_model is not None
 
         self.assertDictEqual(
-            retrieved_model.voiceovers_and_contents_mapping, {})
+            retrieved_model.language_code_to_accent, {})
 
         voiceover_services.update_voice_artist_metadata(
-            self.voice_artist_id, self.voiceovers_and_contents_mapping)
+            self.voice_artist_id, self.language_code_to_accent)
+
         retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
             self.voice_artist_id, strict=False)
         assert retrieved_model is not None
 
         self.assertDictEqual(
-            retrieved_model.voiceovers_and_contents_mapping,
-            self.voiceovers_and_contents_mapping)
+            retrieved_model.language_code_to_accent,
+            self.language_code_to_accent)
 
     def test_should_create_voice_artist_metadata_model_successfully(
         self
@@ -328,11 +299,58 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
         voice_artist_metadata_model = (
             voiceover_services.create_voice_artist_metadata_model_instance(
                 self.voice_artist_id,
-                self.voiceovers_and_contents_mapping
+                self.language_code_to_accent
             )
         )
 
         self.assertEqual(voice_artist_metadata_model.id, self.voice_artist_id)
         self.assertDictEqual(
-            voice_artist_metadata_model.voiceovers_and_contents_mapping,
-            self.voiceovers_and_contents_mapping)
+            voice_artist_metadata_model.language_code_to_accent,
+            self.language_code_to_accent)
+
+
+class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
+    """Unit test to validate voice artists metadata informations."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        self.voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        self.exploration_id = 'exploration_id'
+        self.content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_0', self.voiceover1)
+            },
+            'content_1': {
+                'hi': ('voice_artist_1', self.voiceover2)
+            }
+        }
+
+    def test_should_create_exploration_voice_artists_link_model_successfully(
+        self
+    ) -> None:
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                self.exploration_id,
+                self.content_id_to_voiceovers_mapping
+            )
+        )
+
+        self.assertEqual(
+            exploration_voice_artists_link_model.id, self.exploration_id)
+        self.assertDictEqual(
+            exploration_voice_artists_link_model.
+            content_id_to_voiceovers_mapping,
+            self.content_id_to_voiceovers_mapping
+        )

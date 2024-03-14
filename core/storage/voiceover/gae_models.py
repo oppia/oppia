@@ -231,10 +231,6 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     Instances of this class are keyed by the user ID.
     """
 
-    # Dictionary mapping language codes to nested dictionaries.Each nested dict
-    # contains exploration IDs as keys and list of voiceovers as values.
-    language_code_to_voiceovers = datastore_services.JsonProperty(required=True)
-
     # Dictionary mapping codes as keys and language acccent codes as values.
     language_code_to_accent = datastore_services.JsonProperty(required=True)
 
@@ -258,7 +254,7 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
             super(
                 VoiceArtistMetadataModel, cls
             ).get_export_policy(), **{
-                'voiceovers_and_contents_mapping': (
+                'language_code_to_accent': (
                     base_models.EXPORT_POLICY.EXPORTED)
             }
         )
@@ -266,8 +262,9 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """The model contains data corresponding to a user: user_id and their
-        provided voiceover data, but it isn't deleted because the voiceover
-        data is needed to classify voiceovers.
+        provided language code for in which they contributed to voiceovers,
+        but it isn't deleted because the language code is needed to
+        classify voiceovers.
         """
         return base_models.DELETION_POLICY.KEEP
 
@@ -283,28 +280,14 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     def create(
         cls,
         voice_artist_id: str,
-        language_code_to_voiceovers,
-        language_code_to_accent
+        language_code_to_accent: Dict[str, str]
     ) -> VoiceArtistMetadataModel:
         """Creates a new VoiceArtistMetadataModel instance.
 
         Args:
             voice_artist_id: str. User ID of the voice artist.
-            voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType.
-                A dictionary mapping language codes to nested dictionaries.
-                Each nested dictionary contains the following key-value pairs:
-                (a). 'language_accent_code': A string indicating the accent
-                code of the voice artist for voiceovers in the respective
-                language.
-                (b). 'exploration_id_to_content_ids': A mapping from
-                exploration IDs (strings) to lists of content IDs (strings),
-                denoting the content IDs for which voiceovers are provided in a
-                given exploration by the voice artist.
-                (c). 'exploration_id_to_voiceovers': A dict with exploration
-                IDs as keys and the list of sample voiceovers as values, where
-                each voiceover is represented as a dictionary (VoiceoverDict).
-                This field specifically contains all of the voiceovers
-                contributed by the user in the given exploration.
+            language_code_to_accent: dict(str, str). A dictionary mapping
+                language codes to its corresponding language accent codes.
 
         Returns:
             VoiceArtistMetadataModel. The newly created
@@ -321,7 +304,6 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
 
         entity = cls(
             id=voice_artist_id,
-            language_code_to_voiceovers=language_code_to_voiceovers,
             language_code_to_accent=language_code_to_accent
         )
         entity.update_timestamps()
@@ -344,10 +326,11 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         """
         user_data: Dict[str, VoiceoversAndContentsMappingType] = {}
         voice_artist_metadata_model = cls.get(user_id, strict=False)
+
         if voice_artist_metadata_model is not None:
             user_data = {
-                'voiceovers_and_contents_mapping': (
-                    voice_artist_metadata_model.voiceovers_and_contents_mapping)
+                'language_code_to_accent': (
+                    voice_artist_metadata_model.language_code_to_accent)
             }
         return user_data
 
@@ -362,7 +345,8 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
     # nested dict contains language codes as keys and a 2-tuple as values. The
     # 2-tuple contains voice artist ID as the first element and VoiceoverDict
     # as the second element.
-    content_id_to_voice_artists = datastore_services.JsonProperty(required=True)
+    content_id_to_voiceovers_mapping = (
+        datastore_services.JsonProperty(required=True))
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
@@ -371,8 +355,8 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
             super(
                 ExplorationVoiceArtistsLinkModel, cls
             ).get_export_policy(), **{
-                'voiceovers_and_contents_mapping': (
-                    base_models.EXPORT_POLICY.EXPORTED)
+                'content_id_to_voiceovers_mapping': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE)
             }
         )
 
@@ -388,16 +372,35 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """Model contain user ID of voice artist and their provided
-        voiceovers metadata.
+        exploration voice artist link model.
         """
-        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
 
     @classmethod
     def create(
         cls,
         exploration_id: str,
-        content_id_to_voice_artists,
-    ) -> VoiceArtistMetadataModel:
+        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType,
+    ) -> ExplorationVoiceArtistsLinkModel:
+        """Creates a new ExplorationVoiceArtistsLinkModel instance.
+
+        Args:
+            exploration_id: str. The ID of the exploration for which new model
+                will be created.
+            content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType.
+                A dictionary with content IDs as keys and nested dicts as
+                values. Each nested dict contains language codes as keys and a
+                2-tuple as values. The 2-tuple contains voice artist ID as the
+                first element and VoiceoverDict as the second element.
+
+        Returns:
+            ExplorationVoiceArtistsLinkModel. The newly created
+            ExplorationVoiceArtistsLinkModel instance.
+
+        Raises:
+            Exception. An exploration voice artist link model with a given
+                exploration ID already exists.
+        """
 
         if cls.get(exploration_id, strict=False):
             raise Exception(
@@ -406,7 +409,7 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
 
         entity = cls(
             id=exploration_id,
-            content_id_to_voice_artists=content_id_to_voice_artists
+            content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping
         )
         entity.update_timestamps()
         entity.put()
