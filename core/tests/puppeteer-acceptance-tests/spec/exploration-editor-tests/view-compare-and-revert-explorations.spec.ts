@@ -16,45 +16,56 @@
  * @fileoverview Acceptance Test for history tab in exploration editor.
  */
 
-import { UserFactory } from
-  '../../puppeteer-testing-utilities/user-factory';
-import testConstants from
-  '../../puppeteer-testing-utilities/test-constants';
-import { ExplorationEditor } from '../../user-utilities/exploration-editor-utils';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT: number = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Exploration Editor', function() {
+describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
-      'explorationAdm', 'exploration_creator@example.com');
+      'explorationAdm',
+      'exploration_creator@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to view, compare, revert, and download revisions',
-    async function() {
+  it(
+    'should be able to view, compare, revert, and download revisions',
+    async function () {
       await explorationEditor.navigateToCreatorDashboard();
-      await explorationEditor.createExploration(
-        'Test-revision', ' End Exploration ');
+      await explorationEditor.createExploration('Test-revision');
+      await explorationEditor.addAnInteractionToTheExploration(
+        ' End Exploration '
+      );
       await explorationEditor.createMultipleRevisionsOfTheSameExploration(
-        'Test-revision', 13);
+        'Test-revision',
+        13
+      );
 
       await explorationEditor.navigateToHistoryTab();
-      await explorationEditor.
-        expectlatestRevisionToHaveVersionNoNotesUsernameDate();
+      await explorationEditor.expectlatestRevisionToHaveVersionNoNotesUsernameDate();
       await explorationEditor.expectRevisionsToBeOrderedByDate();
       await explorationEditor.filterRevisionsByUsername('explorationAdm');
       await explorationEditor.ExpectPaginatorToChangeItemsPerPage(15);
 
-      await explorationEditor.compareDifferentRevisions();
-      await explorationEditor.expectCompareToDisplayMetadataChanges();
-      await explorationEditor.expectCompareToDisplayExplorationStateChanges();
-      await explorationEditor.downloadAndRevertRevision();
-      await explorationEditor.expectSuccessfulReversionOfRevision();
-    }, DEFAULT_SPEC_TIMEOUT);
+      await explorationEditor.compareDifferentRevisions(1, 12);
+      await explorationEditor.expectMetadataChangesToIncludeChangesIn('title');
+      await explorationEditor.expectDisplayExplorationStateToIncludeChangesIn(
+        'content'
+      );
 
-  afterAll(async function() {
+      await explorationEditor.downloadRevision();
+      await explorationEditor.expectSuccessfulDownloadOfRevision('hjkj');
+      await explorationEditor.revertRevison();
+      await explorationEditor.expectSuccessfulReversionOfRevision();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
+
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

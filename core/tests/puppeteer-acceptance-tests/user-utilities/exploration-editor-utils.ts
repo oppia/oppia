@@ -16,15 +16,11 @@
  * @fileoverview exploration admin users utility file.
  */
 
-import { BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
-const creatorDashboardAdminUrl =
-  testConstants.URLs.CreatorDashboard;
+const creatorDashboardAdminUrl = testConstants.URLs.CreatorDashboard;
 const navigateToHistoryTabButton = '.e2e-test-history-tab';
 const navigateToPreviewTabButton = '.e2e-test-preview-tab';
 const navigateToSettingsTabButton = '.e2e-test-settings-tab';
@@ -45,8 +41,6 @@ const saveDraftButton = 'button.e2e-test-save-draft-button';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = 'input.oppia-float-form-input';
-
-
 
 // Revision property elements.
 const revisionVersionNoSelector = '.e2e-history-table-index';
@@ -101,22 +95,26 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} text - The text in the Exploration.
    * @param {string} interaction - The interaction type in the Exploration.
    */
-  async createExploration(text: string, interaction: string): Promise<void> {
+  async createExploration(text: string): Promise<void> {
     await this.clickOn(createExplorationButtonSelector);
-    await this.page.waitForSelector(
-      dismissWelcomeModalSelector, { visible: true });
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      visible: true,
+    });
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(300);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(explorationTextInput, { visible: true });
+    await this.page.waitForSelector(explorationTextInput, {visible: true});
     await this.page.type(explorationTextInput, `${text}`);
     await this.clickOn(saveContentButton);
+  }
 
+  async addAnInteractionToTheExploration(interactionTOAdd: string) {
     await this.page.waitForSelector(addInteractionButton);
     await this.clickOn(addInteractionButton);
-    await this.page.waitForSelector(endInteractionSelector, { visible: true });
-    await this.clickOn(interaction);
+    await this.page.waitForSelector(endInteractionSelector, {visible: true});
+    await this.clickOn(interactionTOAdd);
     await this.clickOn(saveInteractionButton);
+    await this.clickOn('.oppia-response-header');
   }
 
   /**
@@ -124,7 +122,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async saveExplorationDraft(): Promise<void> {
     await this.clickOn(saveChangesButton);
-    await this.page.waitForSelector(saveDraftButton, { visible: true });
+    await this.page.waitForSelector(saveDraftButton, {visible: true});
     await this.page.waitForTimeout(500);
     await this.clickOn(saveDraftButton);
   }
@@ -147,15 +145,17 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} numOfVersion - Number of versions to be created.
    */
   async createMultipleRevisionsOfTheSameExploration(
-      text: string, numOfVersion: number): Promise<void> {
+    text: string,
+    numOfVersion: number
+  ): Promise<void> {
     await this.makeMetaDataChanges('changes');
     await this.saveExplorationDraft();
     await this.page.waitForTimeout(300);
     for (let i = 0; i < numOfVersion; i++) {
-      await this.page.waitForSelector(stateEditSelector, { visible: true });
+      await this.page.waitForSelector(stateEditSelector, {visible: true});
       await this.clickOn(stateEditSelector);
-      await this.page.waitForSelector(explorationTextInput, { visible: true });
-      await this.page.click(explorationTextInput, { clickCount: 3 });
+      await this.page.waitForSelector(explorationTextInput, {visible: true});
+      await this.page.click(explorationTextInput, {clickCount: 3});
       await this.page.keyboard.press('Backspace');
       await this.page.waitForTimeout(500);
       await this.page.type(explorationTextInput, `${text} ${i + 3}`);
@@ -177,28 +177,40 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} versionsListSelector - Common selector for revisions.
    */
 
-  async getRevisionsList(
-      versionsListSelector: string
-  ): Promise<{
-    versionNo: string;
-    notes: string;
-    user: string;
-    date: string;
-  }[]> {
+  async getRevisionsList(versionsListSelector: string): Promise<
+    {
+      versionNo: string;
+      notes: string;
+      user: string;
+      date: string;
+    }[]
+  > {
     let elements = await this.page.$$(versionsListSelector);
     let revisions: {
-      versionNo: string; notes: string; user: string; date: string; }[] = [];
+      versionNo: string;
+      notes: string;
+      user: string;
+      date: string;
+    }[] = [];
     for (let element of elements) {
       let versionNo = await element.$eval(
-        revisionVersionNoSelector, async(el) => el.textContent);
+        revisionVersionNoSelector,
+        async el => el.textContent
+      );
       let notes = await element.$eval(
-        revisionNoteSelector, async(el) => el.textContent);
+        revisionNoteSelector,
+        async el => el.textContent
+      );
       let user = await element.$eval(
-        revisionUsernameSelector, async(el) => el.textContent);
+        revisionUsernameSelector,
+        async el => el.textContent
+      );
       let date = await element.$eval(
-        revisionDateSelector, async(el) => el.textContent);
+        revisionDateSelector,
+        async el => el.textContent
+      );
       if (versionNo && notes && user && date) {
-        revisions.push({ versionNo, notes, user, date });
+        revisions.push({versionNo, notes, user, date});
       }
     }
     return revisions;
@@ -215,13 +227,21 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('No revisions found');
     }
     let versionNo = await element.$eval(
-      revisionVersionNoSelector, async(el) => el.textContent);
+      revisionVersionNoSelector,
+      async el => el.textContent
+    );
     let notes = await element.$eval(
-      revisionNoteSelector, async(el) => el.textContent);
+      revisionNoteSelector,
+      async el => el.textContent
+    );
     let username = await element.$eval(
-      revisionUsernameSelector, async(el) => el.textContent);
+      revisionUsernameSelector,
+      async el => el.textContent
+    );
     let date = await element.$eval(
-      revisionDateSelector, async(el) => el.textContent);
+      revisionDateSelector,
+      async el => el.textContent
+    );
     if (!versionNo || typeof notes === 'undefined' || !username || !date) {
       throw new Error('The latest revision is missing one or more properties');
     }
@@ -257,51 +277,63 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} itemsPerPage - Number of items/revisions to show per page.
    */
   async ExpectPaginatorToChangeItemsPerPage(
-      itemsPerPage: number): Promise<void> {
+    itemsPerPage: number
+  ): Promise<void> {
     await this.page.waitForTimeout(500);
-    await this.page.waitForSelector(paginatorToggler, { visible: true });
+    await this.page.waitForSelector(paginatorToggler, {visible: true});
     await this.clickOn(paginatorToggler);
-    await this.clickOn('#mat-option-1');
+    const love = '.mat-select-panel';
+    await this.clickOn(`${love} mat-option:nth-child(2)`);
 
     await this.page.waitForTimeout(500);
     let revisions = await this.getRevisionsList(historyListItem);
     if (revisions.length !== itemsPerPage) {
       throw new Error(
         `Pagination Error: When the items per page is set to ${itemsPerPage},
-        expected ${itemsPerPage} user revisions, but got ${revisions.length}`);
+        expected ${itemsPerPage} user revisions, but got ${revisions.length}`
+      );
     } else {
       showMessage(
         `When the items per page is set to ${itemsPerPage}, 
-        correctly shows ${itemsPerPage} user revisions.`);
+        correctly shows ${itemsPerPage} user revisions.`
+      );
     }
   }
 
   /**
    * Function for comparing different revisions.
    */
-  async compareDifferentRevisions(): Promise<void> {
+  async compareDifferentRevisions(
+    version1: number,
+    version2: number
+  ): Promise<void> {
     await this.page.waitForSelector(firstVersionDropdown);
     await this.clickOn(firstVersionDropdown);
-    await this.clickOn('#mat-option-1958');
-    await this.page.waitForTimeout(300);
+    const love = '.mat-select-panel';
+    await this.clickOn(`${love} mat-option:nth-last-child(${version1})`);
     await this.page.waitForSelector(secondVersionDropdown);
     await this.clickOn(secondVersionDropdown);
-    await this.clickOn('#mat-option-1972');
+    const love1 = '#mat-select-2-panel';
+    await this.clickOn(`${love1} mat-option:nth-last-child(${version2})`);
   }
 
   /**
    * Function to check if modifications in the metadata are being reflected.
    */
-  async expectCompareToDisplayMetadataChanges(): Promise<void> {
-    await this.page.waitForTimeout(300);
+  async expectMetadataChangesToIncludeChangesIn(
+    property: string
+  ): Promise<void> {
     await this.clickOn(viewMatadataChangesButton);
     await this.page.waitForTimeout(300);
-    const divContents = await this.page.$$eval(
-      '.CodeMirror-code', divs => divs.map(div => div.textContent));
+    const divContents = await this.page.$$eval('.CodeMirror-code', divs =>
+      divs.map(div => div.textContent)
+    );
     if (divContents[0] !== divContents[1]) {
-      showMessage('Metadata changes are reflected in the versions.');
+      showMessage(`Metadata changes are reflecting changes in ${property}.`);
     } else {
-      throw new Error('No changes detected in the metadata.');
+      throw new Error(
+        `Metadata changes are not reflecting changes ${property}`
+      );
     }
     await this.clickOn(closeMetadataModal);
   }
@@ -310,12 +342,15 @@ export class ExplorationEditor extends BaseUser {
    * Function to check if modifications in the exploration state are being
    * reflected or not.
    */
-  async expectCompareToDisplayExplorationStateChanges(): Promise<void> {
+  async expectDisplayExplorationStateToIncludeChangesIn(
+    property: string
+  ): Promise<void> {
     await this.page.waitForTimeout(400);
     await this.clickOn(testNodeBackground);
     await this.page.waitForTimeout(500);
-    const divContent = await this.page.$$eval(
-      '.CodeMirror-code', divs => divs.map(div => div.textContent));
+    const divContent = await this.page.$$eval('.CodeMirror-code', divs =>
+      divs.map(div => div.textContent)
+    );
     if (divContent[0] !== divContent[1]) {
       showMessage('State changes are reflected in the exploration.');
     } else {
@@ -330,13 +365,50 @@ export class ExplorationEditor extends BaseUser {
    * Function downloads and reverts a version.
    * @param {number} version - revision version.
    * */
-  async downloadAndRevertRevision(): Promise<void> {
+  // async downloadAndRevertRevision(): Promise<void> {
+  //   await this.page.waitForTimeout(1000);
+  //   await this.clickOn(firstVersionOptionsButton);
+  //   await this.page.waitForTimeout(1000);
+  //   await this.page.waitForSelector(downloadVersionButton);
+  //   await this.clickOn(downloadVersionButton);
+  //   await this.page.waitForTimeout(1000);
+  //   await this.clickOn(secondVersionOptionsButton);
+  //   await this.page.waitForTimeout(1000);
+  //   await this.clickOn(revertVersionButton);
+  //   await this.page.click(confirmRevertVersionButton);
+  // }
+  async downloadRevision() {
     await this.page.waitForTimeout(1000);
     await this.clickOn(firstVersionOptionsButton);
     await this.page.waitForTimeout(1000);
     await this.page.waitForSelector(downloadVersionButton);
     await this.clickOn(downloadVersionButton);
-    await this.page.waitForTimeout(1000);
+  }
+
+  async expectSuccessfulDownloadOfRevision(expectedUrl: string): Promise<void> {
+    // Define the handler function
+    const handler = interceptedRequest => {
+      if (interceptedRequest.url() === expectedUrl) {
+        console.log('Download successful');
+        console.log(interceptedRequest.url);
+      } else {
+        console.log('Download failed');
+      }
+
+      interceptedRequest.continue();
+    };
+
+    // Set up a request interception
+    this.page.on('request', handler);
+
+    // Trigger the download
+    await this.downloadRevision();
+
+    // Remove the request interception
+    this.page.off('request', handler);
+  }
+
+  async revertRevison() {
     await this.clickOn(secondVersionOptionsButton);
     await this.page.waitForTimeout(1000);
     await this.clickOn(revertVersionButton);
@@ -355,11 +427,12 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('No Revisions found');
     }
     let notes = await element.$eval(
-      revisionNoteSelector, async(el) => el.textContent);
+      revisionNoteSelector,
+      async el => el.textContent
+    );
     if (notes === null) {
       throw new Error('Revision does not contain a Note');
     }
-    showMessage(notes);
     await this.page.waitForTimeout(500);
     if (notes === ' Reverted exploration to version 14 ') {
       showMessage('Revision is reverting successfully');
@@ -369,23 +442,23 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-  * Function to create a new card in the exploration creator.
-  * @param {string} cardName - name of the card created.
-  */
-  async createNewCard(cardName: string): Promise<void> {
+   * Function to create a new card in the exploration creator.
+   * @param {string} cardName - name of the card created.
+   */
+  async addANewCardToTheExploration(cardName: string): Promise<void> {
     await this.clickOn(openOutcomeDestButton);
-    await this.page.waitForTimeout(500);
-    await this.page.select(destinationCardSelector, '/');
+    await this.page.waitForSelector(destinationCardSelector, {visible: true});
+    await this.select(destinationCardSelector, '/');
     await this.page.waitForSelector(addStateInput);
     await this.page.type(addStateInput, cardName);
     await this.clickOn(saveOutcomeDestButton);
   }
 
   /**
-  * Function to open the next card in the exploration journey.
-  * @param {number} cardNum - card number to switch to.
-  */
-  async goToNextCard(cardNum: number): Promise<void> {
+   * Function to open the next card in the exploration journey.
+   * @param {number} cardNum - card number to switch to.
+   */
+  async goToTheNewlyCreatedCard(cardNum: number): Promise<void> {
     const selector = testNodeBackground;
     await this.page.waitForSelector(selector);
     const elements = await this.page.$$(selector);
@@ -393,90 +466,86 @@ export class ExplorationEditor extends BaseUser {
       await elements[cardNum].click();
     } else {
       throw new Error(
-        `There are not enough elements to click on the ${cardNum}th element.`);
+        `There are not enough elements to click on the ${cardNum}th element.`
+      );
+    }
+  }
+
+  async goToTheIntroductionCard(cardNum: number): Promise<void> {
+    const selector = testNodeBackground;
+    await this.page.waitForSelector(selector);
+    const elements = await this.page.$$(selector);
+    if (elements.length > cardNum) {
+      await elements[cardNum].click();
+    } else {
+      throw new Error(
+        `There are not enough elements to click on the ${cardNum}th element.`
+      );
     }
   }
 
   /**
-  * Function to create questions in the exploration card.
-  * @param {string} question - question to be added.
-  * @param {number} answer - answer of the question.
-  */
-  async loadCardWithQuestion(questionText: string, interaction: string):
-    Promise<void> {
+   * Function to create questions in the exploration card.
+   * @param {string} question - question to be added.
+   * @param {number} answer - answer of the question.
+   */
+  async addContentToTheCard(questionText: string): Promise<void> {
     await this.page.waitForTimeout(2000);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(explorationTextInput, { visible: true });
-    await this.page.click(explorationTextInput, { clickCount: 3 });
+    await this.page.waitForSelector(explorationTextInput, {visible: true});
+    await this.page.click(explorationTextInput, {clickCount: 3});
     await this.page.keyboard.press('Backspace');
     await this.page.waitForTimeout(500);
     await this.type(explorationTextInput, `${questionText}`);
-
     await this.clickOn(saveContentButton);
-    await this.page.waitForSelector(addInteractionButton, { visible: true });
+  }
+
+  async addAnInteractionToTheCard(interaction: string) {
+    await this.page.waitForSelector(addInteractionButton, {visible: true});
     await this.clickOn(addInteractionButton);
     await this.clickOn(interaction);
     await this.clickOn(saveInteractionButton);
   }
-
   /**
-  * Function to add responses to the interactions.
-  * @param {string} response - response to be added.
-  */
+   * Function to add responses to the interactions.
+   * @param {string} response - response to be added.
+   */
   async addResponsesToTheInteraction(response: string): Promise<void> {
     await this.page.waitForSelector(floatFormInput);
     await this.type(floatFormInput, response);
     await this.page.waitForSelector(oppiaResponseSelector);
     await this.clickOn(oppiaResponseSelector);
-    await this.page.waitForSelector(explorationTextInput, { visible: true });
+    await this.page.waitForSelector(explorationTextInput, {visible: true});
     await this.type(explorationTextInput, 'correct');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
   }
 
   /**
-  * Function for creating an exploration containing questions
-  * @param {string} text - text of the exploration.
-  */
-  async LoadExplorationWithQuestions(numQuestions: number): Promise<void> {
-    await this.clickOn('.oppia-response-header');
-
-    for (let i = 0; i < numQuestions; i++) {
-      await this.createNewCard(`Question ${i + 1}`);
-      await this.goToNextCard(i + 1);
-      await this.loadCardWithQuestion(
-        `mention a negative number greater than ${-100 - i}`,
-        numericInputSelector);
-      await this.addResponsesToTheInteraction(`${-99 - i}`);
-    }
-
-    await this.createNewCard('end');
-    await this.goToNextCard(numQuestions + 1);
-    await this.loadCardWithQuestion(
-      'Exploration ends here', endInteractionSelector);
-    await this.goToNextCard(0);
-
-    await this.saveExplorationDraft();
-  }
-
-  /**
-  * Function to navigate the preview tab.
-  */
+   * Function to navigate the preview tab.
+   */
   async navigateToPreviewTab(): Promise<void> {
-    await this.page.waitForTimeout(300);
+    await this.page.waitForSelector(navigateToPreviewTabButton, {
+      visible: true,
+    });
     await this.clickOn(navigateToPreviewTabButton);
-    await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   /**
-  * Function to verify if the exploration tab is loading correctly in
-  * the preview tab or not.
-  */
-  async expectTheExplorationToLoadInPreviewTab(text: string): Promise<void> {
+   * Function to verify if the exploration tab is loading correctly in
+   * the preview tab or not.
+   */
+  async expectTheExplorationToLoadAndStartFromIntroductionCard(
+    text: string
+  ): Promise<void> {
     await this.page.waitForSelector(explorationConversationContent);
     const element = await this.page.$(explorationConversationContent);
     const introMessage = await this.page.evaluate(
-      element => element.textContent, element);
+      element => element.textContent,
+      element
+    );
+    console.log(introMessage);
     if (introMessage === text) {
       showMessage('Exploration is loading correctly in preview tab');
     } else {
@@ -485,8 +554,8 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-  * Function to complete the exploration in the preview tab.
-  */
+   * Function to complete the exploration in the preview tab.
+   */
   async completeTheExplorationInPreviewTab(): Promise<void> {
     await this.clickOn(testContinueButton);
     await this.page.waitForSelector(testFloatFormInput);
@@ -494,16 +563,11 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(submitAnswerButton);
     await this.page.waitForSelector(nextCardButton);
     await this.clickOn(nextCardButton);
-    await this.page.waitForSelector(testFloatFormInput);
-    await this.type(testFloatFormInput, '-3');
-    await this.clickOn(submitAnswerButton);
-    await this.page.waitForSelector(nextCardButton);
-    await this.clickOn(nextCardButton);
   }
 
   /**
-  * Function to verify if the exploration is completed in the preview tab.
-  */
+   * Function to verify if the exploration is completed in the preview tab.
+   */
   async expectTheExplorationToComplete(): Promise<void> {
     await this.page.waitForSelector(explorationCompletedMessage);
     if (explorationCompletedMessage) {
@@ -514,9 +578,9 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-  * Function to verify if the exploration is restarting after
-  * getting completed or not.
-  */
+   * Function to verify if the exploration is restarting after
+   * getting completed or not.
+   */
 
   async restartTheExploration(): Promise<void> {
     await this.page.waitForTimeout(2000);
@@ -524,11 +588,17 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async expectTheExplorationToRestart(text: string): Promise<void> {
+    /*An explicit timeout is set because the page reloads when the
+     *exploration restart button is clicked, and it takes approximately
+     *0.4-0.5 seconds to load properly
+     */
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(explorationConversationContent);
     const element = await this.page.$(explorationConversationContent);
     const introMessage = await this.page.evaluate(
-      element => element.textContent, element);
+      element => element.textContent,
+      element
+    );
     if (introMessage === text) {
       showMessage('Exploration has restarted successfully');
     } else {
@@ -537,5 +607,5 @@ export class ExplorationEditor extends BaseUser {
   }
 }
 
-export let ExplorationEditorFactory =
-  (): ExplorationEditor => new ExplorationEditor();
+export let ExplorationEditorFactory = (): ExplorationEditor =>
+  new ExplorationEditor();
