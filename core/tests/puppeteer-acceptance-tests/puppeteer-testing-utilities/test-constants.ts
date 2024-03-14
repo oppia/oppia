@@ -39,6 +39,7 @@ export default {
     ExternalLinkEvenThoseWhoAreInSchool: 'https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
     ExternalLinkSourceUnesco: 'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
     ExternalLinkWatchAVideo: 'https://www.facebook.com/oppiaorg/videos/189487953721583/',
+    GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',

@@ -22,6 +22,8 @@ import testConstants from
   '../puppeteer-testing-utilities/test-constants';
 import { showMessage } from
   '../puppeteer-testing-utilities/show-message-utils';
+import { Page } from 'puppeteer';
+import test from 'node:test';
 
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
@@ -43,6 +45,7 @@ const evenThoseWhoAreInSchoolUrl =
 const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
 const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
 const watchAVideoUrl = testConstants.URLs.ExternalLinkWatchAVideo;
+const getStartedUrl = testConstants.URLs.GetStarted;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -59,6 +62,17 @@ const navbarGetInvolvedTabDonateButton =
 const navbarGetInvolvedTabContactUsButton =
   'a.e2e-test-navbar-get-involved-menu-contact-us-button';
 const navbarDonateButton = 'a.e2e-test-navbar-donate-button';
+
+const footerAboutLink = 'a.oppia-footer-get-started-link';
+const footerAboutFoundationLink = 'a.oppia-footer-about-foundation-link';
+const footerBlogLink = 'a.oppia-footer-blog-link';
+const footerForumlink = 'a.oppia-footer-forum-link';
+
+const footerGetStartedLink = 'a.e2e-test-get-started-link';
+const footerCreatorGuidelinesLink = 'a.e2e-test-creator-guidelines-link';
+const footerTeachLink = 'a.e2e-test-teach-link';
+const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
+const footerContactLink = 'a.e2e-test-contact-link';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -121,6 +135,50 @@ export class LoggedInUser extends BaseUser {
     ]);
   }
 
+  async navigateToAboutPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerAboutLink,
+      'About Oppia button in the About Menu on navbar', aboutUrl, 'About');
+  }
+
+  async navigateToAboutFoundationPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerAboutFoundationLink,
+      'About Oppia button in the About Menu on navbar', aboutFoundationUrl, 'About Foundation');
+  }
+
+  async navigateToBlogPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerBlogLink,
+      'About Oppia button in the About Menu on navbar', blogUrl, 'Blog');
+  }
+
+  async navigateToForumPageViaFooter(): Promise<void> {
+
+    await Promise.apply
+    await Promise.all([
+      this.page.waitForNavigation().then(async () => await this.page.waitForNavigation()),
+      await this.clickOn(footerForumlink),
+    ]);
+
+    if (this.page.url() !== 'https://groups.google.com/g/oppia') {
+      throw new Error (
+        'The ' + 'About Oppia button in the About Menu on navbar' + ' does not open the ' +
+        'Oopia - Google Groups' + ' page!');
+    } else {
+      showMessage(
+        'The ' + 'About Oppia button in the About Menu on navbar' + ' opens the ' +
+        'Oopia - Google Groups' + ' page.');
+    }
+  }
+
+  async navigateToGetStartedPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerGetStartedLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerGetStartedLink,
+      'About Oppia button in the About Menu on navbar', getStartedUrl, 'Get Started');
+  }
+
   /**
    * Function to click a button and check if it opens the expected destination.
    */
@@ -137,7 +195,9 @@ export class LoggedInUser extends BaseUser {
     if (this.page.url() !== expectedDestinationPageUrl) {
       throw new Error (
         'The ' + buttonName + ' does not open the ' +
-        expectedDestinationPageName + ' page!');
+        expectedDestinationPageName + ' page!\n' +
+        'Expected: ' + expectedDestinationPageUrl + '\n' +
+        'Actual: ' + this.page.url());
     } else {
       showMessage(
         'The ' + buttonName + ' opens the ' +
