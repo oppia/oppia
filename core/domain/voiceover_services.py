@@ -214,24 +214,56 @@ def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
         language mappings.
     """
     voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]] = {}
+    all_voice_artist_to_language_mapping: Dict[str, Dict[str, str]] = {}
 
     voice_artist_metadata_models: Sequence[
         voiceover_models.VoiceArtistMetadataModel] = (
             voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
 
+    exploration_voice_artist_link_models: Sequence[
+        voiceover_models.ExplorationVoiceArtistsLinkModel] = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
+        )
+
     for voice_artist_metadata_model in voice_artist_metadata_models:
         voice_artist_id = voice_artist_metadata_model.id
-        metadata_mapping = (
-            voice_artist_metadata_model.voiceovers_and_contents_mapping)
-        voice_artist_id_to_language_mapping[voice_artist_id] = {}
+        language_code_to_accent = (
+            voice_artist_metadata_model.language_code_to_accent)
 
-        for lang_code, contents_mapping in metadata_mapping.items():
-            language_accent_code = contents_mapping['language_accent_code']
-            voice_artist_id_to_language_mapping[voice_artist_id][lang_code] = (
-                language_accent_code)
+        voice_artist_id_to_language_mapping[voice_artist_id] = (
+            language_code_to_accent
+        )
 
-    return voice_artist_id_to_language_mapping
+    for exp_voice_artist_model in exploration_voice_artist_link_models:
+        content_id_to_voiceovers_mapping = (
+            exp_voice_artist_model.content_id_to_voiceovers_mapping)
 
+        for lang_voiceover_mapping_tuple in (
+                content_id_to_voiceovers_mapping.values()):
+
+            for lang_code, voiceover_tuple in (
+                    lang_voiceover_mapping_tuple.items()):
+
+                voice_artist_id = voiceover_tuple[0]
+
+                accent_type = ''
+                if (
+                    voice_artist_id in voice_artist_id_to_language_mapping and
+                    lang_code in voice_artist_id_to_language_mapping[
+                        voice_artist_id]
+                ):
+                    accent_type = (
+                        voice_artist_id_to_language_mapping[
+                            voice_artist_id][lang_code])
+
+
+                if voice_artist_id not in all_voice_artist_to_language_mapping:
+                    all_voice_artist_to_language_mapping[voice_artist_id] = {}
+
+                all_voice_artist_to_language_mapping[
+                    voice_artist_id][lang_code] = accent_type
+
+    return all_voice_artist_to_language_mapping
 
 def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
     """The method returns a dict with all the voice artist IDs as keys and
@@ -279,21 +311,35 @@ def get_voiceover_filenames(
 
     exploration_id_to_filenames: Dict[str, List[str]] = {}
     filename_to_exp_id: Dict[str, str] = {}
-
-    voice_artist_metadata_model = (
-        voiceover_models.VoiceArtistMetadataModel.get(
-            voice_artist_id, strict=False))
-    assert voice_artist_metadata_model is not None
-    voiceovers_and_contents_mapping = (
-        voice_artist_metadata_model.voiceovers_and_contents_mapping)
-    language_mapping = voiceovers_and_contents_mapping[language_code]
-    voiceover_mapping = language_mapping.get('exploration_id_to_voiceovers')
     contributed_voiceovers: List[
         voiceover_models.VoiceoverDict] = []
-    for exp_id, voiceovers in voiceover_mapping.items():
-        for voiceover in voiceovers:
-            filename_to_exp_id[voiceover['filename']] = exp_id
-        contributed_voiceovers.extend(voiceovers)
+
+    exp_voice_artist_link_models = (
+        voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch())
+
+    for exp_voice_artist_model in exp_voice_artist_link_models:
+        exploration_id = exp_voice_artist_model.id
+        content_id_to_voiceovers_mapping = (
+            exp_voice_artist_model.content_id_to_voiceovers_mapping)
+
+        for lang_code_to_voiceover_mapping in (
+                content_id_to_voiceovers_mapping.values()):
+
+            for lang_code, voiceover_mapping_tuple in (
+                    lang_code_to_voiceover_mapping.items()):
+
+                if lang_code != language_code:
+                    continue
+
+                retrieved_voice_artist_id = voiceover_mapping_tuple[0]
+                voiceover_dict = voiceover_mapping_tuple[1]
+
+                if voice_artist_id != retrieved_voice_artist_id:
+                    continue
+
+                filename_to_exp_id[voiceover_dict['filename']] = exploration_id
+
+                contributed_voiceovers.append(voiceover_dict)
 
     # The key for sorting is defined separately because of a mypy bug.
     # A [no-any-return] is thrown if key is defined in the sort()
@@ -312,8 +358,8 @@ def get_voiceover_filenames(
         # specific language.
         contributed_voiceovers = contributed_voiceovers[:5]
 
-    for voiceover in contributed_voiceovers:
-        filename = voiceover['filename']
+    for voiceover_dict in contributed_voiceovers:
+        filename = voiceover_dict['filename']
         exp_id = filename_to_exp_id[filename]
         if exp_id not in exploration_id_to_filenames:
             exploration_id_to_filenames[exp_id] = []
@@ -324,8 +370,7 @@ def get_voiceover_filenames(
 
 def update_voice_artist_metadata(
     voice_artist_id: str,
-    voiceovers_and_contents_mapping: (
-        voiceover_models.VoiceoversAndContentsMappingType)
+    language_code_to_accent: Dict[str, str]
 ) -> None:
     """The method updates or creates metadata for a voice artist in the
     VoiceArtistMetadataModel.
@@ -333,9 +378,9 @@ def update_voice_artist_metadata(
     Args:
         voice_artist_id: str. The ID of the voice artist for which metadata
             needs to be updated.
-        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType. A
-            dict representing the updated metadata information for the
-            given voice artist.
+        language_code_to_accent: dict(str, str). A dict representing the
+            language accent codes as keys and accent codes as their
+            corresponding value.
     """
     voice_artist_metadata_model = (
         voiceover_models.VoiceArtistMetadataModel.get(
@@ -343,10 +388,10 @@ def update_voice_artist_metadata(
 
     if voice_artist_metadata_model is None:
         voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id, voiceovers_and_contents_mapping)
+            voice_artist_id, language_code_to_accent)
     else:
-        voice_artist_metadata_model.voiceovers_and_contents_mapping = (
-            voiceovers_and_contents_mapping)
+        voice_artist_metadata_model.language_code_to_accent = (
+            language_code_to_accent)
         voice_artist_metadata_model.update_timestamps()
         voice_artist_metadata_model.put()
 
@@ -364,31 +409,41 @@ def update_voice_artist_language_mapping(
             updated.
         language_accent_code: str. The updated language accent code.
     """
-    voice_artist_model = voiceover_models.VoiceArtistMetadataModel.get(
-        voice_artist_id)
-    voiceovers_and_contents_mapping = (
-        voice_artist_model.voiceovers_and_contents_mapping)
-    voiceovers_and_contents_mapping[language_code]['language_accent_code'] = (
-        language_accent_code)
+    voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel.get(
+        voice_artist_id, strict=False)
+    language_code_to_accent = {}
 
-    update_voice_artist_metadata(
-        voice_artist_id=voice_artist_id,
-        voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
+    if voice_artist_metadata_model is None:
+        voice_artist_metadata_model = (
+            create_voice_artist_metadata_model_instance(
+                voice_artist_id=voice_artist_id,
+                language_code_to_accent={}
+            )
+        )
+    else:
+        language_code_to_accent = (
+            voice_artist_metadata_model.language_code_to_accent)
 
+    language_code_to_accent[language_code] = language_accent_code
+
+    voice_artist_metadata_model.language_code_to_accent = (
+        language_code_to_accent)
+
+    voice_artist_metadata_model.update_timestamps()
+    voice_artist_metadata_model.put()
 
 def create_voice_artist_metadata_model_instance(
     voice_artist_id: str,
-    voiceovers_and_contents_mapping: (
-        voiceover_models.VoiceoversAndContentsMappingType)
+    language_code_to_accent: Dict[str, str]
 ) -> voiceover_models.VoiceArtistMetadataModel:
     """The method creates a VoiceArtistMetadataModel instance.
 
     Args:
-        voice_artist_id: str. The ID of the voice artist for which metadata
-            needs to be updated.
-        voiceovers_and_contents_mapping: VoiceoversAndContentsMappingType. A
-            dict representing the updated metadata information for the
-            given voice artist.
+        voice_artist_id: str. The ID of the voice artist for which new model
+            will be created.
+        language_code_to_accent: dict(str, str). A dict representing the
+            language accent codes as keys and accent codes as their
+            corresponding value.
 
     Returns:
         VoiceArtistMetadataModel. A newly created VoiceArtistMetadataModel
@@ -396,7 +451,38 @@ def create_voice_artist_metadata_model_instance(
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
         id=voice_artist_id,
-        voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
+        language_code_to_accent=language_code_to_accent)
     voice_artist_metadata_model.update_timestamps()
 
     return voice_artist_metadata_model
+
+
+def create_exploration_voice_artists_link_model_instance(
+    exploration_id: str,
+    content_id_to_voiceovers_mapping: (
+        voiceover_models.ContentIdToVoiceoverMappingType)
+) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
+    """The method creates a ExplorationVoiceArtistsLinkModel instance.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which new model will
+            be created.
+        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. A
+            dictionary with content IDs as keys and nested dicts as values. Each
+            nested dict contains language codes as keys and a 2-tuple as values.
+            The 2-tuple contains voice artist ID as the first element and
+            VoiceoverDict as the second element.
+
+    Returns:
+        ExplorationVoiceArtistsLinkModel. A newly created
+        ExplorationVoiceArtistsLinkModel instance.
+    """
+    exploration_voice_artists_link_model = (
+        voiceover_models.ExplorationVoiceArtistsLinkModel(
+            id=exploration_id,
+            content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping
+        )
+    )
+    exploration_voice_artists_link_model.update_timestamps()
+
+    return exploration_voice_artists_link_model
