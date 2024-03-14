@@ -16,16 +16,20 @@
  * @fileoverview Component for the configuration tab in the admin panel.
  */
 
-import { Component, EventEmitter, Output } from '@angular/core';
-import { AdminBackendApiService, ConfigPropertiesBackendResponse, NewConfigPropertyValues } from 'domain/admin/admin-backend-api.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { Schema } from 'services/schema-default-value.service';
-import { AdminDataService } from '../services/admin-data.service';
-import { AdminTaskManagerService } from '../services/admin-task-manager.service';
+import {Component, EventEmitter, Output} from '@angular/core';
+import {
+  AdminBackendApiService,
+  ConfigPropertiesBackendResponse,
+  NewConfigPropertyValues,
+} from 'domain/admin/admin-backend-api.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {Schema} from 'services/schema-default-value.service';
+import {AdminDataService} from '../services/admin-data.service';
+import {AdminTaskManagerService} from '../services/admin-task-manager.service';
 
 @Component({
   selector: 'oppia-admin-config-tab',
-  templateUrl: './admin-config-tab.component.html'
+  templateUrl: './admin-config-tab.component.html',
 })
 export class AdminConfigTabComponent {
   @Output() setStatusMessage: EventEmitter<string> = new EventEmitter();
@@ -53,32 +57,42 @@ export class AdminConfigTabComponent {
   }
 
   reloadConfigProperties(): void {
-    this.adminDataService.getDataAsync().then((adminDataObject) => {
+    this.adminDataService.getDataAsync().then(adminDataObject => {
       this.configProperties = adminDataObject.configProperties;
     });
   }
 
   revertToDefaultConfigPropertyValue(configPropertyId: string): void {
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This action is irreversible. Are you sure?'
+      )
+    ) {
       return;
     }
 
-    this.adminBackendApiService.revertConfigPropertyAsync(configPropertyId)
-      .then(() => {
-        this.setStatusMessage.emit('Config property reverted successfully.');
-        this.reloadConfigProperties();
-      }, errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-      });
+    this.adminBackendApiService
+      .revertConfigPropertyAsync(configPropertyId)
+      .then(
+        () => {
+          this.setStatusMessage.emit('Config property reverted successfully.');
+          this.reloadConfigProperties();
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
   }
 
   saveConfigProperties(): void {
     if (this.adminTaskManagerService.isTaskRunning()) {
       return;
     }
-    if (!this.windowRef.nativeWindow.confirm(
-      'This action is irreversible. Are you sure?')) {
+    if (
+      !this.windowRef.nativeWindow.confirm(
+        'This action is irreversible. Are you sure?'
+      )
+    ) {
       return;
     }
 
@@ -90,13 +104,17 @@ export class AdminConfigTabComponent {
       newConfigPropertyValues[property] = this.configProperties[property].value;
     }
 
-    this.adminBackendApiService.saveConfigPropertiesAsync(
-      newConfigPropertyValues).then(() => {
-      this.setStatusMessage.emit('Data saved successfully.');
-      this.adminTaskManagerService.finishTask();
-    }, errorResponse => {
-      this.setStatusMessage.emit('Server error: ' + errorResponse);
-      this.adminTaskManagerService.finishTask();
-    });
+    this.adminBackendApiService
+      .saveConfigPropertiesAsync(newConfigPropertyValues)
+      .then(
+        () => {
+          this.setStatusMessage.emit('Data saved successfully.');
+          this.adminTaskManagerService.finishTask();
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+          this.adminTaskManagerService.finishTask();
+        }
+      );
   }
 }

@@ -16,18 +16,21 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-import { ChangeListService } from './change-list.service';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContextService } from 'services/context.service';
-import { ExplorationStatesService } from './exploration-states.service';
-import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
+import {ChangeListService} from './change-list.service';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {ContextService} from 'services/context.service';
+import {ExplorationStatesService} from './exploration-states.service';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 class MockNgbModalRef {
   componentInstance = {
-    deleteStateName: null
+    deleteStateName: null,
   };
 }
 
@@ -35,7 +38,7 @@ class MockNgbModal {
   open() {
     return {
       componentInstance: MockNgbModalRef,
-      result: Promise.resolve('Hola')
+      result: Promise.resolve('Hola'),
     };
   }
 }
@@ -56,9 +59,9 @@ describe('ExplorationStatesService', () => {
         ChangeListService,
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
-      ]
+          useClass: MockNgbModal,
+        },
+      ],
     });
   });
 
@@ -69,98 +72,109 @@ describe('ExplorationStatesService', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
+    generateContentIdService.init(
+      () => 0,
+      () => {}
+    );
   });
 
   beforeEach(() => {
     let EXP_ID = '7';
     spyOn(contextService, 'getExplorationId').and.returnValue(EXP_ID);
 
-    answerGroup = answerGroupObjectFactory.createFromBackendDict({
-      rule_specs: [{
-        rule_type: 'Contains',
-        inputs: {
-          x: {
-            contentId: 'rule_input',
-            normalizedStrSet: ['hola']
-          }
-        }
-      }],
-      outcome: {
-        dest: 'Me Llamo',
-        dest_if_really_stuck: null,
-        feedback: {
-          content_id: 'feedback_1',
-          html: 'buen trabajo!',
+    answerGroup = answerGroupObjectFactory.createFromBackendDict(
+      {
+        rule_specs: [
+          {
+            rule_type: 'Contains',
+            inputs: {
+              x: {
+                contentId: 'rule_input',
+                normalizedStrSet: ['hola'],
+              },
+            },
+          },
+        ],
+        outcome: {
+          dest: 'Me Llamo',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'feedback_1',
+            html: 'buen trabajo!',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
         },
-        labelled_as_correct: true,
-        param_changes: [],
-        refresher_exploration_id: null,
-        missing_prerequisite_skill_id: null
+        training_data: [],
+        tagged_skill_misconception_id: null,
       },
-      training_data: [],
-      tagged_skill_misconception_id: null
-    }, 'TextInput');
+      'TextInput'
+    );
 
-    explorationStatesService.init({
-      Hola: {
-        content: {content_id: 'content', html: ''},
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            rule_input: {}
-          },
-        },
-        param_changes: [],
-        interaction: {
-          confirmed_unclassified_answers: [],
-          answer_groups: [answerGroup.toBackendDict()],
-          customization_args: {
-            placeholder: {
-              value: {
-                content_id: 'ca_placeholder_0',
-                unicode_str: ''
-              }
+    explorationStatesService.init(
+      {
+        Hola: {
+          content: {content_id: 'content', html: ''},
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {},
+              rule_input: {},
             },
-            rows: { value: 1 },
-            catchMisspellings: {
-              value: false
-            }
           },
-          default_outcome: {
-            dest: 'Me Llamo',
-            dest_if_really_stuck: null,
-            feedback: {
-              content_id: 'feedback_1',
-              html: 'buen trabajo!',
+          param_changes: [],
+          interaction: {
+            confirmed_unclassified_answers: [],
+            answer_groups: [answerGroup.toBackendDict()],
+            customization_args: {
+              placeholder: {
+                value: {
+                  content_id: 'ca_placeholder_0',
+                  unicode_str: '',
+                },
+              },
+              rows: {value: 1},
+              catchMisspellings: {
+                value: false,
+              },
             },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
+            default_outcome: {
+              dest: 'Me Llamo',
+              dest_if_really_stuck: null,
+              feedback: {
+                content_id: 'feedback_1',
+                html: 'buen trabajo!',
+              },
+              labelled_as_correct: true,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
+            },
+            hints: [],
+            id: 'TextInput',
+            solution: null,
           },
-          hints: [],
-          id: 'TextInput',
-          solution: null,
+          linked_skill_id: null,
+          solicit_answer_details: false,
+          classifier_model_id: '0',
+          card_is_checkpoint: false,
         },
-        linked_skill_id: null,
-        solicit_answer_details: false,
-        classifier_model_id: '0',
-        card_is_checkpoint: false,
       },
-    }, false);
+      false
+    );
   });
 
   describe('Callback Registration', () => {
     describe('.registerOnStateAddedCallback', () => {
       it('should callback when a new state is added', fakeAsync(() => {
         spyOn(ngbModal, 'open').and.callFake(() => {
-          return ({
+          return {
             componentInstance: NgbModalRef,
-            result: Promise.resolve()
-          } as NgbModalRef);
+            result: Promise.resolve(),
+          } as NgbModalRef;
         });
         let spy = jasmine.createSpy('callback');
         spyOn(changeListService, 'addState');
@@ -175,10 +189,10 @@ describe('ExplorationStatesService', () => {
     describe('.registerOnStateDeletedCallback', () => {
       it('should callback when a state is deleted', fakeAsync(() => {
         spyOn(ngbModal, 'open').and.callFake(() => {
-          return ({
+          return {
             componentInstance: MockNgbModalRef,
-            result: Promise.resolve('Hola')
-          } as NgbModalRef);
+            result: Promise.resolve('Hola'),
+          } as NgbModalRef;
         });
         spyOn(changeListService, 'deleteState');
 
@@ -205,29 +219,34 @@ describe('ExplorationStatesService', () => {
     });
 
     describe('.registerOnStateInteractionSaved', () => {
-      it('should callback when answer groups of a state are saved',
-        () => {
-          let spy = jasmine.createSpy('callback');
-          spyOn(changeListService, 'editStateProperty');
+      it('should callback when answer groups of a state are saved', () => {
+        let spy = jasmine.createSpy('callback');
+        spyOn(changeListService, 'editStateProperty');
 
-          explorationStatesService.registerOnStateInteractionSavedCallback(spy);
-          explorationStatesService.saveInteractionAnswerGroups(
-            'Hola', [answerGroup]);
+        explorationStatesService.registerOnStateInteractionSavedCallback(spy);
+        explorationStatesService.saveInteractionAnswerGroups('Hola', [
+          answerGroup,
+        ]);
 
-          expect(spy).toHaveBeenCalledWith(
-            explorationStatesService.getState('Hola'));
-        });
+        expect(spy).toHaveBeenCalledWith(
+          explorationStatesService.getState('Hola')
+        );
+      });
     });
   });
 
   it('should save the solicitAnswerDetails correctly', () => {
     expect(
-      explorationStatesService.getSolicitAnswerDetailsMemento(
-        'Hola')).toEqual(false);
+      explorationStatesService.getSolicitAnswerDetailsMemento('Hola')
+    ).toEqual(false);
     const changeListSpy = spyOn(changeListService, 'editStateProperty');
     explorationStatesService.saveSolicitAnswerDetails('Hola', true);
     expect(changeListSpy).toHaveBeenCalledWith(
-      'Hola', 'solicit_answer_details', true, false);
+      'Hola',
+      'solicit_answer_details',
+      true,
+      false
+    );
     expect(
       explorationStatesService.getSolicitAnswerDetailsMemento('Hola')
     ).toBeTrue();

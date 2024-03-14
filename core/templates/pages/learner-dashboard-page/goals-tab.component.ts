@@ -16,35 +16,41 @@
  * @fileoverview Component for goals tab in the Learner Dashboard page.
  */
 
-import { AppConstants } from 'app.constants';
-import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { LearnerDashboardActivityIds } from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ClassroomDomainConstants } from 'domain/classroom/classroom-domain.constants';
-import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {AppConstants} from 'app.constants';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {LearnerDashboardActivityIds} from 'domain/learner_dashboard/learner-dashboard-activity-ids.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
+import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {Subscription} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 import './goals-tab.component.css';
 
 @Component({
   selector: 'oppia-goals-tab',
   templateUrl: './goals-tab.component.html',
-  styleUrls: ['./goals-tab.component.css']
+  styleUrls: ['./goals-tab.component.css'],
 })
 export class GoalsTabComponent implements OnInit {
   constructor(
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private learnerDashboardActivityBackendApiService:
-      LearnerDashboardActivityBackendApiService,
-    private deviceInfoService: DeviceInfoService) {
-  }
+    private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
+    private deviceInfoService: DeviceInfoService
+  ) {}
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -58,7 +64,7 @@ export class GoalsTabComponent implements OnInit {
 
   // Child dropdown is undefined because initially it is in closed state using
   // the following property: {'static' = false}.
-  @ViewChild('dropdown', {'static': false}) dropdownRef: ElementRef | undefined;
+  @ViewChild('dropdown', {static: false}) dropdownRef: ElementRef | undefined;
   learnerDashboardActivityIds!: LearnerDashboardActivityIds;
   MAX_CURRENT_GOALS_LENGTH!: number;
   currentGoalsStoryIsShown!: boolean[];
@@ -74,7 +80,7 @@ export class GoalsTabComponent implements OnInit {
   topicToIndexMapping = {
     CURRENT: 0,
     COMPLETED: 1,
-    NEITHER: 2
+    NEITHER: 2,
   };
 
   indexOfSelectedTopic: number = -1;
@@ -93,7 +99,8 @@ export class GoalsTabComponent implements OnInit {
     this.currentGoalsStoryIsShown[0] = true;
     this.pawImageUrl = this.getStaticImageUrl('/learner_dashboard/paw.svg');
     this.bookImageUrl = this.getStaticImageUrl(
-      '/learner_dashboard/book_icon.png');
+      '/learner_dashboard/book_icon.png'
+    );
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
     let topic: LearnerTopicSummary;
     for (topic of this.currentGoals) {
@@ -101,17 +108,21 @@ export class GoalsTabComponent implements OnInit {
     }
     for (topic of this.completedGoals) {
       this.topicIdsInCompletedGoals.push(topic.id);
-      this.completedGoalsTopicPageUrl.push(this.getTopicPageUrl(
-        topic.urlFragment, topic.classroom));
+      this.completedGoalsTopicPageUrl.push(
+        this.getTopicPageUrl(topic.urlFragment, topic.classroom)
+      );
     }
     for (topic of this.editGoals) {
       this.topicIdsInEditGoals.push(topic.id);
-      this.editGoalsTopicPageUrl.push(this.getTopicPageUrl(
-        topic.urlFragment, topic.classroom));
+      this.editGoalsTopicPageUrl.push(
+        this.getTopicPageUrl(topic.urlFragment, topic.classroom)
+      );
       this.editGoalsTopicClassification.push(
-        this.getTopicClassification(topic.id));
+        this.getTopicClassification(topic.id)
+      );
       this.editGoalsTopicBelongToLearntToPartiallyLearntTopic.push(
-        this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name));
+        this.doesTopicBelongToLearntToPartiallyLearntTopics(topic.name)
+      );
     }
     for (topic of this.partiallyLearntTopicsList) {
       this.topicIdsInPartiallyLearntTopics.push(topic.id);
@@ -120,16 +131,21 @@ export class GoalsTabComponent implements OnInit {
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
-      }));
+      })
+    );
   }
 
   getTopicPageUrl(
-      topicUrlFragment: string, classroomUrlFragment: string): string {
+    topicUrlFragment: string,
+    classroomUrlFragment: string
+  ): string {
     return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE, {
+      ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
+      {
         topic_url_fragment: topicUrlFragment,
-        classroom_url_fragment: classroomUrlFragment
-      });
+        classroom_url_fragment: classroomUrlFragment,
+      }
+    );
   }
 
   getTopicClassification(topicId: string): number {
@@ -154,31 +170,40 @@ export class GoalsTabComponent implements OnInit {
   }
 
   toggleStory(index: number): void {
-    this.currentGoalsStoryIsShown[index] = !(
-      this.currentGoalsStoryIsShown[index]);
+    this.currentGoalsStoryIsShown[index] =
+      !this.currentGoalsStoryIsShown[index];
   }
 
   async addToLearnerGoals(
-      topic: LearnerTopicSummary, topicId: string,
-      index: number): Promise<void> {
+    topic: LearnerTopicSummary,
+    topicId: string,
+    index: number
+  ): Promise<void> {
     var activityId = topicId;
     var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     if (!this.topicIdsInCurrentGoals.includes(activityId)) {
-      var isSuccessfullyAdded = (
+      var isSuccessfullyAdded =
         await this.learnerDashboardActivityBackendApiService.addToLearnerGoals(
-          activityId, activityType));
-      if (isSuccessfullyAdded &&
+          activityId,
+          activityType
+        );
+      if (
+        isSuccessfullyAdded &&
         this.topicIdsInCurrentGoals.length < this.MAX_CURRENT_GOALS_LENGTH &&
-        !this.topicIdsInCompletedGoals.includes(activityId)) {
+        !this.topicIdsInCompletedGoals.includes(activityId)
+      ) {
         this.currentGoalsStoryIsShown.push(false);
         this.currentGoals.push(topic);
         this.topicIdsInCurrentGoals.push(activityId);
         this.editGoalsTopicClassification.splice(
-          index, 1, this.getTopicClassification(topic.id));
+          index,
+          1,
+          this.getTopicClassification(topic.id)
+        );
         if (this.untrackedTopics[topic.classroom]) {
           let indexInNewTopics = this.untrackedTopics[
-            topic.classroom].findIndex(
-            topic => topic.id === topicId);
+            topic.classroom
+          ].findIndex(topic => topic.id === topicId);
           if (indexInNewTopics !== -1) {
             this.untrackedTopics[topic.classroom].splice(indexInNewTopics, 1);
             if (this.untrackedTopics[topic.classroom].length === 0) {
@@ -211,35 +236,44 @@ export class GoalsTabComponent implements OnInit {
   onDocumentClick(event: MouseEvent): void {
     const targetElement = event.target as HTMLElement;
     for (let i = 0; i < this.currentGoals.length; i++) {
-      if (targetElement &&
-          this.showThreeDotsDropdown[i]) {
+      if (targetElement && this.showThreeDotsDropdown[i]) {
         this.showThreeDotsDropdown[i] = false;
       }
     }
   }
 
   removeFromLearnerGoals(
-      topic: LearnerTopicSummary, topicId: string,
-      topicName: string, index: number): void {
+    topic: LearnerTopicSummary,
+    topicId: string,
+    topicName: string,
+    index: number
+  ): void {
     var activityId = topicId;
     var activityTitle = topicName;
     this.learnerDashboardActivityBackendApiService
       .removeActivityModalAsync(
-        LearnerDashboardPageConstants
-          .LEARNER_DASHBOARD_SECTION_I18N_IDS.CURRENT_GOALS
-        , LearnerDashboardPageConstants
-          .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.LEARN_TOPIC,
-        activityId, activityTitle)
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+          .CURRENT_GOALS,
+        LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+          .LEARN_TOPIC,
+        activityId,
+        activityTitle
+      )
       .then(() => {
         this.currentGoalsStoryIsShown.splice(index, 1);
         this.currentGoals.splice(index, 1);
         this.topicIdsInCurrentGoals.splice(index, 1);
         let indexOfTopic = this.topicIdsInEditGoals.indexOf(topicId);
         this.editGoalsTopicClassification.splice(
-          indexOfTopic, 1, this.getTopicClassification(topicId));
-        if (!this.topicIdsInCompletedGoals.includes(topicId) &&
+          indexOfTopic,
+          1,
+          this.getTopicClassification(topicId)
+        );
+        if (
+          !this.topicIdsInCompletedGoals.includes(topicId) &&
           !this.topicIdsInCurrentGoals.includes(topicId) &&
-          !this.topicIdsInPartiallyLearntTopics.includes(topicId)) {
+          !this.topicIdsInPartiallyLearntTopics.includes(topicId)
+        ) {
           if (this.untrackedTopics[topic.classroom]) {
             this.untrackedTopics[topic.classroom].push(topic);
           } else {

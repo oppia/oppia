@@ -16,90 +16,30 @@
  * @fileoverview Module for the collection player page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { EmailDashboardPageComponent } from './email-dashboard-page.component';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {EmailDashboardPageComponent} from './email-dashboard-page.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {EmailDashboardAuthGuard} from './email-dashboard-auth.guard';
+import {EmailDashboardPageRootComponent} from './email-dashboard-page-root.component';
+import {CommonModule} from '@angular/common';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    CommonModule,
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: EmailDashboardPageRootComponent,
+        canActivate: [EmailDashboardAuthGuard],
+      },
+    ]),
   ],
-  declarations: [
-    EmailDashboardPageComponent
-  ],
-  entryComponents: [
-    EmailDashboardPageComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+  declarations: [EmailDashboardPageRootComponent, EmailDashboardPageComponent],
+  entryComponents: [EmailDashboardPageComponent],
 })
-class EmailDashboardPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(EmailDashboardPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class EmailDashboardPageModule {}

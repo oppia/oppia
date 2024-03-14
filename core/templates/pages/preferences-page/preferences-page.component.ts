@@ -16,9 +16,9 @@
  * @fileoverview Component for the Oppia 'edit preferences' page.
  */
 
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, ViewChild, ElementRef} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import { AppConstants } from 'app.constants';
 import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -33,8 +33,8 @@ import { BackendPreferenceUpdateType, EmailPreferencesBackendDict, SubscriptionS
 import { UserService } from 'services/user.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-import { EditProfilePictureModalComponent } from './modal-templates/edit-profile-picture-modal.component';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
+import {EditProfilePictureModalComponent} from './modal-templates/edit-profile-picture-modal.component';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
@@ -62,7 +62,7 @@ const BACKEND_UPDATE_TYPE_DICT: (
 @Component({
   selector: 'oppia-preferences-page',
   templateUrl: './preferences-page.component.html',
-  styleUrls: ['./preferences-page.component.css']
+  styleUrls: ['./preferences-page.component.css'],
 })
 export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -83,8 +83,7 @@ export class PreferencesPageComponent {
   hasPageLoaded: boolean = false;
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   subscriptionList: SubscriptionSummary[] = [];
   preferencesForm!: FormGroup;
@@ -108,7 +107,7 @@ export class PreferencesPageComponent {
     private urlInterpolationService: UrlInterpolationService,
     private userBackendApiService: UserBackendApiService,
     private userService: UserService
-  ) { }
+  ) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
@@ -148,8 +147,8 @@ export class PreferencesPageComponent {
 
   // TODO(#19737): Remove the following function.
   private _saveProfileImageToLocalStorage(image: string): void {
-    const newImageFile = (
-      this.imageUploadHelperService.convertImageDataToImageFile(image));
+    const newImageFile =
+      this.imageUploadHelperService.convertImageDataToImageFile(image);
     if (newImageFile === null) {
       this.alertsService.addWarning('Image uploaded is not valid.');
       return;
@@ -158,14 +157,16 @@ export class PreferencesPageComponent {
     reader.onload = () => {
       const imageData = reader.result as string;
       this.imageLocalStorageService.saveImage(
-        this.username + '_profile_picture.png', imageData);
+        this.username + '_profile_picture.png',
+        imageData
+      );
     };
     reader.readAsDataURL(newImageFile);
   }
 
   showEditProfilePictureModal(): void {
     let modalRef = this.ngbModal.open(EditProfilePictureModalComponent, {
-      backdrop: 'static'
+      backdrop: 'static',
     });
 
     modalRef.result.then((newProfilePictureDataUrl) => {
@@ -204,14 +205,12 @@ export class PreferencesPageComponent {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
-      username);
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
-      username);
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
     return webpImageUrl;
   }
 
@@ -220,10 +219,10 @@ export class PreferencesPageComponent {
     let userInfoPromise = this.userService.getUserInfoAsync();
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
-      (languageItem) => {
+      languageItem => {
         return {
           id: languageItem.id,
-          text: languageItem.description
+          text: languageItem.description,
         };
       }
     );
@@ -378,7 +377,9 @@ export class PreferencesPageComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaPreferencesPage',
+angular.module('oppia').directive(
+  'oppiaPreferencesPage',
   downgradeComponent({
-    component: PreferencesPageComponent
-  }) as angular.IDirectiveFactory);
+    component: PreferencesPageComponent,
+  }) as angular.IDirectiveFactory
+);

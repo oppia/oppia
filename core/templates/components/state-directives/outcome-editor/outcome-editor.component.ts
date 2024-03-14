@@ -16,21 +16,27 @@
  * @fileoverview Component for the outcome editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
-import { AppConstants } from 'app.constants';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Subscription } from 'rxjs';
-import { ExternalSaveService } from 'services/external-save.service';
+import {AppConstants} from 'app.constants';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Subscription} from 'rxjs';
+import {ExternalSaveService} from 'services/external-save.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AddOutcomeModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {AddOutcomeModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-outcome-modal.component';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 interface AddOutcomeModalResponse {
   outcome: Outcome;
@@ -38,7 +44,7 @@ interface AddOutcomeModalResponse {
 
 @Component({
   selector: 'oppia-outcome-editor',
-  templateUrl: './outcome-editor.component.html'
+  templateUrl: './outcome-editor.component.html',
 })
 export class OutcomeEditorComponent implements OnInit {
   @Output() saveDest: EventEmitter<Outcome> = new EventEmitter();
@@ -82,23 +88,23 @@ export class OutcomeEditorComponent implements OnInit {
   }
 
   shouldShowDestIfReallyStuck(): boolean {
-    return !this.savedOutcome.labelledAsCorrect ||
-      this.savedOutcome.destIfReallyStuck !== null;
+    return (
+      !this.savedOutcome.labelledAsCorrect ||
+      this.savedOutcome.destIfReallyStuck !== null
+    );
   }
 
   isFeedbackLengthExceeded(): boolean {
     // TODO(#13764): Edit this check after appropriate limits are found.
-    return (this.outcome.feedback._html.length > 10000);
-  }
-
-  isCorrectnessFeedbackEnabled(): boolean {
-    return this.stateEditorService.getCorrectnessFeedbackEnabled();
+    return this.outcome.feedback._html.length > 10000;
   }
 
   isCurrentInteractionLinear(): boolean {
     let interactionId = this.getCurrentInteractionId();
-    return Boolean(interactionId) && INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey].is_linear;
+    return (
+      Boolean(interactionId) &&
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_linear
+    );
   }
 
   onExternalSave(): void {
@@ -133,9 +139,9 @@ export class OutcomeEditorComponent implements OnInit {
   }
 
   isSelfLoop(outcome: Outcome): boolean {
-    return Boolean (
-      outcome &&
-      outcome.dest === this.stateEditorService.getActiveStateName());
+    return Boolean(
+      outcome && outcome.dest === this.stateEditorService.getActiveStateName()
+    );
   }
 
   getCurrentInteractionId(): string {
@@ -143,9 +149,7 @@ export class OutcomeEditorComponent implements OnInit {
   }
 
   isSelfLoopWithNoFeedback(outcome: Outcome): boolean {
-    return Boolean (
-      this.isSelfLoop(outcome) &&
-      !outcome.hasNonemptyFeedback());
+    return Boolean(this.isSelfLoop(outcome) && !outcome.hasNonemptyFeedback());
   }
 
   invalidStateAfterFeedbackSave(): boolean {
@@ -169,14 +173,17 @@ export class OutcomeEditorComponent implements OnInit {
       let currentOutcome = cloneDeep(this.outcome);
       modalRef.componentInstance.outcome = currentOutcome;
 
-      modalRef.result.then((result: AddOutcomeModalResponse): void => {
-        this.outcome = result.outcome;
-        this.saveThisFeedback();
-      }, () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is clicked.
-        // No further action is needed.
-      });
+      modalRef.result.then(
+        (result: AddOutcomeModalResponse): void => {
+          this.outcome = result.outcome;
+          this.saveThisFeedback();
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
     }
   }
 
@@ -200,21 +207,19 @@ export class OutcomeEditorComponent implements OnInit {
 
   saveThisFeedback(): void {
     this.feedbackEditorIsOpen = false;
-    this.savedOutcome.feedback = cloneDeep(
-      this.outcome.feedback);
+    this.savedOutcome.feedback = cloneDeep(this.outcome.feedback);
 
     if (
       !this.stateEditorService.isInQuestionMode() &&
       this.savedOutcome.dest === this.outcome.dest &&
-        !this.stateEditorService.getStateNames().includes(
-          this.outcome.dest)) {
+      !this.stateEditorService.getStateNames().includes(this.outcome.dest)
+    ) {
       // If the stateName has changed and previously saved
       // destination points to the older name, update it to
       // the active state name.
       let activeStateName = this.stateEditorService.getActiveStateName();
       if (activeStateName === null) {
-        throw new Error(
-          'The active state name is null in the outcome editor.');
+        throw new Error('The active state name is null in the outcome editor.');
       }
       this.savedOutcome.dest = activeStateName;
     }
@@ -233,8 +238,8 @@ export class OutcomeEditorComponent implements OnInit {
         this.onChangeCorrectnessLabel();
       }
     }
-    this.savedOutcome.refresherExplorationId = (
-      this.outcome.refresherExplorationId);
+    this.savedOutcome.refresherExplorationId =
+      this.outcome.refresherExplorationId;
     this.savedOutcome.missingPrerequisiteSkillId =
       this.outcome.missingPrerequisiteSkillId;
 
@@ -244,63 +249,65 @@ export class OutcomeEditorComponent implements OnInit {
   saveThisIfStuckDestination(): void {
     this.stateEditorService.onSaveOutcomeDestIfStuckDetails.emit();
     this.destinationIfStuckEditorIsOpen = false;
-    this.savedOutcome.destIfReallyStuck = (
-      cloneDeep(this.outcome.destIfReallyStuck));
+    this.savedOutcome.destIfReallyStuck = cloneDeep(
+      this.outcome.destIfReallyStuck
+    );
     this.saveDestIfStuck.emit(this.savedOutcome);
   }
 
   onChangeCorrectnessLabel(): void {
-    this.savedOutcome.labelledAsCorrect = (
-      this.outcome.labelledAsCorrect);
+    this.savedOutcome.labelledAsCorrect = this.outcome.labelledAsCorrect;
 
     this.saveCorrectnessLabel.emit(this.savedOutcome);
   }
 
   cancelThisFeedbackEdit(): void {
-    this.outcome.feedback = cloneDeep(
-      this.savedOutcome.feedback);
+    this.outcome.feedback = cloneDeep(this.savedOutcome.feedback);
     this.feedbackEditorIsOpen = false;
   }
 
   cancelThisDestinationEdit(): void {
     this.outcome.dest = cloneDeep(this.savedOutcome.dest);
-    this.outcome.refresherExplorationId = (
-      this.savedOutcome.refresherExplorationId);
+    this.outcome.refresherExplorationId =
+      this.savedOutcome.refresherExplorationId;
     this.outcome.missingPrerequisiteSkillId =
       this.savedOutcome.missingPrerequisiteSkillId;
     this.destinationEditorIsOpen = false;
   }
 
   cancelThisIfStuckDestinationEdit(): void {
-    this.outcome.destIfReallyStuck = (
-      cloneDeep(this.savedOutcome.destIfReallyStuck));
+    this.outcome.destIfReallyStuck = cloneDeep(
+      this.savedOutcome.destIfReallyStuck
+    );
     this.destinationIfStuckEditorIsOpen = false;
   }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
-      this.externalSaveService.onExternalSave.subscribe(
-        () => this.onExternalSave()
+      this.externalSaveService.onExternalSave.subscribe(() =>
+        this.onExternalSave()
       )
     );
     this.directiveSubscriptions.add(
-      this.stateInteractionIdService.onInteractionIdChanged.subscribe(
-        () => this.onExternalSave())
+      this.stateInteractionIdService.onInteractionIdChanged.subscribe(() =>
+        this.onExternalSave()
+      )
     );
-    this.canAddPrerequisiteSkill = (
+    this.canAddPrerequisiteSkill =
       this.ENABLE_PREREQUISITE_SKILLS &&
-      this.stateEditorService.isExplorationCurated());
+      this.stateEditorService.isExplorationCurated();
     this.feedbackEditorIsOpen = false;
     this.destinationEditorIsOpen = false;
     this.correctnessLabelEditorIsOpen = false;
     this.savedOutcome = cloneDeep(this.outcome);
 
-    this.onMobile = (
-      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
-    this.resizeSubscription = this.windowDimensionsService.getResizeEvent()
+    this.onMobile =
+      this.windowDimensionsService.getWidth() <= this.mobileBreakpoint;
+    this.resizeSubscription = this.windowDimensionsService
+      .getResizeEvent()
       .subscribe(event => {
-        this.onMobile = (
-          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint);
+        this.onMobile =
+          this.windowDimensionsService.getWidth() <= this.mobileBreakpoint;
       });
   }
 
@@ -309,7 +316,9 @@ export class OutcomeEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaOutcomeEditor',
-downgradeComponent({
-  component: OutcomeEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaOutcomeEditor',
+  downgradeComponent({
+    component: OutcomeEditorComponent,
+  }) as angular.IDirectiveFactory
+);

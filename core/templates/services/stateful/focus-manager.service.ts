@@ -19,15 +19,15 @@
  *     somewhere in the HTML page.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { IdGenerationService } from 'services/id-generation.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
+import {IdGenerationService} from 'services/id-generation.service';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FocusManagerService {
   // This property can be undefined but not null because we need to emit it.
@@ -36,9 +36,9 @@ export class FocusManagerService {
   private _schemaBasedListEditorIsActive: boolean = false;
 
   constructor(
-      private deviceInfoService: DeviceInfoService,
-      private idGenerationService: IdGenerationService,
-      private windowRef: WindowRef = new WindowRef(),
+    private deviceInfoService: DeviceInfoService,
+    private idGenerationService: IdGenerationService,
+    private windowRef: WindowRef = new WindowRef()
   ) {}
 
   clearFocus(): void {
@@ -85,5 +85,6 @@ export class FocusManagerService {
   }
 }
 
-angular.module('oppia').factory(
-  'FocusManagerService', downgradeInjectable(FocusManagerService));
+angular
+  .module('oppia')
+  .factory('FocusManagerService', downgradeInjectable(FocusManagerService));

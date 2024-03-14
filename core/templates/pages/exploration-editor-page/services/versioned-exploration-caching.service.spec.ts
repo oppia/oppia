@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for versioned exploration caching service.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { VersionedExplorationCachingService } from './versioned-exploration-caching.service';
+import {TestBed} from '@angular/core/testing';
+import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {VersionedExplorationCachingService} from './versioned-exploration-caching.service';
 
 describe('Versioned exploration caching service', () => {
   let versionedExplorationCachingService: VersionedExplorationCachingService;
@@ -34,7 +34,6 @@ describe('Versioned exploration caching service', () => {
       param_specs: {},
       title: 'Exploration',
       language_code: 'en',
-      correctness_feedback_enabled: true,
       objective: 'To learn',
       next_content_id_index: 5,
       states: {
@@ -42,14 +41,14 @@ describe('Versioned exploration caching service', () => {
           param_changes: [],
           classifier_model_id: null,
           recorded_voiceovers: {
-            voiceovers_mapping: {}
+            voiceovers_mapping: {},
           },
           solicit_answer_details: true,
           card_is_checkpoint: true,
           linked_skill_id: null,
           content: {
             html: '',
-            content_id: 'content'
+            content_id: 'content',
           },
           interaction: {
             customization_args: {},
@@ -62,17 +61,17 @@ describe('Versioned exploration caching service', () => {
               dest_if_really_stuck: null,
               feedback: {
                 html: '',
-                content_id: 'content'
+                content_id: 'content',
               },
               labelled_as_correct: true,
               refresher_exploration_id: 'exp',
-              missing_prerequisite_skill_id: null
+              missing_prerequisite_skill_id: null,
             },
             confirmed_unclassified_answers: [],
-            id: null
-          }
-        }
-      }
+            id: null,
+          },
+        },
+      },
     },
     exploration_metadata: {
       title: 'Exploration',
@@ -87,29 +86,31 @@ describe('Versioned exploration caching service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
-      edits_allowed: true
+      edits_allowed: true,
     },
     version: 1,
     can_edit: true,
     preferred_audio_language_code: 'en',
     preferred_language_codes: [],
     auto_tts_enabled: true,
-    correctness_feedback_enabled: true,
     record_playthrough_probability: 1,
     has_viewed_lesson_info_modal_once: false,
     furthest_reached_checkpoint_exp_version: 1,
     furthest_reached_checkpoint_state_name: 'State A',
     most_recently_reached_checkpoint_state_name: 'State A',
-    most_recently_reached_checkpoint_exp_version: 1
+    most_recently_reached_checkpoint_exp_version: 1,
   };
 
   beforeEach(() => {
     versionedExplorationCachingService = TestBed.inject(
-      VersionedExplorationCachingService);
+      VersionedExplorationCachingService
+    );
 
     versionedExplorationCachingService.cacheVersionedExplorationData(
-      'exp_1', 1, testVersionedExplorationData);
+      'exp_1',
+      1,
+      testVersionedExplorationData
+    );
   });
 
   afterEach(() => {
@@ -125,7 +126,10 @@ describe('Versioned exploration caching service', () => {
     expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
 
     versionedExplorationCachingService.cacheVersionedExplorationData(
-      'exp_1', 2, testVersionedExplorationData);
+      'exp_1',
+      2,
+      testVersionedExplorationData
+    );
 
     expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeTrue();
   });
@@ -134,12 +138,17 @@ describe('Versioned exploration caching service', () => {
     expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
 
     versionedExplorationCachingService.cacheVersionedExplorationData(
-      'exp_1', 2, testVersionedExplorationData);
+      'exp_1',
+      2,
+      testVersionedExplorationData
+    );
 
     expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeTrue();
     expect(
-      versionedExplorationCachingService
-        .retrieveCachedVersionedExplorationData('exp_1', 2)
+      versionedExplorationCachingService.retrieveCachedVersionedExplorationData(
+        'exp_1',
+        2
+      )
     ).toEqual(testVersionedExplorationData);
   });
 
@@ -147,12 +156,17 @@ describe('Versioned exploration caching service', () => {
     expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
 
     versionedExplorationCachingService.cacheVersionedExplorationData(
-      'exp_1', 2, testVersionedExplorationData);
+      'exp_1',
+      2,
+      testVersionedExplorationData
+    );
 
     expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeTrue();
 
-    versionedExplorationCachingService
-      .removeCachedVersionedExplorationData('exp_1', 2);
+    versionedExplorationCachingService.removeCachedVersionedExplorationData(
+      'exp_1',
+      2
+    );
 
     expect(versionedExplorationCachingService.isCached('exp_1', 2)).toBeFalse();
   });

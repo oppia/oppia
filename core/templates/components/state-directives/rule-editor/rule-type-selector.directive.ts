@@ -16,12 +16,12 @@
  * @fileoverview Component for the rule type selector.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { ReplaceInputsWithEllipsesPipe } from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {ReplaceInputsWithEllipsesPipe} from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface Choice {
   id: string;
@@ -30,7 +30,7 @@ interface Choice {
 
 @Component({
   selector: 'oppia-rule-type-selector',
-  templateUrl: './rule-type-selector.component.html'
+  templateUrl: './rule-type-selector.component.html',
 })
 export class RuleTypeSelector implements OnInit {
   // This property is initialized using Angular lifecycle hooks
@@ -42,7 +42,7 @@ export class RuleTypeSelector implements OnInit {
 
   constructor(
     private stateInteractionIdService: StateInteractionIdService,
-    private replaceInputsWithEllipsesPipe: ReplaceInputsWithEllipsesPipe,
+    private replaceInputsWithEllipsesPipe: ReplaceInputsWithEllipsesPipe
   ) {}
 
   selectedRule($event: Event): void {
@@ -50,9 +50,10 @@ export class RuleTypeSelector implements OnInit {
   }
 
   ngOnInit(): void {
-    let ruleTypesToDescriptions = INTERACTION_SPECS[
-      this.stateInteractionIdService.savedMemento as InteractionSpecsKey
-    ].rule_descriptions;
+    let ruleTypesToDescriptions =
+      INTERACTION_SPECS[
+        this.stateInteractionIdService.savedMemento as InteractionSpecsKey
+      ].rule_descriptions;
 
     type RuleTypeToDescription = {
       [key in keyof typeof ruleTypesToDescriptions]: string;
@@ -68,7 +69,8 @@ export class RuleTypeSelector implements OnInit {
       this.choices.push({
         id: ruleType,
         text: this.replaceInputsWithEllipsesPipe.transform(
-          ruleTypesToDescriptions[ruleType as keyof RuleTypeToDescription])
+          ruleTypesToDescriptions[ruleType as keyof RuleTypeToDescription]
+        ),
       });
       idx++;
     }
@@ -77,7 +79,9 @@ export class RuleTypeSelector implements OnInit {
     // editor.
     if (equalToIndex) {
       [this.choices[0], this.choices[equalToIndex]] = [
-        this.choices[equalToIndex], this.choices[0]];
+        this.choices[equalToIndex],
+        this.choices[0],
+      ];
     }
 
     if (this.localValue === null || this.localValue === undefined) {
@@ -88,8 +92,9 @@ export class RuleTypeSelector implements OnInit {
   }
 }
 
-
-angular.module('oppia').directive('oppiaRuleTypeSelector',
+angular.module('oppia').directive(
+  'oppiaRuleTypeSelector',
   downgradeComponent({
-    component: RuleTypeSelector
-  }) as angular.IDirectiveFactory);
+    component: RuleTypeSelector,
+  }) as angular.IDirectiveFactory
+);

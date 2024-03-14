@@ -16,18 +16,22 @@
  * @fileoverview Unit tests for the image preloader service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { Exploration, ExplorationBackendDict, ExplorationObjectFactory } from
-  'domain/exploration/ExplorationObjectFactory';
-import { ImagePreloaderService } from
-  'pages/exploration-player-page/services/image-preloader.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { ContextService } from 'services/context.service';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import {
+  Exploration,
+  ExplorationBackendDict,
+  ExplorationObjectFactory,
+} from 'domain/exploration/ExplorationObjectFactory';
+import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {ContextService} from 'services/context.service';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 describe('Image preloader service', () => {
   let httpTestingController: HttpTestingController;
@@ -48,10 +52,8 @@ describe('Image preloader service', () => {
   let entityTranslationsService: EntityTranslationsService;
   let svgSanitizerService: SvgSanitizerService;
 
-
   const initStateName = 'Introduction';
   const explorationDict: ExplorationBackendDict = {
-    correctness_feedback_enabled: false,
     draft_changes: [],
     is_version_of_draft_valid: true,
     language_code: 'en',
@@ -64,20 +66,20 @@ describe('Image preloader service', () => {
         param_changes: [],
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
-            default_outcome: {}
-          }
+            default_outcome: {},
+          },
         },
         interaction: {
           id: 'Continue',
           default_outcome: {
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
             },
             dest: 'State 3',
             dest_if_really_stuck: null,
@@ -91,13 +93,13 @@ describe('Image preloader service', () => {
             buttonText: {
               value: {
                 unicode_str: 'Continue',
-                content_id: ''
-              }
-            }
+                content_id: '',
+              },
+            },
           },
           solution: null,
           answer_groups: [],
-          hints: []
+          hints: [],
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -108,12 +110,12 @@ describe('Image preloader service', () => {
         param_changes: [],
         content: {
           content_id: 'content',
-          html: 'Congratulations, you have finished!'
+          html: 'Congratulations, you have finished!',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {}
-          }
+            content: {},
+          },
         },
         interaction: {
           id: 'EndExploration',
@@ -121,12 +123,12 @@ describe('Image preloader service', () => {
           confirmed_unclassified_answers: [],
           customization_args: {
             recommendedExplorationIds: {
-              value: []
-            }
+              value: [],
+            },
           },
           solution: null,
           answer_groups: [],
-          hints: []
+          hints: [],
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -138,15 +140,15 @@ describe('Image preloader service', () => {
         param_changes: [],
         content: {
           content_id: 'content',
-          html: 'Multiple Choice'
+          html: 'Multiple Choice',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
             default_outcome: {},
             feedback_1: {},
-            feedback_2: {}
-          }
+            feedback_2: {},
+          },
         },
         interaction: {
           id: 'MultipleChoiceInput',
@@ -155,7 +157,7 @@ describe('Image preloader service', () => {
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: 'Try Again!'
+              html: 'Try Again!',
             },
             param_changes: [],
             labelled_as_correct: null,
@@ -165,21 +167,26 @@ describe('Image preloader service', () => {
           confirmed_unclassified_answers: [],
           customization_args: {
             choices: {
-              value: [{
-                html: '<p> Go to ItemSelection <oppia-noninteractive-image' +
-                ' filepath-with-value="&amp;quot;' +
-                'sIMChoice1_height_32_width_42.png&amp;' +
-                'quot;"></oppia-noninteractive-image></p>',
-                content_id: ''
-              }, {
-                html: '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
-                ' filepath-with-value="&amp;quot;' +
-                'sIMChoice2_height_30_width_40.png&amp;' +
-                'quot;"></oppia-noninteractive-image></p>',
-                content_id: ''
-              }]
+              value: [
+                {
+                  html:
+                    '<p> Go to ItemSelection <oppia-noninteractive-image' +
+                    ' filepath-with-value="&amp;quot;' +
+                    'sIMChoice1_height_32_width_42.png&amp;' +
+                    'quot;"></oppia-noninteractive-image></p>',
+                  content_id: '',
+                },
+                {
+                  html:
+                    '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
+                    ' filepath-with-value="&amp;quot;' +
+                    'sIMChoice2_height_30_width_40.png&amp;' +
+                    'quot;"></oppia-noninteractive-image></p>',
+                  content_id: '',
+                },
+              ],
             },
-            showChoicesInShuffledOrder: {value: false}
+            showChoicesInShuffledOrder: {value: false},
           },
           answer_groups: [
             {
@@ -188,20 +195,23 @@ describe('Image preloader service', () => {
                 dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_1',
-                  html: '<p>We are going to ItemSelection' +
-                  '<oppia-noninteractive-image filepath-with-value=' +
-                  '"&amp;quot;sIOFeedback_height_50_width_50.png' +
-                  '&amp;quot;"></oppia-noninteractive-image></p>'
+                  html:
+                    '<p>We are going to ItemSelection' +
+                    '<oppia-noninteractive-image filepath-with-value=' +
+                    '"&amp;quot;sIOFeedback_height_50_width_50.png' +
+                    '&amp;quot;"></oppia-noninteractive-image></p>',
                 },
                 param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 labelled_as_correct: null,
               },
-              rule_specs: [{
-                rule_type: 'Equals',
-                inputs: {x: 0}
-              }],
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 0},
+                },
+              ],
               training_data: null,
               tagged_skill_misconception_id: null,
             },
@@ -211,23 +221,25 @@ describe('Image preloader service', () => {
                 dest_if_really_stuck: null,
                 feedback: {
                   content_id: 'feedback_2',
-                  html: "Let's go to state 1 ImageAndRegion"
+                  html: "Let's go to state 1 ImageAndRegion",
                 },
                 param_changes: [],
                 refresher_exploration_id: null,
                 missing_prerequisite_skill_id: null,
                 labelled_as_correct: false,
               },
-              rule_specs: [{
-                rule_type: 'Equals',
-                inputs: {x: 1}
-              }],
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 1},
+                },
+              ],
               training_data: null,
               tagged_skill_misconception_id: null,
-            }
+            },
           ],
           hints: [],
-          solution: null
+          solution: null,
         },
         solicit_answer_details: false,
         card_is_checkpoint: true,
@@ -237,7 +249,7 @@ describe('Image preloader service', () => {
         param_changes: [],
         content: {
           content_id: 'content',
-          html: '<p>Text Input Content</p>'
+          html: '<p>Text Input Content</p>',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -245,8 +257,8 @@ describe('Image preloader service', () => {
             default_outcome: {},
             feedback_1: {},
             feedback_2: {},
-            hint_1: {}
-          }
+            hint_1: {},
+          },
         },
         interaction: {
           id: 'TextInput',
@@ -255,88 +267,102 @@ describe('Image preloader service', () => {
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
             },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
+            missing_prerequisite_skill_id: null,
           },
           confirmed_unclassified_answers: [],
           customization_args: {
             rows: {
-              value: 1
+              value: 1,
             },
             placeholder: {
               value: {
                 unicode_str: '',
-                content_id: ''
-              }
+                content_id: '',
+              },
             },
             catchMisspellings: {
-              value: false
-            }
+              value: false,
+            },
           },
-          answer_groups: [{
-            rule_specs: [{
-              rule_type: 'Contains',
-              inputs: {x: {
-                contentId: 'rule_input',
-                normalizedStrSet: ['1']
-              }}
-            }],
-            outcome: {
-              dest: 'State 1',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'feedback_1',
-                html: "<p>Let's go to State 1</p>"
+          answer_groups: [
+            {
+              rule_specs: [
+                {
+                  rule_type: 'Contains',
+                  inputs: {
+                    x: {
+                      contentId: 'rule_input',
+                      normalizedStrSet: ['1'],
+                    },
+                  },
+                },
+              ],
+              outcome: {
+                dest: 'State 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: "<p>Let's go to State 1</p>",
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
+              training_data: null,
+              tagged_skill_misconception_id: null,
             },
-            training_data: null,
-            tagged_skill_misconception_id: null,
-          }, {
-            rule_specs: [{
-              rule_type: 'Contains',
-              inputs: {x: {
-                contentId: 'rule_input',
-                normalizedStrSet: ['2']
-              }}
-            }],
-            outcome: {
-              dest: 'State 1',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'feedback_2',
-                html: "<p>Let's go to State 1</p>"
+            {
+              rule_specs: [
+                {
+                  rule_type: 'Contains',
+                  inputs: {
+                    x: {
+                      contentId: 'rule_input',
+                      normalizedStrSet: ['2'],
+                    },
+                  },
+                },
+              ],
+              outcome: {
+                dest: 'State 1',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: "<p>Let's go to State 1</p>",
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
+              training_data: null,
+              tagged_skill_misconception_id: null,
             },
-            training_data: null,
-            tagged_skill_misconception_id: null,
-          }],
-          hints: [{
-            hint_content: {
-              content_id: 'hint_1',
-              html: '<p><oppia-noninteractive-image filepath-with-value="' +
-              '&amp;quot;s6Hint1_height_60_width_60.png&amp;quot;">' +
-              '</oppia-noninteractive-image></p>'
-            }
-          }],
+          ],
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html:
+                  '<p><oppia-noninteractive-image filepath-with-value="' +
+                  '&amp;quot;s6Hint1_height_60_width_60.png&amp;quot;">' +
+                  '</oppia-noninteractive-image></p>',
+              },
+            },
+          ],
           solution: null,
         },
         solicit_answer_details: false,
         card_is_checkpoint: false,
         linked_skill_id: null,
         classifier_model_id: null,
-      }
+      },
     },
     param_specs: {},
     param_changes: [],
@@ -353,9 +379,8 @@ describe('Image preloader service', () => {
       param_specs: {},
       param_changes: [],
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
-      edits_allowed: true
-    }
+      edits_allowed: true,
+    },
   } as unknown as ExplorationBackendDict;
   class mockReaderObject {
     result = null;
@@ -376,14 +401,10 @@ describe('Image preloader service', () => {
   const filename3 = 'sIOFeedback_height_50_width_50.png';
   const filename4 = 's6Hint1_height_60_width_60.png';
 
-  const requestUrl1 = (
-    `/assetsdevhandler/exploration/1/assets/image/${filename1}`);
-  const requestUrl2 = (
-    `/assetsdevhandler/exploration/1/assets/image/${filename2}`);
-  const requestUrl3 = (
-    `/assetsdevhandler/exploration/1/assets/image/${filename3}`);
-  const requestUrl4 = (
-    `/assetsdevhandler/exploration/1/assets/image/${filename4}`);
+  const requestUrl1 = `/assetsdevhandler/exploration/1/assets/image/${filename1}`;
+  const requestUrl2 = `/assetsdevhandler/exploration/1/assets/image/${filename2}`;
+  const requestUrl3 = `/assetsdevhandler/exploration/1/assets/image/${filename3}`;
+  const requestUrl4 = `/assetsdevhandler/exploration/1/assets/image/${filename4}`;
 
   const imageBlob = new Blob(['image data'], {type: 'imagetype'});
 
@@ -403,10 +424,11 @@ describe('Image preloader service', () => {
     spyOn(entityTranslationsService, 'getHtmlTranslations').and.callFake(
       (unusedLanguageCode, unusedContentIds) => {
         return [];
-      });
+      }
+    );
 
-    exploration = (
-      explorationObjectFactory.createFromBackendDict(explorationDict));
+    exploration =
+      explorationObjectFactory.createFromBackendDict(explorationDict);
   });
 
   it('should be in exploration player after init is called', () => {
@@ -424,48 +446,52 @@ describe('Image preloader service', () => {
     expect(imagePreloaderService.inExplorationPlayer()).toBeFalse();
   });
 
-  it('should maintain the correct number of download requests in queue',
-    fakeAsync(() => {
-      imagePreloaderService.init(exploration);
-      imagePreloaderService.kickOffImagePreloader(initStateName);
+  it('should maintain the correct number of download requests in queue', fakeAsync(() => {
+    imagePreloaderService.init(exploration);
+    imagePreloaderService.kickOffImagePreloader(initStateName);
 
-      // Max files to download simultaneously is 3.
-      httpTestingController.expectOne(requestUrl1).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename1, filename2, filename3]);
-      expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
-      expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeTrue();
-      expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeTrue();
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+    // Max files to download simultaneously is 3.
+    httpTestingController.expectOne(requestUrl1).flush(imageBlob);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename1, filename2, filename3]);
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
+    expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeTrue();
+    expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeTrue();
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      httpTestingController.expectOne(requestUrl2).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename2, filename3, filename4]);
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+    httpTestingController.expectOne(requestUrl2).flush(imageBlob);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename2, filename3, filename4]);
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      httpTestingController.expectOne(requestUrl3).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename3, filename4]);
+    httpTestingController.expectOne(requestUrl3).flush(imageBlob);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename3, filename4]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      httpTestingController.expectOne(requestUrl4).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename4]);
+    httpTestingController.expectOne(requestUrl4).flush(imageBlob);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename4]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([]);
-      expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
-      expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeFalse();
-      expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeFalse();
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
-    }));
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([]);
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
+    expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeFalse();
+    expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeFalse();
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+  }));
 
   it('should properly restart pre-loading from a new state', () => {
     imagePreloaderService.init(exploration);
@@ -474,127 +500,150 @@ describe('Image preloader service', () => {
     httpTestingController.expectOne(requestUrl1);
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename1, filename2, filename3]);
 
     imagePreloaderService.restartImagePreloader('State 6');
 
     httpTestingController.expectOne(requestUrl4);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename4]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename4]);
     expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
   });
 
-  it('should start preloader when state changes and there is at least' +
-    ' one file downloading', fakeAsync(() => {
-    imagePreloaderService.init(exploration);
-    imagePreloaderService.kickOffImagePreloader(initStateName);
+  it(
+    'should start preloader when state changes and there is at least' +
+      ' one file downloading',
+    fakeAsync(() => {
+      imagePreloaderService.init(exploration);
+      imagePreloaderService.kickOffImagePreloader(initStateName);
 
-    httpTestingController.expectOne(requestUrl1);
-    httpTestingController.expectOne(requestUrl2);
-    httpTestingController.expectOne(requestUrl3);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+      httpTestingController.expectOne(requestUrl1);
+      httpTestingController.expectOne(requestUrl2);
+      httpTestingController.expectOne(requestUrl3);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename1, filename2, filename3]);
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
 
-    imagePreloaderService.onStateChange('State 6');
+      imagePreloaderService.onStateChange('State 6');
 
-    httpTestingController.expectOne(requestUrl4).flush(imageBlob);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename4]);
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+      httpTestingController.expectOne(requestUrl4).flush(imageBlob);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename4]);
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
-  }));
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+    })
+  );
 
-  it('should not start preloader when state changes and there is no' +
-    ' file downloading', fakeAsync(() => {
-    imagePreloaderService.init(exploration);
-    imagePreloaderService.kickOffImagePreloader(initStateName);
-
-    httpTestingController.expectOne(requestUrl1).flush(imageBlob);
-    httpTestingController.expectOne(requestUrl2).flush(imageBlob);
-    httpTestingController.expectOne(requestUrl3).flush(imageBlob);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
-
-    flushMicrotasks();
-
-    httpTestingController.expectOne(requestUrl4).flush(imageBlob);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename4]);
-
-    imagePreloaderService.onStateChange('State 6');
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
-
-    flushMicrotasks();
-
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([]);
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
-  }));
-
-  it('should check that there is sync between AssetsBackendApi Service and' +
-    'ImagePreloader Service', fakeAsync(() => {
-    imagePreloaderService.init(exploration);
-    imagePreloaderService.kickOffImagePreloader(initStateName);
-    flushMicrotasks();
-
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
-    expect(
-      assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested().image.map(
-        fileDownloadRequest => fileDownloadRequest.filename))
-      .toEqual([filename1, filename2, filename3]);
-
-    httpTestingController.expectOne(requestUrl1).flush(imageBlob);
-    httpTestingController.expectOne(requestUrl2);
-    httpTestingController.expectOne(requestUrl3);
-    flushMicrotasks();
-
-    httpTestingController.expectOne(requestUrl4);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename2, filename3, filename4]);
-    expect(
-      assetsBackendApiService.getAssetsFilesCurrentlyBeingRequested().image.map(
-        fileDownloadRequest => fileDownloadRequest.filename))
-      .toEqual([filename2, filename3, filename4]);
-  }));
-
-  it('should maintain the filenames of image which failed to download',
+  it(
+    'should not start preloader when state changes and there is no' +
+      ' file downloading',
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
 
       httpTestingController.expectOne(requestUrl1).flush(imageBlob);
       httpTestingController.expectOne(requestUrl2).flush(imageBlob);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename1, filename2, filename3]);
+      httpTestingController.expectOne(requestUrl3).flush(imageBlob);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename1, filename2, filename3]);
 
       flushMicrotasks();
 
-      httpTestingController.expectOne(requestUrl3)
-        .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+      httpTestingController.expectOne(requestUrl4).flush(imageBlob);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename4]);
+
+      imagePreloaderService.onStateChange('State 6');
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+
+      flushMicrotasks();
+
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([]);
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+    })
+  );
+
+  it(
+    'should check that there is sync between AssetsBackendApi Service and' +
+      'ImagePreloader Service',
+    fakeAsync(() => {
+      imagePreloaderService.init(exploration);
+      imagePreloaderService.kickOffImagePreloader(initStateName);
+      flushMicrotasks();
+
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename1, filename2, filename3]);
+      expect(
+        assetsBackendApiService
+          .getAssetsFilesCurrentlyBeingRequested()
+          .image.map(fileDownloadRequest => fileDownloadRequest.filename)
+      ).toEqual([filename1, filename2, filename3]);
+
+      httpTestingController.expectOne(requestUrl1).flush(imageBlob);
+      httpTestingController.expectOne(requestUrl2);
+      httpTestingController.expectOne(requestUrl3);
+      flushMicrotasks();
+
       httpTestingController.expectOne(requestUrl4);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename3, filename4]);
-      expect(imagePreloaderService.isInFailedDownload(filename3)).toBeFalse();
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename2, filename3, filename4]);
+      expect(
+        assetsBackendApiService
+          .getAssetsFilesCurrentlyBeingRequested()
+          .image.map(fileDownloadRequest => fileDownloadRequest.filename)
+      ).toEqual([filename2, filename3, filename4]);
+    })
+  );
 
-      flushMicrotasks();
+  it('should maintain the filenames of image which failed to download', fakeAsync(() => {
+    imagePreloaderService.init(exploration);
+    imagePreloaderService.kickOffImagePreloader(initStateName);
 
-      expect(imagePreloaderService.isInFailedDownload(filename3)).toBeTrue();
-      expect(imagePreloaderService.isInFailedDownload(filename4)).toBeFalse();
+    httpTestingController.expectOne(requestUrl1).flush(imageBlob);
+    httpTestingController.expectOne(requestUrl2).flush(imageBlob);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename1, filename2, filename3]);
 
-      imagePreloaderService.restartImagePreloader('State 6');
+    flushMicrotasks();
 
-      httpTestingController.expectOne(requestUrl4)
-        .flush(imageBlob, {status: 408, statusText: 'Status Text'});
-      flushMicrotasks();
+    httpTestingController
+      .expectOne(requestUrl3)
+      .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+    httpTestingController.expectOne(requestUrl4);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename3, filename4]);
+    expect(imagePreloaderService.isInFailedDownload(filename3)).toBeFalse();
 
-      expect(imagePreloaderService.isInFailedDownload(filename4)).toBeTrue();
-    }));
+    flushMicrotasks();
+
+    expect(imagePreloaderService.isInFailedDownload(filename3)).toBeTrue();
+    expect(imagePreloaderService.isInFailedDownload(filename4)).toBeFalse();
+
+    imagePreloaderService.restartImagePreloader('State 6');
+
+    httpTestingController
+      .expectOne(requestUrl4)
+      .flush(imageBlob, {status: 408, statusText: 'Status Text'});
+    flushMicrotasks();
+
+    expect(imagePreloaderService.isInFailedDownload(filename4)).toBeTrue();
+  }));
 
   it('should calculate the dimensions of the image file', () => {
     imagePreloaderService.init(exploration);
@@ -609,7 +658,8 @@ describe('Image preloader service', () => {
     expect(dimensions1.height).toEqual(50);
 
     const dimensions2 = imagePreloaderService.getDimensionsOfImage(
-      'sIOFeedback_height_30_width_45_height_56_width_56.png');
+      'sIOFeedback_height_30_width_45_height_56_width_56.png'
+    );
     expect(dimensions2.width).toEqual(56);
     expect(dimensions2.height).toEqual(56);
 
@@ -623,14 +673,16 @@ describe('Image preloader service', () => {
 
     const mathSvgDimensions = imagePreloaderService.getDimensionsOfMathSvg(
       'mathImg_20207261338r3ir43lmfd_height_2d456_width_6d124_vertical_0' +
-      'd231.svg');
+        'd231.svg'
+    );
     expect(mathSvgDimensions.height).toEqual(2.456);
     expect(mathSvgDimensions.width).toEqual(6.124);
     expect(mathSvgDimensions.verticalPadding).toEqual(0.231);
 
     expect(() => {
       imagePreloaderService.getDimensionsOfMathSvg(
-        'mathImg_20207261338r3ir43lmfd_2d456_width_6d124_vertical_0d231.svg');
+        'mathImg_20207261338r3ir43lmfd_2d456_width_6d124_vertical_0d231.svg'
+      );
     }).toThrowError(/it does not contain dimensions/);
   });
 
@@ -641,15 +693,17 @@ describe('Image preloader service', () => {
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename1, filename2, filename3]);
     expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
 
     flushMicrotasks();
 
     httpTestingController.expectOne(requestUrl4);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename2, filename3, filename4]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename2, filename3, filename4]);
     expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
 
     var onSuccess = jasmine.createSpy('success');
@@ -661,7 +715,8 @@ describe('Image preloader service', () => {
     // @ts-expect-error
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
-    imagePreloaderService.getImageUrlAsync(filename1)
+    imagePreloaderService
+      .getImageUrlAsync(filename1)
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
@@ -673,19 +728,22 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
-    httpTestingController.expectOne(requestUrl1).flush(
-      new Blob(['svg image'], { type: 'image/svg+xml' }));
+    httpTestingController
+      .expectOne(requestUrl1)
+      .flush(new Blob(['svg image'], {type: 'image/svg+xml'}));
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename1, filename2, filename3]);
     expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
 
     flushMicrotasks();
 
     httpTestingController.expectOne(requestUrl4);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename2, filename3, filename4]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename2, filename3, filename4]);
     expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
 
     var onSuccess = jasmine.createSpy('success');
@@ -698,7 +756,8 @@ describe('Image preloader service', () => {
     spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
 
-    imagePreloaderService.getImageUrlAsync(filename1)
+    imagePreloaderService
+      .getImageUrlAsync(filename1)
       .then(onSuccess, onFailure);
     flushMicrotasks();
 
@@ -707,142 +766,166 @@ describe('Image preloader service', () => {
     expect(onFailure).not.toHaveBeenCalled();
   }));
 
-  it('should get image url when first loading fails and the second' +
-    ' one is successful', fakeAsync(() => {
-    imagePreloaderService.init(exploration);
-    imagePreloaderService.kickOffImagePreloader(initStateName);
-
-    httpTestingController.expectOne(requestUrl1)
-      .flush(imageBlob, {status: 404, statusText: 'Status Text'});
-    httpTestingController.expectOne(requestUrl2);
-    httpTestingController.expectOne(requestUrl3);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
-    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
-
-    flushMicrotasks();
-
-    httpTestingController.expectOne(requestUrl4);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename2, filename3, filename4]);
-    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
-
-    var onSuccess = jasmine.createSpy('success');
-    var onFailure = jasmine.createSpy('fail');
-    // This throws "Argument of type 'mockReaderObject' is not assignable
-    // to parameter of type 'FileReader'.". We need to suppress this error
-    // because 'FileReader' has around 15 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
-
-    imagePreloaderService.getImageUrlAsync(filename1)
-      .then(onSuccess, onFailure);
-
-    httpTestingController.expectOne(requestUrl1).flush(imageBlob);
-    flushMicrotasks();
-
-    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
-    expect(onSuccess).toHaveBeenCalled();
-    expect(onFailure).not.toHaveBeenCalled();
-  }));
-
-  it('should not get image url when loading image fails in both requests',
+  it(
+    'should get image url when first loading fails and the second' +
+      ' one is successful',
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
 
-      httpTestingController.expectOne(requestUrl1)
+      httpTestingController
+        .expectOne(requestUrl1)
         .flush(imageBlob, {status: 404, statusText: 'Status Text'});
       httpTestingController.expectOne(requestUrl2);
       httpTestingController.expectOne(requestUrl3);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename1, filename2, filename3]);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename1, filename2, filename3]);
       expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
 
       flushMicrotasks();
 
       httpTestingController.expectOne(requestUrl4);
-      expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-        .toEqual([filename2, filename3, filename4]);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename2, filename3, filename4]);
       expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
 
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
+      // This throws "Argument of type 'mockReaderObject' is not assignable
+      // to parameter of type 'FileReader'.". We need to suppress this error
+      // because 'FileReader' has around 15 more properties. We have only defined
+      // the properties we need in 'mockReaderObject'.
+      // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
 
-      imagePreloaderService.getImageUrlAsync(filename1)
+      imagePreloaderService
+        .getImageUrlAsync(filename1)
         .then(onSuccess, onFailure);
 
-      httpTestingController.expectOne(requestUrl1)
-        .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+      httpTestingController.expectOne(requestUrl1).flush(imageBlob);
       flushMicrotasks();
 
-      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
-      expect(onSuccess).not.toHaveBeenCalled();
-      expect(onFailure).toHaveBeenCalled();
-    }));
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
+      expect(onSuccess).toHaveBeenCalled();
+      expect(onFailure).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should call the successful callback when loading an image after' +
-    ' trying to get its image url', fakeAsync(() => {
+  it('should not get image url when loading image fails in both requests', fakeAsync(() => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
-    var onSuccess = jasmine.createSpy('success');
-    var onFailure = jasmine.createSpy('fail');
-    // This throws "Argument of type 'mockReaderObject' is not assignable
-    // to parameter of type 'FileReader'.". We need to suppress this error
-    // because 'FileReader' has around 15 more properties. We have only defined
-    // the properties we need in 'mockReaderObject'.
-    // @ts-expect-error
-    spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
-
-    imagePreloaderService.getImageUrlAsync(filename1)
-      .then(onSuccess, onFailure);
-
-    httpTestingController.expectOne(requestUrl1).flush(imageBlob);
-    httpTestingController.expectOne(requestUrl2);
-    httpTestingController.expectOne(requestUrl3);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
-    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
-
-    flushMicrotasks();
-
-    httpTestingController.expectOne(requestUrl4);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename2, filename3, filename4]);
-
-    expect(onSuccess).toHaveBeenCalled();
-    expect(onFailure).not.toHaveBeenCalled();
-  }));
-
-  it('should call the failed callback when loading an image fails after' +
-  ' trying to get its image url', fakeAsync(() => {
-    imagePreloaderService.init(exploration);
-    imagePreloaderService.kickOffImagePreloader(initStateName);
-
-    var onSuccess = jasmine.createSpy('success');
-    var onFailure = jasmine.createSpy('fail');
-
-    imagePreloaderService.getImageUrlAsync(filename1)
-      .then(onSuccess, onFailure);
-
-    httpTestingController.expectOne(requestUrl1)
+    httpTestingController
+      .expectOne(requestUrl1)
       .flush(imageBlob, {status: 404, statusText: 'Status Text'});
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename1, filename2, filename3]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename1, filename2, filename3]);
     expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
 
     flushMicrotasks();
 
     httpTestingController.expectOne(requestUrl4);
-    expect(imagePreloaderService.getFilenamesOfImageCurrentlyDownloading())
-      .toEqual([filename2, filename3, filename4]);
+    expect(
+      imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+    ).toEqual([filename2, filename3, filename4]);
     expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
 
+    var onSuccess = jasmine.createSpy('success');
+    var onFailure = jasmine.createSpy('fail');
+
+    imagePreloaderService
+      .getImageUrlAsync(filename1)
+      .then(onSuccess, onFailure);
+
+    httpTestingController
+      .expectOne(requestUrl1)
+      .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+    flushMicrotasks();
+
+    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
     expect(onSuccess).not.toHaveBeenCalled();
     expect(onFailure).toHaveBeenCalled();
   }));
+
+  it(
+    'should call the successful callback when loading an image after' +
+      ' trying to get its image url',
+    fakeAsync(() => {
+      imagePreloaderService.init(exploration);
+      imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      var onSuccess = jasmine.createSpy('success');
+      var onFailure = jasmine.createSpy('fail');
+      // This throws "Argument of type 'mockReaderObject' is not assignable
+      // to parameter of type 'FileReader'.". We need to suppress this error
+      // because 'FileReader' has around 15 more properties. We have only defined
+      // the properties we need in 'mockReaderObject'.
+      // @ts-expect-error
+      spyOn(window, 'FileReader').and.returnValue(new mockReaderObject());
+
+      imagePreloaderService
+        .getImageUrlAsync(filename1)
+        .then(onSuccess, onFailure);
+
+      httpTestingController.expectOne(requestUrl1).flush(imageBlob);
+      httpTestingController.expectOne(requestUrl2);
+      httpTestingController.expectOne(requestUrl3);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename1, filename2, filename3]);
+      expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
+
+      flushMicrotasks();
+
+      httpTestingController.expectOne(requestUrl4);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename2, filename3, filename4]);
+
+      expect(onSuccess).toHaveBeenCalled();
+      expect(onFailure).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should call the failed callback when loading an image fails after' +
+      ' trying to get its image url',
+    fakeAsync(() => {
+      imagePreloaderService.init(exploration);
+      imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      var onSuccess = jasmine.createSpy('success');
+      var onFailure = jasmine.createSpy('fail');
+
+      imagePreloaderService
+        .getImageUrlAsync(filename1)
+        .then(onSuccess, onFailure);
+
+      httpTestingController
+        .expectOne(requestUrl1)
+        .flush(imageBlob, {status: 404, statusText: 'Status Text'});
+      httpTestingController.expectOne(requestUrl2);
+      httpTestingController.expectOne(requestUrl3);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename1, filename2, filename3]);
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
+
+      flushMicrotasks();
+
+      httpTestingController.expectOne(requestUrl4);
+      expect(
+        imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
+      ).toEqual([filename2, filename3, filename4]);
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
+
+      expect(onSuccess).not.toHaveBeenCalled();
+      expect(onFailure).toHaveBeenCalled();
+    })
+  );
 });

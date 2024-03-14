@@ -21,8 +21,8 @@ import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/co
 import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatChipList } from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 
 @Component({
   selector: 'oppia-subject-interests',
@@ -48,14 +48,16 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('chipList') chipList!: MatChipList;
-  @ViewChild('subjectInterestInput') subjectInterestInput!:
-  ElementRef<HTMLInputElement>;
+  @ViewChild('subjectInterestInput')
+  subjectInterestInput!: ElementRef<HTMLInputElement>;
 
   constructor() {
     this.filteredSubjectInterests = this.formCtrl.valueChanges.pipe(
       startWith(null),
-      map((interest: string | null) => interest ? this.filter(
-        interest) : this.allSubjectInterests.slice()));
+      map((interest: string | null) =>
+        interest ? this.filter(interest) : this.allSubjectInterests.slice()
+      )
+    );
   }
 
   // Implementing the ControlValueAccessor interface through the following
@@ -96,7 +98,7 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
     return validRegex.test(value) && !this.subjectInterests.includes(value);
   }
 
-  add(event: { value: string }): void {
+  add(event: {value: string}): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -121,7 +123,7 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
     }
   }
 
-  selected(event: { option: {value: string }}): void {
+  selected(event: {option: {value: string}}): void {
     if (this.subjectInterests.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -132,7 +134,8 @@ export class SubjectInterestsComponent implements ControlValueAccessor {
   filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.allSubjectInterests.filter(
-      interest => interest.toLowerCase().includes(filterValue));
+    return this.allSubjectInterests.filter(interest =>
+      interest.toLowerCase().includes(filterValue)
+    );
   }
 }

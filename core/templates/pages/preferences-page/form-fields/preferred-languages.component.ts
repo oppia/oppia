@@ -92,11 +92,12 @@ ControlValueAccessor {
         break;
       }
     }
-    return availableLanguage &&
-      this.preferredLanguages.indexOf(value) < 0 ? true : false;
+    return availableLanguage && this.preferredLanguages.indexOf(value) < 0
+      ? true
+      : false;
   }
 
-  add(event: { value: string }): void {
+  add(event: {value: string}): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -119,7 +120,7 @@ ControlValueAccessor {
     }
   }
 
-  selected(event: { option: { value: string } }): void {
+  selected(event: {option: {value: string}}): void {
     if (this.preferredLanguages.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -132,8 +133,8 @@ ControlValueAccessor {
       this.filteredChoices = this.choices.filter(choice => {
         const lowerSearchQuery = this.searchQuery.toLowerCase();
         return (
-          (choice.text.toLowerCase().includes(lowerSearchQuery)) ||
-          (choice.id.toLowerCase().includes(lowerSearchQuery))
+          choice.text.toLowerCase().includes(lowerSearchQuery) ||
+          choice.id.toLowerCase().includes(lowerSearchQuery)
         );
       });
     } else {

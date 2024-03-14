@@ -17,15 +17,15 @@
  * been migrated to angular router.
  */
 
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { APP_BASE_HREF } from '@angular/common';
+import {NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {HttpClientModule} from '@angular/common/http';
+import {APP_BASE_HREF} from '@angular/common';
 
-import { ErrorPageComponent } from './error-page.component';
-import { ErrorPageRootComponent } from './error-page-root.component';
-import { ErrorPageRoutingModule } from './old-error-page-routing.module';
-import { ErrorPageSharedModule } from './error-page-shared.module';
+import {ErrorPageComponent} from './error-page.component';
+import {ErrorPageRootComponent} from './error-page-root.component';
+import {ErrorPageRoutingModule} from './old-error-page-routing.module';
+import {ErrorPageSharedModule} from './error-page-shared.module';
 
 // TODO (#19154): Remove this module in favor of error-page-migrated.module.ts
 // once angular migration is complete.
@@ -37,18 +37,13 @@ import { ErrorPageSharedModule } from './error-page-shared.module';
     ErrorPageRoutingModule,
     ErrorPageSharedModule,
   ],
-  entryComponents: [
-    ErrorPageComponent,
-    ErrorPageRootComponent,
-  ],
-  bootstrap: [
-    ErrorPageRootComponent
-  ],
+  entryComponents: [ErrorPageComponent, ErrorPageRootComponent],
+  bootstrap: [ErrorPageRootComponent],
   providers: [
     {
       provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+      useValue: '/',
+    },
+  ],
 })
 export class OldErrorPageModule {}

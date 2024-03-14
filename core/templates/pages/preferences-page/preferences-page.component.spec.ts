@@ -70,17 +70,19 @@ describe('Preferences Page Component', () => {
       can_receive_editor_role_email: true,
       can_receive_feedback_message_email: false,
       can_receive_subscription_email: true,
-      subscription_list: [{
-        creator_username: 'creator',
-        creator_impact: 0
-      }]
+      subscription_list: [
+        {
+          creator_username: 'creator',
+          creator_impact: 0,
+        },
+      ],
     };
 
     class MockWindowRef {
       imageData: Record<string, string> = {};
       _window = {
         location: {
-          reload: () => {}
+          reload: () => {},
         },
         sessionStorage: {
           removeItem: (name: string) => {
@@ -113,7 +115,7 @@ describe('Preferences Page Component', () => {
           updates: UpdatePreferenceDict[]
       ): Promise<UpdatePreferencesResponse> {
         return Promise.resolve({
-          bulk_email_signup_message_should_be_shown: false
+          bulk_email_signup_message_should_be_shown: false,
         });
       }
     }
@@ -121,14 +123,11 @@ describe('Preferences Page Component', () => {
     beforeEach(waitForAsync(() => {
       mockWindowRef = new MockWindowRef();
       TestBed.configureTestingModule({
-        imports: [
-          NgbModalModule,
-          HttpClientTestingModule
-        ],
+        imports: [NgbModalModule, HttpClientTestingModule],
         declarations: [
           MockTranslatePipe,
           MockTruncatePipe,
-          PreferencesPageComponent
+          PreferencesPageComponent,
         ],
         providers: [
           AlertsService,
@@ -139,15 +138,15 @@ describe('Preferences Page Component', () => {
           UrlInterpolationService,
           {
             provide: UserBackendApiService,
-            useClass: MockUserBackendApiService
+            useClass: MockUserBackendApiService,
           },
           UserService,
           {
             provide: WindowRef,
-            useValue: mockWindowRef
-          }
+            useValue: mockWindowRef,
+          },
         ],
-        schemas: [NO_ERRORS_SCHEMA]
+        schemas: [NO_ERRORS_SCHEMA],
       }).compileComponents();
     }));
 
@@ -159,15 +158,18 @@ describe('Preferences Page Component', () => {
       languageUtilService = TestBed.inject(LanguageUtilService);
       urlInterpolationService = TestBed.inject(UrlInterpolationService);
       preventPageUnloadEventService = TestBed.inject(
-        PreventPageUnloadEventService);
+        PreventPageUnloadEventService
+      );
       alertsService = TestBed.inject(AlertsService);
       i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
       ngbModal = TestBed.inject(NgbModal);
       mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
-      spyOn(userService, 'getProfileImageDataUrl').and.returnValue(
-        ['profile-image-url-png', 'profile-image-url-webp']);
+      spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
+        'profile-image-url-png',
+        'profile-image-url-webp',
+      ]);
     });
 
     it('should be defined', () => {
@@ -179,16 +181,29 @@ describe('Preferences Page Component', () => {
       let userEmail = 'test_email@example.com';
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(loaderService, 'hideLoadingScreen');
-      spyOn(userService, 'getUserInfoAsync').and
-        .returnValue(Promise.resolve(new UserInfo(
-          ['USER_ROLE'], false, false, false, false, false, 'en', username,
-          userEmail, true)));
-      spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue(
-        [{
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(
+          new UserInfo(
+            ['USER_ROLE'],
+            false,
+            false,
+            false,
+            false,
+            false,
+            'en',
+            username,
+            userEmail,
+            true
+          )
+        )
+      );
+      spyOn(languageUtilService, 'getLanguageIdsAndTexts').and.returnValue([
+        {
           id: 'en',
           text: 'English',
-          ariaLabelInEnglish: 'English'
-        }]);
+          ariaLabelInEnglish: 'English',
+        },
+      ]);
       componentInstance.ngOnInit();
       tick();
       tick();
@@ -221,32 +236,35 @@ describe('Preferences Page Component', () => {
       expect(formValues.emailPreferences.canReceiveFeedbackMessageEmail)
         .toEqual(preferencesData.can_receive_feedback_message_email);
       expect(componentInstance.subscriptionList).toEqual(
-        preferencesData.subscription_list);
+        preferencesData.subscription_list
+      );
       expect(loaderService.showLoadingScreen).toHaveBeenCalled();
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
     }));
 
     it('should get user profile image png data url correctly', () => {
       expect(componentInstance.getProfileImagePngDataUrl('username')).toBe(
-        'profile-image-url-png');
+        'profile-image-url-png'
+      );
     });
 
     it('should get user profile image webp data url correctly', () => {
       expect(componentInstance.getProfileImageWebpDataUrl('username')).toBe(
-        'profile-image-url-webp');
+        'profile-image-url-webp'
+      );
     });
 
-    it('should set default profile pictures when username is null',
-      fakeAsync(() => {
-        let userInfo = {
-          getUsername: () => null,
-          isSuperAdmin: () => true,
-          getEmail: () => 'test_email@example.com'
-        };
-        spyOn(loaderService, 'showLoadingScreen');
-        spyOn(loaderService, 'hideLoadingScreen');
-        spyOn(userService, 'getUserInfoAsync')
-          .and.resolveTo(userInfo as UserInfo);
+    it('should set default profile pictures when username is null', fakeAsync(() => {
+      let userInfo = {
+        getUsername: () => null,
+        isSuperAdmin: () => true,
+        getEmail: () => 'test_email@example.com',
+      };
+      spyOn(loaderService, 'showLoadingScreen');
+      spyOn(loaderService, 'hideLoadingScreen');
+      spyOn(userService, 'getUserInfoAsync').and.resolveTo(
+        userInfo as UserInfo
+      );
 
         componentInstance.ngOnInit();
         tick();
@@ -260,7 +278,8 @@ describe('Preferences Page Component', () => {
     it('should get static image url', () => {
       let staticImageUrl = 'static_image_url';
       spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-        staticImageUrl);
+        staticImageUrl
+      );
       expect(componentInstance.getStaticImageUrl('')).toEqual(staticImageUrl);
     });
 
@@ -402,8 +421,9 @@ describe('Preferences Page Component', () => {
     });
 
     it('should validate user popover when username is longer 10 chars', () => {
-      expect(componentInstance.showUsernamePopover('greaterthan10characters'))
-        .toEqual('mouseenter');
+      expect(
+        componentInstance.showUsernamePopover('greaterthan10characters')
+      ).toEqual('mouseenter');
     });
 
     it('should not show popover when username is shorter than 10 chars', () => {
@@ -419,7 +439,7 @@ describe('Preferences Page Component', () => {
     it('should show edit profile picture modal', fakeAsync(() => {
       let profilePictureDataUrl = 'data:image/png;base64,JUMzJTg3JTJD';
       spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(profilePictureDataUrl)
+        result: Promise.resolve(profilePictureDataUrl),
       } as NgbModalRef);
       spyOn(mockWindowRef.nativeWindow.location, 'reload');
       spyOn(userService, 'getUserInfoAsync').and
@@ -433,7 +453,8 @@ describe('Preferences Page Component', () => {
       componentInstance.savePreferences();
       tick();
       expect(mockWindowRef.nativeWindow.sessionStorage.getItem('file')).toEqual(
-        profilePictureDataUrl);
+        profilePictureDataUrl
+      );
       expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
     }));
 
@@ -545,13 +566,13 @@ describe('Preferences Page Component', () => {
     }
 
     beforeEach(() => {
-      spyOnProperty(AssetsBackendApiService, 'EMULATOR_MODE', 'get')
-        .and.returnValue(false);
+      spyOnProperty(
+        AssetsBackendApiService,
+        'EMULATOR_MODE',
+        'get'
+      ).and.returnValue(false);
       TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule,
-          NgbModalModule
-        ],
+        imports: [HttpClientTestingModule, NgbModalModule],
         declarations: [
           PreferencesPageComponent,
           MockTranslatePipe,
@@ -569,7 +590,7 @@ describe('Preferences Page Component', () => {
             useClass: MockUserBackendApiService
           }
         ],
-        schemas: [NO_ERRORS_SCHEMA]
+        schemas: [NO_ERRORS_SCHEMA],
       }).compileComponents();
       fixture = TestBed.createComponent(PreferencesPageComponent);
       componentInstance = fixture.componentInstance;
@@ -583,7 +604,7 @@ describe('Preferences Page Component', () => {
       mockUserBackendApiService = TestBed.inject(UserBackendApiService);
       let profilePictureDataUrl = 'data:image/png;base64,JUMzJTg3JTJD';
       spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(profilePictureDataUrl)
+        result: Promise.resolve(profilePictureDataUrl),
       } as NgbModalRef);
       spyOn(mockUserBackendApiService, 'updateMultiplePreferencesDataAsync')
         .and.returnValue(
@@ -614,7 +635,7 @@ describe('Preferences Page Component', () => {
     it('should handle tab key press for first radio', () => {
       const mockSecondRadio = new ElementRef(document.createElement('input'));
       const mockThirdRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent('keydown', { key: 'Tab' });
+      const event = new KeyboardEvent('keydown', {key: 'Tab'});
 
       componentInstance.secondRadio = mockSecondRadio;
       componentInstance.thirdRadio = mockThirdRadio;
@@ -624,16 +645,18 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForFirstRadio(event);
 
-      expect(componentInstance.secondRadio.nativeElement.focus)
-        .toHaveBeenCalled();
-      expect(componentInstance.thirdRadio.nativeElement.focus)
-        .not.toHaveBeenCalled();
+      expect(
+        componentInstance.secondRadio.nativeElement.focus
+      ).toHaveBeenCalled();
+      expect(
+        componentInstance.thirdRadio.nativeElement.focus
+      ).not.toHaveBeenCalled();
     });
 
     it('should handle tab key press for second radio', () => {
       const mockFirstRadio = new ElementRef(document.createElement('input'));
       const mockThirdRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent('keydown', { key: 'Tab' });
+      const event = new KeyboardEvent('keydown', {key: 'Tab'});
 
       componentInstance.firstRadio = mockFirstRadio;
       componentInstance.thirdRadio = mockThirdRadio;
@@ -643,17 +666,18 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForSecondRadio(event);
 
-      expect(componentInstance.firstRadio.nativeElement.focus)
-        .not.toHaveBeenCalled();
-      expect(componentInstance.thirdRadio.nativeElement.focus)
-        .toHaveBeenCalled();
+      expect(
+        componentInstance.firstRadio.nativeElement.focus
+      ).not.toHaveBeenCalled();
+      expect(
+        componentInstance.thirdRadio.nativeElement.focus
+      ).toHaveBeenCalled();
     });
 
     it('should handle shift+tab key press for second radio', () => {
       const mockFirstRadio = new ElementRef(document.createElement('input'));
       const mockThirdRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent(
-        'keydown', { key: 'Tab', shiftKey: true });
+      const event = new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true});
 
       componentInstance.firstRadio = mockFirstRadio;
       componentInstance.thirdRadio = mockThirdRadio;
@@ -663,17 +687,18 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForSecondRadio(event);
 
-      expect(componentInstance.firstRadio.nativeElement.focus)
-        .toHaveBeenCalled();
-      expect(componentInstance.thirdRadio.nativeElement.focus)
-        .not.toHaveBeenCalled();
+      expect(
+        componentInstance.firstRadio.nativeElement.focus
+      ).toHaveBeenCalled();
+      expect(
+        componentInstance.thirdRadio.nativeElement.focus
+      ).not.toHaveBeenCalled();
     });
 
     it('should handle shift+tab key press for third radio', () => {
       const mockFirstRadio = new ElementRef(document.createElement('input'));
       const mockSecondRadio = new ElementRef(document.createElement('input'));
-      const event = new KeyboardEvent(
-        'keydown', { key: 'Tab', shiftKey: true });
+      const event = new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true});
 
       componentInstance.firstRadio = mockFirstRadio;
       componentInstance.secondRadio = mockSecondRadio;
@@ -683,10 +708,12 @@ describe('Preferences Page Component', () => {
 
       componentInstance.handleTabForThirdRadio(event);
 
-      expect(componentInstance.firstRadio.nativeElement.focus)
-        .not.toHaveBeenCalled();
-      expect(componentInstance.secondRadio.nativeElement.focus)
-        .toHaveBeenCalled();
+      expect(
+        componentInstance.firstRadio.nativeElement.focus
+      ).not.toHaveBeenCalled();
+      expect(
+        componentInstance.secondRadio.nativeElement.focus
+      ).toHaveBeenCalled();
     });
 
     afterEach(() => {

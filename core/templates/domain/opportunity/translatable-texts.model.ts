@@ -16,7 +16,10 @@
  * @fileoverview Frontend Model for translatable texts
  */
 
-import { TranslatableItem, TranslatableItemBackendDict } from './translatable-content.model';
+import {
+  TranslatableItem,
+  TranslatableItemBackendDict,
+} from './translatable-content.model';
 
 export interface ContentIdToContentBackendDictMapping {
   [contentId: string]: TranslatableItemBackendDict;
@@ -34,27 +37,28 @@ export interface StateNamesToContentIdMapping {
 }
 
 export interface TranslatableTextsBackendDict {
-  'state_names_to_content_id_mapping': StateNamesToContentIdBackendDictMapping;
-  'version': string;
+  state_names_to_content_id_mapping: StateNamesToContentIdBackendDictMapping;
+  version: string;
 }
 
 export class TranslatableTexts {
   constructor(
-      private readonly stateNamesToContentIdMapping:
-      StateNamesToContentIdMapping,
-      private readonly version: string) {}
+    private readonly stateNamesToContentIdMapping: StateNamesToContentIdMapping,
+    private readonly version: string
+  ) {}
 
-  static createFromBackendDict(backendDict: TranslatableTextsBackendDict):
-    TranslatableTexts {
+  static createFromBackendDict(
+    backendDict: TranslatableTextsBackendDict
+  ): TranslatableTexts {
     const stateNamesToContentIdMapping: StateNamesToContentIdMapping = {};
     for (let stateName in backendDict.state_names_to_content_id_mapping) {
-      const contentIdToWrittenTranslationMapping = (
-        backendDict.state_names_to_content_id_mapping[stateName]);
+      const contentIdToWrittenTranslationMapping =
+        backendDict.state_names_to_content_id_mapping[stateName];
       const contentIdMapping: ContentIdToContentMapping = {};
       for (const contentId in contentIdToWrittenTranslationMapping) {
-        contentIdMapping[contentId] = (
-          TranslatableItem.createFromBackendDict(
-            contentIdToWrittenTranslationMapping[contentId]));
+        contentIdMapping[contentId] = TranslatableItem.createFromBackendDict(
+          contentIdToWrittenTranslationMapping[contentId]
+        );
       }
       stateNamesToContentIdMapping[stateName] = contentIdMapping;
     }

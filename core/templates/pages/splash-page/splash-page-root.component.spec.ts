@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for the splash page root component.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { SplashPageRootComponent } from './splash-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SplashPageRootComponent} from './splash-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -41,18 +41,15 @@ describe('Splash Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        SplashPageRootComponent,
-        MockTranslatePipe
-      ],
+      declarations: [SplashPageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -63,10 +60,9 @@ describe('Splash Page Root', () => {
     translateService = TestBed.inject(TranslateService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize and subscribe to onLangChange', () => {
     spyOn(translateService.onLangChange, 'subscribe');
@@ -92,10 +88,12 @@ describe('Splash Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.TITLE
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.META
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

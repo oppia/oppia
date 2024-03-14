@@ -41,7 +41,7 @@ import requests
 
 from typing import (
     Dict, Final, List, Literal, Optional, Sequence, TypedDict,
-    Union, overload)
+    overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -661,14 +661,15 @@ def _save_user_contribution_rights(
 def _update_user_contribution_rights(
     user_contribution_rights: user_domain.UserContributionRights
 ) -> None:
-    """Updates the users rights model if the updated object has review rights in
-    at least one item else delete the existing model.
+    """Updates the users rights model if the updated object has review rights
+     or submit rights in at least one item else delete the existing model.
 
     Args:
         user_contribution_rights: UserContributionRights. The updated
             UserContributionRights object of the user.
     """
-    if user_contribution_rights.can_review_at_least_one_item():
+    if user_contribution_rights.can_review_at_least_one_item() or (
+       user_contribution_rights.can_submit_at_least_one_item()):
         _save_user_contribution_rights(user_contribution_rights)
     else:
         remove_contribution_reviewer(user_contribution_rights.id)
@@ -1594,7 +1595,7 @@ def record_user_created_an_exploration(user_id: str) -> None:
 def add_user_to_mailing_list(
     email: str,
     tag: str,
-    name: Union[str, None]=None
+    name: Optional[str]=None
 ) -> bool:
     """Adds user to the bulk email provider with the relevant tag and required
     merge fields.

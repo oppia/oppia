@@ -16,26 +16,29 @@
  * @fileoverview Unit tests for adding syllabus items to learner group.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { AddSyllabusItemsComponent } from './add-syllabus-items.component';
-import { NavigationService } from 'services/navigation.service';
-import { TranslateService } from '@ngx-translate/core';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
-import { LearnerGroupSyllabusBackendApiService, SyllabusSelectionDetails } from
-  'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerGroupSubtopicSummary } from
-  'domain/learner_group/learner-group-subtopic-summary.model';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ConstructTranslationIdsService } from
-  'services/construct-translation-ids.service';
-import { LearnerGroupSyllabus } from
-  'domain/learner_group/learner-group-syllabus.model';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
+import {EventEmitter, NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {AddSyllabusItemsComponent} from './add-syllabus-items.component';
+import {NavigationService} from 'services/navigation.service';
+import {TranslateService} from '@ngx-translate/core';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {
+  LearnerGroupSyllabusBackendApiService,
+  SyllabusSelectionDetails,
+} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {LearnerGroupSubtopicSummary} from 'domain/learner_group/learner-group-subtopic-summary.model';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ConstructTranslationIdsService} from 'services/construct-translation-ids.service';
+import {LearnerGroupSyllabus} from 'domain/learner_group/learner-group-syllabus.model';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 @Pipe({name: 'truncate'})
 class MockTrunctePipe {
@@ -73,8 +76,7 @@ describe('AddSyllabusItemsComponent', () => {
   let windowDimensionsService: WindowDimensionsService;
   let assetsBackendApiService: AssetsBackendApiService;
   let constructTranslationIdsService: ConstructTranslationIdsService;
-  let learnerGroupSyllabusBackendApiService:
-    LearnerGroupSyllabusBackendApiService;
+  let learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService;
   let languageUtilService: LanguageUtilService;
   let selectionDetailsStub: SyllabusSelectionDetails;
 
@@ -85,11 +87,12 @@ describe('AddSyllabusItemsComponent', () => {
     parent_topic_name: 'parentTopicName',
     thumbnail_filename: 'thumbnailFilename',
     thumbnail_bg_color: 'red',
-    subtopic_mastery: 0.5
+    subtopic_mastery: 0.5,
   };
-  const sampleLearnerGroupSubtopicSummary = (
+  const sampleLearnerGroupSubtopicSummary =
     LearnerGroupSubtopicSummary.createFromBackendDict(
-      sampleSubtopicSummaryDict));
+      sampleSubtopicSummaryDict
+    );
 
   const sampleStorySummaryBackendDict = {
     id: 'story_id_0',
@@ -104,18 +107,20 @@ describe('AddSyllabusItemsComponent', () => {
     all_node_dicts: [],
     topic_name: 'Topic',
     classroom_url_fragment: 'math',
-    topic_url_fragment: 'topic'
+    topic_url_fragment: 'topic',
   };
   const sampleStorySummary = StorySummary.createFromBackendDict(
-    sampleStorySummaryBackendDict);
+    sampleStorySummaryBackendDict
+  );
 
   const mockSyllabusItemsBackendDict = {
     learner_group_id: 'groupId',
     story_summary_dicts: [sampleStorySummaryBackendDict],
-    subtopic_summary_dicts: [sampleSubtopicSummaryDict]
+    subtopic_summary_dicts: [sampleSubtopicSummaryDict],
   };
   const mockSyllabusItems = LearnerGroupSyllabus.createFromBackendDict(
-    mockSyllabusItemsBackendDict);
+    mockSyllabusItemsBackendDict
+  );
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -123,23 +128,23 @@ describe('AddSyllabusItemsComponent', () => {
       declarations: [
         AddSyllabusItemsComponent,
         MockTranslatePipe,
-        MockTrunctePipe
+        MockTrunctePipe,
       ],
       providers: [
         {
           provide: TranslateService,
-          useClass: MockTranslateService
+          useClass: MockTranslateService,
         },
         {
           provide: NavigationService,
-          useClass: MockNavigationService
+          useClass: MockNavigationService,
         },
         {
           provide: WindowDimensionsService,
-          useClass: MockWindowDimensionsService
-        }
+          useClass: MockWindowDimensionsService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -151,16 +156,16 @@ describe('AddSyllabusItemsComponent', () => {
         masterList: [
           {
             id: 'skill',
-            text: 'Skill'
+            text: 'Skill',
           },
           {
             id: 'story',
-            text: 'Story'
-          }
+            text: 'Story',
+          },
         ],
         selection: 'skill',
         defaultValue: 'All',
-        summary: 'Type'
+        summary: 'Type',
       },
       categories: {
         description: 'Maths',
@@ -168,16 +173,16 @@ describe('AddSyllabusItemsComponent', () => {
         masterList: [
           {
             id: 'math',
-            text: 'Maths'
+            text: 'Maths',
           },
           {
             id: 'science',
-            text: 'Science'
-          }
+            text: 'Science',
+          },
         ],
         selection: 'math',
         defaultValue: 'All',
-        summary: 'Category'
+        summary: 'Category',
       },
       languageCodes: {
         description: 'English',
@@ -185,17 +190,17 @@ describe('AddSyllabusItemsComponent', () => {
         masterList: [
           {
             id: 'en',
-            text: 'English'
+            text: 'English',
           },
           {
             id: 'es',
-            text: 'Spanish'
-          }
+            text: 'Spanish',
+          },
         ],
         selection: 'en',
         defaultValue: 'All',
-        summary: 'Language'
-      }
+        summary: 'Language',
+      },
     };
 
     navigationService = TestBed.inject(NavigationService);
@@ -203,9 +208,11 @@ describe('AddSyllabusItemsComponent', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     constructTranslationIdsService = TestBed.inject(
-      ConstructTranslationIdsService);
+      ConstructTranslationIdsService
+    );
     learnerGroupSyllabusBackendApiService = TestBed.inject(
-      LearnerGroupSyllabusBackendApiService);
+      LearnerGroupSyllabusBackendApiService
+    );
     languageUtilService = TestBed.inject(LanguageUtilService);
     fixture = TestBed.createComponent(AddSyllabusItemsComponent);
     component = fixture.componentInstance;
@@ -213,8 +220,10 @@ describe('AddSyllabusItemsComponent', () => {
   });
 
   it('should determine if mobile view is active', () => {
-    const windowWidthSpy = spyOn(windowDimensionsService, 'getWidth')
-      .and.returnValue(766);
+    const windowWidthSpy = spyOn(
+      windowDimensionsService,
+      'getWidth'
+    ).and.returnValue(766);
     expect(component.isMobileViewActive()).toBe(true);
 
     windowWidthSpy.and.returnValue(1000);
@@ -228,7 +237,9 @@ describe('AddSyllabusItemsComponent', () => {
     component.openSubmenu(clickEvent, 'category');
 
     expect(navigationService.openSubmenu).toHaveBeenCalledWith(
-      clickEvent, 'category');
+      clickEvent,
+      'category'
+    );
   });
 
   it('should toggle selection', () => {
@@ -250,12 +261,14 @@ describe('AddSyllabusItemsComponent', () => {
   it('should update selection details if a language is selected', () => {
     component.ngOnInit();
     expect(component.selectionDetails.languageCodes.description).toEqual(
-      'Language');
+      'Language'
+    );
     component.selectionDetails = selectionDetailsStub;
     spyOn(translateService, 'instant').and.returnValue('English');
     component.updateSelectionDetails('languageCodes');
     expect(component.selectionDetails.languageCodes.description).toEqual(
-      'English');
+      'English'
+    );
   });
 
   it('should refresh search bar labels', () => {
@@ -281,15 +294,15 @@ describe('AddSyllabusItemsComponent', () => {
     expect(component.isSearchInProgress()).toBe(true);
   });
 
-  it ('should search', fakeAsync(() => {
+  it('should search', fakeAsync(() => {
     component.debounceTimeout = 50;
     component.searchQuery = 'hello';
     component.ngOnInit();
 
     const search = {
       target: {
-        value: 'search'
-      }
+        value: 'search',
+      },
     };
 
     spyOn(component, 'onSearchQueryChangeExec');
@@ -299,34 +312,33 @@ describe('AddSyllabusItemsComponent', () => {
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
   }));
 
-  it('should execute search when search query is changed',
-    fakeAsync(() => {
-      spyOn(
-        learnerGroupSyllabusBackendApiService, 'searchNewSyllabusItemsAsync'
-      ).and.returnValue(Promise.resolve(mockSyllabusItems));
-      component.ngOnInit();
-      component.selectionDetails = selectionDetailsStub;
-      component.selectionDetails.languageCodes.selection = '';
-      component.selectionDetails.categories.selection = '';
-      component.selectionDetails.types.selection = '';
-      component.onSearchQueryChangeExec();
-      tick();
-      fixture.detectChanges();
+  it('should execute search when search query is changed', fakeAsync(() => {
+    spyOn(
+      learnerGroupSyllabusBackendApiService,
+      'searchNewSyllabusItemsAsync'
+    ).and.returnValue(Promise.resolve(mockSyllabusItems));
+    component.ngOnInit();
+    component.selectionDetails = selectionDetailsStub;
+    component.selectionDetails.languageCodes.selection = '';
+    component.selectionDetails.categories.selection = '';
+    component.selectionDetails.types.selection = '';
+    component.onSearchQueryChangeExec();
+    tick();
+    fixture.detectChanges();
 
-      expect(component.storySummaries).toEqual([]);
-      expect(component.subtopicSummaries).toEqual([]);
+    expect(component.storySummaries).toEqual([]);
+    expect(component.subtopicSummaries).toEqual([]);
 
-      component.searchQuery = 'dummy topic';
-      component.onSearchQueryChangeExec();
-      tick();
-      fixture.detectChanges();
+    component.searchQuery = 'dummy topic';
+    component.onSearchQueryChangeExec();
+    tick();
+    fixture.detectChanges();
 
-      expect(component.storySummaries).toEqual(
-        mockSyllabusItems.storySummaries);
-      expect(component.subtopicSummaries).toEqual(
-        mockSyllabusItems.subtopicPageSummaries);
-    })
-  );
+    expect(component.storySummaries).toEqual(mockSyllabusItems.storySummaries);
+    expect(component.subtopicSummaries).toEqual(
+      mockSyllabusItems.subtopicPageSummaries
+    );
+  }));
 
   it('should initialize', fakeAsync(() => {
     spyOn(component, 'searchDropdownCategories').and.returnValue([]);
@@ -346,19 +358,23 @@ describe('AddSyllabusItemsComponent', () => {
     expect(translateService.onLangChange.subscribe).toHaveBeenCalled();
   }));
 
-  it('should call refresh search bar labels whenever the language is ' +
-  'changed', () => {
-    component.ngOnInit();
-    spyOn(component, 'refreshSearchBarLabels');
+  it(
+    'should call refresh search bar labels whenever the language is ' +
+      'changed',
+    () => {
+      component.ngOnInit();
+      spyOn(component, 'refreshSearchBarLabels');
 
-    translateService.onLangChange.emit();
+      translateService.onLangChange.emit();
 
-    expect(component.refreshSearchBarLabels).toHaveBeenCalled();
-  });
+      expect(component.refreshSearchBarLabels).toHaveBeenCalled();
+    }
+  );
 
   it('should get subtopic thumbnail url', () => {
-    spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview')
-      .and.returnValue('/topic/thumbnail/url');
+    spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and.returnValue(
+      '/topic/thumbnail/url'
+    );
 
     expect(
       component.getSubtopicThumbnailUrl(sampleLearnerGroupSubtopicSummary)
@@ -366,11 +382,13 @@ describe('AddSyllabusItemsComponent', () => {
   });
 
   it('should get story thumbnail url', () => {
-    spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview')
-      .and.returnValue('/story/thumbnail/url');
+    spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and.returnValue(
+      '/story/thumbnail/url'
+    );
 
     expect(component.getStoryThumbnailUrl(sampleStorySummary)).toEqual(
-      '/story/thumbnail/url');
+      '/story/thumbnail/url'
+    );
   });
 
   it('should add story to syllabus successfully', () => {
@@ -394,8 +412,9 @@ describe('AddSyllabusItemsComponent', () => {
     component.addSubtopicToSyllabus(sampleLearnerGroupSubtopicSummary);
 
     expect(component.syllabusSubtopicPageIds).toEqual(['topicId1:1']);
-    expect(component.syllabusSubtopicSummaries).toEqual(
-      [sampleLearnerGroupSubtopicSummary]);
+    expect(component.syllabusSubtopicSummaries).toEqual([
+      sampleLearnerGroupSubtopicSummary,
+    ]);
   });
 
   it('should remove story from syllabus successfully', () => {

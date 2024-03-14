@@ -21,7 +21,7 @@ var action = require('../webdriverio_utils/action.js');
 var waitFor = require('./waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-var PreferencesPage = function() {
+var PreferencesPage = function () {
   var USER_PREFERENCES_URL = '/preferences';
   var audioLanguageSelector = $('.e2e-test-audio-language-selector');
   var creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
@@ -32,7 +32,8 @@ var PreferencesPage = function() {
   var emailUpdatesCheckbox = $('.e2e-test-email-updates-checkbox');
   var exportAccountButton = $('.e2e-test-export-account-button');
   var feedbackMessageEmailsCheckbox = $(
-    '.e2e-test-feedback-message-email-checkbox');
+    '.e2e-test-feedback-message-email-checkbox'
+  );
   var languageSelector = $('.e2e-test-site-language-selector');
   var learnerDashboardRadio = $('.e2e-test-learner-dashboard-radio');
   var navBar = $('.e2e-test-navbar-dropdown-toggle');
@@ -42,7 +43,7 @@ var PreferencesPage = function() {
   var profilePhotoUploadError = $('.e2e-test-upload-error');
   var saveChangesButton = $('.e2e-test-save-changes-button');
   var subscription = $('.e2e-test-subscription-name');
-  var subscriptionsSelector = function() {
+  var subscriptionsSelector = function () {
     return $$('.e2e-test-subscription-name');
   };
   var userBioElement = $('.e2e-test-user-bio');
@@ -58,9 +59,11 @@ var PreferencesPage = function() {
     // on a neutral element to move the cursor away.
     await action.click('Navbar Button', navBar);
     await waitFor.visibilityOfInfoToast(
-      `Info toast for saving ${fieldName} takes too long to appear.`);
+      `Info toast for saving ${fieldName} takes too long to appear.`
+    );
     await waitFor.invisibilityOfInfoToast(
-      'Info toast takes too long to disappear.');
+      'Info toast takes too long to disappear.'
+    );
   };
 
   var clickSaveChangesButton = async function() {
@@ -74,13 +77,16 @@ var PreferencesPage = function() {
     await action.click('Preferences page header', pageHeader);
   };
 
-  this.expectUploadError = async function() {
+  this.expectUploadError = async function () {
     expect(await profilePhotoUploadError.isDisplayed()).toBe(true);
   };
 
-  this.uploadProfilePhoto = async function(imgPath, resetExistingImage) {
+  this.uploadProfilePhoto = async function (imgPath, resetExistingImage) {
     return await workflow.uploadImage(
-      profilePhotoClickable, imgPath, resetExistingImage);
+      profilePhotoClickable,
+      imgPath,
+      resetExistingImage
+    );
   };
 
   this.submitProfilePhoto = async function(imgPath, resetExistingImage) {
@@ -92,7 +98,7 @@ var PreferencesPage = function() {
     await action.click('Preferences page header', pageHeader);
   };
 
-  this.getProfilePhotoSource = async function() {
+  this.getProfilePhotoSource = async function () {
     return await workflow.getImageSource(customProfilePhoto);
   };
 
@@ -106,23 +112,25 @@ var PreferencesPage = function() {
     await saveNewChanges('User Bio');
   };
 
-  this.toggleEmailUpdatesCheckbox = async function() {
+  this.toggleEmailUpdatesCheckbox = async function () {
     await action.click('Email Updates checkbox', emailUpdatesCheckbox);
     await saveNewChanges('Email Updates');
   };
 
-  this.toggleEditorRoleEmailsCheckbox = async function() {
+  this.toggleEditorRoleEmailsCheckbox = async function () {
     await action.click('Editor role emails checkbox', editorRoleEmailsCheckbox);
     await saveNewChanges('Editor Role Emails');
   };
 
-  this.toggleFeedbackEmailsCheckbox = async function() {
+  this.toggleFeedbackEmailsCheckbox = async function () {
     await action.click(
-      'Feedback emails checkbox', feedbackMessageEmailsCheckbox);
+      'Feedback emails checkbox',
+      feedbackMessageEmailsCheckbox
+    );
     await saveNewChanges('Feedback Emails');
   };
 
-  this.selectSystemLanguage = async function(language) {
+  this.selectSystemLanguage = async function (language) {
     await action.click('system language selector', languageSelector);
     var dropdownSelectorString = '#mat-select-0-panel';
     var dropdownOption = $(`.mat-option-text=${language}`);
@@ -162,7 +170,7 @@ var PreferencesPage = function() {
     await saveNewChanges('System Language');
   };
 
-  this.selectPreferredAudioLanguage = async function(language) {
+  this.selectPreferredAudioLanguage = async function (language) {
     await action.click('clickable', audioLanguageSelector);
     var dropdownOption = $(`.mat-option-text=${language}`);
     await action.click('clickable', dropdownOption);
@@ -182,30 +190,34 @@ var PreferencesPage = function() {
   };
 
   // Here Newline Character is used as ENTER KEY.
-  this.setUserInterests = async function(interests) {
+  this.setUserInterests = async function (interests) {
     await action.click('User Interest Input', userInterestsInput);
     for (var i = 0; i < interests.length; i++) {
       await action.setValue(
-        'User Interest Input', userInterestsInput, interests[i] + '\n');
+        'User Interest Input',
+        userInterestsInput,
+        interests[i] + '\n'
+      );
       await saveNewChanges('User Interests');
     }
   };
 
-  this.isFeedbackEmailsCheckboxSelected = async function() {
+  this.isFeedbackEmailsCheckboxSelected = async function () {
     return await feedbackMessageEmailsCheckbox.isSelected();
   };
 
-  this.isEditorRoleEmailsCheckboxSelected = async function() {
+  this.isEditorRoleEmailsCheckboxSelected = async function () {
     return await editorRoleEmailsCheckbox.isSelected();
   };
 
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
-  this.expectDisplayedFirstSubscriptionToBe = async function(name) {
+  this.expectDisplayedFirstSubscriptionToBe = async function (name) {
     await waitFor.visibilityOf(
       subscription,
-      'subscription taking too long to appear.');
+      'subscription taking too long to appear.'
+    );
     var subscriptions = await subscriptionsSelector();
     expect(await subscriptions[0].getText()).toMatch(name);
   };
@@ -213,83 +225,89 @@ var PreferencesPage = function() {
   // This function only compares the text displayed on the subscription (which
   // might be abbreviated), rather than the text on the popover that appears
   // when hovering over the tile.
-  this.expectDisplayedLastSubscriptionToBe = async function(name) {
+  this.expectDisplayedLastSubscriptionToBe = async function (name) {
     var subscriptions = await subscriptionsSelector();
     var last = subscriptions.length - 1;
     await waitFor.visibilityOf(
       subscriptions[last],
-      'subscriptions[last] taking too long to appear.');
+      'subscriptions[last] taking too long to appear.'
+    );
     expect(await subscriptions[last].getText()).toMatch(name);
   };
 
-  this.expectPageHeaderToBe = async function(text) {
+  this.expectPageHeaderToBe = async function (text) {
     await waitFor.visibilityOf(
-      pageHeader, 'pageHeader taking too long to appear.');
+      pageHeader,
+      'pageHeader taking too long to appear.'
+    );
     expect(await pageHeader.getText()).toEqual(text);
   };
 
-  this.expectPreferredSiteLanguageToBe = async function(language) {
+  this.expectPreferredSiteLanguageToBe = async function (language) {
     await waitFor.visibilityOf(
       languageSelector,
-      'languageSelector taking too long to appear.');
+      'languageSelector taking too long to appear.'
+    );
     expect(await languageSelector.getText()).toEqual(language);
   };
 
-  this.expectPreferredAudioLanguageToBe = async function(language) {
+  this.expectPreferredAudioLanguageToBe = async function (language) {
     await waitFor.visibilityOf(
       audioLanguageSelector,
-      'audio language selector taking too long to appear.');
+      'audio language selector taking too long to appear.'
+    );
     expect(await audioLanguageSelector.getText()).toEqual(language);
   };
 
-  this.expectPreferredAudioLanguageNotToBe = async function(language) {
+  this.expectPreferredAudioLanguageNotToBe = async function (language) {
     await waitFor.visibilityOf(
       audioLanguageSelector,
-      'audio language selector taking too long to appear.');
+      'audio language selector taking too long to appear.'
+    );
     expect(await audioLanguageSelector.getText()).not.toEqual(language);
   };
 
-  this.expectSubscriptionCountToEqual = async function(expectedCount) {
+  this.expectSubscriptionCountToEqual = async function (expectedCount) {
     if (expectedCount > 0) {
       await waitFor.visibilityOf(
-        subscription, 'Subscription tile is not visible');
+        subscription,
+        'Subscription tile is not visible'
+      );
     }
     let actualCount = await subscriptionsSelector().length;
     expect(actualCount).toEqual(expectedCount);
   };
 
-  this.expectUserBioToBe = async function(bio) {
+  this.expectUserBioToBe = async function (bio) {
     await waitFor.visibilityOf(
       userBioElement, 'User bio field takes too long to appear.');
     expect(await userBioElement.getValue()).toMatch(bio);
   };
 
-  this.selectCreatorDashboard = async function() {
-    await action.click(
-      'Creator Dashboard radio', creatorDashboardRadio);
+  this.selectCreatorDashboard = async function () {
+    await action.click('Creator Dashboard radio', creatorDashboardRadio);
     await saveNewChanges('Creator Dashboard Option');
   };
 
-  this.selectContributorDashboard = async function() {
+  this.selectContributorDashboard = async function () {
     await action.click(
-      'Contributor Dashboard radio', contributorDashboardRadio);
+      'Contributor Dashboard radio',
+      contributorDashboardRadio
+    );
     await saveNewChanges('Contributor Dashboard Option');
   };
 
-  this.selectLearnerDashboard = async function() {
-    await action.click(
-      'Learner Dashboard radio', learnerDashboardRadio);
+  this.selectLearnerDashboard = async function () {
+    await action.click('Learner Dashboard radio', learnerDashboardRadio);
     await saveNewChanges('Learner Dashboard Option');
   };
 
-  this.clickDeleteAccountButton = async function() {
-    await action.click(
-      'Delete Account button', deleteAccountButton);
+  this.clickDeleteAccountButton = async function () {
+    await action.click('Delete Account button', deleteAccountButton);
   };
 
-  this.clickExportAccountButton = async function() {
-    await action.click(
-      'Export Account button', exportAccountButton);
+  this.clickExportAccountButton = async function () {
+    await action.click('Export Account button', exportAccountButton);
   };
 };
 

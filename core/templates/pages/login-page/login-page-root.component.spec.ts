@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the login page root component.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { LoginPageRootComponent } from './login-page-root.component';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {LoginPageRootComponent} from './login-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -40,18 +40,15 @@ describe('Login Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        LoginPageRootComponent,
-        MockTranslatePipe
-      ],
+      declarations: [LoginPageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -62,10 +59,9 @@ describe('Login Page Root', () => {
     translateService = TestBed.inject(TranslateService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize and subscribe to onLangChange', () => {
     spyOn(translateService.onLangChange, 'subscribe');
@@ -91,10 +87,12 @@ describe('Login Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.TITLE
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.META
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

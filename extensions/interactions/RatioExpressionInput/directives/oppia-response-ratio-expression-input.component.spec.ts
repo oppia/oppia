@@ -17,10 +17,10 @@
  * component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseRatioExpressionInputComponent } from './oppia-response-ratio-expression-input.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseRatioExpressionInputComponent} from './oppia-response-ratio-expression-input.component';
 
 describe('ResponseRatioExpressionInput', () => {
   let component: ResponseRatioExpressionInputComponent;
@@ -38,16 +38,15 @@ describe('ResponseRatioExpressionInput', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: mockHtmlEscaperService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = (
-      TestBed.createComponent(ResponseRatioExpressionInputComponent));
+    fixture = TestBed.createComponent(ResponseRatioExpressionInputComponent);
     component = fixture.componentInstance;
   });
 

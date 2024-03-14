@@ -16,9 +16,13 @@
  * @fileoverview Unit tests for exploration metadata object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { ExplorationMetadata, ExplorationMetadataBackendDict, ExplorationMetadataObjectFactory } from './ExplorationMetadataObjectFactory';
+import {TestBed} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {
+  ExplorationMetadata,
+  ExplorationMetadataBackendDict,
+  ExplorationMetadataObjectFactory,
+} from './ExplorationMetadataObjectFactory';
 
 describe('Exploration metadata object factory', () => {
   let explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
@@ -26,17 +30,18 @@ describe('Exploration metadata object factory', () => {
   let explorationMetadataBackendDict: ExplorationMetadataBackendDict;
   const cArgs = {
     parse_with_jinja: true,
-    value: ''
+    value: '',
   };
   const gId = 'Copier';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ExplorationMetadataObjectFactory]
+      providers: [ExplorationMetadataObjectFactory],
     });
 
     explorationMetadataObjectFactory = TestBed.inject(
-      ExplorationMetadataObjectFactory);
+      ExplorationMetadataObjectFactory
+    );
 
     explorationMetadataBackendDict = {
       title: 'Exploration',
@@ -48,24 +53,28 @@ describe('Exploration metadata object factory', () => {
       author_notes: '',
       states_schema_version: 50,
       init_state_name: 'Introduction',
-      param_changes: [{
-        customization_args: cArgs,
-        generator_id: gId,
-        name: 'param_1'
-      }],
+      param_changes: [
+        {
+          customization_args: cArgs,
+          generator_id: gId,
+          name: 'param_1',
+        },
+      ],
       param_specs: {},
       auto_tts_enabled: false,
-      correctness_feedback_enabled: true,
-      edits_allowed: true
+      edits_allowed: true,
     };
   });
 
   it('should create exploration metadata object from backend dict', () => {
-    explorationMetadata = explorationMetadataObjectFactory
-      .createFromBackendDict(explorationMetadataBackendDict);
+    explorationMetadata =
+      explorationMetadataObjectFactory.createFromBackendDict(
+        explorationMetadataBackendDict
+      );
 
     expect(explorationMetadata.toBackendDict()).toEqual(
-      explorationMetadataBackendDict);
+      explorationMetadataBackendDict
+    );
   });
 
   it('should contain all the latest exploration metadata properties', () => {
@@ -74,8 +83,10 @@ describe('Exploration metadata object factory', () => {
     // If you modify anything in constants.METADATA_PROPERTIES, then make
     // sure to include the changes in properties in the attributes of the
     // model class too.
-    explorationMetadata = explorationMetadataObjectFactory
-      .createFromBackendDict(explorationMetadataBackendDict);
+    explorationMetadata =
+      explorationMetadataObjectFactory.createFromBackendDict(
+        explorationMetadataBackendDict
+      );
     const backendDict = explorationMetadata.toBackendDict();
 
     for (let property of AppConstants.METADATA_PROPERTIES) {

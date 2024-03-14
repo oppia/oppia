@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for Merge Skill Modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatRadioModule } from '@angular/material/radio';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MergeSkillModalComponent } from './merge-skill-modal.component';
-import { SkillSelectorComponent } from './skill-selector.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatRadioModule} from '@angular/material/radio';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MergeSkillModalComponent} from './merge-skill-modal.component';
+import {SkillSelectorComponent} from './skill-selector.component';
 
 describe('Merge Skill Modal', () => {
   let fixture: ComponentFixture<MergeSkillModalComponent>;
@@ -38,15 +38,10 @@ describe('Merge Skill Modal', () => {
         MatRadioModule,
         MatCheckboxModule,
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
-      declarations: [
-        MergeSkillModalComponent,
-        SkillSelectorComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [MergeSkillModalComponent, SkillSelectorComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 
@@ -65,7 +60,7 @@ describe('Merge Skill Modal', () => {
     componentInstance.confirm();
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       skill: componentInstance.skill,
-      supersedingSkillId: componentInstance.selectedSkillId
+      supersedingSkillId: componentInstance.selectedSkillId,
     });
   });
 

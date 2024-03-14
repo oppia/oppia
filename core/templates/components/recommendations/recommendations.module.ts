@@ -12,28 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Module for the recommendations components.
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { PostChapterRecommendationsComponent } from './post-chapter-recommendations.component';
+import {PostChapterRecommendationsComponent} from './post-chapter-recommendations.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    TranslateModule,
-  ],
-  declarations: [
-    PostChapterRecommendationsComponent,
-  ],
-  exports: [
-    PostChapterRecommendationsComponent,
-  ]
+  imports: [CommonModule, TranslateModule],
+  declarations: [PostChapterRecommendationsComponent],
+  exports: [PostChapterRecommendationsComponent],
 })
-
-export class RecommendationsModule { }
+export class RecommendationsModule {}

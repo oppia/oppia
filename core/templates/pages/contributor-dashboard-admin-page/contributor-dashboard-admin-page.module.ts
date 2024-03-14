@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,52 +16,42 @@
  * @fileoverview Module for the contributor-dashboard-admin page.
  */
 
-import { CommonModule } from '@angular/common';
-
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { CdAdminTranslationRoleEditorModal } from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
-import { CdAdminQuestionRoleEditorModal } from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
-import { UsernameInputModal } from './username-input-modal/username-input-modal.component';
-import { ContributorDashboardAdminNavbarComponent } from './navbar/contributor-dashboard-admin-navbar.component';
-import { ContributorAdminDashboardPageComponent } from './contributor-admin-dashboard-page.component';
-import { ContributorAdminStatsTable } from './contributor-dashboard-tables/contributor-admin-stats-table.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { TopicFilterComponent } from './topic-filter/topic-filter.component';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {RouterModule} from '@angular/router';
+import {MatTableModule} from '@angular/material/table';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
+import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
+import {UsernameInputModal} from './username-input-modal/username-input-modal.component';
+import {ContributorDashboardAdminNavbarComponent} from './navbar/contributor-dashboard-admin-navbar.component';
+import {ContributorAdminDashboardPageComponent} from './contributor-admin-dashboard-page.component';
+import {ContributorAdminStatsTable} from './contributor-dashboard-tables/contributor-admin-stats-table.component';
+import {TopicFilterComponent} from './topic-filter/topic-filter.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {ContributorDashboardAdminPageRootComponent} from './contributor-dashboard-admin-page-root.component';
+import {ContributorDashboardAdminAuthGuard} from './contributor-dashboard-admin-auth.guard';
+import {ContributorDashboardAdminPageComponent} from './contributor-dashboard-admin-page.component';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
     CommonModule,
     FormsModule,
-    HttpClientModule,
     MatTableModule,
     MatTooltipModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
+    ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ContributorDashboardAdminPageRootComponent,
+        canActivate: [ContributorDashboardAdminAuthGuard],
+      },
+    ]),
     ReactiveFormsModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
   ],
   declarations: [
     CdAdminTranslationRoleEditorModal,
@@ -70,62 +60,19 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     ContributorAdminDashboardPageComponent,
     ContributorAdminStatsTable,
     TopicFilterComponent,
-    UsernameInputModal
+    UsernameInputModal,
+    ContributorDashboardAdminPageComponent,
+    ContributorDashboardAdminPageRootComponent,
   ],
   entryComponents: [
     CdAdminTranslationRoleEditorModal,
     CdAdminQuestionRoleEditorModal,
     ContributorDashboardAdminNavbarComponent,
     ContributorAdminDashboardPageComponent,
+    ContributorDashboardAdminPageComponent,
     ContributorAdminStatsTable,
     TopicFilterComponent,
-    UsernameInputModal
+    UsernameInputModal,
   ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
 })
-class ContributorDashboardAdminPageModule {
-  // Empty placeholder method to satisfy the `Compiler`.
-  ngDoBootstrap() {}
-}
-
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(ContributorDashboardAdminPageModule);
-};
-const downgradedModule = downgradeModule(bootstrapFnAsync);
-
-declare var angular: ng.IAngularStatic;
-
-angular.module('oppia').requires.push(downgradedModule);
-
-angular.module('oppia').directive(
-  // This directive is the downgraded version of the Angular component to
-  // bootstrap the Angular 8.
-  'oppiaAngularRoot',
-  downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+export class ContributorDashboardAdminPageModule {}

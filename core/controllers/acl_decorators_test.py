@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
@@ -31,13 +32,9 @@ from core.domain import classifier_domain
 from core.domain import classifier_services
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import platform_feature_services as feature_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -981,14 +978,6 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
 
         math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
@@ -3322,30 +3311,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_admin_cannot_access_new_contributor_dashboard_admin_page(
         self
     ) -> None:
-        feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            self.owner_id, 'flag update',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain
-                                    .ALLOWED_PLATFORM_TYPES[0]
-                                ]
-                            ]
-                        }
-                    ],
-                    'value_when_matched': True
-                })
-            ]
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
@@ -3359,30 +3329,11 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI])
     def test_question_coordinator_can_access_new_cd_admin_page(
         self
     ) -> None:
-        feature_services.update_feature_flag(
-            platform_parameter_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
-            self.owner_id, 'flag update',
-            [
-                platform_parameter_domain.PlatformParameterRule.from_dict({
-                    'filters': [
-                        {
-                            'type': 'platform_type',
-                            'conditions': [
-                                [
-                                    '=',
-                                    platform_parameter_domain
-                                    .ALLOWED_PLATFORM_TYPES[0]
-                                ]
-                            ]
-                        }
-                    ],
-                    'value_when_matched': True
-                })
-            ]
-        )
         self.add_user_role(
             self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
         self.login(self.user_email)
@@ -7888,11 +7839,69 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
             response['error'],
             'You must be logged in to access this resource.')
 
-    def test_classroom_admin_can_manage_blog_editors(self) -> None:
+    def test_classroom_admin_can_access_classroom_admin_page(self) -> None:
         self.login(self.CLASSROOM_ADMIN_EMAIL)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/classroom-admin')
+
+        self.assertEqual(response['success'], 1)
+        self.logout()
+
+
+class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
+    """Tests for can_access_voiceover_admin_page decorator."""
+
+    username = 'user'
+    user_email = 'user@example.com'
+
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_access_voiceover_admin_page
+        def get(self) -> None:
+            self.render_json({'success': 1})
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+
+        self.add_user_role(
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/voiceover-admin', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_normal_user_cannot_access_voiceover_admin_page(self) -> None:
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/voiceover-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to access voiceover admin page.')
+        self.logout()
+
+    def test_guest_user_cannot_access_voiceover_admin_page(self) -> None:
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/voiceover-admin', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_voiceover_admin_can_access_voiceover_admin_page(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/voiceover-admin')
 
         self.assertEqual(response['success'], 1)
         self.logout()

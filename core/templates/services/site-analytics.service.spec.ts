@@ -16,22 +16,23 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {TestBed} from '@angular/core/testing';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Site Analytics Service', () => {
   let sas: SiteAnalyticsService;
   let ws: WindowRef;
   let gtagSpy: jasmine.Spy;
   let pathname = 'pathname';
+  const explorationId = 'abc1';
 
   class MockWindowRef {
     nativeWindow = {
       gtag: () => {},
       location: {
-        pathname
-      }
+        pathname,
+      },
     };
   }
 
@@ -40,9 +41,9 @@ describe('Site Analytics Service', () => {
       providers: [
         {
           provide: WindowRef,
-          useClass: MockWindowRef
-        }
-      ]
+          useClass: MockWindowRef,
+        },
+      ],
     }).compileComponents();
 
     sas = TestBed.inject(SiteAnalyticsService);
@@ -64,7 +65,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'LoginButton',
-        event_label: pathname + ' LoginEventButton'
+        event_label: pathname + ' LoginEventButton',
       });
     });
 
@@ -72,7 +73,7 @@ describe('Site Analytics Service', () => {
       sas.registerNewSignupEvent('srcElement');
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'sign_up', {
-        source_element: 'srcElement'
+        source_element: 'srcElement',
       });
     });
 
@@ -81,7 +82,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'BrowseLessonsButton',
-        event_label: pathname
+        event_label: pathname,
       });
     });
 
@@ -90,7 +91,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'StartLearningButton',
-        event_label: pathname
+        event_label: pathname,
       });
     });
 
@@ -99,7 +100,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'StartContributingButton',
-        event_label: pathname
+        event_label: pathname,
       });
     });
 
@@ -109,7 +110,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'GoToDonationSite',
-        event_label: donationSite
+        event_label: donationSite,
       });
     });
 
@@ -118,7 +119,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'ApplyToTeachWithOppia',
-        event_label: ''
+        event_label: '',
       });
     });
 
@@ -127,29 +128,26 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'CreateExplorationButton',
-        event_label: pathname
+        event_label: pathname,
       });
     });
 
     it('should register create new exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerCreateNewExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
         event_category: 'NewExploration',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register create new exploration in collection event', () => {
-      const explorationId = 'abc1';
       sas.registerCreateNewExplorationInCollectionEvent(explorationId);
 
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'create', {
-          event_category: 'NewExplorationFromCollection',
-          event_label: explorationId
-        });
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
+        event_category: 'NewExplorationFromCollection',
+        event_label: explorationId,
+      });
     });
 
     it('should register new collection event', () => {
@@ -158,19 +156,17 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
         event_category: 'NewCollection',
-        event_label: collectionId
+        event_label: collectionId,
       });
     });
 
     it('should register commit changes to private exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerCommitChangesToPrivateExplorationEvent(explorationId);
 
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'click', {
-          event_category: 'CommitToPrivateExploration',
-          event_label: explorationId
-        });
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+        event_category: 'CommitToPrivateExploration',
+        event_label: explorationId,
+      });
     });
 
     it('should register share exploration event', () => {
@@ -179,7 +175,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share', {
         event_category: network,
-        event_label: pathname
+        event_label: pathname,
       });
     });
 
@@ -189,7 +185,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share', {
         event_category: network,
-        event_label: pathname
+        event_label: pathname,
       });
     });
 
@@ -199,227 +195,205 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'share', {
         event_category: network,
-        event_label: pathname
+        event_label: pathname,
       });
     });
 
     it('should register open embed info event', () => {
-      const explorationId = 'abc1';
       sas.registerOpenEmbedInfoEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
         event_category: 'EmbedInfoModal',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register commit changes to public exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerCommitChangesToPublicExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'CommitToPublicExploration',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register tutorial modal open event', () => {
-      const explorationId = 'abc1';
       sas.registerTutorialModalOpenEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
         event_category: 'TutorialModalOpen',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register decline tutorial modal event', () => {
-      const explorationId = 'abc1';
       sas.registerDeclineTutorialModalEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'DeclineTutorialModal',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register accept tutorial modal event', () => {
-      const explorationId = 'abc1';
       sas.registerAcceptTutorialModalEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'AcceptTutorialModal',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register click help button event', () => {
-      const explorationId = 'abc1';
       sas.registerClickHelpButtonEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'ClickHelpButton',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register visit help center event', () => {
-      const explorationId = 'abc1';
       sas.registerVisitHelpCenterEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'VisitHelpCenter',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register open tutorial from help center event', () => {
-      const explorationId = 'abc1';
       sas.registerOpenTutorialFromHelpCenterEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'OpenTutorialFromHelpCenter',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register skip tutorial event', () => {
-      const explorationId = 'abc1';
       sas.registerSkipTutorialEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'SkipTutorial',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register finish tutorial event', () => {
-      const explorationId = 'abc1';
       sas.registerFinishTutorialEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'FinishTutorial',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register editor first entry event', () => {
-      const explorationId = 'abc1';
       sas.registerEditorFirstEntryEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
         event_category: 'FirstEnterEditor',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register first open content box event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstOpenContentBoxEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
         event_category: 'FirstOpenContentBox',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register first save content event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSaveContentEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'FirstSaveContent',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register first click add interaction event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstClickAddInteractionEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'FirstClickAddInteraction',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register select interaction type event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSelectInteractionTypeEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'FirstSelectInteractionType',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register first save interaction event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSaveInteractionEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'FirstSaveInteraction',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register first save rule event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstSaveRuleEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'FirstSaveRule',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register first create second state event', () => {
-      const explorationId = 'abc1';
       sas.registerFirstCreateSecondStateEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'create', {
         event_category: 'FirstCreateSecondState',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register save playable exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerSavePlayableExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'save', {
         event_category: 'SavePlayableExploration',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register open publish exploration modal event', () => {
-      const explorationId = 'abc1';
       sas.registerOpenPublishExplorationModalEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'open', {
         event_category: 'PublishExplorationModal',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register publish exploration event', () => {
-      const explorationId = 'abc1';
       sas.registerPublishExplorationEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'PublishExploration',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register visit oppia from iframe event', () => {
-      const explorationId = 'abc1';
       sas.registerVisitOppiaFromIframeEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'VisitOppiaFromIframe',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
@@ -429,20 +403,23 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'PlayerNewCard',
-        event_label: String(cardNumber)
+        event_label: String(cardNumber),
       });
     });
 
-    it('should register new card when card number is greather than 10 and' +
-      ' it\'s a multiple of 10', () => {
-      const cardNumber = 20;
-      sas.registerNewCard(cardNumber, 'abc1');
+    it(
+      'should register new card when card number is greather than 10 and' +
+        " it's a multiple of 10",
+      () => {
+        const cardNumber = 20;
+        sas.registerNewCard(cardNumber, 'abc1');
 
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-        event_category: 'PlayerNewCard',
-        event_label: String(cardNumber)
-      });
-    });
+        expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+          event_category: 'PlayerNewCard',
+          event_label: String(cardNumber),
+        });
+      }
+    );
 
     it('should not register new card', () => {
       const cardNumber = 35;
@@ -456,7 +433,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
         event_category: 'PlayerFinishExploration',
-        event_label: '123'
+        event_label: '123',
       });
     });
 
@@ -468,7 +445,7 @@ describe('Site Analytics Service', () => {
         'classroom_lesson_started',
         {
           topic_name: 'Fractions',
-          exploration_id: '123'
+          exploration_id: '123',
         }
       );
     });
@@ -494,7 +471,7 @@ describe('Site Analytics Service', () => {
           exploration_id: '123',
           chapter_number: '2',
           chapter_card_count: '3',
-          exploration_language: 'en'
+          exploration_language: 'en',
         }
       );
     });
@@ -505,37 +482,34 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'OpenFractionsFromLandingPage',
-        event_label: collectionId
+        event_label: collectionId,
       });
     });
 
     it('should register save recorded audio event', () => {
-      const explorationId = 'abc1';
       sas.registerSaveRecordedAudioEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'SaveRecordedAudio',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register audio recording event', () => {
-      const explorationId = 'abc1';
       sas.registerStartAudioRecordingEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'StartAudioRecording',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
     it('should register upload audio event', () => {
-      const explorationId = 'abc1';
       sas.registerUploadAudioEvent(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'UploadRecordedAudio',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
@@ -545,7 +519,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'ContributorDashboardSuggest',
-        event_label: contributionType
+        event_label: contributionType,
       });
     });
 
@@ -555,21 +529,19 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'ContributorDashboardSubmitSuggestion',
-        event_label: contributionType
+        event_label: contributionType,
       });
     });
 
-    it('should register Contributor Dashboard view suggestion for review event',
-      () => {
-        const contributionType = 'Translation';
-        sas.registerContributorDashboardViewSuggestionForReview(
-          contributionType);
+    it('should register Contributor Dashboard view suggestion for review event', () => {
+      const contributionType = 'Translation';
+      sas.registerContributorDashboardViewSuggestionForReview(contributionType);
 
-        expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
-          event_category: 'ContributorDashboardViewSuggestionForReview',
-          event_label: contributionType
-        });
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+        event_category: 'ContributorDashboardViewSuggestionForReview',
+        event_label: contributionType,
       });
+    });
 
     it('should register Contributor Dashboard accept suggestion event', () => {
       const contributionType = 'Translation';
@@ -577,7 +549,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'ContributorDashboardAcceptSuggestion',
-        event_label: contributionType
+        event_label: contributionType,
       });
     });
 
@@ -587,7 +559,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'ContributorDashboardRejectSuggestion',
-        event_label: contributionType
+        event_label: contributionType,
       });
     });
 
@@ -596,17 +568,16 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
         event_category: 'ActiveUserStartAndSawCards',
-        event_label: ''
+        event_label: '',
       });
     });
 
     it('should register exploration start', () => {
-      const explorationId = 'abc1';
       sas.registerStartExploration(explorationId);
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'engage', {
         event_category: 'PlayerStartExploration',
-        event_label: explorationId
+        event_label: explorationId,
       });
     });
 
@@ -615,13 +586,23 @@ describe('Site Analytics Service', () => {
 
       sas.registerClassroomPageViewed();
       expect(sas._sendEventToLegacyGoogleAnalytics).toHaveBeenCalledWith(
-        'ClassroomEngagement', 'impression', 'ViewClassroom');
+        'ClassroomEngagement',
+        'impression',
+        'ViewClassroom'
+      );
     });
 
     it('should register active classroom lesson usage', () => {
       let explorationId = '123';
       sas.registerClassroomLessonEngagedWithEvent(
-        'math', 'Fractions', 'ch1', explorationId, '2', '3', 'en');
+        'math',
+        'Fractions',
+        'ch1',
+        explorationId,
+        '2',
+        '3',
+        'en'
+      );
 
       expect(gtagSpy).toHaveBeenCalledWith(
         'event',
@@ -633,7 +614,7 @@ describe('Site Analytics Service', () => {
           exploration_id: '123',
           chapter_number: '2',
           chapter_card_count: '3',
-          exploration_language: 'en'
+          exploration_language: 'en',
         }
       );
     });
@@ -643,7 +624,7 @@ describe('Site Analytics Service', () => {
 
       expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
         event_category: 'ClassroomEngagement',
-        event_label: 'ClickOnClassroom'
+        event_label: 'ClickOnClassroom',
       });
     });
 
@@ -651,9 +632,10 @@ describe('Site Analytics Service', () => {
       sas.registerCommunityLessonCompleted('exp_id');
 
       expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'community_lesson_completed',
+        'event',
+        'community_lesson_completed',
         {
-          exploration_id: 'exp_id'
+          exploration_id: 'exp_id',
         }
       );
     });
@@ -662,9 +644,10 @@ describe('Site Analytics Service', () => {
       sas.registerCommunityLessonStarted('exp_id');
 
       expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'community_lesson_started',
+        'event',
+        'community_lesson_started',
         {
-          exploration_id: 'exp_id'
+          exploration_id: 'exp_id',
         }
       );
     });
@@ -672,40 +655,34 @@ describe('Site Analytics Service', () => {
     it('should register audio play event', () => {
       sas.registerStartAudioPlayedEvent('exp_id', 0);
 
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'audio_played',
-        {
-          exploration_id: 'exp_id',
-          card_number: 0
-        }
-      );
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'audio_played', {
+        exploration_id: 'exp_id',
+        card_number: 0,
+      });
     });
 
     it('should register practice session start event', () => {
       sas.registerPracticeSessionStartEvent('math', 'topic', '1,2,3');
 
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'practice_session_start',
-        {
-          classroom_name: 'math',
-          topic_name: 'topic',
-          practice_session_id: '1,2,3'
-        }
-      );
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'practice_session_start', {
+        classroom_name: 'math',
+        topic_name: 'topic',
+        practice_session_id: '1,2,3',
+      });
     });
 
     it('should register practice session end event', () => {
-      sas.registerPracticeSessionEndEvent(
-        'math', 'topic', '1,2,3', 10, 10);
+      sas.registerPracticeSessionEndEvent('math', 'topic', '1,2,3', 10, 10);
 
       expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'practice_session_complete',
+        'event',
+        'practice_session_complete',
         {
           classroom_name: 'math',
           topic_name: 'topic',
           practice_session_id: '1,2,3',
           questions_answered: 10,
-          total_score: 10
+          total_score: 10,
         }
       );
     });
@@ -713,17 +690,27 @@ describe('Site Analytics Service', () => {
     it('should register search results viewed event', () => {
       sas.registerSearchResultsViewedEvent();
 
-      expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'view_search_results', {}
-      );
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'view_search_results', {});
     });
 
     it('should register homepage start learning button click event', () => {
       sas.registerClickHomePageStartLearningButtonEvent();
 
       expect(gtagSpy).toHaveBeenCalledWith(
-        'event', 'discovery_start_learning', {}
+        'event',
+        'discovery_start_learning',
+        {}
       );
+    });
+
+    it('should register submitted answer', () => {
+      const answerIsCorrect = true;
+      sas.registerAnswerSubmitted(explorationId, answerIsCorrect);
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'answer_submitted', {
+        exploration_id: explorationId,
+        answer_is_correct: answerIsCorrect,
+      });
     });
   });
 });

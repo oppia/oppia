@@ -71,7 +71,8 @@ ControlValueAccessor {
 
   filterChoices(searchTerm: string): void {
     this.filteredChoices = this.choices.filter(
-      lang => lang.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1);
+      lang => lang.text.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1
+    );
   }
 
   updateLanguage(code: string): void {

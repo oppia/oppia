@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for PrimaryButtonComponent
  */
 
-import { PrimaryButtonComponent } from './primary-button.component';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {PrimaryButtonComponent} from './primary-button.component';
+import {TestBed, ComponentFixture} from '@angular/core/testing';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
   _window = {
@@ -30,9 +30,9 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val: string) => {}
+      replace: (val: string) => {},
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -52,7 +52,7 @@ describe('PrimaryButtonComponent', () => {
       providers: [
         {
           provide: WindowRef,
-          useValue: windowRef
+          useValue: windowRef,
         },
       ],
     });
@@ -83,30 +83,74 @@ describe('PrimaryButtonComponent', () => {
   it('should handle button click with observers', () => {
     spyOn(component.onClickPrimaryButton, 'emit');
     component.onClickPrimaryButton.subscribe();
-    component.handleButtonClick();
+    fixture.detectChanges();
+    const event = {
+      target: {
+        href: '#',
+        target: '_blank',
+      },
+      preventDefault: () => {},
+    } as unknown as MouseEvent;
+    component.handleButtonClick(event);
     expect(component.onClickPrimaryButton.emit).toHaveBeenCalled();
   });
 
   it('should handle button click with internal link', () => {
     component.buttonHref = '/about';
-    component.handleButtonClick();
+    const event = {
+      target: {
+        href: '/about',
+        target: '_self',
+      },
+      preventDefault: () => {},
+    } as unknown as MouseEvent;
+
+    component.buttonHref = '/about';
+    fixture.detectChanges();
+    component.handleButtonClick(event);
+
+    expect(component.openInNewTab).toBe(false);
+    expect(component.getTarget()).toEqual('_self');
+    expect(component.getButtonHref()).toEqual('/about');
     expect(windowRef.nativeWindow.location.href).toBe('/about');
   });
 
   it('should handle button click with external link', () => {
     const externalLink = 'https://github.com';
+    const event = {
+      target: {
+        href: externalLink,
+        target: '_blank',
+      },
+      preventDefault: () => {},
+    } as unknown as MouseEvent;
+
     const windowOpenSpy = jasmine.createSpyObj('Window', [
       'location',
       'opener',
-      'reload'
+      'reload',
     ]);
-
     spyOn(window, 'open').and.returnValue(windowOpenSpy);
     const newTab = window.open('', '_blank') as Window;
     component.buttonHref = externalLink;
-    component.handleButtonClick();
+    fixture.detectChanges();
+    component.handleButtonClick(event);
 
+    expect(component.openInNewTab).toBe(true);
+    expect(component.getTarget()).toEqual('_blank');
+    expect(component.getButtonHref()).toEqual(externalLink);
     expect(window.open).toHaveBeenCalledWith('', '_blank');
     expect(newTab.location.href).toBe(externalLink);
+  });
+
+  it('should set componentIsButton to false when buttonHref is provided', () => {
+    component.buttonHref = 'http://example.com';
+    fixture.detectChanges();
+    expect(component.componentIsButton).toBe(false);
+  });
+
+  it('should set componentIsButton to true when buttonHref is not provided', () => {
+    fixture.detectChanges();
+    expect(component.componentIsButton).toBe(true);
   });
 });

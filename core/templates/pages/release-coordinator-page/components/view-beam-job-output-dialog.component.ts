@@ -16,17 +16,16 @@
  * @fileoverview Component for viewing the output of an Apache Beam job.
  */
 
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { of, Subscription } from 'rxjs';
-import { catchError, first } from 'rxjs/operators';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import {of, Subscription} from 'rxjs';
+import {catchError, first} from 'rxjs/operators';
 
-import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { ReleaseCoordinatorBackendApiService } from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-
+import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {ReleaseCoordinatorBackendApiService} from 'pages/release-coordinator-page/services/release-coordinator-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'view-beam-job-output-dialog',
@@ -42,21 +41,23 @@ export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
   subscription!: Subscription;
 
   constructor(
-      @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
-      public matDialogRef: MatDialogRef<ViewBeamJobOutputDialogComponent>,
-      private alertsService: AlertsService,
-      private backendApiService: ReleaseCoordinatorBackendApiService) {}
+    @Inject(MAT_DIALOG_DATA) public beamJobRun: BeamJobRun,
+    public matDialogRef: MatDialogRef<ViewBeamJobOutputDialogComponent>,
+    private alertsService: AlertsService,
+    private backendApiService: ReleaseCoordinatorBackendApiService
+  ) {}
 
   ngOnInit(): void {
-    this.subscription = (
-      this.backendApiService.getBeamJobRunOutput(this.beamJobRun).pipe(
+    this.subscription = this.backendApiService
+      .getBeamJobRunOutput(this.beamJobRun)
+      .pipe(
         first(),
         catchError(error => {
           this.alertsService.addWarning(error.message);
           return of(null);
-        }),
+        })
       )
-    ).subscribe(output => this.output = output);
+      .subscribe(output => (this.output = output));
   }
 
   ngOnDestroy(): void {
@@ -68,8 +69,7 @@ export class ViewBeamJobOutputDialogComponent implements OnInit, OnDestroy {
       return '';
     }
     if (this.output.stdout && this.output.stderr) {
-      return this.selectedTab.value ?
-        this.output.stderr : this.output.stdout;
+      return this.selectedTab.value ? this.output.stderr : this.output.stdout;
     } else if (this.output.stdout) {
       return this.output.stdout;
     } else {

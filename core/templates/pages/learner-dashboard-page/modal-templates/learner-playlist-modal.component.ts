@@ -16,15 +16,14 @@
  * @fileoverview Component for learnerPlaylistModal.
  */
 
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'oppia-learner-playlist-modal',
   templateUrl: './learner-playlist-modal.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class LearnerPlaylistModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -39,18 +38,19 @@ export class LearnerPlaylistModalComponent implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private urlInterpolationService: UrlInterpolationService,
+    private urlInterpolationService: UrlInterpolationService
   ) {}
 
   ngOnInit(): void {
     this.sectionNameI18nId = 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION';
-    this.removeFromLearnerPlaylistUrl = (
+    this.removeFromLearnerPlaylistUrl =
       this.urlInterpolationService.interpolateUrl(
-        '/learnerplaylistactivityhandler/' +
-        '<activityType>/<activityId>', {
+        '/learnerplaylistactivityhandler/' + '<activityType>/<activityId>',
+        {
           activityType: this.activityType,
-          activityId: this.activityId
-        }));
+          activityId: this.activityId,
+        }
+      );
   }
 
   remove(): void {
@@ -61,8 +61,3 @@ export class LearnerPlaylistModalComponent implements OnInit {
     this.activeModal.dismiss();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLearnerPlaylistModalComponent',
-  downgradeComponent(
-    {component: LearnerPlaylistModalComponent}));

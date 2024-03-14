@@ -17,40 +17,55 @@
  * in exploration player.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { ExplorationFooterComponent } from './exploration-footer.component';
-import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { LimitToPipe } from 'filters/limit-to.pipe';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { ExplorationSummaryBackendApiService, ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { EventEmitter } from '@angular/core';
-import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { LearnerViewInfoBackendApiService } from '../services/learner-view-info-backend-api.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { PlayerPositionService } from '../services/player-position.service';
-import { PlayerTranscriptService } from '../services/player-transcript.service';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { AudioTranslationLanguageService } from '../services/audio-translation-language.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { Interaction, InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import { ConceptCardManagerService } from '../services/concept-card-manager.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {ExplorationFooterComponent} from './exploration-footer.component';
+import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {LimitToPipe} from 'filters/limit-to.pipe';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {
+  ExplorationSummaryBackendApiService,
+  ExplorationSummaryDict,
+} from 'domain/summary/exploration-summary-backend-api.service';
+import {EventEmitter} from '@angular/core';
+import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {LearnerViewInfoBackendApiService} from '../services/learner-view-info-backend-api.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {PlayerPositionService} from '../services/player-position.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {UserService} from 'services/user.service';
+import {
+  Interaction,
+  InteractionObjectFactory,
+} from 'domain/exploration/InteractionObjectFactory';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 
 class MockCheckpointCelebrationUtilityService {
   private _openLessonInformationModalEmitter = new EventEmitter<void>();
@@ -72,30 +87,30 @@ class MockWindowRef {
       reload: () => {},
       toString: () => {
         return 'http://localhost:8181/?lang=es';
-      }
+      },
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {}
+      removeItem: (name: string) => {},
     },
     gtag: () => {},
     history: {
-      pushState(data: object, title: string, url?: string | null) {}
+      pushState(data: object, title: string, url?: string | null) {},
     },
     document: {
       body: {
         style: {
           overflowY: 'auto',
-        }
-      }
-    }
+        },
+      },
+    },
   };
 }
 
 class MockNgbModalRef {
   componentInstance = {
     skillId: null,
-    explorationId: null
+    explorationId: null,
   };
 }
 
@@ -106,23 +121,20 @@ describe('ExplorationFooterComponent', () => {
   let urlService: UrlService;
   let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService;
   let loggerService: LoggerService;
-  let readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService;
+  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let questionPlayerStateService: QuestionPlayerStateService;
   let mockResizeEventEmitter = new EventEmitter();
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let stateObjectFactory: StateObjectFactory;
   let explorationEngineService: ExplorationEngineService;
-  let editableExplorationBackendApiService:
-    EditableExplorationBackendApiService;
+  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let audioTranslationLanguageService: AudioTranslationLanguageService;
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
-  let checkpointCelebrationUtilityService:
-    CheckpointCelebrationUtilityService;
+  let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
   let ngbModal: NgbModal;
   let conceptCardManagerService: ConceptCardManagerService;
   let interactionObjectFactory: InteractionObjectFactory;
@@ -137,7 +149,7 @@ describe('ExplorationFooterComponent', () => {
       2: 0,
       3: 0,
       4: 0,
-      5: 0
+      5: 0,
     },
     id: 'dummy_id',
     created_on_msec: 2000,
@@ -149,7 +161,7 @@ describe('ExplorationFooterComponent', () => {
     tags: ['tag1', 'tag2'],
     thumbnail_bg_color: 'bg_color_test',
     thumbnail_icon_url: 'icon_url',
-    title: 'expTitle'
+    title: 'expTitle',
   };
 
   let mockResultsLoadedEventEmitter = new EventEmitter<boolean>();
@@ -160,7 +172,7 @@ describe('ExplorationFooterComponent', () => {
       declarations: [
         ExplorationFooterComponent,
         MockTranslatePipe,
-        LimitToPipe
+        LimitToPipe,
       ],
       providers: [
         QuestionPlayerStateService,
@@ -169,18 +181,18 @@ describe('ExplorationFooterComponent', () => {
         UrlInterpolationService,
         {
           provide: CheckpointCelebrationUtilityService,
-          useClass: MockCheckpointCelebrationUtilityService
+          useClass: MockCheckpointCelebrationUtilityService,
         },
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -189,28 +201,32 @@ describe('ExplorationFooterComponent', () => {
     urlService = TestBed.inject(UrlService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     learnerViewInfoBackendApiService = TestBed.inject(
-      LearnerViewInfoBackendApiService);
+      LearnerViewInfoBackendApiService
+    );
     loggerService = TestBed.inject(LoggerService);
     readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService);
+      ReadOnlyExplorationBackendApiService
+    );
     explorationSummaryBackendApiService = TestBed.inject(
-      ExplorationSummaryBackendApiService);
+      ExplorationSummaryBackendApiService
+    );
     editableExplorationBackendApiService = TestBed.inject(
-      EditableExplorationBackendApiService);
-    questionPlayerStateService = TestBed.inject(
-      QuestionPlayerStateService);
+      EditableExplorationBackendApiService
+    );
+    questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService);
+      AudioTranslationLanguageService
+    );
     userService = TestBed.inject(UserService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     checkpointCelebrationUtilityService = TestBed.inject(
-      CheckpointCelebrationUtilityService);
-    conceptCardManagerService = TestBed.inject(
-      ConceptCardManagerService);
+      CheckpointCelebrationUtilityService
+    );
+    conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
     ngbModal = TestBed.inject(NgbModal);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
@@ -218,159 +234,178 @@ describe('ExplorationFooterComponent', () => {
     fixture.detectChanges();
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
-      new EventEmitter<StateCard>());
+      new EventEmitter<StateCard>()
+    );
   });
 
   afterEach(() => {
     component.ngOnDestroy();
   });
 
-  it('should initialise component when user opens exploration ' +
-  'player', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(playerPositionService.onNewCardOpened, 'subscribe');
-    spyOn(urlService, 'isIframed').and.returnValue(true);
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockResizeEventEmitter);
-    spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'subscribe');
-    spyOn(conceptCardManagerService, 'reset');
-    spyOn(
-      checkpointCelebrationUtilityService
-        .getOpenLessonInformationModalEmitter(), 'subscribe');
-    spyOn(component, 'getCheckpointCount').and.returnValue(Promise.resolve());
-    spyOn(component, 'showProgressReminderModal');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
-    spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
-      .returnValue(true);
-    spyOn(
-      explorationSummaryBackendApiService,
-      'loadPublicAndPrivateExplorationSummariesAsync').and.resolveTo({
-      summaries: [
-        {
-          category: 'Coding',
-          community_owned: true,
-          thumbnail_bg_color: '#a33f40',
-          title: 'Project Euler Problem 1',
-          num_views: 263,
-          tags: [],
-          human_readable_contributors_summary: {
-            contributor_1: {
-              num_commits: 1
-            },
-            contributor_2: {
-              num_commits: 3
-            },
-            contributor_3: {
-              num_commits: 2
-            }
-          },
-          status: 'public',
-          language_code: 'en',
-          objective: 'Solve problem 1 on the Project Euler site',
-          thumbnail_icon_url: '/subjects/Lightbulb.svg',
-          id: 'exp1',
-        } as ExplorationSummaryDict
-      ]
-    });
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(new UserInfo(
-        [], false, false,
-        false, false, false, '', '', '', true)));
-
-    // A StateCard which supports hints.
-    let newCard = StateCard.createNewCard(
-      'State 2', '<p>Content</p>', '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
-        id: 'TextInput',
-        answer_groups: [
+  it(
+    'should initialise component when user opens exploration ' + 'player',
+    fakeAsync(() => {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+      spyOn(playerPositionService.onNewCardOpened, 'subscribe');
+      spyOn(urlService, 'isIframed').and.returnValue(true);
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+      spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+        mockResizeEventEmitter
+      );
+      spyOn(playerPositionService.onLoadedMostRecentCheckpoint, 'subscribe');
+      spyOn(conceptCardManagerService, 'reset');
+      spyOn(
+        checkpointCelebrationUtilityService.getOpenLessonInformationModalEmitter(),
+        'subscribe'
+      );
+      spyOn(component, 'getCheckpointCount').and.returnValue(Promise.resolve());
+      spyOn(component, 'showProgressReminderModal');
+      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
+      spyOn(contextService, 'getQuestionPlayerIsManuallySet').and.returnValue(
+        true
+      );
+      spyOn(
+        explorationSummaryBackendApiService,
+        'loadPublicAndPrivateExplorationSummariesAsync'
+      ).and.resolveTo({
+        summaries: [
           {
-            outcome: {
-              dest: 'State',
-              dest_if_really_stuck: null,
-              feedback: {
-                html: '',
-                content_id: 'This is a new feedback text',
+            category: 'Coding',
+            community_owned: true,
+            thumbnail_bg_color: '#a33f40',
+            title: 'Project Euler Problem 1',
+            num_views: 263,
+            tags: [],
+            human_readable_contributors_summary: {
+              contributor_1: {
+                num_commits: 1,
               },
-              refresher_exploration_id: 'test',
-              missing_prerequisite_skill_id: 'test_skill_id',
-              labelled_as_correct: true,
-              param_changes: [],
+              contributor_2: {
+                num_commits: 3,
+              },
+              contributor_3: {
+                num_commits: 2,
+              },
             },
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: '',
-          },
+            status: 'public',
+            language_code: 'en',
+            objective: 'Solve problem 1 on the Project Euler site',
+            thumbnail_icon_url: '/subjects/Lightbulb.svg',
+            id: 'exp1',
+          } as ExplorationSummaryDict,
         ],
-        default_outcome: {
-          dest: 'Hola',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: '',
-            html: '',
+      });
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(
+          new UserInfo([], false, false, false, false, false, '', '', '', true)
+        )
+      );
+
+      // A StateCard which supports hints.
+      let newCard = StateCard.createNewCard(
+        'State 2',
+        '<p>Content</p>',
+        '<interaction></interaction>',
+        interactionObjectFactory.createFromBackendDict({
+          id: 'TextInput',
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'State',
+                dest_if_really_stuck: null,
+                feedback: {
+                  html: '',
+                  content_id: 'This is a new feedback text',
+                },
+                refresher_exploration_id: 'test',
+                missing_prerequisite_skill_id: 'test_skill_id',
+                labelled_as_correct: true,
+                param_changes: [],
+              },
+              rule_specs: [],
+              training_data: [],
+              tagged_skill_misconception_id: '',
+            },
+          ],
+          default_outcome: {
+            dest: 'Hola',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: '',
+              html: '',
+            },
+            labelled_as_correct: true,
+            param_changes: [],
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id',
           },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id',
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: true,
+          confirmed_unclassified_answers: [],
+          customization_args: {
+            rows: {
+              value: true,
+            },
+            placeholder: {
+              value: 1,
+            },
           },
-          placeholder: {
-            value: 1,
-          }
-        },
-        hints: [],
-        solution: {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
+          hints: [],
+          solution: {
+            answer_is_exclusive: true,
+            correct_answer: 'test_answer',
+            explanation: {
+              content_id: '2',
+              html: 'test_explanation1',
+            },
           },
-        }
-      }),
-      RecordedVoiceovers.createEmpty(),
-      'content', audioTranslationLanguageService);
+        }),
+        RecordedVoiceovers.createEmpty(),
+        'content',
+        audioTranslationLanguageService
+      );
 
-    component.ngOnInit();
-    playerPositionService.onNewCardOpened.emit(newCard);
-    tick();
+      component.ngOnInit();
+      playerPositionService.onNewCardOpened.emit(newCard);
+      tick();
 
-    expect(component.explorationId).toBe('exp1');
-    expect(component.iframed).toBeTrue();
-    expect(component.windowIsNarrow).toBeFalse();
-    expect(
-      explorationSummaryBackendApiService.
-        loadPublicAndPrivateExplorationSummariesAsync)
-      .toHaveBeenCalledWith(['exp1']);
-    expect(component.contributorNames).toEqual([
-      'contributor_2', 'contributor_3', 'contributor_1']);
-    expect(playerPositionService.onLoadedMostRecentCheckpoint.subscribe)
-      .toHaveBeenCalled();
-    expect(playerPositionService.onNewCardOpened.subscribe).toHaveBeenCalled();
-    expect(conceptCardManagerService.reset).toHaveBeenCalled();
+      expect(component.explorationId).toBe('exp1');
+      expect(component.iframed).toBeTrue();
+      expect(component.windowIsNarrow).toBeFalse();
+      expect(
+        explorationSummaryBackendApiService.loadPublicAndPrivateExplorationSummariesAsync
+      ).toHaveBeenCalledWith(['exp1']);
+      expect(component.contributorNames).toEqual([
+        'contributor_2',
+        'contributor_3',
+        'contributor_1',
+      ]);
+      expect(
+        playerPositionService.onLoadedMostRecentCheckpoint.subscribe
+      ).toHaveBeenCalled();
+      expect(
+        playerPositionService.onNewCardOpened.subscribe
+      ).toHaveBeenCalled();
+      expect(conceptCardManagerService.reset).toHaveBeenCalled();
 
-    component.checkpointCount = 5;
+      component.checkpointCount = 5;
 
-    playerPositionService.onLoadedMostRecentCheckpoint.emit();
+      playerPositionService.onLoadedMostRecentCheckpoint.emit();
 
-    expect(component.getCheckpointCount).toHaveBeenCalledTimes(1);
-    expect(component.showProgressReminderModal).toHaveBeenCalled();
+      expect(component.getCheckpointCount).toHaveBeenCalledTimes(1);
+      expect(component.showProgressReminderModal).toHaveBeenCalled();
 
-    component.checkpointCount = 0;
+      component.checkpointCount = 0;
 
-    playerPositionService.onLoadedMostRecentCheckpoint.emit();
+      playerPositionService.onLoadedMostRecentCheckpoint.emit();
 
-    expect(component.getCheckpointCount).toHaveBeenCalledTimes(2);
-  }));
+      expect(component.getCheckpointCount).toHaveBeenCalledTimes(2);
+    })
+  );
 
   it('should check if progress reminder modal can be shown and show it', () => {
     const recentlyReachedCheckpointSpy = spyOn(
-      component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(1);
+      component,
+      'getMostRecentlyReachedCheckpointIndex'
+    ).and.returnValue(1);
     spyOn(component, 'openProgressReminderModal');
 
     component.showProgressReminderModal();
@@ -386,11 +421,15 @@ describe('ExplorationFooterComponent', () => {
   });
 
   it('should fetch exploration info first if not present', fakeAsync(() => {
-    spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
-      .and.returnValue(3);
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
+      3
+    );
     spyOn(component, 'openProgressReminderModal');
-    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
-      .and.returnValue(Promise.resolve({
+    spyOn(
+      learnerViewInfoBackendApiService,
+      'fetchLearnerInfoAsync'
+    ).and.returnValue(
+      Promise.resolve({
         summaries: [
           {
             category: 'dummy_category',
@@ -402,7 +441,7 @@ describe('ExplorationFooterComponent', () => {
               2: 0,
               3: 0,
               4: 0,
-              5: 0
+              5: 0,
             },
             id: 'dummy_id',
             created_on_msec: 2000,
@@ -414,15 +453,17 @@ describe('ExplorationFooterComponent', () => {
             tags: ['tag1', 'tag2'],
             thumbnail_bg_color: 'bg_color_test',
             thumbnail_icon_url: 'icon_url',
-            title: 'expTitle'
-          }
-        ]
-      }));
+            title: 'expTitle',
+          },
+        ],
+      })
+    );
 
     component.showProgressReminderModal();
 
-    expect(learnerViewInfoBackendApiService.fetchLearnerInfoAsync)
-      .toHaveBeenCalled();
+    expect(
+      learnerViewInfoBackendApiService.fetchLearnerInfoAsync
+    ).toHaveBeenCalled();
   }));
 
   it('should open progress reminder modal', fakeAsync(() => {
@@ -432,26 +473,32 @@ describe('ExplorationFooterComponent', () => {
       componentInstance: {
         checkpointCount: 0,
         completedCheckpointsCount: 0,
-        explorationTitle: ''
+        explorationTitle: '',
       },
-      result: Promise.resolve()
+      result: Promise.resolve(),
     } as NgbModalRef);
     spyOn(
-      editableExplorationBackendApiService, 'resetExplorationProgressAsync')
-      .and.returnValue(Promise.resolve());
+      editableExplorationBackendApiService,
+      'resetExplorationProgressAsync'
+    ).and.returnValue(Promise.resolve());
 
     const stateCard = new StateCard(
-      'End', '<p>Testing</p>', null, new Interaction(
-        [], [], null, null, [], 'EndExploration', null),
-      [], null, 'content', null
+      'End',
+      '<p>Testing</p>',
+      null,
+      new Interaction([], [], null, null, [], 'EndExploration', null),
+      [],
+      null,
+      'content',
+      null
     );
 
     const endState = {
       classifier_model_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
-          content: {}
-        }
+          content: {},
+        },
       },
       solicit_answer_details: false,
       interaction: {
@@ -461,147 +508,173 @@ describe('ExplorationFooterComponent', () => {
         hints: [],
         customization_args: {
           recommendedExplorationIds: {
-            value: ['recommendedExplorationId']
-          }
+            value: ['recommendedExplorationId'],
+          },
         },
         answer_groups: [],
-        default_outcome: null
+        default_outcome: null,
       },
       param_changes: [],
       card_is_checkpoint: false,
       linked_skill_id: null,
       content: {
         content_id: 'content',
-        html: 'Congratulations, you have finished!'
-      }
+        html: 'Congratulations, you have finished!',
+      },
     };
 
     component.expInfo = sampleExpInfo;
     component.checkpointCount = 2;
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
-    spyOn(explorationEngineService, 'getStateCardByName')
-      .and.returnValue(stateCard);
-    spyOn(explorationEngineService, 'getState')
-      .and.returnValue(
-        stateObjectFactory.createFromBackendDict('End', endState));
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      stateCard
+    );
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      stateObjectFactory.createFromBackendDict('End', endState)
+    );
 
     component.openProgressReminderModal();
     tick();
     fixture.detectChanges();
 
     expect(ngbModal.open).toHaveBeenCalled();
-    expect(editableExplorationBackendApiService.resetExplorationProgressAsync)
-      .toHaveBeenCalled();
+    expect(
+      editableExplorationBackendApiService.resetExplorationProgressAsync
+    ).toHaveBeenCalled();
   }));
 
-  it('should show \'Need help? Take a look at the concept' +
-    ' card for refreshing your concepts.\' tooltip', () => {
-    spyOn(conceptCardManagerService, 'isConceptCardTooltipOpen')
-      .and.returnValues(true, false);
-
-    expect(component.isTooltipVisible()).toBe(true);
-    expect(component.isTooltipVisible()).toBe(false);
-  });
-
-  it('should resume exploration if progress reminder modal is canceled',
-    fakeAsync(() => {
-      const ngbModal = TestBed.inject(NgbModal);
-
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          checkpointCount: 0,
-          completedCheckpointsCount: 0,
-          explorationTitle: ''
-        },
-        result: Promise.reject()
-      } as NgbModalRef);
+  it(
+    "should show 'Need help? Take a look at the concept" +
+      " card for refreshing your concepts.' tooltip",
+    () => {
       spyOn(
-        editableExplorationBackendApiService, 'resetExplorationProgressAsync');
+        conceptCardManagerService,
+        'isConceptCardTooltipOpen'
+      ).and.returnValues(true, false);
 
-      const stateCard = new StateCard(
-        'End', '<p>Testing</p>', null, new Interaction(
-          [], [], null, null, [], 'EndExploration', null),
-        [], null, 'content', null
-      );
+      expect(component.isTooltipVisible()).toBe(true);
+      expect(component.isTooltipVisible()).toBe(false);
+    }
+  );
 
-      const endState = {
-        classifier_model_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {}
-          }
+  it('should resume exploration if progress reminder modal is canceled', fakeAsync(() => {
+    const ngbModal = TestBed.inject(NgbModal);
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        checkpointCount: 0,
+        completedCheckpointsCount: 0,
+        explorationTitle: '',
+      },
+      result: Promise.reject(),
+    } as NgbModalRef);
+    spyOn(
+      editableExplorationBackendApiService,
+      'resetExplorationProgressAsync'
+    );
+
+    const stateCard = new StateCard(
+      'End',
+      '<p>Testing</p>',
+      null,
+      new Interaction([], [], null, null, [], 'EndExploration', null),
+      [],
+      null,
+      'content',
+      null
+    );
+
+    const endState = {
+      classifier_model_id: null,
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
         },
-        solicit_answer_details: false,
-        interaction: {
-          solution: null,
-          confirmed_unclassified_answers: [],
-          id: 'EndExploration',
-          hints: [],
-          customization_args: {
-            recommendedExplorationIds: {
-              value: ['recommendedExplorationId']
-            }
+      },
+      solicit_answer_details: false,
+      interaction: {
+        solution: null,
+        confirmed_unclassified_answers: [],
+        id: 'EndExploration',
+        hints: [],
+        customization_args: {
+          recommendedExplorationIds: {
+            value: ['recommendedExplorationId'],
           },
-          answer_groups: [],
-          default_outcome: null
         },
-        param_changes: [],
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: 'Congratulations, you have finished!'
-        }
-      };
+        answer_groups: [],
+        default_outcome: null,
+      },
+      param_changes: [],
+      card_is_checkpoint: false,
+      linked_skill_id: null,
+      content: {
+        content_id: 'content',
+        html: 'Congratulations, you have finished!',
+      },
+    };
 
-      component.expInfo = sampleExpInfo;
-      component.checkpointCount = 2;
-      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
-      spyOn(explorationEngineService, 'getStateCardByName')
-        .and.returnValue(stateCard);
-      spyOn(explorationEngineService, 'getState')
-        .and.returnValue(
-          stateObjectFactory.createFromBackendDict('End', endState));
+    component.expInfo = sampleExpInfo;
+    component.checkpointCount = 2;
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      stateCard
+    );
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      stateObjectFactory.createFromBackendDict('End', endState)
+    );
 
-      component.openProgressReminderModal();
-      tick();
-      fixture.detectChanges();
-
-      expect(ngbModal.open).toHaveBeenCalled();
-      expect(editableExplorationBackendApiService.resetExplorationProgressAsync)
-        .not.toHaveBeenCalled();
-    }));
-
-  it('should handle error if backend call to learnerViewInfoBackendApiService' +
-  ' fails while opening progress reminder modal', fakeAsync(() => {
-    component.explorationId = 'expId';
-    component.expInfo = null;
-    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
-      .and.returnValue(Promise.reject());
-    spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
-      .and.returnValue(3);
-    spyOn(loggerService, 'error');
-
-    component.showProgressReminderModal();
+    component.openProgressReminderModal();
     tick();
+    fixture.detectChanges();
 
-    expect(loggerService.error).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(
+      editableExplorationBackendApiService.resetExplorationProgressAsync
+    ).not.toHaveBeenCalled();
   }));
 
-  it('should not show hints after user finishes practice session' +
-  ' and results are loaded.', () => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+  it(
+    'should handle error if backend call to learnerViewInfoBackendApiService' +
+      ' fails while opening progress reminder modal',
+    fakeAsync(() => {
+      component.explorationId = 'expId';
+      component.expInfo = null;
+      spyOn(
+        learnerViewInfoBackendApiService,
+        'fetchLearnerInfoAsync'
+      ).and.returnValue(Promise.reject());
+      spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
+        3
+      );
+      spyOn(loggerService, 'error');
 
-    spyOnProperty(questionPlayerStateService, 'resultsPageIsLoadedEventEmitter')
-      .and.returnValue(mockResultsLoadedEventEmitter);
+      component.showProgressReminderModal();
+      tick();
 
-    component.ngOnInit();
-    mockResultsLoadedEventEmitter.emit(true);
+      expect(loggerService.error).toHaveBeenCalled();
+    })
+  );
 
-    expect(component.hintsAndSolutionsAreSupported).toBeFalse();
-  });
+  it(
+    'should not show hints after user finishes practice session' +
+      ' and results are loaded.',
+    () => {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+
+      spyOnProperty(
+        questionPlayerStateService,
+        'resultsPageIsLoadedEventEmitter'
+      ).and.returnValue(mockResultsLoadedEventEmitter);
+
+      component.ngOnInit();
+      mockResultsLoadedEventEmitter.emit(true);
+
+      expect(component.hintsAndSolutionsAreSupported).toBeFalse();
+    }
+  );
 
   it('should open the lesson information card', fakeAsync(() => {
     let ngbModal = TestBed.inject(NgbModal);
@@ -611,14 +684,14 @@ describe('ExplorationFooterComponent', () => {
         numberofCheckpoints: 0,
         completedWidth: 0,
         contributorNames: [],
-        expInfo: null
+        expInfo: null,
       },
       result: {
         then: (successCallback: () => void, errorCallback: () => void) => {
           successCallback();
           errorCallback();
-        }
-      }
+        },
+      },
     } as NgbModalRef);
 
     let sampleExpResponse: FetchExplorationBackendResponse = {
@@ -634,7 +707,6 @@ describe('ExplorationFooterComponent', () => {
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
-        correctness_feedback_enabled: true,
         objective: 'To learn',
         states: {
           Start: {
@@ -645,8 +717,8 @@ describe('ExplorationFooterComponent', () => {
                 feedback_1: {},
                 rule_input_2: {},
                 content: {},
-                default_outcome: {}
-              }
+                default_outcome: {},
+              },
             },
             solicit_answer_details: false,
             interaction: {
@@ -656,17 +728,17 @@ describe('ExplorationFooterComponent', () => {
               hints: [],
               customization_args: {
                 rows: {
-                  value: 1
+                  value: 1,
                 },
                 placeholder: {
                   value: {
                     unicode_str: '',
-                    content_id: 'ca_placeholder_0'
-                  }
+                    content_id: 'ca_placeholder_0',
+                  },
                 },
                 catchMisspellings: {
-                  value: false
-                }
+                  value: false,
+                },
               },
               answer_groups: [
                 {
@@ -676,28 +748,26 @@ describe('ExplorationFooterComponent', () => {
                     labelled_as_correct: false,
                     feedback: {
                       content_id: 'feedback_1',
-                      html: '<p>Good Job</p>'
+                      html: '<p>Good Job</p>',
                     },
                     param_changes: [],
                     dest_if_really_stuck: null,
-                    dest: 'Mid'
+                    dest: 'Mid',
                   },
                   training_data: [],
                   rule_specs: [
                     {
                       inputs: {
                         x: {
-                          normalizedStrSet: [
-                            'answer'
-                          ],
-                          contentId: 'rule_input_2'
-                        }
+                          normalizedStrSet: ['answer'],
+                          contentId: 'rule_input_2',
+                        },
                       },
-                      rule_type: 'FuzzyEquals'
-                    }
+                      rule_type: 'FuzzyEquals',
+                    },
                   ],
-                  tagged_skill_misconception_id: null
-                }
+                  tagged_skill_misconception_id: null,
+                },
               ],
               default_outcome: {
                 missing_prerequisite_skill_id: null,
@@ -705,27 +775,27 @@ describe('ExplorationFooterComponent', () => {
                 labelled_as_correct: false,
                 feedback: {
                   content_id: 'default_outcome',
-                  html: '<p>Try again.</p>'
+                  html: '<p>Try again.</p>',
                 },
                 param_changes: [],
                 dest_if_really_stuck: null,
-                dest: 'Start'
-              }
+                dest: 'Start',
+              },
             },
             param_changes: [],
             card_is_checkpoint: true,
             linked_skill_id: null,
             content: {
               content_id: 'content',
-              html: '<p>First Question</p>'
-            }
+              html: '<p>First Question</p>',
+            },
           },
           End: {
             classifier_model_id: null,
             recorded_voiceovers: {
               voiceovers_mapping: {
-                content: {}
-              }
+                content: {},
+              },
             },
             solicit_answer_details: false,
             interaction: {
@@ -735,19 +805,19 @@ describe('ExplorationFooterComponent', () => {
               hints: [],
               customization_args: {
                 recommendedExplorationIds: {
-                  value: ['recommnendedExplorationId']
-                }
+                  value: ['recommnendedExplorationId'],
+                },
               },
               answer_groups: [],
-              default_outcome: null
+              default_outcome: null,
             },
             param_changes: [],
             card_is_checkpoint: false,
             linked_skill_id: null,
             content: {
               content_id: 'content',
-              html: 'Congratulations, you have finished!'
-            }
+              html: 'Congratulations, you have finished!',
+            },
           },
           Mid: {
             classifier_model_id: null,
@@ -757,8 +827,8 @@ describe('ExplorationFooterComponent', () => {
                 feedback_1: {},
                 rule_input_2: {},
                 content: {},
-                default_outcome: {}
-              }
+                default_outcome: {},
+              },
             },
             solicit_answer_details: false,
             interaction: {
@@ -768,17 +838,17 @@ describe('ExplorationFooterComponent', () => {
               hints: [],
               customization_args: {
                 rows: {
-                  value: 1
+                  value: 1,
                 },
                 placeholder: {
                   value: {
                     unicode_str: '',
-                    content_id: 'ca_placeholder_0'
-                  }
+                    content_id: 'ca_placeholder_0',
+                  },
                 },
                 catchMisspellings: {
-                  value: false
-                }
+                  value: false,
+                },
               },
               answer_groups: [
                 {
@@ -788,28 +858,26 @@ describe('ExplorationFooterComponent', () => {
                     labelled_as_correct: false,
                     feedback: {
                       content_id: 'feedback_1',
-                      html: ' <p>Good Job</p>'
+                      html: ' <p>Good Job</p>',
                     },
                     param_changes: [],
                     dest_if_really_stuck: null,
-                    dest: 'End'
+                    dest: 'End',
                   },
                   training_data: [],
                   rule_specs: [
                     {
                       inputs: {
                         x: {
-                          normalizedStrSet: [
-                            'answer'
-                          ],
-                          contentId: 'rule_input_2'
-                        }
+                          normalizedStrSet: ['answer'],
+                          contentId: 'rule_input_2',
+                        },
                       },
-                      rule_type: 'FuzzyEquals'
-                    }
+                      rule_type: 'FuzzyEquals',
+                    },
                   ],
-                  tagged_skill_misconception_id: null
-                }
+                  tagged_skill_misconception_id: null,
+                },
               ],
               default_outcome: {
                 missing_prerequisite_skill_id: null,
@@ -817,22 +885,22 @@ describe('ExplorationFooterComponent', () => {
                 labelled_as_correct: false,
                 feedback: {
                   content_id: 'default_outcome',
-                  html: '<p>try again.</p>'
+                  html: '<p>try again.</p>',
                 },
                 param_changes: [],
                 dest_if_really_stuck: null,
-                dest: 'Mid'
-              }
+                dest: 'Mid',
+              },
             },
             param_changes: [],
             card_is_checkpoint: true,
             linked_skill_id: null,
             content: {
               content_id: 'content',
-              html: '<p>Second Question</p>'
-            }
-          }
-        }
+              html: '<p>Second Question</p>',
+            },
+          },
+        },
       },
       exploration_metadata: {
         title: 'Exploration',
@@ -847,43 +915,52 @@ describe('ExplorationFooterComponent', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
-        edits_allowed: true
+        edits_allowed: true,
       },
       version: 1,
       can_edit: true,
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
       auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       has_viewed_lesson_info_modal_once: false,
       furthest_reached_checkpoint_exp_version: 1,
       furthest_reached_checkpoint_state_name: 'Mid',
       most_recently_reached_checkpoint_state_name: 'Mid',
-      most_recently_reached_checkpoint_exp_version: 1
+      most_recently_reached_checkpoint_exp_version: 1,
     };
 
-    spyOn(readOnlyExplorationBackendApiService, 'loadLatestExplorationAsync')
-      .and.returnValue(Promise.resolve(sampleExpResponse));
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'loadLatestExplorationAsync'
+    ).and.returnValue(Promise.resolve(sampleExpResponse));
 
     component.checkpointCount = 2;
 
-    spyOn(component, 'getMostRecentlyReachedCheckpointIndex')
-      .and.returnValue(2);
-    spyOn(explorationEngineService, 'getState')
-      .and.returnValue(stateObjectFactory.createFromBackendDict(
-        'End', sampleExpResponse.exploration.states.End
-      ));
-
-    let stateCard = new StateCard(
-      'End', '<p>Testing</p>', null, new Interaction(
-        [], [], null, null, [], 'EndExploration', null),
-      [], null, 'content', null
+    spyOn(component, 'getMostRecentlyReachedCheckpointIndex').and.returnValue(
+      2
+    );
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      stateObjectFactory.createFromBackendDict(
+        'End',
+        sampleExpResponse.exploration.states.End
+      )
     );
 
-    spyOn(explorationEngineService, 'getStateCardByName')
-      .and.returnValue(stateCard);
+    let stateCard = new StateCard(
+      'End',
+      '<p>Testing</p>',
+      null,
+      new Interaction([], [], null, null, [], 'EndExploration', null),
+      [],
+      null,
+      'content',
+      null
+    );
+
+    spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+      stateCard
+    );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
     component.openInformationCardModal();
     tick();
@@ -896,10 +973,10 @@ describe('ExplorationFooterComponent', () => {
 
   it('should open concept card when user clicks on the icon', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-          { componentInstance: MockNgbModalRef,
-            result: Promise.resolve()
-          }) as NgbModalRef;
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
     });
     component.openConceptCardModal();
     expect(modalSpy).toHaveBeenCalled();
@@ -912,14 +989,14 @@ describe('ExplorationFooterComponent', () => {
       classifier_model_id: null,
       recorded_voiceovers: {
         voiceovers_mapping: {
-          content: {}
-        }
+          content: {},
+        },
       },
       solicit_answer_details: false,
       written_translations: {
         translations_mapping: {
-          content: {}
-        }
+          content: {},
+        },
       },
       interaction: {
         solution: null,
@@ -928,11 +1005,11 @@ describe('ExplorationFooterComponent', () => {
         hints: [],
         customization_args: {
           recommendedExplorationIds: {
-            value: ['recommendedExplorationId']
-          }
+            value: ['recommendedExplorationId'],
+          },
         },
         answer_groups: [],
-        default_outcome: null
+        default_outcome: null,
       },
       param_changes: [],
       next_content_id_index: 0,
@@ -940,12 +1017,12 @@ describe('ExplorationFooterComponent', () => {
       linked_skill_id: 'Id',
       content: {
         content_id: 'content',
-        html: 'Congratulations, you have finished!'
-      }
+        html: 'Congratulations, you have finished!',
+      },
     };
-    spyOn(explorationEngineService, 'getState')
-      .and.returnValue(
-        stateObjectFactory.createFromBackendDict('End', endState));
+    spyOn(explorationEngineService, 'getState').and.returnValue(
+      stateObjectFactory.createFromBackendDict('End', endState)
+    );
 
     component.showConceptCard();
 
@@ -959,10 +1036,14 @@ describe('ExplorationFooterComponent', () => {
 
     spyOn(component, 'openInformationCardModal');
     component.showInformationCard();
-    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
-      .and.returnValue(Promise.resolve({
-        summaries: []
-      }));
+    spyOn(
+      learnerViewInfoBackendApiService,
+      'fetchLearnerInfoAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        summaries: [],
+      })
+    );
 
     expect(component.openInformationCardModal).toHaveBeenCalled();
     component.expInfo = null;
@@ -970,78 +1051,86 @@ describe('ExplorationFooterComponent', () => {
     component.showInformationCard();
     tick();
 
-    expect(learnerViewInfoBackendApiService.fetchLearnerInfoAsync)
-      .toHaveBeenCalled();
+    expect(
+      learnerViewInfoBackendApiService.fetchLearnerInfoAsync
+    ).toHaveBeenCalled();
   }));
 
   it('should get footer image url', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      'dummy_image_url');
+      'dummy_image_url'
+    );
 
-    expect(component.getStaticImageUrl('general/apple.svg'))
-      .toEqual('dummy_image_url');
+    expect(component.getStaticImageUrl('general/apple.svg')).toEqual(
+      'dummy_image_url'
+    );
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
-      'general/apple.svg');
+      'general/apple.svg'
+    );
   });
 
   it('should get checkpoint index from state name', fakeAsync(() => {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
     const card = StateCard.createNewCard(
-      'State A', '<p>Content</p>', '<interaction></interaction>',
+      'State A',
+      '<p>Content</p>',
+      '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
-      'content', audioTranslationLanguageService);
+      'content',
+      audioTranslationLanguageService
+    );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
-    spyOn(explorationEngineService, 'getStateFromStateName')
-      .and.returnValue(stateObjectFactory.createFromBackendDict(
-        'State A', {
-          classifier_model_id: null,
-          content: {
-            html: '',
-            content_id: 'content'
-          },
-          interaction: {
-            id: 'FractionInput',
-            customization_args: {
-              requireSimplestForm: { value: false },
-              allowImproperFraction: { value: true },
-              allowNonzeroIntegerPart: { value: true },
-              customPlaceholder: { value: {
+    spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
+      stateObjectFactory.createFromBackendDict('State A', {
+        classifier_model_id: null,
+        content: {
+          html: '',
+          content_id: 'content',
+        },
+        interaction: {
+          id: 'FractionInput',
+          customization_args: {
+            requireSimplestForm: {value: false},
+            allowImproperFraction: {value: true},
+            allowNonzeroIntegerPart: {value: true},
+            customPlaceholder: {
+              value: {
                 content_id: '',
-                unicode_str: ''
-              } },
-            },
-            answer_groups: [],
-            default_outcome: {
-              dest: 'Introduction',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'default_outcome',
-                html: ''
+                unicode_str: '',
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null
             },
-            confirmed_unclassified_answers: [],
-            hints: [],
-            solution: null
           },
-          linked_skill_id: null,
-          param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {}
-            }
+          answer_groups: [],
+          default_outcome: {
+            dest: 'Introduction',
+            dest_if_really_stuck: null,
+            feedback: {
+              content_id: 'default_outcome',
+              html: '',
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
-          solicit_answer_details: false,
-          card_is_checkpoint: true,
-        }
-
-      ));
+          confirmed_unclassified_answers: [],
+          hints: [],
+          solution: null,
+        },
+        linked_skill_id: null,
+        param_changes: [],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+          },
+        },
+        solicit_answer_details: false,
+        card_is_checkpoint: true,
+      })
+    );
 
     let checkpointIndex = component.getMostRecentlyReachedCheckpointIndex();
     tick();
@@ -1049,21 +1138,26 @@ describe('ExplorationFooterComponent', () => {
     expect(checkpointIndex).toEqual(1);
   }));
 
-  it('should handle error if backend call' +
-  'to learnerViewInfoBackendApiService fails', fakeAsync(() => {
-    let explorationId = 'expId';
-    component.explorationId = explorationId;
-    component.expInfo = null;
+  it(
+    'should handle error if backend call' +
+      'to learnerViewInfoBackendApiService fails',
+    fakeAsync(() => {
+      let explorationId = 'expId';
+      component.explorationId = explorationId;
+      component.expInfo = null;
 
-    spyOn(learnerViewInfoBackendApiService, 'fetchLearnerInfoAsync')
-      .and.returnValue(Promise.reject());
-    spyOn(loggerService, 'error');
+      spyOn(
+        learnerViewInfoBackendApiService,
+        'fetchLearnerInfoAsync'
+      ).and.returnValue(Promise.reject());
+      spyOn(loggerService, 'error');
 
-    component.showInformationCard();
-    tick();
+      component.showInformationCard();
+      tick();
 
-    expect(loggerService.error).toHaveBeenCalled();
-  }));
+      expect(loggerService.error).toHaveBeenCalled();
+    })
+  );
 
   it('should fetch number of checkpoints correctly', fakeAsync(() => {
     let sampleDataResults: FetchExplorationBackendResponse = {
@@ -1078,7 +1172,6 @@ describe('ExplorationFooterComponent', () => {
         param_specs: null,
         title: 'Exploration',
         language_code: 'en',
-        correctness_feedback_enabled: true,
         objective: 'To learn',
         states: {
           Introduction: {
@@ -1090,7 +1183,7 @@ describe('ExplorationFooterComponent', () => {
             linked_skill_id: null,
             content: {
               html: '',
-              content_id: 'content'
+              content_id: 'content',
             },
             interaction: {
               customization_args: {},
@@ -1103,17 +1196,17 @@ describe('ExplorationFooterComponent', () => {
                 dest: 'Introduction',
                 feedback: {
                   html: '',
-                  content_id: 'content'
+                  content_id: 'content',
                 },
                 labelled_as_correct: true,
                 refresher_exploration_id: 'exp',
-                missing_prerequisite_skill_id: null
+                missing_prerequisite_skill_id: null,
               },
               confirmed_unclassified_answers: [],
-              id: null
-            }
-          }
-        }
+              id: null,
+            },
+          },
+        },
       },
       exploration_metadata: {
         title: 'Exploration',
@@ -1128,28 +1221,28 @@ describe('ExplorationFooterComponent', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
-        edits_allowed: true
+        edits_allowed: true,
       },
       version: 1,
       can_edit: true,
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
       auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
       furthest_reached_checkpoint_exp_version: 1,
       furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
-      most_recently_reached_checkpoint_exp_version: 1
+      most_recently_reached_checkpoint_exp_version: 1,
     };
 
     component.explorationId = 'expId';
 
-    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
-      .and.returnValue(Promise.resolve(sampleDataResults));
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchExplorationAsync'
+    ).and.returnValue(Promise.resolve(sampleDataResults));
     expect(component.checkpointCount).toEqual(0);
 
     component.getCheckpointCount();
@@ -1172,7 +1265,6 @@ describe('ExplorationFooterComponent', () => {
         title: 'Exploration',
         next_content_id_index: 5,
         language_code: 'en',
-        correctness_feedback_enabled: true,
         objective: 'To learn',
         states: {
           Introduction: {
@@ -1184,7 +1276,7 @@ describe('ExplorationFooterComponent', () => {
             linked_skill_id: null,
             content: {
               html: '',
-              content_id: 'content'
+              content_id: 'content',
             },
             interaction: {
               customization_args: {},
@@ -1197,17 +1289,17 @@ describe('ExplorationFooterComponent', () => {
                 dest_if_really_stuck: null,
                 feedback: {
                   html: '',
-                  content_id: 'content'
+                  content_id: 'content',
                 },
                 labelled_as_correct: true,
                 refresher_exploration_id: 'exp',
-                missing_prerequisite_skill_id: null
+                missing_prerequisite_skill_id: null,
               },
               confirmed_unclassified_answers: [],
-              id: null
-            }
-          }
-        }
+              id: null,
+            },
+          },
+        },
       },
       exploration_metadata: {
         title: 'Exploration',
@@ -1222,26 +1314,26 @@ describe('ExplorationFooterComponent', () => {
         param_specs: {},
         param_changes: [],
         auto_tts_enabled: false,
-        correctness_feedback_enabled: true,
-        edits_allowed: true
+        edits_allowed: true,
       },
       version: 1,
       can_edit: true,
       preferred_audio_language_code: 'en',
       preferred_language_codes: [],
       auto_tts_enabled: true,
-      correctness_feedback_enabled: true,
       record_playthrough_probability: 1,
       draft_change_list_id: 0,
       has_viewed_lesson_info_modal_once: false,
       furthest_reached_checkpoint_exp_version: 1,
       furthest_reached_checkpoint_state_name: 'State B',
       most_recently_reached_checkpoint_state_name: 'State A',
-      most_recently_reached_checkpoint_exp_version: 1
+      most_recently_reached_checkpoint_exp_version: 1,
     };
 
-    spyOn(readOnlyExplorationBackendApiService, 'fetchExplorationAsync')
-      .and.returnValue(Promise.resolve(sampleDataResults));
+    spyOn(
+      readOnlyExplorationBackendApiService,
+      'fetchExplorationAsync'
+    ).and.returnValue(Promise.resolve(sampleDataResults));
 
     component.explorationId = 'expId';
 
@@ -1254,40 +1346,48 @@ describe('ExplorationFooterComponent', () => {
   it('should correctly mark lesson info tooltip as viewed', () => {
     spyOn(
       editableExplorationBackendApiService,
-      'recordLearnerHasViewedLessonInfoModalOnce').and.returnValue(
-      Promise.resolve());
+      'recordLearnerHasViewedLessonInfoModalOnce'
+    ).and.returnValue(Promise.resolve());
     expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeFalse();
     component.userIsLoggedIn = true;
     component.learnerHasViewedLessonInfo();
     expect(component.hasLearnerHasViewedLessonInfoTooltip()).toBeTrue();
     expect(
-      editableExplorationBackendApiService.
-        recordLearnerHasViewedLessonInfoModalOnce).toHaveBeenCalled();
+      editableExplorationBackendApiService.recordLearnerHasViewedLessonInfoModalOnce
+    ).toHaveBeenCalled();
   });
 
-  it('should show hints when initialized in question player when user is' +
-  ' going through the practice session and should add subscription.', () => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(
-      questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'subscribe');
+  it(
+    'should show hints when initialized in question player when user is' +
+      ' going through the practice session and should add subscription.',
+    () => {
+      spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(
+        questionPlayerStateService.resultsPageIsLoadedEventEmitter,
+        'subscribe'
+      );
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(component.hintsAndSolutionsAreSupported).toBeTrue();
-    expect(questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe)
-      .toHaveBeenCalled();
-  });
+      expect(component.hintsAndSolutionsAreSupported).toBeTrue();
+      expect(
+        questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe
+      ).toHaveBeenCalled();
+    }
+  );
 
   it('should check if window is narrow when user resizes window', () => {
     spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(urlService, 'isIframed').and.returnValue(true);
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockResizeEventEmitter);
+      mockResizeEventEmitter
+    );
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
-    spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
-      .returnValue(false);
+    spyOn(contextService, 'getQuestionPlayerIsManuallySet').and.returnValue(
+      false
+    );
     component.windowIsNarrow = true;
 
     component.ngOnInit();
@@ -1300,38 +1400,45 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'getExplorationId').and.returnValue('expId');
     spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
     spyOn(
-      checkpointCelebrationUtilityService
-        .getOpenLessonInformationModalEmitter(), 'subscribe')
-      .and.callThrough();
+      checkpointCelebrationUtilityService.getOpenLessonInformationModalEmitter(),
+      'subscribe'
+    ).and.callThrough();
     spyOn(component, 'showInformationCard');
 
     component.ngOnInit();
     checkpointCelebrationUtilityService.openLessonInformationModal();
 
     expect(
-      checkpointCelebrationUtilityService
-        .getOpenLessonInformationModalEmitter().subscribe).toHaveBeenCalled();
+      checkpointCelebrationUtilityService.getOpenLessonInformationModalEmitter()
+        .subscribe
+    ).toHaveBeenCalled();
     expect(component.showInformationCard).toHaveBeenCalled();
   });
 
-  it('should not display author names when exploration is in question' +
-  ' player mode', () => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
-    spyOn(urlService, 'isIframed').and.returnValue(true);
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockResizeEventEmitter);
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
-    spyOn(contextService, 'getQuestionPlayerIsManuallySet').and
-      .returnValue(false);
-    spyOn(
-      explorationSummaryBackendApiService,
-      'loadPublicAndPrivateExplorationSummariesAsync');
+  it(
+    'should not display author names when exploration is in question' +
+      ' player mode',
+    () => {
+      spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+      spyOn(urlService, 'isIframed').and.returnValue(true);
+      spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+      spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
+        mockResizeEventEmitter
+      );
+      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(contextService, 'getQuestionPlayerIsManuallySet').and.returnValue(
+        false
+      );
+      spyOn(
+        explorationSummaryBackendApiService,
+        'loadPublicAndPrivateExplorationSummariesAsync'
+      );
 
-    component.ngOnInit();
+      component.ngOnInit();
 
-    expect(
-      explorationSummaryBackendApiService.
-        loadPublicAndPrivateExplorationSummariesAsync).not.toHaveBeenCalled();
-  });
+      expect(
+        explorationSummaryBackendApiService.loadPublicAndPrivateExplorationSummariesAsync
+      ).not.toHaveBeenCalled();
+    }
+  );
 });

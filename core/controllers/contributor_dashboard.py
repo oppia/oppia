@@ -23,7 +23,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -196,9 +196,10 @@ class ContributionOpportunitiesHandler(
         """
         # We want to focus attention on lessons that are part of a classroom.
         # See issue #12221.
-        classroom_topic_ids = []
-        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
-            classroom_topic_ids.extend(classroom_dict['topic_ids'])
+        classroom_topic_ids: List[str] = []
+        classrooms = classroom_config_services.get_all_classrooms()
+        for classroom in classrooms:
+            classroom_topic_ids.extend(classroom.get_topic_ids())
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
         # TODO(#8912): Associate each skill/skill opportunity with all linked
@@ -492,11 +493,12 @@ class LessonsPinningHandler(
         """Handles pinning/unpinning lessons."""
         assert self.normalized_payload is not None
         assert self.user_id is not None
-        topic_id = self.normalized_payload.get('topic_id')
+        topic_name = self.normalized_payload.get('topic_id')
         language_code = self.normalized_payload.get('language_code')
         opportunity_id = self.normalized_payload.get('opportunity_id')
-
-        if language_code and topic_id:
+        if language_code and topic_name:
+            topic = topic_fetchers.get_topic_by_name(topic_name)
+            topic_id = topic.id
             opportunity_services.update_pinned_opportunity_model(
                 self.user_id, language_code, topic_id, opportunity_id
             )

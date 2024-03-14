@@ -16,39 +16,33 @@
  * @fileoverview Component for the create learner group page.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupBackendApiService } from
-  'domain/learner_group/learner-group-backend-api.service';
-import { LearnerGroupSubtopicSummary } from
-  'domain/learner_group/learner-group-subtopic-summary.model';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { LearnerGroupUserInfo } from
-  'domain/learner_group/learner-group-user-info.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {LearnerGroupSubtopicSummary} from 'domain/learner_group/learner-group-subtopic-summary.model';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 import './create-learner-group-page.component.css';
-
 
 @Component({
   selector: 'oppia-create-learner-group-page',
   templateUrl: './create-learner-group-page.component.html',
-  styleUrls: ['./create-learner-group-page.component.css']
+  styleUrls: ['./create-learner-group-page.component.css'],
 })
 export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  LEARNER_GROUP_CREATION_SECTION_I18N_IDS = (
-    LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS);
+  LEARNER_GROUP_CREATION_SECTION_I18N_IDS =
+    LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS;
 
   activeSection!: string;
   furthestReachedSectionNumber: number = 1;
@@ -74,9 +68,8 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.activeSection = (
-      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS
-    );
+    this.activeSection =
+      this.LEARNER_GROUP_CREATION_SECTION_I18N_IDS.GROUP_DETAILS;
     this.subscribeToOnLangChange();
   }
 
@@ -90,7 +83,8 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_CREATE_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_CREATE_LEARNER_GROUP_PAGE_TITLE'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -102,10 +96,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   }
 
   isGroupDetailsNextButtonDisabled(): boolean {
-    return (
-      !this.learnerGroupTitle ||
-      !this.learnerGroupDescription
-    );
+    return !this.learnerGroupTitle || !this.learnerGroupDescription;
   }
 
   updateLearnerGroupTitle(title: string): void {
@@ -117,7 +108,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   }
 
   updateLearnerGroupSubtopics(
-      subtopicSummaries: LearnerGroupSubtopicSummary[]
+    subtopicSummaries: LearnerGroupSubtopicSummary[]
   ): void {
     this.syllabusSubtopicSummaries = subtopicSummaries;
   }
@@ -139,7 +130,7 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
   }
 
   updateLearnerGroupInvitedLearnersInfo(
-      invitedUsersInfo: LearnerGroupUserInfo[]
+    invitedUsersInfo: LearnerGroupUserInfo[]
   ): void {
     this.learnerGroupInvitedLearnersInfo = invitedUsersInfo;
   }
@@ -169,21 +160,24 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   createLearnerGroup(): void {
     this.loaderService.showLoadingScreen('Creating learner group');
-    this.learnerGroupBackendApiService.createNewLearnerGroupAsync(
-      this.learnerGroupTitle,
-      this.learnerGroupDescription,
-      this.learnerGroupInvitedLearners,
-      this.learnerGroupSubtopicPageIds,
-      this.learnerGroupStoryIds
-    ).then((responseLearnerGroup: LearnerGroupData) => {
-      this.learnerGroup = responseLearnerGroup;
-      this.learnerGroupUrl = (
-        this.windowRef.nativeWindow.location.protocol + '//' +
-         this.windowRef.nativeWindow.location.host +
-          '/edit-learner-group/' + this.learnerGroup.id
-      );
-      this.loaderService.hideLoadingScreen();
-    });
+    this.learnerGroupBackendApiService
+      .createNewLearnerGroupAsync(
+        this.learnerGroupTitle,
+        this.learnerGroupDescription,
+        this.learnerGroupInvitedLearners,
+        this.learnerGroupSubtopicPageIds,
+        this.learnerGroupStoryIds
+      )
+      .then((responseLearnerGroup: LearnerGroupData) => {
+        this.learnerGroup = responseLearnerGroup;
+        this.learnerGroupUrl =
+          this.windowRef.nativeWindow.location.protocol +
+          '//' +
+          this.windowRef.nativeWindow.location.host +
+          '/edit-learner-group/' +
+          this.learnerGroup.id;
+        this.loaderService.hideLoadingScreen();
+      });
   }
 
   copyCreatedGroupUrl(): void {
@@ -194,7 +188,3 @@ export class CreateLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaCreateLearnerGroupPage',
-  downgradeComponent({component: CreateLearnerGroupPageComponent}));

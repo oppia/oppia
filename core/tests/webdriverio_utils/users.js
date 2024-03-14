@@ -24,7 +24,7 @@ var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
 
-var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
+var _createFirebaseAccount = async function (email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
   // developer email used to sign in is consistent with these accounts, we
   // manually change them to lower case.
@@ -41,8 +41,9 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
     password: await HashWasm.md5(email),
   });
   if (isSuperAdmin) {
-    await FirebaseAdmin.auth().setCustomUserClaims(
-      user.uid, {role: 'super_admin'});
+    await FirebaseAdmin.auth().setCustomUserClaims(user.uid, {
+      role: 'super_admin',
+    });
   }
 };
 
@@ -55,9 +56,10 @@ var _createFirebaseAccount = async function(email, isSuperAdmin = false) {
 // When manual navigation is enabled, the function will explicitly redirect the
 // browser to the login page. If disabled, then the function will assume that
 // the browser is already on the login page.
-var login = async function(email, useManualNavigation = true) {
+var login = async function (email, useManualNavigation = true) {
   if (useManualNavigation) {
     await browser.url(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
+    waitFor.pageToFullyLoad();
   }
 
   var loginPage = $('.e2e-test-login-page');
@@ -68,41 +70,54 @@ var login = async function(email, useManualNavigation = true) {
 
   var signInButton = $('.e2e-test-sign-in-button');
 
-  await waitFor.clientSideRedirection(async() => {
-    // Click the "sign in" button to trigger redirection.
-    await action.click('Sign in button', signInButton);
-  }, (url) => {
-    // Users will be redirected to preferred dashboard if they are fully
-    // registered. Otherwise, they will be redirected to signup page.
-    // eslint-disable-next-line max-len
-    return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(url);
-  }, async() => {
-    // Cannot predict the new page, so waiting for loading message to disappear.
-    await waitFor.pageToFullyLoad();
-  });
+  await waitFor.clientSideRedirection(
+    async () => {
+      // Click the "sign in" button to trigger redirection.
+      await action.click('Sign in button', signInButton);
+    },
+    url => {
+      // Users will be redirected to preferred dashboard if they are fully
+      // registered. Otherwise, they will be redirected to signup page.
+      // eslint-disable-next-line max-len
+      return /(learner-dashboard|creator-dashboard|signup|pending-account-deletion)/.test(
+        url
+      );
+    },
+    async () => {
+      // Cannot predict the new page, so waiting for loading message to disappear.
+      await waitFor.pageToFullyLoad();
+    }
+  );
 };
 
-var logout = async function() {
-  await waitFor.clientSideRedirection(async() => {
-    await browser.url(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
-    await waitFor.pageToFullyLoad();
-  }, (url) => {
-    // Wait until the URL has changed to something that is not /logout.
-    return !(/logout/.test(url));
-  }, async() => {
-    var splashPage = $('.e2e-test-splash-page');
-    await waitFor.visibilityOf(
-      splashPage, 'Splash page takes too long to appear');
-    await waitFor.pageToFullyLoad();
-  });
+var logout = async function () {
+  await waitFor.clientSideRedirection(
+    async () => {
+      await browser.url(general.SERVER_URL_PREFIX + general.LOGOUT_URL_SUFFIX);
+      await waitFor.pageToFullyLoad();
+    },
+    url => {
+      // Wait until the URL has changed to something that is not /logout.
+      return !/logout/.test(url);
+    },
+    async () => {
+      var splashPage = $('.e2e-test-splash-page');
+      await waitFor.visibilityOf(
+        splashPage,
+        'Splash page takes too long to appear'
+      );
+      await waitFor.pageToFullyLoad();
+    }
+  );
 };
 
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
-var _completeSignup = async function(username) {
+var _completeSignup = async function (username) {
   await waitFor.pageToFullyLoad();
   var cookieBannerAcceptButton = $(
-    '.e2e-test-oppia-cookie-banner-accept-button');
+    '.e2e-test-oppia-cookie-banner-accept-button'
+  );
   var cookieButtonPresent = await cookieBannerAcceptButton.isDisplayed();
   if (cookieButtonPresent) {
     await action.click('Accept Cookie Button', cookieBannerAcceptButton);
@@ -114,40 +129,46 @@ var _completeSignup = async function(username) {
   var usernameInput = $('.e2e-test-username-input');
   await action.setValue('Username input', usernameInput, username);
 
-  var agreeToTermsCheckbox = await (
-    $('.e2e-test-agree-to-terms-checkbox'));
+  var agreeToTermsCheckbox = await $('.e2e-test-agree-to-terms-checkbox');
   await action.click('Agree to terms checkbox', agreeToTermsCheckbox);
 
   var registerUser = $('.e2e-test-register-user');
 
   var currentUrl = decodeURIComponent(await browser.getUrl());
 
-  var returnUrl = currentUrl.split('return_url=')[
-    currentUrl.split('return_url=').length - 1];
+  var returnUrl =
+    currentUrl.split('return_url=')[currentUrl.split('return_url=').length - 1];
 
-  await waitFor.clientSideRedirection(async() => {
-    // Click the "register user" button to trigger redirection.
-    await action.click('Register user button', registerUser);
-  }, (url) => {
-    if (returnUrl === '/') {
-      return /(learner-dashboard|creator-dashboard)/.test(url);
-    } else {
-      return (new RegExp(returnUrl)).test(url);
+  await waitFor.clientSideRedirection(
+    async () => {
+      // Click the "register user" button to trigger redirection.
+      await action.click('Register user button', registerUser);
+    },
+    url => {
+      if (returnUrl === '/') {
+        return /(learner-dashboard|creator-dashboard)/.test(url);
+      } else {
+        return new RegExp(returnUrl).test(url);
+      }
+    },
+    async () => {
+      // Cannot predict the new page, so waiting for loading message to disappear.
+      await waitFor.pageToFullyLoad();
     }
-  }, async() => {
-    // Cannot predict the new page, so waiting for loading message to disappear.
-    await waitFor.pageToFullyLoad();
-  });
+  );
 };
 
-var createAndLoginUser = async function(
-    email, username, useManualNavigation = true) {
+var createAndLoginUser = async function (
+  email,
+  username,
+  useManualNavigation = true
+) {
   await _createFirebaseAccount(email);
   await login(email, useManualNavigation);
   await _completeSignup(username);
 };
 
-var createAndLoginCurriculumAdminUser = async function(email, username) {
+var createAndLoginCurriculumAdminUser = async function (email, username) {
   // We cannot declare this as a global variable because this
   // fails the test with error '$ is not defined for Admin.js file'.
   var adminPage = new AdminPage.AdminPage();
@@ -157,29 +178,29 @@ var createAndLoginCurriculumAdminUser = async function(email, username) {
   await adminPage.addRole(username, 'curriculum admin');
 };
 
-var createAndLoginSuperAdminUser = async function(email, username) {
+var createAndLoginSuperAdminUser = async function (email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
 };
 
-var createAndLoginCurriculumAdminUserMobile = async function(email, username) {
+var createAndLoginCurriculumAdminUserMobile = async function (email, username) {
   await _createFirebaseAccount(email, true);
   await login(email);
   await _completeSignup(username);
 };
 
-var createAdminMobile = async function(email, username) {
+var createAdminMobile = async function (email, username) {
   await createAndLoginCurriculumAdminUserMobile(email, username);
   await logout();
 };
 
-var createUser = async function(email, username) {
+var createUser = async function (email, username) {
   await createAndLoginUser(email, username);
   await logout();
 };
 
-var createUserWithRole = async function(email, username, role) {
+var createUserWithRole = async function (email, username, role) {
   // We cannot declare this as a global variable because this
   // fails the test with error '$ is not defined for Admin.js file'.
   var adminPage = new AdminPage.AdminPage();
@@ -191,15 +212,15 @@ var createUserWithRole = async function(email, username, role) {
   await logout();
 };
 
-var createModerator = async function(email, username) {
+var createModerator = async function (email, username) {
   await createUserWithRole(email, username, 'moderator');
 };
 
-var createCollectionEditor = async function(email, username) {
+var createCollectionEditor = async function (email, username) {
   await createUserWithRole(email, username, 'collection editor');
 };
 
-var createAdmin = async function(email, username) {
+var createAdmin = async function (email, username) {
   await createAndLoginCurriculumAdminUser(email, username);
   await logout();
 };
@@ -215,5 +236,5 @@ exports.createCollectionEditor = createCollectionEditor;
 exports.createAndLoginCurriculumAdminUser = createAndLoginCurriculumAdminUser;
 exports.createAndLoginSuperAdminUser = createAndLoginSuperAdminUser;
 exports.createAdminMobile = createAdminMobile;
-exports.createAndLoginCurriculumAdminUserMobile = (
-  createAndLoginCurriculumAdminUserMobile);
+exports.createAndLoginCurriculumAdminUserMobile =
+  createAndLoginCurriculumAdminUserMobile;

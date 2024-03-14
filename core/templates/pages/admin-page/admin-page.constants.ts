@@ -43,8 +43,10 @@ export const AdminPageConstants = {
     CONFIG: '#/config',
     PLATFORM_PARAMETERS: '#/platform-parameters',
     ROLES: '#/roles',
-    MISC: '#/misc'
+    MISC: '#/misc',
   },
 
-  PROFILE_URL_TEMPLATE: '/profile/<username>'
+  EXPLORATION_INTERACTIONS_HANDLER: '/interactions',
+
+  PROFILE_URL_TEMPLATE: '/profile/<username>',
 } as const;
