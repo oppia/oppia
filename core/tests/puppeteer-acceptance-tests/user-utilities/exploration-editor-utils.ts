@@ -34,7 +34,6 @@ const explorationTextInput = 'div.oppia-rte';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const endInteractionSelector = '.e2e-test-interaction-tile-EndExploration';
-const numericInputSelector = '.e2e-test-interaction-tile-NumericInput';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 const saveDraftButton = 'button.e2e-test-save-draft-button';
