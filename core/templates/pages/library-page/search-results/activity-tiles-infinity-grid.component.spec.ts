@@ -16,15 +16,21 @@
  * @fileoverview Unit tests for activityTilesInfinityGrid.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { of } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { LoaderService } from 'services/loader.service';
-import { SearchResponseBackendDict } from 'services/search-backend-api.service';
-import { SearchService } from 'services/search.service';
-import { ActivityTilesInfinityGridComponent } from './activity-tiles-infinity-grid.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {of} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {LoaderService} from 'services/loader.service';
+import {SearchResponseBackendDict} from 'services/search-backend-api.service';
+import {SearchService} from 'services/search.service';
+import {ActivityTilesInfinityGridComponent} from './activity-tiles-infinity-grid.component';
 
 describe('Activity Tiles Infinity Grid Component', () => {
   let fixture: ComponentFixture<ActivityTilesInfinityGridComponent>;
@@ -40,15 +46,9 @@ describe('Activity Tiles Infinity Grid Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ActivityTilesInfinityGridComponent
-      ],
-      providers: [
-        LoaderService,
-        SearchService,
-        WindowDimensionsService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [ActivityTilesInfinityGridComponent],
+      providers: [LoaderService, SearchService, WindowDimensionsService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -66,11 +66,15 @@ describe('Activity Tiles Infinity Grid Component', () => {
 
   it('should initialize', fakeAsync(() => {
     spyOnProperty(loaderService, 'onLoadingMessageChange').and.returnValue(
-      mockOnLoadingMessageChange);
-    spyOnProperty(searchService, 'onInitialSearchResultsLoaded')
-      .and.returnValue(mockOnInitialSearchResultsLoaded);
+      mockOnLoadingMessageChange
+    );
+    spyOnProperty(
+      searchService,
+      'onInitialSearchResultsLoaded'
+    ).and.returnValue(mockOnInitialSearchResultsLoaded);
     spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockResizeEventEmitter);
+      mockResizeEventEmitter
+    );
     spyOn(windowDimensionsService, 'getWidth').and.returnValue(400);
 
     componentInstance.ngOnInit();
@@ -89,14 +93,18 @@ describe('Activity Tiles Infinity Grid Component', () => {
     componentInstance.loadingMessage = '';
     componentInstance.endOfPageIsReached = false;
     componentInstance.allActivitiesInOrder = [];
-    spyOn(searchService, 'loadMoreData').and.callFake((
+    spyOn(searchService, 'loadMoreData').and.callFake(
+      (
         successCallback: (
-          SearchResponseData: SearchResponseBackendDict, boolean: boolean
+          SearchResponseData: SearchResponseBackendDict,
+          boolean: boolean
         ) => void,
-        failureCallback: (boolean: boolean) => void) => {
-      successCallback({ search_cursor: null, activity_list: [] }, true);
-      failureCallback(true);
-    });
+        failureCallback: (boolean: boolean) => void
+      ) => {
+        successCallback({search_cursor: null, activity_list: []}, true);
+        failureCallback(true);
+      }
+    );
 
     componentInstance.showMoreActivities();
     expect(componentInstance.endOfPageIsReached).toBeTrue();

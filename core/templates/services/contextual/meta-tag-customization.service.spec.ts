@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for MetaTagCustomizationService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { MetaTagCustomizationService } from
-  'services/contextual/meta-tag-customization.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {TestBed} from '@angular/core/testing';
+import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Meta Tag Customization Service', () => {
   let mtcs: MetaTagCustomizationService;
@@ -35,8 +34,8 @@ describe('Meta Tag Customization Service', () => {
       {
         propertyType: 'name',
         propertyValue: 'application-name',
-        content: 'Oppia.org'
-      }
+        content: 'Oppia.org',
+      },
     ];
 
     let removeSpy = jasmine.createSpy();
@@ -44,11 +43,13 @@ describe('Meta Tag Customization Service', () => {
     spyOn(wrs.nativeWindow.document, 'querySelector').and.returnValue({
       remove: () => {
         removeSpy();
-      }
+      },
     } as Element);
 
     const appendChildSpy = spyOn(
-      wrs.nativeWindow.document.head, 'appendChild').and.callThrough();
+      wrs.nativeWindow.document.head,
+      'appendChild'
+    ).and.callThrough();
     mtcs.addOrReplaceMetaTags(metaTags);
 
     const meta = wrs.nativeWindow.document.createElement('meta');

@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for the filtered choices field component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from 'modules/material.module';
-import { FilteredChoicesFieldComponent } from './filtered-choices-field.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MaterialModule} from 'modules/material.module';
+import {FilteredChoicesFieldComponent} from './filtered-choices-field.component';
 
 describe('Filtered Choices Field Component', () => {
   let componentInstance: FilteredChoicesFieldComponent;
@@ -28,14 +28,8 @@ describe('Filtered Choices Field Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        BrowserAnimationsModule,
-        MaterialModule,
-        FormsModule,
-      ],
-      declarations: [
-        FilteredChoicesFieldComponent
-      ]
+      imports: [BrowserAnimationsModule, MaterialModule, FormsModule],
+      declarations: [FilteredChoicesFieldComponent],
     }).compileComponents();
   }));
 
@@ -52,7 +46,8 @@ describe('Filtered Choices Field Component', () => {
     componentInstance.choices = ['choice1'];
     componentInstance.ngOnInit();
     expect(componentInstance.filteredChoices).toEqual(
-      componentInstance.choices);
+      componentInstance.choices
+    );
   });
 
   it('should filter choices', () => {

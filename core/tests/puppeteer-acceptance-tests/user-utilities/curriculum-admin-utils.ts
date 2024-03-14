@@ -16,10 +16,8 @@
  * @fileoverview Curriculum Admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
 
 const richTextAreaField = 'div.e2e-test-rte';
 const floatTextField = 'input.e2e-test-float-form-input';
@@ -114,21 +112,7 @@ const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
 const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
-
-export interface ICurriculumAdmin extends IBaseUser {
-  navigateToTopicAndSkillsDashboardPage: () => Promise<void>;
-  createSkill: () => Promise<void>;
-  createQuestion: () => Promise<void>;
-  navigateToCreatorDashboardPage: () => Promise<void>;
-  createExploration: () => Promise<string | null>;
-  createTopic: () => Promise<string>;
-  createSubTopic: () => Promise<void>;
-  createStory: () => Promise<void>;
-  createChapter: (explorationId: string) => Promise<void>;
-  publishStory: () => Promise<void>;
-}
-
-class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
+export class CurriculumAdmin extends BaseUser {
   /**
    * Function for navigating to the topic and skills dashboard page.
    */
@@ -146,7 +130,8 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(skillReviewMaterialHeader);
     await this.type(richTextAreaField, 'This is a test skill with 3 questions');
     await this.page.waitForSelector(
-      `${confirmSkillCreationButton}:not([disabled])`);
+      `${confirmSkillCreationButton}:not([disabled])`
+    );
     await this.clickOn(confirmSkillCreationButton);
   }
 
@@ -158,8 +143,7 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(easyQuestionDifficultyOption);
     await this.clickOn(textStateEditSelector);
     await this.type(richTextAreaField, 'Add 1+2');
-    await this.page.waitForSelector(
-      `${saveContentButton}:not([disabled])`);
+    await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
@@ -184,8 +168,7 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.type(floatTextField, '3');
     await this.clickOn(submitAnswerButton);
     await this.type(richTextAreaField, '1+2 is 3');
-    await this.page.waitForSelector(
-      `${submitSolutionButton}:not([disabled])`);
+    await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
 
     await this.clickOn(saveQuestionButton);
@@ -204,7 +187,8 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
   async createExploration() {
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
-      `${dismissWelcomeModalSelector}:not([disabled])`);
+      `${dismissWelcomeModalSelector}:not([disabled])`
+    );
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(500);
     await this.clickOn(textStateEditSelector);
@@ -215,13 +199,13 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(addInteractionButton);
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector(
-      `${saveChangesButton}:not([disabled])`);
+    await this.page.waitForSelector(`${saveChangesButton}:not([disabled])`);
     await this.clickOn(saveChangesButton);
     await this.clickOn(saveDraftButton);
 
     await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`);
+      `${publishExplorationButton}:not([disabled])`
+    );
     await this.clickOn(publishExplorationButton);
     await this.type(explorationTitleInput, 'Test Exploration');
     await this.type(explorationGoalInput, 'Test Exploration');
@@ -229,13 +213,15 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
     await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`);
+      `${publishExplorationButton}:not([disabled])`
+    );
     await this.clickOn(publishExplorationButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
-      element => element.textContent);
+      element => element.textContent
+    );
     return explorationIdUrl;
   }
 
@@ -248,22 +234,21 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.type(topicUrlFragmentField, 'test-topic-one');
     await this.type(topicWebFragmentField, 'Test Topic 1');
     await this.type(
-      topicDescriptionField, 'This topic is to test curriculum admin utility.'
+      topicDescriptionField,
+      'This topic is to test curriculum admin utility.'
     );
     await this.clickOn(photoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(
-      `${uploadPhotoButton}:not([disabled])`);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForTimeout(500);
-    await this.page.waitForSelector(
-      `${createTopicButton}:not([disabled])`);
+    await this.page.waitForSelector(`${createTopicButton}:not([disabled])`);
     await this.clickOn(createTopicButton);
     return this.page.url();
   }
 
   async openTopicEditor() {
-    await this.navigateToTopicAndSkillsDashboardPage()
+    await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(topicsTab);
     await this.clickOn(topic);
   }
@@ -279,16 +264,15 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(subTopicDescriptionEditorToggle);
     await this.page.waitForTimeout(500);
     await this.type(
-      richTextAreaField, 'This subtopic is to test curriculum admin utility.'
+      richTextAreaField,
+      'This subtopic is to test curriculum admin utility.'
     );
     await this.clickOn(photoBoxButton);
     await this.page.waitForTimeout(500);
     await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(
-      `${uploadPhotoButton}:not([disabled])`);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(
-      `${createSubTopicButton}:not([disabled])`);
+    await this.page.waitForSelector(`${createSubTopicButton}:not([disabled])`);
     await this.clickOn(createSubTopicButton);
   }
 
@@ -301,15 +285,14 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.type(storyTitleField, 'Test Story 1');
     await this.type(storyUrlFragmentField, 'test-story-one');
     await this.type(
-      storyDescriptionField, 'This story is to test curriculum admin utility.'
+      storyDescriptionField,
+      'This story is to test curriculum admin utility.'
     );
     await this.clickOn(photoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(
-      `${uploadPhotoButton}:not([disabled])`);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(
-      `${createStoryButton}:not([disabled])`);
+    await this.page.waitForSelector(`${createStoryButton}:not([disabled])`);
     await this.clickOn(createStoryButton);
   }
 
@@ -320,10 +303,12 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.clickOn(editorMainTabButton);
     await this.clickOn(saveStoryButton);
     await this.type(
-      saveStoryMessageInput, 'Test publishing story as curriculum admin.'
+      saveStoryMessageInput,
+      'Test publishing story as curriculum admin.'
     );
     await this.page.waitForSelector(
-      `${confirmSaveStoryButton}:not([disabled])`);
+      `${confirmSaveStoryButton}:not([disabled])`
+    );
     await this.clickOn(confirmSaveStoryButton);
     await this.page.waitForTimeout(500);
     await this.clickOn(publishStoryButton);
@@ -338,14 +323,12 @@ class CurriculumAdmin extends BaseUser implements ICurriculumAdmin {
     await this.type(chapterExplorationIdField, explorationId);
     await this.clickOn(photoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
-    await this.page.waitForSelector(
-      `${uploadPhotoButton}:not([disabled])`);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(
-      `${createChapterButton}:not([disabled])`);
+    await this.page.waitForSelector(`${createChapterButton}:not([disabled])`);
     await this.clickOn(createChapterButton);
   }
 }
 
-export let CurriculumAdminFactory =
-  (): ICurriculumAdmin => new CurriculumAdmin();
+export let CurriculumAdminFactory = (): CurriculumAdmin =>
+  new CurriculumAdmin();

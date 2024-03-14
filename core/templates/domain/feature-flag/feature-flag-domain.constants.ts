@@ -22,8 +22,7 @@ export const FeatureFlagDomainConstants = {
   DUMMY_HANDLER_URL: '/feature_flag_dummy_handler',
 
   // Url for the backend handler for evaluation of platform features.
-  FEATURE_FLAGS_EVALUATION_HANDLER_URL: (
-    '/feature_flags_evaluation_handler'),
+  FEATURE_FLAGS_EVALUATION_HANDLER_URL: '/feature_flags_evaluation_handler',
 
   // Url for the backend handler to perform actions for feature flags.
   FEATURE_FLAGS_URL: '/feature_flags',

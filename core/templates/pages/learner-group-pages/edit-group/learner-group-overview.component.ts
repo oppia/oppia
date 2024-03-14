@@ -16,37 +16,31 @@
  * @fileoverview Component for the learner group overview.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { LearnerGroupSyllabusBackendApiService } from
-  'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { LearnerGroupUserInfo } from
-  'domain/learner_group/learner-group-user-info.model';
-import { LearnerGroupUserProgress } from
-  'domain/learner_group/learner-group-user-progress.model';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { UserService } from 'services/user.service';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
+import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {UserService} from 'services/user.service';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 
 import './learner-group-overview.component.css';
-
 
 @Component({
   selector: 'oppia-learner-group-overview',
   templateUrl: './learner-group-overview.component.html',
-  styleUrls: ['./learner-group-overview.component.css']
+  styleUrls: ['./learner-group-overview.component.css'],
 })
 export class LearnerGroupOverviewComponent implements OnInit {
   @Input() learnerGroup!: LearnerGroupData;
   learnersProgress!: LearnerGroupUserProgress[];
   activeTab!: string;
-  EDIT_OVERVIEW_SECTIONS_I18N_IDS = (
-    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS
-  );
+  EDIT_OVERVIEW_SECTIONS_I18N_IDS =
+    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_OVERVIEW_SECTIONS;
 
   constructor(
-    private learnerGroupSyllabusBackendApiService:
-      LearnerGroupSyllabusBackendApiService,
+    private learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService,
     private userService: UserService
   ) {}
 
@@ -55,8 +49,10 @@ export class LearnerGroupOverviewComponent implements OnInit {
     if (this.learnerGroup && this.learnerGroup.learnerUsernames.length > 0) {
       this.learnerGroupSyllabusBackendApiService
         .fetchLearnersProgressInAssignedSyllabus(
-          this.learnerGroup.id, this.learnerGroup.learnerUsernames
-        ).then(learnersProgress => {
+          this.learnerGroup.id,
+          this.learnerGroup.learnerUsernames
+        )
+        .then(learnersProgress => {
           this.learnersProgress = learnersProgress;
         });
     }
@@ -74,15 +70,13 @@ export class LearnerGroupOverviewComponent implements OnInit {
     let storyCompletionsInfo: LearnerGroupUserInfo[] = [];
     this.learnersProgress.forEach(learnerProgress => {
       learnerProgress.storiesProgress.map(storyProgress => {
-        if (storyProgress.getId() === storyId &&
+        if (
+          storyProgress.getId() === storyId &&
           storyProgress.getCompletedNodeTitles().length ===
-          storyProgress.getNodeTitles().length
+            storyProgress.getNodeTitles().length
         ) {
           storyCompletionsInfo.push(
-            new LearnerGroupUserInfo(
-              learnerProgress.username,
-              ''
-            )
+            new LearnerGroupUserInfo(learnerProgress.username, '')
           );
         }
       });
@@ -91,20 +85,18 @@ export class LearnerGroupOverviewComponent implements OnInit {
   }
 
   getStrugglingLearnersInfoInSubtopics(
-      subtopicPageId: string
+    subtopicPageId: string
   ): LearnerGroupUserInfo[] {
     let strugglingLearnerInfo: LearnerGroupUserInfo[] = [];
     this.learnersProgress.forEach(learnerProgress => {
       learnerProgress.subtopicsProgress.map(subtopicProgress => {
-        if (subtopicProgress.subtopicPageId === subtopicPageId &&
-        subtopicProgress.subtopicMastery &&
-        subtopicProgress.subtopicMastery < 0.6
+        if (
+          subtopicProgress.subtopicPageId === subtopicPageId &&
+          subtopicProgress.subtopicMastery &&
+          subtopicProgress.subtopicMastery < 0.6
         ) {
           strugglingLearnerInfo.push(
-            new LearnerGroupUserInfo(
-              learnerProgress.username,
-              ''
-            )
+            new LearnerGroupUserInfo(learnerProgress.username, '')
           );
         }
       });
@@ -113,18 +105,19 @@ export class LearnerGroupOverviewComponent implements OnInit {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
-      username);
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
-      username);
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
     return webpImageUrl;
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaLearnerGroupOverview',
-  downgradeComponent({component: LearnerGroupOverviewComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaLearnerGroupOverview',
+    downgradeComponent({component: LearnerGroupOverviewComponent})
+  );

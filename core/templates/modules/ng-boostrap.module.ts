@@ -16,11 +16,16 @@
  * @fileoverview Module for Ng Bootstrap.
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NgbDropdownModule, NgbTooltipModule, NgbNavModule,
-  NgbModalModule, NgbPopoverModule,
-  NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {
+  NgbDropdownModule,
+  NgbTooltipModule,
+  NgbNavModule,
+  NgbModalModule,
+  NgbPopoverModule,
+  NgbTypeaheadModule,
+} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
@@ -30,7 +35,7 @@ import { NgbDropdownModule, NgbTooltipModule, NgbNavModule,
     NgbNavModule,
     NgbModalModule,
     NgbPopoverModule,
-    NgbTypeaheadModule
+    NgbTypeaheadModule,
   ],
   exports: [
     CommonModule,
@@ -39,7 +44,7 @@ import { NgbDropdownModule, NgbTooltipModule, NgbNavModule,
     NgbNavModule,
     NgbModalModule,
     NgbPopoverModule,
-    NgbTypeaheadModule
-  ]
+    NgbTypeaheadModule,
+  ],
 })
 export class NgBootstrapModule {}

@@ -36,31 +36,33 @@ ruleTester.run('no-multiline-disable', rule, {
     /* eslint-disable no-multiline-disable */
     /* eslint-disable max-len */
     it('should' +
-    'check if we can disable our new lint check')`
+    'check if we can disable our new lint check')`,
   ],
 
   invalid: [
     {
-      code:
-      `
+      code: `
       /* eslint-disable max-len */
       var a = (true ||
         true);`,
-      errors: [{
-        message: 'Do not use disable statement for multilines',
-        type: null
-      }]
+      errors: [
+        {
+          message: 'Do not use disable statement for multilines',
+          type: null,
+        },
+      ],
     },
     {
-      code:
-      `
+      code: `
       // eslint-disable max-len
       var a = (true ||
         true);`,
-      errors: [{
-        message: 'Do not use disable statement for multilines',
-        type: null
-      }]
-    }
-  ]
+      errors: [
+        {
+          message: 'Do not use disable statement for multilines',
+          type: null,
+        },
+      ],
+    },
+  ],
 });

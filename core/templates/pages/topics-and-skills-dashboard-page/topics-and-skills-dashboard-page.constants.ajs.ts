@@ -18,21 +18,36 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import {TopicsAndSkillsDashboardPageConstants} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
-angular.module('oppia').constant(
-  'SKILL_DESCRIPTION_STATUS_VALUES',
-  TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES);
+angular
+  .module('oppia')
+  .constant(
+    'SKILL_DESCRIPTION_STATUS_VALUES',
+    TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
+  );
 
-angular.module('oppia').constant(
-  'TOPIC_SORT_OPTIONS',
-  TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS);
-angular.module('oppia').constant(
-  'TOPIC_PUBLISHED_OPTIONS',
-  TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS);
-angular.module('oppia').constant(
-  'TOPIC_FILTER_CLASSROOM_ALL',
-  TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL);
-angular.module('oppia').constant(
-  'SKILL_STATUS_OPTIONS',
-  TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS);
+angular
+  .module('oppia')
+  .constant(
+    'TOPIC_SORT_OPTIONS',
+    TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS
+  );
+angular
+  .module('oppia')
+  .constant(
+    'TOPIC_PUBLISHED_OPTIONS',
+    TopicsAndSkillsDashboardPageConstants.TOPIC_PUBLISHED_OPTIONS
+  );
+angular
+  .module('oppia')
+  .constant(
+    'TOPIC_FILTER_CLASSROOM_ALL',
+    TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_CLASSROOM_ALL
+  );
+angular
+  .module('oppia')
+  .constant(
+    'SKILL_STATUS_OPTIONS',
+    TopicsAndSkillsDashboardPageConstants.SKILL_STATUS_OPTIONS
+  );

@@ -25,11 +25,11 @@
  *     blob/master/sklearn/feature_extraction/text.py#L541
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TextInputTokenizer {
   // It returns 'null' if input contains less than 2 alphanumeric characters.
@@ -45,5 +45,6 @@ export class TextInputTokenizer {
   }
 }
 
-angular.module('oppia').factory(
-  'TextInputTokenizer', downgradeInjectable(TextInputTokenizer));
+angular
+  .module('oppia')
+  .factory('TextInputTokenizer', downgradeInjectable(TextInputTokenizer));
