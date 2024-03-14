@@ -17,6 +17,7 @@
  */
 
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 
 const curriculumAdminThumbnailImage =
@@ -128,10 +129,13 @@ export class CurriculumAdmin extends BaseUser {
   async createSkill(): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addSkillButton);
-    await this.type(skillDescriptionField, 'Test Skill 3');
+    await this.type(skillDescriptionField, 'Test Skill 1');
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, 'This is a test skill with 3 questions');
+    await this.type(
+      richTextAreaField,
+      'This is a test skill for curriculum admin.'
+    );
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
@@ -253,6 +257,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   async openTopicEditor(): Promise<void> {
+    await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(topicsTab);
     await this.clickOn(topic);
@@ -311,7 +316,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async createChapter(explorationId: string): Promise<void> {
     await this.clickOn(addChapterButton);
-    await this.type(chapterTitleField, 'Test Story 1');
+    await this.type(chapterTitleField, 'Test Chapter 1');
     await this.type(chapterExplorationIdField, explorationId);
     await this.clickOn(chapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
@@ -337,6 +342,69 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForTimeout(500);
     await this.clickOn(publishStoryButton);
+  }
+
+  /**
+   * This function checks if the topic with given subtopic and skill is published.
+   */
+  async expectPublishedTopicToBePresent(): Promise<void> {
+    let expectedSubTopicName = 'Test Subtopic 1';
+    let expectedSkillName = 'Test Skill 1';
+
+    await this.openTopicEditor();
+    await this.page.waitForSelector('.e2e-test-subtopic');
+
+    let subTopicName = await this.page.$eval(
+      '.e2e-test-subtopic',
+      element => (element as HTMLElement).innerText
+    );
+    let skillName = await this.page.$eval(
+      '.e2e-test-skill-item',
+      element => (element as HTMLElement).innerText
+    );
+    if (subTopicName != expectedSubTopicName) {
+      throw new Error(
+        `Subtopic with title ${expectedSubTopicName} does not exist!`
+      );
+    } else if (skillName != expectedSkillName) {
+      throw new Error(
+        `Subtopic with title ${expectedSubTopicName} does not exist!`
+      );
+    }
+    showMessage(
+      `Published topic with subtopic ${expectedSubTopicName} and skill ${skillName} exists!`
+    );
+  }
+
+  /**
+   * This function checks if the story with given chapter is published.
+   */
+  async expectPublishedStoryToBePresent(): Promise<void> {
+    let expectedStoryName = 'Test Story 1';
+    let expectedChapterName = 'Test Chapter 1';
+
+    await this.page.waitForSelector('.e2e-test-story-title');
+    let storyName = await this.page.$eval(
+      '.e2e-test-story-title',
+      element => (element as HTMLElement).innerText
+    );
+
+    await this.clickOn('.e2e-test-story-title');
+    await this.page.waitForSelector('.e2e-test-chapter-title');
+    let chapterName = await this.page.$eval(
+      '.e2e-test-chapter-title',
+      element => (element as HTMLElement).innerText
+    );
+    if (storyName != expectedStoryName) {
+      throw new Error(`Story with title ${expectedStoryName} does not exist!`);
+    } else if (chapterName != expectedChapterName) {
+      throw new Error(
+        `Chapter with title ${expectedChapterName} does not exist!`
+      );
+    }
+    showMessage(
+      `Published story with title ${expectedStoryName} and chapter with title ${expectedChapterName} exists!`
+    );
   }
 }
 

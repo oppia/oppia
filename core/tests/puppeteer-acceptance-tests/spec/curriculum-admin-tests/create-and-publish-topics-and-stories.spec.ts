@@ -52,6 +52,9 @@ describe('Curriculum Admin', function () {
       await curriculumAdmin.createStory();
       await curriculumAdmin.createChapter(explorationId);
       await curriculumAdmin.publishStory();
+
+      await curriculumAdmin.expectPublishedTopicToBePresent();
+      await curriculumAdmin.expectPublishedStoryToBePresent();
     },
     DEFAULT_SPEC_TIMEOUT
   );
