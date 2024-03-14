@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for curriculum admin
+ * @fileoverview Acceptance Test for topic management by curriculum admin
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -37,7 +37,7 @@ describe('Curriculum Admin', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'should create skill.',
+    'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       explorationUrl = await curriculumAdmin.createExploration();
