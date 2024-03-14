@@ -58,7 +58,6 @@ describe('Exploration Editor', function () {
       );
 
       await explorationEditor.downloadRevision();
-      await explorationEditor.expectSuccessfulDownloadOfRevision('hjkj');
       await explorationEditor.revertRevison();
       await explorationEditor.expectSuccessfulReversionOfRevision();
     },

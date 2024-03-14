@@ -282,8 +282,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(paginatorToggler, {visible: true});
     await this.clickOn(paginatorToggler);
-    const love = '.mat-select-panel';
-    await this.clickOn(`${love} mat-option:nth-child(2)`);
+    const PaginatorOptionsSelector = '.mat-select-panel';
+    await this.clickOn(`${PaginatorOptionsSelector} mat-option:nth-child(2)`);
 
     await this.page.waitForTimeout(500);
     let revisions = await this.getRevisionsList(historyListItem);
@@ -352,60 +352,23 @@ export class ExplorationEditor extends BaseUser {
       divs.map(div => div.textContent)
     );
     if (divContent[0] !== divContent[1]) {
-      showMessage('State changes are reflected in the exploration.');
+      showMessage(
+        `Exploration state changes are reflected in the ${property}.`
+      );
     } else {
-      throw new Error('No changes detected in the exploration state.');
+      throw new Error(`No changes detected in the exploration state.`);
     }
     await this.clickOn(closeStateModal);
     await this.page.waitForSelector(resetGraphButton);
     await this.clickOn(resetGraphButton);
   }
 
-  /**
-   * Function downloads and reverts a version.
-   * @param {number} version - revision version.
-   * */
-  // async downloadAndRevertRevision(): Promise<void> {
-  //   await this.page.waitForTimeout(1000);
-  //   await this.clickOn(firstVersionOptionsButton);
-  //   await this.page.waitForTimeout(1000);
-  //   await this.page.waitForSelector(downloadVersionButton);
-  //   await this.clickOn(downloadVersionButton);
-  //   await this.page.waitForTimeout(1000);
-  //   await this.clickOn(secondVersionOptionsButton);
-  //   await this.page.waitForTimeout(1000);
-  //   await this.clickOn(revertVersionButton);
-  //   await this.page.click(confirmRevertVersionButton);
-  // }
   async downloadRevision() {
     await this.page.waitForTimeout(1000);
     await this.clickOn(firstVersionOptionsButton);
     await this.page.waitForTimeout(1000);
     await this.page.waitForSelector(downloadVersionButton);
     await this.clickOn(downloadVersionButton);
-  }
-
-  async expectSuccessfulDownloadOfRevision(expectedUrl: string): Promise<void> {
-    // Define the handler function
-    const handler = interceptedRequest => {
-      if (interceptedRequest.url() === expectedUrl) {
-        console.log('Download successful');
-        console.log(interceptedRequest.url);
-      } else {
-        console.log('Download failed');
-      }
-
-      interceptedRequest.continue();
-    };
-
-    // Set up a request interception
-    this.page.on('request', handler);
-
-    // Trigger the download
-    await this.downloadRevision();
-
-    // Remove the request interception
-    this.page.off('request', handler);
   }
 
   async revertRevison() {
