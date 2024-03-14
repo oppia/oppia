@@ -362,13 +362,13 @@ export class CurriculumAdmin extends BaseUser {
       '.e2e-test-skill-item',
       element => (element as HTMLElement).innerText
     );
-    if (subTopicName != expectedSubTopicName) {
+    if (subTopicName !== expectedSubTopicName) {
       throw new Error(
         `Subtopic with title ${expectedSubTopicName} does not exist!`
       );
-    } else if (skillName != expectedSkillName) {
+    } else if (skillName !== expectedSkillName) {
       throw new Error(
-        `Subtopic with title ${expectedSubTopicName} does not exist!`
+        `Skill with title ${expectedSubTopicName} does not exist!`
       );
     }
     showMessage(
@@ -395,9 +395,9 @@ export class CurriculumAdmin extends BaseUser {
       '.e2e-test-chapter-title',
       element => (element as HTMLElement).innerText
     );
-    if (storyName != expectedStoryName) {
+    if (storyName !== expectedStoryName) {
       throw new Error(`Story with title ${expectedStoryName} does not exist!`);
-    } else if (chapterName != expectedChapterName) {
+    } else if (chapterName !== expectedChapterName) {
       throw new Error(
         `Chapter with title ${expectedChapterName} does not exist!`
       );
