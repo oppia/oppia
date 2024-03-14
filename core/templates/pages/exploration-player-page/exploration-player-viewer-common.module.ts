@@ -19,29 +19,25 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { SwitchContentLanguageRefreshRequiredModalComponent } from './switch-content-language-refresh-required-modal.component';
-import { LessonInformationCardModalComponent } from './templates/lesson-information-card-modal.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {SwitchContentLanguageRefreshRequiredModalComponent} from './switch-content-language-refresh-required-modal.component';
+import {LessonInformationCardModalComponent} from './templates/lesson-information-card-modal.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule
-  ],
+  imports: [CommonModule, SharedComponentsModule],
   declarations: [
     SwitchContentLanguageRefreshRequiredModalComponent,
-    LessonInformationCardModalComponent
+    LessonInformationCardModalComponent,
   ],
   entryComponents: [
     SwitchContentLanguageRefreshRequiredModalComponent,
-    LessonInformationCardModalComponent
+    LessonInformationCardModalComponent,
   ],
   exports: [
     SwitchContentLanguageRefreshRequiredModalComponent,
-    LessonInformationCardModalComponent
+    LessonInformationCardModalComponent,
   ],
 })
-
-export class ExplorationPlayerViewerCommonModule { }
+export class ExplorationPlayerViewerCommonModule {}

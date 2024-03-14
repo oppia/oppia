@@ -19,26 +19,25 @@
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('TranslationFileHashLoaderBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  function($http, $q, UrlInterpolationService) {
+  '$http',
+  '$q',
+  'UrlInterpolationService',
+  function ($http, $q, UrlInterpolationService) {
     /* Options object contains:
      *  prefix: added before key, defined by developer
      *  key: language key, determined internally by i18n library
      *  suffix: added after key, defined by developer
      */
-    return function(options) {
-      var fileUrl = [
-        options.prefix,
-        options.key,
-        options.suffix
-      ].join('');
-      return $http.get(
-        UrlInterpolationService.getStaticAssetUrl(fileUrl)
-      ).then(function(result) {
-        return result.data;
-      }, function() {
-        return $q.reject(options.key);
-      });
+    return function (options) {
+      var fileUrl = [options.prefix, options.key, options.suffix].join('');
+      return $http.get(UrlInterpolationService.getStaticAssetUrl(fileUrl)).then(
+        function (result) {
+          return result.data;
+        },
+        function () {
+          return $q.reject(options.key);
+        }
+      );
     };
-  }
+  },
 ]);

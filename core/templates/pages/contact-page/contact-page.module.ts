@@ -16,26 +16,16 @@
  * @fileoverview Module for the contact page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ContactPageComponent } from './contact-page.component';
-import { ContactPageRootComponent } from './contact-page-root.component';
-import { CommonModule } from '@angular/common';
-import { ContactPageRoutingModule } from './contact-page-routing.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ContactPageComponent} from './contact-page.component';
+import {ContactPageRootComponent} from './contact-page-root.component';
+import {CommonModule} from '@angular/common';
+import {ContactPageRoutingModule} from './contact-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    ContactPageRoutingModule
-  ],
-  declarations: [
-    ContactPageComponent,
-    ContactPageRootComponent
-  ],
-  entryComponents: [
-    ContactPageComponent,
-    ContactPageRootComponent
-  ]
+  imports: [CommonModule, SharedComponentsModule, ContactPageRoutingModule],
+  declarations: [ContactPageComponent, ContactPageRootComponent],
+  entryComponents: [ContactPageComponent, ContactPageRootComponent],
 })
 export class ContactPageModule {}

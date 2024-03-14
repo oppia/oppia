@@ -23,9 +23,9 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'Lint check to ensure that constants are not declared in files other' +
-        ' than *.constants.ajs.ts and there are no multiple constants'),
+        ' than *.constants.ajs.ts and there are no multiple constants',
       category: 'Possible Errors',
       recommended: true,
     },
@@ -34,54 +34,56 @@ module.exports = {
     messages: {
       nonConstantFile: 'Constant is used in non constant file.',
       multipleConstant: 'There are mutliple constants in this file.',
-      notFoundAsConst: (
-        'Please add \'as const\' at the end of the constant ' +
+      notFoundAsConst:
+        "Please add 'as const' at the end of the constant " +
         'declaration. A constants file should have the following ' +
-        'structure:\n export const SomeConstants = { ... } as const;')
+        'structure:\n export const SomeConstants = { ... } as const;',
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var constantsDeclarations = [];
     var args;
     var filename = context.getFilename();
 
-    var selector = (
+    var selector =
       'CallExpression[callee.property.name=constant]' +
-      '[callee.object.callee.object.name=angular]');
+      '[callee.object.callee.object.name=angular]';
 
     if (filename.endsWith('constants.ts')) {
       return {
-        VariableDeclarator: function(node) {
-          if ((node.init.type !== 'TSAsExpression') ||
-           (node.init.typeAnnotation.typeName.name !== 'const')) {
-            context.report ({
+        VariableDeclarator: function (node) {
+          if (
+            node.init.type !== 'TSAsExpression' ||
+            node.init.typeAnnotation.typeName.name !== 'const'
+          ) {
+            context.report({
               node: node,
-              messageId: 'notFoundAsConst'
+              messageId: 'notFoundAsConst',
             });
           }
-        }
+        },
       };
     }
 
     return {
-      [selector]: function(node) {
+      [selector]: function (node) {
         if (!filename.endsWith('.constants.ajs.ts')) {
-          context.report ({
+          context.report({
             node: node,
-            messageId: 'nonConstantFile'
+            messageId: 'nonConstantFile',
           });
         }
         args = node.arguments[0].value;
         if (!constantsDeclarations.includes(args)) {
           constantsDeclarations.push(args);
         } else {
-          context.report ({
+          context.report({
             node: node.arguments[0],
-            messageId: 'multipleConstant'
+            messageId: 'multipleConstant',
           });
         }
-      }
+      },
     };
-  }
+  },
 };

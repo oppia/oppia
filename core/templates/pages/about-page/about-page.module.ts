@@ -16,22 +16,15 @@
  * @fileoverview Module for the about page.
  */
 
-import { NgModule } from '@angular/core';
-import { AboutPageComponent } from './about-page.component';
-import { AboutPageRootComponent } from './about-page-root.component';
-import { AboutPageRoutingModule } from './about-page-routing.module';
-import { CommonModule } from '@angular/common';
-import { SharedComponentsModule } from 'components/shared-component.module';
+import {NgModule} from '@angular/core';
+import {AboutPageComponent} from './about-page.component';
+import {AboutPageRootComponent} from './about-page-root.component';
+import {AboutPageRoutingModule} from './about-page-routing.module';
+import {CommonModule} from '@angular/common';
+import {SharedComponentsModule} from 'components/shared-component.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    AboutPageRoutingModule,
-  ],
-  declarations: [
-    AboutPageComponent,
-    AboutPageRootComponent
-  ],
+  imports: [CommonModule, SharedComponentsModule, AboutPageRoutingModule],
+  declarations: [AboutPageComponent, AboutPageRootComponent],
 })
 export class AboutPageModule {}

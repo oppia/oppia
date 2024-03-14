@@ -17,31 +17,31 @@
  * since the Epoch to human-readable dates.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DateTimeFormatService {
-/**
-  * This function returns the time (using locale conventions) if the local
-  * datetime representation has the same date as the current date. Else if the
-  * local datetime representation has the same year as the current date, it
-  * returns the date in the format 'MMM D'. Else, it returns the full date in
-  * the format 'MM/DD/YY'.
-  * @param {number} millisSinceEpoch - milliseconds since Epoch
-  * @returns {string} - a date
-  */
+  /**
+   * This function returns the time (using locale conventions) if the local
+   * datetime representation has the same date as the current date. Else if the
+   * local datetime representation has the same year as the current date, it
+   * returns the date in the format 'MMM D'. Else, it returns the full date in
+   * the format 'MM/DD/YY'.
+   * @param {number} millisSinceEpoch - milliseconds since Epoch
+   * @returns {string} - a date
+   */
   getLocaleAbbreviatedDatetimeString(millisSinceEpoch: number): string {
     let date = new Date(millisSinceEpoch);
     if (date.toLocaleDateString() === new Date().toLocaleDateString()) {
       return date.toLocaleTimeString([], {
         hour: 'numeric',
         minute: 'numeric',
-        hour12: true
+        hour12: true,
       });
     } else if (date.getFullYear() === new Date().getFullYear()) {
       // Moment will return Oct 10.
@@ -115,5 +115,6 @@ export class DateTimeFormatService {
   }
 }
 
-angular.module('oppia').factory(
-  'DateTimeFormatService', downgradeInjectable(DateTimeFormatService));
+angular
+  .module('oppia')
+  .factory('DateTimeFormatService', downgradeInjectable(DateTimeFormatService));

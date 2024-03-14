@@ -18,16 +18,21 @@
 
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
-  'algebraic-expression-input-rules.service.ts');
+    'algebraic-expression-input-rules.service.ts'
+);
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
-  'algebraic-expression-input-validation.service.ts');
+    'algebraic-expression-input-validation.service.ts'
+);
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
-  'oppia-interactive-algebraic-expression-input.component.ts');
+    'oppia-interactive-algebraic-expression-input.component.ts'
+);
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
-  'oppia-response-algebraic-expression-input.component.ts');
+    'oppia-response-algebraic-expression-input.component.ts'
+);
 require(
   'interactions/AlgebraicExpressionInput/directives/' +
-  'oppia-short-response-algebraic-expression-input.component.ts');
+    'oppia-short-response-algebraic-expression-input.component.ts'
+);

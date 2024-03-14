@@ -20,11 +20,13 @@ export const convertHtmlToUnicode = (html: string): string => {
   const domparser = new DOMParser();
   const dom = domparser.parseFromString(html, 'text/html');
 
-  return (dom.querySelector('body')?.innerText) as string;
+  return dom.querySelector('body')?.innerText as string;
 };
 
-angular.module('oppia').filter('convertHtmlToUnicode', [function() {
-  return function(html: string) {
-    return convertHtmlToUnicode(html);
-  };
-}]);
+angular.module('oppia').filter('convertHtmlToUnicode', [
+  function () {
+    return function (html: string) {
+      return convertHtmlToUnicode(html);
+    };
+  },
+]);

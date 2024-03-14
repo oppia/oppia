@@ -17,17 +17,13 @@
  * associated with a given skill.
  */
 
-
-import { Question } from './QuestionObjectFactory';
+import {Question} from './QuestionObjectFactory';
 
 export class DiagnosticTestQuestionsModel {
   private _mainQuestion: Question;
   private _backupQuestion: Question;
 
-  constructor(
-      mainQuestion: Question,
-      backupQuestion: Question,
-  ) {
+  constructor(mainQuestion: Question, backupQuestion: Question) {
     this._mainQuestion = mainQuestion;
     this._backupQuestion = backupQuestion;
   }
