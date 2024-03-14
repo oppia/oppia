@@ -46,6 +46,7 @@ from typing import Dict, Final, List, Optional, Tuple, Type
 sys.path.append(os.getcwd())
 from scripts import common  # isort:skip  # pylint: disable=wrong-import-position
 from scripts import install_python_prod_dependencies # isort:skip  # pylint: disable=wrong-import-position
+from core import feconf #isort:skip # pylint: disable=wrong-import-position
 
 GitRef = collections.namedtuple(
     'GitRef', ['local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'])
@@ -60,7 +61,11 @@ MYPY_TYPE_CHECK_MODULE: Final = 'scripts.run_mypy_checks'
 FILE_DIR: Final = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR: Final = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG: Final = '--files'
-PYTHON_CMD: Final = 'python'
+
+# Path to currently running python interpreter,
+# it is required to resolve python version conflict in docker.
+PYTHON_CMD: Final = sys.executable if feconf.OPPIA_IS_DOCKERIZED else 'python'
+
 OPPIA_PARENT_DIR: Final = os.path.join(
     FILE_DIR, os.pardir, os.pardir, os.pardir
 )
