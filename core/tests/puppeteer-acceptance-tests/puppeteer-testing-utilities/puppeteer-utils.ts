@@ -47,7 +47,7 @@ export class BaseUser {
       '--use-fake-ui-for-media-stream',
     ];
 
-    const headless = process.env.HEADLESS === 'true';
+    const headless = process.env.HEADLESS === 'false';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -191,10 +191,7 @@ export class BaseUser {
       throw new Error(`The ${selector} does not have a href attribute!`);
     }
     if (href !== expectedUrl) {
-      throw new Error(
-        `The ${selector} does not open the expected URL!
-         Actual: ${href}, Expected: ${expectedUrl}`
-      );
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
     }
   }
 

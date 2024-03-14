@@ -330,17 +330,11 @@ export class LoggedInUser extends BaseUser {
         'The Even Those Who Are In School button does not exist!'
       );
     }
-    try {
-      await this.openExternalPdfLink(
-        anchorElementSelector,
-        evenThoseWhoAreInSchoolUrl
-      );
-      showMessage(
-        'The Even Those Who Are In School link opens the right page.'
-      );
-    } catch (error) {
-      throw new Error(error);
-    }
+    await this.openExternalPdfLink(
+      anchorElementSelector,
+      evenThoseWhoAreInSchoolUrl
+    );
+    showMessage('The Even Those Who Are In School link opens the right page.');
   }
 
   /**
