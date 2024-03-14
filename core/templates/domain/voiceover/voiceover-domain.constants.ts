@@ -21,5 +21,5 @@ export const VoiceoverDomainConstants = {
   VOICEOVER_LANGUAGE_CODES_MAPPING_URL: '/voiceover_language_codes_mapping',
   VOICE_ARTIST_METADATA_HANDLER_URL: '/voice_artist_metadata_handler',
   GET_VOICEOVERS_FOR_VOICE_ARTIST_URL_TEMPLATE:
-    '/get_sample_voiceovers/<voice_artist_id>/<language_code>'
+    '/get_sample_voiceovers/<voice_artist_id>/<language_code>',
 } as const;

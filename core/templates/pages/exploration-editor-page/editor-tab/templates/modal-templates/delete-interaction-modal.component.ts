@@ -16,16 +16,15 @@
  * @fileoverview Component for Delete Interaction Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'delete-interaction-modal',
-  templateUrl: './delete-interaction-modal.component.html'
+  templateUrl: './delete-interaction-modal.component.html',
 })
-export class DeleteInteractionModalComponent
-  extends ConfirmOrCancelModal {
+export class DeleteInteractionModalComponent extends ConfirmOrCancelModal {
   constructor(ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }

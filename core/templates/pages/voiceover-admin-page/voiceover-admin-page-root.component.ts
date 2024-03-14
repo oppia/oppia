@@ -16,20 +16,18 @@
  * @fileoverview Voiceover admin page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
-
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-voiceover-admin-page-root',
   templateUrl: './voiceover-admin-page-root.component.html',
 })
 export class VoiceoverAdminPageRootComponent extends BaseRootComponent {
-  title: string = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.TITLE);
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.TITLE;
 
-  meta: MetaTagData[] = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.META as
-    unknown as Readonly<MetaTagData>[]);
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .VOICEOVER_ADMIN.META as unknown as Readonly<MetaTagData>[];
 }

@@ -21,14 +21,15 @@
 // HTML bind directive that trusts the value it is given and also evaluates
 // custom directive tags in the provided value.
 angular.module('oppia').directive('angularHtmlBind', [
-  '$compile', function($compile) {
+  '$compile',
+  function ($compile) {
     return {
       restrict: 'E',
-      link: function(scope, elm, attrs) {
+      link: function (scope, elm, attrs) {
         // Clean up old scopes if the html changes.
         // Reference: https://stackoverflow.com/a/42927814
         var newScope: ng.IScope;
-        scope.$watch(attrs.htmlData, function(newValue: string) {
+        scope.$watch(attrs.htmlData, function (newValue: string) {
           if (newScope) {
             newScope.$destroy();
           }
@@ -54,6 +55,7 @@ angular.module('oppia').directive('angularHtmlBind', [
           elm.html(newValue as string);
           $compile(elm.contents())(newScope);
         });
-      }
+      },
     };
-  }]);
+  },
+]);

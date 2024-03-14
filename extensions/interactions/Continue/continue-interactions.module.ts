@@ -18,34 +18,29 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { OppiaResponseContinueComponent } from './directives/oppia-response-continue.component';
-import { OppiaShortResponseContinueComponent } from './directives/oppia-short-response-continue.component';
-import { OppiaInteractiveContinue } from './directives/oppia-interactive-continue.component';
-import { MaterialModule } from 'modules/material.module';
-
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {OppiaResponseContinueComponent} from './directives/oppia-response-continue.component';
+import {OppiaShortResponseContinueComponent} from './directives/oppia-short-response-continue.component';
+import {OppiaInteractiveContinue} from './directives/oppia-interactive-continue.component';
+import {MaterialModule} from 'modules/material.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MaterialModule
-  ],
+  imports: [CommonModule, MaterialModule],
   declarations: [
     OppiaResponseContinueComponent,
     OppiaShortResponseContinueComponent,
-    OppiaInteractiveContinue
+    OppiaInteractiveContinue,
   ],
   entryComponents: [
     OppiaResponseContinueComponent,
     OppiaShortResponseContinueComponent,
-    OppiaInteractiveContinue
+    OppiaInteractiveContinue,
   ],
   exports: [
     OppiaResponseContinueComponent,
     OppiaShortResponseContinueComponent,
-    OppiaInteractiveContinue
+    OppiaInteractiveContinue,
   ],
 })
-
-export class ContinueExtensionsModule { }
+export class ContinueExtensionsModule {}

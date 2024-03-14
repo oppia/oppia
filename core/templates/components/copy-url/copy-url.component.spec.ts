@@ -12,18 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for copy exploration URL component.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { ComponentOverviewComponent } from './copy-url.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {ComponentOverviewComponent} from './copy-url.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockI18nLanguageCodeService {
   isCurrentLanguageRTL(): boolean {
@@ -38,20 +43,15 @@ describe('Copy Exploration URL component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      declarations: [
-        ComponentOverviewComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [ComponentOverviewComponent, MockTranslatePipe],
       providers: [
         {
           provide: I18nLanguageCodeService,
-          useClass: MockI18nLanguageCodeService
-        }
+          useClass: MockI18nLanguageCodeService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -70,7 +70,6 @@ describe('Copy Exploration URL component', () => {
     component.copyUrlButton();
     tick(1000);
 
-    expect(clipboard.copy).toHaveBeenCalledWith(
-      explorationURL);
+    expect(clipboard.copy).toHaveBeenCalledWith(explorationURL);
   }));
 });

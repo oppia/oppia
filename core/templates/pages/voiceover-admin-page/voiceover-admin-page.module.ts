@@ -16,26 +16,23 @@
  * @fileoverview Module for the voicover-admin page.
  */
 
-
-import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { RouterModule } from '@angular/router';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
-
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { VoiceoverAdminPageComponent } from './voiceover-admin-page.component';
-import { VoiceoverAdminNavbarComponent } from './navbar/voiceover-admin-navbar.component';
-import { VoiceoverRemovalConfirmModalComponent } from './modals/language-accent-removal-confirm-modal.component';
-import { AddAccentToVoiceoverLanguageModalComponent } from './modals/add-accent-to-voiceover-language-modal.component';
-import { SharedFormsModule } from 'components/forms/shared-forms.module';
-import { VoiceoverAdminPageRootComponent } from './voiceover-admin-page-root.component';
-import { VoiceoverAdminAuthGuard } from './voiceover-admin-page-auth.guard';
-
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatTableModule} from '@angular/material/table';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {VoiceoverAdminPageComponent} from './voiceover-admin-page.component';
+import {VoiceoverAdminNavbarComponent} from './navbar/voiceover-admin-navbar.component';
+import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
+import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {VoiceoverAdminPageRootComponent} from './voiceover-admin-page-root.component';
+import {VoiceoverAdminAuthGuard} from './voiceover-admin-page-auth.guard';
 
 @NgModule({
   imports: [
@@ -61,14 +58,14 @@ import { VoiceoverAdminAuthGuard } from './voiceover-admin-page-auth.guard';
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
     VoiceoverRemovalConfirmModalComponent,
-    AddAccentToVoiceoverLanguageModalComponent
+    AddAccentToVoiceoverLanguageModalComponent,
   ],
   entryComponents: [
     VoiceoverAdminPageRootComponent,
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
     VoiceoverRemovalConfirmModalComponent,
-    AddAccentToVoiceoverLanguageModalComponent
-  ]
+    AddAccentToVoiceoverLanguageModalComponent,
+  ],
 })
 export class VoiceoverAdminPageModule {}

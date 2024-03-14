@@ -17,9 +17,11 @@
  * in nested directives. See: http://stackoverflow.com/q/14430655
  */
 
-angular.module('oppia').factory(
-  'NestedDirectivesRecursionTimeoutPreventionService', [
-    '$compile', function($compile) {
+angular
+  .module('oppia')
+  .factory('NestedDirectivesRecursionTimeoutPreventionService', [
+    '$compile',
+    function ($compile) {
       return {
         /**
          * Manually compiles the element, fixing the recursion loop.
@@ -28,11 +30,11 @@ angular.module('oppia').factory(
          *   with function(s) registered via pre and post properties.
          * @return {object} An object containing the linking functions.
          */
-        compile: function(element, link) {
+        compile: function (element, link) {
           // Normalize the link parameter.
           if (angular.isFunction(link)) {
             link = {
-              post: link
+              post: link,
             };
           }
 
@@ -40,14 +42,14 @@ angular.module('oppia').factory(
           var contents = element.contents().remove();
           var compiledContents;
           return {
-            pre: (link && link.pre) ? link.pre : null,
-            post: function(scope, element) {
+            pre: link && link.pre ? link.pre : null,
+            post: function (scope, element) {
               // Compile the contents.
               if (!compiledContents) {
                 compiledContents = $compile(contents);
               }
               // Re-add the compiled contents to the element.
-              compiledContents(scope, function(clone) {
+              compiledContents(scope, function (clone) {
                 element.append(clone);
               });
 
@@ -55,8 +57,9 @@ angular.module('oppia').factory(
               if (link && link.post) {
                 link.post.apply(null, arguments);
               }
-            }
+            },
           };
-        }
+        },
       };
-    }]);
+    },
+  ]);

@@ -16,40 +16,47 @@
  * @fileoverview Tests for Voice Artist Language Mapping model.
  */
 
-import { VoiceArtistLanguageMapping } from './voice-artist-language-mapping.model';
+import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
 
 describe('voice artist language mapping model', () => {
   it('should get language accent mapping field values', () => {
-    let voiceArtistLanguageMapping = (
+    let voiceArtistLanguageMapping =
       VoiceArtistLanguageMapping.createVoiceArtistLanguageMapping(
-        'voiceArtistId', 'languageCode', 'languageAccentCode'));
+        'voiceArtistId',
+        'languageCode',
+        'languageAccentCode'
+      );
     expect(voiceArtistLanguageMapping.getVoiceArtistID()).toEqual(
-      'voiceArtistId');
+      'voiceArtistId'
+    );
     expect(voiceArtistLanguageMapping.getLanguageCode()).toEqual(
-      'languageCode');
+      'languageCode'
+    );
     expect(voiceArtistLanguageMapping.getLanguageAccentCode()).toEqual(
-      'languageAccentCode');
+      'languageAccentCode'
+    );
   });
 
   it('should get language accent language mapping list', () => {
     let voiceArtistIdToLanguageMapping = {
       voiceArtist1: {
-        en: 'en-US'
+        en: 'en-US',
       },
       voiceArtist2: {
-        hi: 'hi-IN'
+        hi: 'hi-IN',
       },
       voiceArtist3: {
-        en: 'en-IN'
+        en: 'en-IN',
       },
       voiceArtist4: {
-        ar: 'Arabic (Egypt)'
-      }
+        ar: 'Arabic (Egypt)',
+      },
     };
 
-    let voiceArtistLanguageMappingList = (
+    let voiceArtistLanguageMappingList =
       VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
-        voiceArtistIdToLanguageMapping));
+        voiceArtistIdToLanguageMapping
+      );
 
     expect(voiceArtistLanguageMappingList.length).toEqual(4);
   });

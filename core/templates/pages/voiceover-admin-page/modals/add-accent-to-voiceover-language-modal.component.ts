@@ -16,22 +16,22 @@
  * @fileoverview Add language accent modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {
-  VoiceoverBackendApiService, LanguageAccentToDescription,
-  ExplorationIdToFilenames
+  VoiceoverBackendApiService,
+  LanguageAccentToDescription,
+  ExplorationIdToFilenames,
 } from 'domain/voiceover/voiceover-backend-api.service';
-import { AudioPlayerService } from 'services/audio-player.service';
-import { ContextService } from 'services/context.service';
+import {AudioPlayerService} from 'services/audio-player.service';
+import {ContextService} from 'services/context.service';
 
 @Component({
   selector: 'oppia-add-accent-to-voiceover-language-modal',
-  templateUrl: './add-accent-to-voiceover-language-modal.component.html'
+  templateUrl: './add-accent-to-voiceover-language-modal.component.html',
 })
-export class AddAccentToVoiceoverLanguageModalComponent
-  extends ConfirmOrCancelModal {
+export class AddAccentToVoiceoverLanguageModalComponent extends ConfirmOrCancelModal {
   languageCode: string = '';
   languageAccentCode: string = '';
   voiceArtistId: string = '';
@@ -46,18 +46,18 @@ export class AddAccentToVoiceoverLanguageModalComponent
     private ngbActiveModal: NgbActiveModal,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private audioPlayerService: AudioPlayerService,
-    private contextService: ContextService,
+    private contextService: ContextService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.voiceoverBackendApiService.fetchFilenamesForVoiceArtistAsync(
-      this.voiceArtistId, this.languageCode
-    ).then(explorationIdToFilenames => {
-      this.explorationIdsToFilenames = explorationIdToFilenames;
-      this.pageIsInitialized = true;
-    });
+    this.voiceoverBackendApiService
+      .fetchFilenamesForVoiceArtistAsync(this.voiceArtistId, this.languageCode)
+      .then(explorationIdToFilenames => {
+        this.explorationIdsToFilenames = explorationIdToFilenames;
+        this.pageIsInitialized = true;
+      });
   }
 
   update(): void {

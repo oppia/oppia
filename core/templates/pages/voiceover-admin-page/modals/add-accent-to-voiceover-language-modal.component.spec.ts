@@ -16,16 +16,21 @@
  * @fileoverview Tests for language accent add modal.
  */
 
-import { ComponentFixture, TestBed, fakeAsync, waitForAsync, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AddAccentToVoiceoverLanguageModalComponent } from './add-accent-to-voiceover-language-modal.component';
-import { AudioPlayerService } from 'services/audio-player.service';
-import { MatTableModule } from '@angular/material/table';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { VoiceoverBackendApiService } from 'domain/voiceover/voiceover-backend-api.service';
-
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  waitForAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AddAccentToVoiceoverLanguageModalComponent} from './add-accent-to-voiceover-language-modal.component';
+import {AudioPlayerService} from 'services/audio-player.service';
+import {MatTableModule} from '@angular/material/table';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
 describe('Add accent to voiceover', () => {
   let fixture: ComponentFixture<AddAccentToVoiceoverLanguageModalComponent>;
@@ -42,22 +47,21 @@ describe('Add accent to voiceover', () => {
         MatTableModule,
         MaterialModule,
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
-      declarations: [
-        AddAccentToVoiceoverLanguageModalComponent
-      ],
+      declarations: [AddAccentToVoiceoverLanguageModalComponent],
       providers: [
         VoiceoverBackendApiService,
         AudioPlayerService,
         NgbActiveModal,
-      ]
+      ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      AddAccentToVoiceoverLanguageModalComponent);
+      AddAccentToVoiceoverLanguageModalComponent
+    );
     componentInstance = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
@@ -68,7 +72,7 @@ describe('Add accent to voiceover', () => {
 
   it('should initialize component', fakeAsync(() => {
     let explorationIdToFilenames = {
-      expId: ['filename1.mp3', 'filename2.mp3']
+      expId: ['filename1.mp3', 'filename2.mp3'],
     };
     spyOn(
       voiceoverBackendApiService,
@@ -102,7 +106,8 @@ describe('Add accent to voiceover', () => {
     componentInstance.addLanguageAccentCodeSupport(updatedLanguageAccentCode);
 
     expect(componentInstance.languageAccentCode).toEqual(
-      updatedLanguageAccentCode);
+      updatedLanguageAccentCode
+    );
   });
 
   it('should be able to play audio', () => {

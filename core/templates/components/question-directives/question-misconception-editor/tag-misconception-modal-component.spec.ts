@@ -16,13 +16,16 @@
  * @fileoverview Unit tests for tag misconception modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { MisconceptionObjectFactory, MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { TagMisconceptionModalComponent } from './tag-misconception-modal-component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {
+  MisconceptionObjectFactory,
+  MisconceptionSkillMap,
+} from 'domain/skill/MisconceptionObjectFactory';
+import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
 
 class MockActiveModal {
   close(): void {
@@ -46,17 +49,15 @@ describe('Tag Misconception Modal Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        TagMisconceptionModalComponent
-      ],
+      declarations: [TagMisconceptionModalComponent],
       providers: [
         StateEditorService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -70,12 +71,22 @@ describe('Tag Misconception Modal Component', () => {
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
-          1, 'misc1', 'notes1', 'feedback1', true)
+          1,
+          'misc1',
+          'notes1',
+          'feedback1',
+          true
+        ),
       ],
       def: [
         misconceptionObjectFactory.create(
-          2, 'misc2', 'notes2', 'feedback1', true)
-      ]
+          2,
+          'misc2',
+          'notes2',
+          'feedback1',
+          true
+        ),
+      ],
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
       return mockMisconceptionObject;
@@ -105,7 +116,8 @@ describe('Tag Misconception Modal Component', () => {
     component.updateValues(updatedValues);
 
     expect(component.tempSelectedMisconception).toEqual(
-      mockMisconceptionObject.def[0]);
+      mockMisconceptionObject.def[0]
+    );
     expect(component.tempSelectedMisconceptionSkillId).toEqual('id');
     expect(component.tempMisconceptionFeedbackIsUsed).toBeFalse();
   });
@@ -120,7 +132,7 @@ describe('Tag Misconception Modal Component', () => {
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       misconception: mockMisconceptionObject.abc[0],
       misconceptionSkillId: 'abc',
-      feedbackIsUsed: true
+      feedbackIsUsed: true,
     });
   });
 });

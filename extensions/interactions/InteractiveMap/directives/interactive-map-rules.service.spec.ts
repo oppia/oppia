@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for Interactive Map rules.
  */
 
-import { InteractiveMapRulesService } from
-  'interactions/InteractiveMap/directives/interactive-map-rules.service';
+import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
 
 describe('Numeric Input service', () => {
   let imrs: InteractiveMapRulesService;
@@ -33,137 +32,201 @@ describe('Numeric Input service', () => {
   var SOUTH_POLE: number[] = [-90, 0];
   var EQUATOR_ORIGIN: number[] = [0, 0];
 
-  it('should have a correct \'within\' rule', () => {
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, 180],
-      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(true);
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(true);
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(true);
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, -180],
-      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(true);
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, 180],
-      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(false);
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(false);
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(false);
-    expect(imrs.Within(EQUATOR_ORIGIN, {
-      p: [0, -180],
-      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(false);
-    expect(imrs.Within(NORTH_POLE, {
-      p: [90, 180],
-      d: 0.1
-    })).toBe(true);
-    expect(imrs.Within(NORTH_POLE, {
-      p: [90, -180],
-      d: 0.1
-    })).toBe(true);
-    expect(imrs.Within(SOUTH_POLE, {
-      p: [-90, -180],
-      d: 0.1
-    })).toBe(true);
-    expect(imrs.Within(SOUTH_POLE, {
-      p: [-90, 180],
-      d: 0.1
-    })).toBe(true);
-    expect(imrs.Within([-37, -97], {
-      p: [55, -45],
-      d: 11370
-    })).toBe(true);
-    expect(imrs.Within([47, -17], {
-      p: [-81, 117],
-      d: 15890
-    })).toBe(true);
-    expect(imrs.Within([16, -142], {
-      p: [-42, 3],
-      d: 15500
-    })).toBe(false);
-    expect(imrs.Within([83, -127], {
-      p: [27, -123],
-      d: 6220
-    })).toBe(false);
+  it("should have a correct 'within' rule", () => {
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, 180],
+        d: HALF_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, 90],
+        d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, -90],
+        d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, -180],
+        d: HALF_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, 180],
+        d: HALF_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, 90],
+        d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, -90],
+        d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.Within(EQUATOR_ORIGIN, {
+        p: [0, -180],
+        d: HALF_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.Within(NORTH_POLE, {
+        p: [90, 180],
+        d: 0.1,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within(NORTH_POLE, {
+        p: [90, -180],
+        d: 0.1,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within(SOUTH_POLE, {
+        p: [-90, -180],
+        d: 0.1,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within(SOUTH_POLE, {
+        p: [-90, 180],
+        d: 0.1,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within([-37, -97], {
+        p: [55, -45],
+        d: 11370,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within([47, -17], {
+        p: [-81, 117],
+        d: 15890,
+      })
+    ).toBe(true);
+    expect(
+      imrs.Within([16, -142], {
+        p: [-42, 3],
+        d: 15500,
+      })
+    ).toBe(false);
+    expect(
+      imrs.Within([83, -127], {
+        p: [27, -123],
+        d: 6220,
+      })
+    ).toBe(false);
   });
 
-  it('should have a correct \'not within\' rule', () => {
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, 180],
-      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(false);
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(false);
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(false);
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, -180],
-      d: HALF_CIRCUMFERENCE_KM + DELTA_KM
-    })).toBe(false);
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, 180],
-      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(true);
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, 90],
-      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(true);
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, -90],
-      d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(true);
-    expect(imrs.NotWithin(EQUATOR_ORIGIN, {
-      p: [0, -180],
-      d: HALF_CIRCUMFERENCE_KM - DELTA_KM
-    })).toBe(true);
-    expect(imrs.NotWithin(NORTH_POLE, {
-      p: [90, 180],
-      d: 0.1
-    })).toBe(false);
-    expect(imrs.NotWithin(NORTH_POLE, {
-      p: [90, -180],
-      d: 0.1
-    })).toBe(false);
-    expect(imrs.NotWithin(SOUTH_POLE, {
-      p: [-90, -180],
-      d: 0.1
-    })).toBe(false);
-    expect(imrs.NotWithin(SOUTH_POLE, {
-      p: [-90, 180],
-      d: 0.1
-    })).toBe(false);
-    expect(imrs.NotWithin([-37, -97], {
-      p: [55, -45],
-      d: 11370
-    })).toBe(false);
-    expect(imrs.NotWithin([47, -17], {
-      p: [-81, 117],
-      d: 15890
-    })).toBe(false);
-    expect(imrs.NotWithin([16, -142], {
-      p: [-42, 3],
-      d: 15500
-    })).toBe(true);
-    expect(imrs.NotWithin([83, -127], {
-      p: [27, -123],
-      d: 6220
-    })).toBe(true);
+  it("should have a correct 'not within' rule", () => {
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, 180],
+        d: HALF_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, 90],
+        d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, -90],
+        d: QUARTER_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, -180],
+        d: HALF_CIRCUMFERENCE_KM + DELTA_KM,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, 180],
+        d: HALF_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, 90],
+        d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, -90],
+        d: QUARTER_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.NotWithin(EQUATOR_ORIGIN, {
+        p: [0, -180],
+        d: HALF_CIRCUMFERENCE_KM - DELTA_KM,
+      })
+    ).toBe(true);
+    expect(
+      imrs.NotWithin(NORTH_POLE, {
+        p: [90, 180],
+        d: 0.1,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin(NORTH_POLE, {
+        p: [90, -180],
+        d: 0.1,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin(SOUTH_POLE, {
+        p: [-90, -180],
+        d: 0.1,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin(SOUTH_POLE, {
+        p: [-90, 180],
+        d: 0.1,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin([-37, -97], {
+        p: [55, -45],
+        d: 11370,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin([47, -17], {
+        p: [-81, 117],
+        d: 15890,
+      })
+    ).toBe(false);
+    expect(
+      imrs.NotWithin([16, -142], {
+        p: [-42, 3],
+        d: 15500,
+      })
+    ).toBe(true);
+    expect(
+      imrs.NotWithin([83, -127], {
+        p: [27, -123],
+        d: 6220,
+      })
+    ).toBe(true);
   });
 });

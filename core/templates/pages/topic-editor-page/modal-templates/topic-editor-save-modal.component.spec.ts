@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for TopicEditorSaveModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TopicEditorSaveModalComponent } from './topic-editor-save-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TopicEditorSaveModalComponent} from './topic-editor-save-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -31,21 +31,21 @@ class MockActiveModal {
   }
 }
 
-describe('Topic Editor Save Modal Controller', function() {
+describe('Topic Editor Save Modal Controller', function () {
   let component: TopicEditorSaveModalComponent;
   let fixture: ComponentFixture<TopicEditorSaveModalComponent>;
   let topicIsPublished = true;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TopicEditorSaveModalComponent
+      declarations: [TopicEditorSaveModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -57,9 +57,8 @@ describe('Topic Editor Save Modal Controller', function() {
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after component is initialized',
-    () => {
-      component.isTopicPublished = topicIsPublished;
-      expect(component.isTopicPublished).toBe(true);
-    });
+  it('should initialize component properties after component is initialized', () => {
+    component.isTopicPublished = topicIsPublished;
+    expect(component.isTopicPublished).toBe(true);
+  });
 });

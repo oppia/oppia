@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for FeedbackPopupBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { FeedbackPopupBackendApiService } from './feedback-popup-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {FeedbackPopupBackendApiService} from './feedback-popup-backend-api.service';
 
 describe('Feedback Popup Backend Api Service', () => {
   let fbpas: FeedbackPopupBackendApiService;
@@ -36,9 +38,9 @@ describe('Feedback Popup Backend Api Service', () => {
         FeedbackPopupBackendApiService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
-      ]
+          useClass: MockTranslateService,
+        },
+      ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     fbpas = TestBed.inject(FeedbackPopupBackendApiService);
@@ -52,7 +54,8 @@ describe('Feedback Popup Backend Api Service', () => {
     let feedback: string = 'test feedback';
     let includeAuthor: boolean = true;
     let stateName: string = 'test state name';
-    fbpas.submitFeedbackAsync(subject, feedback, includeAuthor, stateName)
+    fbpas
+      .submitFeedbackAsync(subject, feedback, includeAuthor, stateName)
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(fbpas.feedbackUrl);
     expect(req.request.method).toEqual('POST');
@@ -62,6 +65,5 @@ describe('Feedback Popup Backend Api Service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 });

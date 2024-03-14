@@ -16,16 +16,15 @@
  * @fileoverview Component for the 'thanks' page.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'thanks-page',
   templateUrl: './thanks-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ThanksPageComponent {
   constructor(private urlInterpolationService: UrlInterpolationService) {}
@@ -34,5 +33,9 @@ export class ThanksPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 }
-angular.module('oppia').directive(
-  'thanksPage', downgradeComponent({component: ThanksPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'thanksPage',
+    downgradeComponent({component: ThanksPageComponent})
+  );

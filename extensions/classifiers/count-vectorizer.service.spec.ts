@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the count vectorizer service.
  */
 
-import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
+import {CountVectorizerService} from 'classifiers/count-vectorizer.service';
 
 describe('Count vectorizer service', () => {
   let service: CountVectorizerService;
@@ -27,7 +27,9 @@ describe('Count vectorizer service', () => {
   it('should produce correct vector from tokens', () => {
     const tokens = ['a', 'b', 'a', 'c', 'd', 'b', 'a'];
     const vocabulary = {
-      a: 0, b: 1, c: 2
+      a: 0,
+      b: 1,
+      c: 2,
     };
     const vector = service.vectorize(tokens, vocabulary);
     const expectedVector = [3, 2, 1];
@@ -38,7 +40,9 @@ describe('Count vectorizer service', () => {
   it('should produce vector filled with zeros when tokens is null', () => {
     const tokens = null;
     const vocabulary = {
-      a: 0, b: 1, c: 2
+      a: 0,
+      b: 1,
+      c: 2,
     };
     const vector = service.vectorize(tokens, vocabulary);
     const expectedVector = [0, 0, 0];

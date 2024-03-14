@@ -16,20 +16,20 @@
  * @fileoverview Module for the blog-dashboard page.
  */
 
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { RouterModule } from '@angular/router';
-import { BlogDashboardPageComponent } from 'pages/blog-dashboard-page/blog-dashboard-page.component';
-import { SharedBlogComponentsModule } from 'pages/blog-dashboard-page/shared-blog-components.module';
-import { NgModule } from '@angular/core';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { BlogDashboardPageRootComponent } from './blog-dashboard-page-root.component';
-import { BlogAuthorDetailsEditorComponent } from './modal-templates/author-detail-editor-modal.component';
-import { BlogDashboardPageAuthGuard } from './blog-dashboard-page-auth.guard';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {RouterModule} from '@angular/router';
+import {BlogDashboardPageComponent} from 'pages/blog-dashboard-page/blog-dashboard-page.component';
+import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-components.module';
+import {NgModule} from '@angular/core';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {BlogDashboardPageRootComponent} from './blog-dashboard-page-root.component';
+import {BlogAuthorDetailsEditorComponent} from './modal-templates/author-detail-editor-modal.component';
+import {BlogDashboardPageAuthGuard} from './blog-dashboard-page-auth.guard';
 
 @NgModule({
   imports: [
@@ -43,20 +43,19 @@ import { BlogDashboardPageAuthGuard } from './blog-dashboard-page-auth.guard';
       {
         path: '',
         component: BlogDashboardPageRootComponent,
-        canActivate: [BlogDashboardPageAuthGuard]
-      }
+        canActivate: [BlogDashboardPageAuthGuard],
+      },
     ]),
     MatButtonToggleModule,
   ],
   declarations: [
     BlogDashboardPageComponent,
     BlogAuthorDetailsEditorComponent,
-    BlogDashboardPageRootComponent
+    BlogDashboardPageRootComponent,
   ],
   entryComponents: [
     BlogDashboardPageComponent,
-    BlogAuthorDetailsEditorComponent
-
+    BlogAuthorDetailsEditorComponent,
   ],
 })
 export class BlogDashboardPageModule {}

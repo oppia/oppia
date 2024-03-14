@@ -16,12 +16,11 @@
  * @fileoverview Unit test for GuppyConfigurationService
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Component, OnInit } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {Component, OnInit} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 
-import { GuppyConfigurationService } from
-  'services/guppy-configuration.service';
+import {GuppyConfigurationService} from 'services/guppy-configuration.service';
 
 declare global {
   interface Window {
@@ -42,8 +41,8 @@ class MockGuppy {
   }
 
   static configure(name: string, val: Object): void {}
-  static 'remove_global_symbol'(symbol: string): void {}
-  static 'add_global_symbol'(name: string, symbol: Object): void {}
+  static remove_global_symbol(symbol: string): void {}
+  static add_global_symbol(name: string, symbol: Object): void {}
 }
 
 class MockComponent {
@@ -59,7 +58,7 @@ class MockComponent {
 
 @Component({
   template: '',
-  selector: 'mock-component-b'
+  selector: 'mock-component-b',
 })
 class MockComponentB implements OnInit {
   constructor(private guppyConfigService: GuppyConfigurationService) {}
@@ -100,21 +99,17 @@ describe('GuppyConfigurationService', () => {
     let fixture: ComponentFixture<MockComponentB>;
 
     beforeEach(waitForAsync(() => {
-      TestBed.configureTestingModule(
-        {
-          imports: [HttpClientTestingModule],
-          declarations: [MockComponentB],
-        }
-      ).compileComponents();
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        declarations: [MockComponentB],
+      }).compileComponents();
       guppyConfigurationService = TestBed.get(GuppyConfigurationService);
       window.Guppy = MockGuppy as unknown as Guppy;
     }));
     beforeEach(() => {
-      fixture = TestBed.createComponent(
-        MockComponentB);
+      fixture = TestBed.createComponent(MockComponentB);
       component = fixture.componentInstance;
     });
-
 
     it('should configure guppy on the first initialization', () => {
       GuppyConfigurationService.serviceIsInitialized = false;

@@ -16,22 +16,28 @@
  * @fileoverview Component for subject interests form field.
  */
 
-import { ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatChipList } from '@angular/material/chips';
+import {ENTER} from '@angular/cdk/keycodes';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {MatChipList} from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
-import { Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, startWith} from 'rxjs/operators';
 
 @Component({
   selector: 'oppia-subject-interests',
-  templateUrl: './subject-interests.component.html'
+  templateUrl: './subject-interests.component.html',
 })
 export class SubjectInterestsComponent {
   @Input() subjectInterests: string[] = [];
-  @Output() subjectInterestsChange: EventEmitter<string[]> = (
-    new EventEmitter());
+  @Output() subjectInterestsChange: EventEmitter<string[]> = new EventEmitter();
 
   selectable = true;
   removable = true;
@@ -43,14 +49,16 @@ export class SubjectInterestsComponent {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @ViewChild('chipList') chipList!: MatChipList;
-  @ViewChild('subjectInterestInput') subjectInterestInput!:
-  ElementRef<HTMLInputElement>;
+  @ViewChild('subjectInterestInput')
+  subjectInterestInput!: ElementRef<HTMLInputElement>;
 
   constructor() {
     this.filteredSubjectInterests = this.formCtrl.valueChanges.pipe(
       startWith(null),
-      map((interest: string | null) => interest ? this.filter(
-        interest) : this.allSubjectInterests.slice()));
+      map((interest: string | null) =>
+        interest ? this.filter(interest) : this.allSubjectInterests.slice()
+      )
+    );
   }
 
   ngOnInit(): void {
@@ -66,10 +74,12 @@ export class SubjectInterestsComponent {
 
   validInput(value: string): boolean {
     return value === value.toLowerCase() &&
-      this.subjectInterests.indexOf(value) < 0 ? true : false;
+      this.subjectInterests.indexOf(value) < 0
+      ? true
+      : false;
   }
 
-  add(event: { value: string }): void {
+  add(event: {value: string}): void {
     const value = (event.value || '').trim();
     if (!value) {
       return;
@@ -94,7 +104,7 @@ export class SubjectInterestsComponent {
     }
   }
 
-  selected(event: { option: {value: string }}): void {
+  selected(event: {option: {value: string}}): void {
     if (this.subjectInterests.indexOf(event.option.value) > -1) {
       this.remove(event.option.value);
     } else {
@@ -105,7 +115,8 @@ export class SubjectInterestsComponent {
   filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.allSubjectInterests.filter(
-      interest => interest.toLowerCase().includes(filterValue));
+    return this.allSubjectInterests.filter(interest =>
+      interest.toLowerCase().includes(filterValue)
+    );
   }
 }

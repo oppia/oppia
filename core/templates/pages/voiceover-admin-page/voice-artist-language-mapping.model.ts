@@ -17,8 +17,7 @@
  * language mapping informaiton.
  */
 
-import { VoiceArtistIdToLanguageMapping } from 'domain/voiceover/voiceover-backend-api.service';
-
+import {VoiceArtistIdToLanguageMapping} from 'domain/voiceover/voiceover-backend-api.service';
 
 export class VoiceArtistLanguageMapping {
   _voiceArtistId: string;
@@ -38,9 +37,9 @@ export class VoiceArtistLanguageMapping {
   }
 
   constructor(
-      voiceArtistID: string,
-      languageCode: string,
-      languageAccentCode: string
+    voiceArtistID: string,
+    languageCode: string,
+    languageAccentCode: string
   ) {
     this._voiceArtistId = voiceArtistID;
     this._languageCode = languageCode;
@@ -48,17 +47,20 @@ export class VoiceArtistLanguageMapping {
   }
 
   static createVoiceArtistLanguageMapping(
-      voiceArtistID: string,
-      languageCode: string,
-      languageAccentCode: string
+    voiceArtistID: string,
+    languageCode: string,
+    languageAccentCode: string
   ): VoiceArtistLanguageMapping {
     return new VoiceArtistLanguageMapping(
-      voiceArtistID, languageCode, languageAccentCode);
+      voiceArtistID,
+      languageCode,
+      languageAccentCode
+    );
   }
 
   static sortBasedOnLanguageCode(
-      metaDataMapping1: VoiceArtistLanguageMapping,
-      metadataMapping2: VoiceArtistLanguageMapping
+    metaDataMapping1: VoiceArtistLanguageMapping,
+    metadataMapping2: VoiceArtistLanguageMapping
   ): number {
     if (metaDataMapping1._languageCode < metadataMapping2._languageCode) {
       return -1;
@@ -70,18 +72,22 @@ export class VoiceArtistLanguageMapping {
   }
 
   static createVoiceArtistLanguageMappingList(
-      voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping
+    voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping
   ): VoiceArtistLanguageMapping[] {
     let voiceArtistLanguageMappingList: VoiceArtistLanguageMapping[] = [];
 
     for (let voiceArtistId in voiceArtistIdToLanguageMapping) {
       for (let languageCode in voiceArtistIdToLanguageMapping[voiceArtistId]) {
-        let languageAccentCode = (
-          voiceArtistIdToLanguageMapping[voiceArtistId][languageCode]);
+        let languageAccentCode =
+          voiceArtistIdToLanguageMapping[voiceArtistId][languageCode];
 
         voiceArtistLanguageMappingList.push(
           this.createVoiceArtistLanguageMapping(
-            voiceArtistId, languageCode, languageAccentCode));
+            voiceArtistId,
+            languageCode,
+            languageAccentCode
+          )
+        );
       }
     }
     return voiceArtistLanguageMappingList.sort(this.sortBasedOnLanguageCode);
