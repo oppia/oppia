@@ -17,18 +17,18 @@
  */
 
 export interface FeaturedTranslationLanguageBackendDict {
-  'language_code': string;
+  language_code: string;
   explanation: string;
 }
 
 export class FeaturedTranslationLanguage {
   constructor(
-      readonly languageCode: string,
-      readonly explanation: string
+    readonly languageCode: string,
+    readonly explanation: string
   ) {}
 
   static createFromBackendDict(
-      featuredTranslationBackendDict: FeaturedTranslationLanguageBackendDict
+    featuredTranslationBackendDict: FeaturedTranslationLanguageBackendDict
   ): FeaturedTranslationLanguage {
     return new FeaturedTranslationLanguage(
       featuredTranslationBackendDict.language_code,

@@ -16,12 +16,11 @@
  * @fileoverview Unit tests for the preventPageUnloadEventService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { PreventPageUnloadEventService }
-  from 'services/prevent-page-unload-event.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {TestBed} from '@angular/core/testing';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
-describe ('Prevent page unload event service', function() {
+describe('Prevent page unload event service', function () {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let windowRef: WindowRef;
 
@@ -32,18 +31,18 @@ describe ('Prevent page unload event service', function() {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [PreventPageUnloadEventService]
+      providers: [PreventPageUnloadEventService],
     });
     preventPageUnloadEventService = TestBed.inject(
-      PreventPageUnloadEventService);
+      PreventPageUnloadEventService
+    );
     windowRef = TestBed.inject(WindowRef);
   });
-
 
   // Mocking window object here because beforeunload requres the
   // full page to reload. Page reloads raise an error in karma.
   var mockWindow = {
-    addEventListener: function(eventname: string, callback: () => {}) {
+    addEventListener: function (eventname: string, callback: () => {}) {
       document.addEventListener('mock' + eventname, callback);
     },
     location: {
@@ -51,8 +50,8 @@ describe ('Prevent page unload event service', function() {
         if (val) {
           document.dispatchEvent(reloadEvt);
         }
-      }
-    }
+      },
+    },
   } as Window;
 
   it('should adding listener', () => {

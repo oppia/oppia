@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to report a bug in the Oppia project.
+        Thanks for taking the time to request a new feature in the Oppia project.
   - type: markdown
     attributes:
       value: |

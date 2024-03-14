@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for the change subtopic assignment modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ChangeSubtopicAssignmentModalComponent } from './change-subtopic-assignment-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subtopic } from 'domain/topic/subtopic.model';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ChangeSubtopicAssignmentModalComponent} from './change-subtopic-assignment-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {Subtopic} from 'domain/topic/subtopic.model';
 
 describe('Change subtopic assignment modal', () => {
   let component: ChangeSubtopicAssignmentModalComponent;
@@ -31,9 +31,7 @@ describe('Change subtopic assignment modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ChangeSubtopicAssignmentModalComponent],
-      providers: [
-        NgbActiveModal,
-      ],
+      providers: [NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -44,15 +42,14 @@ describe('Change subtopic assignment modal', () => {
     component.subtopics = subtopics;
   });
 
-  it('should initialize component properties after component is initialized',
-    function() {
-      component.ngOnInit();
+  it('should initialize component properties after component is initialized', function () {
+    component.ngOnInit();
 
-      expect(component.subtopics).toEqual(subtopics);
-      expect(component.selectedSubtopicId).toEqual(null);
-    });
+    expect(component.subtopics).toEqual(subtopics);
+    expect(component.selectedSubtopicId).toEqual(null);
+  });
 
-  it('should change the selected subtopic index', function() {
+  it('should change the selected subtopic index', function () {
     // Setup.
     component.changeSelectedSubtopic(10);
     // Pre-check.

@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for PlatformParameterAdminBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { PlatformParameterAdminBackendApiService } from
-  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
-import { PlatformParameterRule } from
-  'domain/platform-parameter/platform-parameter-rule.model';
+import {PlatformParameterAdminBackendApiService} from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
+import {PlatformParameterRule} from 'domain/platform-parameter/platform-parameter-rule.model';
 
 describe('PlatformParameterAdminBackendApiService', () => {
   let parameterAdminService: PlatformParameterAdminBackendApiService;
@@ -31,11 +31,12 @@ describe('PlatformParameterAdminBackendApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     parameterAdminService = TestBed.get(
-      PlatformParameterAdminBackendApiService);
+      PlatformParameterAdminBackendApiService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -43,54 +44,52 @@ describe('PlatformParameterAdminBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  it('should make a request to update the platform param rules',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should make a request to update the platform param rules', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      const newRules = [
-        PlatformParameterRule.createFromBackendDict({
-          filters: [],
-          value_when_matched: false
-        })
-      ];
+    const newRules = [
+      PlatformParameterRule.createFromBackendDict({
+        filters: [],
+        value_when_matched: false,
+      }),
+    ];
 
-      parameterAdminService.updatePlatformParameter(
-        'param_name', 'update message', newRules, false
-      ).then(successHandler, failHandler);
+    parameterAdminService
+      .updatePlatformParameter('param_name', 'update message', newRules, false)
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne('/adminhandler');
-      req.flush({});
-      expect(req.request.method).toEqual('POST');
+    const req = httpTestingController.expectOne('/adminhandler');
+    req.flush({});
+    expect(req.request.method).toEqual('POST');
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should reject to update platform params if the request fails',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should reject to update platform params if the request fails', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      const newRules = [
-        PlatformParameterRule.createFromBackendDict({
-          filters: [],
-          value_when_matched: false
-        })
-      ];
+    const newRules = [
+      PlatformParameterRule.createFromBackendDict({
+        filters: [],
+        value_when_matched: false,
+      }),
+    ];
 
-      parameterAdminService.updatePlatformParameter(
-        'param_name', 'update message', newRules, false
-      ).then(successHandler, failHandler);
+    parameterAdminService
+      .updatePlatformParameter('param_name', 'update message', newRules, false)
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne('/adminhandler');
-      req.error(new ErrorEvent('Error'));
+    const req = httpTestingController.expectOne('/adminhandler');
+    req.error(new ErrorEvent('Error'));
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    }));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

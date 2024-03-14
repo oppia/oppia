@@ -16,72 +16,84 @@
  * @fileoverview Validation service for the interaction.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Warning, baseInteractionValidationService } from
-  'interactions/base-interaction-validation.service';
-import { InteractiveMapCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {
+  Warning,
+  baseInteractionValidationService,
+} from 'interactions/base-interaction-validation.service';
+import {InteractiveMapCustomizationArgs} from 'interactions/customization-args-defs';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class InteractiveMapValidationService {
   constructor(
-      private baseInteractionValidationServiceInstance:
-        baseInteractionValidationService) {}
+    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+  ) {}
 
   getCustomizationArgsWarnings(
-      customizationArgs: InteractiveMapCustomizationArgs): Warning[] {
+    customizationArgs: InteractiveMapCustomizationArgs
+  ): Warning[] {
     var warningsList = [];
 
     this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
-      customizationArgs, ['latitude', 'longitude']);
+      customizationArgs,
+      ['latitude', 'longitude']
+    );
 
-    if (customizationArgs.latitude.value < -90 ||
-        customizationArgs.latitude.value > 90) {
+    if (
+      customizationArgs.latitude.value < -90 ||
+      customizationArgs.latitude.value > 90
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting latitude between -90 and 90.'
+        message: 'Please pick a starting latitude between -90 and 90.',
       });
     }
 
-    if (customizationArgs.longitude.value < -180 ||
-        customizationArgs.longitude.value > 180) {
+    if (
+      customizationArgs.longitude.value < -180 ||
+      customizationArgs.longitude.value > 180
+    ) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting longitude between -180 and 180.'
+        message: 'Please pick a starting longitude between -180 and 180.',
       });
     }
     return warningsList;
   }
 
   getAllWarnings(
-      stateName: string, customizationArgs: InteractiveMapCustomizationArgs,
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome): Warning[] {
+    stateName: string,
+    customizationArgs: InteractiveMapCustomizationArgs,
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome
+  ): Warning[] {
     var warningsList: Warning[] = [];
 
     warningsList = warningsList.concat(
-      this.getCustomizationArgsWarnings(customizationArgs));
+      this.getCustomizationArgsWarnings(customizationArgs)
+    );
 
     for (var i = 0; i < answerGroups.length; i++) {
       var rules = answerGroups[i].rules;
       for (var j = 0; j < rules.length; j++) {
-        if (rules[j].type === 'Within' ||
-            rules[j].type === 'NotWithin') {
+        if (rules[j].type === 'Within' || rules[j].type === 'NotWithin') {
           if (rules[j].inputs.d < 0) {
             warningsList.push({
               type: AppConstants.WARNING_TYPES.CRITICAL,
-              message: 'Please ensure that learner answer ' + String(j + 1) +
-              ' in Oppia response ' + String(i + 1) +
-              ' refers to a valid distance.'
+              message:
+                'Please ensure that learner answer ' +
+                String(j + 1) +
+                ' in Oppia response ' +
+                String(i + 1) +
+                ' refers to a valid distance.',
             });
           }
         }
@@ -90,12 +102,19 @@ export class InteractiveMapValidationService {
 
     warningsList = warningsList.concat(
       this.baseInteractionValidationServiceInstance.getAllOutcomeWarnings(
-        answerGroups, defaultOutcome, stateName));
+        answerGroups,
+        defaultOutcome,
+        stateName
+      )
+    );
 
     return warningsList;
   }
 }
 
-angular.module('oppia').factory(
-  'InteractiveMapValidationService',
-  downgradeInjectable(InteractiveMapValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'InteractiveMapValidationService',
+    downgradeInjectable(InteractiveMapValidationService)
+  );

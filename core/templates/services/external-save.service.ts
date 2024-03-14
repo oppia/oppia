@@ -16,11 +16,11 @@
  * @fileoverview Service provides emitter for external save
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable, EventEmitter} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExternalSaveService {
   private _externalSaveEventEmitter = new EventEmitter<void>();
@@ -30,5 +30,6 @@ export class ExternalSaveService {
   }
 }
 
-angular.module('oppia').factory('ExternalSaveService',
-  downgradeInjectable(ExternalSaveService));
+angular
+  .module('oppia')
+  .factory('ExternalSaveService', downgradeInjectable(ExternalSaveService));

@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for Image Click Input rules.
  */
 
-import { ImageClickInputRulesService } from
-  'interactions/ImageClickInput/directives/image-click-input-rules.service';
+import {ImageClickInputRulesService} from 'interactions/ImageClickInput/directives/image-click-input-rules.service';
 
 describe('Image Click Input rules service', () => {
   let icirs: ImageClickInputRulesService;
@@ -25,31 +24,51 @@ describe('Image Click Input rules service', () => {
     icirs = new ImageClickInputRulesService();
   });
 
-  it('should have a correct \'is in region\' rule', () => {
-    expect(icirs.IsInRegion({
-      clickPosition: [0.5, 0.5],
-      clickedRegions: ['a', 'b', 'c']
-    }, {
-      x: 'b'
-    })).toBe(true);
-    expect(icirs.IsInRegion({
-      clickPosition: [0.3, 1.0],
-      clickedRegions: ['123']
-    }, {
-      x: '123'
-    })).toBe(true);
+  it("should have a correct 'is in region' rule", () => {
+    expect(
+      icirs.IsInRegion(
+        {
+          clickPosition: [0.5, 0.5],
+          clickedRegions: ['a', 'b', 'c'],
+        },
+        {
+          x: 'b',
+        }
+      )
+    ).toBe(true);
+    expect(
+      icirs.IsInRegion(
+        {
+          clickPosition: [0.3, 1.0],
+          clickedRegions: ['123'],
+        },
+        {
+          x: '123',
+        }
+      )
+    ).toBe(true);
 
-    expect(icirs.IsInRegion({
-      clickPosition: [1.0, 0.5],
-      clickedRegions: ['a', 'b', 'c']
-    }, {
-      x: 'd'
-    })).toBe(false);
-    expect(icirs.IsInRegion({
-      clickPosition: [0.5, 0.5],
-      clickedRegions: []
-    }, {
-      x: 'a'
-    })).toBe(false);
+    expect(
+      icirs.IsInRegion(
+        {
+          clickPosition: [1.0, 0.5],
+          clickedRegions: ['a', 'b', 'c'],
+        },
+        {
+          x: 'd',
+        }
+      )
+    ).toBe(false);
+    expect(
+      icirs.IsInRegion(
+        {
+          clickPosition: [0.5, 0.5],
+          clickedRegions: [],
+        },
+        {
+          x: 'a',
+        }
+      )
+    ).toBe(false);
   });
 });

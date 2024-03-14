@@ -17,13 +17,13 @@
  *   versions of an exploration.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { State } from 'domain/state/StateObjectFactory';
-import { StateDiffModalComponent } from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
-import { StateLink } from 'pages/exploration-editor-page/services/exploration-diff.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {State} from 'domain/state/StateObjectFactory';
+import {StateDiffModalComponent} from 'pages/exploration-editor-page/modal-templates/state-diff-modal.component';
+import {StateLink} from 'pages/exploration-editor-page/services/exploration-diff.service';
 
 interface NodesData {
   [key: string]: {
@@ -94,7 +94,7 @@ interface DiffGraphData {
 
 @Component({
   selector: 'oppia-version-diff-visualization',
-  templateUrl: './version-diff-visualization.component.html'
+  templateUrl: './version-diff-visualization.component.html',
 })
 export class VersionDiffVisualizationComponent implements OnInit {
   // An object with the following properties:
@@ -171,26 +171,29 @@ export class VersionDiffVisualizationComponent implements OnInit {
   legendGraph!: LegendGraph;
   LEGEND_GRAPH_COLORS!: LEGEND_GRAPH_COLORS | Record<string, string>;
   LEGEND_GRAPH_SECONDARY_LABELS!:
-    LEGEND_GRAPH_SECONDARY_LABELS | Record<string, string>;
+    | LEGEND_GRAPH_SECONDARY_LABELS
+    | Record<string, string>;
 
   LEGEND_GRAPH_LINK_PROPERTY_MAPPING!: LEGEND_GRAPH_LINK_PROPERTY_MAPPING;
 
-  constructor(
-    private ngbModal: NgbModal,
-  ) {}
+  constructor(private ngbModal: NgbModal) {}
 
   // Opens the modal showing the history diff for a given state.
   // stateId is the unique ID assigned to a state during the
   // calculation of the state graph.
   onClickStateInDiffGraph(stateId: string): void {
     let oldStateName = null;
-    if (this.nodesData[stateId].newestStateName !==
-      this.nodesData[stateId].originalStateName) {
+    if (
+      this.nodesData[stateId].newestStateName !==
+      this.nodesData[stateId].originalStateName
+    ) {
       oldStateName = this.nodesData[stateId].originalStateName;
     }
     this.showStateDiffModal(
       this.nodesData[stateId].newestStateName,
-      oldStateName, this.nodesData[stateId].stateProperty);
+      oldStateName,
+      this.nodesData[stateId].stateProperty
+    );
   }
 
   // Shows a modal comparing changes on a state between 2 versions.
@@ -203,29 +206,33 @@ export class VersionDiffVisualizationComponent implements OnInit {
   // - stateProperty is whether the state is added, changed, unchanged or
   //   deleted.
   showStateDiffModal(
-      newStateName: string,
-      oldStateName: string | null,
-      stateProperty: string
+    newStateName: string,
+    oldStateName: string | null,
+    stateProperty: string
   ): void {
     let modalRef: NgbModalRef = this.ngbModal.open(StateDiffModalComponent, {
       backdrop: true,
       windowClass: 'state-diff-modal',
-      size: 'xl'
+      size: 'xl',
     });
 
     modalRef.componentInstance.newStateName = newStateName;
     modalRef.componentInstance.oldStateName = oldStateName;
 
     let newState = null;
-    if (stateProperty !== this.STATE_PROPERTY_DELETED &&
-        this.diffData.v2States.hasOwnProperty(newStateName)) {
+    if (
+      stateProperty !== this.STATE_PROPERTY_DELETED &&
+      this.diffData.v2States.hasOwnProperty(newStateName)
+    ) {
       newState = this.diffData.v2States[newStateName];
     }
 
     let oldState = null;
     let stateNameToRetrieve = oldStateName || newStateName;
-    if (stateProperty !== this.STATE_PROPERTY_ADDED &&
-        this.diffData.v1States.hasOwnProperty(stateNameToRetrieve)) {
+    if (
+      stateProperty !== this.STATE_PROPERTY_ADDED &&
+      this.diffData.v1States.hasOwnProperty(stateNameToRetrieve)
+    ) {
       oldState = this.diffData.v1States[stateNameToRetrieve];
     }
 
@@ -233,12 +240,14 @@ export class VersionDiffVisualizationComponent implements OnInit {
     modalRef.componentInstance.oldState = oldState;
     modalRef.componentInstance.headers = {
       leftPane: this.earlierVersionHeader,
-      rightPane: this.laterVersionHeader
+      rightPane: this.laterVersionHeader,
     };
 
-    modalRef.result.then(() => {}, () => {});
+    modalRef.result.then(
+      () => {},
+      () => {}
+    );
   }
-
 
   ngOnInit(): void {
     this.nodesData = this.diffData.nodes;
@@ -253,26 +262,26 @@ export class VersionDiffVisualizationComponent implements OnInit {
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_DELETED] = this.COLOR_DELETED;
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED] = this.COLOR_CHANGED;
     this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_UNCHANGED] = this.COLOR_UNCHANGED;
-    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_RENAMED] = (
-      this.COLOR_RENAMED_UNCHANGED);
-    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED_RENAMED] = (
-      this.COLOR_CHANGED);
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_RENAMED] =
+      this.COLOR_RENAMED_UNCHANGED;
+    this.LEGEND_GRAPH_COLORS[this.NODE_TYPE_CHANGED_RENAMED] =
+      this.COLOR_CHANGED;
 
     this.LEGEND_GRAPH_SECONDARY_LABELS = {};
-    this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_CHANGED_RENAMED] = (
-      '(was: Old name)');
-    this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_RENAMED] = (
-      '(was: Old name)');
+    this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_CHANGED_RENAMED] =
+      '(was: Old name)';
+    this.LEGEND_GRAPH_SECONDARY_LABELS[this.NODE_TYPE_RENAMED] =
+      '(was: Old name)';
     this.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
-      hidden: 'stroke: none; marker-end: none;'
+      hidden: 'stroke: none; marker-end: none;',
     };
     this.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
-      added: (
+      added:
         'stroke: #1F7D1F; stroke-opacity: 0.8; ' +
-        'marker-end: url(#arrowhead-green)'),
-      deleted: (
+        'marker-end: url(#arrowhead-green)',
+      deleted:
         'stroke: #B22222; stroke-opacity: 0.8; ' +
-        'marker-end: url(#arrowhead-red)')
+        'marker-end: url(#arrowhead-red)',
     };
     this.diffGraphSecondaryLabels = {};
     this.diffGraphNodeColors = {};
@@ -290,10 +299,12 @@ export class VersionDiffVisualizationComponent implements OnInit {
       } else if (nodeStateProperty === this.STATE_PROPERTY_CHANGED) {
         this.diffGraphNodes[nodeId] = this.nodesData[nodeId].originalStateName;
         this.diffGraphNodeColors[nodeId] = this.COLOR_CHANGED;
-        if (this.nodesData[nodeId].originalStateName !==
-            this.nodesData[nodeId].newestStateName) {
-          this.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-          this.nodesData[nodeId].originalStateName + ')';
+        if (
+          this.nodesData[nodeId].originalStateName !==
+          this.nodesData[nodeId].newestStateName
+        ) {
+          this.diffGraphSecondaryLabels[nodeId] =
+            '(was: ' + this.nodesData[nodeId].originalStateName + ')';
           this.diffGraphNodes[nodeId] = this.nodesData[nodeId].newestStateName;
           this._stateTypeUsed[this.NODE_TYPE_CHANGED_RENAMED] = true;
         } else {
@@ -302,10 +313,12 @@ export class VersionDiffVisualizationComponent implements OnInit {
       } else if (nodeStateProperty === this.STATE_PROPERTY_UNCHANGED) {
         this.diffGraphNodes[nodeId] = this.nodesData[nodeId].originalStateName;
         this.diffGraphNodeColors[nodeId] = this.COLOR_UNCHANGED;
-        if (this.nodesData[nodeId].originalStateName !==
-            this.nodesData[nodeId].newestStateName) {
-          this.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-          this.nodesData[nodeId].originalStateName + ')';
+        if (
+          this.nodesData[nodeId].originalStateName !==
+          this.nodesData[nodeId].newestStateName
+        ) {
+          this.diffGraphSecondaryLabels[nodeId] =
+            '(was: ' + this.nodesData[nodeId].originalStateName + ')';
           this.diffGraphNodes[nodeId] = this.nodesData[nodeId].newestStateName;
           this.diffGraphNodeColors[nodeId] = this.COLOR_RENAMED_UNCHANGED;
           this._stateTypeUsed[this.NODE_TYPE_RENAMED] = true;
@@ -323,7 +336,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
       nodes: this.diffGraphNodes,
       links: this.diffData.links,
       initStateId: this.diffData.v2InitStateId,
-      finalStateIds: this.diffData.finalStateIds
+      finalStateIds: this.diffData.finalStateIds,
     };
 
     // Generate the legend graph.
@@ -331,7 +344,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
       nodes: {},
       links: [],
       finalStateIds: [],
-      initStateId: ''
+      initStateId: '',
     };
 
     // Last used state type is null by default.
@@ -343,7 +356,7 @@ export class VersionDiffVisualizationComponent implements OnInit {
           this.legendGraph.links.push({
             source: _lastUsedStateType,
             target: stateProperty,
-            linkProperty: 'hidden'
+            linkProperty: 'hidden',
           });
         }
         _lastUsedStateType = stateProperty;
@@ -355,7 +368,9 @@ export class VersionDiffVisualizationComponent implements OnInit {
     }
   }
 }
-angular.module('oppia').directive('oppiaVersionDiffVisualization',
+angular.module('oppia').directive(
+  'oppiaVersionDiffVisualization',
   downgradeComponent({
-    component: VersionDiffVisualizationComponent
-  }) as angular.IDirectiveFactory);
+    component: VersionDiffVisualizationComponent,
+  }) as angular.IDirectiveFactory
+);

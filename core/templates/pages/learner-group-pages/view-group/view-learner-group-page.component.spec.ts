@@ -16,25 +16,28 @@
  * @fileoverview Unit tests for view learner group page.
  */
 
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from
-  '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerGroupBackendApiService } from
-  'domain/learner_group/learner-group-backend-api.service';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { TranslateService } from '@ngx-translate/core';
-import { ViewLearnerGroupPageComponent } from './view-learner-group-page.component';
-import { ContextService } from 'services/context.service';
-import { LearnerGroupUserProgress } from 'domain/learner_group/learner-group-user-progress.model';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { LoaderService } from 'services/loader.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LearnerGroupSyllabusBackendApiService } from 'domain/learner_group/learner-group-syllabus-backend-api.service';
-import { UserService } from 'services/user.service';
-import { UserInfo } from 'domain/user/user-info.model';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {TranslateService} from '@ngx-translate/core';
+import {ViewLearnerGroupPageComponent} from './view-learner-group-page.component';
+import {ContextService} from 'services/context.service';
+import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {LoaderService} from 'services/loader.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LearnerGroupSyllabusBackendApiService} from 'domain/learner_group/learner-group-syllabus-backend-api.service';
+import {UserService} from 'services/user.service';
+import {UserInfo} from 'domain/user/user-info.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -49,7 +52,7 @@ class MockWindowRef {
     location: {
       href: '',
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 }
 
@@ -62,8 +65,7 @@ describe('ViewLearnerGroupPageComponent', () => {
   let loaderService: LoaderService;
   let windowRef: MockWindowRef;
   let userService: UserService;
-  let learnerGroupSyllabusBackendApiService:
-    LearnerGroupSyllabusBackendApiService;
+  let learnerGroupSyllabusBackendApiService: LearnerGroupSyllabusBackendApiService;
 
   const sampleLearnerGroupSubtopicSummaryDict = {
     subtopic_id: 1,
@@ -72,7 +74,7 @@ describe('ViewLearnerGroupPageComponent', () => {
     parent_topic_name: 'parentTopicName',
     thumbnail_filename: 'thumbnailFilename',
     thumbnail_bg_color: 'red',
-    subtopic_mastery: 0.95
+    subtopic_mastery: 0.95,
   };
 
   const sampleStorySummaryBackendDict = {
@@ -88,61 +90,74 @@ describe('ViewLearnerGroupPageComponent', () => {
     all_node_dicts: [],
     topic_name: 'Topic one',
     topic_url_fragment: 'topic-one',
-    classroom_url_fragment: 'math'
+    classroom_url_fragment: 'math',
   };
 
   const sampleLearnerGroupUserProgDict = {
     username: 'username2',
     progress_sharing_is_turned_on: true,
     stories_progress: [sampleStorySummaryBackendDict],
-    subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict]
+    subtopic_pages_progress: [sampleLearnerGroupSubtopicSummaryDict],
   };
-  const sampleLearnerGroupUserProg = (
+  const sampleLearnerGroupUserProg =
     LearnerGroupUserProgress.createFromBackendDict(
-      sampleLearnerGroupUserProgDict)
-  );
+      sampleLearnerGroupUserProgDict
+    );
 
   const learnerGroup = new LearnerGroupData(
-    'groupId', 'title', 'description', ['facilitator_username'],
-    ['username2'], ['username1'], ['subtopic_page_id'], []
+    'groupId',
+    'title',
+    'description',
+    ['facilitator_username'],
+    ['username2'],
+    ['username1'],
+    ['subtopic_page_id'],
+    []
   );
 
   const userInfo = new UserInfo(
-    ['USER_ROLE'], true, false, false, false, true,
-    'en', 'username1', 'tester@example.com', true
+    ['USER_ROLE'],
+    true,
+    false,
+    false,
+    false,
+    true,
+    'en',
+    'username1',
+    'tester@example.com',
+    true
   );
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ViewLearnerGroupPageComponent,
-        MockTranslatePipe
-      ],
+      declarations: [ViewLearnerGroupPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: WindowRef,
-          useValue: windowRef
+          useValue: windowRef,
         },
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
   beforeEach(() => {
     learnerGroupBackendApiService = TestBed.inject(
-      LearnerGroupBackendApiService);
+      LearnerGroupBackendApiService
+    );
     contextService = TestBed.inject(ContextService);
     ngbModal = TestBed.inject(NgbModal);
     loaderService = TestBed.inject(LoaderService);
     userService = TestBed.inject(UserService);
     learnerGroupSyllabusBackendApiService = TestBed.inject(
-      LearnerGroupSyllabusBackendApiService);
+      LearnerGroupSyllabusBackendApiService
+    );
     fixture = TestBed.createComponent(ViewLearnerGroupPageComponent);
     component = fixture.componentInstance;
 
@@ -152,8 +167,10 @@ describe('ViewLearnerGroupPageComponent', () => {
   });
 
   it('should initialize', fakeAsync(() => {
-    spyOn(learnerGroupBackendApiService, 'fetchLearnerGroupInfoAsync')
-      .and.returnValue(Promise.resolve(learnerGroup));
+    spyOn(
+      learnerGroupBackendApiService,
+      'fetchLearnerGroupInfoAsync'
+    ).and.returnValue(Promise.resolve(learnerGroup));
     spyOn(
       learnerGroupBackendApiService,
       'fetchProgressSharingPermissionOfLearnerAsync'
@@ -163,13 +180,15 @@ describe('ViewLearnerGroupPageComponent', () => {
       'fetchLearnerSpecificProgressInAssignedSyllabus'
     ).and.returnValue(Promise.resolve(sampleLearnerGroupUserProg));
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(userInfo));
+      Promise.resolve(userInfo)
+    );
 
     component.ngOnInit();
     tick();
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.OVERVIEW);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.OVERVIEW
+    );
     expect(component.learnerGroup).toEqual(learnerGroup);
     expect(component.getLearnersCount()).toBe(1);
     expect(component.username).toBe('username1');
@@ -178,17 +197,21 @@ describe('ViewLearnerGroupPageComponent', () => {
 
   it('should set active tab and check if tab is active correctly', () => {
     component.setActiveTab(
-      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS
+    );
 
     expect(component.activeTab).toEqual(
-      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS
+    );
 
     let tabIsActive = component.isTabActive(
-      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.ASSIGNED_SYLLABUS
+    );
     expect(tabIsActive).toBeTrue();
 
     tabIsActive = component.isTabActive(
-      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.OVERVIEW);
+      LearnerGroupPagesConstants.VIEW_LEARNER_GROUP_TABS.OVERVIEW
+    );
     expect(tabIsActive).toBeFalse();
   });
 
@@ -207,10 +230,12 @@ describe('ViewLearnerGroupPageComponent', () => {
       componentInstance: {
         learnerGroupTitle: learnerGroup.title,
       },
-      result: Promise.resolve()
+      result: Promise.resolve(),
     } as NgbModalRef);
-    spyOn(learnerGroupBackendApiService, 'exitLearnerGroupAsync')
-      .and.returnValue(Promise.resolve(learnerGroup));
+    spyOn(
+      learnerGroupBackendApiService,
+      'exitLearnerGroupAsync'
+    ).and.returnValue(Promise.resolve(learnerGroup));
     spyOn(loaderService, 'showLoadingScreen');
 
     component.learnerGroup = learnerGroup;
@@ -220,34 +245,34 @@ describe('ViewLearnerGroupPageComponent', () => {
     tick();
 
     expect(windowRef.nativeWindow.location.href).toBe(
-      '/learner-dashboard?active_tab=learner-groups');
+      '/learner-dashboard?active_tab=learner-groups'
+    );
     expect(loaderService.showLoadingScreen).toHaveBeenCalledWith(
-      'Exiting Group');
+      'Exiting Group'
+    );
   }));
 
-  it('should correctly view and update learner group preferences',
-    fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: {
-          learnerGroup: learnerGroup,
-          progressSharingPermission: true
-        },
-        result: Promise.resolve({
-          progressSharingPermission: false
-        })
-      } as NgbModalRef);
-      spyOn(
-        learnerGroupBackendApiService,
-        'updateProgressSharingPermissionAsync'
-      ).and.returnValue(Promise.resolve(false));
+  it('should correctly view and update learner group preferences', fakeAsync(() => {
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        learnerGroup: learnerGroup,
+        progressSharingPermission: true,
+      },
+      result: Promise.resolve({
+        progressSharingPermission: false,
+      }),
+    } as NgbModalRef);
+    spyOn(
+      learnerGroupBackendApiService,
+      'updateProgressSharingPermissionAsync'
+    ).and.returnValue(Promise.resolve(false));
 
-      component.learnerGroup = learnerGroup;
-      component.progressSharingPermission = true;
+    component.learnerGroup = learnerGroup;
+    component.progressSharingPermission = true;
 
-      component.viewLearnerGroupPreferences();
-      tick();
+    component.viewLearnerGroupPreferences();
+    tick();
 
-      expect(component.progressSharingPermission).toBe(false);
-    })
-  );
+    expect(component.progressSharingPermission).toBe(false);
+  }));
 });

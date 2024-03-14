@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for AddHintModalComponent.
  */
 
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { StateHintsService } from 'components/state-editor/state-editor-properties-services/state-hints.service';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { ContextService } from 'services/context.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { AddHintModalComponent } from './add-hint-modal.component';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {ContextService} from 'services/context.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {AddHintModalComponent} from './add-hint-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -45,19 +45,18 @@ describe('Add Hint Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AddHintModalComponent
-      ],
+      declarations: [AddHintModalComponent],
       providers: [
         ContextService,
         GenerateContentIdService,
         ChangeDetectorRef,
-        StateHintsService, {
+        StateHintsService,
+        {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -75,30 +74,28 @@ describe('Add Hint Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize the properties after component is initialized',
-    () => {
-      expect(component.tmpHint).toBe('');
-      expect(component.hintIndex).toBe(5);
-    });
+  it('should initialize the properties after component is initialized', () => {
+    expect(component.tmpHint).toBe('');
+    expect(component.hintIndex).toBe(5);
+  });
 
   it('should get schema', () => {
-    expect(component.getSchema())
-      .toEqual(component.HINT_FORM_SCHEMA);
+    expect(component.getSchema()).toEqual(component.HINT_FORM_SCHEMA);
   });
 
   it('should save hint when closing the modal', () => {
     let contentId = 'cont_1';
     let hintExpected = Hint.createNew(contentId, '');
     spyOn(ngbActiveModal, 'close');
-    spyOn(
-      generateContentIdService, 'getNextStateId'
-    ).and.returnValue(contentId);
+    spyOn(generateContentIdService, 'getNextStateId').and.returnValue(
+      contentId
+    );
 
     component.saveHint();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       hint: hintExpected,
-      contentId: contentId
+      contentId: contentId,
     });
   });
 
@@ -109,16 +106,16 @@ describe('Add Hint Modal Component', () => {
   });
 
   it('should check if hint length is not valid', () => {
-    let hint1 = '<p>This is a hint </p>';
+    let hint1 = '<p>This is a hint.</p>';
     let hint2 = hint1.repeat(35);
 
     expect(component.isHintLengthExceeded(hint2)).toBe(true);
   });
 
   it('should update hint', () => {
-    component.tmpHint = 'hint';
+    component.tmpHint = '<p>hint</p>';
 
-    let hint = 'new hint';
+    let hint = '<p>new hint</p>';
     component.updateLocalHint(hint);
 
     expect(component.tmpHint).toEqual(hint);

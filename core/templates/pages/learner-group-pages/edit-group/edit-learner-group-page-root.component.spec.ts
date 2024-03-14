@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for Learner Group Editor Root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { AppConstants } from '../../../app.constants';
-import { PageHeadService } from '../../../services/page-head.service';
-import { EditLearnerGroupPageRootComponent } from './edit-learner-group-page-root.component';
+import {AppConstants} from '../../../app.constants';
+import {PageHeadService} from '../../../services/page-head.service';
+import {EditLearnerGroupPageRootComponent} from './edit-learner-group-page-root.component';
 
 describe('EditLearnerGroupPageRootComponent', () => {
   let fixture: ComponentFixture<EditLearnerGroupPageRootComponent>;
@@ -43,8 +43,10 @@ describe('EditLearnerGroupPageRootComponent', () => {
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.TITLE
+    );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR.META
+    );
   });
 });
