@@ -15,6 +15,7 @@ omit =
     */scripts/install_third_party_libs.py
     */scripts/setup.py
     */scripts/setup_gae.py
+    */scripts/run_acceptance_tests.py
 
 # The 'exclude_lines' is used to skip a particular clause in coverage.
 # We exclude any line with a comment of “pragma: no cover” as this is the default option

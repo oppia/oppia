@@ -547,7 +547,8 @@ def main(args: Optional[List[str]] = None) -> None:
                     'scripts.setup_gae_test',
                     'scripts.setup_test',
                     'scripts.script_import_test',
-                    'scripts.build_test'
+                    'scripts.build_test',
+                    'scripts.run_acceptance_tests_test'
                     ]
                 all_test_targets = [
                     test for test in all_test_targets
