@@ -35,10 +35,10 @@ const addTitleBar = '#explorationTitle';
 const addGoalBar = '.e2e-test-exploration-objective-input';
 const addGoal = '.e2e-test-exploration-objective-input';
 const categoryDropDawn = '.mat-select-arrow-wrapper';
-const addCategory = '#mat-option-69';
-const languageUpdateBar = '#mat-select-value-9';
-const addLanguage = '#mat-option-6';
-const addTags = '#mat-chip-list-input-0';
+const addCategory = 'Algebra';
+const languageUpdateBar = 'English';
+const addLanguage = 'English';
+const addTags = '.e2e-test-chip-list-tags';
 const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
 const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label[for="text-speech-switch"]';
@@ -47,8 +47,8 @@ const feedbackToggleOff = 'label[for="feedback-switch"]';
 const editbutton = '.oppia-edit-roles-btn';
 const addUserName = '#newMemberUsername';
 const addRoleBar = '#mat-select-value-11';
-const collaboratorRoleOption = '#mat-option-62';
-const playTesterRoleOption = '#mat-option-63';
+const collaboratorRoleOption = ' Collaborator ';
+const playTesterRoleOption = ' Playtester ';
 const saveRole = '.e2e-test-save-role';
 const deleteExplorationButton = '.oppia-delete-button';
 const saveDraftButton = '.oppia-save-draft-button';
@@ -190,7 +190,9 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectAlgebraAsACategory(): Promise<void> {
     await this.clickOn(categoryDropDawn);
-    await this.page.waitForSelector('#mat-option-69', {visible: true});
+    await this.page.waitForSelector('[aria-label="dropdown search"]', {
+      visible: true,
+    });
     await this.clickOn(addCategory);
   }
 
@@ -222,7 +224,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectEnglishAsLanguage(): Promise<void> {
     await this.clickOn(languageUpdateBar);
-    await this.page.waitForSelector('#mat-option-6', {visible: true});
+    await this.page.waitForSelector('[tabindex="0"]', {visible: true});
     await this.clickOn(addLanguage);
   }
 
