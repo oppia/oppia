@@ -232,8 +232,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
         user_data = (
             voiceover_models.VoiceArtistMetadataModel.export_data(
                 user_id))
-        test_data: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {
+        test_data: Dict[str, Dict[str, str]] = {
                 'language_code_to_accent': language_code_to_accent
             }
         self.assertDictEqual(user_data, test_data)

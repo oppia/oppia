@@ -27,7 +27,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -39,6 +39,13 @@ datastore_services = models.Registry.import_datastore_services()
 
 (voiceover_models, exp_models) = models.Registry.import_models([
     models.Names.VOICEOVER, models.Names.EXPLORATION])
+
+
+class ExplorationAndSnapshotModelDict(TypedDict):
+    """Dict representation of grouped exploration and snapshot models."""
+
+    exploration_models: List[exp_models.ExplorationModel]
+    snapshot_models: List[exp_models.ExplorationSnapshotContentModel]
 
 
 class CreateVoiceArtistMetadataModelsJob(base_jobs.JobBase):
@@ -329,12 +336,7 @@ class CreateVoiceArtistMetadataModelsJob(base_jobs.JobBase):
 
     def get_exploration_voice_artists_link_model(
         self,
-        elements: Tuple[str, Dict[str, List[
-            Union[
-                voiceover_models.ExplorationSnapshotContentModel,
-                voiceover_models.ExplorationModel
-            ]]]
-        ]
+        elements: Tuple[str, ExplorationAndSnapshotModelDict]
     ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
         """The method creates an exploration voice artist link model using the
         exploration snapshot models for a given exploration model.
@@ -353,15 +355,15 @@ class CreateVoiceArtistMetadataModelsJob(base_jobs.JobBase):
         """
 
         exploration_id: str = elements[0]
-        exploration_model: (
-            voiceover_models.ExplorationModel) = (
-                elements[1]['exploration_models'][0])
+        exploration_model = elements[1]['exploration_models'][0]
+        snapshot_models = elements[1]['snapshot_models']
 
-        snapshot_models: List[
-            voiceover_models.ExplorationSnapshotContentModel] = (
-                elements[1]['snapshot_models'])
-
-        snapshot_models.sort(key=lambda model: model.id, reverse=True)
+        # The key for sorting is defined separately because of a mypy bug.
+        # A [no-any-return] is thrown if key is defined in the sort()
+        # method instead.
+        # https://github.com/python/mypy/issues/9590
+        k = lambda model: model.id
+        snapshot_models.sort(key=k, reverse=True)
 
         content_id_to_voiceovers_mapping = (
             self.get_content_id_to_voice_artist_mapping(exploration_model))

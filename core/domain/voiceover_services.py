@@ -254,7 +254,7 @@ def create_voice_artist_metadata_model_instance(
 
 
 def create_exploration_voice_artists_link_model_instance(
-    exploration_id,
+    exploration_id: str,
     content_id_to_voiceovers_mapping: (
         voiceover_models.ContentIdToVoiceoverMappingType)
 ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
