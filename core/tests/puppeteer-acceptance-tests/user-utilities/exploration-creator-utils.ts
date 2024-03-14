@@ -98,8 +98,10 @@ export class ExplorationCreator extends BaseUser {
       visible: true,
     });
     await this.clickOn('.e2e-test-edit-content-pencil-button');
-    await this.page.waitForSelector('.e2e-test-rte', {visible: true});
-    await this.type('.e2e-test-rte', Introtext);
+    await this.page.waitForSelector('div.oppia-rte.e2e-test-rte', {
+      visible: true,
+    });
+    await this.type('div.oppia-rte.e2e-test-rte', Introtext);
     await this.clickOn(introTitleSubmitButton);
   }
 
