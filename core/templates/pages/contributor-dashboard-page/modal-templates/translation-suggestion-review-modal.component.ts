@@ -556,13 +556,11 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
           }.`
         );
         this.clearQueuedSuggestion();
-        this.currentSnackbarRef.dismiss();
       },
       errorMessage => {
         this.alertsService.clearWarnings();
         this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
         this.revertSuggestionResolution();
-        this.currentSnackbarRef.dismiss();
       }
     );
   }
