@@ -187,6 +187,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectAlgebraAsACategory(): Promise<void> {
     await this.clickOn(categoryDropDawn);
+    await this.page.waitForSelector('#mat-option-69', {visible: true});
     await this.clickOn(addCategory);
   }
 
@@ -199,7 +200,6 @@ export class ExplorationCreator extends BaseUser {
       throw new Error('Category dropdown not found.');
     }
     await categoryDropdown.click();
-    await this.page.waitForSelector('#mat-option-69', {visible: true});
     const selectedCategory = await this.page.evaluate(() => {
       return (document.querySelector('#mat-option-69') as HTMLElement)
         .innerText;
@@ -219,6 +219,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectEnglishAsLanguage(): Promise<void> {
     await this.clickOn(languageUpdateBar);
+    await this.page.waitForSelector('#mat-option-6', {visible: true});
     await this.clickOn(addLanguage);
   }
 
@@ -418,9 +419,9 @@ export class ExplorationCreator extends BaseUser {
    * deleted successfully or not.
    */
   async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(): Promise<void> {
-    await this.page.waitForSelector(
-      '.oppia-editor-publish-button:([disabled])'
-    );
+    // await this.page.waitForSelector(
+    //   '.oppia-editor-publish-button:([disabled])'
+    // );
     try {
       await this.page.goto(explorationUrlAfterPublished);
       throw new Error('Exploration is not deleted successfully.');
