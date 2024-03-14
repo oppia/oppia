@@ -25,7 +25,6 @@ const ROLES = testConstants.Roles;
 
 describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
-  let topicUrl: string | null;
   let explorationUrl: string | null;
   let explorationId: string | null;
 

@@ -137,6 +137,7 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.page.waitForTimeout(500);
     await this.clickOn(confirmSkillCreationButton);
+    await this.page.bringToFront();
   }
 
   /**
@@ -248,6 +249,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(`${createTopicButton}:not([disabled])`);
     await this.clickOn(createTopicButton);
+    await this.page.bringToFront();
   }
 
   async openTopicEditor(): Promise<void> {
@@ -307,7 +309,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a chapter for a certain story.
    */
-  async createChapter(explorationId: string) {
+  async createChapter(explorationId: string): Promise<void> {
     await this.clickOn(addChapterButton);
     await this.type(chapterTitleField, 'Test Story 1');
     await this.type(chapterExplorationIdField, explorationId);
