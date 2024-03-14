@@ -16,11 +16,22 @@
  * @fileoverview Preferred languages component.
  */
 
-import { ENTER } from '@angular/cdk/keycodes';
-import { AfterViewInit, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatChipList } from '@angular/material/chips';
-import { LanguageIdAndText } from 'domain/utilities/language-util.service';
+import {ENTER} from '@angular/cdk/keycodes';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  forwardRef,
+  Input,
+  ViewChild,
+} from '@angular/core';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
+import {MatChipList} from '@angular/material/chips';
+import {LanguageIdAndText} from 'domain/utilities/language-util.service';
 
 @Component({
   selector: 'oppia-preferred-languages',
@@ -29,12 +40,13 @@ import { LanguageIdAndText } from 'domain/utilities/language-util.service';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => PreferredLanguagesComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
-export class PreferredLanguagesComponent implements AfterViewInit,
-ControlValueAccessor {
+export class PreferredLanguagesComponent
+  implements AfterViewInit, ControlValueAccessor
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1

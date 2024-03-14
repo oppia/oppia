@@ -49,7 +49,7 @@ var PreferencesPage = function () {
   var userBioElement = $('.e2e-test-user-bio');
   var userInterestsInput = $('.e2e-test-subject-interests-input');
 
-  var saveNewChanges = async function(fieldName) {
+  var saveNewChanges = async function (fieldName) {
     // If the following click event is omitted, the '(change)' event
     // won't be triggered for language-selector, failing to register changes.
     await action.click('Navbar Button', navBar);
@@ -66,11 +66,11 @@ var PreferencesPage = function () {
     );
   };
 
-  var clickSaveChangesButton = async function() {
+  var clickSaveChangesButton = async function () {
     await action.click('Save Changes button', saveChangesButton);
   };
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.url(USER_PREFERENCES_URL);
     await waitFor.pageToFullyLoad();
     // Click on a neutral element.
@@ -89,9 +89,13 @@ var PreferencesPage = function () {
     );
   };
 
-  this.submitProfilePhoto = async function(imgPath, resetExistingImage) {
+  this.submitProfilePhoto = async function (imgPath, resetExistingImage) {
     await workflow.submitImage(
-      profilePhotoClickable, profilePhotoCropper, imgPath, resetExistingImage);
+      profilePhotoClickable,
+      profilePhotoCropper,
+      imgPath,
+      resetExistingImage
+    );
     await clickSaveChangesButton();
     await waitFor.pageToFullyLoad();
     // Click on a neutral element.
@@ -107,7 +111,7 @@ var PreferencesPage = function () {
    *
    * @param {string} bio - The text to append to the existing user bio.
    */
-  this.editUserBio = async function(bio) {
+  this.editUserBio = async function (bio) {
     await action.addValue('User bio field', userBioElement, bio);
     await saveNewChanges('User Bio');
   };
@@ -149,7 +153,7 @@ var PreferencesPage = function () {
       fully displayed in the viewport unlike in the other cases.
     */
 
-    await browser.execute((selector)=>{
+    await browser.execute(selector => {
       var element = document.querySelector(`${selector}`);
       element.scrollTop = 0;
     }, dropdownSelectorString);
@@ -158,14 +162,14 @@ var PreferencesPage = function () {
       if (await dropdownOption.isDisplayedInViewport()) {
         break;
       }
-      await browser.execute((selector)=>{
+      await browser.execute(selector => {
         var element = document.querySelector(`${selector}`);
         element.scrollTop += 100;
       }, dropdownSelectorString);
     }
 
-    await dropdownOption.waitForDisplayed({ timeout: 5000 });
-    await dropdownOption.waitForClickable({ timeout: 5000 });
+    await dropdownOption.waitForDisplayed({timeout: 5000});
+    await dropdownOption.waitForClickable({timeout: 5000});
     await action.click('clickable', dropdownOption);
     await saveNewChanges('System Language');
   };
@@ -182,7 +186,7 @@ var PreferencesPage = function () {
    *
    * @param {string} bio - The new bio text to set for the user.
    */
-  this.setUserBio = async function(bio) {
+  this.setUserBio = async function (bio) {
     var inputFieldName = 'User bio input field';
     await action.clear(inputFieldName, userBioElement);
     await action.setValue(inputFieldName, userBioElement, bio);
@@ -280,7 +284,9 @@ var PreferencesPage = function () {
 
   this.expectUserBioToBe = async function (bio) {
     await waitFor.visibilityOf(
-      userBioElement, 'User bio field takes too long to appear.');
+      userBioElement,
+      'User bio field takes too long to appear.'
+    );
     expect(await userBioElement.getValue()).toMatch(bio);
   };
 

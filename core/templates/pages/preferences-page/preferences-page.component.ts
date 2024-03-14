@@ -20,25 +20,34 @@ import {Component, ViewChild, ElementRef} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { AppConstants } from 'app.constants';
-import { LanguageIdAndText, LanguageUtilService } from 'domain/utilities/language-util.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AlertsService } from 'services/alerts.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { LoaderService } from 'services/loader.service';
-import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { BackendPreferenceUpdateType, EmailPreferencesBackendDict, SubscriptionSummary, UpdatePreferenceDict, UserBackendApiService } from 'services/user-backend-api.service';
-import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
+import {
+  LanguageIdAndText,
+  LanguageUtilService,
+} from 'domain/utilities/language-util.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AlertsService} from 'services/alerts.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {LoaderService} from 'services/loader.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {
+  BackendPreferenceUpdateType,
+  EmailPreferencesBackendDict,
+  SubscriptionSummary,
+  UpdatePreferenceDict,
+  UserBackendApiService,
+} from 'services/user-backend-api.service';
+import {UserService} from 'services/user.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 import {EditProfilePictureModalComponent} from './modal-templates/edit-profile-picture-modal.component';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
-import { FormControl, FormGroup } from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 
 interface AudioLangaugeChoice {
   id: string;
@@ -47,8 +56,7 @@ interface AudioLangaugeChoice {
 
 // A Dict that maps the form Control names in the frontend
 // to the backend update_types.
-const BACKEND_UPDATE_TYPE_DICT: (
-  { [key: string]: BackendPreferenceUpdateType }) = {
+const BACKEND_UPDATE_TYPE_DICT: {[key: string]: BackendPreferenceUpdateType} = {
   profilePicturePngDataUrl: 'profile_picture_data_url',
   userBio: 'user_bio',
   defaultDashboard: 'default_dashboard',
@@ -56,7 +64,7 @@ const BACKEND_UPDATE_TYPE_DICT: (
   preferredLanguageCodes: 'preferred_language_codes',
   preferredSiteLanguageCode: 'preferred_site_language_code',
   preferredAudioLanguageCode: 'preferred_audio_language_code',
-  emailPreferences: 'email_preferences'
+  emailPreferences: 'email_preferences',
 };
 
 @Component({
@@ -131,7 +139,8 @@ export class PreferencesPageComponent {
   }
 
   private updateAndMarkProfileImageAsChanged(
-      newProfilePictureDataUrl: string): void {
+    newProfilePictureDataUrl: string
+  ): void {
     const pngControl = this.preferencesForm.controls.profilePicturePngDataUrl;
     const webpControl = this.preferencesForm.controls.profilePictureWebpDataUrl;
     pngControl.setValue(newProfilePictureDataUrl);
@@ -169,15 +178,18 @@ export class PreferencesPageComponent {
       backdrop: 'static',
     });
 
-    modalRef.result.then((newProfilePictureDataUrl) => {
-      if (newProfilePictureDataUrl) {
-        this.updateAndMarkProfileImageAsChanged(newProfilePictureDataUrl);
+    modalRef.result.then(
+      newProfilePictureDataUrl => {
+        if (newProfilePictureDataUrl) {
+          this.updateAndMarkProfileImageAsChanged(newProfilePictureDataUrl);
+        }
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       }
-    }, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    );
   }
 
   handleTabForFirstRadio(event: KeyboardEvent): void {
@@ -231,46 +243,54 @@ export class PreferencesPageComponent {
 
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
 
-    Promise.all([userInfoPromise, preferencesPromise])
-      .then(([userInfo, preferencesData]) => {
+    Promise.all([userInfoPromise, preferencesPromise]).then(
+      ([userInfo, preferencesData]) => {
         this.username = userInfo.getUsername();
         this.email = userInfo.getEmail();
         let profilePicturePngDataUrl: string;
         let profilePictureWebpDataUrl: string;
         if (this.username !== null) {
-          [profilePicturePngDataUrl, profilePictureWebpDataUrl] = (
-            this.userService.getProfileImageDataUrl(this.username));
+          [profilePicturePngDataUrl, profilePictureWebpDataUrl] =
+            this.userService.getProfileImageDataUrl(this.username);
         } else {
-          profilePictureWebpDataUrl = (
+          profilePictureWebpDataUrl =
             this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH));
-          profilePicturePngDataUrl = (
+              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+            );
+          profilePicturePngDataUrl =
             this.urlInterpolationService.getStaticImageUrl(
-              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH));
+              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+            );
         }
         this.preferencesForm = new FormGroup({
           profilePicturePngDataUrl: new FormControl(profilePicturePngDataUrl),
-          profilePictureWebpDataUrl: new FormControl(
-            profilePictureWebpDataUrl),
+          profilePictureWebpDataUrl: new FormControl(profilePictureWebpDataUrl),
           userBio: new FormControl(preferencesData.user_bio),
           defaultDashboard: new FormControl(preferencesData.default_dashboard),
           subjectInterests: new FormControl(preferencesData.subject_interests),
           preferredLanguageCodes: new FormControl(
-            preferencesData.preferred_language_codes),
+            preferencesData.preferred_language_codes
+          ),
           preferredSiteLanguageCode: new FormControl(
-            preferencesData.preferred_site_language_code),
+            preferencesData.preferred_site_language_code
+          ),
           preferredAudioLanguageCode: new FormControl(
-            preferencesData.preferred_audio_language_code),
+            preferencesData.preferred_audio_language_code
+          ),
           emailPreferences: new FormGroup({
             canReceiveEmailUpdates: new FormControl(
-              preferencesData.can_receive_email_updates),
+              preferencesData.can_receive_email_updates
+            ),
             canReceiveEditorRoleEmail: new FormControl(
-              preferencesData.can_receive_editor_role_email),
+              preferencesData.can_receive_editor_role_email
+            ),
             canReceiveFeedbackMessageEmail: new FormControl(
-              preferencesData.can_receive_feedback_message_email),
+              preferencesData.can_receive_feedback_message_email
+            ),
             canReceiveSubscriptionEmail: new FormControl(
-              preferencesData.can_receive_subscription_email)
-          })
+              preferencesData.can_receive_subscription_email
+            ),
+          }),
         });
 
         this.subscriptionList = preferencesData.subscription_list;
@@ -287,7 +307,8 @@ export class PreferencesPageComponent {
 
         this.hasPageLoaded = true;
         this.loaderService.hideLoadingScreen();
-      });
+      }
+    );
 
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();
@@ -316,22 +337,22 @@ export class PreferencesPageComponent {
         let emailFormData = this.preferencesForm.controls[key].value;
         let emailData: EmailPreferencesBackendDict = {
           can_receive_email_updates: emailFormData.canReceiveEmailUpdates,
-          can_receive_editor_role_email: (
-            emailFormData.canReceiveEditorRoleEmail),
-          can_receive_feedback_message_email: (
-            emailFormData.canReceiveFeedbackMessageEmail),
-          can_receive_subscription_email: (
-            emailFormData.canReceiveSubscriptionEmail)
+          can_receive_editor_role_email:
+            emailFormData.canReceiveEditorRoleEmail,
+          can_receive_feedback_message_email:
+            emailFormData.canReceiveFeedbackMessageEmail,
+          can_receive_subscription_email:
+            emailFormData.canReceiveSubscriptionEmail,
         };
         updates.push({
           update_type: BACKEND_UPDATE_TYPE_DICT[key],
-          data: emailData
+          data: emailData,
         });
         continue;
       }
       updates.push({
         update_type: BACKEND_UPDATE_TYPE_DICT[key],
-        data: this.preferencesForm.controls[key].value
+        data: this.preferencesForm.controls[key].value,
       });
     }
 
@@ -340,16 +361,18 @@ export class PreferencesPageComponent {
       // Remove 'profile_picture_data_url' from updates if the emulator mode is
       // on because the backend doesn't support updating profile picture in
       // emulator mode.
-      updates = updates.filter((update) => {
+      updates = updates.filter(update => {
         return update.update_type !== 'profile_picture_data_url';
       });
     }
 
-    this.userBackendApiService.updateMultiplePreferencesDataAsync(updates)
-      .then((returnData) => {
+    this.userBackendApiService
+      .updateMultiplePreferencesDataAsync(updates)
+      .then(returnData => {
         if (this.preferencesForm.controls.preferredSiteLanguageCode.dirty) {
           this.i18nLanguageCodeService.setI18nLanguageCode(
-            this.preferencesForm.controls.preferredSiteLanguageCode.value);
+            this.preferencesForm.controls.preferredSiteLanguageCode.value
+          );
         }
         if (returnData.bulk_email_signup_message_should_be_shown) {
           const formGrp = this.preferencesForm.controls
@@ -363,7 +386,8 @@ export class PreferencesPageComponent {
           // TODO(#19737): Remove the following 'if' condition.
           if (AssetsBackendApiService.EMULATOR_MODE) {
             this._saveProfileImageToLocalStorage(
-              this.preferencesForm.controls.profilePicturePngDataUrl.value);
+              this.preferencesForm.controls.profilePicturePngDataUrl.value
+            );
           }
           // The reload is needed in order to update the profile picture
           // in the top-right corner(Nav Bar).

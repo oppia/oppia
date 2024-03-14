@@ -16,10 +16,20 @@
  * @fileoverview Component for subject interests form field.
  */
 
-import { ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
-import { ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MatChipList } from '@angular/material/chips';
+import {ENTER} from '@angular/cdk/keycodes';
+import {
+  Component,
+  ElementRef,
+  forwardRef,
+  Input,
+  ViewChild,
+} from '@angular/core';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
+import {MatChipList} from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
@@ -31,9 +41,9 @@ import {map, startWith} from 'rxjs/operators';
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SubjectInterestsComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
 export class SubjectInterestsComponent implements ControlValueAccessor {
   @Input() subjectInterests: string[] = [];

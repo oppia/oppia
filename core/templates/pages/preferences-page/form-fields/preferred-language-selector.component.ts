@@ -16,8 +16,8 @@
  * @fileoverview Component for the preferred language selector.
  */
 
-import { Component, forwardRef, Input} from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {Component, forwardRef, Input} from '@angular/core';
+import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 interface Language {
   id: string;
   text: string;
@@ -31,12 +31,13 @@ interface Language {
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => PreferredSiteLanguageSelectorComponent),
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 })
-export class PreferredSiteLanguageSelectorComponent implements
-ControlValueAccessor {
+export class PreferredSiteLanguageSelectorComponent
+  implements ControlValueAccessor
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1

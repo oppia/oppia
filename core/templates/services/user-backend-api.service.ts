@@ -62,20 +62,24 @@ interface LoginUrlResponseDict {
   login_url: string;
 }
 
-export type BackendPreferenceUpdateType = (
-  'profile_picture_data_url' |'user_bio' | 'subject_interests' |
-  'default_dashboard' | 'preferred_language_codes' |
-  'preferred_site_language_code' | 'preferred_audio_language_code' |
-  'email_preferences'
-);
+export type BackendPreferenceUpdateType =
+  | 'profile_picture_data_url'
+  | 'user_bio'
+  | 'subject_interests'
+  | 'default_dashboard'
+  | 'preferred_language_codes'
+  | 'preferred_site_language_code'
+  | 'preferred_audio_language_code'
+  | 'email_preferences';
 
-type DataType<
-  UpdateType extends BackendPreferenceUpdateType> =
-  UpdateType extends 'email_preferences' ? EmailPreferencesBackendDict :
-  UpdateType extends 'preferred_language_codes' ? string[] :
-  string;
+type DataType<UpdateType extends BackendPreferenceUpdateType> =
+  UpdateType extends 'email_preferences'
+    ? EmailPreferencesBackendDict
+    : UpdateType extends 'preferred_language_codes'
+      ? string[]
+      : string;
 
-export interface UpdatePreferenceDict{
+export interface UpdatePreferenceDict {
   update_type: BackendPreferenceUpdateType;
   data: DataType<BackendPreferenceUpdateType>;
 }
@@ -112,10 +116,14 @@ export class UserBackendApiService {
   }
 
   async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
-    return this.updateMultiplePreferencesDataAsync([{
-      update_type: 'profile_picture_data_url',
-      data: newProfileImageDataUrl}]);
+    newProfileImageDataUrl: string
+  ): Promise<UpdatePreferencesResponse> {
+    return this.updateMultiplePreferencesDataAsync([
+      {
+        update_type: 'profile_picture_data_url',
+        data: newProfileImageDataUrl,
+      },
+    ]);
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {
@@ -155,12 +163,13 @@ export class UserBackendApiService {
   }
 
   async updateMultiplePreferencesDataAsync(
-      updates: UpdatePreferenceDict[]
+    updates: UpdatePreferenceDict[]
   ): Promise<UpdatePreferencesResponse> {
-    return this.http.put<UpdatePreferencesResponse>(
-      this.PREFERENCES_DATA_URL,
-      { updates: updates }
-    ).toPromise();
+    return this.http
+      .put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
+        updates: updates,
+      })
+      .toPromise();
   }
 }
 angular
