@@ -156,9 +156,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isTranslationOverflowing: boolean = false;
   explorationImagesString: string = '';
   suggestionImagesString: string = '';
-  queuedSuggestion: PendingSuggestionDict | null = null;
+  queuedSuggestion?: PendingSuggestionDict;
   commitTimeout?: NodeJS.Timeout;
-  removedSuggestion: ActiveContributionDict | null = null;
+  removedSuggestion?: ActiveContributionDict;
   hasQueuedSuggestion: boolean = false;
   currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
   @Input() altTextIsDisplayed: boolean = false;
@@ -445,12 +445,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   resolveSuggestionAndUpdateModal(): void {
-    this.resolvedSuggestionIds.push(this.queuedSuggestion!.suggestion_id);
+    this.resolvedSuggestionIds.push(this.queuedSuggestion.suggestion_id);
 
     // Resolved contributions don't need to be displayed in the modal.
     this.removedSuggestion =
-      this.allContributions[this.queuedSuggestion!.suggestion_id];
-    delete this.allContributions[this.queuedSuggestion!.suggestion_id];
+      this.allContributions[this.queuedSuggestion.suggestion_id];
+    delete this.allContributions[this.queuedSuggestion.suggestion_id];
 
     // If the reviewed item was the last item, close the modal.
     if (this.lastSuggestionToReview || this.isLastItem) {
@@ -513,15 +513,15 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   revertSuggestionResolution(): void {
     // Remove the suggestion ID from resolvedSuggestionIds.
     const index = this.resolvedSuggestionIds.indexOf(
-      this.queuedSuggestion!.suggestion_id
+      this.queuedSuggestion.suggestion_id
     );
     if (index > -1) {
       this.resolvedSuggestionIds.splice(index, 1);
     }
 
     // Add the removed suggestion back to allContributions.
-    this.allContributions[this.queuedSuggestion!.suggestion_id] =
-      this.removedSuggestion!;
+    this.allContributions[this.queuedSuggestion.suggestion_id] =
+      this.removedSuggestion;
   }
 
   startCommitTimeout(): void {
@@ -543,14 +543,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.queuedSuggestion.action_status,
       this.queuedSuggestion.reviewer_message,
       this.queuedSuggestion.action_status === 'accept'
-        ? this.queuedSuggestion.commit_message!
+        ? this.queuedSuggestion.commit_message
         : null,
       // Only include commit_message for accepted suggestions.
       () => {
         this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage(
           `Suggestion ${
-            this.queuedSuggestion!.action_status === 'accept'
+            this.queuedSuggestion.action_status === 'accept'
               ? 'accepted'
               : 'rejected'
           }.`
@@ -581,7 +581,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       if (indexToRemove !== -1) {
         this.resolvedSuggestionIds.splice(indexToRemove, 1);
         this.allContributions[this.queuedSuggestion.suggestion_id] =
-          this.removedSuggestion!;
+          this.removedSuggestion;
       }
     }
     this.clearQueuedSuggestion();
