@@ -28,6 +28,12 @@ const saveDraftButton = 'button.e2e-test-save-draft-button';
 const publishExplorationButton = 'button.e2e-test-publish-exploration';
 
 const photoBoxButton = 'div.e2e-test-photo-button';
+const subtopicPhotoBoxButton =
+  '.e2e-test-subtopic-thumbnail .e2e-test-photo-button';
+const storyPhotoBoxButton =
+  'oppia-create-new-story-modal .e2e-test-photo-button';
+const chapterPhotoBoxButton =
+  '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 const curriculumAdminThumbnailImage =
   testConstants.images.curriculumAdminThumbnailImage;
@@ -35,7 +41,6 @@ const curriculumAdminThumbnailImage =
 const editorMainTabButton = 'a.e2e-test-main-tab';
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const saveStoryMessageInput = 'textarea.e2e-test-commit-message-input';
-const confirmSaveStoryButton = 'button.e2e-test-close-save-modal-button';
 const publishStoryButton = 'button.e2e-test-publish-story-button';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
@@ -45,7 +50,7 @@ const topic = 'a.e2e-test-topic-name';
 
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
-const createSkillButton = 'button.e2e-test-create-skill-button';
+const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
 
@@ -99,7 +104,10 @@ const subTopicTitleField = 'input.e2e-test-new-subtopic-title-field';
 const subTopicUrlFragmentField =
   'input.e2e-test-new-subtopic-url-fragment-field';
 const subTopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
-const createSubTopicButton = 'button.e2e-test-confirm-subtopic-creation-button';
+const createSubTopicButton = '.e2e-test-confirm-subtopic-creation-button';
+
+const saveTopicButton = 'button.e2e-test-save-topic-button';
+const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
@@ -125,13 +133,15 @@ export class CurriculumAdmin extends BaseUser {
    */
   async createSkill() {
     await this.openTopicEditor();
-    await this.clickOn(createSkillButton);
+    await this.clickOn(addSkillButton);
     await this.type(skillDescriptionField, 'Test Skill 3');
     await this.clickOn(skillReviewMaterialHeader);
+    await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, 'This is a test skill with 3 questions');
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
+    await this.page.waitForTimeout(500);
     await this.clickOn(confirmSkillCreationButton);
   }
 
@@ -267,13 +277,17 @@ export class CurriculumAdmin extends BaseUser {
       richTextAreaField,
       'This subtopic is to test curriculum admin utility.'
     );
-    await this.clickOn(photoBoxButton);
-    await this.page.waitForTimeout(500);
+    await this.clickOn(subtopicPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForSelector(`${createSubTopicButton}:not([disabled])`);
+    await this.page.waitForTimeout(500);
     await this.clickOn(createSubTopicButton);
+    await this.page.waitForSelector(`${saveTopicButton}:not([disabled])`);
+    await this.page.waitForTimeout(500);
+    await this.clickOn(saveTopicButton);
+    await this.clickOn(closeSaveModalButton);
   }
 
   /**
@@ -288,11 +302,12 @@ export class CurriculumAdmin extends BaseUser {
       storyDescriptionField,
       'This story is to test curriculum admin utility.'
     );
-    await this.clickOn(photoBoxButton);
+    await this.clickOn(storyPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForSelector(`${createStoryButton}:not([disabled])`);
+    await this.page.waitForTimeout(500);
     await this.clickOn(createStoryButton);
   }
 
@@ -300,16 +315,15 @@ export class CurriculumAdmin extends BaseUser {
    * Function for publishing a story as a curriculum admin.
    */
   async publishStory() {
-    await this.clickOn(editorMainTabButton);
+    await this.page.waitForSelector(`${saveStoryButton}:not([disabled])`);
+    await this.page.waitForTimeout(500);
     await this.clickOn(saveStoryButton);
     await this.type(
       saveStoryMessageInput,
       'Test publishing story as curriculum admin.'
     );
-    await this.page.waitForSelector(
-      `${confirmSaveStoryButton}:not([disabled])`
-    );
-    await this.clickOn(confirmSaveStoryButton);
+    await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
+    await this.clickOn(closeSaveModalButton);
     await this.page.waitForTimeout(500);
     await this.clickOn(publishStoryButton);
   }
@@ -321,11 +335,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(addChapterButton);
     await this.type(chapterTitleField, 'Test Story 1');
     await this.type(chapterExplorationIdField, explorationId);
-    await this.clickOn(photoBoxButton);
+    await this.clickOn(chapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.page.waitForSelector(`${createChapterButton}:not([disabled])`);
+    await this.page.waitForTimeout(500);
     await this.clickOn(createChapterButton);
   }
 }
