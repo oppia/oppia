@@ -44,7 +44,7 @@ export class VoiceoverAdminAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isCurriculumAdmin()) {
+    if (userInfo.isVoiceoverAdmin()) {
       return true;
     }
 

@@ -32,9 +32,9 @@ class VoiceoverAdminPageTests(test_utils.GenericTestBase):
     """Checks the voiceover admin page functionality and its rendering."""
 
     def test_get_voiceover_admin_data(self) -> None:
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
 
         language_accent_master_list: Dict[str, Dict[str, str]] = (
             voiceover_services.get_language_accent_master_list())
@@ -60,9 +60,9 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
     """
 
     def test_put_language_accent_codes_mapping_correctly(self) -> None:
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         initial_language_codes_mapping: Dict[str, Dict[str, bool]] = (
@@ -93,9 +93,9 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_invalid_language_accent_codes_mapping_raise_error(self) -> None:
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         invalid_language_codes_mapping = {
@@ -122,8 +122,8 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
         auth_id = 'someUser'
         self.voice_artist_username = 'username'
         user_settings = user_services.create_new_user(
@@ -175,7 +175,7 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_get_voice_artist_data_for_voiceover_admin_page(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
 
         expected_voice_artist_id_to_language_mapping = {
             self.voice_artist_id: {
@@ -198,7 +198,7 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_should_update_voice_artist_language_mapping(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
         initial_voice_artist_id_to_language_mapping = {
@@ -238,7 +238,7 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_exp_id_to_filenames_for_given_voice_artist(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
 
         handler_url = (
             '%s/%s/%s' % (

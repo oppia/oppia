@@ -77,7 +77,18 @@ describe('VoiceoverAdminAuthGuard', () => {
       'getUserInfoAsync'
     ).and.returnValue(
       Promise.resolve(
-        new UserInfo([], false, true, false, false, false, '', '', '', true)
+        new UserInfo(
+          ['VOICEOVER_ADMIN'],
+          false,
+          true,
+          false,
+          false,
+          false,
+          '',
+          '',
+          '',
+          true
+        )
       )
     );
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
