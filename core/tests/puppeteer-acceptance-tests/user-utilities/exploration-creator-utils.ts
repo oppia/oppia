@@ -419,9 +419,6 @@ export class ExplorationCreator extends BaseUser {
    * deleted successfully or not.
    */
   async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(): Promise<void> {
-    // await this.page.waitForSelector(
-    //   '.oppia-editor-publish-button:([disabled])'
-    // );
     try {
       await this.page.goto(explorationUrlAfterPublished);
       throw new Error('Exploration is not deleted successfully.');
