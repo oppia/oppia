@@ -16,24 +16,22 @@
  * @fileoverview Unit test for the State name service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { StateNameService } from
-  'components/state-editor/state-editor-properties-services/state-name.service';
-
+import {StateNameService} from 'components/state-editor/state-editor-properties-services/state-name.service';
 
 describe('State name service', () => {
   let sns: StateNameService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [StateNameService]
+      providers: [StateNameService],
     });
 
     sns = TestBed.get(StateNameService);
   });
 
-  it('should evaluate properties before the initialization', () =>{
+  it('should evaluate properties before the initialization', () => {
     expect(sns.getStateNameSavedMemento()).toBeNull();
     expect(sns.isStateNameEditorShown()).toBeFalse();
   });

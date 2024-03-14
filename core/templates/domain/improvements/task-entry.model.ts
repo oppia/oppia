@@ -15,8 +15,7 @@
 /**
  * @fileoverview Frontend Model for task entry.
  */
-import { ImprovementsConstants } from
-  'domain/improvements/improvements.constants';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
 
 /**
  * Encodes the back-end response of a task entry. This interface is intended to
@@ -28,16 +27,16 @@ import { ImprovementsConstants } from
  * as a table (where the type doesn't matter).
  */
 export interface TaskEntryBackendDict<TaskType = string> {
-  'entity_type': string;
-  'entity_id': string;
-  'entity_version': number;
-  'task_type': TaskType;
-  'target_type': string;
-  'target_id': string;
-  'issue_description': string | null;
-  'status': string;
-  'resolver_username': string | null;
-  'resolved_on_msecs': number | null;
+  entity_type: string;
+  entity_id: string;
+  entity_version: number;
+  task_type: TaskType;
+  target_type: string;
+  target_id: string;
+  issue_description: string | null;
+  status: string;
+  resolver_username: string | null;
+  resolved_on_msecs: number | null;
 }
 
 /**
@@ -50,11 +49,11 @@ export interface TaskEntryBackendDict<TaskType = string> {
  * as a table (where the type doesn't matter).
  */
 export interface TaskEntryPayloadDict<TaskType = string> {
-  'entity_version': number;
-  'task_type': TaskType;
-  'target_id': string;
-  'issue_description': string | null;
-  'status': string;
+  entity_version: number;
+  task_type: TaskType;
+  target_id: string;
+  issue_description: string | null;
+  status: string;
 }
 
 /**

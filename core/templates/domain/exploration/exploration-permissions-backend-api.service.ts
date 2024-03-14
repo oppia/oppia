@@ -16,47 +16,56 @@
  * @fileoverview Backend api service for user exploration permissions.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { ContextService } from 'services/context.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {ContextService} from 'services/context.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {
   ExplorationPermissionsBackendDict,
   ExplorationPermissions,
 } from 'domain/exploration/exploration-permissions.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationPermissionsBackendApiService {
   constructor(
     private contextService: ContextService,
     private http: HttpClient,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async getPermissionsAsync(): Promise<ExplorationPermissions> {
-    let explorationPermissionsUrl = this.urlInterpolationService
-      .interpolateUrl('/createhandler/permissions/<exploration_id>', {
-        exploration_id: this.contextService.getExplorationId()
-      });
+    let explorationPermissionsUrl = this.urlInterpolationService.interpolateUrl(
+      '/createhandler/permissions/<exploration_id>',
+      {
+        exploration_id: this.contextService.getExplorationId(),
+      }
+    );
 
     return new Promise((resolve, reject) => {
-      this.http.get<ExplorationPermissionsBackendDict>(
-        explorationPermissionsUrl).toPromise().then(response => {
-        let permissionsObject = (
-          ExplorationPermissions.createFromBackendDict(
-            response));
-        resolve(permissionsObject);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<ExplorationPermissionsBackendDict>(explorationPermissionsUrl)
+        .toPromise()
+        .then(
+          response => {
+            let permissionsObject =
+              ExplorationPermissions.createFromBackendDict(response);
+            resolve(permissionsObject);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationPermissionsBackendApiService',
-  downgradeInjectable(ExplorationPermissionsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationPermissionsBackendApiService',
+    downgradeInjectable(ExplorationPermissionsBackendApiService)
+  );

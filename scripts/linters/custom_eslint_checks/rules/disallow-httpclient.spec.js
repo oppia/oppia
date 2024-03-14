@@ -24,37 +24,37 @@ var RuleTester = require('eslint').RuleTester;
 var ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2016,
-    sourceType: 'module'
+    sourceType: 'module',
   },
-  parser: require.resolve('@typescript-eslint/parser')
+  parser: require.resolve('@typescript-eslint/parser'),
 });
 
 ruleTester.run('disallow-httpclient', rule, {
   valid: [
     {
-      code:
-      `import { HttpClient } from '@angular/common/http';
+      code: `import { HttpClient } from '@angular/common/http';
       describe('Service', () => {
         let httpClient: HttpClient = null;
       });`,
-      filename: 'foo/bar.backend-api.service.ts'
-    }
+      filename: 'foo/bar.backend-api.service.ts',
+    },
   ],
 
   invalid: [
     {
-      code:
-      `import { HttpClient } from '@angular/common/http';
+      code: `import { HttpClient } from '@angular/common/http';
       describe('Service', () => {
         let httpClient: HttpClient = null;
       });`,
       filename: 'foo/bar.js',
-      errors: [{
-        message: (
-          'An instance of HttpClient is found in this file. You are not' +
-          ' allowed to create http requests from files that are not backend' +
-          ' api services.')
-      }],
+      errors: [
+        {
+          message:
+            'An instance of HttpClient is found in this file. You are not' +
+            ' allowed to create http requests from files that are not backend' +
+            ' api services.',
+        },
+      ],
     },
-  ]
+  ],
 });

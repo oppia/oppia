@@ -16,9 +16,8 @@
  * @fileoverview Test for the diagnostic test player status service.
  */
 
-
-import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-status.service';
-import { TestBed } from '@angular/core/testing';
+import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
+import {TestBed} from '@angular/core/testing';
 
 describe('Diagnostic test player status service', () => {
   let dtpss: DiagnosticTestPlayerStatusService;

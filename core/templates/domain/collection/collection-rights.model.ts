@@ -19,11 +19,11 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface CollectionRightsBackendDict {
-  'collection_id': string | null;
-  'can_edit': boolean | null;
-  'can_unpublish': boolean | null;
-  'is_private': boolean | null;
-  'owner_names': string[];
+  collection_id: string | null;
+  can_edit: boolean | null;
+  can_unpublish: boolean | null;
+  is_private: boolean | null;
+  owner_names: string[];
 }
 
 export class CollectionRights {
@@ -42,8 +42,8 @@ export class CollectionRights {
   }
 
   static create(
-      collectionRightsBackendObject: CollectionRightsBackendDict):
-      CollectionRights {
+    collectionRightsBackendObject: CollectionRightsBackendDict
+  ): CollectionRights {
     return new CollectionRights(cloneDeep(collectionRightsBackendObject));
   }
 
@@ -55,7 +55,7 @@ export class CollectionRights {
       collection_id: null,
       can_edit: null,
       can_unpublish: null,
-      is_private: null
+      is_private: null,
     });
   }
 

@@ -16,29 +16,22 @@
  * @fileoverview Module for the partnerships page.
  */
 
-import { NgModule } from '@angular/core';
-import { PartnershipsPageComponent } from './partnerships-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { PartnershipsPageRootComponent } from
-  './partnerships-page-root.component';
-import { CommonModule } from '@angular/common';
-import { PartnershipsPageRoutingModule } from './partnerships-page-routing.module';
-import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
+import {NgModule} from '@angular/core';
+import {PartnershipsPageComponent} from './partnerships-page.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {PartnershipsPageRootComponent} from './partnerships-page-root.component';
+import {CommonModule} from '@angular/common';
+import {PartnershipsPageRoutingModule} from './partnerships-page-routing.module';
+import {NgbCarouselModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
     PartnershipsPageRoutingModule,
-    NgbCarouselModule
+    NgbCarouselModule,
   ],
-  declarations: [
-    PartnershipsPageComponent,
-    PartnershipsPageRootComponent
-  ],
-  entryComponents: [
-    PartnershipsPageComponent,
-    PartnershipsPageRootComponent
-  ]
+  declarations: [PartnershipsPageComponent, PartnershipsPageRootComponent],
+  entryComponents: [PartnershipsPageComponent, PartnershipsPageRootComponent],
 })
 export class PartnershipsPageModule {}

@@ -16,27 +16,30 @@
  * @fileoverview Service to get data for to a blog dashboard from backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { BlogPostSummaryBackendDict, BlogPostSummary } from 'domain/blog/blog-post-summary.model';
-import { BlogDashboardPageConstants } from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {
+  BlogPostSummaryBackendDict,
+  BlogPostSummary,
+} from 'domain/blog/blog-post-summary.model';
+import {BlogDashboardPageConstants} from 'pages/blog-dashboard-page/blog-dashboard-page.constants';
 
 export interface BlogAuthorDetailsBackendDict {
-  'displayed_author_name': string;
-  'author_bio': string;
+  displayed_author_name: string;
+  author_bio: string;
 }
 export interface BlogDashboardBackendResponse {
-  'author_details': BlogAuthorDetailsBackendDict;
-  'no_of_published_blog_posts': number;
-  'no_of_draft_blog_posts': number;
-  'published_blog_post_summary_dicts': BlogPostSummaryBackendDict[];
-  'draft_blog_post_summary_dicts': BlogPostSummaryBackendDict[];
+  author_details: BlogAuthorDetailsBackendDict;
+  no_of_published_blog_posts: number;
+  no_of_draft_blog_posts: number;
+  published_blog_post_summary_dicts: BlogPostSummaryBackendDict[];
+  draft_blog_post_summary_dicts: BlogPostSummaryBackendDict[];
 }
 
 interface NewBlogPostBackendResponse {
-  'blog_post_id': string;
+  blog_post_id: string;
 }
 export interface BlogDashboardData {
   displayedAuthorName: string;
@@ -51,72 +54,99 @@ export interface BlogAuthorDetails {
   authorBio: string;
 }
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BlogDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
   async fetchBlogDashboardDataAsync(): Promise<BlogDashboardData> {
     return new Promise((resolve, reject) => {
-      this.http.get<BlogDashboardBackendResponse>(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE).toPromise()
-        .then(response => {
-          resolve({
-            displayedAuthorName: response.author_details.displayed_author_name,
-            authorBio: response.author_details.author_bio,
-            numOfDraftBlogPosts: response.no_of_draft_blog_posts,
-            numOfPublishedBlogPosts: response.no_of_published_blog_posts,
-            publishedBlogPostSummaryDicts: (
-              response.published_blog_post_summary_dicts.map(
-                blogPostSummary => {
+      this.http
+        .get<BlogDashboardBackendResponse>(
+          BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              displayedAuthorName:
+                response.author_details.displayed_author_name,
+              authorBio: response.author_details.author_bio,
+              numOfDraftBlogPosts: response.no_of_draft_blog_posts,
+              numOfPublishedBlogPosts: response.no_of_published_blog_posts,
+              publishedBlogPostSummaryDicts:
+                response.published_blog_post_summary_dicts.map(
+                  blogPostSummary => {
+                    return BlogPostSummary.createFromBackendDict(
+                      blogPostSummary
+                    );
+                  }
+                ),
+              draftBlogPostSummaryDicts:
+                response.draft_blog_post_summary_dicts.map(blogPostSummary => {
                   return BlogPostSummary.createFromBackendDict(blogPostSummary);
-                })),
-            draftBlogPostSummaryDicts: (
-              response.draft_blog_post_summary_dicts.map(
-                blogPostSummary => {
-                  return BlogPostSummary.createFromBackendDict(blogPostSummary);
-                })),
-          });
-        }, errorResponse => {
-          reject(errorResponse.error.error);
-        });
+                }),
+            });
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async createBlogPostAsync(): Promise<string> {
     return new Promise((resolve, reject) => {
-      this.http.post<NewBlogPostBackendResponse>(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, {}
-      ).toPromise().then(response => {
-        resolve(response.blog_post_id);
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .post<NewBlogPostBackendResponse>(
+          BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE,
+          {}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.blog_post_id);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async updateAuthorDetailsAsync(
-      displayedAuthorName: string, authorBio: string
+    displayedAuthorName: string,
+    authorBio: string
   ): Promise<BlogAuthorDetails> {
     return new Promise((resolve, reject) => {
       const putData = {
         displayed_author_name: displayedAuthorName,
-        author_bio: authorBio
+        author_bio: authorBio,
       };
-      this.http.put<BlogAuthorDetailsBackendDict>(
-        BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE, putData
-      ).toPromise().then(() => {
-        resolve({
-          displayedAuthorName: displayedAuthorName,
-          authorBio: authorBio
-        });
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .put<BlogAuthorDetailsBackendDict>(
+          BlogDashboardPageConstants.BLOG_DASHBOARD_DATA_URL_TEMPLATE,
+          putData
+        )
+        .toPromise()
+        .then(
+          () => {
+            resolve({
+              displayedAuthorName: displayedAuthorName,
+              authorBio: authorBio,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'BlogDashboardBackendApiService',
-  downgradeInjectable(BlogDashboardBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'BlogDashboardBackendApiService',
+    downgradeInjectable(BlogDashboardBackendApiService)
+  );

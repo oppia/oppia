@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Delete Topic Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteTopicModalComponent } from './delete-topic-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteTopicModalComponent} from './delete-topic-modal.component';
 
 describe('Delete Topic Modal Component', () => {
   let fixture: ComponentFixture<DeleteTopicModalComponent>;
@@ -26,12 +26,8 @@ describe('Delete Topic Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteTopicModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [DeleteTopicModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

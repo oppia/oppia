@@ -16,10 +16,10 @@
  * @fileoverview Oppia root component.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'lightweight-oppia-root',
-  templateUrl: './lightweight-oppia-root.component.html'
+  templateUrl: './lightweight-oppia-root.component.html',
 })
 export class LightweightOppiaRootComponent {}

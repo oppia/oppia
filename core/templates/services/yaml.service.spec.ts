@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for YamlService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { YamlService } from './yaml.service';
+import {TestBed} from '@angular/core/testing';
+import {YamlService} from './yaml.service';
 
 describe('Yaml service', () => {
   let yamlService: YamlService;
@@ -32,16 +32,15 @@ describe('Yaml service', () => {
       someOtherProperty: {
         someSubProperty: 1,
         someOtherSubProperty: 'some other sub property',
-        yetAnotherSubProperty: true
-      }
+        yetAnotherSubProperty: true,
+      },
     };
-    const expectedYamlString = (
+    const expectedYamlString =
       'someProperty: some property\n' +
       'someOtherProperty:\n' +
       '  someSubProperty: 1\n' +
       '  someOtherSubProperty: some other sub property\n' +
-      '  yetAnotherSubProperty: true\n'
-    );
+      '  yetAnotherSubProperty: true\n';
 
     const yamlString = yamlService.stringify(objectToStringify);
 
@@ -49,20 +48,19 @@ describe('Yaml service', () => {
   });
 
   it('should parse a yaml string to get the corresponding object', () => {
-    const yamlString = (
+    const yamlString =
       'someProperty: some property\n' +
       'someOtherProperty:\n' +
       '  someSubProperty: 1\n' +
       '  someOtherSubProperty: some other sub property\n' +
-      '  yetAnotherSubProperty: true\n'
-    );
+      '  yetAnotherSubProperty: true\n';
     const expectedObject = {
       someProperty: 'some property',
       someOtherProperty: {
         someSubProperty: 1,
         someOtherSubProperty: 'some other sub property',
-        yetAnotherSubProperty: true
-      }
+        yetAnotherSubProperty: true,
+      },
     };
 
     const parsedObject = yamlService.parse(yamlString);

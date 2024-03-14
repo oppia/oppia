@@ -16,7 +16,7 @@
  * @fileoverview Tests for Story model class.
  */
 
-import { Story } from 'domain/story/story.model';
+import {Story} from 'domain/story/story.model';
 
 describe('Story object factory', () => {
   let _sampleStory: Story;
@@ -31,24 +31,26 @@ describe('Story object factory', () => {
       corresponding_topic_id: 'topic_id',
       story_contents: {
         initial_node_id: 'node_1',
-        nodes: [{
-          id: 'node_1',
-          title: 'Title 1',
-          description: 'Description',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
-          outline: 'Outline',
-          exploration_id: null,
-          outline_is_finalized: false,
-          thumbnail_filename: 'img.png',
-          thumbnail_bg_color: '#a33f40'
-        }],
-        next_node_id: 'node_3'
+        nodes: [
+          {
+            id: 'node_1',
+            title: 'Title 1',
+            description: 'Description',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: null,
+            outline_is_finalized: false,
+            thumbnail_filename: 'img.png',
+            thumbnail_bg_color: '#a33f40',
+          },
+        ],
+        next_node_id: 'node_3',
       },
       language_code: 'en',
       url_fragment: 'story-title',
-      meta_tag_content: 'story meta tag content'
+      meta_tag_content: 'story meta tag content',
     };
     _sampleStory = Story.createFromBackendDict(
       // This throws "Argument of type '{ id: string; ... }'
@@ -57,7 +59,8 @@ describe('Story object factory', () => {
       // should have a property 'thumbnail' but we didn't add that property in
       // order to test validations.
       // @ts-expect-error
-      sampleStoryBackendDict);
+      sampleStoryBackendDict
+    );
   });
 
   it('should correctly validate a valid story', () => {
@@ -68,13 +71,13 @@ describe('Story object factory', () => {
     _sampleStory.setMetaTagContent('a'.repeat(200));
     expect(_sampleStory.prepublishValidate()).toEqual([
       'Story should have a thumbnail.',
-      'Story meta tag content should not be longer than 160 characters.'
+      'Story meta tag content should not be longer than 160 characters.',
     ]);
     _sampleStory.setThumbnailFilename('image.png');
     _sampleStory.setThumbnailBgColor('#F8BF74');
     _sampleStory.setMetaTagContent('');
     expect(_sampleStory.prepublishValidate()).toEqual([
-      'Story should have meta tag content.'
+      'Story should have meta tag content.',
     ]);
     _sampleStory.setMetaTagContent('abc');
     expect(_sampleStory.prepublishValidate()).toEqual([]);
@@ -83,14 +86,14 @@ describe('Story object factory', () => {
   it('should correctly validate a story with empty title', () => {
     _sampleStory.setTitle('');
     expect(_sampleStory.validate()).toEqual([
-      'Story title should not be empty'
+      'Story title should not be empty',
     ]);
   });
 
   it('should fail validation for empty url fragment', () => {
     _sampleStory.setUrlFragment('');
     expect(_sampleStory.validate()).toEqual([
-      'Url Fragment should not be empty.'
+      'Url Fragment should not be empty.',
     ]);
   });
 
@@ -98,14 +101,14 @@ describe('Story object factory', () => {
     _sampleStory.setUrlFragment(' aBc inv4lid-');
     expect(_sampleStory.validate()).toEqual([
       'Url Fragment contains invalid characters. ' +
-      'Only lowercase words separated by hyphens are allowed.'
+        'Only lowercase words separated by hyphens are allowed.',
     ]);
   });
 
   it('should fail validation for lengthy url fragment', () => {
     _sampleStory.setUrlFragment('abcde-abcde-abcde-abcde-abcde-abcde-abcde');
     expect(_sampleStory.validate()).toEqual([
-      'Url Fragment should not be greater than 30 characters'
+      'Url Fragment should not be greater than 30 characters',
     ]);
   });
 
@@ -119,31 +122,33 @@ describe('Story object factory', () => {
       corresponding_topic_id: 'topic_id_2',
       story_contents: {
         initial_node_id: 'node_2',
-        nodes: [{
-          id: 'node_2',
-          title: 'Title 2',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
-          outline: 'Outline',
-          exploration_id: null,
-          outline_is_finalized: false,
-          description: 'Description',
-          thumbnail_filename: 'img.png',
-          thumbnail_bg_color: '#a33f40',
-          status: 'Published',
-          planned_publication_date_msecs: 100,
-          last_modified_msecs: 100,
-          first_publication_date_msecs: 200,
-          unpublishing_reason: null
-        }],
-        next_node_id: 'node_3'
+        nodes: [
+          {
+            id: 'node_2',
+            title: 'Title 2',
+            prerequisite_skill_ids: [],
+            acquired_skill_ids: [],
+            destination_node_ids: [],
+            outline: 'Outline',
+            exploration_id: null,
+            outline_is_finalized: false,
+            description: 'Description',
+            thumbnail_filename: 'img.png',
+            thumbnail_bg_color: '#a33f40',
+            status: 'Published',
+            planned_publication_date_msecs: 100,
+            last_modified_msecs: 100,
+            first_publication_date_msecs: 200,
+            unpublishing_reason: null,
+          },
+        ],
+        next_node_id: 'node_3',
       },
       language_code: 'en',
       thumbnail_filename: 'img.png',
       thumbnail_bg_color: '#a33f40',
       url_fragment: 'story',
-      meta_tag_content: 'story meta tag content'
+      meta_tag_content: 'story meta tag content',
     });
 
     expect(_sampleStory).not.toBe(secondStory);
