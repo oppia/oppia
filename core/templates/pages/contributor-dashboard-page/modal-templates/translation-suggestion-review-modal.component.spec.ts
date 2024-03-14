@@ -36,6 +36,14 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
 import {UserService} from 'services/user.service';
 import {UserInfo} from 'domain/user/user-info.model';
+import {of, Subject} from 'rxjs';
+import {
+  MatSnackBar,
+  MatSnackBarModule,
+  MatSnackBarRef,
+} from '@angular/material/snack-bar';
+import {OverlayModule} from '@angular/cdk/overlay';
+
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
@@ -43,6 +51,12 @@ import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display
 
 class MockChangeDetectorRef {
   detectChanges(): void {}
+}
+
+class MockMatSnackBarRef {
+  instance = {message: ''};
+  afterDismissed = () => of({action: '', dismissedByAction: false});
+  onAction = () => of(undefined);
 }
 
 describe('Translation Suggestion Review Modal Component', function () {
@@ -56,10 +70,12 @@ describe('Translation Suggestion Review Modal Component', function () {
   let userService: UserService;
   let activeModal: NgbActiveModal;
   let changeDetectorRef: MockChangeDetectorRef = new MockChangeDetectorRef();
+  let snackBar: MatSnackBar;
+  let snackBarSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, OverlayModule, MatSnackBarModule],
       declarations: [TranslationSuggestionReviewModalComponent],
       providers: [
         NgbActiveModal,
@@ -73,6 +89,7 @@ describe('Translation Suggestion Review Modal Component', function () {
           provide: ChangeDetectorRef,
           useValue: changeDetectorRef,
         },
+        MatSnackBar,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -90,12 +107,16 @@ describe('Translation Suggestion Review Modal Component', function () {
     userService = TestBed.inject(UserService);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     languageUtilService = TestBed.inject(LanguageUtilService);
+    snackBar = TestBed.inject(MatSnackBar);
     spyOn(
       siteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview'
     );
     spyOn(languageUtilService, 'getAudioLanguageDescription').and.returnValue(
       'audio_language_description'
+    );
+    snackBarSpy = spyOn(snackBar, 'openFromComponent').and.returnValue(
+      new MockMatSnackBarRef() as unknown as MatSnackBarRef<unknown>
     );
 
     component.contentContainer = new ElementRef({offsetHeight: 150});
@@ -360,6 +381,10 @@ describe('Translation Suggestion Review Modal Component', function () {
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
+      spyOn(window as any, 'setTimeout').and.callFake((callback: Function) => {
+        callback();
+        return 1234;
+      });
     });
 
     it('should call user service at initialization.', function () {
@@ -441,99 +466,11 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
 
     it(
-      'should accept suggestion in suggestion modal service when clicking' +
-        ' on accept and review next suggestion button',
-      function () {
+      'should queue the suggestion when clicked on accept and ' +
+        'review button',
+      () => {
         component.ngOnInit();
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-        // Suggestion 1's exploration_content_html matches its content_html.
-        expect(component.hasExplorationContentChanged()).toBe(false);
 
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardAcceptSuggestion'
-        );
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        spyOn(activeModal, 'close');
-        spyOn(alertsService, 'addSuccessMessage');
-
-        component.reviewMessage = 'Review message example';
-        component.translationUpdated = true;
-        component.acceptAndReviewNext();
-
-        expect(component.activeSuggestionId).toBe('suggestion_2');
-        expect(component.activeSuggestion).toEqual(suggestion2);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-        // Suggestion 2's exploration_content_html does not match its
-        // content_html.
-        expect(component.hasExplorationContentChanged()).toBe(true);
-        expect(
-          siteAnalyticsService.registerContributorDashboardAcceptSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '1',
-          'suggestion_1',
-          'accept',
-          'Review message example: ' +
-            '(Note: This suggestion was submitted with reviewer edits.)',
-          'hint section of "StateName" card',
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addSuccessMessage).toHaveBeenCalled();
-
-        component.reviewMessage = 'Review message example 2';
-        component.translationUpdated = false;
-        component.acceptAndReviewNext();
-
-        expect(
-          siteAnalyticsService.registerContributorDashboardAcceptSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '2',
-          'suggestion_2',
-          'accept',
-          'Review message example 2',
-          'hint section of "StateName" card',
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addSuccessMessage).toHaveBeenCalled();
-        expect(activeModal.close).toHaveBeenCalledWith([
-          'suggestion_1',
-          'suggestion_2',
-        ]);
-      }
-    );
-
-    it(
-      'should set suggestion review message to auto-generated note when ' +
-        'suggestion is accepted with edits and no user-supplied review message',
-      function () {
-        component.ngOnInit();
         expect(component.activeSuggestionId).toBe('suggestion_1');
         expect(component.activeSuggestion).toEqual(suggestion1);
         expect(component.reviewable).toBe(reviewable);
@@ -543,136 +480,103 @@ describe('Translation Suggestion Review Modal Component', function () {
           siteAnalyticsService,
           'registerContributorDashboardAcceptSuggestion'
         );
-        spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
+        spyOn(contributionAndReviewService, 'reviewExplorationSuggestion');
+        spyOn(activeModal, 'close');
         spyOn(alertsService, 'addSuccessMessage');
+        spyOn(component, 'resolveSuggestionAndUpdateModal').and.stub();
+        spyOn(component, 'startCommitTimeout').and.stub();
+        spyOn(component, 'showSnackbar').and.stub();
 
-        component.translationUpdated = true;
         component.acceptAndReviewNext();
-
-        expect(
-          siteAnalyticsService.registerContributorDashboardAcceptSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '1',
-          'suggestion_1',
-          'accept',
-          '(Note: This suggestion was submitted with reviewer edits.)',
-          'hint section of "StateName" card',
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addSuccessMessage).toHaveBeenCalled();
+        expect(component.hasQueuedSuggestion).toBeTrue();
+        expect(component.queuedSuggestion).toEqual({
+          target_id: '1',
+          suggestion_id: 'suggestion_1',
+          action_status: AppConstants.ACTION_ACCEPT_SUGGESTION,
+          reviewer_message: '',
+          commit_message: 'hint section of "StateName" card',
+        });
       }
     );
 
     it(
-      'should reject suggestion in suggestion modal service when clicking ' +
-        'on reject and review next suggestion button',
-      function () {
+      'should queue the suggestion when clicked on reject and' +
+        'review button',
+      () => {
         component.ngOnInit();
+
         expect(component.activeSuggestionId).toBe('suggestion_1');
         expect(component.activeSuggestion).toEqual(suggestion1);
         expect(component.reviewable).toBe(reviewable);
         expect(component.reviewMessage).toBe('');
 
         spyOn(
-          contributionAndReviewService,
-          'reviewExplorationSuggestion'
-        ).and.callFake(
-          (
-            targetId,
-            suggestionId,
-            action,
-            reviewMessage,
-            commitMessage,
-            successCallback,
-            errorCallback
-          ) => {
-            return Promise.resolve(successCallback(suggestionId));
-          }
-        );
-        spyOn(
           siteAnalyticsService,
-          'registerContributorDashboardRejectSuggestion'
+          'registerContributorDashboardAcceptSuggestion'
         );
+        spyOn(contributionAndReviewService, 'reviewExplorationSuggestion');
         spyOn(activeModal, 'close');
         spyOn(alertsService, 'addSuccessMessage');
+        spyOn(component, 'resolveSuggestionAndUpdateModal').and.stub();
+        spyOn(component, 'startCommitTimeout').and.stub();
+        spyOn(component, 'showSnackbar').and.stub();
 
-        component.reviewMessage = 'Review message example';
-        component.translationUpdated = true;
-        component.rejectAndReviewNext(component.reviewMessage);
+        component.rejectAndReviewNext('rejected');
 
-        expect(component.activeSuggestionId).toBe('suggestion_2');
-        expect(component.activeSuggestion).toEqual(suggestion2);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-        expect(
-          siteAnalyticsService.registerContributorDashboardRejectSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '1',
-          'suggestion_1',
-          'reject',
-          'Review message example',
-          null,
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addSuccessMessage).toHaveBeenCalled();
-
-        component.reviewMessage = 'Review message example 2';
-        component.translationUpdated = false;
-        component.rejectAndReviewNext(component.reviewMessage);
-
-        expect(
-          siteAnalyticsService.registerContributorDashboardRejectSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(alertsService.addSuccessMessage).toHaveBeenCalled();
-        expect(activeModal.close).toHaveBeenCalledWith([
-          'suggestion_1',
-          'suggestion_2',
-        ]);
+        expect(component.hasQueuedSuggestion).toBeTrue();
+        expect(component.queuedSuggestion).toEqual({
+          target_id: '1',
+          suggestion_id: 'suggestion_1',
+          action_status: AppConstants.ACTION_REJECT_SUGGESTION,
+          reviewer_message: 'rejected',
+        });
       }
     );
+
+    it('should undo the queued suggestion when clicked on undo button', () => {
+      component.ngOnInit();
+      component.resolvedSuggestionIds = ['suggestion_1'];
+
+      component.queuedSuggestion = {
+        target_id: '1',
+        suggestion_id: 'suggestion_1',
+        action_status: AppConstants.ACTION_REJECT_SUGGESTION,
+        reviewer_message: 'rejected',
+        commit_message: 'hint section of "StateName" card',
+      };
+
+      component.hasQueuedSuggestion = true;
+
+      component.undoReviewAction();
+      expect(component.hasQueuedSuggestion).toBeFalse();
+      expect(component.queuedSuggestion).toBe(null);
+    });
+
+    it('should show the pop up bar when suggestion is queued', () => {
+      spyOn(component, 'commitQueuedSuggestion').and.callThrough();
+      component.hasQueuedSuggestion = true;
+      component.showSnackbar();
+
+      expect(snackBarSpy.calls.mostRecent().returnValue.instance.message).toBe(
+        'Suggestion queued'
+      );
+    });
 
     it(
       'should allow the reviewer to fix the suggestion if the backend pre' +
         ' accept/reject validation failed',
-      function () {
-        const responseMessage = 'Pre accept validation failed.';
-
+      function (done) {
         component.ngOnInit();
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('');
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardAcceptSuggestion'
-        );
-        spyOn(
-          siteAnalyticsService,
-          'registerContributorDashboardRejectSuggestion'
-        );
+
+        const responseMessage = 'Pre accept validation failed.';
+        component.hasQueuedSuggestion = true;
+        component.queuedSuggestion = {
+          target_id: '1',
+          suggestion_id: 'suggestion_1',
+          action_status: 'reject',
+          reviewer_message: 'Queued',
+        };
+
         spyOn(
           contributionAndReviewService,
           'reviewExplorationSuggestion'
@@ -686,60 +590,129 @@ describe('Translation Suggestion Review Modal Component', function () {
             successCallback,
             errorCallback
           ) => {
-            return Promise.reject(errorCallback(responseMessage));
+            errorCallback(responseMessage);
+            return Promise.reject();
           }
         );
         spyOn(alertsService, 'addWarning');
+        component.showSnackbar();
 
-        component.reviewMessage = 'Review message example';
+        component.commitQueuedSuggestion();
+
+        setTimeout(() => {
+          expect(
+            contributionAndReviewService.reviewExplorationSuggestion
+          ).toHaveBeenCalledWith(
+            '1',
+            'suggestion_1',
+            'reject',
+            'Queued',
+            null,
+            jasmine.any(Function),
+            jasmine.any(Function)
+          );
+          expect(alertsService.addWarning).toHaveBeenCalledWith(
+            jasmine.stringContaining(responseMessage)
+          );
+          done();
+        }, 0);
+      }
+    );
+
+    it(
+      'should commit the queued suggestion when' + ' the snackbar is dismissed',
+      () => {
+        const commitQueuedSuggestionSpy = spyOn(
+          component,
+          'commitQueuedSuggestion'
+        ).and.callThrough();
+
+        let afterDismissedObservable = new Subject<void>();
+        let snackBarRefMock = {
+          instance: {message: ''},
+          afterDismissed: () => afterDismissedObservable.asObservable(),
+          onAction: () => of(null),
+        };
+
+        snackBarSpy.and.returnValue(snackBarRefMock);
+
+        component.showSnackbar();
+        component.hasQueuedSuggestion = true;
+
+        afterDismissedObservable.next();
+        afterDismissedObservable.complete();
+
+        expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
+      }
+    );
+
+    it(
+      'should remove suggestion_id from resolvedSuggestionIds' + 'if it exists',
+      () => {
+        component.ngOnInit();
+        component.resolvedSuggestionIds = ['suggestion_1', 'suggestion_2'];
+        component.queuedSuggestion = {
+          suggestion_id: 'suggestion_1',
+          action_status: 'accept',
+          target_id: '1',
+          reviewer_message: '',
+        };
+
+        component.revertSuggestionResolution();
+
+        expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
+      }
+    );
+
+    it(
+      'should not modify resolvedSuggestionIds if suggestion_id' +
+        'does not exist',
+      () => {
+        component.ngOnInit();
+        component.resolvedSuggestionIds = ['suggestion_2'];
+        component.queuedSuggestion = {
+          suggestion_id: 'suggestion_1',
+          action_status: 'accept',
+          target_id: '1',
+          reviewer_message: '',
+        };
+
+        component.revertSuggestionResolution();
+
+        expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
+      }
+    );
+
+    it(
+      'should close the modal if the suggestion reviewed is' + 'the last item',
+      () => {
+        component.ngOnInit();
+        expect(component.activeSuggestionId).toBe('suggestion_1');
+        expect(component.activeSuggestion).toEqual(suggestion1);
+        expect(component.reviewable).toBe(reviewable);
+        expect(component.reviewMessage).toBe('');
+
+        spyOn(
+          siteAnalyticsService,
+          'registerContributorDashboardAcceptSuggestion'
+        );
+        spyOn(contributionAndReviewService, 'reviewExplorationSuggestion');
+        const modalCloseSpy = spyOn(activeModal, 'close');
+        spyOn(alertsService, 'addSuccessMessage');
+        const commitQueuedSuggestionSpy = spyOn(
+          component,
+          'commitQueuedSuggestion'
+        ).and.stub();
+
+        component.goToNextItem();
+        spyOn(component, 'resolveSuggestionAndUpdateModal').and.callThrough();
+        expect(component.activeSuggestionId).toBe('suggestion_2');
+        expect(component.activeSuggestion).toEqual(suggestion2);
+        component.isLastItem = true;
         component.acceptAndReviewNext();
-
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('Review message example');
-        expect(
-          siteAnalyticsService.registerContributorDashboardAcceptSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '1',
-          'suggestion_1',
-          'accept',
-          'Review message example',
-          'hint section of "StateName" card',
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addWarning).toHaveBeenCalledWith(
-          jasmine.stringContaining(responseMessage)
-        );
-
-        component.reviewMessage = 'Edited review message example';
-        component.rejectAndReviewNext(component.reviewMessage);
-
-        expect(component.activeSuggestionId).toBe('suggestion_1');
-        expect(component.activeSuggestion).toEqual(suggestion1);
-        expect(component.reviewable).toBe(reviewable);
-        expect(component.reviewMessage).toBe('Edited review message example');
-        expect(
-          siteAnalyticsService.registerContributorDashboardRejectSuggestion
-        ).toHaveBeenCalledWith('Translation');
-        expect(
-          contributionAndReviewService.reviewExplorationSuggestion
-        ).toHaveBeenCalledWith(
-          '1',
-          'suggestion_1',
-          'reject',
-          'Edited review message example',
-          null,
-          jasmine.any(Function),
-          jasmine.any(Function)
-        );
-        expect(alertsService.addWarning).toHaveBeenCalledWith(
-          jasmine.stringContaining(responseMessage)
-        );
+        component.isLastItem = true;
+        expect(modalCloseSpy).toHaveBeenCalled();
+        expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
       }
     );
 
@@ -1174,7 +1147,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       it(
         'should reject suggestion in suggestion modal service when clicking ' +
           'on reject and review next suggestion button',
-        function () {
+        fakeAsync(() => {
           expect(component.activeSuggestionId).toBe('suggestion_1');
           expect(component.activeSuggestion).toEqual(suggestion1);
           expect(component.reviewable).toBe(reviewable);
@@ -1202,9 +1175,12 @@ describe('Translation Suggestion Review Modal Component', function () {
           );
           spyOn(activeModal, 'close');
           spyOn(alertsService, 'addSuccessMessage');
+          spyOn(component, 'showSnackbar');
 
           component.reviewMessage = 'Review message example';
+          component.showSnackbar();
           component.rejectAndReviewNext(component.reviewMessage);
+          tick(30000);
 
           expect(
             siteAnalyticsService.registerContributorDashboardRejectSuggestion
@@ -1224,7 +1200,8 @@ describe('Translation Suggestion Review Modal Component', function () {
             'Suggestion rejected.'
           );
           expect(activeModal.close).toHaveBeenCalledWith(['suggestion_1']);
-        }
+          flush();
+        })
       );
     }
   );
