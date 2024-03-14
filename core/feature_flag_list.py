@@ -49,7 +49,7 @@ class FeatureNames(enum.Enum):
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     NEW_LESSON_PLAYER = 'new_lesson_player'
-    UNDO_TRANSLATION_STATUS = 'undo_translation_status'
+    CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -75,7 +75,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.UNDO_TRANSLATION_STATUS
+    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -197,10 +197,10 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV
         )
     ),
-    FeatureNames.UNDO_TRANSLATION_STATUS.value: (
+    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
-            'This flag to let translation reviewers undo the status '
-            'of translation reviews.',
+            'This flag allows translation reviewers to undo translation '
+            'suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.DEV
         )
     )
