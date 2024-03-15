@@ -1176,7 +1176,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "這將會您的 Oppia 帳號資料下載成一個 JSON 格式文字檔案。",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT": "請不要離開此頁面。目前正在載入您的資料，完成後會下載成 JSON 格式的文字檔案。若出現問題，請聯絡",
 	"I18N_PREFERENCES_HEADING": "偏好設定",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "任何您在此頁面上的更改將會被自動儲存。",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "您尚未訂閱任何創作者。以點擊在作者個人檔案頁面中「訂閱」按鈕的方式，來隨時訂閱您喜歡的作者。透過訂閱作者，當作者發布新課程時，您會在電子郵件收到通知。",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "影響",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "偏好設定 | Oppia",

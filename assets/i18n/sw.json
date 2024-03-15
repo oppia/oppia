@@ -1061,7 +1061,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "Hii itapakua data ya akaunti yako ya Oppia kama faili ya maandishi iliyoumbizwa na JSON.",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT": "Tafadhali usiondoke kwenye ukurasa huu. Data yako inapakiwa kwa sasa na itapakuliwa kama faili ya maandishi iliyoumbizwa na JSON itakapokamilika. Ikiwa kitu kitaenda vibaya, tafadhali wasiliana",
 	"I18N_PREFERENCES_HEADING": "Mapendeleo",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Mabadiliko yoyote utakayofanya kwenye ukurasa huu yatahifadhiwa kiotomatiki.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Bado hujajisajili kwa watayarishi wowote. Jisikie huru kujiandikisha kwa mwandishi unayempenda kwa kubofya kitufe cha 'jiandikishe' katika ukurasa wa wasifu wa mwandishi. Kwa kujiandikisha kwa mwandishi, utaarifiwa kwa barua-pepe mwandishi atakapochapisha somo jipya.",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "Athari",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "Mapendeleo | Oppia",
