@@ -837,13 +837,13 @@ describe('Translation Suggestion Review Modal Component', function () {
       () => {
         spyOn(window, 'setTimeout');
         spyOn(component, 'commitQueuedSuggestion');
-        component.commitTimeout = null;
+        component.commitTimeout = undefined;
 
         component.startCommitTimeout();
 
         expect(window.setTimeout).toHaveBeenCalled();
         const timeoutCallback = (
-          window.setTimeout as jasmine.Spy
+          window.setTimeout as unknown as jasmine.Spy
         ).calls.mostRecent().args[0];
         expect(typeof timeoutCallback).toBe('function');
 

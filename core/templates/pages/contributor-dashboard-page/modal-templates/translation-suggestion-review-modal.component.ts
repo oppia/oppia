@@ -445,12 +445,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   resolveSuggestionAndUpdateModal(): void {
-    this.resolvedSuggestionIds.push(this.queuedSuggestion.suggestion_id);
+    this.resolvedSuggestionIds.push(this.queuedSuggestion?.suggestion_id);
 
     // Resolved contributions don't need to be displayed in the modal.
     this.removedSuggestion =
-      this.allContributions[this.queuedSuggestion.suggestion_id];
-    delete this.allContributions[this.queuedSuggestion.suggestion_id];
+      this.allContributions[this.queuedSuggestion?.suggestion_id];
+    delete this.allContributions[this.queuedSuggestion?.suggestion_id];
 
     // If the reviewed item was the last item, close the modal.
     if (this.lastSuggestionToReview || this.isLastItem) {
@@ -513,14 +513,14 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   revertSuggestionResolution(): void {
     // Remove the suggestion ID from resolvedSuggestionIds.
     const index = this.resolvedSuggestionIds.indexOf(
-      this.queuedSuggestion.suggestion_id
+      this.queuedSuggestion?.suggestion_id
     );
     if (index > -1) {
       this.resolvedSuggestionIds.splice(index, 1);
     }
 
     // Add the removed suggestion back to allContributions.
-    this.allContributions[this.queuedSuggestion.suggestion_id] =
+    this.allContributions[this.queuedSuggestion?.suggestion_id] =
       this.removedSuggestion;
   }
 
@@ -542,7 +542,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.queuedSuggestion.suggestion_id,
       this.queuedSuggestion.action_status,
       this.queuedSuggestion.reviewer_message,
-      this.queuedSuggestion.action_status === 'accept'
+      this.queuedSuggestion?.action_status === 'accept'
         ? this.queuedSuggestion.commit_message
         : null,
       // Only include commit_message for accepted suggestions.
@@ -566,7 +566,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   clearQueuedSuggestion(): void {
-    this.queuedSuggestion = null;
+    this.queuedSuggestion = undefined;
     this.hasQueuedSuggestion = false;
   }
 
@@ -578,8 +578,10 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       );
       if (indexToRemove !== -1) {
         this.resolvedSuggestionIds.splice(indexToRemove, 1);
-        this.allContributions[this.queuedSuggestion.suggestion_id] =
-          this.removedSuggestion;
+        if (this.removedSuggestion) {
+          this.allContributions[this.queuedSuggestion?.suggestion_id] =
+            this.removedSuggestion;
+        }
       }
     }
     this.clearQueuedSuggestion();
