@@ -16,12 +16,12 @@
  * @fileoverview Service that handles routing for the collection editor page.
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {Injectable, EventEmitter} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CollectionEditorRoutingService {
   // These properties are initialized using private functions
@@ -34,9 +34,7 @@ export class CollectionEditorRoutingService {
   private _STATS_TAB = 'stats';
   private _updateViewEventEmitter: EventEmitter<void> = new EventEmitter();
 
-  constructor(
-    private windowRef: WindowRef
-  ) {
+  constructor(private windowRef: WindowRef) {
     let currentHash: string = this.windowRef.nativeWindow.location.hash;
     this._changeTab(currentHash.substring(1, currentHash.length));
   }
@@ -81,5 +79,9 @@ export class CollectionEditorRoutingService {
   }
 }
 
-angular.module('oppia').factory('CollectionEditorRoutingService',
-  downgradeInjectable(CollectionEditorRoutingService));
+angular
+  .module('oppia')
+  .factory(
+    'CollectionEditorRoutingService',
+    downgradeInjectable(CollectionEditorRoutingService)
+  );

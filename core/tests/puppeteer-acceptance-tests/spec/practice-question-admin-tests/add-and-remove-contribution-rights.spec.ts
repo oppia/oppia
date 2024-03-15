@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,26 +17,32 @@
  * reviewing question rights to users.
  */
 
-const userFactory = require(
-  '../../puppeteer-testing-utilities/user-factory.js');
-const testConstants = require(
-  '../../puppeteer-testing-utilities/test-constants.js');
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {QuestionAdmin} from '../../user-utilities/question-admin-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
 
-describe('Question Admin', function() {
-  let questionAdmin = null;
+describe('Question Admin', function () {
+  let questionAdmin: QuestionAdmin;
 
-  beforeAll(async function() {
-    questionAdmin =
-      await userFactory.createNewQuestionAdmin('questionAdm');
+  beforeAll(async function () {
+    questionAdmin = await UserFactory.createNewUser(
+      'questionAdm',
+      'question_admin@example.com',
+      [ROLES.QUESTION_ADMIN]
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to provide rights to review and submit questions to user.',
-    async function() {
-      let Tester = await userFactory.createNewGuestUser(
-        'Tester', 'admin.tester@example.com');
-      await userFactory.closeBrowserForUser(Tester);
+  it(
+    'should be able to provide rights to review and submit questions to user.',
+    async function () {
+      let Tester = await UserFactory.createNewUser(
+        'Tester',
+        'admin.tester@example.com'
+      );
+      await UserFactory.closeBrowserForUser(Tester);
 
       await questionAdmin.navigateToContributorDashboardAdminPage();
       await questionAdmin.verifyUserCannotReviewQuestions('Tester');
@@ -59,9 +65,11 @@ describe('Question Admin', function() {
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
-    await userFactory.closeAllBrowsers();
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

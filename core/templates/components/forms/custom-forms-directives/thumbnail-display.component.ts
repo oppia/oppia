@@ -16,16 +16,16 @@
  * @fileoverview Component for thumbnail display.
  */
 
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { SafeResourceUrl } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {SafeResourceUrl} from '@angular/platform-browser';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 @Component({
   selector: 'oppia-thumbnail-display',
   templateUrl: './thumbnail-display.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
@@ -55,7 +55,8 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
     // If the SVG image is passed as base64 data.
     if (this.imgSrc.indexOf('data:image/svg+xml;base64') === 0) {
       const safeResourceUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-        this.imgSrc);
+        this.imgSrc
+      );
       if (safeResourceUrl !== null) {
         this.imageSourceInView = safeResourceUrl;
       }
@@ -75,6 +76,9 @@ export class ThumbnailDisplayComponent implements OnInit, OnChanges {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaThumbnailDisplay', downgradeComponent(
-    {component: ThumbnailDisplayComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaThumbnailDisplay',
+    downgradeComponent({component: ThumbnailDisplayComponent})
+  );

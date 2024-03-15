@@ -16,85 +16,231 @@
  * @fileoverview Service for Computing length of HTML strings.
  */
 
-import { Injectable, SecurityContext } from '@angular/core';
-import { LoggerService } from './contextual/logger.service';
-import { DomSanitizer } from '@angular/platform-browser';
+export const CALCULATION_TYPE_WORD = 'word';
+export const CALCULATION_TYPE_CHARACTER = 'character';
+
+// eslint-disable-next-line max-len
+const CUSTOM_TAG_REGEX =
+  /<oppia-noninteractive-(?:math|image|link|collapsible|video|skillreview|tabs)[^>]*>/g;
+
+type CalculationType =
+  | typeof CALCULATION_TYPE_WORD
+  | typeof CALCULATION_TYPE_CHARACTER;
+
+import {Injectable, SecurityContext} from '@angular/core';
+import {LoggerService} from './contextual/logger.service';
+import {DomSanitizer} from '@angular/platform-browser';
+import {HtmlEscaperService} from './html-escaper.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class HtmlLengthService {
   constructor(
     private loggerService: LoggerService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   /**
-    * ['oppia-noninteractive-image', 'oppia-noninteractive-math']
-    * The above tags constitutes for non text nodes.
-    */
-  nonTextTags = ['oppia-noninteractive-math', 'oppia-noninteractive-image'];
+   * The below tags constitutes for non text nodes.
+   */
+  nonTextTags = [
+    'oppia-noninteractive-math',
+    'oppia-noninteractive-image',
+    'oppia-noninteractive-link',
+    'oppia-noninteractive-collapsible',
+    'oppia-noninteractive-video',
+    'oppia-noninteractive-tabs',
+    'oppia-noninteractive-skillreview',
+  ];
 
   /**
-    * ['li','blockquote','em','strong', 'p', 'a']
-    * The above tags serve as the tags for text content. Blockquote,
-    * em, a, strong occur as descendants of p tag. li tags are
-    * descendants of ol/ul tags.
-    */
-  textTags = ['p', 'ul', 'ol'];
-
-  computeHtmlLengthInWords(htmlString: string): number {
-    if (!htmlString) {
-      this.loggerService.error('Empty string was passed to compute length');
-      return 0;
-    }
+   * This function calculates the length of a given HTML
+   * string. The length can be calculated in two ways,
+   * depending on the 'calculationType' parameter:
+   * 1. If 'calculationType' is 'word', the function will
+   *    count the number of words in the HTML string. A
+   *    word is typically defined as a sequence of
+   *    characters separated by spaces.
+   * 2. If 'calculationType' is 'character', the function
+   *    will count the number of characters in the HTML
+   *    string. This includes all visible characters,
+   *    punctuation, and whitespace.
+   * @param {string} htmlString - The HTML string for
+   *    which the length is to be calculated.
+   * @param {CalculationType} calculationType - The type
+   *    of calculation to be performed. It can be either
+   *    'word' or 'character'.
+   * @returns {number} The calculated length of the HTML
+   *    string according to the specified 'calculationType'.
+   */
+  computeHtmlLength(
+    htmlString: string,
+    calculationType: CalculationType
+  ): number {
     const sanitizedHtml = this.sanitizer.sanitize(
-      SecurityContext.HTML, htmlString) as string;
-    let totalWeight = this.calculateBaselineLength(sanitizedHtml);
+      SecurityContext.HTML,
+      htmlString
+    ) as string;
 
     // Identify custom tags using regex on the original HTML string.
-    const customTagRegex = /<oppia-noninteractive-(?:math|image)[^>]*>/g;
-    const customTags = htmlString.match(customTagRegex);
+    const customTags = htmlString.match(CUSTOM_TAG_REGEX);
+
+    let totalLength = this.calculateBaselineLength(
+      sanitizedHtml,
+      calculationType
+    );
 
     if (customTags) {
       for (const customTag of customTags) {
-        totalWeight += this.getWeightForNonTextNodes(customTag);
+        totalLength += this.getLengthForNonTextNodes(
+          customTag,
+          calculationType
+        );
       }
     }
-    return totalWeight;
+    return totalLength;
   }
 
-  private calculateBaselineLength(sanitizedHtml: string): number {
+  /**
+   * This function calculates the baseline length of a
+   * sanitized HTML string. The length can be calculated
+   * in two ways, depending on the 'calculationType'
+   * parameter:
+   * 1. If 'calculationType' is 'word'
+   * 2. If 'calculationType' is 'character'
+   *
+   * @param {string} sanitizedHtml - The sanitized HTML
+   *    string for which the length is to be calculated.
+   *    It can also process normal strings.
+   * @param {CalculationType} calculationType - The type
+   *    of calculation to be performed. It can be either
+   *    'word' or 'character'.
+   * @returns {number} The calculated length of the HTML
+   *    string according to the specified 'calculationType'.
+   */
+
+  calculateBaselineLength(
+    sanitizedHtml: string,
+    calculationType: CalculationType
+  ): number {
     let domparser = new DOMParser();
-    let dom = domparser.parseFromString(sanitizedHtml, 'text/html');
-    let totalWeight = 0;
-    for (let tag of Array.from(dom.body.children)) {
-      const ltag = tag.tagName.toLowerCase();
-      if (this.textTags.includes(ltag)) {
-        totalWeight += this.getWeightForTextNodes(tag as HTMLElement);
+    let dom: Document;
+    dom = domparser.parseFromString(sanitizedHtml, 'text/html');
+
+    let totalLength = 0;
+
+    Array.from(dom.body.childNodes).forEach(node => {
+      if (node.nodeType === Node.TEXT_NODE && node.nodeValue !== null) {
+        totalLength += this.calculateTextLength(
+          node.nodeValue,
+          calculationType
+        );
       }
+    });
+
+    for (let tag of Array.from(dom.body.children)) {
+      /**
+       * Guarding against tag.textContent === null, which can
+       * arise in special cases as explained in the following reference:
+       * (https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent)
+       */
+      const textContent = tag.textContent || '';
+      totalLength += this.calculateTextLength(textContent, calculationType);
     }
-    return totalWeight;
+    return totalLength;
   }
 
-  private getWeightForTextNodes(textNode: HTMLElement): number {
-    const textContent = textNode.textContent || '';
-    const words = textContent.trim().split(' ');
-    const wordCount = words.length;
+  /**
+   * This function calculates the length of a given text content
+   * based on the specified calculation type.
+   *
+   * @param {string} textContent - The text content for which the
+   *    length is to be calculated. This is typically a string of
+   *    text that may include words, spaces, punctuation, and other
+   *    characters.
+   * @param {CalculationType} calculationType - The method used to
+   *    calculate the length. It can be either 'word' or 'character'.
+   *    If 'word', the function counts the number of words in the
+   *    text content. If 'character', it counts the number of
+   *    characters.
+   * @returns {number} The length of the text content. This is
+   *    calculated as the number of words or characters in the text
+   *    content, depending on the calculation type.
+   */
 
-    return wordCount;
+  private calculateTextLength(
+    textContent: string,
+    calculationType: CalculationType
+  ): number {
+    let trimmedTextContent = textContent.trim();
+    let totalLength = 0;
+    if (calculationType === CALCULATION_TYPE_WORD && trimmedTextContent) {
+      const words = trimmedTextContent.split(' ');
+      totalLength = words.length;
+    } else {
+      totalLength = trimmedTextContent.length;
+    }
+    return totalLength;
   }
 
-  private getWeightForNonTextNodes(nonTextNode: string): number {
-    if (nonTextNode.includes('oppia-noninteractive-math')) {
-      return 1;
+  /**
+   * This function calculates the length of a given non-text
+   * node based on the specified calculation type.
+   *
+   * @param {string} nonTextNode - The non-text node for which
+   *    the length is to be calculated. This is typically an HTML
+   *    string that represents a non-text element in the DOM,
+   *    such as an image or a video element.
+   * @param {CalculationType} calculationType - The method used
+   *    to calculate the length. It can be either 'word' or
+   *    'character'. If 'word', the function counts the number
+   *    of words in the non-text node. If 'character', it counts
+   *    the number of characters.
+   * @returns {number} The length of the non-text node. This is
+   *    calculated as the number of words or characters in the
+   *    non-text node, depending on the calculation type.
+   */
+
+  // TODO(#19729): Create RTE-component-specific logic
+  // for calculating the lengths of RTE-components.
+  getLengthForNonTextNodes(
+    nonTextNode: string,
+    calculationType: CalculationType
+  ): number {
+    let domparser = new DOMParser();
+    let dom: Document;
+    dom = domparser.parseFromString(nonTextNode, 'text/html');
+    let domTag = dom.body.children[0];
+    let domId = domTag.tagName.toLowerCase();
+    switch (domId) {
+      case 'oppia-noninteractive-math':
+        return 1;
+      case 'oppia-noninteractive-collapsible':
+      case 'oppia-noninteractive-tabs':
+        return 1000;
+      case 'oppia-noninteractive-video':
+        return 0;
+      case 'oppia-noninteractive-link':
+      case 'oppia-noninteractive-skillreview': {
+        const textValueAttr = domTag.getAttribute('text-with-value') || '';
+        const textValue = this.htmlEscaperService.escapedJsonToObj(
+          textValueAttr
+        ) as string;
+        const length = this.calculateTextLength(textValue, calculationType);
+        return length;
+      }
+      case 'oppia-noninteractive-image': {
+        const altTextAttr = domTag.getAttribute('alt-with-value') || '';
+        const altTextValue = this.htmlEscaperService.escapedJsonToObj(
+          altTextAttr
+        ) as string;
+        const length = this.calculateTextLength(altTextValue, calculationType);
+        return length + 10;
+      }
+      default:
+        throw new Error(`Invalid non-text node: ${domId}`);
     }
-    const altTextMatch = nonTextNode.match(/alt-with-value=["']([^"']*)["']/);
-    let words = [];
-    if (altTextMatch && altTextMatch[1]) {
-      const altText = altTextMatch[1];
-      words = altText.trim().split(' ');
-    }
-    return words.length + 2; // +2 as a bonus for images with text.
   }
 }

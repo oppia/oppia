@@ -18,16 +18,21 @@
 
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'drag-and-drop-sort-input-rules.service.ts');
+    'drag-and-drop-sort-input-rules.service.ts'
+);
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'drag-and-drop-sort-input-validation.service.ts');
+    'drag-and-drop-sort-input-validation.service.ts'
+);
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'oppia-interactive-drag-and-drop-sort-input.component.ts');
+    'oppia-interactive-drag-and-drop-sort-input.component.ts'
+);
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'oppia-response-drag-and-drop-sort-input.component.ts');
+    'oppia-response-drag-and-drop-sort-input.component.ts'
+);
 require(
   'interactions/DragAndDropSortInput/directives/' +
-  'oppia-short-response-drag-and-drop-sort-input.component.ts');
+    'oppia-short-response-drag-and-drop-sort-input.component.ts'
+);

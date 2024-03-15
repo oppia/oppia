@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for the state content editor directive.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {fakeAsync, tick} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { StateContentEditorComponent } from './state-content-editor.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {StateContentEditorComponent} from './state-content-editor.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
-import { ChangeListService } from 'pages/exploration-editor-page/services/change-list.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateContentService } from 'components/state-editor/state-editor-properties-services/state-content.service';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {StateContentService} from 'components/state-editor/state-editor-properties-services/state-content.service';
 
 describe('StateHintsEditorComponent', () => {
   let component: StateContentEditorComponent;
@@ -36,28 +36,19 @@ describe('StateHintsEditorComponent', () => {
   let externalSaveService: ExternalSaveService;
   let stateContentService: StateContentService;
 
-  let _getContent = function(contentId: string, contentString: string) {
+  let _getContent = function (contentId: string, contentString: string) {
     return SubtitledHtml.createFromBackendDict({
       content_id: contentId,
-      html: contentString
+      html: contentString,
     });
   };
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        StateContentEditorComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        ChangeListService,
-        ExternalSaveService,
-        StateContentService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [HttpClientTestingModule],
+      declarations: [StateContentEditorComponent, MockTranslatePipe],
+      providers: [ChangeListService, ExternalSaveService, StateContentService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -72,7 +63,7 @@ describe('StateHintsEditorComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should start with the content editor not being open', function() {
+  it('should start with the content editor not being open', function () {
     component.ngOnInit();
 
     expect(component.contentEditorIsOpen).toBeFalse();
@@ -80,10 +71,10 @@ describe('StateHintsEditorComponent', () => {
 
   it('should save hint when external save event is triggered', fakeAsync(() => {
     let onExternalSaveEmitter = new EventEmitter();
-    spyOnProperty(externalSaveService, 'onExternalSave')
-      .and.returnValue(onExternalSaveEmitter);
-    spyOn(component.saveStateContent, 'emit')
-      .and.callThrough();
+    spyOnProperty(externalSaveService, 'onExternalSave').and.returnValue(
+      onExternalSaveEmitter
+    );
+    spyOn(component.saveStateContent, 'emit').and.callThrough();
 
     component.ngOnInit();
     component.contentEditorIsOpen = true;
@@ -91,44 +82,42 @@ describe('StateHintsEditorComponent', () => {
     onExternalSaveEmitter.emit();
     tick();
 
-    expect(component.saveStateContent.emit)
-      .toHaveBeenCalled();
+    expect(component.saveStateContent.emit).toHaveBeenCalled();
   }));
 
-  it('should hide card height limit warning', function() {
+  it('should hide card height limit warning', function () {
     component.cardHeightLimitWarningIsShown = true;
     component.hideCardHeightLimitWarning();
 
     expect(component.cardHeightLimitWarningIsShown).toBeFalse();
   });
 
-  it('should show card height limit warning', function() {
-    stateContentService.displayed = (
-      _getContent('content', ''));
+  it('should show card height limit warning', function () {
+    stateContentService.displayed = _getContent('content', '');
 
     expect(component.isCardContentLengthLimitReached()).toBeFalse();
   });
 
-  it('should correctly handle no-op edits', function() {
+  it('should correctly handle no-op edits', function () {
     component.ngOnInit();
 
     expect(component.contentEditorIsOpen).toBeFalse();
-    expect(stateContentService.savedMemento).toEqual(_getContent(
-      'content', ''));
+    expect(stateContentService.savedMemento).toEqual(
+      _getContent('content', '')
+    );
 
     component.openStateContentEditor();
 
     expect(component.contentEditorIsOpen).toBeTrue();
 
-    stateContentService.displayed = (
-      _getContent('content', ''));
+    stateContentService.displayed = _getContent('content', '');
     component.onSaveContentButtonClicked();
 
     expect(component.contentEditorIsOpen).toBeFalse();
     expect(changeListService.getChangeList()).toEqual([]);
   });
 
-  it('should check that content edits are saved correctly', function() {
+  it('should check that content edits are saved correctly', function () {
     spyOn(component.saveStateContent, 'emit');
 
     component.ngOnInit();
@@ -139,18 +128,19 @@ describe('StateHintsEditorComponent', () => {
     stateContentService.displayed = _getContent('content', 'babababa');
     component.onSaveContentButtonClicked();
 
-    expect(component.saveStateContent.emit)
-      .toHaveBeenCalled();
+    expect(component.saveStateContent.emit).toHaveBeenCalled();
 
     component.openStateContentEditor();
     stateContentService.displayed = _getContent(
-      'content', 'And now for something completely different.');
+      'content',
+      'And now for something completely different.'
+    );
     component.onSaveContentButtonClicked();
 
     expect(component.saveStateContent.emit).toHaveBeenCalled();
   });
 
-  it('should not save changes to content when edit is cancelled', function() {
+  it('should not save changes to content when edit is cancelled', function () {
     component.ngOnInit();
     var contentBeforeEdit = angular.copy(stateContentService.savedMemento);
 
@@ -163,19 +153,19 @@ describe('StateHintsEditorComponent', () => {
     expect(stateContentService.displayed).toEqual(contentBeforeEdit);
   });
 
-  it('should call the callback function on-save', function() {
+  it('should call the callback function on-save', function () {
     spyOn(component.saveStateContent, 'emit');
 
     component.onSaveContentButtonClicked();
 
-    expect(component.saveStateContent.emit)
-      .toHaveBeenCalled();
+    expect(component.saveStateContent.emit).toHaveBeenCalled();
   });
 
   it('should update when card height limit is reached', () => {
     component.cardHeightLimitReached = false;
     spyOn(component, 'isCardHeightLimitReached').and.returnValue(
-      !component.cardHeightLimitReached);
+      !component.cardHeightLimitReached
+    );
 
     component.ngAfterViewChecked();
 

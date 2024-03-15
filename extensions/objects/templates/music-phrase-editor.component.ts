@@ -17,15 +17,10 @@
  */
 
 // This component is always editable.
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AlertsService } from 'services/alerts.service';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AlertsService} from 'services/alerts.service';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 interface MusicPhraseSchema {
   type: string;
@@ -33,14 +28,14 @@ interface MusicPhraseSchema {
     type: string;
     choices: string[];
   };
-  'ui_config': { 'add_element_text': string };
-  validators: { id: string; 'max_value': number }[];
+  ui_config: {add_element_text: string};
+  validators: {id: string; max_value: number}[];
 }
 
 @Component({
   selector: 'music-phrase-editor',
   templateUrl: './music-phrase-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class MusicPhraseEditorComponent implements OnInit {
   @Input() modalId!: symbol;
@@ -68,29 +63,41 @@ export class MusicPhraseEditorComponent implements OnInit {
     items: {
       type: 'unicode',
       choices: [
-        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
-        'F5', 'G5', 'A5'
-      ]
+        'C4',
+        'D4',
+        'E4',
+        'F4',
+        'G4',
+        'A4',
+        'B4',
+        'C5',
+        'D5',
+        'E5',
+        'F5',
+        'G5',
+        'A5',
+      ],
     },
     ui_config: {
-      add_element_text: 'Add Note ♩'
+      add_element_text: 'Add Note ♩',
     },
-    validators: [{
-      id: 'has_length_at_most',
-      max_value: this._MAX_NOTES_IN_PHRASE
-    }]
+    validators: [
+      {
+        id: 'has_length_at_most',
+        max_value: this._MAX_NOTES_IN_PHRASE,
+      },
+    ],
   };
 
   constructor(private alertsService: AlertsService) {
     this._createProxy();
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   private _createProxy(): void {
     this._proxy = new Proxy(this._localValue, {
-      deleteProperty: function(target, property) {
+      deleteProperty: function (target, property) {
         return true;
       },
       set: (target, property, value, receiver) => {
@@ -102,15 +109,14 @@ export class MusicPhraseEditorComponent implements OnInit {
         target[property] = value;
         this._updateValue(this._localValue);
         return true;
-      }
+      },
     });
   }
 
   private _updateValue(newValue: string[]): void {
     if (newValue && this.value) {
       if (newValue.length > this._MAX_NOTES_IN_PHRASE) {
-        this.alertsService.addWarning(
-          'There are too many notes on the staff.');
+        this.alertsService.addWarning('There are too many notes on the staff.');
       } else {
         const parentValues = [];
         for (let i = 0; i < newValue.length; i++) {
@@ -118,8 +124,8 @@ export class MusicPhraseEditorComponent implements OnInit {
             readableNoteName: newValue[i],
             noteDuration: {
               num: 1,
-              den: 1
-            }
+              den: 1,
+            },
           });
         }
         this.value = parentValues;
@@ -144,6 +150,9 @@ export class MusicPhraseEditorComponent implements OnInit {
     return this.schema;
   }
 }
-angular.module('oppia').directive('musicPhraseEditor', downgradeComponent({
-  component: MusicPhraseEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'musicPhraseEditor',
+  downgradeComponent({
+    component: MusicPhraseEditorComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,20 +16,23 @@
  * @fileoverview Unit tests for add or update solution modal component.
  */
 
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import { Solution, SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { ContextService } from 'services/context.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { AddOrUpdateSolutionModalComponent } from './add-or-update-solution-modal.component';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { InteractionRulesService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
+import {
+  Solution,
+  SolutionObjectFactory,
+} from 'domain/exploration/SolutionObjectFactory';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {ContextService} from 'services/context.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {AddOrUpdateSolutionModalComponent} from './add-or-update-solution-modal.component';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {InteractionRulesService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 class MockActiveModal {
   close(): void {
@@ -58,9 +61,7 @@ describe('Add Or Update Solution Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AddOrUpdateSolutionModalComponent
-      ],
+      declarations: [AddOrUpdateSolutionModalComponent],
       providers: [
         ContextService,
         CurrentInteractionService,
@@ -68,13 +69,13 @@ describe('Add Or Update Solution Modal Component', () => {
         ExplorationHtmlFormatterService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         StateCustomizationArgsService,
         StateInteractionIdService,
-        StateSolutionService
+        StateSolutionService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -83,12 +84,16 @@ describe('Add Or Update Solution Modal Component', () => {
     component = fixture.componentInstance;
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     explorationHtmlFormatterService = TestBed.inject(
-      ExplorationHtmlFormatterService);
+      ExplorationHtmlFormatterService
+    );
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => {});
+    generateContentIdService.init(
+      () => 0,
+      () => {}
+    );
   });
 
   describe('when solution is valid', () => {
@@ -97,12 +102,17 @@ describe('Add Or Update Solution Modal Component', () => {
       contextService = TestBed.inject(ContextService);
 
       spyOn(contextService, 'getEntityType').and.returnValue('question');
-      spyOn(explorationHtmlFormatterService, 'getInteractionHtml')
-        .and.returnValue('<p>Interaction Html</p>');
+      spyOn(
+        explorationHtmlFormatterService,
+        'getInteractionHtml'
+      ).and.returnValue('<p>Interaction Html</p>');
 
       answerEditorHtml = new Solution(
-        explorationHtmlFormatterService, true, 'solution',
-        SubtitledHtml.createDefault('Explanation html', 'cont_1'));
+        explorationHtmlFormatterService,
+        true,
+        'solution',
+        SubtitledHtml.createDefault('Explanation html', 'cont_1')
+      );
 
       stateSolutionService.init('', answerEditorHtml);
       stateInteractionIdService.init('', 'TextInput');
@@ -114,12 +124,13 @@ describe('Add Or Update Solution Modal Component', () => {
       stateSolutionService.init('', answerEditorHtml);
 
       expect(component.correctAnswerEditorHtml).toEqual(
-        '<p>Interaction Html</p>');
+        '<p>Interaction Html</p>'
+      );
       expect(component.data).toEqual({
         answerIsExclusive: true,
         correctAnswer: undefined,
         explanationHtml: 'Explanation html',
-        explanationContentId: 'cont_1'
+        explanationContentId: 'cont_1',
       });
       expect(component.answerIsValid).toBeFalse();
       expect(component.ansOptions).toEqual(['The only', 'One']);
@@ -140,12 +151,11 @@ describe('Add Or Update Solution Modal Component', () => {
       expect(component.data.answerIsExclusive).toBeFalse();
     });
 
-    it('should update correct answer when submitting current interaction',
-      () => {
-        currentInteractionService.onSubmit('answer', mockInteractionRule);
+    it('should update correct answer when submitting current interaction', () => {
+      currentInteractionService.onSubmit('answer', mockInteractionRule);
 
-        expect(component.data.correctAnswer).toEqual('answer');
-      });
+      expect(component.data.correctAnswer).toEqual('answer');
+    });
 
     it('should submit answer when clicking on submit button', () => {
       spyOn(currentInteractionService, 'submitAnswer');
@@ -168,8 +178,10 @@ describe('Add Or Update Solution Modal Component', () => {
     });
 
     it('should tell if submit button is disabled', () => {
-      spyOn(currentInteractionService, 'isSubmitButtonDisabled')
-        .and.returnValue(true);
+      spyOn(
+        currentInteractionService,
+        'isSubmitButtonDisabled'
+      ).and.returnValue(true);
 
       expect(component.isSubmitButtonDisabled()).toBeTrue();
     });
@@ -183,15 +195,20 @@ describe('Add Or Update Solution Modal Component', () => {
 
       expect(ngbActiveModal.close).toHaveBeenCalledWith({
         solution: solutionObjectFactory.createNew(
-          true, 'answer', 'Explanation html', 'cont_1')
+          true,
+          'answer',
+          'Explanation html',
+          'cont_1'
+        ),
       });
     });
 
     it('should not show solution explanation length validation error', () => {
-      let solutionExplanation = 'Explanation html';
+      let solutionExplanation = '<p>Explanation html</p>';
 
-      expect(component.isSolutionExplanationLengthExceeded(
-        solutionExplanation)).toBeFalse();
+      expect(
+        component.isSolutionExplanationLengthExceeded(solutionExplanation)
+      ).toBeFalse();
     });
   });
 
@@ -201,8 +218,10 @@ describe('Add Or Update Solution Modal Component', () => {
       contextService = TestBed.inject(ContextService);
 
       spyOn(contextService, 'getEntityType').and.returnValue('question');
-      spyOn(explorationHtmlFormatterService, 'getInteractionHtml').and
-        .returnValue('answerEditorHtml');
+      spyOn(
+        explorationHtmlFormatterService,
+        'getInteractionHtml'
+      ).and.returnValue('answerEditorHtml');
 
       stateInteractionIdService.init('', 'TextInput');
       fixture.detectChanges();
@@ -215,10 +234,11 @@ describe('Add Or Update Solution Modal Component', () => {
     });
 
     it('should show solution explanation length validation error', () => {
-      let solutionExplanation = 'Solution explanation'.repeat(180);
+      let solutionExplanation = '<p>Solution explanation</p>'.repeat(180);
 
-      expect(component.isSolutionExplanationLengthExceeded(
-        solutionExplanation)).toBeTrue();
+      expect(
+        component.isSolutionExplanationLengthExceeded(solutionExplanation)
+      ).toBeTrue();
     });
   });
 });

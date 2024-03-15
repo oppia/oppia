@@ -22,17 +22,15 @@
  * before working further and avoid unnecessary data loss.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { LocalStorageService } from './local-storage.service';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {LocalStorageService} from './local-storage.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StalenessDetectionService {
-  constructor(
-    private localStorageService: LocalStorageService
-  ) {}
+  constructor(private localStorageService: LocalStorageService) {}
 
   /**
    * Checks if an entity editor tab with a particular url is stale.
@@ -44,12 +42,15 @@ export class StalenessDetectionService {
    * @returns {boolean} Whether the particular tab is stale.
    */
   isEntityEditorTabStale(
-      entityEditorBrowserTabsInfoConstant: string,
-      entityId: string, currentVersion: number
+    entityEditorBrowserTabsInfoConstant: string,
+    entityId: string,
+    currentVersion: number
   ): boolean {
-    const entityEditorBrowserTabsInfo = (
+    const entityEditorBrowserTabsInfo =
       this.localStorageService.getEntityEditorBrowserTabsInfo(
-        entityEditorBrowserTabsInfoConstant, entityId));
+        entityEditorBrowserTabsInfoConstant,
+        entityId
+      );
 
     if (entityEditorBrowserTabsInfo) {
       return entityEditorBrowserTabsInfo.getLatestVersion() !== currentVersion;
@@ -67,12 +68,14 @@ export class StalenessDetectionService {
    * has some unsaved changes on them.
    */
   doesSomeOtherEntityEditorPageHaveUnsavedChanges(
-      entityEditorBrowserTabsInfoConstant: string,
-      entityId: string
+    entityEditorBrowserTabsInfoConstant: string,
+    entityId: string
   ): boolean {
-    const entityEditorBrowserTabsInfo = (
+    const entityEditorBrowserTabsInfo =
       this.localStorageService.getEntityEditorBrowserTabsInfo(
-        entityEditorBrowserTabsInfoConstant, entityId));
+        entityEditorBrowserTabsInfoConstant,
+        entityId
+      );
 
     if (entityEditorBrowserTabsInfo) {
       return entityEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges();
@@ -81,6 +84,9 @@ export class StalenessDetectionService {
   }
 }
 
-angular.module('oppia').factory(
-  'StalenessDetectionService',
-  downgradeInjectable(StalenessDetectionService));
+angular
+  .module('oppia')
+  .factory(
+    'StalenessDetectionService',
+    downgradeInjectable(StalenessDetectionService)
+  );

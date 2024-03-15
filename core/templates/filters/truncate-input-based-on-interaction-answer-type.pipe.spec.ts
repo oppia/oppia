@@ -17,16 +17,17 @@
  *  Pipe for Oppia.
  */
 
-import { TruncateInputBasedOnInteractionAnswerTypePipe } from './truncate-input-based-on-interaction-answer-type.pipe';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {TruncateInputBasedOnInteractionAnswerTypePipe} from './truncate-input-based-on-interaction-answer-type.pipe';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 
 describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   let pipe: TruncateInputBasedOnInteractionAnswerTypePipe;
 
   beforeEach(() => {
     pipe = new TruncateInputBasedOnInteractionAnswerTypePipe(
-      new TruncatePipe(new ConvertToPlainTextPipe()));
+      new TruncatePipe(new ConvertToPlainTextPipe())
+    );
   });
 
   it('should correctly truncate input data', () => {
@@ -37,10 +38,10 @@ describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
       error: 'error',
     };
 
-    expect(pipe.transform('Hey oppia  users!', 'TextInput', 8))
-      .toBe('Hey o...');
-    expect(pipe.transform(data, 'CodeRepl', 8))
-      .toBe('Hey o...');
+    expect(pipe.transform('Hey oppia  users!', 'TextInput', 8)).toBe(
+      'Hey o...'
+    );
+    expect(pipe.transform(data, 'CodeRepl', 8)).toBe('Hey o...');
     expect(() => {
       pipe.transform(data, 'ImageClickInput', 8);
     }).toThrowError('Unknown interaction answer type');

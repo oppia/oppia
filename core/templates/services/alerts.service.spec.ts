@@ -15,16 +15,16 @@
 /**
  * @fileoverview Unit tests for the Alerts Service.
  */
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AlertsService } from 'services/alerts.service';
+import {AlertsService} from 'services/alerts.service';
 
-describe('Alerts Service', function() {
+describe('Alerts Service', function () {
   let alertsService: AlertsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [AlertsService]
+      providers: [AlertsService],
     });
     alertsService = TestBed.inject(AlertsService);
   });
@@ -55,7 +55,7 @@ describe('Alerts Service', function() {
       expect(alertsService.warnings.length).toBe(3);
       alertsService.deleteWarning({
         type: 'warning',
-        content: warning
+        content: warning,
       });
       expect(alertsService.warnings.length).toBe(2);
 
@@ -83,7 +83,7 @@ describe('Alerts Service', function() {
       expect(alertsService.warnings.length).toBe(4);
       alertsService.deleteWarning({
         type: 'warning',
-        content: warning
+        content: warning,
       });
       expect(alertsService.warnings.length).toBe(2);
 
@@ -148,15 +148,17 @@ describe('Alerts Service', function() {
       alertsService.deleteMessage({
         type: 'info',
         content: message,
-        timeout: 1
+        timeout: 1,
       });
       expect(alertsService.messages.length).toBe(2);
 
       // Search for the message.
       let found = false;
       for (let i = 0; i < alertsService.messages.length; i++) {
-        if (alertsService.messages[i].content === message &&
-            alertsService.messages[i].type === 'info') {
+        if (
+          alertsService.messages[i].content === message &&
+          alertsService.messages[i].type === 'info'
+        ) {
           found = true;
         }
       }
@@ -178,15 +180,17 @@ describe('Alerts Service', function() {
       alertsService.deleteMessage({
         type: 'info',
         content: message,
-        timeout: 1
+        timeout: 1,
       });
       expect(alertsService.messages.length).toBe(2);
 
       // Search for the message.
       let found = false;
       for (let i = 0; i < alertsService.messages.length; i++) {
-        if (alertsService.messages[i].content === message &&
-            alertsService.messages[i].type === 'info') {
+        if (
+          alertsService.messages[i].content === message &&
+          alertsService.messages[i].type === 'info'
+        ) {
           found = true;
         }
       }

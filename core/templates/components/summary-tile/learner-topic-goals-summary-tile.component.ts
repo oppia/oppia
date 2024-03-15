@@ -16,20 +16,20 @@
  * @fileoverview Component for a learner topic goals summary tile.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { UrlService } from 'services/contextual/url.service';
-import { StoryNode } from 'domain/story/story-node.model';
-import { StorySummary } from 'domain/story/story-summary.model';
+import {Component, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {UrlService} from 'services/contextual/url.service';
+import {StoryNode} from 'domain/story/story-node.model';
+import {StorySummary} from 'domain/story/story-summary.model';
 
 @Component({
   selector: 'oppia-learner-topic-goals-summary-tile',
-  templateUrl: './learner-topic-goals-summary-tile.component.html'
+  templateUrl: './learner-topic-goals-summary-tile.component.html',
 })
 export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -56,22 +56,20 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService,
+    private urlService: UrlService
   ) {}
 
   getAllIncompleteStoryNodes(): StoryNode[] {
-    let allStorySummaries: StorySummary[] = (
-      this.topicSummary.getCanonicalStorySummaryDicts()
-    );
+    let allStorySummaries: StorySummary[] =
+      this.topicSummary.getCanonicalStorySummaryDicts();
     let allIncompleteStoryNodes: StoryNode[] = [];
     allStorySummaries.map(storySummary => {
       if (allIncompleteStoryNodes.length === 0) {
         let allNodes = storySummary.getAllNodes();
-        let completedStoryNodes: string[] = (
-          storySummary.getCompletedNodeTitles()
-        );
+        let completedStoryNodes: string[] =
+          storySummary.getCompletedNodeTitles();
         allIncompleteStoryNodes = allNodes.filter(node => {
-          return (!completedStoryNodes.includes(node.getTitle()));
+          return !completedStoryNodes.includes(node.getTitle());
         });
         this.storySummaryToDisplay = storySummary;
       }
@@ -80,25 +78,41 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   }
 
   getStoryNodeLink(): string {
-    const classroomUrlFragment = (
-      this.storySummaryToDisplay.getClassroomUrlFragment());
+    const classroomUrlFragment =
+      this.storySummaryToDisplay.getClassroomUrlFragment();
     const topicUrlFragment = this.storySummaryToDisplay.getTopicUrlFragment();
     const explorationId = this.storyNodeToDisplay.getExplorationId();
-    if (classroomUrlFragment === undefined || topicUrlFragment === undefined ||
-      explorationId === null) {
+    if (
+      classroomUrlFragment === undefined ||
+      topicUrlFragment === undefined ||
+      explorationId === null
+    ) {
       return '#';
     }
     let result = this.urlInterpolationService.interpolateUrl(
-      '/explore/<exp_id>', { exp_id: explorationId });
+      '/explore/<exp_id>',
+      {exp_id: explorationId}
+    );
     result = this.urlService.addField(
-      result, 'topic_url_fragment', topicUrlFragment);
+      result,
+      'topic_url_fragment',
+      topicUrlFragment
+    );
     result = this.urlService.addField(
-      result, 'classroom_url_fragment', classroomUrlFragment);
+      result,
+      'classroom_url_fragment',
+      classroomUrlFragment
+    );
     result = this.urlService.addField(
-      result, 'story_url_fragment',
-      this.storySummaryToDisplay.getUrlFragment());
+      result,
+      'story_url_fragment',
+      this.storySummaryToDisplay.getUrlFragment()
+    );
     result = this.urlService.addField(
-      result, 'node_id', this.storyNodeToDisplay.getId());
+      result,
+      'node_id',
+      this.storyNodeToDisplay.getId()
+    );
     return result;
   }
 
@@ -109,10 +123,12 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
 
       let thumbnailFilename = this.storyNodeToDisplay.getThumbnailFilename();
       if (thumbnailFilename) {
-        this.thumbnailUrl = (
+        this.thumbnailUrl =
           this.assetsBackendApiService.getThumbnailUrlForPreview(
-            AppConstants.ENTITY_TYPE.STORY, this.storySummaryToDisplay.getId(),
-            thumbnailFilename));
+            AppConstants.ENTITY_TYPE.STORY,
+            this.storySummaryToDisplay.getId(),
+            thumbnailFilename
+          );
       }
 
       this.storyNodeTitle = this.storyNodeToDisplay.getTitle();
@@ -123,14 +139,13 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       this.storyName = this.storySummaryToDisplay.getTitle();
 
       this.storyNodeLink = this.getStoryNodeLink();
-      let totalStoryNodesCount = (
-        this.storySummaryToDisplay.getAllNodes().length
-      );
-      let completedNodesCount = (
-        this.storySummaryToDisplay.getCompletedNodeTitles().length
-      );
+      let totalStoryNodesCount =
+        this.storySummaryToDisplay.getAllNodes().length;
+      let completedNodesCount =
+        this.storySummaryToDisplay.getCompletedNodeTitles().length;
       this.storyProgress = Math.floor(
-        (completedNodesCount / totalStoryNodesCount) * 100);
+        (completedNodesCount / totalStoryNodesCount) * 100
+      );
     }
   }
 
@@ -142,6 +157,9 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaLearnerTopicSummaryTile', downgradeComponent(
-    {component: LearnerTopicGoalsSummaryTileComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaLearnerTopicSummaryTile',
+    downgradeComponent({component: LearnerTopicGoalsSummaryTileComponent})
+  );
