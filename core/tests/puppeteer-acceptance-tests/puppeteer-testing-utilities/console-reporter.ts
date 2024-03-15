@@ -86,7 +86,12 @@ export class ConsoleReporter {
     browser.on('targetcreated', async (target: Target) => {
       if (target.type() === 'page') {
         const page = await target.page();
-        if (!page || !page.url().includes(HOST_URL)) {
+        // Here we include 'about:blank' because this is the default page url
+        // that is passed through when the browser opens.
+        if (
+          !page ||
+          (page.url() !== HOST_URL && page.url() !== 'about:blank')
+        ) {
           return;
         }
         page.on('console', async (message: PuppeteerConsoleMessage) => {
