@@ -73,13 +73,6 @@ export class AdminRouterService {
   }
 
   /**
-   * @returns {boolean} Whether the config tab is open.
-   */
-  isConfigTabOpen(): boolean {
-    return this.currentTabHash === AdminPageConstants.ADMIN_TAB_URLS.CONFIG;
-  }
-
-  /**
    * @returns {boolean} Whether the roles tab is open.
    */
   isRolesTabOpen(): boolean {

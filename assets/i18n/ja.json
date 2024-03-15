@@ -482,7 +482,6 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "このサイトに関するニュースと更新を受け取る",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "サブスクライブした著者が新しい探検を公開したときにメールを受け取る",
 	"I18N_PREFERENCES_HEADING": "個人設定",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "このページで実行した変更は自動保存されます。",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "まだどの著者もサブスクライブしていません。",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "影響",
 	"I18N_PREFERENCES_PAGE_TITLE": "プロフィールの個人設定を変更 - Oppia",

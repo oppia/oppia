@@ -1075,7 +1075,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "Cela téléchargera les données de votre compte Oppia sous forme d’un fichier texte au format JSON.",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT": "Veuillez ne pas quitter cette page. Vos données sont actuellement en cours de chargement et seront téléchargées sous forme de fichier texte au format JSON une fois ceci terminé. Si quelque chose se passe mal, veuillez contacter",
 	"I18N_PREFERENCES_HEADING": "Préférences",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Toute modification que vous ferez sur cette page sera automatiquement enregistrée.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Vous ne vous êtes encore abonné à aucun créateur. Vous pouvez librement vous abonner à votre auteur favori en cliquant sur le bouton « s’abonner » dans la page de profil de l’auteur. En vous abonnant à un auteur, vous serez notifié{{GENDER:||e}} par courriel quand l’auteur publiera une nouvelle leçon.",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "Impact",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "Préférences | Oppia",
