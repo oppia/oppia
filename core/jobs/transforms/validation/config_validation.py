@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from core.domain import config_domain
 from core.domain import platform_parameter_domain as parameter_domain
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
@@ -31,32 +30,6 @@ if MYPY:  # pragma: no cover
     from mypy_imports import config_models
 
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
-
-
-@validation_decorators.AuditsExisting(
-    config_models.ConfigPropertySnapshotMetadataModel)
-class ValidateConfigPropertySnapshotMetadataModel(
-    base_validation.BaseValidateCommitCmdsSchema[
-        config_models.ConfigPropertySnapshotMetadataModel
-    ]
-):
-    """Overrides _get_change_domain_class for
-    ConfigPropertySnapshotMetadataModel.
-    """
-
-    def _get_change_domain_class(
-        self, input_model: config_models.ConfigPropertySnapshotMetadataModel  # pylint: disable=unused-argument
-    ) -> Type[config_domain.ConfigPropertyChange]:
-        """Returns a change domain class.
-
-        Args:
-            input_model: datastore_services.Model. Entity to validate.
-
-        Returns:
-            config_domain.ConfigPropertyChange. A domain object class for the
-            changes made by commit commands of the model.
-        """
-        return config_domain.ConfigPropertyChange
 
 
 @validation_decorators.AuditsExisting(

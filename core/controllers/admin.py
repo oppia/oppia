@@ -158,11 +158,6 @@ class ClassroomPageDataDict(TypedDict):
     url_fragment: str
 
 
-AllowedAdminConfigPropertyValueTypes = Union[
-    str, bool, float, Dict[str, str], List[str], ClassroomPageDataDict
-]
-
-
 class AdminHandlerNormalizePayloadDict(TypedDict):
     """Dict representation of AdminHandler's normalized_payload
     dictionary.
@@ -325,11 +320,7 @@ class AdminHandler(
             )
         ]
 
-        # TODO(#19810): Remove the ``config_properties`` key-value pair from
-        # this dict, once the classroom configuration and new platform parameter
-        # tabs are prepared for onboarding the existing field.
         self.render_json({
-            'config_properties': {},
             'demo_collections': sorted(feconf.DEMO_COLLECTIONS.items()),
             'demo_explorations': sorted(feconf.DEMO_EXPLORATIONS.items()),
             'demo_exploration_ids': demo_exploration_ids,

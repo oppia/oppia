@@ -210,7 +210,6 @@
         "core.domain.improvements_domain_test",
         "core.domain.platform_parameter_registry_test",
         "core.domain.topic_services_test",
-        "core.domain.config_domain_test",
         "core.android_validation_constants_test",
         "core.domain.skill_fetchers_test",
         "scripts.check_e2e_tests_are_captured_in_ci_test",
