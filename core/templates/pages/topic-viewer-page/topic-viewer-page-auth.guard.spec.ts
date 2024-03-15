@@ -97,7 +97,7 @@ describe('TopicViewerAccessGuard', () => {
         canActivateResult = result;
       });
 
-    tick();    
+    tick();
     expect(canActivateResult).toBeFalse();
     expect(navigateSpy).toHaveBeenCalledWith(
       [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]);
