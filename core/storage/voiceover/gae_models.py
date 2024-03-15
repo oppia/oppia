@@ -21,7 +21,7 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, List, Tuple, TypedDict, Union
+from typing import Dict, Final, Tuple, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -45,21 +45,9 @@ class VoiceoverDict(TypedDict):
     duration_secs: float
 
 
-VoiceoversAndContentsMappingType = Dict[
-    str, Dict[
-        str, Union[
-            str,
-            Dict[str, List[str]],
-            Dict[str, List[VoiceoverDict]]
-        ]
-    ]
-]
-
 ContentIdToVoiceoverMappingType = Dict[
     str, Dict[str, Tuple[str, VoiceoverDict]]
 ]
-
-VoiceoverMappingType = Dict[str, Dict[str, VoiceoverDict]]
 
 
 class EntityVoiceoversModel(base_models.BaseModel):
@@ -277,7 +265,7 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
     @classmethod
-    def create(
+    def create_model(
         cls,
         voice_artist_id: str,
         language_code_to_accent: Dict[str, str]
@@ -314,7 +302,7 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     @classmethod
     def export_data(
         cls, user_id: str
-    ) -> Dict[str, VoiceoversAndContentsMappingType]:
+    ) -> Dict[str, Dict[str, str]]:
         """Exports the data from VoiceArtistMetadataModel into
         dict format for Takeout.
 
@@ -324,7 +312,7 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from VoiceArtistMetadataModel.
         """
-        user_data: Dict[str, VoiceoversAndContentsMappingType] = {}
+        user_data: Dict[str, Dict[str, str]] = {}
         voice_artist_metadata_model = cls.get(user_id, strict=False)
 
         if voice_artist_metadata_model is not None:
@@ -374,10 +362,10 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
         """Model contain user ID of voice artist and their provided
         exploration voice artist link model.
         """
-        return base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
-    def create(
+    def create_model(
         cls,
         exploration_id: str,
         content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType,

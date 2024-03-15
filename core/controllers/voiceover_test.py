@@ -151,27 +151,38 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
             'duration_secs': 5.0
         }
 
-        self.voiceovers_and_contents_mapping: (
-            voiceover_models.VoiceoversAndContentsMappingType) = {
-            'en': {
-                'language_accent_code': '',
-                'exploration_id_to_content_ids': {
-                    'exp_1': ['content_1', 'content_2', 'content_3']
+        self.language_code_to_accent: Dict[str, str] = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
+
+        self.content_id_to_voiceovers_mapping: (
+            voiceover_models.ContentIdToVoiceoverMappingType) = {
+                'content_1': {
+                    'en': (self.voice_artist_id, self.voiceover1)
                 },
-                'exploration_id_to_voiceovers': {
-                    'exp_1': [
-                        self.voiceover1,
-                        self.voiceover2,
-                        self.voiceover3
-                    ]
+                'content_2': {
+                    'hi': (self.voice_artist_id, self.voiceover2)
+                },
+                'content_3': {
+                    'ar': (self.voice_artist_id, self.voiceover1)
                 }
             }
-        }
+
+        exploration_voice_artist_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id',
+                content_id_to_voiceovers_mapping=(
+                    self.content_id_to_voiceovers_mapping)
+            )
+        )
+        exploration_voice_artist_link_model.put()
 
         voiceover_services.update_voice_artist_metadata(
             voice_artist_id=self.voice_artist_id,
-            voiceovers_and_contents_mapping=(
-                self.voiceovers_and_contents_mapping)
+            language_code_to_accent=(
+                self.language_code_to_accent)
         )
 
     def test_get_voice_artist_data_for_voiceover_admin_page(self) -> None:
@@ -179,7 +190,9 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
 
         expected_voice_artist_id_to_language_mapping = {
             self.voice_artist_id: {
-                'en': ''
+                'en': 'en-US',
+                'hi': 'hi-IN',
+                'ar': ''
             }
         }
         expected_voice_artist_id_to_voice_artist_name = {
@@ -203,7 +216,9 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
 
         initial_voice_artist_id_to_language_mapping = {
             self.voice_artist_id: {
-                'en': ''
+                'en': 'en-US',
+                'hi': 'hi-IN',
+                'ar': ''
             }
         }
         voice_artist_id_to_language_mapping = (
@@ -216,8 +231,8 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
 
         payload = {
             'voice_artist_id': self.voice_artist_id,
-            'language_code': 'en',
-            'language_accent_code': 'en-US'
+            'language_code': 'ar',
+            'language_accent_code': 'ar-EG'
         }
         self.put_json(
             feconf.VOICE_ARTIST_METADATA_HANDLER,
@@ -225,7 +240,9 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
 
         final_voice_artist_id_to_language_mapping = {
             self.voice_artist_id: {
-                'en': 'en-US'
+                'en': 'en-US',
+                'hi': 'hi-IN',
+                'ar': 'ar-EG'
             }
         }
         voice_artist_id_to_language_mapping = (
@@ -248,7 +265,25 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         )
 
         expected_exp_id_to_filenames = {
-            'exp_1': ['filename3.mp3', 'filename2.mp3', 'filename1.mp3']
+            'exploration_id': ['filename1.mp3']
+        }
+
+        json_response = self.get_json(handler_url)
+
+        self.assertDictEqual(
+            json_response['exploration_id_to_filenames'],
+            expected_exp_id_to_filenames
+        )
+
+        handler_url = (
+            '%s/%s/%s' % (
+                feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
+                self.voice_artist_id,
+                'hi')
+        )
+
+        expected_exp_id_to_filenames = {
+            'exploration_id': ['filename2.mp3']
         }
 
         json_response = self.get_json(handler_url)

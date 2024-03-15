@@ -493,7 +493,7 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             retrieved_voice_artist_to_language_mapping
         )
 
-    def test_should_get_exploration_id_to_filenames(self):
+    def test_should_get_exploration_id_to_filenames(self) -> None:
         exploration_voice_artists_link_model1 = (
             voiceover_services.
             create_exploration_voice_artists_link_model_instance(
@@ -543,7 +543,6 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
 
         self.assertEqual(total_files, 5)
 
-
         exploration_id_to_filenames = (
             voiceover_services.get_voiceover_filenames(
                 voice_artist_id='voice_artist_2', language_code='ar'))
@@ -553,9 +552,3 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             total_files += len(filnames)
 
         self.assertEqual(total_files, 1)
-
-
-
-
-
-
