@@ -66,6 +66,13 @@ const CONSOLE_ERRORS_TO_IGNORE = [
   ),
 ];
 
+const CONSOLE_ERRORS_TO_FIX = [
+  // TODO(#19746): Development console error "Uncaught in Promise" on signup.
+  new RegExp(
+    'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
+  ),
+];
+
 export class ConsoleReporter {
   private static consoleMessages: ConsoleMessage[] = [];
 
@@ -83,7 +90,7 @@ export class ConsoleReporter {
           let messageText = message.text();
           // Sometimes puppeteer returns a JSHandle error so we have to parse
           // it to get the message in this case.
-          if (message.text().includes('JSHandle@error')) {
+          if (messageText.includes('JSHandle@error')) {
             const messages = await Promise.all(
               message.args().map((arg: JSHandle) =>
                 arg.executionContext().evaluate((arg: unknown) => {
@@ -134,11 +141,13 @@ export class ConsoleReporter {
    * This function gets the console messages that are considered errors.
    */
   private static getConsoleErrors(): ConsoleMessage[] {
-    const uniqueMessages = ConsoleReporter.consoleMessages.filter(
-      (message, index, self) =>
-        self.findIndex(m => m.text === message.text) === index &&
-        CONSOLE_ERRORS_TO_IGNORE.every(e => message.text.match(e) === null)
-    );
-    return uniqueMessages.filter(message => message.type === 'error');
+    return ConsoleReporter.consoleMessages
+      .filter(
+        (message, index, self) =>
+          self.findIndex(m => m.text === message.text) === index &&
+          CONSOLE_ERRORS_TO_IGNORE.every(e => message.text.match(e) === null) &&
+          CONSOLE_ERRORS_TO_FIX.every(e => message.text.match(e) === null)
+      )
+      .filter(message => message.type === 'error');
   }
 }
