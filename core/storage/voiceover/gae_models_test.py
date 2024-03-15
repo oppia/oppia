@@ -314,7 +314,7 @@ class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             voiceover_models.ExplorationVoiceArtistsLinkModel.
                 get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_should_create_model_successfully(self) -> None:
         voiceover1: voiceover_models.VoiceoverDict = {
