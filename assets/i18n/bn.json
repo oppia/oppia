@@ -615,7 +615,6 @@
 	"I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "আমরা আপনাকে স্বয়ংক্রিয়ভাবে আমাদের মেইলিং তালিকায় যুক্ত করতে পারিনি। আমাদের মেইলিং লিস্টে সাইন আপ করতে অনুগ্রহ করে নিচের লিঙ্কে যান:",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT": "অ্যাকাউন্ট রপ্তানি করুন",
 	"I18N_PREFERENCES_HEADING": "পছন্দসমূহ",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "এই পাতায় কোন পরিবর্তন করলে তা স্বয়ংক্রিয়ভাবে সংরক্ষিত হবে।",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "প্রভাব",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "পছন্দসমূহ | ওপিয়া",
 	"I18N_PREFERENCES_PAGE_TITLE": "আপনার প্রোফাইলের পছন্দসমূহ পরিবর্তন করুন - ওপিয়া",

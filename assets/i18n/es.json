@@ -563,7 +563,6 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Recibir mensajes de correo cuando el autor ha suscrito una nueva publicación de exploración.",
 	"I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "No pudimos agregarte a nuestra lista de correo automáticamente. Visite el siguiente enlace para suscribirse a nuestra lista de correo:",
 	"I18N_PREFERENCES_HEADING": "Preferencias",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Los cambios que hagas en esta página serán guardados automáticamente.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Aún no estás suscrito a ningún creador. Siéntete libre de suscribirse a su autor favorito haciendo clic en el botón 'suscribirse' en la página de perfil del autor. Al suscribirse a un autor, se le notificará por correo electrónico cuando el autor publique una nueva lección.",
 	"I18N_PREFERENCES_PAGE_TITLE": "Cambiar sus preferencias de perfil - Oppia",
 	"I18N_PREFERENCES_PICTURE": "Foto",

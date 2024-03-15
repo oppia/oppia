@@ -75,4 +75,22 @@ describe('Preferred Site Language Selector Component', () => {
     componentInstance.updateLanguage('en');
     expect(componentInstance.preferredLanguageCode).toEqual('en');
   });
+
+  it('should write value', () => {
+    const code = 'en';
+    componentInstance.writeValue(code);
+    expect(componentInstance.preferredLanguageCode).toEqual(code);
+  });
+
+  it('should register onChange function', () => {
+    const fn = (value: string) => {};
+    componentInstance.registerOnChange(fn);
+    expect(componentInstance.onChange).toBe(fn);
+  });
+
+  it('should register onTouched function', () => {
+    const fn = () => {};
+    componentInstance.registerOnTouched(fn);
+    expect(componentInstance.onTouched).toBe(fn);
+  });
 });

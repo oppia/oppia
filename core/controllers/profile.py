@@ -335,65 +335,75 @@ class PreferencesHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def put(self) -> None:
         """Handles PUT requests."""
         assert self.user_id is not None
-        update_type = self.payload.get('update_type')
-        data = self.payload.get('data')
+        updates = self.payload['updates']
         bulk_email_signup_message_should_be_shown = False
         user_settings = user_services.get_user_settings(self.user_id)
 
-        if update_type == 'subject_interests':
-            self.__validate_data_type(update_type, list, data)
-            user_settings.subject_interests = data
-        elif update_type == 'preferred_language_codes':
-            self.__validate_data_type(update_type, list, data)
-            user_settings.preferred_language_codes = data
-        elif update_type == 'email_preferences':
-            required_keys = [
-                'can_receive_email_updates', 'can_receive_editor_role_email',
-                'can_receive_feedback_message_email',
-                'can_receive_subscription_email']
-            # Check if all required keys are in the data dictionary.
-            if not all(key in data for key in required_keys):
-                raise self.InvalidInputException(
-                    'Expected data to contain the fields,%s, received %s'
-                    % (required_keys, data))
-            if not all(isinstance(value, bool) for value in data.values()):
-                raise self.InvalidInputException(
-                    'Expected all values of data to be boolean,received %s'
-                    % data)
+        for update in updates:
+            update_type = update['update_type']
+            data = update['data']
 
-            bulk_email_signup_message_should_be_shown = (
-                user_services.update_email_preferences(
-                    self.user_id, data['can_receive_email_updates'],
-                    data['can_receive_editor_role_email'],
-                    data['can_receive_feedback_message_email'],
-                    data['can_receive_subscription_email']))
-        elif update_type == 'user_bio':
-            self.__validate_data_type(update_type, str, data)
-            if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+            if update_type == 'subject_interests':
+                self.__validate_data_type(update_type, list, data)
+                user_settings.subject_interests = data
+            elif update_type == 'preferred_language_codes':
+                self.__validate_data_type(update_type, list, data)
+                user_settings.preferred_language_codes = data
+            elif update_type == 'email_preferences':
+                required_keys = [
+                    'can_receive_email_updates',
+                    'can_receive_editor_role_email',
+                    'can_receive_feedback_message_email',
+                    'can_receive_subscription_email']
+                missing_keys = [
+                    key for key in required_keys if key not in data]
+                if missing_keys:
+                    raise self.InvalidInputException(
+                        'Expected data dict to have all the required keys. '
+                        'Missing keys: %s .' % ', '.join(missing_keys))
+
+                non_boolean_keys = [
+                    key for key, value in data.items()
+                    if not isinstance(value, bool)]
+                if non_boolean_keys:
+                    raise self.InvalidInputException(
+                        'Expected all values of data to be booleans. '
+                        'Non-boolean values found for keys: %s .'
+                        % ', '.join(non_boolean_keys))
+
+                bulk_email_signup_message_should_be_shown = (
+                    user_services.update_email_preferences(
+                        self.user_id, data['can_receive_email_updates'],
+                        data['can_receive_editor_role_email'],
+                        data['can_receive_feedback_message_email'],
+                        data['can_receive_subscription_email']))
+            elif update_type == 'user_bio':
+                self.__validate_data_type(update_type, str, data)
+                if len(data) > feconf.MAX_BIO_LENGTH_IN_CHARS:
+                    raise self.InvalidInputException(
+                        'User bio exceeds maximum character limit: %s'
+                        % feconf.MAX_BIO_LENGTH_IN_CHARS)
+                user_settings.user_bio = data
+            elif update_type == 'preferred_site_language_code':
+                self.__validate_data_type(update_type, str, data)
+                user_settings.preferred_site_language_code = data
+            elif update_type == 'preferred_audio_language_code':
+                self.__validate_data_type(update_type, str, data)
+                user_settings.preferred_audio_language_code = data
+            elif update_type == 'preferred_translation_language_code':
+                self.__validate_data_type(update_type, str, data)
+                user_settings.preferred_translation_language_code = data
+            elif update_type == 'default_dashboard':
+                self.__validate_data_type(update_type, str, data)
+                user_settings.default_dashboard = data
+            elif update_type == 'profile_picture_data_url':
+                self.__validate_data_type(update_type, str, data)
+                assert user_settings.username is not None
+                user_services.update_profile_picture_data_url(
+                    user_settings.username, data)
+            else:
                 raise self.InvalidInputException(
-                    'User bio exceeds maximum character limit: %s'
-                    % feconf.MAX_BIO_LENGTH_IN_CHARS)
-            user_settings.user_bio = data
-        elif update_type == 'preferred_site_language_code':
-            self.__validate_data_type(update_type, str, data)
-            user_settings.preferred_site_language_code = data
-        elif update_type == 'preferred_audio_language_code':
-            self.__validate_data_type(update_type, str, data)
-            user_settings.preferred_audio_language_code = data
-        elif update_type == 'preferred_translation_language_code':
-            self.__validate_data_type(update_type, str, data)
-            user_settings.preferred_translation_language_code = data
-        elif update_type == 'default_dashboard':
-            self.__validate_data_type(update_type, str, data)
-            user_settings.default_dashboard = data
-        elif update_type == 'profile_picture_data_url':
-            self.__validate_data_type(update_type, str, data)
-            assert user_settings.username is not None
-            user_services.update_profile_picture_data_url(
-                user_settings.username, data)
-        else:
-            raise self.InvalidInputException(
-                'Invalid update type: %s' % update_type)
+                    'Invalid update type: %s' % update_type)
 
         user_services.save_user_settings(user_settings)
         self.render_json({

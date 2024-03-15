@@ -550,7 +550,6 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "当您订阅的创建者发布了新的探险时接收电子邮件",
 	"I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "我们无法自动将您加入我们的邮件列表。请访问下面的链接以注册到我们的邮件列表：",
 	"I18N_PREFERENCES_HEADING": "参数设置",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "在此页面做出的任何更改都将被自动保存。",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "您尚未订阅任何创作者。通过点击作者个人资料页面中的“订阅”按钮，随时订阅您喜欢的作者。通过订阅作者，当作者发布新课程时，您将收到电子邮件通知。",
 	"I18N_PREFERENCES_PAGE_TITLE": "更改您的个人设置 - Oppia",
 	"I18N_PREFERENCES_PICTURE": "图片",

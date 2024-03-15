@@ -81,7 +81,7 @@ describe('Subject interests form field Component', () => {
   });
 
   it('should add subject interest', () => {
-    spyOn(componentInstance.subjectInterestsChange, 'emit');
+    spyOn(componentInstance, 'onChange');
     spyOn(componentInstance, 'validInput').and.returnValue(true);
     componentInstance.subjectInterests = [];
     componentInstance.allSubjectInterests = [];
@@ -92,7 +92,9 @@ describe('Subject interests form field Component', () => {
     } as ElementRef;
     componentInstance.add({value: 'math'});
     componentInstance.add({value: ''});
-    expect(componentInstance.subjectInterestsChange.emit).toHaveBeenCalled();
+    expect(componentInstance.onChange).toHaveBeenCalled();
+    expect(componentInstance.subjectInterests).toEqual(['math']);
+    expect(componentInstance.allSubjectInterests).toEqual(['math']);
   });
 
   it('should remove subject interest', () => {
@@ -118,5 +120,23 @@ describe('Subject interests form field Component', () => {
     componentInstance.allSubjectInterests = ['math'];
     expect(componentInstance.filter('math')).toEqual(['math']);
     expect(componentInstance.filter('art')).toEqual([]);
+  });
+
+  it('should write value', () => {
+    const interests = ['math', 'art'];
+    componentInstance.writeValue(interests);
+    expect(componentInstance.subjectInterests).toEqual(interests);
+  });
+
+  it('should register onChange function', () => {
+    const fn = (value: string[]) => {};
+    componentInstance.registerOnChange(fn);
+    expect(componentInstance.onChange).toBe(fn);
+  });
+
+  it('should register onTouched function', () => {
+    const fn = () => {};
+    componentInstance.registerOnTouched(fn);
+    expect(componentInstance.onTouched).toBe(fn);
   });
 });

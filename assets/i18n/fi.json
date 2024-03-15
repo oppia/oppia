@@ -776,7 +776,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT": "Vie käyttäjä",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "Tämä lataa Oppia-tilisi tiedot JSON-muotoisena tekstitiedostona.",
 	"I18N_PREFERENCES_HEADING": "Asetukset",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Kaikki tällä sivulla tekemäsi muutokset tallennetaan automaattisesti.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Et ole tilannut yhtään luojaa vielä. Voit vapaasti tilata suosikkiluojasi napsauttamalla \"Tilaa\"-painiketta tekijän profiilisivulla. Tilaamalla saat sähköpostiisi ilmoituksen, kun tekijä julkaisee uuden oppitunnin.",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "Vaikutus",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "Asetukset | Oppia",

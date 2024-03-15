@@ -41,6 +41,7 @@ var PreferencesPage = function () {
   var profilePhotoClickable = $('.e2e-test-photo-clickable');
   var profilePhotoCropper = $('.e2e-test-photo-crop .cropper-container');
   var profilePhotoUploadError = $('.e2e-test-upload-error');
+  var saveChangesButton = $('.e2e-test-save-changes-button');
   var subscription = $('.e2e-test-subscription-name');
   var subscriptionsSelector = function () {
     return $$('.e2e-test-subscription-name');
@@ -49,6 +50,13 @@ var PreferencesPage = function () {
   var userInterestsInput = $('.e2e-test-subject-interests-input');
 
   var saveNewChanges = async function (fieldName) {
+    // If the following click event is omitted, the '(change)' event
+    // won't be triggered for language-selector, failing to register changes.
+    await action.click('Navbar Button', navBar);
+    await clickSaveChangesButton();
+    // Due to screen dimensions in e2e tests, the Info toast overlaps
+    // with the 'Save Changes' button. To avoid this collision, we click
+    // on a neutral element to move the cursor away.
     await action.click('Navbar Button', navBar);
     await waitFor.visibilityOfInfoToast(
       `Info toast for saving ${fieldName} takes too long to appear.`
@@ -56,6 +64,10 @@ var PreferencesPage = function () {
     await waitFor.invisibilityOfInfoToast(
       'Info toast takes too long to disappear.'
     );
+  };
+
+  var clickSaveChangesButton = async function () {
+    await action.click('Save Changes button', saveChangesButton);
   };
 
   this.get = async function () {
@@ -78,18 +90,27 @@ var PreferencesPage = function () {
   };
 
   this.submitProfilePhoto = async function (imgPath, resetExistingImage) {
-    return await workflow.submitImage(
+    await workflow.submitImage(
       profilePhotoClickable,
       profilePhotoCropper,
       imgPath,
       resetExistingImage
     );
+    await clickSaveChangesButton();
+    await waitFor.pageToFullyLoad();
+    // Click on a neutral element.
+    await action.click('Preferences page header', pageHeader);
   };
 
   this.getProfilePhotoSource = async function () {
     return await workflow.getImageSource(customProfilePhoto);
   };
 
+  /**
+   * Appends given text to the existing user bio in the preferences page.
+   *
+   * @param {string} bio - The text to append to the existing user bio.
+   */
   this.editUserBio = async function (bio) {
     await action.addValue('User bio field', userBioElement, bio);
     await saveNewChanges('User Bio');
@@ -115,7 +136,40 @@ var PreferencesPage = function () {
 
   this.selectSystemLanguage = async function (language) {
     await action.click('system language selector', languageSelector);
+    var dropdownSelectorString = '#mat-select-0-panel';
     var dropdownOption = $(`.mat-option-text=${language}`);
+
+    /*
+      The 'click' method of WebDriverIO sometimes fails to click the elements
+      which are not 'fully' visible in the viewport. Refer http://v4.webdriver.io/api/action/click.html.
+      In our case 'English' option might be partially hidden under the 'Search'
+      input field in the mat-select component as WebdriverIO doesn't scroll the
+      required dropdown 'fully' into the viewport before clicking it.
+      Note: the 'Search' input field is sticky to the top of the dropdown.
+      Refer the Known Problems section in the link https://www.npmjs.com/package/ngx-mat-select-search#known-problems
+
+      To ensure that options like 'English' are correctly clicked at all times,
+      we scroll the dropdown  programmatically until the required option is
+      fully displayed in the viewport unlike in the other cases.
+    */
+
+    await browser.execute(selector => {
+      var element = document.querySelector(`${selector}`);
+      element.scrollTop = 0;
+    }, dropdownSelectorString);
+
+    while (true) {
+      if (await dropdownOption.isDisplayedInViewport()) {
+        break;
+      }
+      await browser.execute(selector => {
+        var element = document.querySelector(`${selector}`);
+        element.scrollTop += 100;
+      }, dropdownSelectorString);
+    }
+
+    await dropdownOption.waitForDisplayed({timeout: 5000});
+    await dropdownOption.waitForClickable({timeout: 5000});
     await action.click('clickable', dropdownOption);
     await saveNewChanges('System Language');
   };
@@ -127,10 +181,14 @@ var PreferencesPage = function () {
     await saveNewChanges('Preferred Audio Language');
   };
 
+  /**
+   * Replaces the existing user bio with the given text in the preferences page.
+   *
+   * @param {string} bio - The new bio text to set for the user.
+   */
   this.setUserBio = async function (bio) {
     var inputFieldName = 'User bio input field';
     await action.clear(inputFieldName, userBioElement);
-    await saveNewChanges('User Bio');
     await action.setValue(inputFieldName, userBioElement, bio);
     await saveNewChanges('User Bio');
   };
@@ -229,7 +287,7 @@ var PreferencesPage = function () {
       userBioElement,
       'User bio field takes too long to appear.'
     );
-    expect(await userBioElement.getAttribute('value')).toMatch(bio);
+    expect(await userBioElement.getValue()).toMatch(bio);
   };
 
   this.selectCreatorDashboard = async function () {

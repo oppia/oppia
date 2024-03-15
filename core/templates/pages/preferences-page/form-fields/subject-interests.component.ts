@@ -20,12 +20,15 @@ import {ENTER} from '@angular/cdk/keycodes';
 import {
   Component,
   ElementRef,
-  EventEmitter,
+  forwardRef,
   Input,
-  Output,
   ViewChild,
 } from '@angular/core';
-import {FormControl} from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import {MatChipList} from '@angular/material/chips';
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
@@ -34,10 +37,16 @@ import {map, startWith} from 'rxjs/operators';
 @Component({
   selector: 'oppia-subject-interests',
   templateUrl: './subject-interests.component.html',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => SubjectInterestsComponent),
+      multi: true,
+    },
+  ],
 })
-export class SubjectInterestsComponent {
+export class SubjectInterestsComponent implements ControlValueAccessor {
   @Input() subjectInterests: string[] = [];
-  @Output() subjectInterestsChange: EventEmitter<string[]> = new EventEmitter();
 
   selectable = true;
   removable = true;
@@ -61,6 +70,25 @@ export class SubjectInterestsComponent {
     );
   }
 
+  // Implementing the ControlValueAccessor interface through the following
+  // 5 methods to make the component work as a form field.
+  onChange: (value: string[]) => void = () => {};
+  onTouched: () => void = () => {};
+
+  writeValue(value: string[]): void {
+    if (value !== undefined) {
+      this.subjectInterests = value;
+    }
+  }
+
+  registerOnChange(fn: (value: string[]) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
   ngOnInit(): void {
     this.formCtrl.valueChanges.subscribe((value: string) => {
       if (!this.validInput(value)) {
@@ -73,10 +101,11 @@ export class SubjectInterestsComponent {
   }
 
   validInput(value: string): boolean {
-    return value === value.toLowerCase() &&
-      this.subjectInterests.indexOf(value) < 0
-      ? true
-      : false;
+    // The following regex matches only lowercase
+    // alphabetic characters and spaces.
+    let validRegex = new RegExp('^[a-z\\s]*$');
+
+    return validRegex.test(value) && !this.subjectInterests.includes(value);
   }
 
   add(event: {value: string}): void {
@@ -90,7 +119,7 @@ export class SubjectInterestsComponent {
       if (this.allSubjectInterests.indexOf(value) < 0) {
         this.allSubjectInterests.push(value);
       }
-      this.subjectInterestsChange.emit(this.subjectInterests);
+      this.onChange(this.subjectInterests);
       this.subjectInterestInput.nativeElement.value = '';
     }
   }
@@ -100,7 +129,7 @@ export class SubjectInterestsComponent {
 
     if (index >= 0) {
       this.subjectInterests.splice(index, 1);
-      this.subjectInterestsChange.emit(this.subjectInterests);
+      this.onChange(this.subjectInterests);
     }
   }
 

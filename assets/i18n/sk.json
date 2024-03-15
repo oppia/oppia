@@ -570,7 +570,6 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "Dostávať emaily keď tvorca ktorého odoberáte zverejní novú výpravu",
 	"I18N_PREFERENCES_EMAIL_SIGNUP_TEXT": "Nepodarilo sa nám pridať Vás do nášho emailového zoznamu. Prosím prejdite na nasledovný odkaz pre prihlásenie sa do nášho zoznamu:",
 	"I18N_PREFERENCES_HEADING": "Nastavenia",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Akékoľvek úpravy, ktoré na tejto stránke vykonáte sa uložia automaticky.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Ešte neodoberáte žiadneho tvorcu. Prihláste sa na odber Vášho obľúbeného autora kliknutím na \"odoberať\" na profilovej stránke autora. Prihlásením sa na odber autora budete dostávať emaily keď autor zverení novú lekciu.",
 	"I18N_PREFERENCES_PAGE_TITLE": "Zmeniť nastavenia Vášho profilu - Oppia",
 	"I18N_PREFERENCES_PICTURE": "Obrázok",
