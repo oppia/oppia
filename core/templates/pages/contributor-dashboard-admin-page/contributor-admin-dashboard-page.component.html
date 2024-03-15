@@ -160,7 +160,7 @@
               <mat-datepicker-toggle matSuffix [for]="lastDatepicker"></mat-datepicker-toggle>
               <mat-datepicker #lastDatepicker></mat-datepicker>
             </mat-form-field>
-            <b class="filter-label double-sided-arrow">⇌</b>
+            <b class="filter-label">To</b>
             <mat-form-field>
               <input matInput [matDatepicker]="firstDatepicker" (dateChange)="changeFirstActivity($event)" [(ngModel)]="selectedFirstActivity" [max]="today" [min]="selectedLastActivity">
               <mat-datepicker-toggle matSuffix [for]="firstDatepicker"></mat-datepicker-toggle>
