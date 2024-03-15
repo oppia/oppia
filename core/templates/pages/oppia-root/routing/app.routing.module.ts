@@ -147,7 +147,7 @@ const routes: Route[] = [
       import('pages/topic-viewer-page/topic-viewer-page.module')
         .then(m => m.TopicViewerPageModule),
     canActivate: [IsLoggedInGuard]
-  }, 
+  },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',

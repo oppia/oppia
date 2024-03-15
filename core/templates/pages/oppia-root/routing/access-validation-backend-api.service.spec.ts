@@ -252,8 +252,8 @@ describe('Access validation backend api service', () => {
   })
   );
 
-
-  it('should not validate access to topic viewer page with invalid access', fakeAsync (() => {
+  it('should not validate access to topic viewer page with invalid ' +
+  'access', fakeAsync (() => {
     avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(

@@ -20,12 +20,13 @@ import datetime
 
 from core import feature_flag_list
 from core import feconf
+from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
-from core.domain import skill_services
-from core.domain import topic_fetchers
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils

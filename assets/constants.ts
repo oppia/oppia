@@ -7235,7 +7235,7 @@ export default {
           "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
         }
       ]
-    }, 
+    },
     "BLOG_ADMIN": {
       "ROUTE": "blog-admin",
       "TITLE": "Oppia Blog Admin Panel",

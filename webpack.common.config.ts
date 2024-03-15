@@ -112,7 +112,7 @@ module.exports = {
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
       'topics-and-skills-dashboard-page.import.ts'
-    ),    
+    ),
     voiceover_admin:
       commonPrefix + '/pages/voiceover-admin-page/' +
       'voiceover-admin-page.import.ts',

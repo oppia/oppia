@@ -42,7 +42,7 @@ export class AccessValidationBackendApiService {
   );
 
   TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR = (
-    '/access_validation_handler/can_access_topic_viewer_page'); 
+    '/access_validation_handler/can_access_topic_viewer_page');
 
   LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_create_learner_group_page'
@@ -104,7 +104,7 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(
       this.TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR).toPromise();
   }
- 
+
   validateCanManageOwnAccount(): Promise<void> {
     return this.http.get<void>(
       this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR).toPromise();
