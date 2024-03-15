@@ -132,7 +132,7 @@ export class ConsoleReporter {
 
           ConsoleReporter.consoleMessages.push({
             type: message.type(),
-            text: `${messageText}`,
+            text: messageText,
             url: page.url(),
           });
         });
