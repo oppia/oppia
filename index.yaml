@@ -52,12 +52,6 @@ indexes:
   - name: commit_message
   - name: commit_type
 
-- kind: ConfigPropertySnapshotMetadataModel
-  properties:
-  - name: committer_id
-  - name: commit_message
-  - name: commit_type
-
 - kind: ExpCopiesRealtimeModel
   properties:
   - name: realtime_layer
