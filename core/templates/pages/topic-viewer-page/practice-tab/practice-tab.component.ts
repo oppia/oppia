@@ -17,11 +17,9 @@
  */
 
 import { Component, Input, OnInit, OnDestroy } from '@angular/core';
-
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-
 import { Subtopic } from 'domain/topic/subtopic.model';
 import { QuestionBackendApiService } from
   'domain/question/question-backend-api.service';
@@ -34,7 +32,6 @@ import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { PracticeSessionConfirmationModal } from 'pages/topic-viewer-page/modals/practice-session-confirmation-modal.component';
 import { LoaderService } from 'services/loader.service';
-
 import './practice-tab.component.css';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
 
@@ -243,5 +240,3 @@ export class PracticeTabComponent implements OnInit, OnDestroy {
     return 'white';
   }
 }
-
-

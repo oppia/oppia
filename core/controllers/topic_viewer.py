@@ -31,7 +31,6 @@ from core.domain import topic_fetchers
 from typing import Dict
 
 
-
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Manages the data that needs to be displayed to a learner on the topic
     viewer page.

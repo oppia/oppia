@@ -19,7 +19,6 @@ import { Location } from '@angular/common';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-
 import { AppConstants } from '../../app.constants';
 import { TopicViewerAccessGuard } from './topic-viewer-page-auth.guard';
 import { AccessValidationBackendApiService } from '../../pages/oppia-root/routing/access-validation-backend-api.service';
@@ -91,18 +90,17 @@ describe('TopicViewerAccessGuard', () => {
     const navigateSpy = spyOn(router, 'navigate')
       .and.returnValue(Promise.resolve(true));
 
-      let canActivateResult: boolean | null = null;
+    let canActivateResult: boolean | null = null;
 
-      guard.canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-        .then((result) => {
-          canActivateResult = result;
-        });
+    guard.canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then((result) => {
+        canActivateResult = result;
+      });
   
-      tick();
+    tick();
   
-      expect(canActivateResult).toBeFalse();
-      expect(navigateSpy).toHaveBeenCalledWith(
-        [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]
-      );
-    }));
-  });
+    expect(canActivateResult).toBeFalse();
+    expect(navigateSpy).toHaveBeenCalledWith(
+      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]);
+  }));
+});

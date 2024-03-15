@@ -17,13 +17,10 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-
-
 import { StorySummary } from 'domain/story/story-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
-
 import './topic-viewer-stories-list.component.css';
 
 
@@ -77,4 +74,3 @@ export class StoriesListComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 768;
   }
 }
-

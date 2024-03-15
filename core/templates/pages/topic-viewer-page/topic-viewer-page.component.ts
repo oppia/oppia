@@ -17,10 +17,8 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
-
 import { TranslateService } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
-
 import { AppConstants } from 'app.constants';
 import { ReadOnlyTopic } from
   'domain/topic_viewer/read-only-topic-object.factory';
@@ -41,7 +39,6 @@ import { LoaderService } from 'services/loader.service';
 import { PageTitleService } from 'services/page-title.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-
 import './topic-viewer-page.component.css';
 
 
@@ -195,4 +192,3 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     }
   }
 }
-

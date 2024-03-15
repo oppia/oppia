@@ -18,15 +18,11 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { RouterModule } from '@angular/router';
-
-
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicViewerNavbarBreadcrumbComponent } from
   // eslint-disable-next-line max-len
   'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
 import { TopicViewerPageComponent } from
   'pages/topic-viewer-page/topic-viewer-page.component';
 import { toastrConfig } from 'pages/oppia-root/app.module';
@@ -38,7 +34,6 @@ import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-vie
 
 @NgModule({
   imports: [
-    
     SharedComponentsModule,
     CommonModule,
     TopicPlayerViewerCommonModule,
@@ -65,5 +60,3 @@ import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-vie
 })
 
 export class TopicViewerPageModule {}
-
-

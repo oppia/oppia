@@ -17,8 +17,6 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-
-
 import { ReadOnlyTopic } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from
@@ -67,4 +65,3 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
-

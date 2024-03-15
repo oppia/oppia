@@ -112,8 +112,7 @@ module.exports = {
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
       'topics-and-skills-dashboard-page.import.ts'
-    ),
-    
+    ),    
     voiceover_admin:
       commonPrefix + '/pages/voiceover-admin-page/' +
       'voiceover-admin-page.import.ts',
@@ -389,7 +388,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    
     new HtmlWebpackPlugin({
       chunks: ['facilitator_dashboard'],
       filename: 'facilitator-dashboard-page.mainpage.html',

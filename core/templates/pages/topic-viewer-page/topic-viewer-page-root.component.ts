@@ -25,7 +25,8 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   templateUrl: './topic-viewer-page-root.component.html',
 })
 export class TopicViewerPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_VIEWER.TITLE;
+  title: string = AppConstants.
+    PAGES_REGISTERED_WITH_FRONTEND.TOPIC_VIEWER.TITLE;
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_VIEWER.META as
     unknown as Readonly<MetaTagData>[];

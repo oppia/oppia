@@ -105,7 +105,6 @@ export class AccessValidationBackendApiService {
       this.TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR).toPromise();
   }
  
-
   validateCanManageOwnAccount(): Promise<void> {
     return this.http.get<void>(
       this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR).toPromise();

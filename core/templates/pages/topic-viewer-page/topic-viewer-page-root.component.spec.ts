@@ -20,7 +20,6 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
-
 import { AppConstants } from '../../app.constants';
 import { PageHeadService } from '../../services/page-head.service';
 import { TopicViewerPageRootComponent } from './topic-viewer-page-root.component';
