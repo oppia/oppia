@@ -237,7 +237,8 @@ describe('Access validation backend api service', () => {
       successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-        '/access_validation_handler/can_access_blog_author_profile_page/username'
+      '/access_validation_handler/can_access_blog_author_profile_page/' +
+      'username'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({
@@ -280,7 +281,7 @@ describe('Access validation backend api service', () => {
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_topic_viewer_page');
     expect(req.request.method).toEqual('GET');
-      req.flush({});
+    req.flush({});
 
 
     flushMicrotasks();
