@@ -97,41 +97,43 @@ export class ConsoleReporter {
         const page = await target.page();
         // Here we exclude urls that are opened that are not part of the
         // application.
-        if (
-          page &&
-          (page.url().includes(HOST_URL) || page.url() === 'about:blank')
-        ) {
-          page.on('console', async (message: PuppeteerConsoleMessage) => {
-            let messageText = message.text();
-            // Sometimes puppeteer returns a JSHandle error so we have to parse
-            // it to get the message in this case.
-            if (messageText.includes('JSHandle@error')) {
-              const messages = await Promise.all(
-                message.args().map((arg: JSHandle) =>
-                  arg.executionContext().evaluate((arg: unknown) => {
-                    if (arg instanceof Error) {
-                      return arg.message;
-                    }
-                    return null;
-                  }, arg)
-                )
-              );
-              messageText = messages.join(' ');
-            }
-
-            // Here we concat the message text with the message's source if it is present.
-            const messageSource = message.location().url;
-            messageText = messageSource
-              ? `${messageSource} ${messageText}`
-              : messageText;
-
-            ConsoleReporter.consoleMessages.push({
-              type: message.type(),
-              text: `${messageText}`,
-              url: page.url(),
-            });
-          });
+        if (!page) {
+          return;
         }
+        page.on('console', async (message: PuppeteerConsoleMessage) => {
+          if (!page.url().includes(HOST_URL)) {
+            return;
+          }
+
+          let messageText = message.text();
+          // Sometimes puppeteer returns a JSHandle error so we have to parse
+          // it to get the message in this case.
+          if (messageText.includes('JSHandle@error')) {
+            const messages = await Promise.all(
+              message.args().map((arg: JSHandle) =>
+                arg.executionContext().evaluate((arg: unknown) => {
+                  if (arg instanceof Error) {
+                    return arg.message;
+                  }
+                  return null;
+                }, arg)
+              )
+            );
+            messageText = messages.join(' ');
+          }
+
+          // Here we concat the message text with the message's source if it is present.
+          const messageSource = message.location().url;
+          messageText = messageSource
+            ? `${messageSource} ${messageText}`
+            : messageText;
+
+          ConsoleReporter.consoleMessages.push({
+            type: message.type(),
+            text: `${messageText}`,
+            url: page.url(),
+          });
+        });
       }
     });
   }
