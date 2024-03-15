@@ -25,7 +25,7 @@ import {
   JSHandle,
 } from 'puppeteer';
 
-import {escapeRegExp} from 'lodash';
+import escapeRegExp from 'lodash/escapeRegExp';
 
 interface ConsoleMessage {
   type: ConsoleMessageType;
