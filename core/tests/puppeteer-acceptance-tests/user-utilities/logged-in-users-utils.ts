@@ -681,11 +681,12 @@ export class LoggedInUser extends BaseUser {
       this.clickOn(watchAVideoButton),
     ]);
 
+    const url = this.page.url().split('?')[0];
     const deviceHasMobileWidth = this.viewport.width < BREAKPOINTS.MOBILE;
     const expectedWatchAVideoUrl = deviceHasMobileWidth
-      ? mobileWatchAVideoUrl.split('?')[0]
+      ? mobileWatchAVideoUrl
       : watchAVideoUrl;
-    if (this.page.url() !== expectedWatchAVideoUrl) {
+    if (url !== expectedWatchAVideoUrl) {
       throw new Error('The Watch A Video button does not open the right page!');
     }
     showMessage('The Watch A Video button opens the right page.');
