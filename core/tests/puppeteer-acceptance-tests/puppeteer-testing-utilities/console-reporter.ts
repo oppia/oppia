@@ -75,7 +75,8 @@ const CONSOLE_ERRORS_TO_FIX = [
     'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
   ),
   escapeRegExp(
-    'http://localhost:8181/dist/oppia-angular-prod/favicon.ico Failed to load resource: the server responded with a status of 404 (Not Found)'
+    'http://localhost:8181/dist/oppia-angular-prod/favicon.ico Failed ' +
+      'to load resource: the server responded with a status of 404 (Not Found)'
   ),
 ];
 
