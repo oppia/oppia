@@ -219,7 +219,7 @@ def update_voice_artist_metadata(
             voice_artist_id, strict=False))
 
     if voice_artist_metadata_model is None:
-        voiceover_models.VoiceArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id, language_code_to_accent)
     else:
         voice_artist_metadata_model.language_code_to_accent = (

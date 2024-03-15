@@ -190,7 +190,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             voiceover_models.VoiceArtistMetadataModel.
             has_reference_to_user_id(user_id))
 
-        voiceover_models.VoiceArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=user_id, language_code_to_accent={})
 
         self.assertTrue(
@@ -199,7 +199,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
 
     def test_should_raise_error_if_user_id_already_exists(self) -> None:
         user_id = 'user_id'
-        voiceover_models.VoiceArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=user_id, language_code_to_accent={})
 
         with self.assertRaisesRegex(
@@ -207,7 +207,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             'A voice artist metadata model with a given voice'
             'artist ID already exists'
         ):
-            voiceover_models.VoiceArtistMetadataModel.create(
+            voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=user_id, language_code_to_accent={})
 
     def test_export_data_trivial(self) -> None:
@@ -216,8 +216,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             voiceover_models.VoiceArtistMetadataModel.export_data(
                 non_existent_user_id)
         )
-        test_data: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {}
+        test_data: Dict[str, Dict[str, str]] = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self) -> None:
@@ -226,7 +225,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             'hi': 'hi-IN'
         }
         user_id = 'user_id'
-        voiceover_models.VoiceArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=user_id,
             language_code_to_accent=language_code_to_accent)
         user_data = (
@@ -256,7 +255,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
         }
 
         voice_artist_metadata_model = (
-            voiceover_models.VoiceArtistMetadataModel.create(
+            voiceover_models.VoiceArtistMetadataModel.create_model(
                 voice_artist_id=user_id,
                 language_code_to_accent=language_code_to_accent
             )
@@ -293,7 +292,7 @@ class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
 
     def test_should_raise_error_if_exp_id_already_exists(self) -> None:
         exploration_id = 'exploration_id'
-        voiceover_models.ExplorationVoiceArtistsLinkModel.create(
+        voiceover_models.ExplorationVoiceArtistsLinkModel.create_model(
             exploration_id=exploration_id, content_id_to_voiceovers_mapping={})
 
         with self.assertRaisesRegex(
@@ -301,7 +300,7 @@ class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
             'An exploration voice artist link model with a given '
             'exploration ID already exists'
         ):
-            voiceover_models.ExplorationVoiceArtistsLinkModel.create(
+            voiceover_models.ExplorationVoiceArtistsLinkModel.create_model(
             exploration_id=exploration_id, content_id_to_voiceovers_mapping={})
 
     def test_get_deletion_policy_is_to_keep(self) -> None:
@@ -315,7 +314,7 @@ class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             voiceover_models.ExplorationVoiceArtistsLinkModel.
                 get_model_association_to_user(),
-            base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
 
     def test_should_create_model_successfully(self) -> None:
         voiceover1: voiceover_models.VoiceoverDict = {
@@ -342,8 +341,8 @@ class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
             }
         }
 
-        voice_artist_metadata_model = (
-            voiceover_models.ExplorationVoiceArtistsLinkModel.create(
+        exploration_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.create_model(
                 exploration_id=exploration_id,
                 content_id_to_voiceovers_mapping=(
                     content_id_to_voiceovers_mapping)
@@ -355,8 +354,9 @@ class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
         assert retrieved_model
 
         self.assertEqual(
-            voice_artist_metadata_model.id, retrieved_model.id)
+            exploration_voice_artist_link_model.id, retrieved_model.id)
         self.assertDictEqual(
-            voice_artist_metadata_model.content_id_to_voiceovers_mapping,
+            exploration_voice_artist_link_model.
+            content_id_to_voiceovers_mapping,
             retrieved_model.content_id_to_voiceovers_mapping
         )
