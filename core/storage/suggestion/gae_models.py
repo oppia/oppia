@@ -2321,6 +2321,7 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
         language_code: str,
         sort_by: Optional[SortChoices.value],
         topic_ids: Optional[List[str]],
+        max_days_since_first_activity: Optional[int],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationSubmitterTotalContributionStatsModel],
                 int,
@@ -2336,6 +2337,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
+            max_days_since_first_activity: int. To get number of users
+                who are active in max_days_since_first_activity.
             max_days_since_last_activity: int. To get number of users
                 who are active in max_days_since_last_activity.
 
@@ -2344,8 +2347,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
-                    topic_ids and max_days_since_last_activity filters,
-                    returned in the order specified by sort_by.
+                    topic_ids, max_days_since_first_activity and
+                    max_days_since_last_activity filters, returned in the order
+                    specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -2396,9 +2400,14 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
             TranslationSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if max_days_since_last_activity is not None:
-            last_date = today - datetime.timedelta(
-                days=max_days_since_last_activity)
+        if ((max_days_since_first_activity) or (
+            max_days_since_last_activity)) is not None:
+            if max_days_since_first_activity is not None:
+                first_date = today - datetime.timedelta(
+                    days=max_days_since_first_activity)
+            if max_days_since_last_activity is not None:
+                last_date = today - datetime.timedelta(
+                    days=max_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -2409,10 +2418,24 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     break
                 for result_model in result_models:
                     next_offset += 1
-                    if result_model.last_contribution_date >= last_date:
-                        sorted_results.append(result_model)
-                        if len(sorted_results) == page_size:
-                            break
+                    if ((max_days_since_first_activity) and (
+                        max_days_since_last_activity)) is not None:
+                        if (((result_model.first_contribution_date) <= (
+                            first_date)) and (
+                            result_model.last_contribution_date >= last_date)):
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_first_activity is not None:
+                        if result_model.first_contribution_date <= first_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_last_activity is not None:
+                        if result_model.last_contribution_date >= last_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -2742,6 +2765,7 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         language_code: str,
         sort_by: Optional[SortChoices.value],
+        max_days_since_first_activity: Optional[int],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[TranslationReviewerTotalContributionStatsModel],
                 int,
@@ -2755,6 +2779,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             language_code: str. The language code to get results for.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
+            max_days_since_first_activity: int|None. To get number of users
+                who are active in max_days_since_first_activity.
             max_days_since_last_activity: int|None. To get number of users
                 who are active in max_days_since_last_activity.
 
@@ -2763,8 +2789,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
-                    and max_days_since_last_activity filters, returned in the
-                    order specified by sort_by.
+                    max_days_since_first_activity and
+                    max_days_since_last_activityfilters, returned in the order
+                    specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -2800,9 +2827,14 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             TranslationReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if max_days_since_last_activity is not None:
-            last_date = today - datetime.timedelta(
-                days=max_days_since_last_activity)
+        if ((max_days_since_first_activity) or (
+            max_days_since_last_activity)) is not None:
+            if max_days_since_first_activity is not None:
+                first_date = today - datetime.timedelta(
+                    days=max_days_since_first_activity)
+            if max_days_since_last_activity is not None:
+                last_date = today - datetime.timedelta(
+                    days=max_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -2813,10 +2845,24 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     break
                 for result_model in result_models:
                     next_offset += 1
-                    if result_model.last_contribution_date >= last_date:
-                        sorted_results.append(result_model)
-                        if len(sorted_results) == page_size:
-                            break
+                    if ((max_days_since_first_activity) and (
+                        max_days_since_last_activity)) is not None:
+                        if (((result_model.first_contribution_date) <= (
+                            first_date)) and (
+                            result_model.last_contribution_date >= last_date)):
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_first_activity is not None:
+                        if result_model.first_contribution_date <= first_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_last_activity is not None:
+                        if result_model.last_contribution_date >= last_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -3067,6 +3113,7 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         offset: int,
         sort_by: Optional[SortChoices.value],
         topic_ids: Optional[List[str]],
+        max_days_since_first_activity: Optional[int],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionSubmitterTotalContributionStatsModel],
                 int,
@@ -3081,6 +3128,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
+            max_days_since_first_activity: int|None. To get number of users
+                who are active in max_days_since_first_activity.
             max_days_since_last_activity: int|None. To get number of users
                 who are active in max_days_since_last_activity.
 
@@ -3089,8 +3138,9 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied topic_ids
-                    and max_days_since_last_activity filters,
-                    returned in the order specified by sort_by.
+                    max_days_since_first_activity and
+                    max_days_since_last_activity filters, returned in the
+                    order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3137,9 +3187,14 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
             QuestionSubmitterTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if max_days_since_last_activity is not None:
-            last_date = today - datetime.timedelta(
-                days=max_days_since_last_activity)
+        if ((max_days_since_first_activity) or (
+            max_days_since_last_activity)) is not None:
+            if max_days_since_first_activity is not None:
+                first_date = today - datetime.timedelta(
+                    days=max_days_since_first_activity)
+            if max_days_since_last_activity is not None:
+                last_date = today - datetime.timedelta(
+                    days=max_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -3150,10 +3205,24 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     break
                 for result_model in result_models:
                     next_offset += 1
-                    if result_model.last_contribution_date >= last_date:
-                        sorted_results.append(result_model)
-                        if len(sorted_results) == page_size:
-                            break
+                    if ((max_days_since_first_activity) and (
+                        max_days_since_last_activity)) is not None:
+                        if (((result_model.first_contribution_date) <= (
+                            first_date)) and (
+                            result_model.last_contribution_date >= last_date)):
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_first_activity is not None:
+                        if result_model.first_contribution_date <= first_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_last_activity is not None:
+                        if result_model.last_contribution_date >= last_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)
@@ -3365,6 +3434,7 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         page_size: int,
         offset: int,
         sort_by: Optional[SortChoices.value],
+        max_days_since_first_activity: Optional[int],
         max_days_since_last_activity: Optional[int]
     ) -> Tuple[Sequence[QuestionReviewerTotalContributionStatsModel],
                 int,
@@ -3377,6 +3447,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 results matching the query.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
+            max_days_since_first_activity: int|None. To get number of users
+                who are active in max_days_since_first_activity.
             max_days_since_last_activity: int|None. To get number of users
                 who are active in max_days_since_last_activity.
 
@@ -3385,8 +3457,8 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
-                    max_days_since_last_activity filters,
-                    returned in the order specified by sort_by.
+                    max_days_since_first_activity, max_days_since_last_activity
+                    filters, returned in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3419,9 +3491,14 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
             QuestionReviewerTotalContributionStatsModel] = []
         today = datetime.date.today()
 
-        if max_days_since_last_activity is not None:
-            last_date = today - datetime.timedelta(
-                days=max_days_since_last_activity)
+        if ((max_days_since_first_activity) or (
+            max_days_since_last_activity)) is not None:
+            if max_days_since_first_activity is not None:
+                first_date = today - datetime.timedelta(
+                    days=max_days_since_first_activity)
+            if max_days_since_last_activity is not None:
+                last_date = today - datetime.timedelta(
+                    days=max_days_since_last_activity)
             next_offset = offset
             while len(sorted_results) < page_size:
                 result_models: Sequence[
@@ -3432,10 +3509,24 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                     break
                 for result_model in result_models:
                     next_offset += 1
-                    if result_model.last_contribution_date >= last_date:
-                        sorted_results.append(result_model)
-                        if len(sorted_results) == page_size:
-                            break
+                    if ((max_days_since_first_activity) and (
+                        max_days_since_last_activity)) is not None:
+                        if (((result_model.first_contribution_date) <= (
+                            first_date)) and (
+                            result_model.last_contribution_date >= last_date)):
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_first_activity is not None:
+                        if result_model.first_contribution_date <= first_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
+                    elif max_days_since_last_activity is not None:
+                        if result_model.last_contribution_date >= last_date:
+                            sorted_results.append(result_model)
+                            if len(sorted_results) == page_size:
+                                break
         else:
             sorted_results = list(sort_query.fetch(page_size, offset=offset))
             next_offset = offset + len(sorted_results)

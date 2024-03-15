@@ -867,7 +867,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
             rejected_translation_word_count=(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=(
+                datetime.date.today() - datetime.timedelta(7)),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -940,7 +941,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
                 self.ACCEPTED_TRANSLATION_WORD_COUNT),
             rejected_translations_count=(
                 self.REJECTED_TRANSLATIONS_COUNT),
-            first_contribution_date=datetime.datetime.utcnow(),
+            first_contribution_date=(
+                datetime.date.today() - datetime.timedelta(7)),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -1013,7 +1015,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_without_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=(
+                datetime.date.today() - datetime.timedelta(7)),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -1074,7 +1077,8 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             accepted_questions_with_reviewer_edits_count=(
                 self.ACCEPTED_QUESTIONS_WITH_REVIEWER_EDITS_COUNT),
             rejected_questions_count=self.REJECTED_QUESTIONS_COUNT,
-            first_contribution_date=datetime.date.today(),
+            first_contribution_date=(
+                datetime.date.today() - datetime.timedelta(7)),
             last_contribution_date=(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
@@ -1252,6 +1256,39 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_get_translation_submitter_stats_for_first_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_first_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/submission', {
+                'page_size': 4,
+                'offset': 0,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'max_days_since_first_activity': 5,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            1
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_name'],
+            'user4'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
     def test_get_translation_reviewer_stats_for_pagination(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -1339,6 +1376,39 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['stats'][1]['contributor_name'],
             'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_translation_reviewer_stats_for_first_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_first_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/translation/review', {
+                'page_size': 4,
+                'offset': 0,
+                'language_code': self.SUGGESTION_LANGUAGE_CODE,
+                'max_days_since_first_activity': 5,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            1
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_name'],
+            'user4'
         )
         self.assertEqual(
             response['next_offset'],
@@ -1478,6 +1548,38 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
+    def test_get_question_submitter_stats_for_first_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_first_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/submission', {
+                'page_size': 4,
+                'offset': 0,
+                'max_days_since_first_activity': 5,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            1
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_name'],
+            'user4'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
     def test_get_question_reviewer_stats_for_pagination(self) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
@@ -1562,6 +1664,38 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(
             response['stats'][1]['contributor_name'],
             'user2'
+        )
+        self.assertEqual(
+            response['next_offset'],
+            4
+        )
+        self.assertEqual(
+            response['more'],
+            False
+        )
+        self.logout()
+
+    def test_get_question_reviewer_stats_for_first_activity_filter(
+        self
+    ) -> None:
+        self.login(self.CONTRIBUTOR_EMAIL)
+
+        # Test with max_days_since_first_activity filter and pagination.
+        response = self.get_json(
+            '/contributor-dashboard-admin-stats/question/review', {
+                'page_size': 4,
+                'offset': 0,
+                'max_days_since_first_activity': 5,
+                'topic_ids': []
+            })
+
+        self.assertEqual(
+            len(response['stats']),
+            1
+        )
+        self.assertEqual(
+            response['stats'][0]['contributor_name'],
+            'user4'
         )
         self.assertEqual(
             response['next_offset'],

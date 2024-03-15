@@ -55,12 +55,6 @@ export interface TopicChoice {
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
   templateUrl: './contributor-admin-dashboard-page.component.html',
   animations: [
-    trigger('lastActivityDropdown', [
-      state('expanded', style({transform: 'rotate(180deg)'})),
-      state('collapsed', style({transform: 'rotate(0)'})),
-      transition('expanded => collapsed', animate('200ms ease-out')),
-      transition('collapsed => expanded', animate('200ms ease-in')),
-    ]),
     trigger('languageDropdownTrigger', [
       state('expanded', style({transform: 'rotate(180deg)'})),
       state('collapsed', style({transform: 'rotate(0)'})),
@@ -73,11 +67,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   @ViewChild('languageDropdown', {static: false})
   languageDropdownRef!: ElementRef;
 
-  @ViewChild('activityDropdown', {static: false})
-  activityDropdownRef!: ElementRef;
-
   languageDropdownShown: boolean = false;
-  activityDropdownShown: boolean = false;
   activeTab!: string;
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
@@ -91,9 +81,12 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   isQuestionCoordinator!: boolean;
   isTranslationCoordinator!: boolean;
   loadingMessage!: string;
-  selectedLastActivity!: number;
   allTopicNames: string[] = [];
-  lastActivity: number[] = [];
+  today!: Date;
+  selectedFirstActivity!: Date;
+  selectedLastActivity!: Date;
+  selectedFirstActivityInDays!: number;
+  selectedLastActivityInDays!: number;
   selectedTopicIds: string[] = [];
   selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
@@ -137,14 +130,19 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
           }
         );
 
-        this.selectedLastActivity = 0;
-
         this.userService.getUserInfoAsync().then(userInfo => {
           const username = userInfo.getUsername();
 
           if (username === null) {
             return;
           }
+          this.today = new Date();
+          this.selectedFirstActivity = new Date();
+          this.selectedLastActivity = new Date(
+            this.today.getTime() - 24 * 60 * 60 * 1000 * 90
+          );
+          this.selectFirstActivity();
+          this.selectLastActivity();
           this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
           this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
 
@@ -183,7 +181,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
           this.loadingMessage = '';
           this.changeDetectorRef.detectChanges();
-          this.lastActivity = [0, 7, 30, 90];
 
           this.contributorDashboardAdminStatsBackendApiService
             .fetchTopicChoices()
@@ -231,16 +228,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.languageDropdownShown = !this.languageDropdownShown;
   }
 
-  toggleActivityDropdown(): void {
-    this.activityDropdownShown = !this.activityDropdownShown;
-  }
-
   createFilter(): void {
     const tempFilter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      this.selectedLastActivity
+      this.selectedFirstActivityInDays,
+      this.selectedLastActivityInDays
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {
@@ -274,9 +268,50 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.createFilter();
   }
 
-  selectLastActivity(lastActive: number): void {
-    this.selectedLastActivity = lastActive;
-    this.createFilter();
+  changeFirstActivity(value: Date): void {
+    this.selectedFirstActivity = new Date(value);
+    this.selectFirstActivity();
+  }
+
+  changeLastActivity(value: Date): void {
+    this.selectedLastActivity = new Date(value);
+    this.selectLastActivity();
+  }
+
+  selectFirstActivity(): void {
+    this.today = new Date();
+    const selectedFirstDate = new Date(this.selectedFirstActivity);
+    if (this.today.getTime() >= selectedFirstDate.getTime()) {
+      if (
+        this.selectedLastActivity &&
+        selectedFirstDate.getTime() >=
+          new Date(this.selectedLastActivity).getTime()
+      ) {
+        const oneDay = 24 * 60 * 60 * 1000;
+        this.selectedFirstActivityInDays = Math.floor(
+          Math.abs(this.today.getTime() - selectedFirstDate.getTime()) / oneDay
+        );
+        this.createFilter();
+      }
+    }
+  }
+
+  selectLastActivity(): void {
+    this.today = new Date();
+    const selectedLastDate = new Date(this.selectedLastActivity);
+    if (this.today.getTime() >= selectedLastDate.getTime()) {
+      if (
+        this.selectedFirstActivity &&
+        selectedLastDate.getTime() <=
+          new Date(this.selectedFirstActivity).getTime()
+      ) {
+        const oneDay = 24 * 60 * 60 * 1000;
+        this.selectedLastActivityInDays = Math.floor(
+          Math.abs(this.today.getTime() - selectedLastDate.getTime()) / oneDay
+        );
+        this.createFilter();
+      }
+    }
   }
 
   setActiveTab(tabName: string): void {
@@ -410,12 +445,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
       ) {
         this.languageDropdownShown = false;
       }
-    }
-    if (
-      targetElement &&
-      !this.activityDropdownRef.nativeElement.contains(targetElement)
-    ) {
-      this.activityDropdownShown = false;
     }
   }
 }

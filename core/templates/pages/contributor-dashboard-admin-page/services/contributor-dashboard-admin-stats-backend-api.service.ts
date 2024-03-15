@@ -47,6 +47,7 @@ export interface TranslationSubmitterBackendDict {
   rejected_translations_count: number;
   rejected_translation_word_count: number;
   first_contribution_date: string;
+  first_contributed_in_days: number;
   last_contributed_in_days: number;
 }
 
@@ -60,6 +61,7 @@ export interface TranslationReviewerBackendDict {
   accepted_translation_word_count: number;
   rejected_translations_count: number;
   first_contribution_date: string;
+  first_contributed_in_days: number;
   last_contributed_in_days: number;
 }
 
@@ -73,6 +75,7 @@ export interface QuestionSubmitterBackendDict {
   accepted_questions_without_reviewer_edits_count: number;
   rejected_questions_count: number;
   first_contribution_date: string;
+  first_contributed_in_days: number;
   last_contributed_in_days: number;
 }
 
@@ -84,6 +87,7 @@ export interface QuestionReviewerBackendDict {
   accepted_questions_with_reviewer_edits_count: number;
   rejected_questions_count: number;
   first_contribution_date: string;
+  first_contributed_in_days: number;
   last_contributed_in_days: number;
 }
 
@@ -217,6 +221,11 @@ export class ContributorDashboardAdminStatsBackendApiService {
       language_code: filter.languageCode
         ? filter.languageCode
         : PageConstants.DEFAULT_LANGUAGE_FILTER,
+      ...(filter.firstActivity
+        ? {
+            max_days_since_first_activity: filter.firstActivity,
+          }
+        : {}),
       ...(filter.lastActivity
         ? {
             max_days_since_last_activity: filter.lastActivity,

@@ -136,10 +136,26 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   vertical-align: top;
   width: 40%;
 }
-.last-activity-selector-container {
+.date-selector-container {
   display: inline-block;
   vertical-align: top;
-  width: 40%;
+  width: 58%;
+}
+.date-selector-inner-container {
+  align-items: center;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+  padding: 0 10px;
+  position: relative;
+  vertical-align: top;
+}
+.filter-label {
+  margin: 2px;
 }
 @media (max-width: 815px) {
   .oppia-dashboard-container {
@@ -226,7 +242,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   color: #00645c;
 }
 .topic-selector-container {
-  width: 50%;
+  width: 40%;
 }
 .dashboard-tabs .dashboard-tabs-text:hover,
 .dashboard-tabs .dashboard-tabs-text:focus {
@@ -339,8 +355,17 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   .language-selector-container {
     width: auto;
   }
-  .last-activity-selector-container {
+  .date-selector-container {
     width: auto;
+  }
+  .date-selector-inner-container {
+    padding: 0 5px;
+  }
+  .filter-label {
+    margin: 1px;
+  }
+  .double-sided-arrow {
+    font-size: medium;
   }
   .topic-selector-container {
     width: auto;
