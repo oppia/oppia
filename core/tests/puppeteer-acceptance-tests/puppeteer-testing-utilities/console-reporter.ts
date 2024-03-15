@@ -95,12 +95,12 @@ export class ConsoleReporter {
     browser.on('targetcreated', async (target: Target) => {
       if (target.type() === 'page') {
         const page = await target.page();
-        // Here we exclude urls that are opened that are not part of the
-        // application.
         if (!page) {
           return;
         }
         page.on('console', async (message: PuppeteerConsoleMessage) => {
+          // Here we exclude urls that are opened that are not part of the
+          // application.
           if (!page.url().includes(HOST_URL)) {
             return;
           }
