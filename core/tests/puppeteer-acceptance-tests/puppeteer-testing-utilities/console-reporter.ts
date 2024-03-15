@@ -74,6 +74,9 @@ const CONSOLE_ERRORS_TO_FIX = [
   new RegExp(
     'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
   ),
+  escapeRegExp(
+    'http://localhost:8181/dist/oppia-angular-prod/favicon.ico Failed to load resource: the server responded with a status of 404 (Not Found)'
+  ),
 ];
 
 export class ConsoleReporter {
@@ -86,11 +89,11 @@ export class ConsoleReporter {
     browser.on('targetcreated', async (target: Target) => {
       if (target.type() === 'page') {
         const page = await target.page();
-        // Here we include 'about:blank' because this is the default page url
-        // that is passed through when the browser opens.
+        // Here we exclude urls that are opened that are not part of the
+        // application.
         if (
           !page ||
-          (page.url() !== HOST_URL && page.url() !== 'about:blank')
+          (!page.url().includes(HOST_URL) && page.url() !== 'about:blank')
         ) {
           return;
         }
@@ -132,13 +135,15 @@ export class ConsoleReporter {
    * This function reports any console errors that were detected
    * while running the tests.
    */
-  public static reportConsoleErrors(): void {
-    const errors = ConsoleReporter.getConsoleErrors();
+  public static reportConsoleErrors(
+    errorsToIgnore: (RegExp | string)[] = []
+  ): void {
+    const errors = ConsoleReporter.getConsoleErrors(errorsToIgnore);
     if (errors.length > 0) {
       const errorMessages = errors
         .map(
           (error: ConsoleMessage, index: number) =>
-            `${index + 1}. Occured at ${error.url}:\n${error.text}`
+            `${index + 1}. Occured at ${error.url}\n${error.text}`
         )
         .join('\n');
       throw new Error(
@@ -150,13 +155,21 @@ export class ConsoleReporter {
   /**
    * This function gets the console messages that are considered errors.
    */
-  private static getConsoleErrors(): ConsoleMessage[] {
+  private static getConsoleErrors(
+    errorsToIgnore: (RegExp | string)[]
+  ): ConsoleMessage[] {
+    errorsToIgnore = errorsToIgnore.concat(
+      CONSOLE_ERRORS_TO_IGNORE,
+      CONSOLE_ERRORS_TO_FIX
+    );
+
     return ConsoleReporter.consoleMessages
       .filter(
         (message, index, self) =>
           self.findIndex(m => m.text === message.text) === index &&
-          CONSOLE_ERRORS_TO_IGNORE.every(e => message.text.match(e) === null) &&
-          CONSOLE_ERRORS_TO_FIX.every(e => message.text.match(e) === null)
+          errorsToIgnore.every(
+            (error: RegExp | string) => message.text.match(error) === null
+          )
       )
       .filter(message => message.type === 'error');
   }
