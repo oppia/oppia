@@ -683,7 +683,7 @@ export class LoggedInUser extends BaseUser {
 
     const deviceHasMobileWidth = this.viewport.width < BREAKPOINTS.MOBILE;
     const expectedWatchAVideoUrl = deviceHasMobileWidth
-      ? mobileWatchAVideoUrl
+      ? mobileWatchAVideoUrl.split('?')[0]
       : watchAVideoUrl;
     if (this.page.url() !== expectedWatchAVideoUrl) {
       throw new Error('The Watch A Video button does not open the right page!');
