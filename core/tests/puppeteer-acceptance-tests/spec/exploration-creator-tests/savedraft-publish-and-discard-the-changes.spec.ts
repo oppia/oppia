@@ -41,10 +41,10 @@ describe('Exploration Publisher, Saver and Drafter', function () {
     async function () {
       await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.switchToEditorTab();
+      await explorationCreator.updateCardName('Test');
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text'
       );
-      await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
       await explorationCreator.showMessageOfSuccessfulExplorationCreation();
 
