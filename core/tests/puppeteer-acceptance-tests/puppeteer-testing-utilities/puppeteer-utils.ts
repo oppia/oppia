@@ -69,7 +69,7 @@ export class BaseUser {
         args,
       })
       .then(async browser => {
-        ConsoleReporter.trackBrowserConsoleMessages(browser);
+        ConsoleReporter.trackConsoleMessagesInBrowser(browser);
         this.browserObject = browser;
         this.page = await browser.newPage();
 

@@ -25,29 +25,29 @@ import {
   JSHandle,
 } from 'puppeteer';
 
-import _ from 'lodash';
+import {escapeRegExp} from 'lodash';
 
-type ConsoleMessage = {
+interface ConsoleMessage {
   type: ConsoleMessageType;
   text: string;
-};
+}
 
 const CONSOLE_ERRORS_TO_IGNORE = [
   // These "localhost:9099" are errors related to communicating with the
   // Firebase emulator, which would never occur in production, so we just ignore
   // them.
-  _.escapeRegExp(
+  escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
       'relyingparty/getAccountInfo?key=fake-api-key'
   ),
-  _.escapeRegExp(
+  escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
       'relyingparty/verifyPassword?key=fake-api-key'
   ),
   // This error covers the case when the PencilCode site uses an
   // invalid SSL certificate (which can happen when it expires).
   // In such cases, we ignore the error since it is out of our control.
-  _.escapeRegExp(
+  escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
       'load resource: net::ERR_CERT_DATE_INVALID'
   ),
@@ -79,7 +79,7 @@ export class ConsoleReporter {
   /**
    * This function starts to track a browser's console messages.
    */
-  public static trackBrowserConsoleMessages(browser: Browser) {
+  public static trackConsoleMessagesInBrowser(browser: Browser): void {
     browser.on('targetcreated', async (target: Target) => {
       if (target.type() === 'page') {
         const page = await target.page();
@@ -122,7 +122,7 @@ export class ConsoleReporter {
    * This function reports any console errors that were detected
    * while running the tests.
    */
-  public static reportConsoleErrors() {
+  public static reportConsoleErrors(): void {
     const errors = ConsoleReporter.getConsoleErrors();
     if (errors.length > 0) {
       const errorMessages = errors
