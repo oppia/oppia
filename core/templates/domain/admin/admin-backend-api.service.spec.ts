@@ -16,15 +16,20 @@
  * @fileoverview Unit tests for AdminBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { AdminPageData, AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { PlatformParameterFilterType } from 'domain/platform-parameter/platform-parameter-filter.model';
-import { PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
-import { CsrfTokenService } from 'services/csrf-token.service';
+import {
+  AdminPageData,
+  AdminBackendApiService,
+} from 'domain/admin/admin-backend-api.service';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-parameter-filter.model';
+import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
+import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('Admin backend api service', () => {
   let abas: AdminBackendApiService;

@@ -141,7 +141,7 @@ var AdminPage = function () {
     );
   };
 
-  this.get = async function() {
+  this.get = async function () {
     await browser.url(ADMIN_URL_SUFFIX);
     await waitFor.pageToFullyLoad();
   };
@@ -151,7 +151,7 @@ var AdminPage = function () {
     await waitFor.pageToFullyLoad();
   };
 
-  this._editUserRole = async function(username) {
+  this._editUserRole = async function (username) {
     await this.get();
     await _switchToRolesTab();
     await action.setValue(
