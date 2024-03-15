@@ -287,7 +287,6 @@
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "Hanya moderator dan admin situs yang dapat melihat ini.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Terima berita dan pemberitahuan mengenai situs ini",
 	"I18N_PREFERENCES_HEADING": "Preferensi",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Semua perubahan yang anda lakukan di halaman ini akan tersimpan secara otomatis.",
 	"I18N_PREFERENCES_PAGE_TITLE": "Ubah preferensi profil anda - Oppia",
 	"I18N_PREFERENCES_PICTURE": "Gambar",
 	"I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE": "Preferensi Bahasa Eksplorasi",

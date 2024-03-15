@@ -380,7 +380,6 @@
 	"I18N_PREFERENCES_EMAIL_EXPLAIN": "중재자와 사이트 관리자만 당신의 이메일 주소를 볼 수 있습니다.",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "이 사이트에 대한 소식이나 업데이트 받기",
 	"I18N_PREFERENCES_HEADING": "환경 설정",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "당신이 이 페이지에 한 모든 것들은 자동 저장됩니다.",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "환경 설정 | Oppia",
 	"I18N_PREFERENCES_PICTURE": "사진",
 	"I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE": "선호하는 오디오 언어",

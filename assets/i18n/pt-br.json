@@ -1106,7 +1106,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "Isso fará o download dos dados da sua conta Oppia como um arquivo de texto formatado em JSON.",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT": "Por favor, não saia desta página. Seus dados estão sendo carregados e serão baixados como um arquivo de texto formatado em JSON após a conclusão. Se algo der errado, entre em contato",
 	"I18N_PREFERENCES_HEADING": "Preferências",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Qualquer alteração que você fizer nesta página será salva automaticamente.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Você ainda não se inscreveu em nenhum criador de conteúdo. Clique no botão \"inscrever-se\" do seu autor favorito no perfil dele. Ao inscrever-se você será notificado por e-mail quando o autor postar uma nova lição.",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "Impacto",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "Preferências | Oppia",
