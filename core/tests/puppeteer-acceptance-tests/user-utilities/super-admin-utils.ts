@@ -25,7 +25,6 @@ const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
 const roleEditorButtonSelector = 'button.e2e-test-role-edit-button';
 const rolesSelectDropdown = 'div.mat-select-trigger';
 const addRoleButton = 'button.oppia-add-role-button';
-const progressSpinner = 'div.e2e-test-progress-spinner';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -44,11 +43,12 @@ export class SuperAdmin extends BaseUser {
         allRoles[i]
       );
       if (roleText.toLowerCase() === role) {
-        await allRoles[i].click();
-        await this.page.waitForSelector(progressSpinner, {hidden: true});
-        await this.page.waitForSelector(
-          `.e2e-test-${role.split(' ').join('-')}-remove-button-container`
-        );
+        // Here we are clicking on the role in the DOM since the options
+        // might not be in view.
+        await Promise.all([
+          allRoles[i].evaluate(role => (role as HTMLElement).click(), role),
+          this.page.waitForNetworkIdle(),
+        ]);
         return;
       }
     }

@@ -19,6 +19,7 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {BlogPostEditor} from '../../user-utilities/blog-post-editor-utils';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
@@ -59,6 +60,10 @@ describe('Blog Editor', function () {
     },
     DEFAULT_SPEC_TIMEOUT
   );
+
+  afterEach(function () {
+    ConsoleReporter.reportConsoleErrors();
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

@@ -19,6 +19,7 @@
 import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../functions/is-element-clickable';
+import {ConsoleReporter} from './console-reporter';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -68,6 +69,7 @@ export class BaseUser {
         args,
       })
       .then(async browser => {
+        ConsoleReporter.trackBrowserConsoleMessages(browser);
         this.browserObject = browser;
         this.page = await browser.newPage();
 
@@ -98,6 +100,7 @@ export class BaseUser {
           }
         });
       });
+
     return this.page;
   }
 
