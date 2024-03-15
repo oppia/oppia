@@ -53,7 +53,9 @@ describe('Voiceover player', function () {
     );
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorPage.navigateToTranslationTab();
+    await browser.pause(10000);
     await explorationEditorTranslationTab.exitTutorial();
+    await browser.pause(10000);
     await explorationEditorTranslationTab.uploadAudioFileForLanguage(
       'हिन्दी (Hindi)',
       '../data/cafe.mp3'
