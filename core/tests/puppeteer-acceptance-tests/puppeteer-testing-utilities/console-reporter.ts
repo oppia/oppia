@@ -27,9 +27,12 @@ import {
 
 import escapeRegExp from 'lodash/escapeRegExp';
 
+const HOST_URL = 'http://localhost:8181';
+
 interface ConsoleMessage {
   type: ConsoleMessageType;
   text: string;
+  url: string;
 }
 
 const CONSOLE_ERRORS_TO_IGNORE = [
@@ -83,7 +86,7 @@ export class ConsoleReporter {
     browser.on('targetcreated', async (target: Target) => {
       if (target.type() === 'page') {
         const page = await target.page();
-        if (!page) {
+        if (!page || !page.url().includes(HOST_URL)) {
           return;
         }
         page.on('console', async (message: PuppeteerConsoleMessage) => {
@@ -104,14 +107,16 @@ export class ConsoleReporter {
             messageText = messages.join(' ');
           }
 
-          // Here we concat the page's url with the message's source if it is present.
-          const url = message.location().url
-            ? `${page.url()} ${message.location().url}`
-            : page.url();
+          // Here we concat the message text with the message's source if it is present.
+          const messageSource = message.location().url;
+          messageText = messageSource
+            ? `${messageSource} ${messageText}`
+            : messageText;
 
           ConsoleReporter.consoleMessages.push({
             type: message.type(),
-            text: `${url} ${messageText}`,
+            text: `${messageText}`,
+            url: page.url(),
           });
         });
       }
@@ -128,7 +133,7 @@ export class ConsoleReporter {
       const errorMessages = errors
         .map(
           (error: ConsoleMessage, index: number) =>
-            `${index + 1}. ${error.text}`
+            `${index + 1}. Occured at ${error.url}:\n${error.text}`
         )
         .join('\n');
       throw new Error(
