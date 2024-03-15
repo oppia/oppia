@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility File for detecting and filtering console logs
- * while running puppeteer acceptance tests.
+ * @fileoverview Utility File for detecting, filtering and reporting
+ * certain console logs while running puppeteer tests.
  */
 
 import {
@@ -139,8 +139,7 @@ export class ConsoleReporter {
   }
 
   /**
-   * This function reports any console errors that were detected
-   * while running the tests.
+   * This function reports any console errors that were detected.
    */
   public static reportConsoleErrors(
     errorsToIgnore: (RegExp | string)[] = []
@@ -171,14 +170,13 @@ export class ConsoleReporter {
       CONSOLE_ERRORS_TO_FIX
     );
 
-    return ConsoleReporter.consoleMessages
-      .filter(
-        (message, index, self) =>
-          self.findIndex(m => m.text === message.text) === index &&
-          errorsToIgnore.every(
-            (error: RegExp | string) => message.text.match(error) === null
-          )
-      )
-      .filter(message => message.type === 'error');
+    return ConsoleReporter.consoleMessages.filter(
+      (message, index, self) =>
+        message.type === 'error' &&
+        self.findIndex(m => m.text === message.text) === index &&
+        errorsToIgnore.every(
+          (error: RegExp | string) => message.text.match(error) === null
+        )
+    );
   }
 }
