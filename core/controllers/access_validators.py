@@ -114,7 +114,7 @@ class TopicViewerPageAccessValidationHandler(
     @acl_decorators.can_access_topic_viewer_page
     def get(self, _: str) -> None:
         """Handles GET requests."""
-        pass  
+        pass
 
 
 class ProfileExistsValidationHandler(

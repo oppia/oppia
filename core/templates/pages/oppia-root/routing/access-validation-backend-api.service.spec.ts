@@ -233,32 +233,31 @@ describe('Access validation backend api service', () => {
 
   it('should not validate access to blog author profile page with invalid ' +
   'access', fakeAsync (() => {
-    avbas.validateAccessToBlogAuthorProfilePage('username').then(
-      successSpy, failSpy);
+      avbas.validateAccessToBlogAuthorProfilePage('username').then(
+        successSpy, failSpy);
 
-    const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_blog_author_profile_page/username'
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Access Denied.'
-    }, {
-      status: 401, statusText: 'Access Denied.'
-    });
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_blog_author_profile_page/username'
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush({
+        error: 'Access Denied.'
+      }, {
+        status: 401, statusText: 'Access Denied.'
+      });
 
-    flushMicrotasks();
-    expect(successSpy).not.toHaveBeenCalled();
-    expect(failSpy).toHaveBeenCalled();
-  })
-  );
+      flushMicrotasks();
+      expect(successSpy).not.toHaveBeenCalled();
+      expect(failSpy).toHaveBeenCalled();
+    }));
 
   it('should not validate access to topic viewer page with invalid ' +
   'access', fakeAsync (() => {
     avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
 
-    const req = httpTestingController.expectOne(
+     const req = httpTestingController.expectOne(
      '/access_validation_handler/can_access_topic_viewer_page');
-    expect(req.request.method).toEqual('GET');
+     expect(req.request.method).toEqual('GET');
     req.flush({
       error: 'Access Denied.'
     }, {
@@ -273,14 +272,14 @@ describe('Access validation backend api service', () => {
   );
 
 
-  it('should validate access to topic viewer page with valid access', fakeAsync (
-    () => {
-    avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
+  it('should validate access to topic viewer page with valid ' +
+  'access', fakeAsync (() => {
+      avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
 
 
-    const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_topic_viewer_page');
-    expect(req.request.method).toEqual('GET');
+      const req = httpTestingController.expectOne(
+        '/access_validation_handler/can_access_topic_viewer_page');
+      expect(req.request.method).toEqual('GET');
     req.flush({});
 
 

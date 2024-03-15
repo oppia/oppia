@@ -38,7 +38,6 @@ export class TopicViewerAccessGuard implements CanActivate {
     private router: Router,
     private location: Location
   ) {}
-  
   async canActivate(
       _route: ActivatedRouteSnapshot,
       state: RouterStateSnapshot
