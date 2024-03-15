@@ -680,16 +680,12 @@ export class LoggedInUser extends BaseUser {
       this.page.waitForNavigation(),
       this.clickOn(watchAVideoButton),
     ]);
-    const url = this.page.url().split('?')[0];
-    if (
-      this.viewport.width < BREAKPOINTS.MOBILE &&
-      url !== mobileWatchAVideoUrl
-    ) {
-      throw new Error('The Watch A Video button does not open the right page!');
-    } else if (
-      this.viewport.width >= BREAKPOINTS.MOBILE &&
-      url !== watchAVideoUrl
-    ) {
+
+    const deviceHasMobileWidth = this.viewport.width < BREAKPOINTS.MOBILE;
+    const expectedWatchAVideoUrl = deviceHasMobileWidth
+      ? mobileWatchAVideoUrl
+      : watchAVideoUrl;
+    if (this.page.url() !== expectedWatchAVideoUrl) {
       throw new Error('The Watch A Video button does not open the right page!');
     }
     showMessage('The Watch A Video button opens the right page.');

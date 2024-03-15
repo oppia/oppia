@@ -74,10 +74,12 @@ const CONSOLE_ERRORS_TO_FIX = [
   new RegExp(
     'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
   ),
+  // TODO(#19687): 404 (Not Found) for favicon on home page.
   escapeRegExp(
     'http://localhost:8181/dist/oppia-angular-prod/favicon.ico Failed ' +
       'to load resource: the server responded with a status of 404 (Not Found)'
   ),
+  // TODO(#19733): 404 (Not Found) for resources used in midi-js.
   escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/acoustic' +
       '_grand_piano-ogg.js Failed to load resource: the server responded with a ' +
@@ -149,7 +151,7 @@ export class ConsoleReporter {
       const errorMessages = errors
         .map(
           (error: ConsoleMessage, index: number) =>
-            `${index + 1}. Occured at ${error.url}\n${error.text}`
+            `${index + 1}. Occurred at ${error.url}\n${error.text}`
         )
         .join('\n');
       ConsoleReporter.consoleMessages = [];

@@ -1123,19 +1123,6 @@ class ManagedProcessTests(test_utils.TestBase):
                 stdout=subprocess.PIPE)):
             self.assertEqual(os.getenv('MOBILE'), 'true')
 
-    def test_managed_acceptance_test_server_mobile_with_invalid_suite(
-        self
-    ) -> None:
-        suite_name = 'invalid_suite'
-
-        expected_regexp = 'Invalid suite name: %s' % suite_name
-        with self.assertRaisesRegex(Exception, expected_regexp):
-            self.exit_stack.enter_context(
-                servers.managed_acceptance_tests_server(
-                    suite_name=suite_name,
-                    mobile=True,
-                    stdout=subprocess.PIPE))
-
 
 class GetChromedriverVersionTests(test_utils.TestBase):
 

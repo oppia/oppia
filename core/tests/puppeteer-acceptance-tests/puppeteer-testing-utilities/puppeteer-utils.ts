@@ -147,7 +147,7 @@ export class BaseUser {
    * This function waits for an element to be clickable either by its CSS selector or
    * by the ElementHandle.
    */
-  async waitForClickable(
+  async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
     try {
@@ -173,10 +173,10 @@ export class BaseUser {
       `\/\/*[contains(text(), normalize-space('${selector}'))]`
     );
     if (button !== undefined) {
-      await this.waitForClickable(button);
+      await this.waitForElementToBeClickable(button);
       await button.click();
     } else {
-      await this.waitForClickable(selector);
+      await this.waitForElementToBeClickable(selector);
       await this.page.click(selector);
     }
   }

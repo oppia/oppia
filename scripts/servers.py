@@ -761,8 +761,6 @@ def managed_acceptance_tests_server(
     """
     if not mobile and suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
         raise Exception('Invalid suite name: %s' % suite_name)
-    if mobile and suite_name not in common.MOBILE_ACCEPTANCE_TESTS_SUITE_NAMES:
-        raise Exception('Invalid suite name: %s' % suite_name)
 
     if headless:
         os.environ['HEADLESS'] = 'true'
