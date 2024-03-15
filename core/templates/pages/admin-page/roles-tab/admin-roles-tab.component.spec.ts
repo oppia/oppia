@@ -87,7 +87,6 @@ describe('Admin roles tab component ', function () {
     roleToActions: {
       Admin: ['Accept any suggestion', 'Access creator dashboard'],
     },
-    configProperties: {},
     viewableRoles: ['MODERATOR', 'TOPIC_MANAGER'],
     humanReadableRoles: {
       FULL_USER: 'full user',

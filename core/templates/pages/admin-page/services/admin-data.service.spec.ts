@@ -67,15 +67,6 @@ describe('Admin Data Service', () => {
     updatable_roles: ['TOPIC_MANAGER'],
     human_readable_current_time: 'June 03 15:31:20',
     demo_collections: [],
-    config_properties: {
-      record_playthrough_probability: {
-        schema: {
-          type: 'float',
-        },
-        value: 0.2,
-        description: 'The record_playthrough_probability.',
-      },
-    },
     demo_exploration_ids: ['19'],
     demo_explorations: [['0', 'welcome.yaml']],
     viewable_roles: ['TOPIC_MANAGER'],
@@ -119,7 +110,6 @@ describe('Admin Data Service', () => {
       demoExplorationIds: sampleAdminData.demo_exploration_ids,
       updatableRoles: sampleAdminData.updatable_roles,
       roleToActions: sampleAdminData.role_to_actions,
-      configProperties: sampleAdminData.config_properties,
       viewableRoles: sampleAdminData.viewable_roles,
       humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
