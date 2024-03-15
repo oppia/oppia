@@ -403,14 +403,15 @@ class CreateVoiceArtistMetadataModelsJob(base_jobs.JobBase):
                 )
             )
 
-        exploration_voice_artists_link_model = (
-            voiceover_services.
-            create_exploration_voice_artists_link_model_instance(
-                exploration_id, content_id_to_voiceovers_mapping
+        with datastore_services.get_ndb_context():
+            exploration_voice_artists_link_model = (
+                voiceover_services.
+                create_exploration_voice_artists_link_model_instance(
+                    exploration_id, content_id_to_voiceovers_mapping
+                )
             )
-        )
 
-        return exploration_voice_artists_link_model
+            return exploration_voice_artists_link_model
 
     def extract_exploration_id_from_snapshot_id(
         self,
