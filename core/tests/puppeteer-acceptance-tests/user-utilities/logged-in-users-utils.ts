@@ -88,9 +88,9 @@ const thanksForDonatingClass = '.modal-open';
 const donatePage = '.modal-backdrop.fade';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
-const mobileSidebarAboutButton = 'a.e2e-mobile-test-about-link';
+const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
 const mobileSidebarAboutFoundationButton =
-  'a.e2e-mobile-test-about-foundation-button';
+  'a.e2e-mobile-test-sidebar-about-foundation-button';
 const mobileSidebarExpandGetInvolvedMenuButton =
   'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
 const mobileSidebarGetInvolvedMenuPartnershipsButton =
