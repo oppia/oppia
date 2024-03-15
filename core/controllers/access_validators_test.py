@@ -416,6 +416,15 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the blog home page and its rendering."""
 
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+
     def test_any_user_can_access_topic_viewer_page(self) -> None:
         self.get_json(
            '%s/can_access_topic_viewer_page' %
