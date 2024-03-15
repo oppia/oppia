@@ -18,8 +18,8 @@
  */
 
 export interface StoryReferenceBackendDict {
-  'story_id': string;
-  'story_is_published': boolean;
+  story_id: string;
+  story_is_published: boolean;
 }
 
 export class StoryReference {
@@ -41,10 +41,12 @@ export class StoryReference {
   }
 
   static createFromBackendDict(
-      storyReferenceBackendDict: StoryReferenceBackendDict): StoryReference {
+    storyReferenceBackendDict: StoryReferenceBackendDict
+  ): StoryReference {
     return new StoryReference(
       storyReferenceBackendDict.story_id,
-      storyReferenceBackendDict.story_is_published);
+      storyReferenceBackendDict.story_is_published
+    );
   }
 
   static createFromStoryId(storyId: string): StoryReference {

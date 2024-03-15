@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for testInteractionPanel.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { TestInteractionPanel } from './test-interaction-panel.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {TestInteractionPanel} from './test-interaction-panel.component';
 
 class MockNgbModal {
   close() {
@@ -33,8 +33,8 @@ class MockExplorationStatesService {
   getState(item1: string) {
     return {
       interaction: {
-        id: 'TextInput'
-      }
+        id: 'TextInput',
+      },
     };
   }
 }
@@ -46,21 +46,19 @@ describe('Test Interaction Panel Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TestInteractionPanel
-      ],
+      declarations: [TestInteractionPanel],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         {
           provide: ExplorationStatesService,
-          useClass: MockExplorationStatesService
+          useClass: MockExplorationStatesService,
         },
-        CurrentInteractionService
+        CurrentInteractionService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -73,22 +71,21 @@ describe('Test Interaction Panel Component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize controller properties after its initialization',
-    () => {
-      spyOn(currentInteractionService, 'isSubmitButtonDisabled')
-        .and.returnValue(false);
+  it('should initialize controller properties after its initialization', () => {
+    spyOn(currentInteractionService, 'isSubmitButtonDisabled').and.returnValue(
+      false
+    );
 
-      component.stateName = 'TextInput';
-      component.ngOnInit();
-      let isSubmitButtonDisabled = component.isSubmitButtonDisabled();
+    component.stateName = 'TextInput';
+    component.ngOnInit();
+    let isSubmitButtonDisabled = component.isSubmitButtonDisabled();
 
-      expect(component.interactionIsInline).toEqual(true);
-      expect(isSubmitButtonDisabled).toEqual(false);
-    });
+    expect(component.interactionIsInline).toEqual(true);
+    expect(isSubmitButtonDisabled).toEqual(false);
+  });
 
   it('should submit answer when clicking on button', () => {
-    spyOn(currentInteractionService, 'submitAnswer')
-      .and.stub();
+    spyOn(currentInteractionService, 'submitAnswer').and.stub();
 
     component.stateName = 'TextInput';
     component.ngOnInit();

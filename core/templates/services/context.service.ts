@@ -17,17 +17,17 @@
  * context.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { EntityContext } from 'domain/utilities/entity-context.model';
-import { ServicesConstants } from 'services/services.constants';
-import { UrlService } from 'services/contextual/url.service';
-import { BlogPostPageService } from 'pages/blog-post-page/services/blog-post-page.service';
+import {AppConstants} from 'app.constants';
+import {EntityContext} from 'domain/utilities/entity-context.model';
+import {ServicesConstants} from 'services/services.constants';
+import {UrlService} from 'services/contextual/url.service';
+import {BlogPostPageService} from 'pages/blog-post-page/services/blog-post-page.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContextService {
   constructor(
@@ -44,8 +44,8 @@ export class ContextService {
   // it (using the appropriate reset fn) initially. Since these are static,
   // depending on the order of tests, values may be retained across tests.
   static customEntityContext: EntityContext | null = null;
-  static imageSaveDestination: string = (
-    AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+  static imageSaveDestination: string =
+    AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
 
   // Page Context is null initially when no shared service exist.
   pageContext: string | null = null;
@@ -98,10 +98,12 @@ export class ContextService {
     } else {
       let pathnameArray = this.urlService.getPathname().split('/');
       for (let i = 0; i < pathnameArray.length; i++) {
-        if (pathnameArray[i] === 'explore' ||
-            pathnameArray[i] === 'lesson' ||
-            (pathnameArray[i] === 'embed' &&
-                pathnameArray[i + 1] === 'exploration')) {
+        if (
+          pathnameArray[i] === 'explore' ||
+          pathnameArray[i] === 'lesson' ||
+          (pathnameArray[i] === 'embed' &&
+            pathnameArray[i + 1] === 'exploration')
+        ) {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
           return ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER;
         } else if (pathnameArray[i] === 'create') {
@@ -121,27 +123,27 @@ export class ContextService {
           return ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR;
         } else if (
           pathnameArray[i] === 'session' ||
-            pathnameArray[i] === 'review-test') {
+          pathnameArray[i] === 'review-test'
+        ) {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
           return ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER;
         } else if (pathnameArray[i] === 'collection_editor') {
           this.pageContext = ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR;
         } else if (pathnameArray[i] === 'topics-and-skills-dashboard') {
-          this.pageContext = (
-            ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD);
+          this.pageContext =
+            ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
           return ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD;
         } else if (pathnameArray[i] === 'contributor-dashboard') {
-          this.pageContext = (
-            ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD);
+          this.pageContext =
+            ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
           return ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD;
         } else if (pathnameArray[i] === 'blog-dashboard') {
-          this.pageContext = (
-            ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD);
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD;
           return ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD;
         } else if (pathnameArray[i] === 'edit-learner-group') {
-          this.pageContext = (
-            ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR);
+          this.pageContext =
+            ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR;
         }
       }
@@ -175,9 +177,10 @@ export class ContextService {
   isInExplorationContext(): boolean {
     return (
       this.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
       this.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER
+    );
   }
 
   // This function is used in cases where the URL does not specify the
@@ -185,7 +188,9 @@ export class ContextService {
   // any page via the RTE.
   setCustomEntityContext(entityType: string, entityId: string): void {
     ContextService.customEntityContext = new EntityContext(
-      entityId, entityType);
+      entityId,
+      entityType
+    );
   }
 
   removeCustomEntityContext(): void {
@@ -223,11 +228,12 @@ export class ContextService {
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
     for (let i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'create' ||
-          pathnameArray[i] === 'explore' ||
-          pathnameArray[i] === 'lesson' ||
-          (pathnameArray[i] === 'embed' &&
-              pathnameArray[i + 1] === 'exploration')) {
+      if (
+        pathnameArray[i] === 'create' ||
+        pathnameArray[i] === 'explore' ||
+        pathnameArray[i] === 'lesson' ||
+        (pathnameArray[i] === 'embed' && pathnameArray[i + 1] === 'exploration')
+      ) {
         return AppConstants.ENTITY_TYPE.EXPLORATION;
       }
       if (pathnameArray[i] === 'topic_editor') {
@@ -267,10 +273,12 @@ export class ContextService {
       // /create/{exploration_id} or /embed/exploration/{exploration_id}.
       let pathnameArray = this.urlService.getPathname().split('/');
       for (let i = 0; i < pathnameArray.length; i++) {
-        if (pathnameArray[i] === 'explore' ||
-            pathnameArray[i] === 'create' ||
-            pathnameArray[i] === 'skill_editor' ||
-            pathnameArray[i] === 'lesson') {
+        if (
+          pathnameArray[i] === 'explore' ||
+          pathnameArray[i] === 'create' ||
+          pathnameArray[i] === 'skill_editor' ||
+          pathnameArray[i] === 'lesson'
+        ) {
           this.explorationId = pathnameArray[i + 1];
           return pathnameArray[i + 1];
         }
@@ -282,7 +290,7 @@ export class ContextService {
     }
     throw new Error(
       'ContextService should not be used outside the ' +
-      'context of an exploration or a question.'
+        'context of an exploration or a question.'
     );
   }
 
@@ -296,15 +304,17 @@ export class ContextService {
     // /learner-group/{group_id}.
     let pathnameArray = this.urlService.getPathname().split('/');
     for (let i = 0; i < pathnameArray.length; i++) {
-      if (pathnameArray[i] === 'edit-learner-group' ||
-          pathnameArray[i] === 'learner-group') {
+      if (
+        pathnameArray[i] === 'edit-learner-group' ||
+        pathnameArray[i] === 'learner-group'
+      ) {
         this.learnerGroupId = pathnameArray[i + 1];
         return pathnameArray[i + 1];
       }
     }
     throw new Error(
       'ContextService should not be used outside the ' +
-      'context of a learner group.'
+        'context of a learner group.'
     );
   }
 
@@ -313,34 +323,37 @@ export class ContextService {
   isInExplorationEditorMode(): boolean {
     return (
       this.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
-      this.getEditorTabContext() === (
-        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
+        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
+      this.getEditorTabContext() ===
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR
+    );
   }
 
   isInQuestionPlayerMode(): boolean {
     return (
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER ||
-        this.questionPlayerIsManuallySet);
+      this.questionPlayerIsManuallySet
+    );
   }
 
   isInExplorationPlayerPage(): boolean {
     return (
       this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER
+    );
   }
 
   isInExplorationEditorPage(): boolean {
     return (
       this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
+    );
   }
 
   isInBlogPostEditorPage(): boolean {
     return (
-      this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD
     );
   }
 
@@ -357,18 +370,18 @@ export class ContextService {
       ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD,
       ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD,
     ];
-    return (allowedPageContext.includes(currentPageContext));
+    return allowedPageContext.includes(currentPageContext);
   }
 
   // Sets the current context to save images to the server.
   resetImageSaveDestination(): void {
-    ContextService.imageSaveDestination = (
-      AppConstants.IMAGE_SAVE_DESTINATION_SERVER);
+    ContextService.imageSaveDestination =
+      AppConstants.IMAGE_SAVE_DESTINATION_SERVER;
   }
 
   setImageSaveDestinationToLocalStorage(): void {
-    ContextService.imageSaveDestination = (
-      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE);
+    ContextService.imageSaveDestination =
+      AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE;
   }
 
   getImageSaveDestination(): string {
@@ -376,5 +389,6 @@ export class ContextService {
   }
 }
 
-angular.module('oppia').factory(
-  'ContextService', downgradeInjectable(ContextService));
+angular
+  .module('oppia')
+  .factory('ContextService', downgradeInjectable(ContextService));

@@ -16,10 +16,9 @@
  * @fileoverview Tests for language accent removal confirmation modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { VoiceoverRemovalConfirmModalComponent } from './language-accent-removal-confirm-modal.component';
-
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {VoiceoverRemovalConfirmModalComponent} from './language-accent-removal-confirm-modal.component';
 
 describe('Language Accent Removal Confirmation Modal', () => {
   let fixture: ComponentFixture<VoiceoverRemovalConfirmModalComponent>;
@@ -29,12 +28,8 @@ describe('Language Accent Removal Confirmation Modal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        VoiceoverRemovalConfirmModalComponent
-      ],
-      providers: [
-        NgbActiveModal,
-      ]
+      declarations: [VoiceoverRemovalConfirmModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

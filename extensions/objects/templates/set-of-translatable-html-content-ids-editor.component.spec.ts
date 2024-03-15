@@ -16,9 +16,9 @@
  * @fileoverview Component for set of translatable html content id editor.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { SetOfTranslatableHtmlContentIdsEditorComponent } from './set-of-translatable-html-content-ids-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {SetOfTranslatableHtmlContentIdsEditorComponent} from './set-of-translatable-html-content-ids-editor.component';
 
 describe('SetOfTranslatableHtmlContentIdsEditorComponent', () => {
   let component: SetOfTranslatableHtmlContentIdsEditorComponent;
@@ -27,47 +27,51 @@ describe('SetOfTranslatableHtmlContentIdsEditorComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [SetOfTranslatableHtmlContentIdsEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      SetOfTranslatableHtmlContentIdsEditorComponent);
+      SetOfTranslatableHtmlContentIdsEditorComponent
+    );
     component = fixture.componentInstance;
 
     component.initArgs = {
       choices: [
         {
-          val: 'ca_choices_1'
+          val: 'ca_choices_1',
         },
         {
-          val: 'ca_choices_2'
+          val: 'ca_choices_2',
         },
         {
-          val: 'ca_choices_3'
-        }
-      ]
+          val: 'ca_choices_3',
+        },
+      ],
     };
 
     component.ngOnInit();
   });
 
-  it('should initialise when usr adds response for \'Item Selection\' ' +
-  'interaction', () => {
-    expect(component.choices).toEqual([
-      {
-        val: 'ca_choices_1'
-      },
-      {
-        val: 'ca_choices_2'
-      },
-      {
-        val: 'ca_choices_3'
-      }
-    ]);
-    expect(component.selections).toEqual([false, false, false]);
-  });
+  it(
+    "should initialise when usr adds response for 'Item Selection' " +
+      'interaction',
+    () => {
+      expect(component.choices).toEqual([
+        {
+          val: 'ca_choices_1',
+        },
+        {
+          val: 'ca_choices_2',
+        },
+        {
+          val: 'ca_choices_3',
+        },
+      ]);
+      expect(component.selections).toEqual([false, false, false]);
+    }
+  );
 
   it('should initialise component when user edits response', () => {
     component.value = ['ca_choices_2'];
@@ -81,14 +85,14 @@ describe('SetOfTranslatableHtmlContentIdsEditorComponent', () => {
     expect(component.value).toEqual(['ca_choices_2']);
     expect(component.choices).toEqual([
       {
-        val: 'ca_choices_1'
+        val: 'ca_choices_1',
       },
       {
-        val: 'ca_choices_2'
+        val: 'ca_choices_2',
       },
       {
-        val: 'ca_choices_3'
-      }
+        val: 'ca_choices_3',
+      },
     ]);
     expect(component.selections).toEqual([false, true, false]);
   });

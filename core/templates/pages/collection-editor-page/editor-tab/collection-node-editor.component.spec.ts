@@ -16,19 +16,21 @@
  * @fileoverview Unit tests for for Collection node editor component.
  */
 
-import { async, ComponentFixture, TestBed } from
-  '@angular/core/testing';
-import { CollectionNodeEditorComponent } from './collection-node-editor.component';
-import { CollectionLinearizerService } from '../services/collection-linearizer.service';
-import { AlertsService } from 'services/alerts.service';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
-import { Collection, CollectionBackendDict } from 'domain/collection/collection.model';
-import { CollectionNode } from 'domain/collection/collection-node.model';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {CollectionNodeEditorComponent} from './collection-node-editor.component';
+import {CollectionLinearizerService} from '../services/collection-linearizer.service';
+import {AlertsService} from 'services/alerts.service';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
+import {
+  Collection,
+  CollectionBackendDict,
+} from 'domain/collection/collection.model';
+import {CollectionNode} from 'domain/collection/collection-node.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 
 describe('Collection node editor component ', () => {
   let component: CollectionNodeEditorComponent;
@@ -38,8 +40,7 @@ describe('Collection node editor component ', () => {
   let collectionEditorStateService: CollectionEditorStateService;
 
   let sampleCollection: Collection;
-  let learnerExplorationSummaryBackendDict:
-    LearnerExplorationSummaryBackendDict;
+  let learnerExplorationSummaryBackendDict: LearnerExplorationSummaryBackendDict;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -47,10 +48,10 @@ describe('Collection node editor component ', () => {
         BrowserAnimationsModule,
         MaterialModule,
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
       ],
       declarations: [CollectionNodeEditorComponent],
-      providers: []
+      providers: [],
     }).compileComponents();
   }));
 
@@ -61,8 +62,8 @@ describe('Collection node editor component ', () => {
     alertsService = TestBed.inject(AlertsService);
     collectionEditorStateService = TestBed.inject(CollectionEditorStateService);
 
-    component.collectionNode = CollectionNode.createFromExplorationId(
-      'exp_id0');
+    component.collectionNode =
+      CollectionNode.createFromExplorationId('exp_id0');
 
     learnerExplorationSummaryBackendDict = {
       activity_type: 'exploration',
@@ -76,7 +77,7 @@ describe('Collection node editor component ', () => {
         2: 0,
         3: 0,
         4: 0,
-        5: 0
+        5: 0,
       },
       human_readable_contributors_summary: {},
       language_code: 'en',
@@ -86,7 +87,7 @@ describe('Collection node editor component ', () => {
       tags: [],
       thumbnail_bg_color: '#cc4b00',
       thumbnail_icon_url: '/subjects/Algebra.svg',
-      title: 'a title'
+      title: 'a title',
     };
 
     let sampleCollectionBackendObject: CollectionBackendDict = {
@@ -98,25 +99,27 @@ describe('Collection node editor component ', () => {
       category: 'a category',
       version: 1,
       schema_version: 1,
-      nodes: [{
-        exploration_id: 'exp_id0',
-        exploration_summary: learnerExplorationSummaryBackendDict
-      },
-      {
-        exploration_id: 'exp_id1',
-        exploration_summary: learnerExplorationSummaryBackendDict
-      }],
+      nodes: [
+        {
+          exploration_id: 'exp_id0',
+          exploration_summary: learnerExplorationSummaryBackendDict,
+        },
+        {
+          exploration_id: 'exp_id1',
+          exploration_summary: learnerExplorationSummaryBackendDict,
+        },
+      ],
       playthrough_dict: {
         next_exploration_id: 'expId',
-        completed_exploration_ids: ['expId2']
-      }
+        completed_exploration_ids: ['expId2'],
+      },
     };
 
-    sampleCollection = Collection.create(
-      sampleCollectionBackendObject);
+    sampleCollection = Collection.create(sampleCollectionBackendObject);
 
-    spyOn(collectionEditorStateService, 'getCollection')
-      .and.returnValue(sampleCollection);
+    spyOn(collectionEditorStateService, 'getCollection').and.returnValue(
+      sampleCollection
+    );
     fixture.detectChanges();
   });
 
@@ -125,72 +128,78 @@ describe('Collection node editor component ', () => {
     expect(component.collection).toEqual(sampleCollection);
   });
 
-  it('should delete node when calling \'deleteNode\'', () => {
-    let removeSpy = spyOn(collectionLinearizerService, 'removeCollectionNode')
-      .and.returnValue(true);
+  it("should delete node when calling 'deleteNode'", () => {
+    let removeSpy = spyOn(
+      collectionLinearizerService,
+      'removeCollectionNode'
+    ).and.returnValue(true);
 
     component.deleteNode();
 
     expect(removeSpy).toHaveBeenCalled();
   });
 
-  it('should not delete node from collection in case ' +
-    'of backend error', () => {
-    spyOn(collectionLinearizerService, 'removeCollectionNode')
-      .and.returnValue(false);
-    let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.returnValue();
+  it(
+    'should not delete node from collection in case ' + 'of backend error',
+    () => {
+      spyOn(
+        collectionLinearizerService,
+        'removeCollectionNode'
+      ).and.returnValue(false);
+      let alertsSpy = spyOn(alertsService, 'fatalWarning').and.returnValue();
 
-    component.deleteNode();
+      component.deleteNode();
 
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'Internal collection editor error. Could not delete ' +
-      'exploration by ID: exp_id0');
-  });
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Internal collection editor error. Could not delete ' +
+          'exploration by ID: exp_id0'
+      );
+    }
+  );
 
-  it('should shift node to left when calling \'shiftNodeLeft\'', () => {
-    let shiftNodeLeftSpy = spyOn(collectionLinearizerService, 'shiftNodeLeft')
-      .and.returnValue(true);
+  it("should shift node to left when calling 'shiftNodeLeft'", () => {
+    let shiftNodeLeftSpy = spyOn(
+      collectionLinearizerService,
+      'shiftNodeLeft'
+    ).and.returnValue(true);
 
     component.shiftNodeLeft();
 
     expect(shiftNodeLeftSpy).toHaveBeenCalled();
   });
 
-  it('should not shift node to left in case ' +
-    'of backend error', () => {
-    spyOn(collectionLinearizerService, 'shiftNodeLeft')
-      .and.returnValue(false);
-    let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.returnValue();
+  it('should not shift node to left in case ' + 'of backend error', () => {
+    spyOn(collectionLinearizerService, 'shiftNodeLeft').and.returnValue(false);
+    let alertsSpy = spyOn(alertsService, 'fatalWarning').and.returnValue();
 
     component.shiftNodeLeft();
 
     expect(alertsSpy).toHaveBeenCalledWith(
       'Internal collection editor error. Could not shift node left ' +
-      'with ID: exp_id0');
+        'with ID: exp_id0'
+    );
   });
 
-  it('should shift node to right when calling \'shiftNodeRight\'', () => {
-    let shiftNodeRightSpy = spyOn(collectionLinearizerService, 'shiftNodeRight')
-      .and.returnValue(true);
+  it("should shift node to right when calling 'shiftNodeRight'", () => {
+    let shiftNodeRightSpy = spyOn(
+      collectionLinearizerService,
+      'shiftNodeRight'
+    ).and.returnValue(true);
 
     component.shiftNodeRight();
 
     expect(shiftNodeRightSpy).toHaveBeenCalled();
   });
 
-  it('should not shift node to right in case ' +
-    'of backend error', () => {
-    spyOn(collectionLinearizerService, 'shiftNodeRight')
-      .and.returnValue(false);
-    let alertsSpy = spyOn(alertsService, 'fatalWarning')
-      .and.returnValue();
+  it('should not shift node to right in case ' + 'of backend error', () => {
+    spyOn(collectionLinearizerService, 'shiftNodeRight').and.returnValue(false);
+    let alertsSpy = spyOn(alertsService, 'fatalWarning').and.returnValue();
 
     component.shiftNodeRight();
 
     expect(alertsSpy).toHaveBeenCalledWith(
       'Internal collection editor error. Could not shift node right ' +
-      'with ID: exp_id0');
+        'with ID: exp_id0'
+    );
   });
 });

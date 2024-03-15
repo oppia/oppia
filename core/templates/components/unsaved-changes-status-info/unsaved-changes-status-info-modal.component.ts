@@ -16,7 +16,7 @@
  * @fileoverview Component for unsaved changes status information modal.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-unsaved-changes-status-info-modal',

@@ -16,16 +16,18 @@
  * @fileoverview Component for question player concept card modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-noninteractive-skillreview-concept-card-modal',
-  templateUrl: './noninteractive-skillreview-concept-card-modal.component.html'
+  templateUrl: './noninteractive-skillreview-concept-card-modal.component.html',
 })
-export class OppiaNoninteractiveSkillreviewConceptCardModalComponent extends
-  ConfirmOrCancelModal implements OnInit {
+export class OppiaNoninteractiveSkillreviewConceptCardModalComponent
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1

@@ -16,31 +16,28 @@
  * @fileoverview Component for Invite learners modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { LearnerGroupUserInfo } from 'domain/learner_group/learner-group-user-info.model';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
 
 @Component({
   selector: 'oppia-invite-learners-modal',
-  templateUrl: './invite-learners-modal.component.html'
+  templateUrl: './invite-learners-modal.component.html',
 })
 export class InviteLearnersModalComponent extends ConfirmOrCancelModal {
   learnerGroupId!: string;
   invitedLearners: string[] = [];
   invitedLearnersInfo: LearnerGroupUserInfo[] = [];
 
-
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
   confirm(): void {
     this.ngbActiveModal.close({
       invitedLearners: this.invitedLearners,
-      invitedLearnersInfo: this.invitedLearnersInfo
+      invitedLearnersInfo: this.invitedLearnersInfo,
     });
   }
 
@@ -49,7 +46,7 @@ export class InviteLearnersModalComponent extends ConfirmOrCancelModal {
   }
 
   updateNewlyInvitedLearnersInfo(
-      invitedLearnersInfo: LearnerGroupUserInfo[]
+    invitedLearnersInfo: LearnerGroupUserInfo[]
   ): void {
     this.invitedLearnersInfo = invitedLearnersInfo;
   }

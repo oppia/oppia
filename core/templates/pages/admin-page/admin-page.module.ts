@@ -16,11 +16,11 @@
  * @fileoverview Module for the admin page.
  */
 
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { ToastrModule } from 'ngx-toastr';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {ToastrModule} from 'ngx-toastr';
 
 import { SharedComponentsModule } from 'components/shared-component.module';
 import { TopicManagerRoleEditorModalComponent } from './roles-tab/topic-manager-role-editor-modal.component';

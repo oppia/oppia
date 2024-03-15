@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for NewlyCreatedTopic model.
  */
 
-import { NewlyCreatedTopic } from
-  'domain/topics_and_skills_dashboard/newly-created-topic.model';
+import {NewlyCreatedTopic} from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
 
 describe('Newly Created Topic Model', () => {
   let topic: NewlyCreatedTopic;
@@ -55,9 +53,8 @@ describe('Newly Created Topic Model', () => {
     expect(topic.isValid()).toBe(true);
 
     // eslint-disable-next-line max-len
-    topic.pageTitleFragment = (
-      'testatestatestatestatestatestatestatestatestatestatestatesta'
-    );
+    topic.pageTitleFragment =
+      'testatestatestatestatestatestatestatestatestatestatestatesta';
     expect(topic.isValid()).toBeFalse();
   });
 });
