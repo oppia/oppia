@@ -78,6 +78,11 @@ const CONSOLE_ERRORS_TO_FIX = [
     'http://localhost:8181/dist/oppia-angular-prod/favicon.ico Failed ' +
       'to load resource: the server responded with a status of 404 (Not Found)'
   ),
+  escapeRegExp(
+    'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/acoustic' +
+      '_grand_piano-ogg.js Failed to load resource: the server responded with a ' +
+      'status of 404 (Not Found)'
+  ),
 ];
 
 export class ConsoleReporter {
@@ -93,41 +98,40 @@ export class ConsoleReporter {
         // Here we exclude urls that are opened that are not part of the
         // application.
         if (
-          !page ||
-          (!page.url().includes(HOST_URL) && page.url() !== 'about:blank')
+          page &&
+          (page.url().includes(HOST_URL) || page.url() === 'about:blank')
         ) {
-          return;
-        }
-        page.on('console', async (message: PuppeteerConsoleMessage) => {
-          let messageText = message.text();
-          // Sometimes puppeteer returns a JSHandle error so we have to parse
-          // it to get the message in this case.
-          if (messageText.includes('JSHandle@error')) {
-            const messages = await Promise.all(
-              message.args().map((arg: JSHandle) =>
-                arg.executionContext().evaluate((arg: unknown) => {
-                  if (arg instanceof Error) {
-                    return arg.message;
-                  }
-                  return null;
-                }, arg)
-              )
-            );
-            messageText = messages.join(' ');
-          }
+          page.on('console', async (message: PuppeteerConsoleMessage) => {
+            let messageText = message.text();
+            // Sometimes puppeteer returns a JSHandle error so we have to parse
+            // it to get the message in this case.
+            if (messageText.includes('JSHandle@error')) {
+              const messages = await Promise.all(
+                message.args().map((arg: JSHandle) =>
+                  arg.executionContext().evaluate((arg: unknown) => {
+                    if (arg instanceof Error) {
+                      return arg.message;
+                    }
+                    return null;
+                  }, arg)
+                )
+              );
+              messageText = messages.join(' ');
+            }
 
-          // Here we concat the message text with the message's source if it is present.
-          const messageSource = message.location().url;
-          messageText = messageSource
-            ? `${messageSource} ${messageText}`
-            : messageText;
+            // Here we concat the message text with the message's source if it is present.
+            const messageSource = message.location().url;
+            messageText = messageSource
+              ? `${messageSource} ${messageText}`
+              : messageText;
 
-          ConsoleReporter.consoleMessages.push({
-            type: message.type(),
-            text: `${messageText}`,
-            url: page.url(),
+            ConsoleReporter.consoleMessages.push({
+              type: message.type(),
+              text: `${messageText}`,
+              url: page.url(),
+            });
           });
-        });
+        }
       }
     });
   }
@@ -147,6 +151,7 @@ export class ConsoleReporter {
             `${index + 1}. Occured at ${error.url}\n${error.text}`
         )
         .join('\n');
+      ConsoleReporter.consoleMessages = [];
       throw new Error(
         `The following errors were detected in the console:\n${errorMessages}`
       );
