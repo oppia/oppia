@@ -41,6 +41,9 @@ export class AccessValidationBackendApiService {
     '<learner_group_id>'
   );
 
+  TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_topic_viewer_page'); 
+
   LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_create_learner_group_page'
   );
@@ -96,6 +99,12 @@ export class AccessValidationBackendApiService {
       });
     return this.http.get<void>(url).toPromise();
   }
+
+  validateAccessToTopicViewerPage(): Promise<void> {
+    return this.http.get<void>(
+      this.TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR).toPromise();
+  }
+ 
 
   validateCanManageOwnAccount(): Promise<void> {
     return this.http.get<void>(

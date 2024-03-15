@@ -17,7 +17,7 @@
  */
 
 import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+
 
 import { StorySummary } from 'domain/story/story-summary.model';
 import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
@@ -77,6 +77,4 @@ export class StoriesListComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 768;
   }
 }
-angular.module('oppia').directive(
-  'storiesList', downgradeComponent(
-    {component: StoriesListComponent}));
+

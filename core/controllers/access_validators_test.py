@@ -410,6 +410,36 @@ class BlogPostPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+   """Checks the access to the blog home page and its rendering."""
+
+
+   def test_any_user_can_access_topic_viewer_page(self) -> None:
+       self.get_json(
+           '%s/can_access_topic_viewer_page' %
+           ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
+
+
+   def test_accessibility_of_unpublished_topic_viewer_page(self) -> None:
+       topic = topic_domain.Topic.create_default_topic(
+           'topic_id_1', 'private_topic_name',
+           'private_topic_name', 'description', 'fragm')
+       topic.thumbnail_filename = 'Image.svg'
+       topic.thumbnail_bg_color = (
+           constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0])
+       topic.url_fragment = 'private'
+       topic_services.save_new_topic(self.admin_id, topic)
+
+
+       self.get_json(
+           '%s/can_access_topic_viewer_page' %
+           ACCESS_VALIDATION_HANDLER_PREFIX,
+           expected_status_int=404)
+       self.login(self.CURRICULUM_ADMIN_EMAIL)
+       self.get_html_response('%s/can_access_topic_viewer_page' %
+           ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
+       self.logout()
+
 class BlogAuthorProfilePageAccessValidationHandlerTests(
     test_utils.GenericTestBase):
     """Checks the access to the blog author profile page and its rendering."""

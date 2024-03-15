@@ -19,7 +19,7 @@
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlInterpolationService } from '../../../domain/utilities/url-interpolation.service';
 import { AccessValidationBackendApiService } from './access-validation-backend-api.service';
 
 describe('Access validation backend api service', () => {
@@ -251,6 +251,48 @@ describe('Access validation backend api service', () => {
     expect(failSpy).toHaveBeenCalled();
   })
   );
+
+
+it('should not validate access to topic viewer page with invalid access',
+fakeAsync (() => {
+  avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
+
+
+  const req = httpTestingController.expectOne(
+    '/access_validation_handler/can_access_topic_viewer_page');
+  expect(req.request.method).toEqual('GET');
+  req.flush({
+    error: 'Access Denied.'
+  }, {
+    status: 401, statusText: 'Access Denied.'
+  });
+
+
+  flushMicrotasks();
+  expect(successSpy).not.toHaveBeenCalled();
+  expect(failSpy).toHaveBeenCalled();
+})
+);
+
+
+it('should validate access to topic viewer page with valid access', fakeAsync (
+  () => {
+    avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
+
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_topic_viewer_page');
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+
+
 
   it('should validate access to blog author profile page with valid access',
     fakeAsync (() => {

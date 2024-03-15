@@ -113,8 +113,7 @@ module.exports = {
       '/pages/topics-and-skills-dashboard-page/' +
       'topics-and-skills-dashboard-page.import.ts'
     ),
-    topic_viewer:
-      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
+    
     voiceover_admin:
       commonPrefix + '/pages/voiceover-admin-page/' +
       'voiceover-admin-page.import.ts',
@@ -390,17 +389,7 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false
     }),
-    new HtmlWebpackPlugin({
-      chunks: ['topic_viewer'],
-      filename: 'topic-viewer-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix + '/pages/topic-viewer-page/' +
-        'topic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
+    
     new HtmlWebpackPlugin({
       chunks: ['facilitator_dashboard'],
       filename: 'facilitator-dashboard-page.mainpage.html',
