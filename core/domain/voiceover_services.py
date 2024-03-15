@@ -275,16 +275,30 @@ def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
     """
     voice_artist_id_to_voice_artist_name = {}
 
-    voice_artist_metadata_models: Sequence[
-        voiceover_models.VoiceArtistMetadataModel] = (
-            voiceover_models.VoiceArtistMetadataModel.get_all().fetch())
+    exploration_voice_artist_link_models: Sequence[
+        voiceover_models.ExplorationVoiceArtistsLinkModel] = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
+        )
 
-    for voice_artist_metadata_model in voice_artist_metadata_models:
-        voice_artist_id = voice_artist_metadata_model.id
-        voice_artist_name = user_services.get_username(voice_artist_id)
+    for exp_voice_artist_model in exploration_voice_artist_link_models:
+        content_id_to_voiceovers_mapping = (
+            exp_voice_artist_model.content_id_to_voiceovers_mapping)
 
-        voice_artist_id_to_voice_artist_name[voice_artist_id] = (
-            voice_artist_name)
+        for lang_voiceover_mapping_tuple in (
+                content_id_to_voiceovers_mapping.values()):
+
+            for voiceover_tuple in (
+                    lang_voiceover_mapping_tuple.values()):
+
+                voice_artist_id = voiceover_tuple[0]
+
+                if voice_artist_id in voice_artist_id_to_voice_artist_name:
+                    continue
+
+                voice_artist_name = user_services.get_username(voice_artist_id)
+
+                voice_artist_id_to_voice_artist_name[voice_artist_id] = (
+                    voice_artist_name)
 
     return voice_artist_id_to_voice_artist_name
 

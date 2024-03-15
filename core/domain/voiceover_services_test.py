@@ -294,26 +294,6 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
             retrieved_model.language_code_to_accent,
             self.language_code_to_accent)
 
-    def test_get_voice_artist_id_to_username(self) -> None:
-        auth_id = 'someUser'
-        username = 'username'
-        user_settings = user_services.create_new_user(
-            auth_id, 'user@example.com')
-        voice_artist_id = user_settings.user_id
-        user_services.set_username(voice_artist_id, username)
-
-        expected_voice_artist_id_to_username = {
-            voice_artist_id: username
-        }
-
-        voiceover_services.update_voice_artist_metadata(
-            voice_artist_id, self.language_code_to_accent)
-
-        self.assertDictEqual(
-            voiceover_services.get_voice_artist_ids_to_voice_artist_names(),
-            expected_voice_artist_id_to_username
-        )
-
     def test_update_voice_artist_language_mapping(self) -> None:
         language_code = 'en'
         initial_language_accent_code = 'en-US'
@@ -360,7 +340,7 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
 
 
 class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
-    """Unit test to validate voice artists metadata informations."""
+    """Unit test to validate exploration voice artists link informations."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -491,6 +471,39 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_voice_artist_to_language_mapping,
             retrieved_voice_artist_to_language_mapping
+        )
+
+    def test_get_all_voice_artist_id_to_username(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        voice_artist_id = user_settings.user_id
+        user_services.set_username(voice_artist_id, username)
+
+        expected_voice_artist_id_to_username = {
+            voice_artist_id: username
+        }
+
+        exploration_voice_artists_link_model2 = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_2',
+                content_id_to_voiceovers_mapping={
+                    'content_0': {
+                        'hi': (voice_artist_id, self.voiceover1)
+                    },
+                    'content_1': {
+                        'en': (voice_artist_id, self.voiceover2)
+                    }
+                }
+            )
+        )
+        exploration_voice_artists_link_model2.put()
+
+        self.assertDictEqual(
+            voiceover_services.get_voice_artist_ids_to_voice_artist_names(),
+            expected_voice_artist_id_to_username
         )
 
     def test_should_get_exploration_id_to_filenames(self) -> None:
