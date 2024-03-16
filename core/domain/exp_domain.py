@@ -5841,9 +5841,10 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
                 the State object.
             rights: rights_domain.ActivityRightsDict. Dictionary
                 representation of activity rights.
-            exploration_email_preferences: (
-                Optional[user_domain.UserExplorationPrefsDict]). Dictionary
+            exploration_email_preferences: Optional[user_domain.
+                UserExplorationPrefsDict]. Dictionary
                 representing feedback and suggestion email settings.
+
             draft_change_list_id: int. The id of draf change list.
             is_valid_draft_version: Optional[bool]. Whether the given draft
                 version is valid or not.
