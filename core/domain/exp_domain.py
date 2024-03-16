@@ -5822,11 +5822,6 @@ class UserExplorationDataDict(TypedDict):
 class UserExplorationData(translation_domain.BaseTranslatableObject):
     """Domain object for an User Exploration data."""
 
-    default_exploration_email_prefs: user_domain.UserExplorationPrefsDict = {
-        'mute_feedback_notifications': False,
-        'mute_suggestion_notifications': False
-    }
-
     def __init__(
         self,
         exploration: Exploration,
@@ -5846,7 +5841,8 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
                 the State object.
             rights: rights_domain.ActivityRightsDict. Dictionary
                 representation of activity rights.
-            exploration_email_preferences: Optional[user_domain.UserExplorationPrefsDict]. Dictionary # pylint: disable=line-too-long
+            exploration_email_preferences: Optional[
+                user_domain.UserExplorationPrefsDict]. Dictionary
                 representing feedback and suggestion email settings.
             draft_change_list_id: int. The id of draf change list.
             is_valid_draft_version: Optional[bool]. Whether the given draft
@@ -5862,8 +5858,10 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         self.rights = rights
         self.is_valid_draft_version = is_valid_draft_version
         if exploration_email_preferences is None:
-            self.exploration_email_preferences = (
-                self.default_exploration_email_prefs)
+            self.exploration_email_preferences: user_domain.UserExplorationPrefsDict = {
+                'mute_feedback_notifications':False,
+                'mute_suggestion_notifications':False
+            }
         else:
             self.exploration_email_preferences = exploration_email_preferences
 

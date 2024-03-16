@@ -193,7 +193,7 @@ class ExplorationHandler(
         assert self.normalized_request is not None
         version = self.normalized_request.get('v')
         apply_draft = self.normalized_request['apply_draft']
-        exploration_data: exp_domain.UserExplorationDataDict
+
         try:
             if self.user_id is None:
                 exploration = exp_fetchers.get_exploration_by_id(exploration_id)
