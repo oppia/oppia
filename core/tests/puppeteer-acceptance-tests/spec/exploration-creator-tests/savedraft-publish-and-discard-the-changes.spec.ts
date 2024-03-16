@@ -30,10 +30,10 @@ describe('Exploration Publisher, Saver and Drafter', function () {
       'explorationAdm',
       'exploration_creator@example.com'
     );
-    explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor',
-      'exploration_visitor@example.com'
-    );
+    // explorationVisitor = await UserFactory.createNewUser(
+    //   'explorationVisitor',
+    //   'exploration_visitor@example.com'
+    // );
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
@@ -41,10 +41,10 @@ describe('Exploration Publisher, Saver and Drafter', function () {
     async function () {
       await explorationCreator.openCreatorDashboardPage();
       await explorationCreator.switchToEditorTab();
-      await explorationCreator.updateCardName('Test');
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text'
       );
+      await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
       await explorationCreator.showMessageOfSuccessfulExplorationCreation();
 
