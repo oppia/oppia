@@ -49,10 +49,6 @@ export class AdminPageComponent {
     return this.adminRouterService.isActivitiesTabOpen();
   }
 
-  isConfigTabOpen(): boolean {
-    return this.adminRouterService.isConfigTabOpen();
-  }
-
   isPlatformParamsTabOpen(): boolean {
     return this.adminRouterService.isPlatformParamsTabOpen();
   }

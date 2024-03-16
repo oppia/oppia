@@ -17,7 +17,6 @@
  */
 
 import {CustomDatepickerAdapter} from 'services/custom-datepicker-adapter.service';
-import {NativeDateAdapter} from '@angular/material/core';
 import {TestBed} from '@angular/core/testing';
 
 describe('CustomDatepickerAdapter', () => {

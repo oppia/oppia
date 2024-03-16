@@ -147,6 +147,7 @@
 /scripts/populate_sample_contributor_data*.py @oppia/contributor-experience-team
 /core/templates/services/html-length.service.ts @oppia/contributor-experience-team
 /core/templates/services/html-length.service.spec.ts @oppia/contributor-experience-team
+/core/templates/services/custom-datepicker-adapter.service.ts @oppia/contributor-experience-team
 
 
 # Core documentation
@@ -543,7 +544,6 @@
 /core/__init__.py @oppia/lace-backend-reviewers
 /core/controllers/__init__.py @oppia/lace-backend-reviewers
 /core/domain/__init__.py @oppia/lace-backend-reviewers
-/core/domain/config*.py @oppia/lace-backend-reviewers
 /core/domain/change_domain*.py @oppia/lace-backend-reviewers
 /core/templates/tests/ @oppia/lace-frontend-reviewers
 /core/templates/domain/utilities/ @oppia/lace-frontend-reviewers
