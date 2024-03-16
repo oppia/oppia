@@ -30,10 +30,10 @@ describe('Exploration Publisher, Saver and Drafter', function () {
       'explorationAdm',
       'exploration_creator@example.com'
     );
-    // explorationVisitor = await UserFactory.createNewUser(
-    //   'explorationVisitor',
-    //   'exploration_visitor@example.com'
-    // );
+    explorationVisitor = await UserFactory.createNewUser(
+      'explorationVisitor',
+      'exploration_visitor@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
