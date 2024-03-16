@@ -41,6 +41,8 @@ import {UsernameInputModal} from './username-input-modal/username-input-modal.co
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import isEqual from 'lodash/isEqual';
+import {CustomDatepickerAdapter} from 'services/custom-datepicker-adapter.service';
+import {DateAdapter, MAT_DATE_FORMATS} from '@angular/material/core';
 
 export interface LanguageChoice {
   id: string;
@@ -50,6 +52,15 @@ export interface TopicChoice {
   id: string;
   topic: string;
 }
+export const PICK_FORMATS = {
+  parse: {dateInput: {month: 'short', year: 'numeric', day: 'numeric'}},
+  display: {
+    dateInput: 'input',
+    monthYearLabel: {year: 'numeric', month: 'short'},
+    dateA11yLabel: {year: 'numeric', month: 'long', day: 'numeric'},
+    monthYearA11yLabel: {year: 'numeric', month: 'long'},
+  },
+};
 @Component({
   selector: 'contributor-admin-dashboard-page',
   styleUrls: ['./contributor-admin-dashboard-page.component.css'],
@@ -61,6 +72,10 @@ export interface TopicChoice {
       transition('expanded => collapsed', animate('200ms ease-out')),
       transition('collapsed => expanded', animate('200ms ease-in')),
     ]),
+  ],
+  providers: [
+    {provide: DateAdapter, useClass: CustomDatepickerAdapter},
+    {provide: MAT_DATE_FORMATS, useValue: PICK_FORMATS},
   ],
 })
 export class ContributorAdminDashboardPageComponent implements OnInit {
