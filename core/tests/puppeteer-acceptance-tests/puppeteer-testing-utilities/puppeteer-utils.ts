@@ -174,6 +174,28 @@ export class BaseUser {
   }
 
   /**
+   * This function validates whether an anchor tag is correctly linked
+   * to external PDFs or not. Use this particularly when interacting with
+   * buttons associated with external PDF links, because Puppeteer,
+   * in headless-mode, does not natively support the opening of external PDFs.
+   */
+  async openExternalPdfLink(
+    selector: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.waitForSelector(selector);
+    const href = await this.page.$eval(selector, element =>
+      element.getAttribute('href')
+    );
+    if (href === null) {
+      throw new Error(`The ${selector} does not have a href attribute!`);
+    }
+    if (href !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
+    }
+  }
+
+  /**
    * This function logs out the current user.
    */
   async logout(): Promise<void> {
