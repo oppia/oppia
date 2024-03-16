@@ -38,7 +38,7 @@ EXCLUDED_DIRECTORIES: Final = [
     'venv/',
     # This file is an edited copy of a file from the Google Cloud SDK. To keep
     # the changes minimal, we do not add types to this file.
-    'docker/wsgi_server.py',
+    'docker/patched_wsgi_server.py',
     # The files in 'build_sources' and 'data' directories can be
     # ignored while type checking, because these files are only
     # used as resources for the tests.
