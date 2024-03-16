@@ -31,13 +31,10 @@ const interactionAddbutton = '.oppia-add-interaction-button';
 const endInteractionTab = '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
-const addTitleBar = '#explorationTitle';
-const addGoalBar = '.e2e-test-exploration-objective-input';
-const addGoal = '.e2e-test-exploration-objective-input';
+const addTitleBar = 'input#explorationTitle';
+const addGoal = 'input.e2e-test-exploration-objective-input';
 const categoryDropDawn = '.mat-select-arrow-wrapper';
-const addCategory = 'Algebra';
-const languageUpdateBar = 'English';
-const addLanguage = 'English';
+const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
 const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
 const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
@@ -136,7 +133,6 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating Title.
    */
   async addTitle(Title: string): Promise<void> {
-    await this.clickOn(addTitleBar);
     await this.type(addTitleBar, Title);
   }
 
@@ -165,7 +161,6 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding a goal.
    */
   async updateGoal(goal: string): Promise<void> {
-    await this.clickOn(addGoalBar);
     await this.type(addGoal, goal);
   }
 
@@ -189,10 +184,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectAlgebraAsACategory(): Promise<void> {
     await this.clickOn(categoryDropDawn);
-    await this.page.waitForSelector('.mat-select-search-panel', {
-      visible: true,
-    });
-    await this.clickOn(addCategory);
+    await this.clickOn('Algebra');
   }
 
   /**
@@ -205,7 +197,7 @@ export class ExplorationCreator extends BaseUser {
     }
     await categoryDropdown.click();
     const selectedCategory = await this.page.evaluate(() => {
-      return (document.querySelector('#mat-option-69') as HTMLElement)
+      return (document.querySelector('mat-option-230') as HTMLElement)
         .innerText;
     });
     if (selectedCategory === expectedCategory) {
@@ -227,7 +219,7 @@ export class ExplorationCreator extends BaseUser {
       '.e2e-test-exploration-language-selector-choice',
       {visible: true}
     );
-    await this.clickOn(addLanguage);
+    await this.clickOn('English');
   }
 
   /**
