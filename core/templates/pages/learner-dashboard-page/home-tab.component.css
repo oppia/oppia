@@ -8,6 +8,8 @@
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
 }
+
+/*change width to 100% for redesign*/
 .home-tab .continue-where-you-left-off {
   background-color: #fff;
   border-radius: 4px;
@@ -90,6 +92,7 @@
   padding: 32px 23px 0 32px;
 }
 
+/*change width to 100% for redesign*/
 .home-tab .suggested-for-you,
 .home-tab .empty-suggested-for-you {
   background-color: #fff;
@@ -175,6 +178,7 @@
     font-size: 25px;
     margin-left: 0;
   }
+  /*change width to 100% for redesign*/
   .home-tab .continue-where-you-left-off,
   .home-tab .suggested-for-you,
   .home-tab .empty-suggested-for-you {

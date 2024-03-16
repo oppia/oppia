@@ -1,11 +1,10 @@
-<background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
+<background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && !isShowRedesignedLearnerDashboardActive && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
 <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
-     class="oppia-learner-dashboard-container position-relative">
-  <div class="row oppia-row"
-       [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
-       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
+     class="position-relative" [ngClass]="{'oppia-learner-dash-container w-100' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
+  <div [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'row oppia-row': !isShowRedesignedLearnerDashboardActive() ,'d-flex justify-content-center oppia-learner-dash-content': isShowRedesignedLearnerDashboardActive()}">
     <div class="col-md-3 oppia-learner-dashboard-side-content"
-         *ngIf="!windowIsNarrow">
+         *ngIf="!windowIsNarrow && !isShowRedesignedLearnerDashboardActive()">
       <mat-card class="oppia-learner-dashboard-main-menu">
         <h4 class="oppia-learner-dashboard-menu oppia-learner-dashborad-menu-hover e2e-test-home-section" tabindex="0"
             [ngClass]="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
@@ -40,7 +39,48 @@
         </h4>
       </mat-card>
     </div>
-    <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow" headroom>
+    <!--REDESIGN-->
+    <nav class="align-items-center d-flex flex-md-column justify-content-center oppia-learner-dash-sidebar_position" role="navigation" *ngIf="isShowRedesignedLearnerDashboardActive()">
+      <ol class="oppia-learner-dash-sidebar">
+        <li class="oppia-learner-dash-sidebar_pic">
+          <!--if want frame, div w/ "border border-2 border-white mb-5 rounded-circle oppia-learner-dash-sidebar_pic-frame" style-->
+          <picture>
+            <source type="image/webp" [srcset]="profilePictureWebpDataUrl" >
+            <source type="image/png" [srcset]="profilePicturePngDataUrl" >
+            <img alt="Profile image of user" class="mb-5" height="72px" [src]="profilePicturePngDataUrl" width="72px" >
+          </picture>
+        </li>
+        <li>
+          <button class="align-items-center d-inline-flex e2e-test-home-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
+                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
+            <span class="fa fa-home fa-lg"></span>
+            {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate }}
+          </button>
+        </li>
+        <li>
+          <button class="align-items-center d-inline-flex e2e-test-goals-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
+                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)"
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
+            <span class="fa fa-bullseye fa-lg"></span>
+            {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate }}
+          </button>
+        </li>
+        <li>
+          <button class="align-items-center d-inline-flex e2e-test-progress-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
+                  (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)"
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
+            <span class="fa fa-chart-line fa-lg"></span>
+            {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate }}
+          </button>
+        </li>
+      </ol>
+    </nav>
+    <!---->
+    <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow && !isShowRedesignedLearnerDashboardActive()" headroom>
       <mat-card class="oppia-learner-dashboard-button-menu d-flex justify-content-around">
         <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}">
           <img [src]="homeImageUrl" alt="home image" class="oppia-svg-image">
@@ -77,12 +117,10 @@
         </div>
       </mat-card>
     </div>
-
-    <div class="col-md-8 oppia-learner-dashboard-main-content"
-         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
-      <div class="oppia-learner-dashboard-main-content-container d-flex"
-           [ngClass]="{'pl-5': !windowIsNarrow, 'justify-content-center': windowIsNarrow}">
-        <div *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
+    <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'learner-dash-tab ml-md-4 px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
+      <div class="d-flex"
+           [ngClass]="{'oppia-learner-dashboard-main-content-container pl-5': !windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'justify-content-center': windowIsNarrow}">
+        <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [goalTopics]="allTopics"
                           [partiallyLearntTopicsList]="partiallyLearntTopicsList"
@@ -135,7 +173,8 @@
     </div>
 
     <div class="col-md-2 oppia-learner-dashboard-side-content"
-         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}">
+         [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow}"
+         *ngIf="!isShowRedesignedLearnerDashboardActive()" >
     </div>
   </div>
 </div>

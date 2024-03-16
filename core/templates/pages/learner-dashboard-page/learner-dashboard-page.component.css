@@ -186,7 +186,7 @@ oppia-learner-dashboard-page .oppia-updated-status {
   margin-right: 15px;
 }
 
-oppia-learner-dashboard-page .learner-groups-icon {
+oppia-learner-dashboard-page .oppia-learner-groups-icon {
   font-size: 44px;
 }
 
@@ -252,11 +252,11 @@ oppia-learner-dashboard-page .learner-groups-icon {
   oppia-learner-dashboard-page .home-button,
   oppia-learner-dashboard-page .goals-button,
   oppia-learner-dashboard-page .progress-button,
-  oppia-learner-dashboard-page .learner-groups-button {
+  oppia-learner-dashboard-page .oppia-learner-groups-button {
     font-size: 14px;
   }
 
-  oppia-learner-dashboard-page .learner-groups-icon {
+  oppia-learner-dashboard-page .oppia-learner-groups-icon {
     font-size: 36px;
   }
 }
@@ -307,4 +307,151 @@ oppia-learner-dashboard-page .learner-groups-icon {
 
 .oppia-diagram-spinning-button {
   margin: 0 auto;
+}
+
+
+
+/*REDESIGN CLASSES*/
+.oppia-learner-dash-container {
+  padding: 0 16px;
+}
+
+.oppia-learner-dash-sidebar {
+  background-color: #00645c;
+  border-radius: 4px;
+  height: 95%;
+  list-style-type: none;
+  margin-bottom: 0;
+  max-height: 706px;
+  padding: 16px;
+  width: 248px;
+}
+
+.oppia-learner-dash-sidebar_btn {
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  margin-bottom: 16px;
+  padding: 12px 8px;
+}
+
+.oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover {
+  background-color: #004d45;
+}
+
+.oppia-learner-dash-sidebar_btn span {
+  margin-right: .5em;
+}
+
+.oppia-learner-dash-sidebar_btn--active {
+  background-color: #fff;
+  box-shadow: 0 4px 4px 0 #00000040;
+  color: #00645c;
+}
+
+.oppia-learner-dash-sidebar_pic-frame {
+  height: 72px;
+  width: 72px;
+}
+
+.oppia-learner-dash-sidebar_position {
+  height: 92vh;
+  max-height: 750px;
+}
+
+.oppia-learner-dash-tab {
+  flex-grow: 1;
+  max-width: 1216px;
+}
+
+@media screen and (max-width: 767px) {
+  .oppia-learner-dash-container {
+    padding: 0;
+  }
+
+  .oppia-learner-dash-content {
+    align-content: flex-start;
+    flex-direction: column;
+  }
+
+  .oppia-learner-dash-sidebar {
+    background-color: #a5d3ec;
+    border-radius: 0;
+    display: flex;
+    height: max-content;
+    justify-content: space-around;
+    padding: 0;
+    width: 100%;
+  }
+
+  .oppia-learner-dash-sidebar_btn {
+    background-color: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0 !important;
+    border-top: 2px solid transparent;
+    color: #00645c;
+    flex-direction: column;
+    font-size: 14px;
+    height: max-content;
+    margin-bottom: 0;
+    width: 120px !important;
+  }
+
+  .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover {
+    background-color: transparent;
+    border-bottom-color: #00645c;
+    color: #00645c;
+  }
+
+  .oppia-learner-dash-sidebar_btn span {
+    color: #fff;
+    margin-bottom: .5em;
+    margin-right: 0;
+  }
+
+  .oppia-learner-dash-sidebar_btn--active {
+    background-color: transparent;
+    border-bottom-color: #00645c;
+    box-shadow: none;
+    color: #00645c;
+  }
+
+  .oppia-learner-dash-sidebar_btn--active span {
+    color: #00645c;
+  }
+
+  .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover span {
+    color: #00645c;
+  }
+
+  .oppia-learner-dash-sidebar_pic {
+    display: none;
+  }
+
+  .oppia-learner-dash-sidebar_position {
+    height: max-content;
+    padding: 0;
+    position: relative;
+    top: 0;
+  }
+
+  .oppia-learner-dash-sidebar > ol li {
+    width: max-content;
+  }
+}
+
+@media screen and (min-width: 1513px) {
+  .oppia-learner-dash-container {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .oppia-learner-dash-sidebar {
+    max-height: 100%;
+  }
+
+  .oppia-learner-dash-sidebar_position {
+    max-height: 100%;
+  }
 }
