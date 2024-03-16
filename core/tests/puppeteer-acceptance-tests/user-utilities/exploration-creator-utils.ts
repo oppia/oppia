@@ -97,7 +97,8 @@ export class ExplorationCreator extends BaseUser {
   async updateExplorationIntroText(Introtext: string): Promise<void> {
     await this.page.waitForTimeout(500);
     await this.clickOn('div.e2e-test-state-edit-content');
-    await this.page.waitForTimeout(500);
+    // await this.page.waitForTimeout(500);
+    //Checking whether the function will work without this explicit timeout or not.
     await this.clickOn('div.e2e-test-rte');
     await this.type('div.e2e-test-rte', Introtext);
     await this.clickOn(introTitleSubmitButton);
@@ -135,7 +136,6 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating Title.
    */
   async addTitle(Title: string): Promise<void> {
-    await this.page.waitForSelector('#explorationTitle', {visible: true});
     await this.clickOn(addTitleBar);
     await this.type(addTitleBar, Title);
   }
