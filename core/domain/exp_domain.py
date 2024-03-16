@@ -5857,13 +5857,13 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         self.states = states
         self.rights = rights
         self.is_valid_draft_version = is_valid_draft_version
-        if exploration_email_preferences is None:
-            self.exploration_email_preferences: user_domain.UserExplorationPrefsDict = {
-                'mute_feedback_notifications':False,
-                'mute_suggestion_notifications':False
+        self.exploration_email_preferences = (
+            {
+                'mute_feedback_notifications': False,
+                'mute_suggestion_notifications': False
             }
-        else:
-            self.exploration_email_preferences = exploration_email_preferences
+            if exploration_email_preferences is None else exploration_email_preferences
+        )
 
     def to_dict(self) -> UserExplorationDataDict:
         """Gets the dict representation of UserExplorationData
