@@ -195,12 +195,11 @@ class SelectThread(object):
         failed = True
         while failed:
           try:
-            print("DEBUGGING: Trying to get file descriptors")
             ready_file_descriptors = [fd for fd, _ in poll.poll(
               _READINESS_TIMEOUT_SECONDS * _SECONDS_TO_MILLISECONDS)]
             failed = False
-          except Exception as e:
-            print("DEBUGGING EXCEPTION:", e)
+          except select.error:
+            pass
       else:
         ready_file_descriptors, _, _ = select.select(fds, [], [],
                                                      _READINESS_TIMEOUT_SECONDS)
