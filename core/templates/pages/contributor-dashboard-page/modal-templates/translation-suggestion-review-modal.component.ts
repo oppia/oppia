@@ -542,19 +542,19 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
     this.contributionAndReviewService.reviewExplorationSuggestion(
-      this.queuedSuggestion.target_id,
-      this.queuedSuggestion.suggestion_id,
-      this.queuedSuggestion.action_status,
-      this.queuedSuggestion.reviewer_message,
+      this.queuedSuggestion?.target_id,
+      this.queuedSuggestion?.suggestion_id,
+      this.queuedSuggestion?.action_status,
+      this.queuedSuggestion?.reviewer_message,
       this.queuedSuggestion?.action_status === 'accept'
-        ? this.queuedSuggestion.commit_message
+        ? this.queuedSuggestion?.commit_message
         : null,
       // Only include commit_message for accepted suggestions.
       () => {
         this.alertsService.clearMessages();
         this.alertsService.addSuccessMessage(
           `Suggestion ${
-            this.queuedSuggestion.action_status === 'accept'
+            this.queuedSuggestion?.action_status === 'accept'
               ? 'accepted'
               : 'rejected'
           }.`
