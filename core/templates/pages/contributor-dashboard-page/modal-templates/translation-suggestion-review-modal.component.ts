@@ -514,7 +514,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   revertSuggestionResolution(): void {
     // Remove the suggestion ID from resolvedSuggestionIds.
-    if (this.queuedSuggestion) {
+    if (this.queuedSuggestion && this.removedSuggestion) {
       const index = this.resolvedSuggestionIds.indexOf(
         this.queuedSuggestion?.suggestion_id
       );
@@ -538,7 +538,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   commitQueuedSuggestion(): void {
-    if (!this.hasQueuedSuggestion && !this.queuedSuggestion) {
+    if (!this.queuedSuggestion) {
       return;
     }
     this.contributionAndReviewService.reviewExplorationSuggestion(
