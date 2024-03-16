@@ -48,7 +48,7 @@ class ExplorationAndSnapshotModelDict(TypedDict):
     snapshot_models: List[exp_models.ExplorationSnapshotContentModel]
 
 
-class CreateExplorationVoiceArtistLinkaModelsJob(base_jobs.JobBase):
+class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
     """Jobs used for fetching and saving voice artist names from curated
     exploration models.
     """
@@ -498,9 +498,9 @@ class CreateExplorationVoiceArtistLinkaModelsJob(base_jobs.JobBase):
         return exploration_voice_artist_link_result
 
 
-class AuditExplorationVoiceArtistLinkaModelsJob(
-    CreateExplorationVoiceArtistLinkaModelsJob
+class AuditExplorationVoiceArtistLinkModelsJob(
+    CreateExplorationVoiceArtistLinkModelsJob
 ):
-    """Audit CreateExplorationVoiceArtistLinkaModelsJob."""
+    """Audit CreateExplorationVoiceArtistLinkModelsJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
