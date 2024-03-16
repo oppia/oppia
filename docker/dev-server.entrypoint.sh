@@ -46,4 +46,5 @@ else
 fi
 
 $build_cmd
+cp /app/oppia/docker/patched_wsgi_server.py /app/vm_deps/google-cloud-sdk/platform/google_appengine/google/appengine/tools/devappserver2/wsgi_server.py
 $dev_appserver_cmd
