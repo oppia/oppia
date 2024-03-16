@@ -78,6 +78,7 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {ConversationSkinService} from '../services/conversation-skin.service';
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
@@ -226,7 +227,8 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private platformFeatureService: PlatformFeatureService,
     private translateService: TranslateService,
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
+    private conversationSkinService: ConversationSkinService
   ) {}
 
   adjustPageHeightOnresize(): void {
@@ -329,6 +331,14 @@ export class ConversationSkinComponent {
         this.isLearnerReallyStuck = true;
         this.triggerIfLearnerStuckActionDirectly();
       })
+    );
+
+    this.directiveSubscriptions.add(
+      this.conversationSkinService.addNewCardEventEmitter.subscribe(
+        (newCard: StateCard) => {
+          this._addNewCard(newCard);
+        }
+      )
     );
 
     this.directiveSubscriptions.add(
@@ -1184,7 +1194,9 @@ export class ConversationSkinComponent {
       !this.explorationPlayerStateService.isInQuestionPlayerMode()
     ) {
       // Navigate the learner to the most recently reached checkpoint state.
-      this._navigateToMostRecentlyReachedCheckpoint();
+      this.conversationSkinService.navigateToMostRecentlyReachedCheckpoint(
+        this.mostRecentlyReachedCheckpoint
+      );
     }
     this.hasFullyLoaded = true;
 
