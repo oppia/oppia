@@ -767,15 +767,14 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         self.publish_exploration(self.owner_id, exploration_3.id)
 
 
-class CreateVoiceArtistMetadataModelsJobTests(
+class CreateExplorationVoiceArtistLinkaModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
 
     JOB_CLASS: Type[
-        manual_voice_artist_name_job.
-        CreateVoiceArtistMetadataModelsJob
+        manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkaModelsJob
     ] = (
-        manual_voice_artist_name_job.
-        CreateVoiceArtistMetadataModelsJob)
+        manual_voice_artist_name_job.CreateExplorationVoiceArtistLinkaModelsJob
+    )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
@@ -805,8 +804,11 @@ class CreateVoiceArtistMetadataModelsJobTests(
 class AuditVoiceArtistMetadataModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
 
-    JOB_CLASS: Type[manual_voice_artist_name_job.AuditVoiceArtistNamesJob] = (
-        manual_voice_artist_name_job.AuditVoiceArtistNamesJob)
+    JOB_CLASS: Type[
+        manual_voice_artist_name_job.AuditExplorationVoiceArtistLinkaModelsJob
+    ] = (
+        manual_voice_artist_name_job.AuditExplorationVoiceArtistLinkaModelsJob
+    )
 
     def test_empty_storage(self) -> None:
         self.assert_job_output_is_empty()
