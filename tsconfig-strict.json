@@ -84,6 +84,14 @@
       "./node_modules/@types"
     ]
   },
+  "exclude": [
+    "core/tests",
+    "extensions/classifiers/proto",
+    "**/*.spec.ts",
+    "**/*Spec.ts",
+    "**/*.ajs.ts",
+    "core/templates/tests/unit-test-utils.ajs.ts"
+  ],
   "include": [
     "core",
     "extensions",
