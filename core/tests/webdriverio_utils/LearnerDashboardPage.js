@@ -17,50 +17,50 @@
  * tests.
  */
 
-let waitFor = require('./waitFor.js');
-let action = require('./action.js');
+var waitFor = require('./waitFor.js');
+var action = require('./action.js');
 
-let LearnerDashboardPage = function () {
-  let LEARNER_DASHBOARD_URL = '/learner-dashboard';
-  let addToLearnerGoalsButton = $(
+var LearnerDashboardPage = function () {
+  var LEARNER_DASHBOARD_URL = '/learner-dashboard';
+  var addToLearnerGoalsButton = $(
     '.e2e-test-add-topic-to-current-goals-button'
   );
-  let communityLessonsSection = $('.e2e-test-community-lessons-section');
-  let completeCommunityLessonsSection = $(
+  var communityLessonsSection = $('.e2e-test-community-lessons-section');
+  var completeCommunityLessonsSection = $(
     '.e2e-test-completed-community-lessons-section'
   );
-  let completedGoalsTopicName = $('.e2e-test-completed-goals-topic-name');
-  let currentGoalsTopicName = $('.e2e-test-topic-name-in-current-goals');
-  let editGoalsTopicName = $('.e2e-test-topic-name-in-edit-goals');
-  let goalsSection = $('.e2e-test-goals-section');
-  let homeSection = $('.e2e-test-home-section');
-  let incompleteCommunityLessonsSection = $(
+  var completedGoalsTopicName = $('.e2e-test-completed-goals-topic-name');
+  var currentGoalsTopicName = $('.e2e-test-topic-name-in-current-goals');
+  var editGoalsTopicName = $('.e2e-test-topic-name-in-edit-goals');
+  var goalsSection = $('.e2e-test-goals-section');
+  var homeSection = $('.e2e-test-home-section');
+  var incompleteCommunityLessonsSection = $(
     '.e2e-test-incomplete-community-lessons-section'
   );
-  let progressSection = $('.e2e-test-progress-section');
-  let subscriptionSection = $('.e2e-test-subscriptions-section');
-  let skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
-  let stopicNamesInLearnerTopicSummaryTile = $(
+  var progressSection = $('.e2e-test-progress-section');
+  var subscriptionSection = $('.e2e-test-subscriptions-section');
+  var skillProficiencyTopicTitle = $('.e2e-test-skill-proficiency-topic-title');
+  var stopicNamesInLearnerTopicSummaryTile = $(
     '.e2e-test-learner-topic-summary-tile-title'
   );
-  let stopicNamesInLearnerTopicSummaryTilesSelector = function () {
+  var stopicNamesInLearnerTopicSummaryTilesSelector = function () {
     return $$('.e2e-test-learner-topic-summary-tile-title');
   };
-  let storyNamesInLearnerStorySummaryTile = $(
+  var storyNamesInLearnerStorySummaryTile = $(
     '.e2e-test-story-name-in-learner-story-summary-tile'
   );
-  let storyNamesInLearnerStorySummaryTilesSelector = function () {
+  var storyNamesInLearnerStorySummaryTilesSelector = function () {
     return $$('.e2e-test-story-name-in-learner-story-summary-tile');
   };
-  let topicNamesInLearnerStorySummaryTile = $(
+  var topicNamesInLearnerStorySummaryTile = $(
     '.e2e-test-topic-name-in-learner-story-summary-tile'
   );
-  let topicNamesInLearnerStorySummaryTilesSelector = function () {
+  var topicNamesInLearnerStorySummaryTilesSelector = function () {
     return $$('.e2e-test-topic-name-in-learner-story-summary-tile');
   };
 
-  let subscriptionNameElement = $('.e2e-test-subscription-name');
-  let subscriptionNameSelector = function () {
+  var subscriptionNameElement = $('.e2e-test-subscription-name');
+  var subscriptionNameSelector = function () {
     return $$('.e2e-test-subscription-name');
   };
 
@@ -90,7 +90,7 @@ let LearnerDashboardPage = function () {
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = async function (title) {
-    let collectionTitle = $(`.e2e-test-collection-summary-tile-title=${title}`);
+    var collectionTitle = $(`.e2e-test-collection-summary-tile-title=${title}`);
     await waitFor.visibilityOf(
       collectionTitle,
       'Unable to find collection ' + title
@@ -99,15 +99,15 @@ let LearnerDashboardPage = function () {
   };
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = async function (title) {
-    let items = await $$(`.e2e-test-exp-summary-tile-title=${title}`);
+    var items = await $$(`.e2e-test-exp-summary-tile-title=${title}`);
     expect(items.length).toBe(0);
   };
 
   this.expectTitleOfExplorationSummaryTileToMatch = async function (title) {
     // This explorationTitleArray is an Array but it will have only one element
     // that is the exploration with the title passed as a parameter.
-    let explorationTitle = $(`.e2e-test-exp-summary-tile-title=${title}`);
-    let titleOfExplorationSummary = await action.getText(
+    var explorationTitle = $(`.e2e-test-exp-summary-tile-title=${title}`);
+    var titleOfExplorationSummary = await action.getText(
       'Exploration title',
       explorationTitle
     );
@@ -156,7 +156,7 @@ let LearnerDashboardPage = function () {
       name,
       `Text "${name}" taking too long to be present in editGoalsTopic`
     );
-    let topicName = $(`.e2e-test-topic-name-in-edit-goals=${name}`);
+    var topicName = $(`.e2e-test-topic-name-in-edit-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -170,7 +170,7 @@ let LearnerDashboardPage = function () {
       name,
       `Text "${name}" taking too long to be present in currentGoalsTopic`
     );
-    let topicName = $(`.e2e-test-topic-name-in-current-goals=${name}`);
+    var topicName = $(`.e2e-test-topic-name-in-current-goals=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -184,7 +184,7 @@ let LearnerDashboardPage = function () {
       name,
       `Text "${name}" taking too long to be present in skillProficiencyTopic`
     );
-    let topicName = $(`.e2e-test-skill-proficiency-topic-title=${name}`);
+    var topicName = $(`.e2e-test-skill-proficiency-topic-title=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -198,7 +198,7 @@ let LearnerDashboardPage = function () {
       name,
       `Text "${name}" taking too long to be present in completedGoalsTopic`
     );
-    let topicName = $(`.e2e-test-completed-goals-topic-name*=${name}`);
+    var topicName = $(`.e2e-test-completed-goals-topic-name*=${name}`);
     expect(await action.getText('Topic Name', topicName)).toMatch(name);
   };
 
@@ -209,7 +209,7 @@ let LearnerDashboardPage = function () {
         'Learner Topic Name takes too long to appear'
       );
     }
-    let stopicNamesInLearnerTopicSummaryTiles =
+    var stopicNamesInLearnerTopicSummaryTiles =
       await stopicNamesInLearnerTopicSummaryTilesSelector();
     expect(stopicNamesInLearnerTopicSummaryTiles.length).toEqual(value);
   };
@@ -221,7 +221,7 @@ let LearnerDashboardPage = function () {
         'Story Name Card takes too long to appear'
       );
     }
-    let storyNamesInLearnerStorySummaryTiles =
+    var storyNamesInLearnerStorySummaryTiles =
       await storyNamesInLearnerStorySummaryTilesSelector();
     expect(storyNamesInLearnerStorySummaryTiles.length).toEqual(value);
   };
@@ -233,7 +233,7 @@ let LearnerDashboardPage = function () {
         'Topic Name Card takes too long to appear'
       );
     }
-    let topicNamesInLearnerStorySummaryTiles =
+    var topicNamesInLearnerStorySummaryTiles =
       await topicNamesInLearnerStorySummaryTilesSelector();
     expect(topicNamesInLearnerStorySummaryTiles.length).toEqual(value);
   };
@@ -252,13 +252,13 @@ let LearnerDashboardPage = function () {
       subscriptionNameElement,
       'Subscription First Name takes too long to appear'
     );
-    let subscriptionName = await subscriptionNameSelector();
+    var subscriptionName = await subscriptionNameSelector();
     expect(await subscriptionName[0].getText()).toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = async function (name) {
-    let subscriptionName = await subscriptionNameSelector();
-    let lastElement = subscriptionName.length - 1;
+    var subscriptionName = await subscriptionNameSelector();
+    var lastElement = subscriptionName.length - 1;
     await waitFor.visibilityOf(
       subscriptionName[lastElement],
       'Subscription Last Name takes too long to appear'
@@ -269,7 +269,7 @@ let LearnerDashboardPage = function () {
   this.navigateToCommunityLessonsAndCheckIncompleteExplorations =
     async function (explorationTitle) {
       await this.navigateToCommunityLessonsSection();
-      let explorationTitleInIncompleteSection =
+      var explorationTitleInIncompleteSection =
         incompleteCommunityLessonsSection.$(
           `.e2e-test-exp-summary-tile-title=${explorationTitle}`
         );
@@ -285,7 +285,7 @@ let LearnerDashboardPage = function () {
     explorationTitle
   ) {
     await this.navigateToCommunityLessonsSection();
-    let explorationTitleInCompleteSection = completeCommunityLessonsSection.$(
+    var explorationTitleInCompleteSection = completeCommunityLessonsSection.$(
       `.e2e-test-exp-summary-tile-title=${explorationTitle}`
     );
     expect(
@@ -299,7 +299,7 @@ let LearnerDashboardPage = function () {
   this.navigateToCommunityLessonsAndCheckIncompleteCollections =
     async function (collectionTitle) {
       await this.navigateToCommunityLessonsSection();
-      let collectionTitleInIncompleteSection =
+      var collectionTitleInIncompleteSection =
         incompleteCommunityLessonsSection.$(
           `.e2e-test-collection-summary-tile-title=${collectionTitle}`
         );
@@ -315,7 +315,7 @@ let LearnerDashboardPage = function () {
     collectionTitle
   ) {
     await this.navigateToCommunityLessonsSection();
-    let collectionTitleInCompleteSection = completeCommunityLessonsSection.$(
+    var collectionTitleInCompleteSection = completeCommunityLessonsSection.$(
       `.e2e-test-collection-summary-tile-title=${collectionTitle}`
     );
     expect(
