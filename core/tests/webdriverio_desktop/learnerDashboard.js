@@ -16,46 +16,46 @@
  * @fileoverview End-to-end tests for the learner dashboard page.
  */
 
-var general = require('../webdriverio_utils/general.js');
-var users = require('../webdriverio_utils/users.js');
-var workflow = require('../webdriverio_utils/workflow.js');
-var waitFor = require('../webdriverio_utils/waitFor.js');
+let general = require('../webdriverio_utils/general.js');
+let users = require('../webdriverio_utils/users.js');
+let workflow = require('../webdriverio_utils/workflow.js');
+let waitFor = require('../webdriverio_utils/waitFor.js');
 
-var TopicsAndSkillsDashboardPage = require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
-var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
-var LearnerDashboardPage = require('../webdriverio_utils/LearnerDashboardPage.js');
-var TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
-var StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
-var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
-var SubscriptionDashboardPage = require('../webdriverio_utils/SubscriptionDashboardPage.js');
-var TopicAndStoryViewerPage = require('../webdriverio_utils/TopicAndStoryViewerPage.js');
-var forms = require('../webdriverio_utils/forms.js');
-var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
-var Constants = require('../webdriverio_utils/WebdriverioConstants.js');
-var SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
-var DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
+let TopicsAndSkillsDashboardPage = require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
+let ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
+let LearnerDashboardPage = require('../webdriverio_utils/LearnerDashboardPage.js');
+let TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
+let StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
+let LibraryPage = require('../webdriverio_utils/LibraryPage.js');
+let SubscriptionDashboardPage = require('../webdriverio_utils/SubscriptionDashboardPage.js');
+let TopicAndStoryViewerPage = require('../webdriverio_utils/TopicAndStoryViewerPage.js');
+let forms = require('../webdriverio_utils/forms.js');
+let ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+let Constants = require('../webdriverio_utils/WebdriverioConstants.js');
+let SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
+let DiagnosticTestPage = require('../webdriverio_utils/DiagnosticTestPage.js');
 
 describe('Learner dashboard functionality', function () {
-  var explorationPlayerPage = null;
-  var topicsAndSkillsDashboardPage = null;
-  var libraryPage = null;
-  var topicEditorPage = null;
-  var storyEditorPage = null;
-  var topicAndStoryViewerPage = null;
-  var explorationEditorMainTab = null;
-  var learnerDashboardPage = null;
-  var subscriptionDashboardPage = null;
-  var skillEditorPage = null;
-  var dummyExplorationIds = [];
+  let explorationPlayerPage = null;
+  let topicsAndSkillsDashboardPage = null;
+  let libraryPage = null;
+  let topicEditorPage = null;
+  let storyEditorPage = null;
+  let topicAndStoryViewerPage = null;
+  let explorationEditorMainTab = null;
+  let learnerDashboardPage = null;
+  let subscriptionDashboardPage = null;
+  let skillEditorPage = null;
+  let dummyExplorationIds = [];
 
-  var createDummyExplorations = async function () {
-    var EXPLORATION = {
+  let createDummyExplorations = async function () {
+    let EXPLORATION = {
       category: 'Biology',
       objective: 'The goal is to check story viewer functionality.',
       language: 'English',
     };
 
-    for (var i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 3; i++) {
       await workflow.createAndPublishTwoCardExploration(
         `Learner Dashboard Exploration ${i}`,
         EXPLORATION.category,
@@ -91,9 +91,9 @@ describe('Learner dashboard functionality', function () {
       'learner1@learnerDashboard.com',
       'learner1learnerDashboard'
     );
-    var creator1Id = 'creatorName';
+    let creator1Id = 'creatorName';
     await users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
-    var creator2Id = 'collectionAdm';
+    let creator2Id = 'collectionAdm';
     await users.createUser(creator2Id + '@learnerDashboard.com', creator2Id);
     await users.login(creator1Id + '@learnerDashboard.com');
     await workflow.createAndPublishExploration(
@@ -133,13 +133,13 @@ describe('Learner dashboard functionality', function () {
   });
 
   it('should add and remove exploration to play later list', async function () {
-    var EXPLORATION_FRACTION = 'fraction';
-    var EXPLORATION_SINGING = 'singing';
-    var CATEGORY_MATHEMATICS = 'Mathematics';
-    var CATEGORY_MUSIC = 'Music';
-    var LANGUAGE_ENGLISH = 'English';
-    var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
-    var EXPLORATION_OBJECTIVE2 = 'show us the darkness';
+    let EXPLORATION_FRACTION = 'fraction';
+    let EXPLORATION_SINGING = 'singing';
+    let CATEGORY_MATHEMATICS = 'Mathematics';
+    let CATEGORY_MUSIC = 'Music';
+    let LANGUAGE_ENGLISH = 'English';
+    let EXPLORATION_OBJECTIVE = 'hold the light of two trees';
+    let EXPLORATION_OBJECTIVE2 = 'show us the darkness';
 
     await users.createUser(
       'creator@learnerDashboard.com',
@@ -196,14 +196,14 @@ describe('Learner dashboard functionality', function () {
     'should display correct topics in edit goals, learn something new ' +
       'section, current goals and continue where you left off section',
     async function () {
-      var TOPIC_NAME = 'Learner Dashboard Topic 1';
-      var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
-      var TOPIC_DESCRIPTION = 'Topic description';
+      let TOPIC_NAME = 'Learner Dashboard Topic 1';
+      let TOPIC_URL_FRAGMENT_NAME = 'ld-topic-one';
+      let TOPIC_DESCRIPTION = 'Topic description';
       await users.createAndLoginCurriculumAdminUser(
         'creator@learnerDashboard1.com',
         'learnerDashboard1'
       );
-      var handle = await browser.getWindowHandle();
+      let handle = await browser.getWindowHandle();
       await learnerDashboardPage.get();
       await learnerDashboardPage.navigateToHomeSection();
       await learnerDashboardPage.expectNumberOfTopicsInSuggestedForYou(0);
@@ -235,8 +235,8 @@ describe('Learner dashboard functionality', function () {
       await storyEditorPage.returnToTopic();
       await topicEditorPage.expectStoryPublicationStatusToBe('Yes', 0);
 
-      var url = await browser.getUrl();
-      var topicId = url.split('/')[4].slice(0, -1);
+      let url = await browser.getUrl();
+      let topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
       await browser.url('/classroom-admin/');
       await waitFor.pageToFullyLoad();
@@ -326,15 +326,15 @@ describe('Learner dashboard functionality', function () {
       'in skill proficiency section, learnt topics in completed goals section ' +
       'and completed stories in completed stories section',
     async function () {
-      var TOPIC_NAME = 'Learner Dashboard Topic 2';
-      var TOPIC_URL_FRAGMENT_NAME = 'ld-topic-two';
-      var TOPIC_DESCRIPTION = 'Topic description';
+      let TOPIC_NAME = 'Learner Dashboard Topic 2';
+      let TOPIC_URL_FRAGMENT_NAME = 'ld-topic-two';
+      let TOPIC_DESCRIPTION = 'Topic description';
       await users.createAndLoginCurriculumAdminUser(
         'creator@learnerDashboard2.com',
         'learnerDashboard2'
       );
       await createDummyExplorations();
-      var handle = await browser.getWindowHandle();
+      let handle = await browser.getWindowHandle();
       await topicsAndSkillsDashboardPage.get();
       await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
       await topicsAndSkillsDashboardPage.createTopic(
@@ -343,8 +343,8 @@ describe('Learner dashboard functionality', function () {
         TOPIC_DESCRIPTION,
         false
       );
-      var url = await browser.getUrl();
-      var topicId = url.split('/')[4].slice(0, -1);
+      let url = await browser.getUrl();
+      let topicId = url.split('/')[4].slice(0, -1);
       await general.closeCurrentTabAndSwitchTo(handle);
       await browser.url('/classroom-admin/');
       await waitFor.pageToFullyLoad();
@@ -362,7 +362,7 @@ describe('Learner dashboard functionality', function () {
         'Second explanation for easy difficulty.'
       );
       await skillEditorPage.saveOrPublishSkill('Edited rubrics');
-      var url = await browser.getUrl();
+      let url = await browser.getUrl();
       skillId = url.split('/')[4];
       await skillEditorPage.get(skillId);
 
@@ -386,7 +386,7 @@ describe('Learner dashboard functionality', function () {
           'FuzzyEquals',
           ['correct']
         );
-        var responseEditor =
+        let responseEditor =
           await explorationEditorMainTab.getResponseEditor(0);
         await responseEditor.markAsCorrect();
         await (
@@ -440,7 +440,7 @@ describe('Learner dashboard functionality', function () {
         Constants.TEST_SVG_PATH
       );
       await storyEditorPage.updateMetaTagContent('story meta tag');
-      for (var i = 0; i < 3; i++) {
+      for (let i = 0; i < 3; i++) {
         await storyEditorPage.createNewChapter(
           `Chapter ${i}`,
           dummyExplorationIds[i],
