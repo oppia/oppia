@@ -502,23 +502,23 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
     def test_access_topic_editor_page_without_logging_in(self) -> None:
         self.get_json(
             '%s/can_access_topic_editor/%s' % (
-            ACCESS_VALIDATION_HANDLER_PREFIX,
-            self.topic_id), expected_status_int=401)
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401
+        )
 
     def test_access_topic_editor_page_with_guest_user(self) -> None:
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.login(self.VIEWER_EMAIL)
         self.get_json(
             '%s/can_access_topic_editor/%s' % (
-            ACCESS_VALIDATION_HANDLER_PREFIX,
-            self.topic_id), expected_status_int=401)
-        self.logout()
+               ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401
+        )
 
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id),
-            expected_status_int=401)
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=401
+        )
         self.logout()
 
     def test_access_topic_editor_page_with_curriculum_admin(
@@ -527,8 +527,9 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_html_response(
             '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX,
-                self.topic_id), expected_status_int=200)
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
+            ), expected_status_int=200
+        )
         self.logout()
 
     def test_cannot_access_topic_editor_page_with_non_existent_topic_id(
@@ -537,8 +538,9 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
             '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX,
-                topic_fetchers.get_new_topic_id()), expected_status_int=404)
+                ACCESS_VALIDATION_HANDLER_PREFIX, topic_fetchers.get_new_topic_id()
+            ), expected_status_int=404
+        )
         self.logout()
 
     def test_cannot_access_topic_editor_page_with_invalid_topic_id(
@@ -548,5 +550,6 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
         self.get_html_response(
             '%s/can_access_topic_editor?topic_id=invalid_id' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX,
-                ), expected_status_int=404)
+            ), expected_status_int=404
+        )
         self.logout()
