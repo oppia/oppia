@@ -538,7 +538,8 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.get_json(
             '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, topic_fetchers.get_new_topic_id()
+                ACCESS_VALIDATION_HANDLER_PREFIX,
+                topic_fetchers.get_new_topic_id()
             ), expected_status_int=404
         )
         self.logout()
