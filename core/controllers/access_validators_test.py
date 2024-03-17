@@ -473,7 +473,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
-class TopicEditorPageAccessValidationHandlerTests(test_utils.EmailTestBase):
+class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the topic editor page and its rendering."""
 
     def setUp(self) -> None:
