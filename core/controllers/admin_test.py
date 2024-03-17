@@ -1333,7 +1333,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         response = self.delete_json(
             '/adminsuperadminhandler', params={'username': 'testsuper'},
-            expected_status_int=401)
+            expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -2832,7 +2832,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
                 'username': self.NEW_USER_USERNAME,
                 'user_id': self.admin_user_id
             },
-            expected_status_int=401)
+            expected_status_int=400)
 
     def test_delete_with_correct_user_id_andusername_returns_true(
         self

@@ -54,7 +54,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
     def test_page_not_found(self) -> None:
-        message = 'Could not find the page {}/profilehandler/data/{}.'.format(
+        message = 'Could not find the resource {}/profilehandler/data/{}.'.format(
             'http://localhost', self.EDITOR_USERNAME
         )
         error = {
