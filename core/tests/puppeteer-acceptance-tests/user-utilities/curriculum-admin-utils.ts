@@ -88,12 +88,12 @@ const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
 const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
 
-const addSubTopicButton = 'button.e2e-test-add-subtopic-button';
-const subTopicTitleField = 'input.e2e-test-new-subtopic-title-field';
-const subTopicUrlFragmentField =
+const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
+const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicUrlFragmentField =
   'input.e2e-test-new-subtopic-url-fragment-field';
-const subTopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
-const createSubTopicButton = '.e2e-test-confirm-subtopic-creation-button';
+const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
+const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
@@ -216,8 +216,8 @@ export class CurriculumAdmin extends BaseUser {
       `${publishExplorationButton}:not([disabled])`
     );
     await this.clickOn(publishExplorationButton);
-    await this.type(explorationTitleInput, 'Test Exploration');
-    await this.type(explorationGoalInput, 'Test Exploration');
+    await this.type(explorationTitleInput, 'Test Exploration Title 1');
+    await this.type(explorationGoalInput, 'Test Exploration Goal 1');
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
@@ -280,10 +280,10 @@ export class CurriculumAdmin extends BaseUser {
    */
   async createSubTopic(): Promise<void> {
     await this.openTopicEditor();
-    await this.clickOn(addSubTopicButton);
-    await this.type(subTopicTitleField, 'Test Subtopic 1');
-    await this.type(subTopicUrlFragmentField, 'test-subtopic-one');
-    await this.clickOn(subTopicDescriptionEditorToggle);
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, 'Test Subtopic 1');
+    await this.type(subtopicUrlFragmentField, 'test-subtopic-one');
+    await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForTimeout(500);
     await this.type(
       richTextAreaField,
@@ -293,9 +293,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(`${createSubTopicButton}:not([disabled])`);
+    await this.page.waitForSelector(`${createSubtopicButton}:not([disabled])`);
     await this.page.waitForTimeout(500);
-    await this.clickOn(createSubTopicButton);
+    await this.clickOn(createSubtopicButton);
     await this.page.waitForSelector(`${saveTopicButton}:not([disabled])`);
     await this.page.waitForTimeout(500);
     await this.clickOn(saveTopicButton);
@@ -360,13 +360,13 @@ export class CurriculumAdmin extends BaseUser {
    * This function checks if the topic with given subtopic and skill is published.
    */
   async expectPublishedTopicToBePresent(): Promise<void> {
-    let expectedSubTopicName = 'Test Subtopic 1';
+    let expectedSubtopicName = 'Test Subtopic 1';
     let expectedSkillName = 'Test Skill 1';
 
     await this.openTopicEditor();
     await this.page.waitForSelector('.e2e-test-subtopic');
 
-    let subTopicName = await this.page.$eval(
+    let subtopicName = await this.page.$eval(
       '.e2e-test-subtopic',
       element => (element as HTMLElement).innerText
     );
@@ -374,17 +374,17 @@ export class CurriculumAdmin extends BaseUser {
       '.e2e-test-skill-item',
       element => (element as HTMLElement).innerText
     );
-    if (subTopicName !== expectedSubTopicName) {
+    if (subtopicName !== expectedSubtopicName) {
       throw new Error(
-        `Subtopic with title ${expectedSubTopicName} does not exist!`
+        `Subtopic with title ${expectedSubtopicName} does not exist!`
       );
     } else if (skillName !== expectedSkillName) {
       throw new Error(
-        `Skill with title ${expectedSubTopicName} does not exist!`
+        `Skill with title ${expectedSubtopicName} does not exist!`
       );
     }
     showMessage(
-      `Published topic with subtopic ${expectedSubTopicName} and skill ${skillName} exists!`
+      `Published topic with subtopic ${expectedSubtopicName} and skill ${skillName} exists!`
     );
   }
 
