@@ -18,8 +18,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -30,22 +28,30 @@ jobs:
 
       - name: Check for unresolved todos
         id: check_for_unresolved_todos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --issue=${{ github.event.issue.number }} --commit_sha=${{ github.sha }} --generate_file
 
       - name: Reopen issue
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue reopen ${{ github.event.issue.number }}
     
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --issue=${{ github.event.issue.number }} --new_comment_file=unresolved_todo_list.txt
 
       - name: Add Comment
         if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue comment ${{ github.event.issue.number }} -F $(pwd)/unresolved_todo_list.txt
   pull_request_check:
@@ -54,8 +60,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -66,16 +70,22 @@ jobs:
         
       - name: Check for unresolved todos
         id: check_for_unresolved_todos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --commit_sha=${{ github.sha }} --generate_file
 
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
         if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --new_comment_file=unresolved_todo_list.txt
 
       - name: Add Comment
         if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr comment ${{ github.event.pull_request.number }} -F $(pwd)/unresolved_todo_list.txt
