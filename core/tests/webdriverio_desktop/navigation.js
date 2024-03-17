@@ -294,11 +294,16 @@ describe('Error reporting', function () {
     await browser.pause(2000);
     // Deleting the cookies simulates an expired session error.
     await browser.deleteCookies();
+    // Expect the cookies are deleted.
+    let cookies = await browser.getCookies();
+    expect(cookies).toEqual([]);
     await browser.setupInterceptor();
     // Expect that the frontend error is sent to the backend handler.
     await browser.expectRequest('POST', '/frontend_errors', 200);
     let creatorDashboardRadio = $('.e2e-test-creator-dashboard-radio');
+    let saveChangesButton = $('.e2e-test-save-changes-button');
     await action.click('Creator Dashboard radio', creatorDashboardRadio);
+    await action.click('Save Changes button', saveChangesButton);
     // Add a 1 second delay to ensure that expected request gets triggered.
     // eslint-disable-next-line oppia/e2e-practices
     await browser.pause(1000);
