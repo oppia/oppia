@@ -27,9 +27,9 @@ const duplicateBlogPostWarning =
   ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
-const BLOG_EDITOR_ERRORS_TO_IGNORE = [
+ConsoleReporter.setConsoleErrorsToIgnore([
   'Blog Post with the given title exists already. Please use a different title.',
-];
+]);
 
 describe('Blog Editor', function () {
   let blogPostEditor: BlogPostEditor;
@@ -64,10 +64,6 @@ describe('Blog Editor', function () {
     },
     DEFAULT_SPEC_TIMEOUT
   );
-
-  afterEach(function () {
-    ConsoleReporter.reportConsoleErrors(BLOG_EDITOR_ERRORS_TO_IGNORE);
-  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

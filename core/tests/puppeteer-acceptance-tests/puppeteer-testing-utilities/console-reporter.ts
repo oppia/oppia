@@ -89,6 +89,7 @@ const CONSOLE_ERRORS_TO_FIX = [
 
 export class ConsoleReporter {
   private static consoleMessages: ConsoleMessage[] = [];
+  private static consoleErrorsToIgnore: (RegExp | string)[] = [];
 
   /**
    * This function initializes tracking for the browser's console messages.
@@ -143,10 +144,8 @@ export class ConsoleReporter {
   /**
    * This function reports any console errors that were detected.
    */
-  public static reportConsoleErrors(
-    errorsToIgnore: (RegExp | string)[] = []
-  ): void {
-    const errors = ConsoleReporter.getConsoleErrors(errorsToIgnore);
+  public static reportConsoleErrors(): void {
+    const errors = ConsoleReporter.getConsoleErrors();
     if (errors.length > 0) {
       const errorMessages = errors
         .map(
@@ -162,12 +161,19 @@ export class ConsoleReporter {
   }
 
   /**
+   * This function sets the console errors to ignore.
+   */
+  public static setConsoleErrorsToIgnore(
+    errorsToIgnore: (RegExp | string)[]
+  ): void {
+    ConsoleReporter.consoleErrorsToIgnore = errorsToIgnore;
+  }
+
+  /**
    * This function gets the console messages that are considered errors.
    */
-  private static getConsoleErrors(
-    errorsToIgnore: (RegExp | string)[]
-  ): ConsoleMessage[] {
-    errorsToIgnore = errorsToIgnore.concat(
+  private static getConsoleErrors(): ConsoleMessage[] {
+    let errorsToIgnore = ConsoleReporter.consoleErrorsToIgnore.concat(
       CONSOLE_ERRORS_TO_IGNORE,
       CONSOLE_ERRORS_TO_FIX
     );

@@ -20,7 +20,6 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {QuestionAdmin} from '../../user-utilities/question-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
-import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
@@ -69,10 +68,6 @@ describe('Question Admin', function () {
     },
     DEFAULT_SPEC_TIMEOUT
   );
-
-  afterEach(function () {
-    ConsoleReporter.reportConsoleErrors();
-  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

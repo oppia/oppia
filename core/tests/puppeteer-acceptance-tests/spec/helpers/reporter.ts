@@ -18,8 +18,13 @@
 
 import util from 'util';
 import sourceMapSupport from 'source-map-support';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 sourceMapSupport.install();
+
+interface SpecDoneResult extends jasmine.SpecResult {
+  consoleErrorsToIgnore?: (RegExp | string)[];
+}
 
 interface SuiteFailureResult extends jasmine.JasmineDoneInfo {
   fullName: string;
@@ -163,9 +168,23 @@ const Reporter: jasmine.CustomReporter = {
     printNewline();
   },
 
-  specDone: function (result: jasmine.SpecResult) {
+  specDone: function (result: SpecDoneResult) {
     specCount++;
     const seconds = result?.duration ? result.duration / 1000 : 0;
+
+    try {
+      ConsoleReporter.reportConsoleErrors();
+    } catch (error) {
+      result.failedExpectations.push({
+        message: error,
+        stack: '',
+        actual: '',
+        expected: '',
+        matcherName: '',
+        passed: false,
+      });
+      result.status = 'failed';
+    }
 
     switch (result.status) {
       case 'pending':

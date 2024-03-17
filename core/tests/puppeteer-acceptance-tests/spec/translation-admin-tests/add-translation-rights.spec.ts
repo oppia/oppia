@@ -20,7 +20,6 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {TranslationAdmin} from '../../user-utilities/translation-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
-import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
@@ -60,10 +59,6 @@ describe('Translation Admin', function () {
     },
     DEFAULT_SPEC_TIMEOUT
   );
-
-  afterEach(async function () {
-    ConsoleReporter.reportConsoleErrors();
-  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
