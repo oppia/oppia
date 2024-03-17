@@ -198,8 +198,7 @@ export default function isElementClickable(element: Element): boolean {
   };
 
   // Here we check if the element is clickable and if not, we scroll it into view
-  // and check again. We do this twice to ensure that the element is centered and
-  // not blocked.
+  // and check again.
   if (!isClickable(element)) {
     element.scrollIntoView({block: 'center', inline: 'center'});
 
