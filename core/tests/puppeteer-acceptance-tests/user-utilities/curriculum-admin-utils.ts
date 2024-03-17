@@ -147,7 +147,11 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a question in the skill editor page.
    */
-  async createQuestion(): Promise<void> {
+  async createQuestion(explorationUrl: string | null): Promise<void> {
+    if (!explorationUrl) {
+      throw new Error('Invalid exploration URL for question creation.');
+    }
+    await this.goto(explorationUrl);
     await this.clickOn(createQuestionButton);
     await this.clickOn(easyQuestionDifficultyOption);
     await this.clickOn(textStateEditSelector);
@@ -208,7 +212,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(addInteractionButton);
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector(`${saveChangesButton}:not([disabled])`);
     await this.clickOn(saveChangesButton);
     await this.clickOn(saveDraftButton);
 
