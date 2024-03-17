@@ -30,7 +30,7 @@ const navigateToMainTabButton = '.e2e-test-main-tab';
 const createExplorationButtonSelector = 'button.e2e-test-create-activity';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const stateEditSelector = 'div.e2e-test-state-edit-content';
-const explorationTextInput = 'div.oppia-rte';
+const explorationContentInput = 'div.oppia-rte';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const endInteractionSelector = '.e2e-test-interaction-tile-EndExploration';
@@ -57,7 +57,7 @@ const downloadVersionButton = '.e2e-test-download-version';
 const resetGraphButton = '.e2e-test-reset-graph';
 const confirmRevertVersionButton = '.e2e-test-confirm-revert';
 const paginatorToggler = '.mat-paginator-page-size-select';
-const viewMatadataChangesButton = '.e2e-test-view-metadata-history';
+const viewMetadataChangesButton = '.e2e-test-view-metadata-history';
 const testNodeBackground = '.e2e-test-node';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
@@ -66,8 +66,6 @@ const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 const closeMetadataModal = '.e2e-test-close-history-metadata-modal';
 const closeStateModal = '.e2e-test-close-history-state-modal';
 const oppiaResponseSelector = '.oppia-click-to-start-editing';
-const firstVersionOptionsButton = '#dropdownMenuButton-0';
-const secondVersionOptionsButton = '#dropdownMenuButton-1';
 
 // Preview tab elements.
 const testContinueButton = '.e2e-test-continue-button';
@@ -91,10 +89,9 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to create an exploration in the Exploration Editor.
-   * @param {string} text - The text in the Exploration.
-   * @param {string} interaction - The interaction type in the Exploration.
+   * @param {string} content - The content in the Exploration.
    */
-  async createExploration(text: string): Promise<void> {
+  async createExploration(content: string): Promise<void> {
     await this.clickOn(createExplorationButtonSelector);
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       visible: true,
@@ -102,20 +99,26 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(300);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(explorationTextInput, {visible: true});
-    await this.page.type(explorationTextInput, `${text}`);
+    await this.page.waitForSelector(explorationContentInput, {visible: true});
+    await this.page.type(explorationContentInput, `${content}`);
     await this.clickOn(saveContentButton);
   }
 
+  /**
+   * Function to add an interaction to the exploration.
+   * @param {string} interactionToAdd - The interaction type to add to the Exploration.
+   */
   async addAnInteractionToTheExploration(
-    interactionTOAdd: string
+    interactionToAdd: string
   ): Promise<void> {
     await this.page.waitForSelector(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(endInteractionSelector, {visible: true});
-    await this.clickOn(interactionTOAdd);
+    await this.clickOn(interactionToAdd);
     await this.clickOn(saveInteractionButton);
-    await this.clickOn('.oppia-response-header');
+    if (interactionToAdd != ' End Exploration ') {
+      await this.clickOn('.oppia-response-header');
+    }
   }
 
   /**
@@ -129,44 +132,47 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to make metadata changes in the Exploration.
-   * @param {string} title - The title of the Exploration.
+   * Function to navigate to the settings tab in the Exploration Editor.
    */
-  async makeMetaDataChanges(title: string): Promise<void> {
+  async navigateToSettingsTab(): Promise<void> {
     await this.page.waitForTimeout(200);
     await this.clickOn(navigateToSettingsTabButton);
     await this.page.waitForTimeout(200);
+  }
+
+  /**
+   * Function to edit the title of the Exploration.
+   * @param {string} title - The new title of the Exploration.
+   */
+  async editExplorationTitle(title: string): Promise<void> {
     await this.page.type(explorationTitleInput, title);
+  }
+
+  /**
+   * Function to navigate to the main tab in the Exploration Editor.
+   */
+  async navigateToMainTab(): Promise<void> {
     await this.clickOn(navigateToMainTabButton);
   }
 
   /**
-   * Function to create multiple revisions of the same Exploration.
-   * @param {string} text - The text of the Exploration.
-   * @param {number} numOfVersion - Number of versions to be created.
+   * Function to edit the content of the Exploration.
+   * @param {string} content - The new content of the Exploration.
    */
-  async createMultipleRevisionsOfTheSameExploration(
-    text: string,
-    numOfVersion: number
-  ): Promise<void> {
-    await this.makeMetaDataChanges('changes');
-    await this.saveExplorationDraft();
+  async editExplorationContent(content: string): Promise<void> {
     await this.page.waitForTimeout(300);
-    for (let i = 0; i < numOfVersion; i++) {
-      await this.page.waitForSelector(stateEditSelector, {visible: true});
-      await this.clickOn(stateEditSelector);
-      await this.page.waitForSelector(explorationTextInput, {visible: true});
-      await this.page.click(explorationTextInput, {clickCount: 3});
-      await this.page.keyboard.press('Backspace');
-      await this.page.waitForTimeout(500);
-      await this.page.type(explorationTextInput, `${text} ${i + 3}`);
-      await this.clickOn(saveContentButton);
-      await this.saveExplorationDraft();
-    }
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOn(stateEditSelector);
+    await this.page.waitForSelector(explorationContentInput, {visible: true});
+    await this.page.click(explorationContentInput, {clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.page.waitForTimeout(500);
+    await this.page.type(explorationContentInput, content);
+    await this.clickOn(saveContentButton);
   }
 
   /**
-   * Function to navigate to the History tab of the Exploration Editor.
+   * Function to navigate to the history tab in the Exploration Editor.
    */
   async navigateToHistoryTab(): Promise<void> {
     await this.page.waitForTimeout(300);
@@ -177,7 +183,6 @@ export class ExplorationEditor extends BaseUser {
    * Function to create a list of all the revisions created.
    * @param {string} versionsListSelector - Common selector for revisions.
    */
-
   async getRevisionsList(versionsListSelector: string): Promise<
     {
       versionNo: string;
@@ -221,44 +226,85 @@ export class ExplorationEditor extends BaseUser {
    * Function to confirm the existence of the Version number, Notes, Username,
    * and Date for a given revision.
    */
-  async expectlatestRevisionToHaveVersionNoNotesUsernameDate(): Promise<void> {
+  async expectRevision1ToHave(property: string): Promise<void> {
     await this.page.waitForTimeout(500);
-    let element = await this.page.$(historyListItem);
+    let element = await this.page.$(`${historyListItem}:nth-child(${6})`);
     if (!element) {
-      throw new Error('No revisions found');
+      throw new Error('Revision 1 not found');
     }
-    let versionNo = await element.$eval(
-      revisionVersionNoSelector,
-      async el => el.textContent
-    );
-    let notes = await element.$eval(
-      revisionNoteSelector,
-      async el => el.textContent
-    );
-    let username = await element.$eval(
-      revisionUsernameSelector,
-      async el => el.textContent
-    );
-    let date = await element.$eval(
-      revisionDateSelector,
-      async el => el.textContent
-    );
-    if (!versionNo || typeof notes === 'undefined' || !username || !date) {
-      throw new Error('The latest revision is missing one or more properties');
+    let selector: string;
+    switch (property) {
+      case 'Version No.':
+        selector = revisionVersionNoSelector;
+        break;
+      case 'Notes':
+        selector = revisionNoteSelector;
+        break;
+      case 'User':
+        selector = revisionUsernameSelector;
+        break;
+      case 'Date':
+        selector = revisionDateSelector;
+        break;
+      default:
+        throw new Error(`Invalid property: ${property}`);
     }
-    showMessage('The versions are not missing any properties');
+    let value = await element.$eval(selector, async el => el.textContent);
+    if (property === 'Notes' && typeof value === 'undefined') {
+      throw new Error(`Revision 1 is missing ${property}`);
+    } else if (property !== 'Notes' && (!value || value.trim() === '')) {
+      throw new Error(`Revision 1 is missing or has an empty ${property}`);
+    }
+    showMessage(`Revision 1 has the property ${property} `);
+  }
+
+  /**
+   * Function to check if a specific revision has a certain property.
+   * @param {string} property - The property to check for.
+   */
+  async expectRevision2ToHave(property: string): Promise<void> {
+    await this.page.waitForTimeout(500);
+    let element = await this.page.$(`${historyListItem}:nth-child(${5})`);
+    if (!element) {
+      throw new Error('Revision 2 not found');
+    }
+    let selector: string;
+    switch (property) {
+      case 'Version No.':
+        selector = revisionVersionNoSelector;
+        break;
+      case 'Notes':
+        selector = revisionNoteSelector;
+        break;
+      case 'User':
+        selector = revisionUsernameSelector;
+        break;
+      case 'Date':
+        selector = revisionDateSelector;
+        break;
+      default:
+        throw new Error(`Invalid property: ${property}`);
+    }
+    let value = await element.$eval(selector, async el => el.textContent);
+    if (property === 'Notes' && typeof value === 'undefined') {
+      throw new Error(`Revision 2 is missing ${property}`);
+    } else if (property !== 'Notes' && (!value || value.trim() === '')) {
+      throw new Error(`Revision 2 is missing or has an empty ${property}`);
+    }
+    showMessage(`Revision 2 has the property ${property} `);
   }
 
   /**
    * Function to verify whether the revisions are sorted by dates or not.
+   * @param {string} property - The property to sort by.
    */
-  async expectRevisionsToBeOrderedByDate(): Promise<void> {
+  async expectRevisionsToBeOrderedBy(property: string): Promise<void> {
     let revisions = await this.getRevisionsList(historyListItem);
     for (let i = 0; i < revisions.length - 1; i++) {
       let date1 = new Date(revisions[i].date);
       let date2 = new Date(revisions[i + 1].date);
       if (date1 < date2) {
-        throw new Error('Revisions are not sorted by date');
+        throw new Error(`Revisions are not sorted by ${property}`);
       }
     }
   }
@@ -267,40 +313,68 @@ export class ExplorationEditor extends BaseUser {
    * Function to filter revisions by username.
    * @param {string} userName - The username to filter by.
    */
-  async filterRevisionsByUsername(userName: string): Promise<void> {
+  async filterRevisionsBySpecificUser(userName: string): Promise<void> {
     await this.page.type(userNameEdit, userName);
     await this.page.type(userNameEdit, '\u000d');
   }
 
   /**
-   * Function to verify if the number of items per page adjusts according
-   * to changes in the paginator settings.
-   * @param {number} itemsPerPage - Number of items/revisions to show per page.
+   * Function to check if a specific user has a certain number of revisions.
+   * @param {number} numberOfVersions - The number of revisions to check for.
    */
-  async ExpectPaginatorToChangeItemsPerPage(
-    itemsPerPage: number
+  async expectSpecificUserToHaveNumberOfRevisions(
+    numberOfVersions: number
   ): Promise<void> {
+    let revisions = await this.getRevisionsList(historyListItem);
+    if (revisions.length !== numberOfVersions) {
+      throw new Error(
+        `The number of revisions are not equal to the created by the user`
+      );
+    } else {
+      showMessage(
+        `The number of revisions are equal to the created by the user`
+      );
+    }
+  }
+
+  /**
+   * Function to adjust the paginator to show a certain number of revisions per page.
+   */
+  async adjustPaginatorToShowRevisionsPerPage(): Promise<void> {
     await this.page.waitForTimeout(500);
     await this.page.waitForSelector(paginatorToggler, {visible: true});
     await this.clickOn(paginatorToggler);
     const PaginatorOptionsSelector = '.mat-select-panel';
     await this.clickOn(`${PaginatorOptionsSelector} mat-option:nth-child(2)`);
+  }
 
-    await this.page.waitForTimeout(500);
-    let revisions = await this.getRevisionsList(historyListItem);
-    if (revisions.length !== itemsPerPage) {
-      throw new Error(
-        `Pagination Error: When the items per page is set to ${itemsPerPage},
-        expected ${itemsPerPage} user revisions, but got ${revisions.length}`
-      );
+  /**
+   * Function to check if the next page of revisions button is in a certain status.
+   * @param {string} status - The status to check for.
+   */
+  async expectNextPageOfRevisionsButtonToBe(status: string): Promise<void> {
+    const nextPageButton = await this.page.$('.mat-paginator-navigation-next');
+    if (!nextPageButton) {
+      throw new Error('Next page button not found');
+    }
+    const isDisabled = await nextPageButton.evaluate(
+      button => button.getAttribute('disabled') === 'true'
+    );
+    if (
+      (status === 'disabled' && isDisabled) ||
+      (status === 'enabled' && !isDisabled)
+    ) {
+      showMessage(`Next page button is ${status}`);
+      if (status === 'enabled') {
+        showMessage(`Next page button is ${status}`);
+        await nextPageButton.click();
+      }
     } else {
-      showMessage(
-        `When the items per page is set to ${itemsPerPage}, 
-        correctly shows ${itemsPerPage} user revisions.`
+      throw new Error(
+        `Expected next page button to be ${status}, but it was ${isDisabled ? 'disabled' : 'enabled'}`
       );
     }
   }
-
   /**
    * Function for comparing different revisions.
    */
@@ -310,12 +384,12 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(firstVersionDropdown);
     await this.clickOn(firstVersionDropdown);
-    const love = '.mat-select-panel';
-    await this.clickOn(`${love} mat-option:nth-last-child(${version1})`);
+    const panel1 = '.mat-select-panel';
+    await this.clickOn(`${panel1} mat-option:nth-last-child(${version1})`);
     await this.page.waitForSelector(secondVersionDropdown);
     await this.clickOn(secondVersionDropdown);
-    const love1 = '#mat-select-2-panel';
-    await this.clickOn(`${love1} mat-option:nth-last-child(${version2})`);
+    const panel2 = '#mat-select-2-panel';
+    await this.clickOn(`${panel2} mat-option:nth-last-child(${version2})`);
   }
 
   /**
@@ -324,7 +398,8 @@ export class ExplorationEditor extends BaseUser {
   async expectMetadataChangesToIncludeChangesIn(
     property: string
   ): Promise<void> {
-    await this.clickOn(viewMatadataChangesButton);
+    await this.page.waitForSelector(viewMetadataChangesButton, {visible: true});
+    await this.clickOn(viewMetadataChangesButton);
     await this.page.waitForTimeout(300);
     const divContents = await this.page.$$eval('.CodeMirror-code', divs =>
       divs.map(div => div.textContent)
@@ -364,25 +439,36 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(resetGraphButton);
   }
 
-  async downloadRevision(): Promise<void> {
+  /**
+   * Function to download a specific revision.
+   * @param {number} revisionNo - The number of the revision to be downloaded.
+   */
+  async downloadRevision(revisionNo: number) {
     await this.page.waitForTimeout(1000);
-    await this.clickOn(firstVersionOptionsButton);
+    const buttons = await this.page.$$('.history-table-option');
+    await buttons[revisionNo - 1].click();
     await this.page.waitForTimeout(1000);
     await this.page.waitForSelector(downloadVersionButton);
     await this.clickOn(downloadVersionButton);
   }
 
-  async revertRevison(): Promise<void> {
-    await this.clickOn(secondVersionOptionsButton);
+  /**
+   * Function to revert to a specific revision.
+   * @param {number} revisionNo - The number of the revision to revert to.
+   */
+  async revertRevision(revisionNo: number): Promise<void> {
+    const buttons = await this.page.$$('.history-table-option');
+    await buttons[revisionNo - 1].click();
     await this.page.waitForTimeout(1000);
     await this.clickOn(revertVersionButton);
-    await this.page.click(confirmRevertVersionButton);
+    await this.clickOn(confirmRevertVersionButton);
   }
 
   /**
-   * Function verifies if a revision is reverting and downloading or not.
+   * Function to verify if a revision is reverting and downloading or not.
+   * @param {number} revisionNo - The number of the revision to check.
    */
-  async expectSuccessfulReversionOfRevision(): Promise<void> {
+  async expectSuccessfulReversionOfRevision(revisionNo: number): Promise<void> {
     // This page takes 3-5 seconds to reload to reflect the reverted revision.
     await this.page.waitForTimeout(5000);
     await this.page.waitForSelector(historyListItem);
@@ -398,7 +484,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Revision does not contain a Note');
     }
     await this.page.waitForTimeout(500);
-    if (notes === ' Reverted exploration to version 14 ') {
+    if (notes === ` Reverted exploration to version ${revisionNo} `) {
       showMessage('Revision is reverting successfully');
     } else {
       throw new Error('Revision is not reverting');
@@ -407,7 +493,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to create a new card in the exploration creator.
-   * @param {string} cardName - name of the card created.
+   * @param {string} cardName - The name of the card to be created.
    */
   async addANewCardToTheExploration(cardName: string): Promise<void> {
     await this.clickOn(openOutcomeDestButton);
@@ -419,22 +505,17 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to open the next card in the exploration journey.
-   * @param {number} cardNum - card number to switch to.
+   * Function to navigate to a specific card in the exploration.
+   * @param {string} cardName - The name of the card to navigate to.
    */
-  async goToTheNewlyCreatedCard(cardNum: number): Promise<void> {
-    const selector = testNodeBackground;
-    await this.page.waitForSelector(selector);
-    const elements = await this.page.$$(selector);
-    if (elements.length > cardNum) {
-      await elements[cardNum].click();
-    } else {
-      throw new Error(
-        `There are not enough elements to click on the ${cardNum}th element.`
-      );
-    }
+  async goToTheCard(cardName: string): Promise<void> {
+    await this.clickOn(cardName);
   }
 
+  /**
+   * Function to navigate to a specific card in the exploration.
+   * @param {number} cardNum - The number of the card to navigate to.
+   */
   async goToTheIntroductionCard(cardNum: number): Promise<void> {
     const selector = testNodeBackground;
     await this.page.waitForSelector(selector);
@@ -449,27 +530,31 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to create questions in the exploration card.
-   * @param {string} question - question to be added.
-   * @param {number} answer - answer of the question.
+   * Function to add content to a card.
+   * @param {string} questionText - The content to be added to the card.
    */
   async addContentToTheCard(questionText: string): Promise<void> {
     await this.page.waitForTimeout(2000);
     await this.clickOn(stateEditSelector);
-    await this.page.waitForSelector(explorationTextInput, {visible: true});
-    await this.page.click(explorationTextInput, {clickCount: 3});
+    await this.page.waitForSelector(explorationContentInput, {visible: true});
+    await this.page.click(explorationContentInput, {clickCount: 3});
     await this.page.keyboard.press('Backspace');
     await this.page.waitForTimeout(500);
-    await this.type(explorationTextInput, `${questionText}`);
+    await this.type(explorationContentInput, `${questionText}`);
     await this.clickOn(saveContentButton);
   }
 
+  /**
+   * Function to add an interaction to a card.
+   * @param {string} interaction - The interaction to be added to the card.
+   */
   async addAnInteractionToTheCard(interaction: string): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {visible: true});
     await this.clickOn(addInteractionButton);
     await this.clickOn(interaction);
     await this.clickOn(saveInteractionButton);
   }
+
   /**
    * Function to add responses to the interactions.
    * @param {string} response - response to be added.
@@ -479,31 +564,31 @@ export class ExplorationEditor extends BaseUser {
     await this.type(floatFormInput, response);
     await this.page.waitForSelector(oppiaResponseSelector);
     await this.clickOn(oppiaResponseSelector);
-    await this.page.waitForSelector(explorationTextInput, {visible: true});
-    await this.type(explorationTextInput, 'correct');
+    await this.page.waitForSelector(explorationContentInput, {visible: true});
+    await this.type(explorationContentInput, 'correct');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
   }
 
   /**
-   * Function to navigate the preview tab.
+   * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
-    await this.page.waitForSelector(navigateToPreviewTabButton, {
-      visible: true,
-    });
     await this.clickOn(navigateToPreviewTabButton);
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await this.page.waitForNavigation({waitUntil: 'networkidle2'});
   }
 
   /**
    * Function to verify if the exploration tab is loading correctly in
    * the preview tab or not.
+   * @param {string} text - The expected introduction card text.
    */
-  async expectTheExplorationToLoadAndStartFromIntroductionCard(
+  async expectTheExplorationToStartFromIntroductionCard(
     text: string
   ): Promise<void> {
-    await this.page.waitForSelector(explorationConversationContent);
+    await this.page.waitForSelector(explorationConversationContent, {
+      visible: true,
+    });
     const element = await this.page.$(explorationConversationContent);
     const introMessage = await this.page.evaluate(
       element => element.textContent,
@@ -541,15 +626,18 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to verify if the exploration is restarting after
-   * getting completed or not.
+   * Function to restart the exploration after it has been completed.
    */
-
   async restartTheExploration(): Promise<void> {
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForTimeout(2500);
     await this.clickOn(explorationRestartButton);
   }
 
+  /**
+   * Function to verify if the exploration is restarting after
+   * getting completed or not.
+   * @param {string} text - The expected introduction card text after restart.
+   */
   async expectTheExplorationToRestart(text: string): Promise<void> {
     /**
      * An explicit timeout is set because the page reloads when the

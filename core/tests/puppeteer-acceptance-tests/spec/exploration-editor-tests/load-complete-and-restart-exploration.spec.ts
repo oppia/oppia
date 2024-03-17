@@ -41,8 +41,8 @@ describe('Exploration Editor', function () {
       );
 
       // The following block of code adds a new card to the exploration that contains a question.
-      await explorationEditor.addANewCardToTheExploration('Question 1');
-      await explorationEditor.goToTheNewlyCreatedCard(1);
+      await explorationEditor.addANewCardToTheExploration('Question Card');
+      await explorationEditor.goToTheCard('Question Card ');
       await explorationEditor.addContentToTheCard(
         'mention a negative number greater than -100.'
       );
@@ -50,8 +50,8 @@ describe('Exploration Editor', function () {
       await explorationEditor.addResponsesToTheInteraction('-45');
 
       // The following block adds the final card with an ‘End’ interaction to conclude the exploration.
-      await explorationEditor.addANewCardToTheExploration('end');
-      await explorationEditor.goToTheNewlyCreatedCard(2);
+      await explorationEditor.addANewCardToTheExploration('Last Card');
+      await explorationEditor.goToTheCard('Last Card ');
       await explorationEditor.addContentToTheCard('Exploration ends here');
       await explorationEditor.addAnInteractionToTheCard(' End Exploration ');
 
@@ -59,7 +59,7 @@ describe('Exploration Editor', function () {
       await explorationEditor.saveExplorationDraft();
 
       await explorationEditor.navigateToPreviewTab();
-      await explorationEditor.expectTheExplorationToLoadAndStartFromIntroductionCard(
+      await explorationEditor.expectTheExplorationToStartFromIntroductionCard(
         'Exploration begins'
       );
 

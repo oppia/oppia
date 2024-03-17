@@ -47,7 +47,7 @@ export class BaseUser {
       '--use-fake-ui-for-media-stream',
     ];
 
-    const headless = process.env.HEADLESS === 'true';
+    const headless = process.env.HEADLESS === 'false';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -68,7 +68,7 @@ export class BaseUser {
       .then(async browser => {
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({width: 1920, height: 1080});
+        await this.page.setViewport({width: 1200, height: 800});
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
