@@ -38,7 +38,7 @@ const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
 
-const BREAKPOINTS = testConstants.Breakpoints;
+const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
 export class BlogPostEditor extends BaseUser {
   /**
@@ -72,9 +72,6 @@ export class BlogPostEditor extends BaseUser {
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
-    await this.page.waitForSelector(
-      'button.e2e-test-save-as-draft-button:not([disabled])'
-    );
     await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
 
     showMessage('Successfully created a draft blog post!');
@@ -131,26 +128,29 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
-   * This function publishes a blog post with given title.
+   * This function uploads a blog post thumbnail image.
    */
-  async publishNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
-    await this.addUserBioInBlogDashboard();
-    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
-
-    await this.expectPublishButtonToBeDisabled();
-    if (this.viewport.width < BREAKPOINTS.MOBILE) {
+  async uploadBlogPostThumbnailImage(): Promise<void> {
+    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
     } else {
       await this.clickOn(thumbnailPhotoBox);
       await this.uploadFile(blogPostThumbnailImage);
-      await this.page.waitForSelector(
-        `${addThumbnailImageButton}:not([disabled])`
-      );
       await this.clickOn(addThumbnailImageButton);
       await this.page.waitForSelector('body.modal-open', {hidden: true});
     }
+  }
 
+  /**
+   * This function publishes a blog post with given title.
+   */
+  async publishNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
+    await this.addUserBioInBlogDashboard();
+    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
+    await this.expectPublishButtonToBeDisabled();
+
+    await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
@@ -159,7 +159,6 @@ export class BlogPostEditor extends BaseUser {
     await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
-    await this.page.waitForSelector(`${publishBlogPostButton}:not([disabled])`);
     await this.clickOn('PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
@@ -172,19 +171,10 @@ export class BlogPostEditor extends BaseUser {
   async createNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
     await this.clickOn('NEW POST');
     await this.clickOn('button.mat-button-toggle-button');
+    await this.expectPublishButtonToBeDisabled();
 
-    if (this.viewport.width < BREAKPOINTS.MOBILE) {
-      await this.uploadFile(blogPostThumbnailImage);
-      await this.clickOn(addThumbnailImageButton);
-    } else {
-      await this.clickOn(thumbnailPhotoBox);
-      await this.uploadFile(blogPostThumbnailImage);
-      await this.page.waitForSelector(
-        `${addThumbnailImageButton}:not([disabled])`
-      );
-      await this.clickOn(addThumbnailImageButton);
-      await this.page.waitForSelector('body.modal-open', {hidden: true});
-    }
+    await this.uploadBlogPostThumbnailImage();
+    await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');

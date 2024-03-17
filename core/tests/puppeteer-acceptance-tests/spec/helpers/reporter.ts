@@ -18,6 +18,7 @@
 
 import util from 'util';
 import sourceMapSupport from 'source-map-support';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 sourceMapSupport.install();
 

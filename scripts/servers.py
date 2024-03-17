@@ -759,18 +759,11 @@ def managed_acceptance_tests_server(
         Exception. The suite_name is not in the list of the acceptance tests
             suite names.
     """
-    if not mobile and suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
         raise Exception('Invalid suite name: %s' % suite_name)
 
-    if headless:
-        os.environ['HEADLESS'] = 'true'
-    else:
-        os.environ['HEADLESS'] = 'false'
-
-    if mobile:
-        os.environ['MOBILE'] = 'true'
-    else:
-        os.environ['MOBILE'] = 'false'
+    os.environ['HEADLESS'] = 'true' if headless else 'false'
+    os.environ['MOBILE'] = 'true' if mobile else 'false'
 
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')

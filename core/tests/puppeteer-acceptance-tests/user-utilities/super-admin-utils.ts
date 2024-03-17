@@ -39,14 +39,14 @@ export class SuperAdmin extends BaseUser {
     const allRoles = await this.page.$$('.mat-option-text');
     for (let i = 0; i < allRoles.length; i++) {
       const roleText = await this.page.evaluate(
-        (role: HTMLElement) => role.innerText,
+        (element: HTMLElement) => element.innerText,
         allRoles[i]
       );
       if (roleText.toLowerCase() === role) {
-        // Here we are clicking on the role in the DOM since the options
+        // Here we are clicking on the role element in the DOM since the options
         // might not be in view.
         await Promise.all([
-          allRoles[i].evaluate(role => (role as HTMLElement).click(), role),
+          allRoles[i].evaluate(element => (element as HTMLElement).click()),
           this.page.waitForNetworkIdle(),
         ]);
         return;
