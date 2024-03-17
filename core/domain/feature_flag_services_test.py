@@ -599,6 +599,9 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         user_models.UserGroupModel(
             id=self.USER_GROUP_1, users=[
                 user_1_id, user_2_id, user_3_id]).put()
+        user_models.UserGroupModel(
+            id=self.USER_GROUP_2, users=[
+                user_1_id, user_2_id]).put()
         swap_name_to_description_feature_stage_registry_dict = (
             self._swap_name_to_description_feature_stage_registry())
         _, swap_all_feature_names_set = self._swap_feature_flags_list()
