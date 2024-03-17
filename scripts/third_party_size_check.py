@@ -38,7 +38,7 @@ THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 15000
 
 
-# TODO(#19800): Testing
+# TODO(#19755): Testing
 def get_skip_files_list() -> List[str]:
     """This function returns the list of the files which are skipped when
     Oppia is deployed to GAE.
