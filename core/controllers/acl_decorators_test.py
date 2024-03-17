@@ -2819,7 +2819,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock/%s' % invalid_id, expected_status_int=404)
         error_msg = (
-            'Could not find the resource http://localhost/mock/%s.' % invalid_id)
+            'Could not find the resource http://localhost/mock/%s.'
+            % invalid_id)
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -4782,8 +4783,8 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
         error_msg = (
-            'Could not find the resource http://localhost/mock_edit_story/%s.' % (
-                self.story_id)
+            'Could not find the resource http://localhost/mock_edit_story/%s.'
+            % (self.story_id)
         )
         self.assertEqual(response['error'], error_msg)
         self.logout()
