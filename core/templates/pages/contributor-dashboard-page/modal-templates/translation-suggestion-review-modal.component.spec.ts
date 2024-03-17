@@ -1561,9 +1561,14 @@ describe('Translation Suggestion Review Modal Component', function () {
 
   it('should extract html related to images', () => {
     const content =
-      '<oppia-noninteractive-image src="image1.jpg">something</oppia-noninteractive-image><another-tag value="a"></another-tag><oppia-noninteractive-image src="image2.jpg"></oppia-noninteractive-image>';
+      '<oppia-noninteractive-image src="image1.jpg">' +
+      'something</oppia-noninteractive-image>' +
+      '<another-tag value="a"></another-tag>' +
+      '<oppia-noninteractive-image src="image2.jpg"></oppia-noninteractive-image>';
     const expectedHtmlString =
-      '<oppia-noninteractive-image src="image1.jpg">something</oppia-noninteractive-image><oppia-noninteractive-image src="image2.jpg"></oppia-noninteractive-image>';
+      '<oppia-noninteractive-image src="image1.jpg">' +
+      'something</oppia-noninteractive-image>' +
+      '<oppia-noninteractive-image src="image2.jpg"></oppia-noninteractive-image>';
 
     const result = component.getImageInfoForSuggestion(content);
 
