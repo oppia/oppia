@@ -18,8 +18,14 @@
 
 export default function isElementClickable(element: Element): boolean {
   /**
-   * This function gets the the overlapping element if any by checking the
+   * This function gets the overlapping element if any by checking the
    * element that is present in the center of the target element's position.
+   *
+   * @param {Element} element The target element to check for overlapping
+   * elements.
+   * @param {ShadowRoot | Document} parent The parent element to check for
+   * the overlapping element at the center of the target element.
+   * @returns {Element | null} The overlapping element if any.
    */
   const getOverlappingElement = (
     element: Element,
@@ -35,8 +41,15 @@ export default function isElementClickable(element: Element): boolean {
   /**
    * This function also gets the overlapping element if any at the center
    * of the given element. However this uses the client rect, which
-   * is applicable in special cases where the text is multiline. This
-   * applies to special cases like the span.
+   * is applicable in special cases where the text is multiline. Use this
+   * function if the element you are checking has multiline text such as
+   * text in the span tag.
+   *
+   * @param {Element} element The target element to check for overlapping
+   * elements.
+   * @param {ShadowRoot | Document} parent The parent element to check for
+   * the overlapping element at the center of the target element.
+   * @returns {Element | null} The overlapping element if any.
    */
   const getOverlappingRect = (
     element: Element,
@@ -53,9 +66,15 @@ export default function isElementClickable(element: Element): boolean {
   /**
    * This function combines the overlapping element and overlapping rect
    * to get the element or elements that are overlapping the given
-   * element.
+   * element at the topmost level.
+   *
+   * @param {Element} element The target element to check for overlapping
+   * elements.
+   * @param {ShadowRoot | Document} parent The parent element to check for
+   * the overlapping element at the center of the target element.
+   * @returns {Element[]} - The overlapping elements if any.
    */
-  const getOverlappingElements = (
+  const getTopmostOverlappingElements = (
     element: Element,
     parent: ShadowRoot | Document = document
   ): Element[] => {
@@ -76,12 +95,14 @@ export default function isElementClickable(element: Element): boolean {
    * overlapping element meaning there are no other elements blocking
    * the target element.
    *
-   * @param {Element} targetElement - The element to compare with the other
+   * @param {Element} targetElement The element to compare with the other
    * overlapping elements.
-   * @param {Element[]} overlappingElements - The overlapping elements to compare
+   * @param {Element[]} overlappingElements The overlapping elements to compare
    * against the target element.
+   * @returns {boolean} Whether the target element is the only overlapping
+   * element.
    */
-  const isOverlappingElementsMatching = (
+  const isTargetTheOnlyOverlappingElement = (
     targetElement: Element,
     overlappingElements: Element[]
   ): boolean => {
@@ -102,7 +123,7 @@ export default function isElementClickable(element: Element): boolean {
     for (const shadowEl of elementsWithShadow) {
       if (shadowEl.shadowRoot) {
         shadowElements.push(
-          ...getOverlappingElements(targetElement, shadowEl.shadowRoot)
+          ...getTopmostOverlappingElements(targetElement, shadowEl.shadowRoot)
         );
       }
     }
@@ -115,11 +136,14 @@ export default function isElementClickable(element: Element): boolean {
       return false;
     }
 
-    return isOverlappingElementsMatching(targetElement, shadowElements);
+    return isTargetTheOnlyOverlappingElement(targetElement, shadowElements);
   };
 
   /**
    * This function checks if the given element is in the viewport.
+   *
+   * @param {Element} element The element to check if it is in the viewport.
+   * @returns {boolean} Whether the element is in the viewport.
    */
   const isElementInViewport = (element: Element): boolean => {
     const elementDimensions = element.getBoundingClientRect();
@@ -140,16 +164,36 @@ export default function isElementClickable(element: Element): boolean {
   };
 
   /**
+   * This function checks if an element is a disableable element and if it is
+   * then it checks if it is disabled.
+   */
+  const isElementDisabled = (element: Element): boolean => {
+    if (
+      element instanceof HTMLFormElement ||
+      element instanceof HTMLButtonElement
+    ) {
+      return element.disabled;
+    }
+    return false;
+  };
+
+  /**
    * This function checks if the element is clickable, by checking if it is
-   * in the viewport and not blocked by any other element. This function also
-   * checks if the element is disabled, applicable for elements like buttons
-   * and form elements.
+   * in the viewport, not blocked by any other element and not disabled.
+   *
+   * @param {Element} element The element to check if it is clickable.
+   * @returns {boolean} Whether the element is clickable or not by verifying
+   * that it is in the viewport, not blocked by any other element and not
+   * disabled.
    */
   const isClickable = (element: Element): boolean => {
     return (
-      (element as HTMLFormElement).disabled !== true &&
+      !isElementDisabled(element) &&
       isElementInViewport(element) &&
-      isOverlappingElementsMatching(element, getOverlappingElements(element))
+      isTargetTheOnlyOverlappingElement(
+        element,
+        getTopmostOverlappingElements(element)
+      )
     );
   };
 

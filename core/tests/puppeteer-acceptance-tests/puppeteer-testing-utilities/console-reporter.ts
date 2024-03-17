@@ -93,7 +93,7 @@ export class ConsoleReporter {
   private static consoleMessages: ConsoleMessage[] = [];
 
   /**
-   * This function starts to track a browser's console messages.
+   * This function initializes tracking for the browser's console messages.
    */
   public static trackConsoleMessagesInBrowser(browser: Browser): void {
     browser.on('targetcreated', async (target: Target) => {
@@ -177,6 +177,7 @@ export class ConsoleReporter {
     return ConsoleReporter.consoleMessages.filter(
       (message, index, self) =>
         message.type === 'error' &&
+        // Here we filter out duplicate messages by their text.
         self.findIndex(m => m.text === message.text) === index &&
         errorsToIgnore.every(
           (error: RegExp | string) => message.text.match(error) === null

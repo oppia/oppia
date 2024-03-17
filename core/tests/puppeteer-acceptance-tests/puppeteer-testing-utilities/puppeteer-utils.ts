@@ -172,6 +172,8 @@ export class BaseUser {
     const [button] = await this.page.$x(
       `\/\/*[contains(text(), normalize-space('${selector}'))]`
     );
+    // If the XPATH failed to find the element, then the button is undefined and we
+    // should use the CSS selector.
     if (button !== undefined) {
       await this.waitForElementToBeClickable(button);
       await button.click();

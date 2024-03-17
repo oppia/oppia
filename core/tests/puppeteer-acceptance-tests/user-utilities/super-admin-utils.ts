@@ -36,17 +36,17 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(roleEditorButtonSelector);
     await this.clickOn(addRoleButton);
     await this.clickOn(rolesSelectDropdown);
-    const allRoles = await this.page.$$('.mat-option-text');
-    for (let i = 0; i < allRoles.length; i++) {
+    const allRoleElements = await this.page.$$('.mat-option-text');
+    for (let i = 0; i < allRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
         (element: HTMLElement) => element.innerText,
-        allRoles[i]
+        allRoleElements[i]
       );
       if (roleText.toLowerCase() === role) {
-        // Here we are clicking on the role element in the DOM since the options
-        // might not be in view.
         await Promise.all([
-          allRoles[i].evaluate(element => (element as HTMLElement).click()),
+          allRoleElements[i].evaluate(element =>
+            (element as HTMLElement).click()
+          ),
           this.page.waitForNetworkIdle(),
         ]);
         return;
