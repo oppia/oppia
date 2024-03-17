@@ -203,11 +203,7 @@ export default function isElementClickable(element: Element): boolean {
   if (!isClickable(element)) {
     element.scrollIntoView({block: 'center', inline: 'center'});
 
-    if (!isClickable(element)) {
-      element.scrollIntoView({block: 'center', inline: 'center'});
-
-      return isClickable(element);
-    }
+    return isClickable(element);
   }
 
   return true;
