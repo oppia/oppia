@@ -85,7 +85,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         if os.path.isdir(os.path.join(os.getcwd(), 'dummy_dir')):
             shutil.rmtree('dummy_dir')
 
-    def test_get_unresolved_todos_no_generate_file_should_fail(self) -> None:
+    def test_get_unresolved_todos_no_generate_github_file_should_fail(self) -> None:
         mock_stdout = io.StringIO()
 
         swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)

@@ -168,7 +168,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 repository_path,
                 todos_associated_with_issue,
                 issue_number)
-            if parsed_args.generate_file:
+            if parsed_args.generate_github_file:
                 append_todos_to_file(
                     repository_path,
                     todos_associated_with_issue,
