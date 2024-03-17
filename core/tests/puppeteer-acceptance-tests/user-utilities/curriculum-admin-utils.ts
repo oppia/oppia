@@ -234,6 +234,18 @@ export class CurriculumAdmin extends BaseUser {
     return explorationIdUrl;
   }
 
+  async getExplorationIdFromUrl(url: string | null): Promise<string> {
+    if (!url) {
+      throw new Error('Exploration URL is null or empty');
+    }
+    const parts = url.split('/');
+    const explorationId = parts.length > 0 ? parts[parts.length - 1] : '';
+    if (!explorationId) {
+      throw new Error('Failed to extract exploration ID from URL');
+    }
+    return explorationId;
+  }
+
   /**
    * Function for creating a topic in the topics-and-skills dashboard.
    */

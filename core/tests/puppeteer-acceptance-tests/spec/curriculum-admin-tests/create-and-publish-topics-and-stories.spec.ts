@@ -26,7 +26,7 @@ const ROLES = testConstants.Roles;
 describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
   let explorationUrl: string | null;
-  let explorationId: string | null;
+  let explorationId: string;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -41,9 +41,8 @@ describe('Curriculum Admin', function () {
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       explorationUrl = await curriculumAdmin.createExploration();
-      explorationId = explorationUrl
-        ? explorationUrl.match(/explore\/(.*)/)?.[1] ?? ''
-        : '';
+      explorationId =
+        await curriculumAdmin.getExplorationIdFromUrl(explorationUrl);
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       await curriculumAdmin.createTopic();
