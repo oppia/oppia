@@ -35,7 +35,7 @@ _PARSER = argparse.ArgumentParser(
 Checks if there are any todos associated with the provided issues.
 """)
 
-# TODO(#19755): Testing
+# TODO(#19755): Testing.
 _PARSER.add_argument(
     '--repository_path', type=str,
     required=True, help='The path to the repository to check for todos.')
@@ -53,13 +53,13 @@ _PARSER.add_argument(
     help='The commit SHA to which we will display the todo in.')
 
 _PARSER.add_argument(
-    '--generate_file',
-    help='If true, generates a file with the todos. '
+    '--generate_github_file',
+    help='If true, generates a file with the todos and their github link. '
          'The default value is false.',
     action='store_true')
 
 
-# TODO(#19755): Testing
+# TODO(#19755): Testing.
 def check_if_todo_is_associated_with_issue(
     todo: todo_finder.TodoDict,
     issue_number: int

@@ -30,7 +30,7 @@ from typing import List
 from . import check_for_unresolved_todos
 
 
-# TODO(#19755): Testing
+# TODO(#19755): Testing.
 class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
     """Unit tests for testing the check_for_unresolved_todos script."""
 
@@ -125,7 +125,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 '--repository_path=dummy_dir',
                 '--issue=4151',
                 '--commit_sha=abcdefg',
-                '--generate_file'])
+                '--generate_github_file'])
 
         expected_failure_log_lines = [
             'The following TODOs are unresolved for this issue #4151:',
@@ -165,7 +165,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                 '--repository_path=dummy_dir',
                 '--issue=4157',
                 '--commit_sha=abcdefg',
-                '--generate_file'])
+                '--generate_github_file'])
         self.assertEqual(
             mock_stdout.getvalue().strip(),
             check_for_unresolved_todos.UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
@@ -208,7 +208,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
                     '--repository_path=dummy_dir',
                     '--pull_request=1234',
                     '--commit_sha=abcdefg',
-                    '--generate_file'])
+                    '--generate_github_file'])
 
         expected_failure_log_lines = [
             'The following TODOs are unresolved for this issue #4151:',

@@ -34,11 +34,11 @@ EXCLUDED_DIRECTORIES = [
 
 # Regex to detect general todos, doesn't have to be correctly formatted.
 TODO_REGEX = re.compile(r'\bTODO\b', re.IGNORECASE)
-# Regex to detect correctly formatted todos, e.g. "TODO(#1234): Description".
+# Regex to detect correctly formatted todos, e.g. "TODO(#1234): Description.".
 CORRECT_TODO_REGEX = re.compile(r'TODO\(#(\d+)\): .+')
 
 
-# TODO(#19755): Testing
+# TODO(#19755): Testing.
 class TodoDict(TypedDict):
     """Dict representation of a todo."""
 
