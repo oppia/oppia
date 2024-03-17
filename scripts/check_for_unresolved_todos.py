@@ -35,6 +35,7 @@ _PARSER = argparse.ArgumentParser(
 Checks if there are any todos associated with the provided issues.
 """)
 
+# TODO(#19800): Testing
 _PARSER.add_argument(
     '--repository_path', type=str,
     required=True, help='The path to the repository to check for todos.')
@@ -58,6 +59,7 @@ _PARSER.add_argument(
     action='store_true')
 
 
+# TODO(#19800): Testing
 def check_if_todo_is_associated_with_issue(
     todo: todo_finder.TodoDict,
     issue_number: int
