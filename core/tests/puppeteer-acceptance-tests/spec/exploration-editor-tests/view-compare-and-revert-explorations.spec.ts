@@ -48,15 +48,15 @@ describe('Exploration Editor', function () {
       await explorationEditor.navigateToMainTab();
       await explorationEditor.saveExplorationDraft();
 
-      //The following block of code creates an additional revision of the same exploration.
+      // The following block of code creates an additional revision of the same exploration.
       await explorationEditor.editExplorationContent('Test-Revision 3');
       await explorationEditor.saveExplorationDraft();
 
-      //The following block of code creates an additional revision of the same exploration.
+      // The following block of code creates an additional revision of the same exploration.
       await explorationEditor.editExplorationContent('Test-Revision 4');
       await explorationEditor.saveExplorationDraft();
 
-      //The following block of code creates an additional revision of the same exploration.
+      // The following block of code creates an additional revision of the same exploration.
       await explorationEditor.editExplorationContent('Test-Revision 5');
       await explorationEditor.saveExplorationDraft();
 

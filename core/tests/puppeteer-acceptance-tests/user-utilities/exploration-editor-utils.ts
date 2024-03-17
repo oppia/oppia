@@ -116,7 +116,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(endInteractionSelector, {visible: true});
     await this.clickOn(interactionToAdd);
     await this.clickOn(saveInteractionButton);
-    if (interactionToAdd != ' End Exploration ') {
+    if (interactionToAdd !== ' End Exploration ') {
       await this.clickOn('.oppia-response-header');
     }
   }
@@ -328,11 +328,11 @@ export class ExplorationEditor extends BaseUser {
     let revisions = await this.getRevisionsList(historyListItem);
     if (revisions.length !== numberOfVersions) {
       throw new Error(
-        `The number of revisions are not equal to the created by the user`
+        'The number of revisions are not equal to the created by the user'
       );
     } else {
       showMessage(
-        `The number of revisions are equal to the created by the user`
+        'The number of revisions are equal to the created by the user'
       );
     }
   }
@@ -443,7 +443,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to download a specific revision.
    * @param {number} revisionNo - The number of the revision to be downloaded.
    */
-  async downloadRevision(revisionNo: number) {
+  async downloadRevision(revisionNo: number): Promise<void> {
     await this.page.waitForTimeout(1000);
     const buttons = await this.page.$$('.history-table-option');
     await buttons[revisionNo - 1].click();
