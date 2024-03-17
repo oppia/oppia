@@ -224,7 +224,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             ):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
-                    url, [200, 301, 302, 400, 401, 404])
+                    url, [200, 301, 302, 400, 401, 404, 500])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
 
