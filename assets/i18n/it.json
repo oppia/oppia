@@ -378,6 +378,7 @@
 	"I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN": "Questa è la lingua che, se disponibile, verrà selezionata per impostazione predefinita quando si esegue un'esplorazione con le traduzioni audio.",
 	"I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_PLACEHOLDER": "Lingua audio preferita",
 	"I18N_PREFERENCES_PROFILE_PICTURE_ADD": "Aggiungi foto del profilo",
+	"I18N_PREFERENCES_SAVE_CHANGES": "Salva modifiche",
 	"I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "Seleziona lingue preferite...",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK": "Es.: matematica, informatica, arte, ...",
 	"I18N_PREFERENCES_USERNAME": "Nome utente",
