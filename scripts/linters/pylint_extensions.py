@@ -2948,12 +2948,21 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
         """
 
         if isinstance(node, astroid.BinOp) and node.op == '+':
-            left_inferred = next(node.left.infer())
-            right_inferred = next(node.right.infer())
-
-            if (isinstance(left_inferred.value, str) and
-                isinstance(right_inferred.value, str)):
-                self.add_message('prefer-string-interpolation', node=node)
+            try:
+                left_inferred = next(node.left.infer())
+                right_inferred = next(node.right.infer())
+            except astroid.exceptions.InferenceError:
+                return
+            else:
+                if (
+                    isinstance(left_inferred, astroid.Const) and
+                    isinstance(right_inferred, astroid.Const)
+                ):
+                    if (
+                        isinstance(left_inferred.value, str) and
+                        isinstance(right_inferred.value, str)
+                    ):
+                        self.add_message('prefer-string-interpolation', node=node)
 
 
 def register(linter: lint.PyLinter) -> None:

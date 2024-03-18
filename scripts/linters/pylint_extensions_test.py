@@ -4825,3 +4825,12 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         expression_node = node.value
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
+
+    def test_infererence_exception(self) -> None:
+        node = astroid.extract_node(
+            """
+            undefined_var + 'somthing here' #@
+            """)
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(node)
