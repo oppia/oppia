@@ -853,23 +853,21 @@ describe('Translation Suggestion Review Modal Component', function () {
       }
     );
 
-    it(
-      'should remove suggestion_id from resolvedSuggestionIds' + 'if it exists',
-      () => {
-        component.ngOnInit();
-        component.resolvedSuggestionIds = ['suggestion_1', 'suggestion_2'];
-        component.queuedSuggestion = {
-          suggestion_id: 'suggestion_1',
-          action_status: 'accept',
-          target_id: '1',
-          reviewer_message: '',
-        };
+    it('should remove suggestion_id from resolvedSuggestionIds if it exists', () => {
+      component.ngOnInit();
+      component.resolvedSuggestionIds = ['suggestion_1', 'suggestion_2'];
+      component.queuedSuggestion = {
+        suggestion_id: 'suggestion_1',
+        action_status: 'accept',
+        target_id: '1',
+        reviewer_message: '',
+      };
+      component.removedSuggestion = contribution1;
 
-        component.revertSuggestionResolution();
+      component.revertSuggestionResolution();
 
-        expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
-      }
-    );
+      expect(component.resolvedSuggestionIds).toEqual(['suggestion_2']);
+    });
 
     it(
       'should cancel suggestion in suggestion modal service when clicking ' +
