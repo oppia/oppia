@@ -28,6 +28,37 @@ describe('Curriculum Admin', function () {
   let explorationUrl: string | null;
   let explorationId: string;
 
+  let exploration = {
+    state: 'Test Exploration',
+    title: 'Test Exploration Title 1',
+    goal: 'Test Exploration Goal 1',
+  };
+
+  let skill = {
+    description: 'Test Skill 1',
+    reviewMaterial: 'This is a test skill for curriculum admin.',
+    questionCount: 3,
+  };
+
+  let topic = {
+    name: 'Test Topic 1',
+    url_fragment: 'test-topic-one',
+    web_fragment: 'Test Topic 1',
+    description: 'This topic is to test curriculum admin utility.',
+  };
+
+  let subtopic = {
+    title: 'Test Subtopic 1',
+    url_fragment: 'test-subtopic-one',
+    description: 'This subtopic is to test curriculum admin utility.',
+  };
+
+  let story = {
+    title: 'Test Story 1',
+    url_fragment: 'test-story-one',
+    description: 'This story is to test curriculum admin utility.',
+  };
+
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
@@ -40,15 +71,18 @@ describe('Curriculum Admin', function () {
     'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
-      explorationUrl = await curriculumAdmin.createExploration();
+      explorationUrl = await curriculumAdmin.createExploration(exploration);
       explorationId =
         await curriculumAdmin.getExplorationIdFromUrl(explorationUrl);
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.createTopic();
-      await curriculumAdmin.createSubTopic();
-      await curriculumAdmin.createSkill();
-      await curriculumAdmin.createAndPublishStoryWithChapter(explorationId);
+      await curriculumAdmin.createTopic(topic);
+      await curriculumAdmin.createSubTopic(subtopic);
+      await curriculumAdmin.createSkill(skill);
+      await curriculumAdmin.createAndPublishStoryWithChapter(
+        story,
+        explorationId
+      );
 
       await curriculumAdmin.expectPublishedTopicToBePresent();
       await curriculumAdmin.expectPublishedStoryToBePresent();

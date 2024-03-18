@@ -117,6 +117,37 @@ const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
 const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
+interface Skill {
+  description: string;
+  reviewMaterial: string;
+  questionCount: number;
+}
+
+interface Exploration {
+  state: string;
+  title: string;
+  goal: string;
+}
+
+interface Topic {
+  name: string;
+  url_fragment: string;
+  web_fragment: string;
+  description: string;
+}
+
+interface Subtopic {
+  title: string;
+  url_fragment: string;
+  description: string;
+}
+
+interface Story {
+  title: string;
+  url_fragment: string;
+  description: string;
+}
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Function for navigating to the topic and skills dashboard page.
@@ -140,16 +171,13 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a skill in the topics and skills dashboard.
    */
-  async createSkill(): Promise<void> {
+  async createSkill(skill: Skill): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addSkillButton);
-    await this.type(skillDescriptionField, 'Test Skill 1');
+    await this.type(skillDescriptionField, skill.description);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(
-      richTextAreaField,
-      'This is a test skill for curriculum admin.'
-    );
+    await this.type(richTextAreaField, skill.reviewMaterial);
     await this.clickAfterWaiting(confirmSkillCreationButton);
     await this.page.bringToFront();
   }
@@ -205,7 +233,7 @@ export class CurriculumAdmin extends BaseUser {
    * Function for creating an exploration as a curriculum admin.
    * Timeout here is necessary for the modal dismiss transition.
    */
-  async createExploration(): Promise<string | null> {
+  async createExploration(exploration: Exploration): Promise<string | null> {
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
       `${dismissWelcomeModalSelector}:not([disabled])`
@@ -214,7 +242,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForTimeout(500);
     await this.clickOn(textStateEditSelector);
     await this.page.keyboard.press('Tab');
-    await this.type(richTextAreaField, 'Test Exploration');
+    await this.type(richTextAreaField, exploration.state);
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
@@ -227,8 +255,8 @@ export class CurriculumAdmin extends BaseUser {
       `${publishExplorationButton}:not([disabled])`
     );
     await this.clickOn(publishExplorationButton);
-    await this.type(explorationTitleInput, 'Test Exploration Title 1');
-    await this.type(explorationGoalInput, 'Test Exploration Goal 1');
+    await this.type(explorationTitleInput, exploration.title);
+    await this.type(explorationGoalInput, exploration.goal);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
@@ -260,15 +288,12 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a topic in the topics-and-skills dashboard.
    */
-  async createTopic(): Promise<void> {
+  async createTopic(topic: Topic): Promise<void> {
     await this.clickOn(addTopicButton);
-    await this.type(topicNameField, 'Test Topic 1');
-    await this.type(topicUrlFragmentField, 'test-topic-one');
-    await this.type(topicWebFragmentField, 'Test Topic 1');
-    await this.type(
-      topicDescriptionField,
-      'This topic is to test curriculum admin utility.'
-    );
+    await this.type(topicNameField, topic.name);
+    await this.type(topicUrlFragmentField, topic.url_fragment);
+    await this.type(topicWebFragmentField, topic.web_fragment);
+    await this.type(topicDescriptionField, topic.description);
     await this.clickOn(photoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
@@ -300,17 +325,14 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a subtopic as a curriculum admin.
    */
-  async createSubTopic(): Promise<void> {
+  async createSubTopic(subtopic: Subtopic): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, 'Test Subtopic 1');
-    await this.type(subtopicUrlFragmentField, 'test-subtopic-one');
+    await this.type(subtopicTitleField, subtopic.title);
+    await this.type(subtopicUrlFragmentField, subtopic.url_fragment);
     await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForTimeout(500);
-    await this.type(
-      richTextAreaField,
-      'This subtopic is to test curriculum admin utility.'
-    );
+    await this.type(richTextAreaField, subtopic.description);
     await this.clickOn(subtopicPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
@@ -323,15 +345,15 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a story for a certain topic.
    */
-  async createAndPublishStoryWithChapter(explorationId: string): Promise<void> {
+  async createAndPublishStoryWithChapter(
+    story: Story,
+    explorationId: string
+  ): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, 'Test Story 1');
-    await this.type(storyUrlFragmentField, 'test-story-one');
-    await this.type(
-      storyDescriptionField,
-      'This story is to test curriculum admin utility.'
-    );
+    await this.type(storyTitleField, story.title);
+    await this.type(storyUrlFragmentField, story.url_fragment);
+    await this.type(storyDescriptionField, story.description);
     await this.clickOn(storyPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
