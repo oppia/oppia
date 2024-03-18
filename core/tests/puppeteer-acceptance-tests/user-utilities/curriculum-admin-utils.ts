@@ -124,6 +124,18 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Function that waits for a button to be clickable.
+   * Timeout is necessary due to transitions, in cases where the button has to be
+   * clicked after a modal opens or closes.
+   * The button will never be clicked and tests will fail without the timeout.
+   */
+  async clickAfterWaiting(selector: string) {
+    await this.page.waitForSelector(`${selector}:not([disabled])`);
+    await this.page.waitForTimeout(500);
+    await this.clickOn(selector);
+  }
+
+  /**
    * Function for creating a skill in the topics and skills dashboard.
    */
   async createSkill(): Promise<void> {
@@ -136,11 +148,7 @@ export class CurriculumAdmin extends BaseUser {
       richTextAreaField,
       'This is a test skill for curriculum admin.'
     );
-    await this.page.waitForSelector(
-      `${confirmSkillCreationButton}:not([disabled])`
-    );
-    await this.page.waitForTimeout(500);
-    await this.clickOn(confirmSkillCreationButton);
+    await this.clickAfterWaiting(confirmSkillCreationButton);
     await this.page.bringToFront();
   }
 
@@ -196,6 +204,7 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for creating an exploration as a curriculum admin.
+   * Timeout here is necessary for the modal dismiss transition.
    */
   async createExploration(): Promise<string | null> {
     await this.clickOn(createExplorationButton);
@@ -205,7 +214,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForTimeout(500);
     await this.clickOn(textStateEditSelector);
-    await this.page.waitForTimeout(500);
+    await this.page.keyboard.press('Tab');
     await this.type(richTextAreaField, 'Test Exploration');
     await this.clickOn(saveContentButton);
 
@@ -265,9 +274,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForTimeout(500);
-    await this.page.waitForSelector(`${createTopicButton}:not([disabled])`);
-    await this.clickOn(createTopicButton);
+    await this.clickAfterWaiting(createTopicButton);
     await this.page.bringToFront();
   }
 
@@ -296,12 +303,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(`${createSubtopicButton}:not([disabled])`);
-    await this.page.waitForTimeout(500);
-    await this.clickOn(createSubtopicButton);
-    await this.page.waitForSelector(`${saveTopicButton}:not([disabled])`);
-    await this.page.waitForTimeout(500);
-    await this.clickOn(saveTopicButton);
+    await this.clickAfterWaiting(createSubtopicButton);
+    await this.clickAfterWaiting(saveTopicButton);
     await this.clickOn(closeSaveModalButton);
   }
 
@@ -321,9 +324,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(`${createStoryButton}:not([disabled])`);
-    await this.page.waitForTimeout(500);
-    await this.clickOn(createStoryButton);
+    await this.clickAfterWaiting(createStoryButton);
   }
 
   /**
@@ -337,18 +338,15 @@ export class CurriculumAdmin extends BaseUser {
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.page.waitForSelector(`${createChapterButton}:not([disabled])`);
-    await this.page.waitForTimeout(500);
-    await this.clickOn(createChapterButton);
+    await this.clickAfterWaiting(createChapterButton);
   }
 
   /**
    * Function for publishing a story as a curriculum admin.
+   * Timeout here is necessary for the closing modal transition.
    */
   async publishStory(): Promise<void> {
-    await this.page.waitForSelector(`${saveStoryButton}:not([disabled])`);
-    await this.page.waitForTimeout(500);
-    await this.clickOn(saveStoryButton);
+    await this.clickAfterWaiting(saveStoryButton);
     await this.type(
       saveStoryMessageInput,
       'Test publishing story as curriculum admin.'
