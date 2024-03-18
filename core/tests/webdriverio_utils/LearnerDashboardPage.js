@@ -140,7 +140,6 @@ var LearnerDashboardPage = function () {
   };
 
   this.expectExplorationTileToBeRemovedFromPlaylist = async function (title) {
-    this.removeExplorationSummaryTileFromPlaylist(title);
     let removeTile = await $(`.e2e-test-exp-summary-tile-title=${title}`);
     await removeTile.waitForDisplayed({timeout: 5000, reverse: true});
     expect(await removeTile.isDisplayed()).toBe(false);

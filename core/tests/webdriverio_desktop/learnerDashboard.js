@@ -183,8 +183,14 @@ describe('Learner dashboard functionality', function () {
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       EXPLORATION_SINGING
     );
+    await learnerDashboardPage.removeExplorationSummaryTileFromPlaylist(
+      EXPLORATION_FRACTION
+    );
     await learnerDashboardPage.expectExplorationTileToBeRemovedFromPlaylist(
       EXPLORATION_FRACTION
+    );
+    await learnerDashboardPage.removeExplorationSummaryTileFromPlaylist(
+      EXPLORATION_SINGING
     );
     await learnerDashboardPage.expectExplorationTileToBeRemovedFromPlaylist(
       EXPLORATION_SINGING
