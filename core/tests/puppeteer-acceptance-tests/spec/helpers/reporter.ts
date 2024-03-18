@@ -22,10 +22,6 @@ import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporte
 
 sourceMapSupport.install();
 
-interface SpecDoneResult extends jasmine.SpecResult {
-  consoleErrorsToIgnore?: (RegExp | string)[];
-}
-
 interface SuiteFailureResult extends jasmine.JasmineDoneInfo {
   fullName: string;
 }
@@ -168,7 +164,7 @@ const Reporter: jasmine.CustomReporter = {
     printNewline();
   },
 
-  specDone: function (result: SpecDoneResult) {
+  specDone: function (result: jasmine.SpecResult) {
     specCount++;
     const seconds = result?.duration ? result.duration / 1000 : 0;
 

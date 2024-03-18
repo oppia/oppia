@@ -43,12 +43,10 @@ export class SuperAdmin extends BaseUser {
         allRoleElements[i]
       );
       if (roleText.toLowerCase() === role) {
-        await Promise.all([
-          allRoleElements[i].evaluate(element =>
-            (element as HTMLElement).click()
-          ),
-          this.page.waitForNetworkIdle(),
-        ]);
+        await allRoleElements[i].evaluate(element =>
+          (element as HTMLElement).click()
+        );
+        await this.page.waitForNetworkIdle();
         return;
       }
     }
