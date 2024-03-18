@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for HTML serialization and escaping services.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { LoggerService } from './contextual/logger.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {LoggerService} from './contextual/logger.service';
 
 describe('HTML escaper service', () => {
   let ohe: HtmlEscaperService;
@@ -27,40 +27,49 @@ describe('HTML escaper service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [HtmlEscaperService]
+      providers: [HtmlEscaperService],
     });
     ohe = TestBed.inject(HtmlEscaperService);
     loggerService = TestBed.inject(LoggerService);
   });
 
-  it('should correctly translate between escaped and unescaped strings',
-    () => {
-      let strs = ['abc', 'a&b<html>', '&&&&&'];
-      for (let i = 0; i < strs.length; i++) {
-        expect(ohe.escapedStrToUnescapedStr(
-          ohe.unescapedStrToEscapedStr(strs[i]))).toEqual(strs[i]);
-      }
+  it('should correctly translate between escaped and unescaped strings', () => {
+    let strs = ['abc', 'a&b<html>', '&&&&&'];
+    for (let i = 0; i < strs.length; i++) {
+      expect(
+        ohe.escapedStrToUnescapedStr(ohe.unescapedStrToEscapedStr(strs[i]))
+      ).toEqual(strs[i]);
     }
-  );
+  });
 
   it('should correctly escape and unescape JSON', () => {
-    let objs = [{
-      a: 'b'
-    }, ['a', 'b'], 2, true, 'abc'];
+    let objs = [
+      {
+        a: 'b',
+      },
+      ['a', 'b'],
+      2,
+      true,
+      'abc',
+    ];
     for (let i = 0; i < objs.length; i++) {
-      expect(ohe.escapedJsonToObj(
-        ohe.objToEscapedJson(objs[i]))).toEqual(objs[i]);
+      expect(ohe.escapedJsonToObj(ohe.objToEscapedJson(objs[i]))).toEqual(
+        objs[i]
+      );
     }
   });
 
-  it('should log an error if an empty string was passed to' +
-   ' JSON decoder', () => {
-    spyOn(loggerService, 'error');
+  it(
+    'should log an error if an empty string was passed to' + ' JSON decoder',
+    () => {
+      spyOn(loggerService, 'error');
 
-    let escapedJsonToObjResponse = ohe.escapedJsonToObj('');
+      let escapedJsonToObjResponse = ohe.escapedJsonToObj('');
 
-    expect(escapedJsonToObjResponse).toBe('');
-    expect(loggerService.error).toHaveBeenCalledWith(
-      'Empty string was passed to JSON decoder.');
-  });
+      expect(escapedJsonToObjResponse).toBe('');
+      expect(loggerService.error).toHaveBeenCalledWith(
+        'Empty string was passed to JSON decoder.'
+      );
+    }
+  );
 });

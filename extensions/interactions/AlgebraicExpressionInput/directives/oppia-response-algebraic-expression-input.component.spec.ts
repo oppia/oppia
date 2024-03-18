@@ -16,28 +16,28 @@
  * @fileoverview Unit tests for the AlgebraicExpressionInput response component.
  */
 
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { ResponseAlgebraicExpressionInputComponent } from './oppia-response-algebraic-expression-input.component';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {ResponseAlgebraicExpressionInputComponent} from './oppia-response-algebraic-expression-input.component';
 
-describe('AlgebraicExpressionInputResponse', function() {
+describe('AlgebraicExpressionInputResponse', function () {
   let component: ResponseAlgebraicExpressionInputComponent;
   let fixture: ComponentFixture<ResponseAlgebraicExpressionInputComponent>;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        declarations: [ResponseAlgebraicExpressionInputComponent]
-      }).compileComponents();
+    TestBed.configureTestingModule({
+      declarations: [ResponseAlgebraicExpressionInputComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      ResponseAlgebraicExpressionInputComponent);
+      ResponseAlgebraicExpressionInputComponent
+    );
     component = fixture.componentInstance;
     component.answer = '&quot;answer&quot;';
     fixture.detectChanges();
   });
-  it('should correctly escape characters in the answer', function() {
+  it('should correctly escape characters in the answer', function () {
     component.ngOnInit();
     expect(component.escapedAnswer).toBe('answer');
   });

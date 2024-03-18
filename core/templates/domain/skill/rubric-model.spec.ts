@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for rubric-model.
  */
 
-import { Rubric } from 'domain/skill/rubric.model';
+import {Rubric} from 'domain/skill/rubric.model';
 
 describe('Rubric object factory', () => {
   let rubricDict: {
-    difficulty: string; explanations: string[];
+    difficulty: string;
+    explanations: string[];
   };
 
   beforeEach(() => {
     rubricDict = {
       difficulty: 'easy',
-      explanations: ['test explanation']
+      explanations: ['test explanation'],
     };
   });
 
@@ -42,8 +43,7 @@ describe('Rubric object factory', () => {
   });
 
   it('should create a new rubric', () => {
-    const rubric = Rubric.create(
-      'medium', ['This is an explanation']);
+    const rubric = Rubric.create('medium', ['This is an explanation']);
     expect(rubric.getDifficulty()).toEqual('medium');
     expect(rubric.getExplanations()).toEqual(['This is an explanation']);
   });

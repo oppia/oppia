@@ -16,24 +16,19 @@
  * @fileoverview Routing module for exploration player page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { ExplorationPlayerPageRootComponent } from './exploration-player-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: ExplorationPlayerPageRootComponent
-  }
+    component: ExplorationPlayerPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class ExplorationPlayerPageRoutingModule {}

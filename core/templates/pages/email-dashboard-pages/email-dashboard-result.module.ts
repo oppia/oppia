@@ -16,22 +16,24 @@
  * @fileoverview Module for the collection player page.
  */
 
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { APP_BASE_HREF } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {APP_BASE_HREF} from '@angular/common';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {RouterModule} from '@angular/router';
 
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { EmailDashboardResultComponent } from './email-dashboard-result.component';
-import { EmailDashboardResultPageRootComponent } from './email-dashboard-result-page-root.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
+import {RequestInterceptor} from 'services/request-interceptor.service';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {
+  platformFeatureInitFactory,
+  PlatformFeatureService,
+} from 'services/platform-feature.service';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {EmailDashboardResultComponent} from './email-dashboard-result.component';
+import {EmailDashboardResultPageRootComponent} from './email-dashboard-result-page-root.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 @NgModule({
   imports: [
@@ -43,33 +45,33 @@ import { SmartRouterModule } from 'hybrid-router-module-provider';
     SmartRouterModule,
     RouterModule.forRoot([]),
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     EmailDashboardResultComponent,
-    EmailDashboardResultPageRootComponent
+    EmailDashboardResultPageRootComponent,
   ],
   entryComponents: [
     EmailDashboardResultComponent,
-    EmailDashboardResultPageRootComponent
+    EmailDashboardResultPageRootComponent,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
+      multi: true,
     },
     {
       provide: APP_BASE_HREF,
-      useValue: '/'
-    }
+      useValue: '/',
+    },
   ],
-  bootstrap: [EmailDashboardResultPageRootComponent]
+  bootstrap: [EmailDashboardResultPageRootComponent],
 })
 export class EmailDashboardResultModule {}

@@ -16,11 +16,11 @@
  * @fileoverview Scripts for the error iframed page.
  */
 import 'pages/common-imports';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { AppConstants } from 'app.constants';
-import { enableProdMode } from '@angular/core';
-import { ErrorIframedPageModule } from './error-iframed-page.module';
-import { LoggerService } from 'services/contextual/logger.service';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {AppConstants} from 'app.constants';
+import {enableProdMode} from '@angular/core';
+import {ErrorIframedPageModule} from './error-iframed-page.module';
+import {LoggerService} from 'services/contextual/logger.service';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
@@ -28,9 +28,9 @@ if (!AppConstants.DEV_MODE) {
 
 const loggerService = new LoggerService();
 
-platformBrowserDynamic().bootstrapModule(ErrorIframedPageModule).catch(
-  (err) => loggerService.error(err)
-);
+platformBrowserDynamic()
+  .bootstrapModule(ErrorIframedPageModule)
+  .catch(err => loggerService.error(err));
 
 // This prevents angular pages to cause side effects to hybrid pages.
 // TODO(#13080): Remove window.name statement from import.ts files

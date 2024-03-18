@@ -16,322 +16,373 @@
  * @fileoverview Root routing module.
  */
 
-import { APP_BASE_HREF } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { AppConstants } from 'app.constants';
-import { IsLoggedInGuard } from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
-import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import {APP_BASE_HREF} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {AppConstants} from 'app.constants';
+import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
+import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
-    loadChildren: () => import('pages/admin-page/admin-page.module')
-      .then(m => m.AdminPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import('pages/admin-page/admin-page.module').then(m => m.AdminPageModule),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
-    loadChildren: () => import('pages/moderator-page/moderator-page.module')
-      .then(m => m.ModeratorPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import('pages/moderator-page/moderator-page.module').then(
+        m => m.ModeratorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_ADMIN.ROUTE,
-    loadChildren: () => import('pages/blog-admin-page/blog-admin-page.module')
-      .then(m => m.BlogAdminPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import('pages/blog-admin-page/blog-admin-page.module').then(
+        m => m.BlogAdminPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
-    loadChildren: () => import(
-      'pages/blog-dashboard-page/blog-dashboard-page.module')
-      .then(m => m.BlogDashboardPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import('pages/blog-dashboard-page/blog-dashboard-page.module').then(
+        m => m.BlogDashboardPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
-    loadChildren: () => import(
-      'pages/email-dashboard-pages/email-dashboard-page.module')
-      .then(m => m.EmailDashboardPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import('pages/email-dashboard-pages/email-dashboard-page.module').then(
+        m => m.EmailDashboardPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import('pages/classroom-page/classroom-page.module')
-      .then(m => m.ClassroomPageModule)
+    loadChildren: () =>
+      import('pages/classroom-page/classroom-page.module').then(
+        m => m.ClassroomPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CURRICULUM_ADMIN.ROUTE,
-    loadChildren: () => import(
-      'pages/classroom-admin-page/classroom-admin-page.module')
-      .then(m => m.ClassroomAdminPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import('pages/classroom-admin-page/classroom-admin-page.module').then(
+        m => m.ClassroomAdminPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_DASHBOARD.ROUTE,
-    loadChildren: () => import(
-      'pages/learner-dashboard-page/learner-dashboard-page.module')
-      .then(m => m.LearnerDashboardPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import('pages/learner-dashboard-page/learner-dashboard-page.module').then(
+        m => m.LearnerDashboardPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR
       .ROUTE,
-    loadChildren: () => import(
-      'pages/learner-group-pages/edit-group/edit-learner-group-page.module')
-      .then(m => m.EditLearnerGroupPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import(
+        'pages/learner-group-pages/edit-group/edit-learner-group-page.module'
+      ).then(m => m.EditLearnerGroupPageModule),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_CREATOR
       .ROUTE,
-    loadChildren: () => import(
-      'pages/learner-group-pages/create-group/create-learner-group-page.module')
-      .then(m => m.CreateLearnerGroupPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import(
+        'pages/learner-group-pages/create-group/create-learner-group-page.module'
+      ).then(m => m.CreateLearnerGroupPageModule),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE,
-    loadChildren: () => import('pages/about-page/about-page.module')
-      .then(m => m.AboutPageModule)
+    loadChildren: () =>
+      import('pages/about-page/about-page.module').then(m => m.AboutPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE,
-    loadChildren: () => import(
-      'pages/about-foundation-page/about-foundation-page.module')
-      .then(m => m.AboutFoundationPageModule)
+    loadChildren: () =>
+      import('pages/about-foundation-page/about-foundation-page.module').then(
+        m => m.AboutFoundationPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE,
-    loadChildren: () => import(
-      'pages/contributor-dashboard-admin-page' +
-      '/contributor-dashboard-admin-page.module')
-      .then(m => m.ContributorDashboardAdminPageModule),
-    canActivate: [IsLoggedInGuard]
+    loadChildren: () =>
+      import(
+        'pages/contributor-dashboard-admin-page' +
+          '/contributor-dashboard-admin-page.module'
+      ).then(m => m.ContributorDashboardAdminPageModule),
+    canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
-    loadChildren: () => import(
-      'pages/exploration-player-page/exploration-player-page.module')
-      .then(m => m.ExplorationPlayerPageModule)
+    loadChildren: () =>
+      import(
+        'pages/exploration-player-page/exploration-player-page.module'
+      ).then(m => m.ExplorationPlayerPageModule),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .EXPLORATION_PLAYER_EMBED.ROUTE),
-    loadChildren: () => import(
-      'pages/exploration-player-page/exploration-player-page.module')
-      .then(m => m.ExplorationPlayerPageModule)
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER_EMBED
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/exploration-player-page/exploration-player-page.module'
+      ).then(m => m.ExplorationPlayerPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.NEW_LESSON_PLAYER.ROUTE,
-    loadChildren: () => import(
-      'pages/exploration-player-page/new-lesson-player' +
-      '/lesson-player-page.module')
-      .then(m => m.NewLessonPlayerPageModule),
-    canActivate: [IsNewLessonPlayerGuard]
+    loadChildren: () =>
+      import(
+        'pages/exploration-player-page/new-lesson-player' +
+          '/lesson-player-page.module'
+      ).then(m => m.NewLessonPlayerPageModule),
+    canActivate: [IsNewLessonPlayerGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,
-    loadChildren: () => import('pages/android-page/android-page.module')
-      .then(m => m.AndroidPageModule)
+    loadChildren: () =>
+      import('pages/android-page/android-page.module').then(
+        m => m.AndroidPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/delete-account-page/delete-account-page.module')
-      .then(m => m.DeleteAccountPageModule)
+    loadChildren: () =>
+      import('pages/delete-account-page/delete-account-page.module').then(
+        m => m.DeleteAccountPageModule
+      ),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION.ROUTE
-    ),
-    loadChildren: () => import(
-      'pages/pending-account-deletion-page/' +
-      'pending-account-deletion-page.module')
-      .then(m => m.PendingAccountDeletionPageModule)
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/pending-account-deletion-page/' +
+          'pending-account-deletion-page.module'
+      ).then(m => m.PendingAccountDeletionPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PREFERENCES.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import('pages/preferences-page/preferences-page.module')
-      .then(m => m.PreferencesPageModule)
+    loadChildren: () =>
+      import('pages/preferences-page/preferences-page.module').then(
+        m => m.PreferencesPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/feedback-updates-page/feedback-updates-page.module')
-      .then(m => m.FeedbackUpdatesPageModule)
+    loadChildren: () =>
+      import('pages/feedback-updates-page/feedback-updates-page.module').then(
+        m => m.FeedbackUpdatesPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE,
-    loadChildren: () => import('pages/profile-page/profile-page.module')
-      .then(m => m.ProfilePageModule)
+    loadChildren: () =>
+      import('pages/profile-page/profile-page.module').then(
+        m => m.ProfilePageModule
+      ),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE.ROUTE
-    ),
-    loadChildren: () => import(
-      'pages/release-coordinator-page/release-coordinator-page.module')
-      .then(m => m.ReleaseCoordinatorPageModule)
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/release-coordinator-page/release-coordinator-page.module'
+      ).then(m => m.ReleaseCoordinatorPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import('pages/library-page/library-page.module')
-      .then(m => m.LibraryPageModule)
+    loadChildren: () =>
+      import('pages/library-page/library-page.module').then(
+        m => m.LibraryPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_SEARCH.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import('pages/library-page/library-page.module')
-      .then(m => m.LibraryPageModule)
+    loadChildren: () =>
+      import('pages/library-page/library-page.module').then(
+        m => m.LibraryPageModule
+      ),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_RECENTLY_PUBLISHED
-        .ROUTE
-    ),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_RECENTLY_PUBLISHED
+      .ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import('pages/library-page/library-page.module')
-      .then(m => m.LibraryPageModule)
+    loadChildren: () =>
+      import('pages/library-page/library-page.module').then(
+        m => m.LibraryPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_TOP_RATED.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import('pages/library-page/library-page.module')
-      .then(m => m.LibraryPageModule)
+    loadChildren: () =>
+      import('pages/library-page/library-page.module').then(
+        m => m.LibraryPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_VIEWER.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/story-viewer-page/story-viewer-page.module')
-      .then(m => m.StoryViewerPageModule)
+    loadChildren: () =>
+      import('pages/story-viewer-page/story-viewer-page.module').then(
+        m => m.StoryViewerPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE,
-    loadChildren: () => import('pages/contact-page/contact-page.module')
-      .then(m => m.ContactPageModule)
+    loadChildren: () =>
+      import('pages/contact-page/contact-page.module').then(
+        m => m.ContactPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE,
-    loadChildren: () => import('pages/donate-page/donate-page.module')
-      .then(m => m.DonatePageModule)
+    loadChildren: () =>
+      import('pages/donate-page/donate-page.module').then(
+        m => m.DonatePageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.GET_STARTED.ROUTE,
-    loadChildren: () => import('pages/get-started-page/get-started-page.module')
-      .then(m => m.GetStartedPageModule)
+    loadChildren: () =>
+      import('pages/get-started-page/get-started-page.module').then(
+        m => m.GetStartedPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE,
-    loadChildren: () => import('pages/license-page/license.module')
-      .then(m => m.LicensePageModule)
+    loadChildren: () =>
+      import('pages/license-page/license.module').then(
+        m => m.LicensePageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGIN.ROUTE,
-    loadChildren: () => import('pages/login-page/login-page.module')
-      .then(m => m.LoginPageModule)
+    loadChildren: () =>
+      import('pages/login-page/login-page.module').then(m => m.LoginPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LOGOUT.ROUTE,
-    loadChildren: () => import('pages/logout-page/logout-page.module')
-      .then(m => m.LogoutPageModule)
+    loadChildren: () =>
+      import('pages/logout-page/logout-page.module').then(
+        m => m.LogoutPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE,
-    loadChildren: () => import(
-      'pages/partnerships-page/partnerships-page.module')
-      .then(m => m.PartnershipsPageModule)
+    loadChildren: () =>
+      import('pages/partnerships-page/partnerships-page.module').then(
+        m => m.PartnershipsPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE,
-    loadChildren: () => import('pages/participation-playbook/playbook.module')
-      .then(m => m.PlaybookPageModule)
+    loadChildren: () =>
+      import('pages/participation-playbook/playbook.module').then(
+        m => m.PlaybookPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRIVACY.ROUTE,
-    loadChildren: () => import('pages/privacy-page/privacy-page.module')
-      .then(m => m.PrivacyPageModule)
+    loadChildren: () =>
+      import('pages/privacy-page/privacy-page.module').then(
+        m => m.PrivacyPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SIGNUP.ROUTE,
-    loadChildren: () => import('pages/signup-page/signup-page.module')
-      .then(m => m.SignupPageModule)
+    loadChildren: () =>
+      import('pages/signup-page/signup-page.module').then(
+        m => m.SignupPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE,
-    loadChildren: () => import('pages/teach-page/teach-page.module')
-      .then(m => m.TeachPageModule)
+    loadChildren: () =>
+      import('pages/teach-page/teach-page.module').then(m => m.TeachPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.ROUTE,
-    loadChildren: () => import('pages/terms-page/terms-page.module')
-      .then(m => m.TermsPageModule)
+    loadChildren: () =>
+      import('pages/terms-page/terms-page.module').then(m => m.TermsPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.THANKS.ROUTE,
-    loadChildren: () => import('pages/thanks-page/thanks-page.module')
-      .then(m => m.ThanksPageModule)
+    loadChildren: () =>
+      import('pages/thanks-page/thanks-page.module').then(
+        m => m.ThanksPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOLUNTEER.ROUTE,
-    loadChildren: () => import(
-      'pages/volunteer-page/volunteer-page.module')
-      .then(m => m.VolunteerPageModule)
+    loadChildren: () =>
+      import('pages/volunteer-page/volunteer-page.module').then(
+        m => m.VolunteerPageModule
+      ),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_VIEWER.ROUTE
-    ),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_VIEWER
+      .ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/learner-group-pages/view-group/view-learner-group-page.module')
-      .then(m => m.ViewLearnerGroupPageModule)
+    loadChildren: () =>
+      import(
+        'pages/learner-group-pages/view-group/view-learner-group-page.module'
+      ).then(m => m.ViewLearnerGroupPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/blog-home-page/blog-home-page.module')
-      .then(m => m.BlogHomePageModule)
+    loadChildren: () =>
+      import('pages/blog-home-page/blog-home-page.module').then(
+        m => m.BlogHomePageModule
+      ),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH.ROUTE
-    ),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE_SEARCH
+      .ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/blog-home-page/blog-home-page.module')
-      .then(m => m.BlogHomePageModule)
+    loadChildren: () =>
+      import('pages/blog-home-page/blog-home-page.module').then(
+        m => m.BlogHomePageModule
+      ),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE.ROUTE
-    ),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_AUTHOR_PROFILE_PAGE
+      .ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/blog-author-profile-page/blog-author-profile-page.module')
-      .then(m => m.BlogAuthorProfilePageModule)
+    loadChildren: () =>
+      import(
+        'pages/blog-author-profile-page/blog-author-profile-page.module'
+      ).then(m => m.BlogAuthorProfilePageModule),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE
-    ),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/blog-post-page/blog-post-page.module')
-      .then(m => m.BlogPostPageModule)
-  }
+    loadChildren: () =>
+      import('pages/blog-post-page/blog-post-page.module').then(
+        m => m.BlogPostPageModule
+      ),
+  },
 ];
 
 // Register stewards landing pages.
@@ -339,9 +390,10 @@ for (let i = 0; i < AppConstants.STEWARDS_LANDING_PAGE.ROUTES.length; i++) {
   // Redirect old stewards landing pages to volunteer page.
   routes.push({
     path: AppConstants.STEWARDS_LANDING_PAGE.ROUTES[i],
-    loadChildren: () => import(
-      'pages/volunteer-page/volunteer-page.module').then(
-      m => m.VolunteerPageModule)
+    loadChildren: () =>
+      import('pages/volunteer-page/volunteer-page.module').then(
+        m => m.VolunteerPageModule
+      ),
   });
 }
 
@@ -350,9 +402,10 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
   for (let i = 0; i < AppConstants.AVAILABLE_LANDING_PAGES[key].length; i++) {
     routes.push({
       path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
-      loadChildren: () => import(
-        'pages/landing-pages/topic-landing-page/topic-landing-page.module')
-        .then(m => m.TopicLandingPageModule)
+      loadChildren: () =>
+        import(
+          'pages/landing-pages/topic-landing-page/topic-landing-page.module'
+        ).then(m => m.TopicLandingPageModule),
     });
   }
 }
@@ -361,35 +414,32 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
 routes.push(
   // Route to register all the custom error pages on oppia.
   {
-    path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .ERROR.ROUTE}/:status_code`,
-    loadChildren: () => import(
-      'pages/error-pages/error-page.module').then(
-      m => m.ErrorPageModule)
+    path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/:status_code`,
+    loadChildren: () =>
+      import('pages/error-pages/error-page.module').then(
+        m => m.ErrorPageModule
+      ),
   },
   // '**' wildcard route must be kept at the end,as it can override all other
   // routes.
   // Add error page for not found routes.
   {
     path: '**',
-    loadChildren: () => import(
-      'pages/error-pages/error-page.module').then(
-      m => m.ErrorPageModule)
+    loadChildren: () =>
+      import('pages/error-pages/error-page.module').then(
+        m => m.ErrorPageModule
+      ),
   }
 );
 
 @NgModule({
-  imports: [
-    RouterModule.forRoot(routes),
-  ],
-  exports: [
-    RouterModule
-  ],
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
   providers: [
     {
       provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+      useValue: '/',
+    },
+  ],
 })
 export class AppRoutingModule {}

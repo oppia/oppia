@@ -16,26 +16,16 @@
  * @fileoverview Module for the teach page.
  */
 
-import { NgModule } from '@angular/core';
-import { TeachPageComponent } from './teach-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TeachPageRootComponent } from './teach-page-root.component';
-import { CommonModule } from '@angular/common';
-import { TeachPageRoutingModule } from './teach-page-routing.module';
+import {NgModule} from '@angular/core';
+import {TeachPageComponent} from './teach-page.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {TeachPageRootComponent} from './teach-page-root.component';
+import {CommonModule} from '@angular/common';
+import {TeachPageRoutingModule} from './teach-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    TeachPageRoutingModule
-  ],
-  declarations: [
-    TeachPageComponent,
-    TeachPageRootComponent,
-  ],
-  entryComponents: [
-    TeachPageComponent,
-    TeachPageRootComponent,
-  ]
+  imports: [CommonModule, SharedComponentsModule, TeachPageRoutingModule],
+  declarations: [TeachPageComponent, TeachPageRootComponent],
+  entryComponents: [TeachPageComponent, TeachPageRootComponent],
 })
 export class TeachPageModule {}

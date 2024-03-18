@@ -16,36 +16,34 @@
  * @fileoverview Unit test for the Tabs rich-text component.
  */
 
-import { SimpleChanges } from '@angular/core';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NoninteractiveTabs } from './oppia-noninteractive-tabs.component';
-import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import {SimpleChanges} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NoninteractiveTabs} from './oppia-noninteractive-tabs.component';
+import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 
 describe('NoninteractiveTabs', () => {
   let component: NoninteractiveTabs;
   let fixture: ComponentFixture<NoninteractiveTabs>;
 
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: string) {
+    escapedJsonToObj: function (answer: string) {
       return JSON.parse(answer);
-    }
+    },
   };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        NgbNavModule
-      ],
+      imports: [NgbNavModule],
       declarations: [NoninteractiveTabs],
       providers: [
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }
+          useValue: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -53,69 +51,75 @@ describe('NoninteractiveTabs', () => {
     fixture = TestBed.createComponent(NoninteractiveTabs);
     component = fixture.componentInstance;
 
-    component.tabContentsWithValue = '[' +
+    component.tabContentsWithValue =
+      '[' +
       '{' +
-          '"title": "Hint introduction",' +
-          '"content": "This set of tabs shows some hints."' +
+      '"title": "Hint introduction",' +
+      '"content": "This set of tabs shows some hints."' +
       '},' +
       '{' +
-          '"title": "Hint 1",' +
-          '"content": "This is a first hint."' +
+      '"title": "Hint 1",' +
+      '"content": "This is a first hint."' +
       '}' +
-  ']';
+      ']';
   });
 
-  it('should should initialise component when user creates tabs in the' +
-  ' rich text editor', () => {
-    component.ngOnInit();
-
-    expect(component.tabContents).toEqual([
-      {
-        title: 'Hint introduction',
-        content: 'This set of tabs shows some hints.'
-      },
-      {
-        title: 'Hint 1',
-        content: 'This is a first hint.'
-      }
-    ]);
-  });
-
-  it('should not update value when \'tabContentsWithValue\' is not defined',
+  it(
+    'should should initialise component when user creates tabs in the' +
+      ' rich text editor',
     () => {
-      component.tabContentsWithValue = '';
-
       component.ngOnInit();
 
-      expect(component.tabContents).toEqual([]);
-    });
+      expect(component.tabContents).toEqual([
+        {
+          title: 'Hint introduction',
+          content: 'This set of tabs shows some hints.',
+        },
+        {
+          title: 'Hint 1',
+          content: 'This is a first hint.',
+        },
+      ]);
+    }
+  );
+
+  it("should not update value when 'tabContentsWithValue' is not defined", () => {
+    component.tabContentsWithValue = '';
+
+    component.ngOnInit();
+
+    expect(component.tabContents).toEqual([]);
+  });
 
   it('should update values when user changes values', () => {
     let changes: SimpleChanges = {
       tabContentsWithValue: {
         currentValue: {
           title: 'New Hint introduction',
-          content: 'This set of tabs shows some hints.'
+          content: 'This set of tabs shows some hints.',
         },
         previousValue: {
           title: 'Hint introduction',
-          content: 'This set of tabs shows some hints.'
+          content: 'This set of tabs shows some hints.',
         },
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
 
-    component.tabContentsWithValue = '[{' +
+    component.tabContentsWithValue =
+      '[{' +
       '"title": "New Hint introduction",' +
       '"content": "This set of tabs shows some hints."' +
-    '}]';
+      '}]';
 
     component.ngOnChanges(changes);
 
-    expect(component.tabContents).toEqual([{
-      title: 'New Hint introduction',
-      content: 'This set of tabs shows some hints.'
-    }]);
+    expect(component.tabContents).toEqual([
+      {
+        title: 'New Hint introduction',
+        content: 'This set of tabs shows some hints.',
+      },
+    ]);
   });
 });

@@ -16,46 +16,52 @@
  * @fileoverview Tests for subtopic-page Model.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {TestBed} from '@angular/core/testing';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
-import { SubtopicPage } from 'domain/topic/subtopic-page.model';
-import { SubtopicPageContents } from './subtopic-page-contents.model';
+import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+import {SubtopicPageContents} from './subtopic-page-contents.model';
 
 describe('Subtopic page Model', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SubtopicPage]
+      providers: [SubtopicPage],
     });
   });
 
-  it('should be able to create a subtopic page object with given topic and ' +
-    'subtopic id', () => {
-    var subtopicPage = SubtopicPage.createDefault(
-      'topic_id', 2);
-    let pageContents = subtopicPage.getPageContents() as SubtopicPageContents;
-    expect(subtopicPage.getId()).toBe('topic_id-2');
-    expect(subtopicPage.getTopicId()).toBe('topic_id');
-    expect(pageContents.getHtml()).toEqual('');
+  it(
+    'should be able to create a subtopic page object with given topic and ' +
+      'subtopic id',
+    () => {
+      var subtopicPage = SubtopicPage.createDefault('topic_id', 2);
+      let pageContents = subtopicPage.getPageContents() as SubtopicPageContents;
+      expect(subtopicPage.getId()).toBe('topic_id-2');
+      expect(subtopicPage.getTopicId()).toBe('topic_id');
+      expect(pageContents.getHtml()).toEqual('');
+      expect(subtopicPage.getLanguageCode()).toEqual('en');
+    }
+  );
+
+  it('should be able to set language code', () => {
+    let recordedVoiceovers = RecordedVoiceovers.createEmpty();
+    recordedVoiceovers.addContentId('content');
+    let subtopicPage = new SubtopicPage(
+      'id',
+      'topic_id',
+      SubtopicPageContents.createDefault(),
+      'en'
+    );
+    expect(subtopicPage.getId()).toEqual('id');
+    expect(subtopicPage.getTopicId()).toEqual('topic_id');
+    expect(subtopicPage.getPageContents()).toEqual(
+      new SubtopicPageContents(
+        SubtitledHtml.createDefault('', 'content'),
+        recordedVoiceovers
+      )
+    );
     expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
-
-  it('should be able to set language code',
-    () => {
-      let recordedVoiceovers = RecordedVoiceovers.createEmpty();
-      recordedVoiceovers.addContentId('content');
-      let subtopicPage = new SubtopicPage(
-        'id', 'topic_id', SubtopicPageContents.createDefault(), 'en');
-      expect(subtopicPage.getId()).toEqual('id');
-      expect(subtopicPage.getTopicId()).toEqual('topic_id');
-      expect(subtopicPage.getPageContents()).toEqual(
-        new SubtopicPageContents(
-          SubtitledHtml.createDefault('', 'content'),
-          recordedVoiceovers)
-      );
-      expect(subtopicPage.getLanguageCode()).toEqual('en');
-    });
 
   it('should be able to copy from another subtopic page', () => {
     var firstSubtopicPage = SubtopicPage.createFromBackendDict({
@@ -64,15 +70,15 @@ describe('Subtopic page Model', () => {
       page_contents: {
         subtitled_html: {
           html: '<p>Data</p>',
-          content_id: 'content'
+          content_id: 'content',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {}
-          }
-        }
+            content: {},
+          },
+        },
       },
-      language_code: 'en'
+      language_code: 'en',
     });
 
     var secondSubtopicPage = SubtopicPage.createFromBackendDict({
@@ -81,15 +87,15 @@ describe('Subtopic page Model', () => {
       page_contents: {
         subtitled_html: {
           html: '<p>Data2</p>',
-          content_id: 'content'
+          content_id: 'content',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
-            content: {}
-          }
-        }
+            content: {},
+          },
+        },
       },
-      language_code: 'en'
+      language_code: 'en',
     });
 
     expect(firstSubtopicPage).not.toBe(secondSubtopicPage);

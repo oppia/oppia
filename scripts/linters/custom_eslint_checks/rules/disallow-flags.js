@@ -24,48 +24,48 @@ module.exports = {
     docs: {
       description: 'Lint check to disallow camelcase and no-explicity flags',
       category: 'Stylistic Issues',
-      recommended: true
+      recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      disallowCamelcaseFlag: (
+      disallowCamelcaseFlag:
         'Please do not use eslint enable|disable for' +
         ' camelcase. If you are using this statement to define properties' +
         ' in an interface for a backend dict. Wrap the property name in' +
-        ' single quotes instead.'),
-      disallowExplicitAnyFlag: (
+        ' single quotes instead.',
+      disallowExplicitAnyFlag:
         'Please do not define "any" types. You can' +
         ' refer https://github.com/oppia/oppia/wiki/Guide-on-defining-types' +
-        ' if you\'re having trouble declaring types.')
-    }
+        " if you're having trouble declaring types.",
+    },
   },
 
-  create: function(context) {
+  create: function (context) {
     var camelCaseRegex = /^ eslint-(enable|disable)(-next-line)? camelcase$/;
     var expicitRegex = /no-explicit-any/;
 
-    var checkAndReportDisallowedFlagMessage = function(comment) {
+    var checkAndReportDisallowedFlagMessage = function (comment) {
       if (camelCaseRegex.test(comment.value)) {
         context.report({
           node: comment,
-          messageId: 'disallowCamelcaseFlag'
+          messageId: 'disallowCamelcaseFlag',
         });
       }
       if (expicitRegex.test(comment.value)) {
         context.report({
           node: comment,
-          messageId: 'disallowExplicitAnyFlag'
+          messageId: 'disallowExplicitAnyFlag',
         });
       }
     };
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         var sourceCode = context.getSourceCode();
         var comments = sourceCode.getAllComments();
         comments.forEach(checkAndReportDisallowedFlagMessage);
-      }
+      },
     };
-  }
+  },
 };

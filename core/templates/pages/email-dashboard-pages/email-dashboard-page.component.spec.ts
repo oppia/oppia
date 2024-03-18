@@ -16,16 +16,22 @@
  * @fileoverview Unit tests for the email dashboard page.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { EmailDashboardQuery } from 'domain/email-dashboard/email-dashboard-query.model';
-import { UserInfo } from 'domain/user/user-info.model';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { EmailDashboardDataService } from './email-dashboard-data.service';
-import { EmailDashboardPageComponent } from './email-dashboard-page.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {EmailDashboardQuery} from 'domain/email-dashboard/email-dashboard-query.model';
+import {UserInfo} from 'domain/user/user-info.model';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {EmailDashboardDataService} from './email-dashboard-data.service';
+import {EmailDashboardPageComponent} from './email-dashboard-page.component';
 
 describe('Email Dashboard Page Component', () => {
   let fixture: ComponentFixture<EmailDashboardPageComponent>;
@@ -40,22 +46,18 @@ describe('Email Dashboard Page Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        EmailDashboardPageComponent
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [EmailDashboardPageComponent],
       providers: [
         {
           provide: ChangeDetectorRef,
-          useClass: MockChangeDetectorRef
+          useClass: MockChangeDetectorRef,
         },
         EmailDashboardDataService,
         LoaderService,
-        UserService
+        UserService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -78,13 +80,25 @@ describe('Email Dashboard Page Component', () => {
 
     let username = 'user';
     let userInfo = new UserInfo(
-      [], true, true, true, true, true, '', username, '', true);
+      [],
+      true,
+      true,
+      true,
+      true,
+      true,
+      '',
+      username,
+      '',
+      true
+    );
     let queries: EmailDashboardQuery[] = [];
 
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(userInfo));
+      Promise.resolve(userInfo)
+    );
     spyOn(emailDashboardDataService, 'getNextQueriesAsync').and.returnValue(
-      Promise.resolve(queries));
+      Promise.resolve(queries)
+    );
     componentInstance.ngOnInit();
     tick();
     expect(componentInstance.username).toEqual(username);
@@ -117,7 +131,8 @@ describe('Email Dashboard Page Component', () => {
   it('should submit query', fakeAsync(() => {
     let queries: EmailDashboardQuery[] = [];
     spyOn(emailDashboardDataService, 'submitQueryAsync').and.returnValue(
-      Promise.resolve(queries));
+      Promise.resolve(queries)
+    );
     spyOn(componentInstance, 'resetForm');
     componentInstance.submitQueryAsync();
     tick();
@@ -128,9 +143,11 @@ describe('Email Dashboard Page Component', () => {
   it('should get next page of queries', fakeAsync(() => {
     let queries: EmailDashboardQuery[] = [];
     spyOn(emailDashboardDataService, 'isNextPageAvailable').and.returnValue(
-      true);
+      true
+    );
     spyOn(emailDashboardDataService, 'getNextQueriesAsync').and.returnValue(
-      Promise.resolve(queries));
+      Promise.resolve(queries)
+    );
     componentInstance.getNextPageOfQueries();
     tick();
     expect(componentInstance.currentPageOfQueries).toEqual(queries);
@@ -138,34 +155,40 @@ describe('Email Dashboard Page Component', () => {
 
   it('should get previous page of queries', () => {
     spyOn(emailDashboardDataService, 'isPreviousPageAvailable').and.returnValue(
-      true);
+      true
+    );
     spyOn(emailDashboardDataService, 'getPreviousQueries').and.returnValue([]);
     componentInstance.getPreviousPageOfQueries();
-    expect(emailDashboardDataService.isPreviousPageAvailable)
-      .toHaveBeenCalled();
+    expect(
+      emailDashboardDataService.isPreviousPageAvailable
+    ).toHaveBeenCalled();
     expect(componentInstance.currentPageOfQueries).toEqual([]);
   });
 
   it('should show next button', () => {
     let nextPageIsAvailable = true;
     spyOn(emailDashboardDataService, 'isNextPageAvailable').and.returnValue(
-      nextPageIsAvailable);
+      nextPageIsAvailable
+    );
     expect(componentInstance.showNextButton()).toEqual(nextPageIsAvailable);
   });
 
   it('should show previous button', () => {
     let previousPageIsAvailable = true;
     spyOn(emailDashboardDataService, 'isPreviousPageAvailable').and.returnValue(
-      previousPageIsAvailable);
+      previousPageIsAvailable
+    );
     expect(componentInstance.showPreviousButton()).toEqual(
-      previousPageIsAvailable);
+      previousPageIsAvailable
+    );
   });
 
   it('should recheck status', fakeAsync(() => {
     let query = new EmailDashboardQuery('', '', 0, '', '');
     componentInstance.currentPageOfQueries = [query];
     spyOn(emailDashboardDataService, 'fetchQueryAsync').and.returnValue(
-      Promise.resolve(query));
+      Promise.resolve(query)
+    );
     componentInstance.recheckStatus(0);
     tick();
     expect(componentInstance.currentPageOfQueries[0]).toEqual(query);
@@ -174,7 +197,8 @@ describe('Email Dashboard Page Component', () => {
   it('should link to result page', () => {
     let submitter = 'submitter1';
     componentInstance.username = submitter;
-    expect(componentInstance.showLinkToResultPage(
-      submitter, 'completed')).toBeTrue();
+    expect(
+      componentInstance.showLinkToResultPage(submitter, 'completed')
+    ).toBeTrue();
   });
 });

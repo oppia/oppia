@@ -17,27 +17,31 @@
  * reviewing question rights to users.
  */
 
-import { UserFactory } from
-  '../../puppeteer-testing-utilities/user-factory';
-import { QuestionAdmin } from '../../user-utilities/question-admin-utils';
-import testConstants from
-  '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {QuestionAdmin} from '../../user-utilities/question-admin-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
 
-describe('Question Admin', function() {
+describe('Question Admin', function () {
   let questionAdmin: QuestionAdmin;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     questionAdmin = await UserFactory.createNewUser(
-      'questionAdm', 'question_admin@example.com', [ROLES.QUESTION_ADMIN]);
+      'questionAdm',
+      'question_admin@example.com',
+      [ROLES.QUESTION_ADMIN]
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to provide rights to review and submit questions to user.',
-    async function() {
+  it(
+    'should be able to provide rights to review and submit questions to user.',
+    async function () {
       let Tester = await UserFactory.createNewUser(
-        'Tester', 'admin.tester@example.com');
+        'Tester',
+        'admin.tester@example.com'
+      );
       await UserFactory.closeBrowserForUser(Tester);
 
       await questionAdmin.navigateToContributorDashboardAdminPage();
@@ -61,9 +65,11 @@ describe('Question Admin', function() {
       await questionAdmin.verifyQuestionReviewersExcludeUser('Tester');
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

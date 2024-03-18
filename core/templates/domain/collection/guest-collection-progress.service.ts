@@ -25,15 +25,15 @@
 // TODO(bhenning): This should be reset upon login, otherwise the progress will
 // be different depending on the user's logged in/logged out state.
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { Collection } from 'domain/collection/collection.model';
-import { GuestCollectionProgress } from 'domain/collection/guest-collection-progress.model';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {Collection} from 'domain/collection/collection.model';
+import {GuestCollectionProgress} from 'domain/collection/guest-collection-progress.model';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GuestCollectionProgressService {
   constructor(private windowRef: WindowRef) {}
@@ -41,22 +41,28 @@ export class GuestCollectionProgressService {
   COLLECTION_STORAGE_KEY = 'collectionProgressStore_v1';
 
   storeGuestCollectionProgress(
-      guestCollectionProgress: GuestCollectionProgress): void {
-    this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY] = (
-      guestCollectionProgress.toJson());
+    guestCollectionProgress: GuestCollectionProgress
+  ): void {
+    this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY] =
+      guestCollectionProgress.toJson();
   }
 
   loadGuestCollectionProgress(): GuestCollectionProgress {
     return GuestCollectionProgress.createFromJson(
-      this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY]);
+      this.windowRef.nativeWindow.localStorage[this.COLLECTION_STORAGE_KEY]
+    );
   }
 
   recordCompletedExploration(
-      collectionId: string, explorationId: string): void {
+    collectionId: string,
+    explorationId: string
+  ): void {
     let guestCollectionProgress = this.loadGuestCollectionProgress();
-    const completedExplorationIdHasBeenAdded = (
+    const completedExplorationIdHasBeenAdded =
       guestCollectionProgress.addCompletedExplorationId(
-        collectionId, explorationId));
+        collectionId,
+        explorationId
+      );
     if (completedExplorationIdHasBeenAdded) {
       this.storeGuestCollectionProgress(guestCollectionProgress);
     }
@@ -68,11 +74,11 @@ export class GuestCollectionProgressService {
     if (collectionId === null) {
       throw new Error('Collection does not exist!');
     }
-    let completedExplorationIds = (
-      guestCollectionProgress.getCompletedExplorationIds(collectionId));
+    let completedExplorationIds =
+      guestCollectionProgress.getCompletedExplorationIds(collectionId);
     // Filter the exploration IDs by whether they are contained within the
     // specified collection structure.
-    return completedExplorationIds.filter((expId) => {
+    return completedExplorationIds.filter(expId => {
       return collection.containsCollectionNode(expId);
     });
   }
@@ -81,7 +87,9 @@ export class GuestCollectionProgressService {
   // A null value will be returned if no explorationIds exist or all
   // explorations are completed.
   _getNextExplorationId(
-      collection: Collection, completedIds: string[]): string | null {
+    collection: Collection,
+    completedIds: string[]
+  ): string | null {
     var explorationIds = collection.getExplorationIds();
 
     for (var i = 0; i < explorationIds.length; i++) {
@@ -97,7 +105,9 @@ export class GuestCollectionProgressService {
    * the specified collection, as a guest.
    */
   recordExplorationCompletedInCollection(
-      collectionId: string, explorationId: string): void {
+    collectionId: string,
+    explorationId: string
+  ): void {
     this.recordCompletedExploration(collectionId, explorationId);
   }
 
@@ -130,13 +140,16 @@ export class GuestCollectionProgressService {
    * guest has completed the collection.
    */
   getNextExplorationId(
-      collection: Collection,
-      completedExplorationIds: string[]
+    collection: Collection,
+    completedExplorationIds: string[]
   ): string | null {
     return this._getNextExplorationId(collection, completedExplorationIds);
   }
 }
 
-angular.module('oppia').factory(
-  'GuestCollectionProgressService',
-  downgradeInjectable(GuestCollectionProgressService));
+angular
+  .module('oppia')
+  .factory(
+    'GuestCollectionProgressService',
+    downgradeInjectable(GuestCollectionProgressService)
+  );

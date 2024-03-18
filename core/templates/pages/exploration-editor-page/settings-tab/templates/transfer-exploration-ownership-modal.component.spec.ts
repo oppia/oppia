@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the TransferExplorationOwnershipModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TransferExplorationOwnershipModalComponent } from './transfer-exploration-ownership-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TransferExplorationOwnershipModalComponent} from './transfer-exploration-ownership-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -32,26 +31,27 @@ class MockActiveModal {
   }
 }
 
-describe('Transfer Exploration Ownership Modal', function() {
+describe('Transfer Exploration Ownership Modal', function () {
   let component: TransferExplorationOwnershipModalComponent;
   let fixture: ComponentFixture<TransferExplorationOwnershipModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TransferExplorationOwnershipModalComponent
+      declarations: [TransferExplorationOwnershipModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed
-      .createComponent(TransferExplorationOwnershipModalComponent);
+    fixture = TestBed.createComponent(
+      TransferExplorationOwnershipModalComponent
+    );
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);

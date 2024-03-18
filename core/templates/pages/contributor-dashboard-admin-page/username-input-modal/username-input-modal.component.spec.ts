@@ -16,13 +16,19 @@
  * @fileoverview Unit tests for UsernameInputModal.
  */
 
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { SignupPageBackendApiService } from '../../signup-page/services/signup-page-backend-api.service';
-import { UsernameInputModal } from './username-input-modal.component';
+import {SignupPageBackendApiService} from '../../signup-page/services/signup-page-backend-api.service';
+import {UsernameInputModal} from './username-input-modal.component';
 
 describe('UsernameInputModal', () => {
   let component: UsernameInputModal;
@@ -32,15 +38,9 @@ describe('UsernameInputModal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        HttpClientTestingModule
-      ],
+      imports: [FormsModule, HttpClientTestingModule],
       declarations: [UsernameInputModal],
-      providers: [
-        NgbActiveModal,
-        SignupPageBackendApiService
-      ]
+      providers: [NgbActiveModal, SignupPageBackendApiService],
     }).compileComponents();
   }));
 
@@ -48,15 +48,15 @@ describe('UsernameInputModal', () => {
     fixture = TestBed.createComponent(UsernameInputModal);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
-    signupPageBackendApiService = TestBed.inject(
-      SignupPageBackendApiService);
+    signupPageBackendApiService = TestBed.inject(SignupPageBackendApiService);
     fixture.detectChanges();
     component.ngOnInit();
   });
 
   it('should throw error when entered username is invaid', fakeAsync(() => {
     spyOn(
-      signupPageBackendApiService, 'checkUsernameAvailableAsync'
+      signupPageBackendApiService,
+      'checkUsernameAvailableAsync'
     ).and.returnValue(Promise.resolve({username_is_taken: false}));
 
     component.saveAndClose();
@@ -67,7 +67,8 @@ describe('UsernameInputModal', () => {
 
   it('should save and close with correct username', fakeAsync(() => {
     spyOn(
-      signupPageBackendApiService, 'checkUsernameAvailableAsync'
+      signupPageBackendApiService,
+      'checkUsernameAvailableAsync'
     ).and.returnValue(Promise.resolve({username_is_taken: true}));
     const modalCloseSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     component.username = 'user1';

@@ -16,32 +16,29 @@
  * @fileoverview Unit tests for the custom OSK letters component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { AllowedVariablesEditorComponent } from './allowed-variables-editor.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {AllowedVariablesEditorComponent} from './allowed-variables-editor.component';
 
-describe('OnScreenKeyboard', function() {
+describe('OnScreenKeyboard', function () {
   let component: AllowedVariablesEditorComponent;
   let fixture: ComponentFixture<AllowedVariablesEditorComponent>;
 
   beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule(
-      {
-        imports: [HttpClientTestingModule],
-        declarations: [AllowedVariablesEditorComponent],
-      }
-    ).compileComponents();
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      declarations: [AllowedVariablesEditorComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      AllowedVariablesEditorComponent);
+    fixture = TestBed.createComponent(AllowedVariablesEditorComponent);
     component = fixture.componentInstance;
     component.value = [];
     component.ngOnInit();
   });
 
-  it('should update letters list', function() {
+  it('should update letters list', function () {
     expect(component.value).toEqual([]);
     expect(component.getRemainingLettersCount()).toBe(10);
     component.updateLettersList('z');
@@ -58,7 +55,7 @@ describe('OnScreenKeyboard', function() {
     expect(component.getRemainingLettersCount()).toBe(10);
   });
 
-  it('should correctly identify keyboard events', function() {
+  it('should correctly identify keyboard events', function () {
     component.lettersAreLowercase = true;
     component.keyDownCallBack({key: 'Shift'} as KeyboardEvent);
     expect(component.lettersAreLowercase).toBeFalse();
@@ -70,12 +67,12 @@ describe('OnScreenKeyboard', function() {
     expect(component.value.length).toBe(0);
     component.keyDownCallBack({key: 'x'} as KeyboardEvent);
     let event: Event = new KeyboardEvent('keydown', {
-      code: 'a'
+      code: 'a',
     });
     window.dispatchEvent(event);
     fixture.detectChanges();
     event = new KeyboardEvent('keyup', {
-      code: 'a'
+      code: 'a',
     });
     window.dispatchEvent(event);
     fixture.detectChanges();

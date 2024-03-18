@@ -21,15 +21,17 @@ var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 
-var customizeComponent = async function(modal, text, skillDescription) {
-  await objects.SkillSelector(
-    modal.$('<skill-selector-editor>')
-  ).setValue(skillDescription);
+var customizeComponent = async function (modal, text, skillDescription) {
+  await objects
+    .SkillSelector(modal.$('<skill-selector-editor>'))
+    .setValue(skillDescription);
 
   var textEditor = objects.UnicodeStringEditor(
-    modal.$('<schema-based-unicode-editor>'));
+    modal.$('<schema-based-unicode-editor>')
+  );
   // Change the text only if is specified as an argument, as this component
   // sometimes relies on highlights.
   if (text === null || text === textEditor.getValue()) {
@@ -38,7 +40,11 @@ var customizeComponent = async function(modal, text, skillDescription) {
   await textEditor.setValue(text);
 };
 
-var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
+var expectComponentDetailsToMatch = async function (
+  elem,
+  text,
+  reviewMaterial
+) {
   var link = elem.$('<a>');
   expect(await link.getText()).toBe(text);
   await link.click();
@@ -46,11 +52,13 @@ var expectComponentDetailsToMatch = async function(elem, text, reviewMaterial) {
     $('.e2e-test-concept-card-explanation'),
     'concept-card-explanation taking too long to show up'
   );
-  await forms.expectRichText(
-    $('.e2e-test-concept-card-explanation')
-  ).toMatch(reviewMaterial);
+  await forms
+    .expectRichText($('.e2e-test-concept-card-explanation'))
+    .toMatch(reviewMaterial);
   await action.click(
-    'Concept Card close button', $('.e2e-test-close-concept-card'));
+    'Concept Card close button',
+    $('.e2e-test-close-concept-card')
+  );
 };
 
 exports.customizeComponent = customizeComponent;

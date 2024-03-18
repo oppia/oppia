@@ -16,15 +16,14 @@
  * @fileoverview Unit tests for HelpModalComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HelpModalComponent } from './help-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { ContextService } from 'services/context.service';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HelpModalComponent} from './help-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {ContextService} from 'services/context.service';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-
-describe('Exploration Player Suggestion Modal Controller', function() {
+describe('Exploration Player Suggestion Modal Controller', function () {
   let component: HelpModalComponent;
   let fixture: ComponentFixture<HelpModalComponent>;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -32,20 +31,15 @@ describe('Exploration Player Suggestion Modal Controller', function() {
   let ngbActiveModal: NgbActiveModal;
   let explorationId = 'exp1';
 
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [HelpModalComponent],
-      providers: [
-        SiteAnalyticsService,
-        ContextService,
-        NgbActiveModal,
-      ],
+      providers: [SiteAnalyticsService, ContextService, NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
-  beforeEach(function() {
+  beforeEach(function () {
     fixture = TestBed.createComponent(HelpModalComponent);
     component = fixture.componentInstance;
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -55,36 +49,44 @@ describe('Exploration Player Suggestion Modal Controller', function() {
     spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
   });
 
-  it('should begin editor tutorial when closing the modal', function() {
+  it('should begin editor tutorial when closing the modal', function () {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     const registerOpenTutorialFromHelpCenterEventSpy = spyOn(
-      siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
+      siteAnalyticsService,
+      'registerOpenTutorialFromHelpCenterEvent'
+    );
     component.ngOnInit();
 
     component.beginEditorTutorial();
 
-    expect(registerOpenTutorialFromHelpCenterEventSpy)
-      .toHaveBeenCalledWith(explorationId);
+    expect(registerOpenTutorialFromHelpCenterEventSpy).toHaveBeenCalledWith(
+      explorationId
+    );
     expect(closeSpy).toHaveBeenCalledWith('editor');
   });
 
-  it('should begin translation tutorial when closing the modal', function() {
+  it('should begin translation tutorial when closing the modal', function () {
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
     let registerOpenTutorialFromHelpCenterEventSpy = spyOn(
-      siteAnalyticsService, 'registerOpenTutorialFromHelpCenterEvent');
+      siteAnalyticsService,
+      'registerOpenTutorialFromHelpCenterEvent'
+    );
     component.ngOnInit();
 
     component.beginTranslationTutorial();
 
-    expect(registerOpenTutorialFromHelpCenterEventSpy)
-      .toHaveBeenCalledWith(explorationId);
+    expect(registerOpenTutorialFromHelpCenterEventSpy).toHaveBeenCalledWith(
+      explorationId
+    );
     expect(closeSpy).toHaveBeenCalledWith('translation');
   });
 
-  it('should dismiss modal when changing to help center', function() {
+  it('should dismiss modal when changing to help center', function () {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     let registerVisitHelpCenterEventSpy = spyOn(
-      siteAnalyticsService, 'registerVisitHelpCenterEvent');
+      siteAnalyticsService,
+      'registerVisitHelpCenterEvent'
+    );
     component.ngOnInit();
 
     component.goToHelpCenter();

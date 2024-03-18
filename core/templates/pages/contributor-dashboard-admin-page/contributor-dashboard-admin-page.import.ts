@@ -22,9 +22,14 @@ import 'zone.js';
 import uiValidate from 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', uiValidate
+  require('angular-cookies'),
+  'ngAnimate',
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  uiValidate,
 ]);
 
 require('Polyfills.ts');
@@ -33,13 +38,16 @@ require('Polyfills.ts');
 // main module the elements are attached to.
 require(
   'pages/contributor-dashboard-admin-page/' +
-  'contributor-dashboard-admin-page.module.ts');
+    'contributor-dashboard-admin-page.module.ts'
+);
 require('App.ts');
 require('base-components/oppia-root.directive.ts');
 
 require(
   'pages/contributor-dashboard-admin-page/' +
-  'contributor-dashboard-admin-page.component.ts');
+    'contributor-dashboard-admin-page.component.ts'
+);
 require(
   'pages/contributor-dashboard-admin-page/' +
-  'contributor-admin-dashboard-page.component.ts');
+    'contributor-admin-dashboard-page.component.ts'
+);

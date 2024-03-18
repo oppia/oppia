@@ -16,17 +16,17 @@
  * @fileoverview Tests for Change List Service.
  */
 
-import { async, fakeAsync, flush, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeListService } from './change-list.service';
-import { LoaderService } from 'services/loader.service';
-import { EventEmitter } from '@angular/core';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { ExplorationDataService } from './exploration-data.service';
-import { AutosaveInfoModalsService } from './autosave-info-modals.service';
-import { AlertsService } from 'services/alerts.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import {async, fakeAsync, flush, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeListService} from './change-list.service';
+import {LoaderService} from 'services/loader.service';
+import {EventEmitter} from '@angular/core';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {ExplorationDataService} from './exploration-data.service';
+import {AutosaveInfoModalsService} from './autosave-info-modals.service';
+import {AlertsService} from 'services/alerts.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
 class MockWindowRef {
   _window = {
@@ -45,16 +45,16 @@ class MockWindowRef {
       set pathname(val) {
         this._pathname = val;
       },
-      reload: () => {}
+      reload: () => {},
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {}
+      removeItem: (name: string) => {},
     },
     navigator: {
       // Internet Connection.
-      onLine: true
-    }
+      onLine: true,
+    },
   };
 
   get nativeWindow() {
@@ -65,13 +65,12 @@ class MockWindowRef {
 class MockExplorationDataService1 {
   explorationId!: 0;
   autosaveChangeListAsync(
-      changeList: string[],
-      successCb: (
-        arg0: {
-          changes_are_mergeable: boolean;
-          is_version_of_draft_valid: boolean;
-        }) => void,
-      errorCb: () => void
+    changeList: string[],
+    successCb: (arg0: {
+      changes_are_mergeable: boolean;
+      is_version_of_draft_valid: boolean;
+    }) => void,
+    errorCb: () => void
   ) {
     successCb({
       changes_are_mergeable: true,
@@ -87,13 +86,12 @@ class MockExplorationDataService1 {
 class MockExplorationDataService2 {
   explorationId!: 0;
   autosaveChangeListAsync(
-      changeList: string[],
-      successCb: (
-        arg0: {
-          changes_are_mergeable: boolean;
-          is_version_of_draft_valid: boolean;
-        }) => void,
-      errorCb: () => void
+    changeList: string[],
+    successCb: (arg0: {
+      changes_are_mergeable: boolean;
+      is_version_of_draft_valid: boolean;
+    }) => void,
+    errorCb: () => void
   ) {
     successCb({
       changes_are_mergeable: false,
@@ -109,9 +107,9 @@ class MockExplorationDataService2 {
 class MockExplorationDataService3 {
   explorationId!: 0;
   autosaveChangeListAsync(
-      changeList: string[],
-      successCb: () => void,
-      errorCb: () => void
+    changeList: string[],
+    successCb: () => void,
+    errorCb: () => void
   ) {
     errorCb();
   }
@@ -150,19 +148,19 @@ describe('Change List Service when changes are mergable', () => {
       providers: [
         {
           provide: ExplorationDataService,
-          useValue: mockExplorationDataService
+          useValue: mockExplorationDataService,
         },
         {
           provide: WindowRef,
-          useValue: mockWindowRef
+          useValue: mockWindowRef,
         },
         {
           provide: LoaderService,
           useValue: {
-            onLoadingMessageChange: mockEventEmitter
-          }
-        }
-      ]
+            onLoadingMessageChange: mockEventEmitter,
+          },
+        },
+      ],
     });
   }));
 
@@ -172,12 +170,15 @@ describe('Change List Service when changes are mergable', () => {
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     alertsService = TestBed.inject(AlertsService);
 
-    spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue();
-    spyOn(autosaveInfoModalsService, 'showNonStrictValidationFailModal')
-      .and.returnValue();
-    alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue();
+    spyOn(
+      autosaveInfoModalsService,
+      'showVersionMismatchModal'
+    ).and.returnValue();
+    spyOn(
+      autosaveInfoModalsService,
+      'showNonStrictValidationFailModal'
+    ).and.returnValue();
+    alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
   });
 
   it('should set loading message when initialized', () => {
@@ -186,45 +187,57 @@ describe('Change List Service when changes are mergable', () => {
     expect(changeListService.loadingMessage).toBe('loadingMessage');
   });
 
-  it('should save changes after deleting a state ' +
-    'when calling \'deleteState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
-    changeListService.explorationChangeList.length = 0;
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+  it(
+    'should save changes after deleting a state ' +
+      "when calling 'deleteState'",
+    fakeAsync(() => {
+      changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+      changeListService.explorationChangeList.length = 0;
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'emit'
+      ).and.callThrough();
 
-    changeListService.deleteState('state');
-    flush();
+      changeListService.deleteState('state');
+      flush();
 
-    expect(saveSpy).toHaveBeenCalled();
-  }));
+      expect(saveSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should save changes after adding a state ' +
-    'when calling \'addState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
-    changeListService.explorationChangeList.length = 0;
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+  it(
+    'should save changes after adding a state ' + "when calling 'addState'",
+    fakeAsync(() => {
+      changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+      changeListService.explorationChangeList.length = 0;
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'emit'
+      ).and.callThrough();
 
-    changeListService.addState('state', 'content_1', 'dafault_outcome_4');
-    flush();
+      changeListService.addState('state', 'content_1', 'dafault_outcome_4');
+      flush();
 
-    expect(saveSpy).toHaveBeenCalled();
-  }));
+      expect(saveSpy).toHaveBeenCalled();
+    })
+  );
 
   it('should add Written Translation', fakeAsync(() => {
     changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     changeListService.loadingMessage = '';
     changeListService.addWrittenTranslation(
-      'contentId', 'dataFormat',
-      'languageCode', 'stateName', 'translationHtml');
+      'contentId',
+      'dataFormat',
+      'languageCode',
+      'stateName',
+      'translationHtml'
+    );
 
     let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
 
     changeListService.addState('state', 'content_1', 'dafault_outcome_4');
     flush();
@@ -233,12 +246,13 @@ describe('Change List Service when changes are mergable', () => {
   }));
 
   it('should add change for markTranslationsAsNeedingUpdate', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     changeListService.loadingMessage = '';
     let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
 
     changeListService.markTranslationsAsNeedingUpdate('content_id_1');
     flush();
@@ -246,12 +260,13 @@ describe('Change List Service when changes are mergable', () => {
   }));
 
   it('should add change for removeTranslations', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     changeListService.loadingMessage = '';
     let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
 
     changeListService.removeTranslations('content_id_1');
     flush();
@@ -259,34 +274,39 @@ describe('Change List Service when changes are mergable', () => {
   }));
 
   it('should add change for edit translations', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     changeListService.loadingMessage = '';
     let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
 
     changeListService.editTranslation(
-      'content_id_1', 'en', new TranslatedContent(
-        'Translated content', 'unicode', false));
+      'content_id_1',
+      'en',
+      new TranslatedContent('Translated content', 'unicode', false)
+    );
     flush();
     expect(saveSpy).toHaveBeenCalled();
     expect(changeListService.explorationChangeList.length).toEqual(1);
   }));
 
   it('should get all translation changelist', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => { }, 10);
+    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
     changeListService.explorationChangeList.length = 0;
     changeListService.loadingMessage = '';
     spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.callThrough();
 
     changeListService.editTranslation(
-      'content_id_1', 'en', new TranslatedContent(
-        'Translated content', 'unicode', false));
-    changeListService.addState(
-      'state_2', 'content_id_2', 'content_id_default');
+      'content_id_1',
+      'en',
+      new TranslatedContent('Translated content', 'unicode', false)
+    );
+    changeListService.addState('state_2', 'content_id_2', 'content_id_default');
     changeListService.removeTranslations('content_id_3');
     changeListService.markTranslationsAsNeedingUpdate('content_id_4');
     flush();
@@ -294,130 +314,171 @@ describe('Change List Service when changes are mergable', () => {
     expect(changeListService.explorationChangeList.length).toEqual(4);
     const translationChangeList = changeListService.getTranslationChangeList();
     expect(translationChangeList.length).toEqual(3);
-    expect(
-      translationChangeList.map(change => change.cmd)).toEqual(
+    expect(translationChangeList.map(change => change.cmd)).toEqual(
       jasmine.arrayWithExactContents([
         'remove_translations',
         'edit_translation',
-        'mark_translations_needs_update'
-      ]));
+        'mark_translations_needs_update',
+      ])
+    );
   }));
 
-  it('should save changes after renaming a state ' +
-    'when calling \'renameState\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
-    changeListService.explorationChangeList.length = 0;
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+  it(
+    'should save changes after renaming a state ' +
+      "when calling 'renameState'",
+    fakeAsync(() => {
+      changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+      changeListService.explorationChangeList.length = 0;
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'emit'
+      ).and.callThrough();
 
-    changeListService.renameState('oldState', 'newState');
-    flush();
+      changeListService.renameState('oldState', 'newState');
+      flush();
 
-    expect(saveSpy).toHaveBeenCalled();
-  }));
+      expect(saveSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should save changes after editing exploration property ' +
-    'when calling \'editExplorationProperty\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
-    changeListService.explorationChangeList.length = 0;
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+  it(
+    'should save changes after editing exploration property ' +
+      "when calling 'editExplorationProperty'",
+    fakeAsync(() => {
+      changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+      changeListService.explorationChangeList.length = 0;
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'emit'
+      ).and.callThrough();
 
-    changeListService.editExplorationProperty(
-      'language_code', 'oldValue', 'newValue');
-    flush();
+      changeListService.editExplorationProperty(
+        'language_code',
+        'oldValue',
+        'newValue'
+      );
+      flush();
 
-    expect(saveSpy).toHaveBeenCalled();
-  }));
+      expect(saveSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should save changes after editing state property ' +
-    'when calling \'editExplorationProperty\'', fakeAsync(() => {
-    changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
-    changeListService.explorationChangeList.length = 0;
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+  it(
+    'should save changes after editing state property ' +
+      "when calling 'editExplorationProperty'",
+    fakeAsync(() => {
+      changeListService.changeListAddedTimeoutId = setTimeout(() => {}, 10);
+      changeListService.explorationChangeList.length = 0;
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'emit'
+      ).and.callThrough();
 
-    changeListService.editStateProperty(
-      'state', 'solution', 'oldValue', 'newValue');
-    flush();
+      changeListService.editStateProperty(
+        'state',
+        'solution',
+        'oldValue',
+        'newValue'
+      );
+      flush();
 
-    expect(saveSpy).toHaveBeenCalled();
-  }));
+      expect(saveSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should not save changes after deleting a state ' +
-    'if loading message is being shown', () => {
-    changeListService.explorationChangeList.length = 0;
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
+  it(
+    'should not save changes after deleting a state ' +
+      'if loading message is being shown',
+    () => {
+      changeListService.explorationChangeList.length = 0;
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'emit'
+      ).and.callThrough();
 
-    // Setting loading message.
-    changeListService.loadingMessage = 'loadingMessage';
-    changeListService.deleteState('state');
+      // Setting loading message.
+      changeListService.loadingMessage = 'loadingMessage';
+      changeListService.deleteState('state');
 
-    expect(saveSpy).not.toHaveBeenCalled();
-  });
+      expect(saveSpy).not.toHaveBeenCalled();
+    }
+  );
 
-  it('should not save changes after deleting a state ' +
-    'if internet is offline', () => {
-    changeListService.explorationChangeList.length = 0;
-    let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.callThrough();
-    // Setting internet to offline.
-    spyOn(internetConnectivityService, 'isOnline')
-      .and.returnValue(false);
+  it(
+    'should not save changes after deleting a state ' +
+      'if internet is offline',
+    () => {
+      changeListService.explorationChangeList.length = 0;
+      let saveSpy = spyOn(
+        changeListService.autosaveInProgressEventEmitter,
+        'emit'
+      ).and.callThrough();
+      // Setting internet to offline.
+      spyOn(internetConnectivityService, 'isOnline').and.returnValue(false);
 
-    changeListService.deleteState('state');
+      changeListService.deleteState('state');
 
-    expect(saveSpy).not.toHaveBeenCalled();
-  });
+      expect(saveSpy).not.toHaveBeenCalled();
+    }
+  );
 
-  it('should discard all changes ' +
-    'when calling \'discardAllChanges\'', () => {
-    let discardSpy = spyOn(mockExplorationDataService, 'discardDraftAsync')
-      .and.callThrough();
+  it('should discard all changes ' + "when calling 'discardAllChanges'", () => {
+    let discardSpy = spyOn(
+      mockExplorationDataService,
+      'discardDraftAsync'
+    ).and.callThrough();
 
     changeListService.discardAllChanges();
 
     expect(discardSpy).toHaveBeenCalled();
   });
 
-  it('should show alert message if we try to edit ' +
-    'an exploration with invalid property', () => {
-    changeListService.editExplorationProperty(
-      'prop1', 'oldValue', 'newValue');
+  it(
+    'should show alert message if we try to edit ' +
+      'an exploration with invalid property',
+    () => {
+      changeListService.editExplorationProperty(
+        'prop1',
+        'oldValue',
+        'newValue'
+      );
 
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'Invalid exploration property: prop1');
-  });
+      expect(alertsSpy).toHaveBeenCalledWith(
+        'Invalid exploration property: prop1'
+      );
+    }
+  );
 
-  it('should show alert message if we try to edit ' +
-    'an state with invalid property', () => {
-    changeListService.editStateProperty(
-      // This throws "Argument of type 'prop1' is not assignable to parameter
-      // of type 'StatePropertyNames'.". We need to suppress this error because
-      // we want to test passing wrong values.
-      // @ts-expect-error
-      'stateName', 'prop1', 'oldValue', 'newValue');
+  it(
+    'should show alert message if we try to edit ' +
+      'an state with invalid property',
+    () => {
+      changeListService.editStateProperty(
+        'stateName',
+        // This throws "Argument of type 'prop1' is not assignable to parameter
+        // of type 'StatePropertyNames'.". We need to suppress this error because
+        // we want to test passing wrong values.
+        // @ts-expect-error
+        'prop1',
+        'oldValue',
+        'newValue'
+      );
 
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'Invalid state property: prop1');
-  });
+      expect(alertsSpy).toHaveBeenCalledWith('Invalid state property: prop1');
+    }
+  );
 
-  it('should check whether exploration locked for editing ' +
-    'when calling \'isExplorationLockedForEditing\'', () => {
-    changeListService.explorationChangeList.length = 2;
-    expect(changeListService.isExplorationLockedForEditing())
-      .toBe(true);
+  it(
+    'should check whether exploration locked for editing ' +
+      "when calling 'isExplorationLockedForEditing'",
+    () => {
+      changeListService.explorationChangeList.length = 2;
+      expect(changeListService.isExplorationLockedForEditing()).toBe(true);
 
-    changeListService.explorationChangeList.length = 0;
-    expect(changeListService.isExplorationLockedForEditing())
-      .toBe(false);
-  });
+      changeListService.explorationChangeList.length = 0;
+      expect(changeListService.isExplorationLockedForEditing()).toBe(false);
+    }
+  );
 });
 
 describe('Change List Service when changes are not mergable', () => {
@@ -437,13 +498,13 @@ describe('Change List Service when changes are not mergable', () => {
       providers: [
         {
           provide: ExplorationDataService,
-          useValue: mockExplorationDataService
+          useValue: mockExplorationDataService,
         },
         {
           provide: WindowRef,
-          useValue: mockWindowRef
-        }
-      ]
+          useValue: mockWindowRef,
+        },
+      ],
     });
   }));
 
@@ -452,18 +513,22 @@ describe('Change List Service when changes are not mergable', () => {
     autosaveInfoModalsService = TestBed.inject(AutosaveInfoModalsService);
     alertsService = TestBed.inject(AlertsService);
 
-    spyOn(autosaveInfoModalsService, 'showVersionMismatchModal')
-      .and.returnValue();
-    spyOn(autosaveInfoModalsService, 'showNonStrictValidationFailModal')
-      .and.returnValue();
-    alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue();
+    spyOn(
+      autosaveInfoModalsService,
+      'showVersionMismatchModal'
+    ).and.returnValue();
+    spyOn(
+      autosaveInfoModalsService,
+      'showNonStrictValidationFailModal'
+    ).and.returnValue();
+    alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
   });
 
-  it('should undo and save changes when calling \'undoLastChange\'', () => {
+  it("should undo and save changes when calling 'undoLastChange'", () => {
     let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue();
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.returnValue();
     changeListService.explorationChangeList.length = 2;
 
     changeListService.undoLastChange();
@@ -476,8 +541,7 @@ describe('Change List Service when changes are not mergable', () => {
 
     changeListService.undoLastChange();
 
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'There are no changes to undo.');
+    expect(alertsSpy).toHaveBeenCalledWith('There are no changes to undo.');
   });
 });
 
@@ -500,15 +564,15 @@ describe('Change List Service when internet is available', () => {
       providers: [
         {
           provide: ExplorationDataService,
-          useValue: mockExplorationDataService
+          useValue: mockExplorationDataService,
         },
         {
           provide: WindowRef,
-          useValue: mockWindowRef
+          useValue: mockWindowRef,
         },
         {
           provide: AutosaveInfoModalsService,
-          useValue: mockAutosaveInfoModalsService
+          useValue: mockAutosaveInfoModalsService,
         },
         {
           provide: InternetConnectivityService,
@@ -516,30 +580,32 @@ describe('Change List Service when internet is available', () => {
             onInternetStateChange: onInternetStateChangeEventEmitter,
             isOnline() {
               return true;
-            }
-          }
-        }
-      ]
+            },
+          },
+        },
+      ],
     });
   }));
 
   beforeEach(() => {
     changeListService = TestBed.inject(ChangeListService);
     alertsService = TestBed.inject(AlertsService);
-    alertsSpy = spyOn(alertsService, 'addWarning')
-      .and.returnValue();
+    alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
   });
 
-  it('should undo and save changes when calling \'undoLastChange\'', () => {
+  it("should undo and save changes when calling 'undoLastChange'", () => {
     let saveSpy = spyOn(
-      changeListService.autosaveInProgressEventEmitter, 'emit')
-      .and.returnValue();
-    changeListService.temporaryListOfChanges = [{
-      cmd: 'add_state',
-      state_name: 'stateName',
-      content_id_for_state_content: 'content_0',
-      content_id_for_default_outcome: 'default_outcome_1'
-    }];
+      changeListService.autosaveInProgressEventEmitter,
+      'emit'
+    ).and.returnValue();
+    changeListService.temporaryListOfChanges = [
+      {
+        cmd: 'add_state',
+        state_name: 'stateName',
+        content_id_for_state_content: 'content_0',
+        content_id_for_default_outcome: 'default_outcome_1',
+      },
+    ];
     changeListService.explorationChangeList.length = 2;
 
     onInternetStateChangeEventEmitter.emit(true);
@@ -549,16 +615,17 @@ describe('Change List Service when internet is available', () => {
   });
 
   it('should not undo changes when there are no changes', () => {
-    changeListService.temporaryListOfChanges = [{
-      cmd: 'add_state',
-      state_name: 'stateName',
-      content_id_for_state_content: 'content_0',
-      content_id_for_default_outcome: 'default_outcome_1'
-    }];
+    changeListService.temporaryListOfChanges = [
+      {
+        cmd: 'add_state',
+        state_name: 'stateName',
+        content_id_for_state_content: 'content_0',
+        content_id_for_default_outcome: 'default_outcome_1',
+      },
+    ];
 
     changeListService.undoLastChange();
 
-    expect(alertsSpy).toHaveBeenCalledWith(
-      'There are no changes to undo.');
+    expect(alertsSpy).toHaveBeenCalledWith('There are no changes to undo.');
   });
 });

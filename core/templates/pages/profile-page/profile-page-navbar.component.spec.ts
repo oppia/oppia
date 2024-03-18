@@ -16,11 +16,10 @@
  * @fileoverview Unit tests for the profile page navbar component.
  */
 
-import { ComponentFixture, TestBed, async } from
-  '@angular/core/testing';
+import {ComponentFixture, TestBed, async} from '@angular/core/testing';
 
-import { ProfilePageNavbarComponent } from './profile-page-navbar.component';
-import { UrlService } from 'services/contextual/url.service';
+import {ProfilePageNavbarComponent} from './profile-page-navbar.component';
+import {UrlService} from 'services/contextual/url.service';
 
 class MockUrlService {
   getUsernameFromProfileUrl() {
@@ -31,13 +30,11 @@ class MockUrlService {
 let component: ProfilePageNavbarComponent;
 let fixture: ComponentFixture<ProfilePageNavbarComponent>;
 
-describe('Profile Page Navbar Component', function() {
+describe('Profile Page Navbar Component', function () {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ProfilePageNavbarComponent],
-      providers: [
-        { provide: UrlService, useClass: MockUrlService }
-      ],
+      providers: [{provide: UrlService, useClass: MockUrlService}],
     }).compileComponents();
   }));
 
@@ -47,10 +44,8 @@ describe('Profile Page Navbar Component', function() {
     fixture.detectChanges();
   });
 
-  it('should get username from profile url when component calls OnInit hook',
-    () => {
-      component.ngOnInit();
-      expect(component.username).toBe('username1');
-    }
-  );
+  it('should get username from profile url when component calls OnInit hook', () => {
+    component.ngOnInit();
+    expect(component.username).toBe('username1');
+  });
 });

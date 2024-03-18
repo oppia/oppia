@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for BeamJobRunResult.
  */
 
-import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
+import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
 
 describe('BeamJobRunResult model', () => {
   it('should copy arguments', () => {
@@ -27,7 +27,8 @@ describe('BeamJobRunResult model', () => {
 
   it('should copy values from backend dict', () => {
     const result = BeamJobRunResult.createFromBackendDict({
-      stdout: 'abc', stderr: 'def'
+      stdout: 'abc',
+      stderr: 'def',
     });
     expect(result.stdout).toEqual('abc');
     expect(result.stderr).toEqual('def');

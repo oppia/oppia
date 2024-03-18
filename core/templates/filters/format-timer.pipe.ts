@@ -16,20 +16,20 @@
  * @fileoverview FormatTime filter for Oppia.
  */
 
-import { Injectable, Pipe, PipeTransform} from '@angular/core';
+import {Injectable, Pipe, PipeTransform} from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 @Pipe({name: 'formatTime'})
 export class FormatTimePipe implements PipeTransform {
   transform(input: number): string {
-    let formatNum = function(n: number) {
+    let formatNum = function (n: number) {
       return (n < 10 ? '0' : '') + n;
     };
 
     let seconds = input % 60;
     let minutes = Math.floor(input / 60);
-    return (formatNum(minutes) + ':' + formatNum(seconds));
+    return formatNum(minutes) + ':' + formatNum(seconds);
   }
 }

@@ -16,10 +16,12 @@
  * @fileoverview Tests for Change model.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { BackendChangeObject, Change } from
-  'domain/editor/undo_redo/change.model';
-import { QuestionObjectFactory } from 'domain/question/QuestionObjectFactory';
+import {TestBed} from '@angular/core/testing';
+import {
+  BackendChangeObject,
+  Change,
+} from 'domain/editor/undo_redo/change.model';
+import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
 
 describe('Change domain objects model', () => {
   let questionObjectFactory: QuestionObjectFactory;
@@ -27,7 +29,7 @@ describe('Change domain objects model', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      providers: [QuestionObjectFactory]
+      providers: [QuestionObjectFactory],
     });
     questionObjectFactory = TestBed.get(QuestionObjectFactory);
   });
@@ -40,7 +42,7 @@ describe('Change domain objects model', () => {
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
-      old_value: 'oldVal'
+      old_value: 'oldVal',
     };
     new Change(backendChangeObject, applyFunc, reverseFunc);
 
@@ -56,16 +58,21 @@ describe('Change domain objects model', () => {
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
-      old_value: 'oldVal'
+      old_value: 'oldVal',
     };
     const changeDomainObject = new Change(
-      backendChangeObject, applyFunc, reverseFunc);
+      backendChangeObject,
+      applyFunc,
+      reverseFunc
+    );
 
     let fakeDomainObject = questionObjectFactory.createDefaultQuestion([]);
     changeDomainObject.applyChange(fakeDomainObject);
 
     expect(applyFunc).toHaveBeenCalledWith(
-      backendChangeObject, fakeDomainObject);
+      backendChangeObject,
+      fakeDomainObject
+    );
     expect(reverseFunc).not.toHaveBeenCalled();
   });
 
@@ -77,70 +84,80 @@ describe('Change domain objects model', () => {
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
-      old_value: 'oldVal'
+      old_value: 'oldVal',
     };
     const changeDomainObject = new Change(
-      backendChangeObject, applyFunc, reverseFunc);
+      backendChangeObject,
+      applyFunc,
+      reverseFunc
+    );
 
     let fakeDomainObject = questionObjectFactory.createDefaultQuestion([]);
     changeDomainObject.reverseChange(fakeDomainObject);
 
     expect(reverseFunc).toHaveBeenCalledWith(
-      backendChangeObject, fakeDomainObject);
+      backendChangeObject,
+      fakeDomainObject
+    );
     expect(applyFunc).not.toHaveBeenCalled();
   });
 
-  it('should not receive changes to the provided change backend object',
-    () => {
-      const backendChangeObject: BackendChangeObject = {
-        cmd: 'update_question_property',
-        property_name: 'language_code',
-        new_value: 'newVal',
-        old_value: 'oldVal'
-      };
-      const changeDomainObject = new Change(
-        backendChangeObject, () => {}, () => {});
-
-      const returnedBackendObject = changeDomainObject.getBackendChangeObject();
-      (
-        returnedBackendObject as typeof backendChangeObject
-      ).property_name = 'language_code';
-
-      expect(changeDomainObject.getBackendChangeObject()).toEqual({
-        cmd: 'update_question_property',
-        property_name: 'language_code',
-        new_value: 'newVal',
-        old_value: 'oldVal'
-      });
-    });
-
-  it('should set new backend change object when using specific method', () => {
-    const changeDomainObject = new Change({
+  it('should not receive changes to the provided change backend object', () => {
+    const backendChangeObject: BackendChangeObject = {
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
-      old_value: 'oldVal'
-    }, () => {}, () => {});
+      old_value: 'oldVal',
+    };
+    const changeDomainObject = new Change(
+      backendChangeObject,
+      () => {},
+      () => {}
+    );
+
+    const returnedBackendObject = changeDomainObject.getBackendChangeObject();
+    (returnedBackendObject as typeof backendChangeObject).property_name =
+      'language_code';
 
     expect(changeDomainObject.getBackendChangeObject()).toEqual({
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
-      old_value: 'oldVal'
+      old_value: 'oldVal',
+    });
+  });
+
+  it('should set new backend change object when using specific method', () => {
+    const changeDomainObject = new Change(
+      {
+        cmd: 'update_question_property',
+        property_name: 'language_code',
+        new_value: 'newVal',
+        old_value: 'oldVal',
+      },
+      () => {},
+      () => {}
+    );
+
+    expect(changeDomainObject.getBackendChangeObject()).toEqual({
+      cmd: 'update_question_property',
+      property_name: 'language_code',
+      new_value: 'newVal',
+      old_value: 'oldVal',
     });
 
     changeDomainObject.setBackendChangeObject({
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
-      old_value: 'oldVal'
+      old_value: 'oldVal',
     });
 
     expect(changeDomainObject.getBackendChangeObject()).toEqual({
       cmd: 'update_question_property',
       property_name: 'language_code',
       new_value: 'newVal',
-      old_value: 'oldVal'
+      old_value: 'oldVal',
     });
   });
 });
