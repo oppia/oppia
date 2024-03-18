@@ -95,6 +95,8 @@ const subtopicUrlFragmentField =
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 
+const skillsTab = 'a.e2e-test-skills-tab';
+const skill = 'a.e2e-test-open-skill-editor';
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const addSkillButton = 'button.e2e-test-add-skill-button';
@@ -124,7 +126,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function that waits for a button to be clickable.
+   * Function that waits for a button to be clickable and then clicks it.
    * Timeout is necessary due to transitions, in cases where the button has to be
    * clicked after a modal opens or closes.
    * The button will never be clicked and tests will fail without the timeout.
@@ -155,11 +157,8 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a question in the skill editor page.
    */
-  async createQuestion(explorationUrl: string | null): Promise<void> {
-    if (!explorationUrl) {
-      throw new Error('Invalid exploration URL for question creation.');
-    }
-    await this.goto(explorationUrl);
+  async createQuestion(): Promise<void> {
+    await this.openSkillEditor();
     await this.clickOn(createQuestionButton);
     await this.clickOn(easyQuestionDifficultyOption);
     await this.clickOn(textStateEditSelector);
@@ -278,11 +277,24 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.bringToFront();
   }
 
+  /**
+   * Function that opens the topic editor page for the topic created.
+   */
   async openTopicEditor(): Promise<void> {
     await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(topicsTab);
     await this.clickOn(topic);
+  }
+
+  /**
+   * Function that opens the skill editor page for the topic created.
+   */
+  async openSkillEditor(): Promise<void> {
+    await this.page.bringToFront();
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.clickOn(skillsTab);
+    await this.clickOn(skill);
   }
 
   /**
