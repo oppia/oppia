@@ -4790,7 +4790,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
-                msg_id='prefer-string-interpolation',
+                msg_id='use-string-interpolation',
                 node=expression_node,
             ),
             ignore_position=True,
@@ -4809,7 +4809,7 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(
             testutils.MessageTest(
-                msg_id='prefer-string-interpolation',
+                msg_id='use-string-interpolation',
                 node=expression_node,
             ),
             ignore_position=True,

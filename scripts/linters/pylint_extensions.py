@@ -2930,12 +2930,12 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
 
     __implements__ = interfaces.IAstroidChecker
 
-    name = 'prefer-string-interpolation'
+    name = 'use-string-interpolation'
     priority = -1
     msgs = {
         'C0042': (
             'Please use string interpolation over string concatenation',
-            'prefer-string-interpolation',
+            'use-string-interpolation',
             'Used when string concatenation is detected.',
         ),
     }
@@ -2962,7 +2962,7 @@ class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[mi
                         isinstance(left_inferred.value, str) and
                         isinstance(right_inferred.value, str)
                     ):
-                        self.add_message('prefer-string-interpolation', node=node)
+                        self.add_message('use-string-interpolation', node=node)
 
 
 def register(linter: lint.PyLinter) -> None:
