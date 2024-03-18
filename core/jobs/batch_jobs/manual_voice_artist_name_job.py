@@ -27,7 +27,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Tuple, TypedDict
+from typing import Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -75,7 +75,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
     def get_user_id_for_given_snapshot(
         self, snapshot_model_id: str
-    ) -> str:
+    ) -> Optional[str]:
         """The method returns the commiter ID for a given snapshot model using
         the snapshot metadata model.
 
@@ -84,42 +84,57 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         Returns:
             str. The commiter ID for the given snapshot model.
+
+        Raises:
+            Exception. The exploration commit log entry model for the given ID
+                does not exist.
         """
 
-        user_id = ''
-        with datastore_services.get_ndb_context():
-            exp_snapshot_metadata_model = (
-                exp_models.ExplorationSnapshotMetadataModel.get(
-                    snapshot_model_id, strict=False))
+        try:
+            with datastore_services.get_ndb_context():
+                exp_snapshot_metadata_model = (
+                    exp_models.ExplorationSnapshotMetadataModel.get(
+                        snapshot_model_id))
 
-            if exp_snapshot_metadata_model:
                 user_id = exp_snapshot_metadata_model.committer_id
 
-        return user_id
+            return user_id
+        except Exception as e:
+            raise Exception(
+                'The exploration commit log entry model for the given ID: %s, '
+                'does not exist' % snapshot_model_id
+            ) from e
 
+    @classmethod
     def get_voiceover_from_recorded_voiceover_diff(
-        self,
+        cls,
         new_voiceover_mapping: Dict[
             str, Dict[str, voiceover_models.VoiceoverDict]],
         old_voiceover_mapping: Dict[
             str, Dict[str, voiceover_models.VoiceoverDict]]
     ) -> Dict[str, Dict[str, voiceover_models.VoiceoverDict]]:
-        """The method calculates the difference between the old and new values
-        of the recorded voiceover to isolate and retrieve only the updated
-        voiceover values within a given commit.
+        """The method compares two voiceover mapping dictionaries and extracts
+        voiceovers present in the new_voiceover_mapping but not in the
+        old_voiceover_mapping.
 
         Args:
-            new_voiceover_mapping: dict(str, dict(str, VoiceoverDict)). A dict
-                representing new values of recorded voiceovers.
-            old_voiceover_mapping: dict(str, dict(str, VoiceoverDict)). A dict
-                representing old values of recorded voiceovers.
+            new_voiceover_mapping: dict(str, dict(str, VoiceoverDict)). A
+                dictionary maps content IDs as keys and nested dicts as values.
+                Each nested dict contains language codes as keys and voiceover
+                dicts as values. The dict represents the new values of recorded
+                voiceovers in the current commit.
+            old_voiceover_mapping: dict(str, dict(str, VoiceoverDict)). A
+                dictionary maps content IDs as keys and nested dicts as values.
+                Each nested dict contains language codes as keys and voiceover
+                dicts as values. The dict represents the old values of recorded
+                voiceovers in the previous commit.
 
         Returns:
-            dict(str, dict(str, VoiceoverDict)). A dictionary maps content
-            IDs as keys and nested dicts as values. Each nested dict contains
-            language codes as keys and voiceover dicts as values. The dictionary
-            representing the difference between the old and new values of the
-            recorded voiceover.
+            dict(str, dict(str, VoiceoverDict)). A dict with content IDs as keys
+            and nested dicts as values. Each nested dict contains language codes
+            as keys and voiceover dicts as values. Only voiceovers that exist in
+            the new voiceover mapping but are absent in the old one are included
+            in this dictionary.
         """
 
         voiceover_mapping_diff: Dict[
@@ -131,7 +146,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             for lang_code, voiceover_dict in (
                 lang_code_to_voiceover_dict.items()):
 
-                if lang_code not in old_voiceover_mapping[content_id]:
+                if lang_code not in old_voiceover_mapping.get(content_id):
 
                     if content_id not in voiceover_mapping_diff:
                         voiceover_mapping_diff[content_id] = {}
@@ -158,8 +173,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         new_snapshot: exp_models.ExplorationSnapshotContentModel,
         old_snapshot: exp_models.ExplorationSnapshotContentModel
     ) -> Dict[str, Dict[str, voiceover_models.VoiceoverDict]]:
-        """The method calculates the voiceover difference between two
-        successive versions of the exploration snapshot model.
+        """The function compares two successive versions of snapshot models and
+        extracts voiceovers that have been added in the later version of the
+        exploration snapshot.
 
         Args:
             new_snapshot: ExplorationSnapshotContentModel. The new exploration
@@ -168,11 +184,11 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 snapshot model, let's say version n-1.
 
         Returns:
-            dict(str, dict(str, VoiceoverDict)). A dictionary maps
-            content IDs as keys and nested dicts as values. Each nested dict
-            contains language codes as keys and voiceover dicts as values. The
-            dictionary representing the difference between the old and new
-            values of the recorded voiceover.
+            dict(str, dict(str, VoiceoverDict)). A dict with content IDs as keys
+            and nested dicts as values. Each nested dict contains language codes
+            as keys and voiceover dicts as values. Only voiceovers that exist in
+            the new snapshot model but are absent in the old snapshot model are
+            included in this dictionary.
         """
 
         new_voiceover_mapping = {}
@@ -188,36 +204,42 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 state['recorded_voiceovers']['voiceovers_mapping'])
             old_voiceover_mapping.update(voiceover_mapping)
 
-        voiceover_mapping_diff = (
-            self.get_voiceover_from_recorded_voiceover_diff(
+        voiceover_mapping_diff: Dict[str, Dict[
+                str, voiceover_models.VoiceoverDict]] = (
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_voiceover_from_recorded_voiceover_diff(
                 new_voiceover_mapping=new_voiceover_mapping,
                 old_voiceover_mapping=old_voiceover_mapping
             )
         )
         return voiceover_mapping_diff
 
-    def get_content_id_to_voice_artist_mapping(
-        self,
+    @classmethod
+    def get_latest_content_ids_and_voice_artist_count(
+        cls,
         exploration: exp_models.ExplorationModel
-    ) -> voiceover_models.ContentIdToVoiceoverMappingType:
-        """This function generates a dictionary based on the contents of the
-        provided exploration and associates it with the relevant voice artist
-        ID responsible for the voiceovers.
+    ) -> Dict[str, List[str]]:
+        """This function generates a dictionary containing content IDs as keys
+        and a list of language codes as values, representing the languages
+        available in the latest version of the provided exploration.
 
         Args:
             exploration: ExplorationModel. The exploration model from which the
                 dict will be created.
 
         Returns:
-            ContentIdToVoiceoverMappingType. A dictionary with content IDs as
-            keys and nested dicts as values. Each nested dict contains language
-            codes as keys and a 2-tuple as values. The 2-tuple contains voice
-            artist ID as the first element and VoiceoverDict as the second
-            element.
+            *. A 2-tuple with the following elements:
+            - dict(str, list(str)). A dictionary containing content IDs as keys
+            and a list of language codes as values, representing the languages
+            available in the latest version of the provided exploration.
+            - int. The number of remaining voice artists that need to be
+            identified for voiceovers in the latest version of exploration.
         """
+        # The number of voice artists that need to be identified for voiceovers
+        # in the latest version of exploration.
+        voice_artist_for_identification = 0
 
-        content_id_to_voiceovers_mapping: (
-            voiceover_models.ContentIdToVoiceoverMappingType) = {}
+        latest_content_id_to_language_codes: Dict[str, List[str]] = {}
         for state in exploration.states.values():
             voiceover_mapping = (
                 state['recorded_voiceovers']['voiceovers_mapping']
@@ -225,114 +247,102 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             for content_id, lang_code_to_voiceovers in (
                     voiceover_mapping.items()):
 
-                content_id_to_voiceovers_mapping[content_id] = {}
+                for lang_code in lang_code_to_voiceovers:
 
-                for lang_code, voiceover_dict in (
-                        lang_code_to_voiceovers.items()):
+                    if content_id not in latest_content_id_to_language_codes:
+                        latest_content_id_to_language_codes[content_id] = []
 
-                    # Empty strings will be assigned as the voice artist name is
-                    # currently unknown, but it will be updated during iteration
-                    # on snapshot models.
-                    content_id_to_voiceovers_mapping[content_id][lang_code] = (
-                        '', voiceover_dict
-                    )
-        return content_id_to_voiceovers_mapping
+                    latest_content_id_to_language_codes[content_id].append(
+                        lang_code)
+                    voice_artist_for_identification += 1
+
+        return (
+            latest_content_id_to_language_codes,
+            voice_artist_for_identification
+        )
 
     def update_content_id_to_voiceovers_mapping(
         self,
+        latest_content_id_to_language_codes: Dict[str, List[str]],
         content_id_to_voiceovers_mapping: (
             voiceover_models.ContentIdToVoiceoverMappingType),
+        remaining_voice_artist_for_identification: int,
         voiceover_mapping: voiceover_models.VoiceoverMappingType,
         voice_artist_id: str
     ) -> voiceover_models.ContentIdToVoiceoverMappingType:
-        """The method updates the dictionary associated with the latest content
-        of the provided exploration and assigns it to the respective voice
-        artists after iterating through exploration snapshot models.
+        """The function iterates through voiceover mapping dictionaries, adding
+        the voice artist ID and voiceover to the
+        `content_id_to_voiceovers_mapping` if both the content ID and language
+        code are found in the `latest_content_id_to_language_codes`.
 
         Args:
+            latest_content_id_to_language_codes: dict(str, list(str)). A
+                dictionary with content IDs as keys and a list of language codes
+                as values, representing the languages available in the latest
+                version of the provided exploration.
             content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType.
                 A dictionary with content IDs as keys and nested dicts as
                 values. Each nested dict contains language codes as keys and
                 a 2-tuple as values. The 2-tuple contains voice artist ID as
                 the first element and VoiceoverDict as the second element.
+            remaining_voice_artist_for_identification: int. The number of
+                remaining voice artists that still need to be identified for
+                voiceovers in the latest version of exploration.
             voiceover_mapping: VoiceoverMappingType. A dictionary maps content
                 IDs as keys and nested dicts as values. Each nested dict
                 contains language codes as keys and voiceover dicts as values.
-                The dictionary representing the difference between the old and
-                new values of the recorded voiceover.
             voice_artist_id: str. The voice artist ID for the given voiceover
                 mapping.
 
         Returns:
-            ContentIdToVoiceoverMappingType. A dictionary with content IDs as
+            *. A 2-tuple with the following elements:
+            - ContentIdToVoiceoverMappingType. A dictionary with content IDs as
             keys and nested dicts as values. Each nested dict contains language
             codes as keys and a 2-tuple as values. The 2-tuple contains voice
             artist ID as the first element and VoiceoverDict as the second
             element.
+            - int. The number of remaining voice artists that still need to be
+            identified for voiceovers in the latest version of exploration.
         """
 
         for content_id, lang_code_to_voiceovers in voiceover_mapping.items():
 
-            # If some old commit models contain voiceovers for
+            # If some old exploration commit contain voiceovers for
             # contents that are not part of the current version,
             # then we should skip the content.
-            if content_id not in content_id_to_voiceovers_mapping:
+            if content_id not in latest_content_id_to_language_codes:
                 continue
+
+            if content_id not in content_id_to_voiceovers_mapping:
+                content_id_to_voiceovers_mapping[content_id] = {}
 
             for lang_code, voiceover_dict in lang_code_to_voiceovers.items():
 
-                # If some old commit models contain voiceovers in
+                # If some old exploration commit contain voiceovers in
                 # languages that are not part of the current version,
                 # then we should skip the language.
                 if lang_code not in (
-                    content_id_to_voiceovers_mapping[content_id]
+                    latest_content_id_to_language_codes[content_id]
                 ):
                     continue
 
-                # If the voice artist ID for the specified language code is
-                # non-empty, then we should skip it, as we are iterating through
-                # snapshot models in reverse order, meaning that in earlier
-                # versions, the voice artist ID would have already been added.
-                user_id = (
-                    content_id_to_voiceovers_mapping[content_id][lang_code][0])
-                if user_id != '':
+                # If a language code already exists in the
+                # content_id_to_voiceovers_mapping, this indicates that the
+                # voice artist for the respective content has already been
+                # identified, and thus we can skip this step.
+                if lang_code in content_id_to_voiceovers_mapping[content_id]:
                     continue
 
                 content_id_to_voiceovers_mapping[content_id][lang_code] = (
                     voice_artist_id, voiceover_dict)
 
-        return content_id_to_voiceovers_mapping
+                # Decrementing the remaining voice artist count since a voice
+                # artist has been identified in this step.
+                remaining_voice_artist_for_identification -= 1
 
-    def exploration_voiceover_is_completely_filled(
-        self,
-        content_id_to_voiceovers_mapping: (
-            voiceover_models.ContentIdToVoiceoverMappingType)
-    ) -> bool:
-        """The method is to check whether all the contents of the latest
-        exploration are mapped to their corresponding voice artist IDs who have
-        contributed to the respective voiceovers.
-
-        Args:
-            content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType.
-                A dictionary with content IDs as keys and nested dicts as
-                values. Each nested dict contains language codes as keys and
-                a 2-tuple as values. The 2-tuple contains voice artist ID as
-                the first element and VoiceoverDict as the second element.
-
-        Returns:
-            bool. A boolean value representing whether all the contents are
-            mapped with the corresponding voiceo artists.
-        """
-        for content_id, lang_code_to_voiceovers in (
-            content_id_to_voiceovers_mapping.items()
-        ):
-            for lang_code in lang_code_to_voiceovers:
-
-                user_id = (
-                    content_id_to_voiceovers_mapping[content_id][lang_code][0])
-                if user_id == '':
-                    return False
-        return True
+        return (
+            content_id_to_voiceovers_mapping,
+            remaining_voice_artist_for_identification)
 
     def get_exploration_voice_artists_link_model(
         self,
@@ -365,8 +375,21 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         k = lambda model: model.id
         snapshot_models.sort(key=k, reverse=True)
 
-        content_id_to_voiceovers_mapping = (
-            self.get_content_id_to_voice_artist_mapping(exploration_model))
+        # The number of remaining voice artists that still need to be
+        # identified for voiceovers in the latest version of exploration.
+        remaining_voice_artist_for_identification: int = 0
+
+        (
+            latest_content_id_to_language_codes,
+            remaining_voice_artist_for_identification
+        ) = (
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_latest_content_ids_and_voice_artist_count(
+                exploration_model)
+        )
+
+        content_id_to_voiceovers_mapping: (
+            voiceover_models.ContentIdToVoiceoverMappingType) = {}
 
         for index, new_snapshot_model in enumerate(snapshot_models[:-1]):
             old_snapshot_model = snapshot_models[index + 1]
@@ -374,34 +397,39 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             voiceover_mapping_diff = self.get_voiceover_diff(
                 new_snapshot_model, old_snapshot_model)
 
-            # If the voiceover mapping difference dictionary is empty, it
+            # If the voiceover mapping difference dictionary is empty, this
             # indicates that no voiceover-related changes were made during the
             # commit, and thus this part can be skipped.
             if not bool(voiceover_mapping_diff):
                 continue
 
-            voice_artist_id = self.get_user_id_for_given_snapshot(
-                new_snapshot_model.id)
+            try:
+                voice_artist_id = self.get_user_id_for_given_snapshot(
+                    new_snapshot_model.id)
 
-            # If the voice artist ID is empty, this means the exploration
-            # snapshot metadata model for the given commit does not exist.
-            if voice_artist_id == '':
-                continue
+                # Once all voice artists for the latest exploration version are
+                # identified, further iteration over the remaining unexplored
+                # snapshot models can be avoided.
+                if remaining_voice_artist_for_identification == 0:
+                    break
 
-            # If all exploration voiceover data is present, we can avoid
-            # iterating over the remaining unexplored snapshot models.
-            if self.exploration_voiceover_is_completely_filled(
-                content_id_to_voiceovers_mapping
-            ):
-                break
-
-            content_id_to_voiceovers_mapping = (
-                self.update_content_id_to_voiceovers_mapping(
+                (
                     content_id_to_voiceovers_mapping,
-                    voiceover_mapping_diff,
-                    voice_artist_id
+                    remaining_voice_artist_for_identification
+                ) = (
+                    self.update_content_id_to_voiceovers_mapping(
+                        latest_content_id_to_language_codes,
+                        content_id_to_voiceovers_mapping,
+                        remaining_voice_artist_for_identification,
+                        voiceover_mapping_diff,
+                        voice_artist_id
+                    )
                 )
-            )
+
+            except Exception:
+                # If exception is raised, this means the exploration
+                # snapshot metadata model for the given commit does not exist.
+                continue
 
         with datastore_services.get_ndb_context():
             exploration_voice_artists_link_model = (
@@ -431,6 +459,13 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         return snapshot_model_id.split('-')[0]
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results for the exploration for which an
+        exploration voice artist link model has been generated.
+
+        Returns:
+            PCollection. A PCollection of results for the exploration for
+            which an exploration voice artist link model has been generated.
+        """
         exploration_models = (
             self.pipeline
             | 'Get exploration models' >> ndb_io.GetModels(
@@ -457,8 +492,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             exploration_snapshot_models
             | 'Pair Exploration snapshot ID to model' >> beam.Map(
                 lambda model: (
-                    self.extract_exploration_id_from_snapshot_id(
-                        model.id), model
+                    self.extract_exploration_id_from_snapshot_id(model.id),
+                    model
                 )
             )
         )
@@ -484,8 +519,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             exploration_voice_artist_link_models
             | 'Get the result for models' >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'Generated exploration voice artist link for %s.' %
-                    model.id
+                    'Generated exploration voice artist link for '
+                    'exploration %s.' % model.id
                 )
             )
         )

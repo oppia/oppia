@@ -221,8 +221,11 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     Instances of this class are keyed by the user ID.
     """
 
-    # Dictionary mapping codes as keys and language acccent codes as values.
-    language_code_to_accent = datastore_services.JsonProperty(required=True)
+    # A dictionary that maps language codes to accent codes. This field
+    # indicates the languages and corresponding accents in which the specified
+    # voice artist has provided voiceovers for curated explorations.
+    language_code_to_accent = datastore_services.JsonProperty(
+        default={}, indexed=False, required=True)
 
     @classmethod
     def has_reference_to_user_id(cls, voice_artist_id: str) -> bool:
@@ -252,17 +255,15 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """The model contains data corresponding to a user: user_id and their
-        provided language code for in which they contributed to voiceovers,
-        but it isn't deleted because the language code is needed to
-        classify voiceovers.
+        provided language code for in which they contributed to voiceovers.
         """
-        return base_models.DELETION_POLICY.KEEP
+        return base_models.DELETION_POLICY.DELETE
 
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model contain user ID of voice artist and their provided
-        voiceovers metadata.
+        """The model contains the user ID of the voice artist and the language
+        code and accent code in which they provided voiceovers.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
 
@@ -326,7 +327,7 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
 
 
 class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
-    """The model links the exploration's latest contents IDs and the voice
+    """The model links the exploration's latest content IDs and the voice
     artist ID who contributed voiceovers in the given language code.
     Instances of this class are keyed by the exploration ID.
     """
@@ -340,7 +341,11 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model contains data corresponding to a user to export."""
+        """The model contains data corresponding to a user, but this isn't
+        exported because the exploration voice artist link model stores the
+        content IDs, language codes, and voiceover dicts for which they have
+        contributed voiceovers and are not relevant to the user for Takeout.
+        """
         return dict(
             super(
                 ExplorationVoiceArtistsLinkModel, cls
@@ -352,17 +357,16 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """The model contains data corresponding to a user: user_id and their
-        provided voiceover data, but it isn't deleted because the voiceover
-        data is needed to classify voiceovers.
-        """
-        return base_models.DELETION_POLICY.KEEP
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user(
     ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model contain user ID of voice artist and their provided
-        exploration voice artist link model.
+        """The model contains data corresponding to a user, but this isn't
+        exported because the exploration voice artist link model stores the
+        content IDs, language codes, and voiceover dicts for which they have
+        contributed voiceovers and are not relevant to the user for Takeout.
         """
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 

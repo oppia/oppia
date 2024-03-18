@@ -258,7 +258,11 @@ def create_exploration_voice_artists_link_model_instance(
     content_id_to_voiceovers_mapping: (
         voiceover_models.ContentIdToVoiceoverMappingType)
 ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
-    """The method creates a ExplorationVoiceArtistsLinkModel instance.
+    """This method instantiates an ExplorationVoiceArtistsLinkModel,
+    establishing a link between the latest content IDs within an exploration
+    and the corresponding voice artist IDs who provided voiceovers in the
+    specified language code. Instances of this class are keyed by the
+    exploration ID.
 
     Args:
         exploration_id: str. The ID of the exploration for which new model will
