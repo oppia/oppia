@@ -30,7 +30,7 @@ from typing import List
 from . import check_for_unresolved_todos
 
 
-# TODO(#19755): Testing.
+# TODO(#7): Testing.
 class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
     """Unit tests for testing the check_for_unresolved_todos script."""
 
