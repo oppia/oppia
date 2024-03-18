@@ -24,18 +24,13 @@ import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ContributorDashboardAdminStatsBackendApiService} from '../services/contributor-dashboard-admin-stats-backend-api.service';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
 import {
-  ContributionAttribute,
-  FormatContributionAttributesService,
-} from '../services/format-contribution-attributes.service';
+  ContributorAttribute,
+  FormatContributorAttributesService,
+} from '../services/format-contributor-attributes.service';
 import {ContributorAdminDashboardFilter} from '../contributor-admin-dashboard-filter.model';
 import {AppConstants} from 'app.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {
-  QuestionReviewerStats,
-  QuestionSubmitterStats,
-  TranslationReviewerStats,
-  TranslationSubmitterStats,
-} from '../contributor-dashboard-admin-summary.model';
+import {ContributorStats} from '../contributor-dashboard-admin-summary.model';
 import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
@@ -80,22 +75,12 @@ export class ContributorAdminStatsTable implements OnInit {
 
   columnsToDisplay: string[] = [];
 
-  dataSource:
-    | TranslationSubmitterStats[]
-    | TranslationReviewerStats[]
-    | QuestionSubmitterStats[]
-    | QuestionReviewerStats[] = [];
+  dataSource: ContributorStats[] = [];
 
   nextOffset: number = 0;
   more: boolean = true;
 
-  expandedElement:
-    | TranslationSubmitterStats[]
-    | TranslationReviewerStats[]
-    | QuestionSubmitterStats[]
-    | QuestionReviewerStats[]
-    | null
-    | [] = null;
+  expandedElement: ContributorStats[] | null | [] = null;
 
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
@@ -116,7 +101,7 @@ export class ContributorAdminStatsTable implements OnInit {
     private windowRef: WindowRef,
     private ContributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
     private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
-    private formatContributionAttributesService: FormatContributionAttributesService,
+    private formatContributorAttributesService: FormatContributorAttributesService,
     private modalService: NgbModal
   ) {}
 
@@ -195,15 +180,12 @@ export class ContributorAdminStatsTable implements OnInit {
     return contributionCount;
   }
 
-  getFormattedContributionAttributes(
-    element:
-      | TranslationSubmitterStats
-      | TranslationReviewerStats
-      | QuestionSubmitterStats
-      | QuestionReviewerStats
-  ): ContributionAttribute[] {
-    return this.formatContributionAttributesService.getContributionAttributes(
-      element
+  getFormattedContributorAttributes(
+    contributorStats: ContributorStats
+  ): ContributorAttribute[] {
+    return contributorStats.getContributorAttributes(
+      contributorStats,
+      this.formatContributorAttributesService
     );
   }
 

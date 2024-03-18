@@ -22,6 +22,16 @@ import {
   QuestionSubmitterBackendDict,
   QuestionReviewerBackendDict,
 } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import {
+  ContributorAttribute,
+  FormatContributorAttributesService,
+} from './services/format-contributor-attributes.service';
+
+export type ContributorStats =
+  | TranslationSubmitterStats
+  | TranslationReviewerStats
+  | QuestionSubmitterStats
+  | QuestionReviewerStats;
 
 export class TranslationSubmitterStats {
   constructor(
@@ -61,6 +71,15 @@ export class TranslationSubmitterStats {
       summaryDict.last_contributed_in_days
     );
   }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats,
+    formatContributorAttributesService: FormatContributorAttributesService
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getTranslationSubmitterContributorAttributes(
+      contributorStats as TranslationSubmitterStats
+    );
+  }
 }
 
 export class TranslationReviewerStats {
@@ -91,6 +110,15 @@ export class TranslationReviewerStats {
       summaryDict.rejected_translations_count,
       summaryDict.first_contribution_date,
       summaryDict.last_contributed_in_days
+    );
+  }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats,
+    formatContributorAttributesService: FormatContributorAttributesService
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getTranslationReviewerContributorAttributes(
+      contributorStats as TranslationReviewerStats
     );
   }
 }
@@ -125,6 +153,15 @@ export class QuestionSubmitterStats {
       summaryDict.last_contributed_in_days
     );
   }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats,
+    formatContributorAttributesService: FormatContributorAttributesService
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getQuestionSubmitterContributorAttributes(
+      contributorStats as QuestionSubmitterStats
+    );
+  }
 }
 
 export class QuestionReviewerStats {
@@ -151,6 +188,15 @@ export class QuestionReviewerStats {
       summaryDict.rejected_questions_count,
       summaryDict.first_contribution_date,
       summaryDict.last_contributed_in_days
+    );
+  }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats,
+    formatContributorAttributesService: FormatContributorAttributesService
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getQuestionReviewerContributorAttributes(
+      contributorStats as QuestionReviewerStats
     );
   }
 }

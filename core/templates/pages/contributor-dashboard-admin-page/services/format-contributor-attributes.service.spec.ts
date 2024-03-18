@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for format contribution attributes service
  */
 
-import {FormatContributionAttributesService} from './format-contribution-attributes.service';
+import {FormatContributorAttributesService} from './format-contributor-attributes.service';
 import {
   QuestionReviewerStats,
   QuestionSubmitterStats,
@@ -25,8 +25,8 @@ import {
 } from '../contributor-dashboard-admin-summary.model';
 
 describe('Format contribution attributes service', () => {
-  let formatContributionAttributesService: FormatContributionAttributesService =
-    new FormatContributionAttributesService();
+  let formatContributionAttributesService: FormatContributorAttributesService =
+    new FormatContributorAttributesService();
 
   let translationSubmitterStats: TranslationSubmitterStats =
     new TranslationSubmitterStats(
@@ -86,112 +86,112 @@ describe('Format contribution attributes service', () => {
   describe('when displaying the stats table', () => {
     it('should return the translation submitter stats attributes correctly', () => {
       expect(
-        formatContributionAttributesService.getContributionAttributes(
+        formatContributionAttributesService.getTranslationSubmitterContributorAttributes(
           translationSubmitterStats
         )
       ).toEqual([
         {
           key: 'Date Joined',
-          value: 'firstcontributiondate',
+          displayText: 'firstcontributiondate',
         },
         {
           key: 'Submitted Translations',
-          value: '3 cards, 4 words',
+          displayText: '3 cards, 4 words',
         },
         {
           key: 'Accepted Translations',
-          value: '5 cards (6 without edits), 7 words',
+          displayText: '5 cards (6 without edits), 7 words',
         },
         {
           key: 'Rejected Translations',
-          value: '8 cards, 9 words',
+          displayText: '8 cards, 9 words',
         },
         {
           key: 'Active Topics',
-          value: 'topic1, topic2',
+          displayText: 'topic1, topic2',
         },
       ]);
     });
 
     it('should return the translation reviewer stats attributes correctly', () => {
       expect(
-        formatContributionAttributesService.getContributionAttributes(
+        formatContributionAttributesService.getTranslationReviewerContributorAttributes(
           translationReviewerStats
         )
       ).toEqual([
         {
           key: 'Date Joined',
-          value: 'firstcontributiondate',
+          displayText: 'firstcontributiondate',
         },
         {
           key: 'Accepted Translations',
-          value: '1 card (3 edited), 4 words',
+          displayText: '1 card (3 edited), 4 words',
         },
         {
           key: 'Rejected Translations',
-          value: '5 cards',
+          displayText: '5 cards',
         },
         {
           key: 'Active Topics',
-          value: 'topic1, topic2',
+          displayText: 'topic1, topic2',
         },
       ]);
     });
 
     it('should return the question submitter stats attributes correctly', () => {
       expect(
-        formatContributionAttributesService.getContributionAttributes(
+        formatContributionAttributesService.getQuestionSubmitterContributorAttributes(
           questionSubmitterStats
         )
       ).toEqual([
         {
           key: 'Date Joined',
-          value: 'firstcontributiondate',
+          displayText: 'firstcontributiondate',
         },
         {
           key: 'Submitted Questions',
-          value: '1 card',
+          displayText: '1 card',
         },
         {
           key: 'Accepted Questions',
-          value: '3 cards (4 without edits)',
+          displayText: '3 cards (4 without edits)',
         },
         {
           key: 'Rejected Questions',
-          value: '5 cards',
+          displayText: '5 cards',
         },
         {
           key: 'Active Topics',
-          value: 'topic1, topic2',
+          displayText: 'topic1, topic2',
         },
       ]);
     });
 
     it('should return the question reviewer stats attributes correctly', () => {
       expect(
-        formatContributionAttributesService.getContributionAttributes(
+        formatContributionAttributesService.getQuestionReviewerContributorAttributes(
           questionReviewerStats
         )
       ).toEqual([
         {
           key: 'Date Joined',
-          value: 'firstcontributiondate',
+          displayText: 'firstcontributiondate',
         },
         {
           key: 'Reviewed Questions',
-          value: '2',
+          displayText: '2',
         },
         {
           key: 'Accepted Questions',
-          value: '1 card (4 edited)',
+          displayText: '1 card (4 edited)',
         },
         {
           key: 'Rejected Questions',
-          value: '6 cards',
+          displayText: '6 cards',
         },
         {
           key: 'Active Topics',
-          value: 'topic1, topic2',
+          displayText: 'topic1, topic2',
         },
       ]);
     });

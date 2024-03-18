@@ -143,11 +143,11 @@
           <div class="details-container">
             <div class="details-sub-container">
               <div class="attribute-container"
-              *ngFor="let attribute of getFormattedContributionAttributes(element)">
+              *ngFor="let attribute of getFormattedContributorAttributes(element)">
                 <div class="attribute-sub-container">
                   <div class="attribute-key">{{attribute.key}}</div>
                   <div class="attribute-value">
-                      {{attribute.value}}
+                      {{attribute.displayText}}
                   </div>
                 </div>
               </div>
