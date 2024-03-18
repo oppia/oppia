@@ -323,7 +323,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a story for a certain topic.
    */
-  async createStory(): Promise<void> {
+  async createAndPublishStoryWithChapter(explorationId: string): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, 'Test Story 1');
@@ -337,6 +337,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.clickAfterWaiting(createStoryButton);
+
+    await this.createChapter(explorationId);
+    await this.publishStory();
   }
 
   /**
