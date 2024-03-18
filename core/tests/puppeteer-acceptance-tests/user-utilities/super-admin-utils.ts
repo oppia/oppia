@@ -62,11 +62,11 @@ export class SuperAdmin extends BaseUser {
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
-    const userRoles = await this.page.$$('.oppia-user-role-description');
-    for (let i = 0; i < userRoles.length; i++) {
+    const userRoleElements = await this.page.$$('.oppia-user-role-description');
+    for (let i = 0; i < userRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
-        (role: HTMLElement) => role.innerText,
-        userRoles[i]
+        (element: HTMLElement) => element.innerText,
+        userRoleElements[i]
       );
       if (roleText.toLowerCase() === role) {
         showMessage(`User ${username} has the ${role} role!`);
@@ -86,11 +86,11 @@ export class SuperAdmin extends BaseUser {
     await this.type(roleEditorInputField, username);
     await this.clickOn(roleEditorButtonSelector);
     await this.page.waitForSelector('div.justify-content-between');
-    const userRoles = await this.page.$$('.oppia-user-role-description');
-    for (let i = 0; i < userRoles.length; i++) {
+    const userRoleElements = await this.page.$$('.oppia-user-role-description');
+    for (let i = 0; i < userRoleElements.length; i++) {
       const roleText = await this.page.evaluate(
-        (role: HTMLElement) => role.innerText,
-        userRoles[i]
+        (element: HTMLElement) => element.innerText,
+        userRoleElements[i]
       );
       if (roleText.toLowerCase() === role) {
         throw new Error(`User has the ${role} role!`);
