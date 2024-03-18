@@ -33,7 +33,7 @@ const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
 const addGoal = 'input.e2e-test-exploration-objective-input';
-const categoryDropDawn = '.mat-select-arrow-wrapper';
+const categoryDropDawn = 'mat-select.e2e-test-exploration-category-dropdown';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
 const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
@@ -55,7 +55,8 @@ const discardConfirmButton = '.e2e-test-confirm-discard-changes';
 const deleteConfirmButton = '.e2e-test-really-delete-exploration-button';
 const voiceArtistEditButton = '.e2e-test-edit-voice-artist-roles';
 const voiceArtistSaveButton = '.e2e-test-add-voice-artist-role-button';
-const publishConfirmButton = '.e2e-test-confirm-pre-publication';
+const saveChangesButton = '.e2e-test-confirm-pre-publication';
+const publishConfirmButton = '.e2e-test-confirm-publish';
 const commitMessage = '.e2e-test-commit-message-input';
 const closePublishedPopUp = '.e2e-test-share-publish-close';
 const addVoiceArtistUserName = '#newVoicAartistUsername';
@@ -92,10 +93,13 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating exploration intro text.
    */
   async updateExplorationIntroText(Introtext: string): Promise<void> {
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
     await this.page.waitForTimeout(500);
     await this.clickOn('div.e2e-test-state-edit-content');
-    // await this.page.waitForTimeout(500);
-    //Checking whether the function will work without this explicit timeout or not.
     await this.clickOn('div.e2e-test-rte');
     await this.type('div.e2e-test-rte', Introtext);
     await this.clickOn(introTitleSubmitButton);
@@ -168,6 +172,7 @@ export class ExplorationCreator extends BaseUser {
    * This function checks if the goal has been set in the exploration.
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
+    await this.clickOn(addGoal);
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input'
     );
@@ -214,11 +219,10 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in selecting language from dropdawn.
    */
   async selectEnglishAsLanguage(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 350);
+    });
     await this.clickOn(languageUpdateBar);
-    await this.page.waitForSelector(
-      '.e2e-test-exploration-language-selector-choice',
-      {visible: true}
-    );
     await this.clickOn('English');
   }
 
@@ -466,8 +470,9 @@ export class ExplorationCreator extends BaseUser {
       '.oppia-editor-publish-button:not([disabled])'
     );
     await this.clickOn(publishButton);
+    await this.clickOn(saveChangesButton);
+    await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
-    await this.clickOn('.e2e-test-confirm-publish');
     await this.clickOn(closePublishedPopUp);
 
     explorationUrlAfterPublished = await this.page.url();

@@ -24,16 +24,16 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Publisher, Saver and Drafter', function () {
   let explorationCreator: ExplorationCreator;
-  let explorationVisitor: ExplorationCreator;
+  // let explorationVisitor: ExplorationCreator;
   beforeAll(async function () {
     explorationCreator = await UserFactory.createNewUser(
       'explorationAdm',
       'exploration_creator@example.com'
     );
-    explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor',
-      'exploration_visitor@example.com'
-    );
+    // explorationVisitor = await UserFactory.createNewUser(
+    //   'explorationVisitor',
+    //   'exploration_visitor@example.com'
+    // );
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
@@ -51,6 +51,7 @@ describe('Exploration Publisher, Saver and Drafter', function () {
       await explorationCreator.goToSettingsTab();
       await explorationCreator.addTitle('Old Title');
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
+      await explorationCreator.expectGoalToEqual('OppiaAcceptanceTestsCheck'); //delete it after check
       await explorationCreator.selectAlgebraAsACategory();
       await explorationCreator.selectEnglishAsLanguage();
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
