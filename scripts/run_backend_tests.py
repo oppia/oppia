@@ -619,22 +619,22 @@ def main(args: Optional[List[str]] = None) -> None:
         print(report_stdout)
         if coverage != 100:
             print(
-            'WARNING: Backend test coverage is below 100%.\n'
-            'The rightmost "Missing" column above'
-            ' shows which lines uncovered.'
+                'WARNING: Backend test coverage is below 100%.\n'
+                'The rightmost "Missing" column above'
+                ' shows lines that are still uncovered.'
             )
 
             print(
-            'Please add tests for scenarios that'
-            ' exercise those lines of code\n'
-            'so that there are no uncovered lines in each file.'
+                'Please add tests for scenarios that'
+                ' exercise those lines of code\n'
+                'so that there are no uncovered lines in each file.'
             )
 
             print(
-            'For more information, please see\n'
-            '[backend tests wiki page]\n'
-            '(https://github.com/oppia/oppia/wiki/'
-            'Backend-tests#coverage-reports ).'
+                'For more information, please see our\n'
+                '[backend tests wiki page]\n'
+                '(https://github.com/oppia/oppia/wiki/'
+                'Backend-tests#coverage-reports).'
             )
 
         if (coverage != 100
@@ -643,6 +643,42 @@ def main(args: Optional[List[str]] = None) -> None:
 
     print('')
     print('Done!')
+
+
+def generate_incomplete_coverage_output(
+    coverage_output_lines: List[str]
+) -> str:
+    """Format coverage report with incomplete coverage lines.
+       separated by dashed line(--).
+
+    Args:
+        coverage_output_lines: List[str]. List of lines with
+            incomplete coverage report.
+
+    Returns:
+        str. Final coverage report with incomplete coverage lines
+        separated by a separator.
+    """
+    # Determine the coverage lines separator.
+    coverage_lines_separator = ''
+    if len(coverage_output_lines) > 1:
+        coverage_lines_separator = coverage_output_lines[1]
+
+    # Initialize the uncovered lines output.
+    uncovered_lines_output = ''
+
+    # Concatenate each uncovered line with the coverage lines separator.
+    for uncovered_line in coverage_output_lines:
+        if (uncovered_line.strip() and '-----' not in uncovered_line):
+            uncovered_lines_output += (
+                f'{uncovered_line}\n'
+                f'{coverage_lines_separator}\n'
+            )
+
+    # Remove the last separator.
+    uncovered_lines_output = uncovered_lines_output.rstrip('\n')
+
+    return uncovered_lines_output
 
 
 def check_coverage(
@@ -680,7 +716,8 @@ def check_coverage(
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
          '--omit="%s*","third_party/*","/usr/share/*"'
-         % common.OPPIA_TOOLS_DIR, '--show-missing']
+         % common.OPPIA_TOOLS_DIR, '--show-missing',
+         '--skip-covered']
     if include:
         cmd.append('--include=%s' % ','.join(include))
 
@@ -693,42 +730,10 @@ def check_coverage(
         check=False)
 
     coverage_output_lines = process.stdout.split('\n')
-    # The `process.stdout` is a string containing the coverage report,
-    # structured as follows:
-    # process_stdout_structure =
-    # Name       Stmts Miss Branch BrPart Cover Missing.
-    # -------------------------------------------------.
-    # file1.py      10    0      2      0   100%   12, 14.
-    # file2.py      20    0      4      0    90%   32, 34, 36, 38.
-    # -------------------------------------------------
-    # TOTAL        30    0      6      0   95%.
-    incomplete_coverage_lines: List[str] = []
-    # Lines with incomplete coverage are appenede to incomplete_coverage_lines.
-    for line_number, line in enumerate(coverage_output_lines):
 
-        # The line having incomplete coverage, not a dashed line(-----),
-        # and not the heading line is appended to incomplete_coverage_lines.
-
-        line_missing_full_coverage = line and (
-            ' 100%' not in line and '-----' not in line and 'Name' not in line
-        )
-        if line_missing_full_coverage:
-            # If a line indicates incomplete coverage then Heading,
-            # Followed by dashed line(----) is appended,
-            # to incomplete_coverage_lines.
-
-            if len(incomplete_coverage_lines) == 0 and line_number:
-                incomplete_coverage_lines.extend(coverage_output_lines[:2])
-
-            incomplete_coverage_lines.append(line)
-
-            # The Subsequent lines will be separated by a dashed line(-----).
-            if line_number + 1 < len(coverage_output_lines) and (
-                ' 100%' not in coverage_output_lines[line_number + 1]):
-                incomplete_coverage_lines.append(coverage_output_lines[1])
-
-    uncovered_lines_output = '\n'.join(incomplete_coverage_lines)
-
+    uncovered_lines_output = generate_incomplete_coverage_output(
+        coverage_output_lines
+    )
     if process.stdout.strip() == 'No data to report.':
         # File under test is exempt from coverage according to the
         # --omit flag or .coveragerc.
