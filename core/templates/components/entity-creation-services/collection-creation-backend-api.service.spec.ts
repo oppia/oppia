@@ -15,12 +15,13 @@
  * @fileoverview Unit test for CollectionCreationBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { CollectionCreationBackendService } from
-  'components/entity-creation-services/collection-creation-backend-api.service';
+import {CollectionCreationBackendService} from 'components/entity-creation-services/collection-creation-backend-api.service';
 
 describe('Collection Creation backend service', () => {
   let collectionCreationBackendService: CollectionCreationBackendService;
@@ -30,11 +31,12 @@ describe('Collection Creation backend service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     collectionCreationBackendService = TestBed.get(
-      CollectionCreationBackendService);
+      CollectionCreationBackendService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -42,49 +44,53 @@ describe('Collection Creation backend service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully create a new collection and obtain the collection ID',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should successfully create a new collection and obtain the collection ID', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      collectionCreationBackendService.createCollectionAsync().then(
-        successHandler, failHandler);
+    collectionCreationBackendService
+      .createCollectionAsync()
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({collection_id: SAMPLE_COLLECTION_ID});
+    let req = httpTestingController.expectOne(
+      '/collection_editor_handler/create_new'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush({collection_id: SAMPLE_COLLECTION_ID});
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should fail to create a new collection and call the fail handler',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should fail to create a new collection and call the fail handler', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      collectionCreationBackendService.createCollectionAsync().then(
-        successHandler, failHandler);
+    collectionCreationBackendService
+      .createCollectionAsync()
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/collection_editor_handler/create_new');
-      expect(req.request.method).toEqual('POST');
-      req.flush({
-        error: 'Error creating a new collection.'
-      }, {
+    let req = httpTestingController.expectOne(
+      '/collection_editor_handler/create_new'
+    );
+    expect(req.request.method).toEqual('POST');
+    req.flush(
+      {
+        error: 'Error creating a new collection.',
+      },
+      {
         status: ERROR_STATUS_CODE,
-        statusText: 'Error creating a new collection.'
-      });
+        statusText: 'Error creating a new collection.',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Error creating a new collection.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error creating a new collection.'
+    );
+  }));
 });

@@ -12,33 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for translatable html content id editor.
  */
 
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-type TranslatableHtmlContentIdEditorChoices = { val: string }[];
+type TranslatableHtmlContentIdEditorChoices = {val: string}[];
 
 @Component({
   selector: 'translatable-html-content-id-editor',
-  templateUrl: './translatable-html-content-id.component.html'
+  templateUrl: './translatable-html-content-id.component.html',
 })
-
 export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() value!: string;
-  @Input() initArgs!: { choices: TranslatableHtmlContentIdEditorChoices };
+  @Input() initArgs!: {choices: TranslatableHtmlContentIdEditorChoices};
   @Output() valueChanged = new EventEmitter();
   name!: string;
   currentValue!: string;
   choices: TranslatableHtmlContentIdEditorChoices = [];
 
-  constructor(private changeDetectorRef: ChangeDetectorRef) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.name = Math.random().toString(36).substring(7);
@@ -57,6 +62,8 @@ export class TranslatableHtmlContentIdEditorComponent implements OnInit {
   }
 }
 angular.module('oppia').directive(
-  'translatableHtmlContentIdEditor', downgradeComponent({
-    component: TranslatableHtmlContentIdEditorComponent
-  }) as angular.IDirectiveFactory);
+  'translatableHtmlContentIdEditor',
+  downgradeComponent({
+    component: TranslatableHtmlContentIdEditorComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,8 +16,7 @@
     "types": [
       "node",
       "jasmine",
-      "puppeteer",
-      "puppeteer-acceptance-tests"
+      "puppeteer"
     ],
     "lib": [
       "ES2017",

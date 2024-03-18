@@ -16,15 +16,14 @@
  * @fileoverview Component for the error page.
  */
 
-import { Component, Input } from '@angular/core';
+import {Component, Input} from '@angular/core';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'error-page',
   templateUrl: './error-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ErrorPageComponent {
   // This property is initialized using Angular lifecycle hooks
@@ -32,9 +31,7 @@ export class ErrorPageComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() statusCode!: string;
 
-  constructor(
-    private urlInterpolationService: UrlInterpolationService,
-  ) {}
+  constructor(private urlInterpolationService: UrlInterpolationService) {}
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);

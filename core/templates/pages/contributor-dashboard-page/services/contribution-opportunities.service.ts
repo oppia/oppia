@@ -16,15 +16,15 @@
  * @fileoverview A service for handling contribution opportunities in different
  * fields.
  */
-import { EventEmitter } from '@angular/core';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter} from '@angular/core';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { ContributionOpportunitiesBackendApiService } from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
-import { SkillOpportunity } from 'domain/opportunity/skill-opportunity.model';
-import { ExplorationOpportunitySummary } from 'domain/opportunity/exploration-opportunity-summary.model';
-import { LoginRequiredModalContent } from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {ContributionOpportunitiesBackendApiService} from 'pages/contributor-dashboard-page/services/contribution-opportunities-backend-api.service';
+import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
+import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
+import {LoginRequiredModalContent} from 'pages/contributor-dashboard-page/modal-templates/login-required-modal.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 export interface SkillOpportunitiesDict {
   opportunities: SkillOpportunity[];
@@ -37,21 +37,21 @@ export interface ExplorationOpportunitiesDict {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContributionOpportunitiesService {
   constructor(
-    private readonly contributionOpportunitiesBackendApiService:
-      ContributionOpportunitiesBackendApiService,
-      private readonly modalService: NgbModal) {}
+    private readonly contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService,
+    private readonly modalService: NgbModal
+  ) {}
 
   private _reloadOpportunitiesEventEmitter = new EventEmitter<void>();
   private _removeOpportunitiesEventEmitter = new EventEmitter<string[]>();
-  private _pinnedOpportunitiesChanged: EventEmitter<
-    Record<string, string>> = new EventEmitter();
+  private _pinnedOpportunitiesChanged: EventEmitter<Record<string, string>> =
+    new EventEmitter();
 
-  private _unpinnedOpportunitiesChanged: EventEmitter<
-    Record<string, string>> = new EventEmitter();
+  private _unpinnedOpportunitiesChanged: EventEmitter<Record<string, string>> =
+    new EventEmitter();
   // These properties are initialized using async methods
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -63,37 +63,40 @@ export class ContributionOpportunitiesService {
   private _moreTranslationOpportunitiesAvailable: boolean = true;
   private _moreVoiceoverOpportunitiesAvailable: boolean = true;
 
-  private async _getSkillOpportunitiesAsync(cursor: string):
-  Promise<SkillOpportunitiesDict> {
+  private async _getSkillOpportunitiesAsync(
+    cursor: string
+  ): Promise<SkillOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchSkillOpportunitiesAsync(cursor)
-      .then(({ opportunities, nextCursor, more }) => {
+      .then(({opportunities, nextCursor, more}) => {
         this._skillOpportunitiesCursor = nextCursor;
         this._moreSkillOpportunitiesAvailable = more;
         return {
           opportunities: opportunities,
-          more: more
+          more: more,
         };
       });
   }
 
   private async _getTranslationOpportunitiesAsync(
-      languageCode: string, topicName: string, cursor: string) {
+    languageCode: string,
+    topicName: string,
+    cursor: string
+  ) {
     return this.contributionOpportunitiesBackendApiService
       .fetchTranslationOpportunitiesAsync(languageCode, topicName, cursor)
-      .then(({ opportunities, nextCursor, more }) => {
+      .then(({opportunities, nextCursor, more}) => {
         this._translationOpportunitiesCursor = nextCursor;
         this._moreTranslationOpportunitiesAvailable = more;
         return {
           opportunities: opportunities,
-          more: more
+          more: more,
         };
       });
   }
 
   private async _getTranslatableTopicNamesAsync() {
-    return this.contributionOpportunitiesBackendApiService
-      .fetchTranslatableTopicNamesAsync();
+    return this.contributionOpportunitiesBackendApiService.fetchTranslatableTopicNamesAsync();
   }
 
   showRequiresLoginModal(): void {
@@ -105,14 +108,13 @@ export class ContributionOpportunitiesService {
   }
 
   async getTranslationOpportunitiesAsync(
-      languageCode: string, topicName: string):
-  Promise<ExplorationOpportunitiesDict> {
-    return this._getTranslationOpportunitiesAsync(
-      languageCode, topicName, '');
+    languageCode: string,
+    topicName: string
+  ): Promise<ExplorationOpportunitiesDict> {
+    return this._getTranslationOpportunitiesAsync(languageCode, topicName, '');
   }
 
-  async getMoreSkillOpportunitiesAsync():
-      Promise<SkillOpportunitiesDict> {
+  async getMoreSkillOpportunitiesAsync(): Promise<SkillOpportunitiesDict> {
     if (this._moreSkillOpportunitiesAvailable) {
       return this._getSkillOpportunitiesAsync(this._skillOpportunitiesCursor);
     }
@@ -120,25 +122,29 @@ export class ContributionOpportunitiesService {
   }
 
   async getMoreTranslationOpportunitiesAsync(
-      languageCode: string, topicName: string):
-  Promise<ExplorationOpportunitiesDict> {
+    languageCode: string,
+    topicName: string
+  ): Promise<ExplorationOpportunitiesDict> {
     if (this._moreTranslationOpportunitiesAvailable) {
       return this._getTranslationOpportunitiesAsync(
-        languageCode, topicName, this._translationOpportunitiesCursor);
+        languageCode,
+        topicName,
+        this._translationOpportunitiesCursor
+      );
     }
     throw new Error('No more translation opportunities available.');
   }
 
   async getReviewableTranslationOpportunitiesAsync(
-      topicName: string,
-      languageCode?: string):
-  Promise<ExplorationOpportunitiesDict> {
+    topicName: string,
+    languageCode?: string
+  ): Promise<ExplorationOpportunitiesDict> {
     return this.contributionOpportunitiesBackendApiService
       .fetchReviewableTranslationOpportunitiesAsync(topicName, languageCode)
-      .then(({ opportunities }) => {
+      .then(({opportunities}) => {
         return {
           opportunities: opportunities,
-          more: false
+          more: false,
         };
       });
   }
@@ -152,47 +158,54 @@ export class ContributionOpportunitiesService {
   }
 
   async pinReviewableTranslationOpportunityAsync(
-      topicName: string,
-      languageCode: string,
-      explorationId: string):
-    Promise<void> {
-    this.pinnedOpportunitiesChanged.emit(
-      {topicName, languageCode, explorationId});
-    return this.contributionOpportunitiesBackendApiService
-      .pinTranslationOpportunity(
-        languageCode,
-        topicName,
-        explorationId);
+    topicName: string,
+    languageCode: string,
+    explorationId: string
+  ): Promise<void> {
+    this.pinnedOpportunitiesChanged.emit({
+      topicName,
+      languageCode,
+      explorationId,
+    });
+    return this.contributionOpportunitiesBackendApiService.pinTranslationOpportunity(
+      languageCode,
+      topicName,
+      explorationId
+    );
   }
 
   async unpinReviewableTranslationOpportunityAsync(
-      topicName: string,
-      languageCode: string,
-      explorationId: string):
-  Promise<void> {
-    this.unpinnedOpportunitiesChanged.emit(
-      {topicName, languageCode, explorationId});
-    return this.contributionOpportunitiesBackendApiService
-      .unpinTranslationOpportunity(
-        languageCode,
-        topicName);
+    topicName: string,
+    languageCode: string,
+    explorationId: string
+  ): Promise<void> {
+    this.unpinnedOpportunitiesChanged.emit({
+      topicName,
+      languageCode,
+      explorationId,
+    });
+    return this.contributionOpportunitiesBackendApiService.unpinTranslationOpportunity(
+      languageCode,
+      topicName
+    );
   }
 
   get removeOpportunitiesEventEmitter(): EventEmitter<string[]> {
     return this._removeOpportunitiesEventEmitter;
   }
 
-  get pinnedOpportunitiesChanged(): EventEmitter<
-  Record<string, string>> {
+  get pinnedOpportunitiesChanged(): EventEmitter<Record<string, string>> {
     return this._pinnedOpportunitiesChanged;
   }
 
-  get unpinnedOpportunitiesChanged(): EventEmitter<
-  Record<string, string>> {
+  get unpinnedOpportunitiesChanged(): EventEmitter<Record<string, string>> {
     return this._unpinnedOpportunitiesChanged;
   }
 }
 
-angular.module('oppia').factory(
-  'ContributionOpportunitiesService',
-  downgradeInjectable(ContributionOpportunitiesService));
+angular
+  .module('oppia')
+  .factory(
+    'ContributionOpportunitiesService',
+    downgradeInjectable(ContributionOpportunitiesService)
+  );

@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the learner group preferences modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { LearnerGroupPreferencesModalComponent } from './learner-group-preferences-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {LearnerGroupPreferencesModalComponent} from './learner-group-preferences-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,27 +33,32 @@ class MockActiveModal {
   }
 }
 
-describe('Learner Group Preferences Modal Component', function() {
+describe('Learner Group Preferences Modal Component', function () {
   let component: LearnerGroupPreferencesModalComponent;
   let ngbActiveModal: NgbActiveModal;
   let fixture: ComponentFixture<LearnerGroupPreferencesModalComponent>;
 
   const learnerGroup = new LearnerGroupData(
-    'groupId', 'title', 'description', ['facilitator_username'],
-    ['username2'], ['username1'], ['subtopic_page_id'], []
+    'groupId',
+    'title',
+    'description',
+    ['facilitator_username'],
+    ['username2'],
+    ['username1'],
+    ['subtopic_page_id'],
+    []
   );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        LearnerGroupPreferencesModalComponent,
-        MockTranslatePipe
+      declarations: [LearnerGroupPreferencesModalComponent, MockTranslatePipe],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -77,7 +81,7 @@ describe('Learner Group Preferences Modal Component', function() {
     component.confirm();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      progressSharingPermission: component.progressSharingPermission
+      progressSharingPermission: component.progressSharingPermission,
     });
   });
 

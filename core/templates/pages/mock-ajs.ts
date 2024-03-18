@@ -28,7 +28,7 @@
 
 // TODO(#13080): Remove the mock-ajs.ts file after the migration is complete.
 
-import { VERSION } from '@angular/core';
+import {VERSION} from '@angular/core';
 
 let mockAngular = {
   $$minErr: () => mockAngular,
@@ -46,7 +46,7 @@ let mockAngular = {
   run: () => mockAngular,
   service: () => mockAngular,
   value: () => mockAngular,
-  version: VERSION
+  version: VERSION,
 };
 
 // This throws "Property 'angular' does not exist on type 'Window & typeof

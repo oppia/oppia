@@ -16,13 +16,14 @@
  * @fileoverview Unit tests for StateInteractionStatsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { StateInteractionStatsBackendApiService } from
-  'domain/exploration/state-interaction-stats-backend-api.service';
-import { VisualizationInfo } from 'domain/exploration/visualization-info.model';
+import {StateInteractionStatsBackendApiService} from 'domain/exploration/state-interaction-stats-backend-api.service';
+import {VisualizationInfo} from 'domain/exploration/visualization-info.model';
 
 describe('State interaction stats backend api service', () => {
   let sisbas: StateInteractionStatsBackendApiService;
@@ -30,7 +31,7 @@ describe('State interaction stats backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     sisbas = TestBed.get(StateInteractionStatsBackendApiService);
@@ -43,53 +44,62 @@ describe('State interaction stats backend api service', () => {
 
   it('should correctly fetch stats', fakeAsync(() => {
     let backendResposne = {
-      visualizations_info: [{
-        addressed_info_is_supported: true,
-        data: [{
-          answer: 'hello',
-          frequency: 0,
-          is_addressed: false
-        }],
-        id: 'testId',
-        options: {}
-      }]
+      visualizations_info: [
+        {
+          addressed_info_is_supported: true,
+          data: [
+            {
+              answer: 'hello',
+              frequency: 0,
+              is_addressed: false,
+            },
+          ],
+          id: 'testId',
+          options: {},
+        },
+      ],
     };
 
     let expectedObjects = backendResposne.visualizations_info.map(
-      VisualizationInfo.createFromBackendDict);
+      VisualizationInfo.createFromBackendDict
+    );
 
-    sisbas.getStatsAsync('expId', 'Intro').then((vizInfo) => {
+    sisbas.getStatsAsync('expId', 'Intro').then(vizInfo => {
       expect(vizInfo).toEqual(expectedObjects);
     });
 
     let req = httpTestingController.expectOne(
-      '/createhandler/state_interaction_stats/expId/Intro');
+      '/createhandler/state_interaction_stats/expId/Intro'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush(backendResposne);
 
     flushMicrotasks();
   }));
 
-  it('should use the rejection handler if the backend request failed.',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend request failed.', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      sisbas.getStatsAsync('expId', 'Intro').then(successHandler, failHandler);
+    sisbas.getStatsAsync('expId', 'Intro').then(successHandler, failHandler);
 
-      var req = httpTestingController.expectOne(
-        '/createhandler/state_interaction_stats/expId/Intro');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
+    var req = httpTestingController.expectOne(
+      '/createhandler/state_interaction_stats/expId/Intro'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
 });

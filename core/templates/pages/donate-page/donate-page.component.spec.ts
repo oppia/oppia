@@ -16,16 +16,16 @@
  * @fileoverview Unit tests for donate page.
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 
-import { DonatePageComponent } from './donate-page.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
-import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
+import {DonatePageComponent} from './donate-page.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
+import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
 
 class MockWindowRef {
   _window = {
@@ -38,10 +38,10 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val: string) => {}
+      replace: (val: string) => {},
     },
     gtag: () => {},
-    onhashchange: () => {}
+    onhashchange: () => {},
   };
 
   get nativeWindow() {
@@ -59,15 +59,12 @@ describe('Donate page', () => {
   beforeEach(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      declarations: [
-        DonatePageComponent,
-        MockTranslatePipe
-      ],
+      declarations: [DonatePageComponent, MockTranslatePipe],
       providers: [
         UrlInterpolationService,
-        { provide: WindowRef, useValue: windowRef },
+        {provide: WindowRef, useValue: windowRef},
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   });
 
@@ -85,7 +82,8 @@ describe('Donate page', () => {
     component.getStaticImageUrl('abc.webp');
 
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
-      'abc.webp');
+      'abc.webp'
+    );
   });
 
   it('should show thank you modal on query parameters change', () => {
@@ -111,13 +109,11 @@ describe('Donate page', () => {
   it('should open donation box modal', () => {
     component.openDonationBoxModal();
 
-    expect(ngbModal.open).toHaveBeenCalledWith(
-      DonationBoxModalComponent, {
-        backdrop: 'static',
-        size: 'xl',
-        windowClass: 'donation-box-modal',
-      }
-    );
+    expect(ngbModal.open).toHaveBeenCalledWith(DonationBoxModalComponent, {
+      backdrop: 'static',
+      size: 'xl',
+      windowClass: 'donation-box-modal',
+    });
   });
 
   it('should change learner tile in carousel', () => {

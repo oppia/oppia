@@ -16,23 +16,23 @@
  * @fileoverview Unit tests for EntityCreationService.
  */
 
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { Topic } from 'domain/topic/topic-object.model';
-import { TopicEditorStateService } from './topic-editor-state.service';
-import { TopicEditorRoutingService } from './topic-editor-routing.service';
-import { EntityCreationService } from './entity-creation.service';
-import { CreateNewSkillModalService } from './create-new-skill-modal.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { CreateNewSubtopicModalComponent } from '../modal-templates/create-new-subtopic-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {Topic} from 'domain/topic/topic-object.model';
+import {TopicEditorStateService} from './topic-editor-state.service';
+import {TopicEditorRoutingService} from './topic-editor-routing.service';
+import {EntityCreationService} from './entity-creation.service';
+import {CreateNewSkillModalService} from './create-new-skill-modal.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {CreateNewSubtopicModalComponent} from '../modal-templates/create-new-subtopic-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 class MockNgbModal {
-  open(): { result: Promise<string> } {
+  open(): {result: Promise<string>} {
     return {
-      result: Promise.resolve('1')
+      result: Promise.resolve('1'),
     };
   }
 }
@@ -47,28 +47,25 @@ describe('Entity creation service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        NgbModule
-      ],
-      declarations: [
-        CreateNewSubtopicModalComponent
-      ],
+      imports: [HttpClientTestingModule, NgbModule],
+      declarations: [CreateNewSubtopicModalComponent],
       providers: [
         TopicEditorStateService,
         TopicEditorRoutingService,
         CreateNewSkillModalService,
         {
           provide: NgbModal,
-          useClass: MockNgbModal
-        }
+          useClass: MockNgbModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [CreateNewSubtopicModalComponent],
-      }
-    }).compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    })
+      .overrideModule(BrowserDynamicTestingModule, {
+        set: {
+          entryComponents: [CreateNewSubtopicModalComponent],
+        },
+      })
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -78,9 +75,25 @@ describe('Entity creation service', () => {
     entityCreationService = TestBed.inject(EntityCreationService);
     createNewSkillModalService = TestBed.inject(CreateNewSkillModalService);
     topic = new Topic(
-      'id', 'Topic name loading', 'Abbrev. name loading',
-      'Url Fragment loading', 'Topic description loading', 'en',
-      [], [], [], 1, 1, [], 'str', '', {}, false, '', '', []
+      'id',
+      'Topic name loading',
+      'Abbrev. name loading',
+      'Url Fragment loading',
+      'Topic description loading',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      'str',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
     );
     let subtopic1 = Subtopic.createFromTitle(1, 'Subtopic1');
     let subtopic2 = Subtopic.createFromTitle(2, 'Subtopic2');
@@ -94,14 +107,14 @@ describe('Entity creation service', () => {
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
   });
 
-  it('should call TopicEditorRoutingService to navigate to subtopic editor',
-    fakeAsync(() => {
-      spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId');
-      entityCreationService.createSubtopic();
-      tick();
-      expect(topicEditorRoutingService.navigateToSubtopicEditorWithId)
-        .toHaveBeenCalled();
-    }));
+  it('should call TopicEditorRoutingService to navigate to subtopic editor', fakeAsync(() => {
+    spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId');
+    entityCreationService.createSubtopic();
+    tick();
+    expect(
+      topicEditorRoutingService.navigateToSubtopicEditorWithId
+    ).toHaveBeenCalled();
+  }));
 
   it('should open create subtopic modal', () => {
     let spy = spyOn(ngbModal, 'open').and.callThrough();
@@ -110,28 +123,29 @@ describe('Entity creation service', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('should close create subtopic modal when cancel button is clicked',
-    () => {
-      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          result: Promise.reject()
-        } as NgbModalRef);
-      });
-      let routingSpy = (
-        spyOn(topicEditorRoutingService, 'navigateToSubtopicEditorWithId'));
-
-      entityCreationService.createSubtopic();
-
-      expect(routingSpy).not.toHaveBeenCalledWith('1');
+  it('should close create subtopic modal when cancel button is clicked', () => {
+    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        result: Promise.reject(),
+      } as NgbModalRef;
     });
+    let routingSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSubtopicEditorWithId'
+    );
 
-  it('should call CreateNewSkillModalService to navigate to skill editor',
-    () => {
-      spyOn(createNewSkillModalService, 'createNewSkill');
+    entityCreationService.createSubtopic();
 
-      entityCreationService.createSkill();
+    expect(routingSpy).not.toHaveBeenCalledWith('1');
+  });
 
-      expect(createNewSkillModalService.createNewSkill)
-        .toHaveBeenCalledWith(['1']);
-    });
+  it('should call CreateNewSkillModalService to navigate to skill editor', () => {
+    spyOn(createNewSkillModalService, 'createNewSkill');
+
+    entityCreationService.createSkill();
+
+    expect(createNewSkillModalService.createNewSkill).toHaveBeenCalledWith([
+      '1',
+    ]);
+  });
 });

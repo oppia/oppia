@@ -16,16 +16,18 @@
  * @fileoverview Component for moderator unpublish exploration modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-delete-exploration-modal',
-  templateUrl: './moderator-unpublish-exploration-modal.component.html'
+  templateUrl: './moderator-unpublish-exploration-modal.component.html',
 })
 export class ModeratorUnpublishExplorationModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -34,9 +36,7 @@ export class ModeratorUnpublishExplorationModalComponent
   emailBody!: string;
   willEmailBeSent: boolean = false;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
@@ -48,8 +48,8 @@ export class ModeratorUnpublishExplorationModalComponent
       this.EMAIL_BODY_SCHEMA = {
         type: 'unicode',
         ui_config: {
-          rows: 20
-        }
+          rows: 20,
+        },
       };
     }
   }

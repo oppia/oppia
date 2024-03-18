@@ -16,28 +16,38 @@
  * @fileoverview Unit tests for ContributorAdminStatsTable.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NO_ERRORS_SCHEMA, SimpleChanges } from '@angular/core';
-import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ContributorAdminStatsTable } from './contributor-admin-stats-table.component';
-import { ContributorDashboardAdminStatsBackendApiService, QuestionReviewerStatsData, QuestionSubmitterStatsData, TranslationReviewerStatsData, TranslationSubmitterStatsData } from '../services/contributor-dashboard-admin-stats-backend-api.service';
-import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service';
-import { MatTableModule } from '@angular/material/table';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
+import {CdAdminTranslationRoleEditorModal} from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ContributorAdminStatsTable} from './contributor-admin-stats-table.component';
+import {
+  ContributorDashboardAdminStatsBackendApiService,
+  QuestionReviewerStatsData,
+  QuestionSubmitterStatsData,
+  TranslationReviewerStatsData,
+  TranslationSubmitterStatsData,
+} from '../services/contributor-dashboard-admin-stats-backend-api.service';
+import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
+import {MatTableModule} from '@angular/material/table';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 
 describe('Contributor stats component', () => {
   let component: ContributorAdminStatsTable;
   let fixture: ComponentFixture<ContributorAdminStatsTable>;
   let $window: WindowRef;
-  let contributorDashboardAdminStatsBackendApiService: (
-    ContributorDashboardAdminStatsBackendApiService);
-  let contributorDashboardAdminBackendApiService: (
-    ContributorDashboardAdminBackendApiService);
+  let contributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService;
+  let contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService;
   let ngbModal: NgbModal;
   class MockNgbModalRef {
     componentInstance!: {};
@@ -45,26 +55,23 @@ describe('Contributor stats component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        MatTableModule,
-        MatTooltipModule
-      ],
+      imports: [HttpClientTestingModule, MatTableModule, MatTooltipModule],
       declarations: [
         CdAdminTranslationRoleEditorModal,
-        ContributorAdminStatsTable
+        ContributorAdminStatsTable,
       ],
       providers: [
         ContributorDashboardAdminStatsBackendApiService,
-        ContributorDashboardAdminBackendApiService
+        ContributorDashboardAdminBackendApiService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [
-          CdAdminTranslationRoleEditorModal]
-      }
-    }).compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    })
+      .overrideModule(BrowserDynamicTestingModule, {
+        set: {
+          entryComponents: [CdAdminTranslationRoleEditorModal],
+        },
+      })
+      .compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
@@ -73,9 +80,11 @@ describe('Contributor stats component', () => {
     component = fixture.componentInstance;
 
     contributorDashboardAdminStatsBackendApiService = TestBed.inject(
-      ContributorDashboardAdminStatsBackendApiService);
+      ContributorDashboardAdminStatsBackendApiService
+    );
     contributorDashboardAdminBackendApiService = TestBed.inject(
-      ContributorDashboardAdminBackendApiService);
+      ContributorDashboardAdminBackendApiService
+    );
     ngbModal = TestBed.inject(NgbModal);
 
     // This approach was choosen because spyOn() doesn't work on properties
@@ -86,7 +95,7 @@ describe('Contributor stats component', () => {
     // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty($window.nativeWindow, 'innerWidth', {
-      get: () => undefined
+      get: () => undefined,
     });
 
     component.ngOnInit();
@@ -103,12 +112,14 @@ describe('Contributor stats component', () => {
     it('should show translation submitter stats', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
-        'fetchContributorAdminStats')
-        .and.returnValue(Promise.resolve({
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
           stats: [],
           nextOffset: 1,
           more: false,
-        } as TranslationSubmitterStatsData));
+        } as TranslationSubmitterStatsData)
+      );
 
       const changes: SimpleChanges = {
         activeTab: {
@@ -129,19 +140,21 @@ describe('Contributor stats component', () => {
         'overallAccuracy',
         'submittedTranslationsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ]);
     }));
 
     it('should show translation reviewer stats', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
-        'fetchContributorAdminStats')
-        .and.returnValue(Promise.resolve({
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
-        } as TranslationReviewerStatsData));
+          more: false,
+        } as TranslationReviewerStatsData)
+      );
 
       const changes: SimpleChanges = {
         activeTab: {
@@ -160,19 +173,21 @@ describe('Contributor stats component', () => {
         'contributorName',
         'reviewedTranslationsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ]);
     }));
 
     it('should show question submitter stats', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
-        'fetchContributorAdminStats')
-        .and.returnValue(Promise.resolve({
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
-        } as QuestionSubmitterStatsData));
+          more: false,
+        } as QuestionSubmitterStatsData)
+      );
 
       const changes: SimpleChanges = {
         activeTab: {
@@ -193,19 +208,21 @@ describe('Contributor stats component', () => {
         'overallAccuracy',
         'submittedQuestionsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ]);
     }));
 
     it('should show question reviewer stats', fakeAsync(() => {
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
-        'fetchContributorAdminStats')
-        .and.returnValue(Promise.resolve({
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
-        } as QuestionReviewerStatsData));
+          more: false,
+        } as QuestionReviewerStatsData)
+      );
 
       const changes: SimpleChanges = {
         activeTab: {
@@ -224,7 +241,7 @@ describe('Contributor stats component', () => {
         'contributorName',
         'reviewedQuestionsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ]);
     }));
 
@@ -281,7 +298,7 @@ describe('Contributor stats component', () => {
         'submittedTranslationsCount',
         'lastContributedInDays',
         'role',
-        'chevron'
+        'chevron',
       ]);
     }));
 
@@ -303,7 +320,7 @@ describe('Contributor stats component', () => {
         'reviewedTranslationsCount',
         'lastContributedInDays',
         'role',
-        'chevron'
+        'chevron',
       ]);
     }));
 
@@ -327,7 +344,7 @@ describe('Contributor stats component', () => {
         'submittedQuestionsCount',
         'lastContributedInDays',
         'role',
-        'chevron'
+        'chevron',
       ]);
     }));
 
@@ -349,179 +366,209 @@ describe('Contributor stats component', () => {
         'reviewedQuestionsCount',
         'lastContributedInDays',
         'role',
-        'chevron'
+        'chevron',
       ]);
 
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
-        'fetchContributorAdminStats')
-        .and.returnValue(Promise.resolve({
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
           stats: [],
           nextOffset: 1,
-          more: false
-        } as QuestionReviewerStatsData));
+          more: false,
+        } as QuestionReviewerStatsData)
+      );
     }));
   });
 
-  it('should open question role editor modal and return changed value of' +
-    ' translation submitter', fakeAsync(() => {
-    const removeRightsSpy = spyOn(
-      contributorDashboardAdminBackendApiService,
-      'removeContributionReviewerAsync');
-    const changes: SimpleChanges = {
-      activeTab: {
-        currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: () => true,
-      },
-    };
-    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
-    component.ngOnChanges(changes);
-    spyOn(
-      contributorDashboardAdminBackendApiService,
-      'contributionReviewerRightsAsync').and.returnValue(Promise.resolve({
-      can_submit_questions: true,
-      can_review_questions: true,
-      can_review_translation_for_language_codes: [],
-      can_review_voiceover_for_language_codes: []
-    }));
-    let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve({
-          isQuestionSubmitter: false,
-          isQuestionReviewer: true
+  it(
+    'should open question role editor modal and return changed value of' +
+      ' translation submitter',
+    fakeAsync(() => {
+      const removeRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'removeContributionReviewerAsync'
+      );
+      const changes: SimpleChanges = {
+        activeTab: {
+          currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      };
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      component.ngOnChanges(changes);
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: true,
+          can_review_questions: true,
+          can_review_translation_for_language_codes: [],
+          can_review_voiceover_for_language_codes: [],
         })
-      }) as NgbModalRef;
-    });
+      );
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: false,
+            isQuestionReviewer: true,
+          }),
+        } as NgbModalRef;
+      });
 
-    component.openRoleEditor('user1');
-    tick();
+      component.openRoleEditor('user1');
+      tick();
 
-    expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
-    expect(removeRightsSpy).toHaveBeenCalled();
-  }));
+      expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
+      expect(removeRightsSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should open question role editor modal and return false changed' +
-    ' value of translation reviewer', fakeAsync(() => {
-    const removeRightsSpy = spyOn(
-      contributorDashboardAdminBackendApiService,
-      'removeContributionReviewerAsync');
-    const changes: SimpleChanges = {
-      activeTab: {
-        currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: () => true,
-      },
-    };
-    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
-    component.ngOnChanges(changes);
-    spyOn(
-      contributorDashboardAdminBackendApiService,
-      'contributionReviewerRightsAsync').and.returnValue(Promise.resolve({
-      can_submit_questions: true,
-      can_review_questions: true,
-      can_review_translation_for_language_codes: [],
-      can_review_voiceover_for_language_codes: []
-    }));
-    let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve({
-          isQuestionSubmitter: true,
-          isQuestionReviewer: false
+  it(
+    'should open question role editor modal and return false changed' +
+      ' value of translation reviewer',
+    fakeAsync(() => {
+      const removeRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'removeContributionReviewerAsync'
+      );
+      const changes: SimpleChanges = {
+        activeTab: {
+          currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      };
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      component.ngOnChanges(changes);
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: true,
+          can_review_questions: true,
+          can_review_translation_for_language_codes: [],
+          can_review_voiceover_for_language_codes: [],
         })
-      }) as NgbModalRef;
-    });
+      );
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: true,
+            isQuestionReviewer: false,
+          }),
+        } as NgbModalRef;
+      });
 
-    component.openRoleEditor('user1');
-    tick();
+      component.openRoleEditor('user1');
+      tick();
 
-    expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
-    expect(removeRightsSpy).toHaveBeenCalled();
-  }));
+      expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
+      expect(removeRightsSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should open question role editor modal and return true changed' +
-    ' value of translation reviewer', fakeAsync(() => {
-    const addRightsSpy = spyOn(
-      contributorDashboardAdminBackendApiService,
-      'addContributionReviewerAsync');
-    const changes: SimpleChanges = {
-      activeTab: {
-        currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: () => true,
-      },
-    };
-    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
-    component.ngOnChanges(changes);
-    spyOn(
-      contributorDashboardAdminBackendApiService,
-      'contributionReviewerRightsAsync').and.returnValue(Promise.resolve({
-      can_submit_questions: true,
-      can_review_questions: false,
-      can_review_translation_for_language_codes: [],
-      can_review_voiceover_for_language_codes: []
-    }));
-    let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve({
-          isQuestionSubmitter: true,
-          isQuestionReviewer: true
+  it(
+    'should open question role editor modal and return true changed' +
+      ' value of translation reviewer',
+    fakeAsync(() => {
+      const addRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'addContributionReviewerAsync'
+      );
+      const changes: SimpleChanges = {
+        activeTab: {
+          currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      };
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      component.ngOnChanges(changes);
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: true,
+          can_review_questions: false,
+          can_review_translation_for_language_codes: [],
+          can_review_voiceover_for_language_codes: [],
         })
-      }) as NgbModalRef;
-    });
+      );
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: true,
+            isQuestionReviewer: true,
+          }),
+        } as NgbModalRef;
+      });
 
-    component.openRoleEditor('user1');
-    tick();
+      component.openRoleEditor('user1');
+      tick();
 
-    expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
-    expect(addRightsSpy).toHaveBeenCalled();
-  }));
+      expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
+      expect(addRightsSpy).toHaveBeenCalled();
+    })
+  );
 
-  it('should open question role editor modal and return true changed' +
-    ' value of translation submitter', fakeAsync(() => {
-    const addRightsSpy = spyOn(
-      contributorDashboardAdminBackendApiService,
-      'addContributionReviewerAsync');
-    const changes: SimpleChanges = {
-      activeTab: {
-        currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
-        previousValue: null,
-        firstChange: true,
-        isFirstChange: () => true,
-      },
-    };
-    component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
-    component.ngOnChanges(changes);
-    spyOn(
-      contributorDashboardAdminBackendApiService,
-      'contributionReviewerRightsAsync').and.returnValue(Promise.resolve({
-      can_submit_questions: false,
-      can_review_questions: true,
-      can_review_translation_for_language_codes: [],
-      can_review_voiceover_for_language_codes: []
-    }));
-    let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve({
-          isQuestionSubmitter: true,
-          isQuestionReviewer: true
+  it(
+    'should open question role editor modal and return true changed' +
+      ' value of translation submitter',
+    fakeAsync(() => {
+      const addRightsSpy = spyOn(
+        contributorDashboardAdminBackendApiService,
+        'addContributionReviewerAsync'
+      );
+      const changes: SimpleChanges = {
+        activeTab: {
+          currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
+          previousValue: null,
+          firstChange: true,
+          isFirstChange: () => true,
+        },
+      };
+      component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      component.ngOnChanges(changes);
+      spyOn(
+        contributorDashboardAdminBackendApiService,
+        'contributionReviewerRightsAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          can_submit_questions: false,
+          can_review_questions: true,
+          can_review_translation_for_language_codes: [],
+          can_review_voiceover_for_language_codes: [],
         })
-      }) as NgbModalRef;
-    });
+      );
+      let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve({
+            isQuestionSubmitter: true,
+            isQuestionReviewer: true,
+          }),
+        } as NgbModalRef;
+      });
 
-    component.openRoleEditor('user1');
-    tick();
+      component.openRoleEditor('user1');
+      tick();
 
-    expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
-    expect(addRightsSpy).toHaveBeenCalled();
-  }));
+      expect(modalSpy).toHaveBeenCalledWith(CdAdminQuestionRoleEditorModal);
+      expect(addRightsSpy).toHaveBeenCalled();
+    })
+  );
 
   it('should open translation role editor modal', fakeAsync(() => {
     const changes: SimpleChanges = {
@@ -536,16 +583,19 @@ describe('Contributor stats component', () => {
     component.ngOnChanges(changes);
     spyOn(
       contributorDashboardAdminBackendApiService,
-      'contributionReviewerRightsAsync').and.returnValue(Promise.resolve({
-      can_submit_questions: false,
-      can_review_questions: true,
-      can_review_translation_for_language_codes: [],
-      can_review_voiceover_for_language_codes: []
-    }));
+      'contributionReviewerRightsAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        can_submit_questions: false,
+        can_review_questions: true,
+        can_review_translation_for_language_codes: [],
+        can_review_voiceover_for_language_codes: [],
+      })
+    );
     let modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
-      return ({
-        componentInstance: MockNgbModalRef
-      }) as NgbModalRef;
+      return {
+        componentInstance: MockNgbModalRef,
+      } as NgbModalRef;
     });
 
     component.openRoleEditor('user1');

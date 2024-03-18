@@ -16,14 +16,27 @@
  * @fileoverview Component for a schema-based editor for integers.
  */
 
-import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { validate } from 'components/forms/validators/schema-validators';
-import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
-
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {
+  NG_VALUE_ACCESSOR,
+  NG_VALIDATORS,
+  ControlValueAccessor,
+  Validator,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {validate} from 'components/forms/validators/schema-validators';
+import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
 
 @Component({
   selector: 'schema-based-int-editor',
@@ -33,17 +46,18 @@ import { Validator as OppiaValidator } from 'interactions/TextInput/directives/t
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SchemaBasedIntEditorComponent),
-      multi: true
+      multi: true,
     },
     {
       provide: NG_VALIDATORS,
       useExisting: forwardRef(() => SchemaBasedIntEditorComponent),
-      multi: true
+      multi: true,
     },
-  ]
+  ],
 })
 export class SchemaBasedIntEditorComponent
-implements ControlValueAccessor, OnInit, Validator {
+  implements ControlValueAccessor, OnInit, Validator
+{
   @Output() inputBlur = new EventEmitter<void>();
   @Output() inputFocus = new EventEmitter<void>();
   // These properties are initialized using Angular lifecycle hooks
@@ -58,7 +72,7 @@ implements ControlValueAccessor, OnInit, Validator {
   constructor(
     private focusManagerService: FocusManagerService,
     private schemaFormSubmittedService: SchemaFormSubmittedService
-  ) { }
+  ) {}
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: number): void {
@@ -71,8 +85,7 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnTouched(): void {
-  }
+  registerOnTouched(): void {}
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors | null {
@@ -105,6 +118,9 @@ implements ControlValueAccessor, OnInit, Validator {
   }
 }
 
-angular.module('oppia').directive('schemaBasedIntEditor', downgradeComponent({
-  component: SchemaBasedIntEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'schemaBasedIntEditor',
+  downgradeComponent({
+    component: SchemaBasedIntEditorComponent,
+  }) as angular.IDirectiveFactory
+);

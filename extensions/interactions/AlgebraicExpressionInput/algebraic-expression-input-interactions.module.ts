@@ -19,32 +19,28 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { AlgebraicExpressionInputInteractionComponent } from './directives/oppia-interactive-algebraic-expression-input.component';
-import { ResponseAlgebraicExpressionInputComponent } from './directives/oppia-response-algebraic-expression-input.component';
-import { ShortResponseAlgebraicExpressionInputComponent } from './directives/oppia-short-response-algebraic-expression-input.component';
-
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {AlgebraicExpressionInputInteractionComponent} from './directives/oppia-interactive-algebraic-expression-input.component';
+import {ResponseAlgebraicExpressionInputComponent} from './directives/oppia-response-algebraic-expression-input.component';
+import {ShortResponseAlgebraicExpressionInputComponent} from './directives/oppia-short-response-algebraic-expression-input.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-  ],
+  imports: [CommonModule],
   declarations: [
     AlgebraicExpressionInputInteractionComponent,
     ResponseAlgebraicExpressionInputComponent,
-    ShortResponseAlgebraicExpressionInputComponent
+    ShortResponseAlgebraicExpressionInputComponent,
   ],
   entryComponents: [
     AlgebraicExpressionInputInteractionComponent,
     ResponseAlgebraicExpressionInputComponent,
-    ShortResponseAlgebraicExpressionInputComponent
+    ShortResponseAlgebraicExpressionInputComponent,
   ],
   exports: [
     AlgebraicExpressionInputInteractionComponent,
     ResponseAlgebraicExpressionInputComponent,
-    ShortResponseAlgebraicExpressionInputComponent
+    ShortResponseAlgebraicExpressionInputComponent,
   ],
 })
-
-export class AlgebraicExpressionInputExtensionsModule { }
+export class AlgebraicExpressionInputExtensionsModule {}

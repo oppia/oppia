@@ -16,123 +16,126 @@
  * @fileoverview Configuration for accessibility.
  */
 
-const baseConfig = require('./.lighthouserc-base.js')
+const baseConfig = require('./.lighthouserc-base.js');
 
 module.exports = {
-  'ci': {
-    'collect': {
-      'numberOfRuns': baseConfig['numberOfRuns'],
-      'puppeteerScript': baseConfig['puppeteerScript'],
-      'url': baseConfig['urlShards'][2]
+  ci: {
+    collect: {
+      numberOfRuns: baseConfig['numberOfRuns'],
+      puppeteerScript: baseConfig['puppeteerScript'],
+      url: baseConfig['urlShards'][2],
     },
-    'assert': {
-      'assertMatrix': [
+    assert: {
+      assertMatrix: [
         {
-          'matchingUrlPattern': '^http://localhost:8181/preferences$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/preferences$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/privacy-policy$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/privacy-policy$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/profile/username1$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/profile/username1$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/signup?return_url=%2F$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/signup?return_url=%2F$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/teach$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/teach$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/topics-and-skills-dashboard$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.9}]
-          }
+          matchingUrlPattern:
+            '^http://localhost:8181/topics-and-skills-dashboard$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.9}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/terms$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.98}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/terms$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.98}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/thanks$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/thanks$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/volunteer$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.9}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/volunteer$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.9}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/learn/staging/dummy-topic-one/story',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern:
+            '^http://localhost:8181/learn/staging/dummy-topic-one/story',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern:
+            '^http://localhost:8181/learn/staging/dummy-topic-one/story/help-jamie-win-arcade',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/learn/math',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/learn/math',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/create/.*$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/create/.*$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/explore/.*$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/explore/.*$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/topic_editor/.*$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 1}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/topic_editor/.*$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 1}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/skill_editor/.*$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.91}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/skill_editor/.*$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.91}],
+          },
         },
         {
-          'matchingUrlPattern': '^http://localhost:8181/story_editor/.*$',
-          'assertions': {
-            'categories:accessibility': ['error', {'minScore': 0.84}]
-          }
+          matchingUrlPattern: '^http://localhost:8181/story_editor/.*$',
+          assertions: {
+            'categories:accessibility': ['error', {minScore: 0.84}],
+          },
         },
-      ]
+      ],
     },
-    'upload': {
-      'target': 'temporary-public-storage'
-    }
-  }
+    upload: {
+      target: 'temporary-public-storage',
+    },
+  },
 };

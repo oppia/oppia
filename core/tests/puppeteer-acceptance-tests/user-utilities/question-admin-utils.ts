@@ -16,14 +16,11 @@
  * @fileoverview Question admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
 const contributorDashboardAdminUrl =
   testConstants.URLs.ContributorDashboardAdmin;
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const reviewQuestionRightValue = 'question';
 const submitQuestionRightValue = 'submit_question';
@@ -33,27 +30,21 @@ const roleMethodValue = 'role';
 // "View Contributor Dashboard Users" form elements.
 const viewContributorFilterMethodSelector =
   'select#view-contributor-filter-method-select';
-const viewContributerUsernameInput =
-  'input#view-contributor-username-input';
+const viewContributerUsernameInput = 'input#view-contributor-username-input';
 const viewContributorCategorySelector =
   'select#view-contributor-category-select';
-const viewContributorSubmitButton =
-  'button#view-contributor-submit-button';
+const viewContributorSubmitButton = 'button#view-contributor-submit-button';
 
-const viewContributorReviewQuestionsResult =
-  '.e2e-test-question-reviewer';
-const viewContributorSubmitQuestionResult =
-  '.e2e-test-question-contributor';
-const viewRoleUserResult =
-  '.e2e-test-reviewer-roles-result';
+const viewContributorReviewQuestionsResult = '.e2e-test-question-reviewer';
+const viewContributorSubmitQuestionResult = '.e2e-test-question-contributor';
+const viewRoleUserResult = '.e2e-test-reviewer-roles-result';
 
 // "Add Contribution Rights" form elements.
-const addContributorUsernameInput =
-  'input#add-contribution-rights-user-input';
+const addContributorUsernameInput = 'input#add-contribution-rights-user-input';
 const addContributonRightsCategorySelector =
   'select#add-contribution-rights-category-select';
 const addContributionRightsSubmitButton =
-   'button#add-contribution-rights-submit-button';
+  'button#add-contribution-rights-submit-button';
 
 // "Remove Contribution Rights" form elements.
 const removeContributorUsernameInput =
@@ -63,27 +54,7 @@ const removeContributonRightsCategorySelector =
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
 
-export interface IQuestionAdmin extends IBaseUser {
-  navigateToContributorDashboardAdminPage: () => Promise<void>;
-  addReviewQuestionRights: (username: string) => Promise<void>;
-  addSubmitQuestionRights: (username: string) => Promise<void>;
-  removeReviewQuestionRights: (username: string) => Promise<void>;
-  removeSubmitQuestionRights: (username: string) => Promise<void>;
-  getDisplayedListOfQuestionReviewers: () => Promise<string[]>;
-  getDisplayedListOfQuestionSubmitters: () => Promise<string[]>;
-  getContributionStatusForUser: (
-    username: string, contribution: string) => Promise<string>;
-  verifyUserCanReviewQuestions: (username: string) => Promise<void>;
-  verifyUserCanSubmitQuestions: (username: string) => Promise<void>;
-  verifyUserCannotReviewQuestions: (username: string) => Promise<void>;
-  verifyUserCannotSubmitQuestions: (username: string) => Promise<void>;
-  verifyQuestionReviewersIncludeUser: (username: string) => Promise<void>;
-  verifyQuestionSubmittersIncludeUser: (username: string) => Promise<void>;
-  verifyQuestionReviewersExcludeUser: (username: string) => Promise<void>;
-  verifyQuestionSubmittersExcludeUser: (username: string) => Promise<void>;
-}
-
-class QuestionAdmin extends BaseUser implements IQuestionAdmin {
+export class QuestionAdmin extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -97,7 +68,9 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
   async addReviewQuestionRights(username: string): Promise<void> {
     await this.type(addContributorUsernameInput, username);
     await this.select(
-      addContributonRightsCategorySelector, reviewQuestionRightValue);
+      addContributonRightsCategorySelector,
+      reviewQuestionRightValue
+    );
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -109,7 +82,9 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
   async addSubmitQuestionRights(username: string): Promise<void> {
     await this.type(addContributorUsernameInput, username);
     await this.select(
-      addContributonRightsCategorySelector, submitQuestionRightValue);
+      addContributonRightsCategorySelector,
+      submitQuestionRightValue
+    );
     await this.clickOn(addContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -121,7 +96,9 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
   async removeReviewQuestionRights(username: string): Promise<void> {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
-      removeContributonRightsCategorySelector, reviewQuestionRightValue);
+      removeContributonRightsCategorySelector,
+      reviewQuestionRightValue
+    );
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -133,7 +110,9 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
   async removeSubmitQuestionRights(username: string): Promise<void> {
     await this.type(removeContributorUsernameInput, username);
     await this.select(
-      removeContributonRightsCategorySelector, submitQuestionRightValue);
+      removeContributonRightsCategorySelector,
+      submitQuestionRightValue
+    );
     await this.clickOn(removeContributionRightsSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -145,7 +124,9 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
   async getDisplayedListOfQuestionReviewers(): Promise<string[]> {
     await this.select(viewContributorFilterMethodSelector, roleMethodValue);
     await this.select(
-      viewContributorCategorySelector, reviewQuestionRightValue);
+      viewContributorCategorySelector,
+      reviewQuestionRightValue
+    );
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -155,9 +136,12 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
       viewRoleUserResult,
       element => (element as HTMLElement).innerText
     );
-    const displayedUsers =
-      displayedUsersText.replace('Usernames:', '').trim().replace(
-        '[', '').replace(']', '').split(',');
+    const displayedUsers = displayedUsersText
+      .replace('Usernames:', '')
+      .trim()
+      .replace('[', '')
+      .replace(']', '')
+      .split(',');
     return displayedUsers;
   }
 
@@ -167,7 +151,9 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
   async getDisplayedListOfQuestionSubmitters(): Promise<string[]> {
     await this.select(viewContributorFilterMethodSelector, roleMethodValue);
     await this.select(
-      viewContributorCategorySelector, submitQuestionRightValue);
+      viewContributorCategorySelector,
+      submitQuestionRightValue
+    );
     await this.clickOn(viewContributorSubmitButton);
 
     await this.page.waitForNetworkIdle();
@@ -177,9 +163,12 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
       viewRoleUserResult,
       element => (element as HTMLElement).innerText
     );
-    const displayedUsers =
-      displayedUsersText.replace('Usernames:', '').trim().replace(
-        '[', '').replace(']', '').split(',');
+    const displayedUsers = displayedUsersText
+      .replace('Usernames:', '')
+      .trim()
+      .replace('[', '')
+      .replace(']', '')
+      .split(',');
     return displayedUsers;
   }
 
@@ -187,8 +176,8 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
    * Function to return the contribution rights status for the user.
    */
   async getContributionStatusForUser(
-      username: string,
-      contribution: string
+    username: string,
+    contribution: string
   ): Promise<string> {
     await this.select(viewContributorFilterMethodSelector, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
@@ -209,14 +198,16 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
    */
   async verifyUserCanReviewQuestions(username: string): Promise<void> {
     const questionReviewStatusForUser = await this.getContributionStatusForUser(
-      username, viewContributorReviewQuestionsResult);
+      username,
+      viewContributorReviewQuestionsResult
+    );
 
     if (questionReviewStatusForUser === 'Not-allowed') {
       throw new Error(
-        `${username} does not have rights for reviewing questions!`);
+        `${username} does not have rights for reviewing questions!`
+      );
     } else {
-      showMessage(
-        `${username} has rights for reviewing questions.`);
+      showMessage(`${username} has rights for reviewing questions.`);
     }
   }
 
@@ -225,14 +216,16 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
    */
   async verifyUserCanSubmitQuestions(username: string): Promise<void> {
     const questionSubmitStatusForUser = await this.getContributionStatusForUser(
-      username, viewContributorSubmitQuestionResult);
+      username,
+      viewContributorSubmitQuestionResult
+    );
 
     if (questionSubmitStatusForUser === 'Not-allowed') {
       throw new Error(
-        `${username} does not have rights for submitting questions!`);
+        `${username} does not have rights for submitting questions!`
+      );
     } else {
-      showMessage(
-        `${username} has rights for submitting questions.`);
+      showMessage(`${username} has rights for submitting questions.`);
     }
   }
 
@@ -241,14 +234,14 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
    */
   async verifyUserCannotReviewQuestions(username: string): Promise<void> {
     const questionReviewStatusForUser = await this.getContributionStatusForUser(
-      username, viewContributorReviewQuestionsResult);
+      username,
+      viewContributorReviewQuestionsResult
+    );
 
     if (questionReviewStatusForUser === 'Allowed') {
-      throw new Error(
-        `${username} has rights for reviewing questions!`);
+      throw new Error(`${username} has rights for reviewing questions!`);
     } else {
-      showMessage(
-        `${username} doesn't have rights for reviewing questions.`);
+      showMessage(`${username} doesn't have rights for reviewing questions.`);
     }
   }
 
@@ -257,14 +250,14 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
    */
   async verifyUserCannotSubmitQuestions(username: string): Promise<void> {
     const questionSubmitStatusForUser = await this.getContributionStatusForUser(
-      username, viewContributorSubmitQuestionResult);
+      username,
+      viewContributorSubmitQuestionResult
+    );
 
     if (questionSubmitStatusForUser === 'Allowed') {
-      throw new Error(
-        `${username} has rights for submitting questions!`);
+      throw new Error(`${username} has rights for submitting questions!`);
     } else {
-      showMessage(
-        `${username} doesn't have rights for submitting questions.`);
+      showMessage(`${username} doesn't have rights for submitting questions.`);
     }
   }
 
@@ -276,7 +269,8 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
 
     if (!displayedUsers.includes(username)) {
       throw new Error(
-        `${username} does not have rights for reviewing questions!`);
+        `${username} does not have rights for reviewing questions!`
+      );
     }
   }
 
@@ -288,7 +282,8 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
 
     if (!displayedUsers.includes(username)) {
       throw new Error(
-        `${username} does not have rights for submitting questions!`);
+        `${username} does not have rights for submitting questions!`
+      );
     }
   }
 
@@ -299,8 +294,7 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
     const displayedUsers = await this.getDisplayedListOfQuestionReviewers();
 
     if (displayedUsers.includes(username)) {
-      throw new Error(
-        `${username} has the right to review questions!`);
+      throw new Error(`${username} has the right to review questions!`);
     }
   }
 
@@ -311,10 +305,9 @@ class QuestionAdmin extends BaseUser implements IQuestionAdmin {
     const displayedUsers = await this.getDisplayedListOfQuestionSubmitters();
 
     if (displayedUsers.includes(username)) {
-      throw new Error(
-        `${username} has the right to submit questions!`);
+      throw new Error(`${username} has the right to submit questions!`);
     }
   }
 }
 
-export let QuestionAdminFactory = (): IQuestionAdmin => new QuestionAdmin();
+export let QuestionAdminFactory = (): QuestionAdmin => new QuestionAdmin();

@@ -12,24 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for the Contributor Admin Dashboard table.
  */
 
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnInit, SimpleChanges} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { animate, state, style, transition, trigger } from '@angular/animations';
-import { ContributorDashboardAdminStatsBackendApiService } from '../services/contributor-dashboard-admin-stats-backend-api.service';
-import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service';
-import { ContributorAdminDashboardFilter } from '../contributor-admin-dashboard-filter.model';
-import { AppConstants } from 'app.constants';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { QuestionReviewerStats, QuestionSubmitterStats, TranslationReviewerStats, TranslationSubmitterStats } from '../contributor-dashboard-admin-summary.model';
-import { CdAdminQuestionRoleEditorModal } from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
-import { CdAdminTranslationRoleEditorModal } from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {animate, state, style, transition, trigger} from '@angular/animations';
+import {ContributorDashboardAdminStatsBackendApiService} from '../services/contributor-dashboard-admin-stats-backend-api.service';
+import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
+import {ContributorAdminDashboardFilter} from '../contributor-admin-dashboard-filter.model';
+import {AppConstants} from 'app.constants';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {
+  QuestionReviewerStats,
+  QuestionSubmitterStats,
+  TranslationReviewerStats,
+  TranslationSubmitterStats,
+} from '../contributor-dashboard-admin-summary.model';
+import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
+import {CdAdminTranslationRoleEditorModal} from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
 import isEqual from 'lodash/isEqual';
 
@@ -38,34 +42,38 @@ import isEqual from 'lodash/isEqual';
   templateUrl: './contributor-admin-stats-table.component.html',
   animations: [
     trigger('detailExpand', [
-      state('collapsed', style(
-        {height: '0px', minHeight: '0', paddingBottom: '0'})),
+      state(
+        'collapsed',
+        style({height: '0px', minHeight: '0', paddingBottom: '0'})
+      ),
       state('expanded', style({height: '*'})),
       transition(
         'expanded <=> collapsed',
-        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+        animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
+      ),
     ]),
     trigger('chevronExpand', [
-      state('expanded', style({ transform: 'rotate(90deg)' })),
-      state('collapsed', style({ transform: 'rotate(0)' })),
+      state('expanded', style({transform: 'rotate(90deg)'})),
+      state('collapsed', style({transform: 'rotate(0)'})),
       transition('expanded => collapsed', animate('200ms ease-out')),
       transition('collapsed => expanded', animate('200ms ease-in')),
     ]),
     trigger('mobileChevronExpand', [
-      state('expanded', style({ transform: 'rotate(-90deg)' })),
-      state('collapsed', style({ transform: 'rotate(90deg)' })),
+      state('expanded', style({transform: 'rotate(-90deg)'})),
+      state('collapsed', style({transform: 'rotate(90deg)'})),
       transition('expanded => collapsed', animate('200ms ease-out')),
       transition('collapsed => expanded', animate('200ms ease-in')),
     ]),
   ],
 })
 export class ContributorAdminStatsTable implements OnInit {
-  @Input() inputs: { activeTab: string;
-                     filter: ContributorAdminDashboardFilter; } =
-      {
-        activeTab: 'Translation Submitter',
-        filter: ContributorAdminDashboardFilter.createDefault()
-      };
+  @Input() inputs: {
+    activeTab: string;
+    filter: ContributorAdminDashboardFilter;
+  } = {
+    activeTab: 'Translation Submitter',
+    filter: ContributorAdminDashboardFilter.createDefault(),
+  };
 
   columnsToDisplay = [
     'chevron',
@@ -74,21 +82,25 @@ export class ContributorAdminStatsTable implements OnInit {
     'overallAccuracy',
     'submittedTranslationsCount',
     'lastContributedInDays',
-    'role'
+    'role',
   ];
 
-  dataSource: TranslationSubmitterStats[] |
-    TranslationReviewerStats[] |
-    QuestionSubmitterStats[] |
-    QuestionReviewerStats[] = [];
+  dataSource:
+    | TranslationSubmitterStats[]
+    | TranslationReviewerStats[]
+    | QuestionSubmitterStats[]
+    | QuestionReviewerStats[] = [];
 
   nextOffset: number = 0;
   more: boolean = true;
 
-  expandedElement: TranslationSubmitterStats[] |
-    TranslationReviewerStats[] |
-    QuestionSubmitterStats[] |
-    QuestionReviewerStats[] | null | [] = null;
+  expandedElement:
+    | TranslationSubmitterStats[]
+    | TranslationReviewerStats[]
+    | QuestionSubmitterStats[]
+    | QuestionReviewerStats[]
+    | null
+    | [] = null;
 
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
@@ -107,11 +119,9 @@ export class ContributorAdminStatsTable implements OnInit {
 
   constructor(
     private windowRef: WindowRef,
-    private ContributorDashboardAdminStatsBackendApiService:
-      ContributorDashboardAdminStatsBackendApiService,
-    private contributorDashboardAdminBackendApiService:
-      ContributorDashboardAdminBackendApiService,
-    private modalService: NgbModal,
+    private ContributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
+    private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
+    private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -123,100 +133,109 @@ export class ContributorAdminStatsTable implements OnInit {
 
   openCdAdminQuestionRoleEditorModal(username: string): void {
     this.contributorDashboardAdminBackendApiService
-      .contributionReviewerRightsAsync(username).then(response => {
-        const modelRef = this.modalService.open(
-          CdAdminQuestionRoleEditorModal);
+      .contributionReviewerRightsAsync(username)
+      .then(response => {
+        const modelRef = this.modalService.open(CdAdminQuestionRoleEditorModal);
         modelRef.componentInstance.username = username;
         modelRef.componentInstance.rights = {
           isQuestionSubmitter: response.can_submit_questions,
-          isQuestionReviewer: response.can_review_questions
+          isQuestionReviewer: response.can_review_questions,
         };
-        modelRef.result.then(results => {
-          if (results.isQuestionSubmitter !== response.can_submit_questions) {
-            if (results.isQuestionSubmitter) {
-              this.contributorDashboardAdminBackendApiService
-                .addContributionReviewerAsync(
+        modelRef.result.then(
+          results => {
+            if (results.isQuestionSubmitter !== response.can_submit_questions) {
+              if (results.isQuestionSubmitter) {
+                this.contributorDashboardAdminBackendApiService.addContributionReviewerAsync(
                   constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
                   username,
                   null
                 );
-            } else {
-              this.contributorDashboardAdminBackendApiService
-                .removeContributionReviewerAsync(
+              } else {
+                this.contributorDashboardAdminBackendApiService.removeContributionReviewerAsync(
                   username,
                   constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
                   null
                 );
+              }
             }
-          }
-          if (results.isQuestionReviewer !== response.can_review_questions) {
-            if (results.isQuestionReviewer) {
-              this.contributorDashboardAdminBackendApiService
-                .addContributionReviewerAsync(
+            if (results.isQuestionReviewer !== response.can_review_questions) {
+              if (results.isQuestionReviewer) {
+                this.contributorDashboardAdminBackendApiService.addContributionReviewerAsync(
                   constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                   username,
                   null
                 );
-            } else {
-              this.contributorDashboardAdminBackendApiService
-                .removeContributionReviewerAsync(
+              } else {
+                this.contributorDashboardAdminBackendApiService.removeContributionReviewerAsync(
                   username,
                   constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                   null
                 );
+              }
             }
+          },
+          () => {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
           }
-        }, () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        });
+        );
       });
   }
 
   openCdAdminTranslationRoleEditorModal(username: string): void {
     this.contributorDashboardAdminBackendApiService
-      .contributionReviewerRightsAsync(username).then(response => {
+      .contributionReviewerRightsAsync(username)
+      .then(response => {
         const modalRef = this.modalService.open(
-          CdAdminTranslationRoleEditorModal);
+          CdAdminTranslationRoleEditorModal
+        );
         modalRef.componentInstance.username = username;
-        modalRef.componentInstance.assignedLanguageIds = (
-          response.can_review_translation_for_language_codes);
+        modalRef.componentInstance.assignedLanguageIds =
+          response.can_review_translation_for_language_codes;
         const languageIdToName: Record<string, string> = {};
         constants.SUPPORTED_AUDIO_LANGUAGES.forEach(
-          language => languageIdToName[language.id] = language.description);
+          language => (languageIdToName[language.id] = language.description)
+        );
         modalRef.componentInstance.languageIdToName = languageIdToName;
       });
   }
 
   getUpperLimitValueForPagination(): number {
-    return (
-      Math.min((
-        (this.statsPageNumber * this.itemsPerPage) +
-          this.itemsPerPage), (this.statsPageNumber * this.itemsPerPage) +
-          this.dataSource.length));
+    return Math.min(
+      this.statsPageNumber * this.itemsPerPage + this.itemsPerPage,
+      this.statsPageNumber * this.itemsPerPage + this.dataSource.length
+    );
   }
 
   openRoleEditor(username: string): void {
     this.expandedElement = null;
-    if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
-      this.inputs.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+    if (
+      this.inputs.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER ||
+      this.inputs.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER
+    ) {
       this.openCdAdminTranslationRoleEditorModal(username);
-    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
-      this.inputs.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
+    } else if (
+      this.inputs.activeTab === this.TAB_NAME_QUESTION_SUBMITTER ||
+      this.inputs.activeTab === this.TAB_NAME_QUESTION_REVIEWER
+    ) {
       this.openCdAdminQuestionRoleEditorModal(username);
     }
   }
 
   checkMobileView(): boolean {
-    return (this.windowRef.nativeWindow.innerWidth < 800);
+    return this.windowRef.nativeWindow.innerWidth < 800;
   }
 
   changesExist(changes: SimpleChanges): boolean {
     let changesExist = false;
     for (let propName in changes) {
-      if (!isEqual(changes[propName].currentValue,
-        changes[propName].previousValue)) {
+      if (
+        !isEqual(
+          changes[propName].currentValue,
+          changes[propName].previousValue
+        )
+      ) {
         changesExist = true;
         break;
       }
@@ -241,7 +260,7 @@ export class ContributorAdminStatsTable implements OnInit {
         'overallAccuracy',
         'submittedTranslationsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ];
       if (this.checkMobileView()) {
         this.columnsToDisplay = [
@@ -251,33 +270,32 @@ export class ContributorAdminStatsTable implements OnInit {
           'submittedTranslationsCount',
           'lastContributedInDays',
           'role',
-          'chevron'
+          'chevron',
         ];
       }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
     } else if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
       this.columnsToDisplay = [
         'chevron',
         'contributorName',
         'reviewedTranslationsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ];
       if (this.checkMobileView()) {
         this.columnsToDisplay = [
@@ -285,26 +303,25 @@ export class ContributorAdminStatsTable implements OnInit {
           'reviewedTranslationsCount',
           'lastContributedInDays',
           'role',
-          'chevron'
+          'chevron',
         ];
       }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
     } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
       this.columnsToDisplay = [
         'chevron',
@@ -313,7 +330,7 @@ export class ContributorAdminStatsTable implements OnInit {
         'overallAccuracy',
         'submittedQuestionsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ];
       if (this.checkMobileView()) {
         this.columnsToDisplay = [
@@ -323,33 +340,32 @@ export class ContributorAdminStatsTable implements OnInit {
           'submittedQuestionsCount',
           'lastContributedInDays',
           'role',
-          'chevron'
+          'chevron',
         ];
       }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
     } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
       this.columnsToDisplay = [
         'chevron',
         'contributorName',
         'reviewedQuestionsCount',
         'lastContributedInDays',
-        'role'
+        'role',
       ];
       if (this.checkMobileView()) {
         this.columnsToDisplay = [
@@ -357,26 +373,25 @@ export class ContributorAdminStatsTable implements OnInit {
           'reviewedQuestionsCount',
           'lastContributedInDays',
           'role',
-          'chevron'
+          'chevron',
         ];
       }
-      this.ContributorDashboardAdminStatsBackendApiService
-        .fetchContributorAdminStats(
-          this.inputs.filter,
-          this.itemsPerPage,
-          this.nextOffset,
-          AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW).then(
-          (response) => {
-            this.dataSource = response.stats;
-            this.nextOffset = response.nextOffset;
-            this.more = response.more;
-            this.loadingMessage = '';
-            this.noDataMessage = '';
-            if (this.dataSource.length === 0) {
-              this.noDataMessage = 'No statistics to display';
-            }
-          });
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
     }
   }
 
@@ -391,7 +406,7 @@ export class ContributorAdminStatsTable implements OnInit {
 
   goToPageNumber(pageNumber: number): void {
     this.statsPageNumber = pageNumber;
-    this.nextOffset = (pageNumber * this.itemsPerPage);
+    this.nextOffset = pageNumber * this.itemsPerPage;
     this.updateColumnsToDisplay();
   }
 
@@ -406,8 +421,9 @@ export class ContributorAdminStatsTable implements OnInit {
   }
 }
 
-
-angular.module('oppia').directive('contributorAdminDashboardPage',
+angular.module('oppia').directive(
+  'contributorAdminDashboardPage',
   downgradeComponent({
-    component: ContributorAdminStatsTable
-  }) as angular.IDirectiveFactory);
+    component: ContributorAdminStatsTable,
+  }) as angular.IDirectiveFactory
+);

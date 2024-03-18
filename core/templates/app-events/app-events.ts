@@ -35,7 +35,6 @@ abstract class EventWithMessage<T> extends BaseEvent {
   }
 }
 
-
 /**
  * Each of the following classes has both a STATIC and an INSTANCE [type] of the
  * same value (the instance value is read from the static value). This allows
@@ -49,8 +48,7 @@ export interface ObjectFormValidityChangeEventMessage {
   modalId: symbol;
 }
 
-export class ObjectFormValidityChangeEvent
-  extends EventWithMessage<ObjectFormValidityChangeEventMessage> {
+export class ObjectFormValidityChangeEvent extends EventWithMessage<ObjectFormValidityChangeEventMessage> {
   static readonly type = 'ObjectFormValidityChangeEvent';
   public readonly type = ObjectFormValidityChangeEvent.type;
 }

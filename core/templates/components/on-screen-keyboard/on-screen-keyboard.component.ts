@@ -17,24 +17,24 @@
  * interactions.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
 
 @Component({
   selector: 'oppia-on-screen-keyboard',
-  templateUrl: './on-screen-keyboard.component.html'
+  templateUrl: './on-screen-keyboard.component.html',
 })
 export class OnScreenKeyboardComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   engine!: {
-    'insert_string': (arg0: string) => void;
-    'insert_symbol': (arg0: string) => void;
+    insert_string: (arg0: string) => void;
+    insert_symbol: (arg0: string) => void;
     backspace: () => void;
     left: () => void;
     right: () => void;
@@ -48,16 +48,31 @@ export class OnScreenKeyboardComponent {
   lettersTab: string = AppConstants.OSK_LETTERS_TAB;
   mainTab: string = AppConstants.OSK_MAIN_TAB;
   greekSymbols: string[] = Object.values(
-    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS
+  );
 
   greekLetters: string[] = Object.keys(
-    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS);
+    AppConstants.GREEK_LETTER_NAMES_TO_SYMBOLS
+  );
 
   currentTab: string = this.mainTab;
   lettersInKeyboardLayout: string[] = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
   functions: string[] = [
-    'log', 'ln', 'sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'arcsin',
-    'arccos', 'arctan', 'sinh', 'cosh', 'tanh'];
+    'log',
+    'ln',
+    'sin',
+    'cos',
+    'tan',
+    'sec',
+    'csc',
+    'cot',
+    'arcsin',
+    'arccos',
+    'arctan',
+    'sinh',
+    'cosh',
+    'tanh',
+  ];
 
   constructor(
     private deviceInfoService: DeviceInfoService,
@@ -121,12 +136,13 @@ export class OnScreenKeyboardComponent {
   showOSK(): boolean {
     if (
       !this.deviceInfoService.isMobileUserAgent() ||
-          !this.deviceInfoService.hasTouchEvents()) {
+      !this.deviceInfoService.hasTouchEvents()
+    ) {
       return false;
     }
     let showOSK = this.guppyInitializationService.getShowOSK();
-    let activeGuppyObject = (
-      this.guppyInitializationService.findActiveGuppyObject());
+    let activeGuppyObject =
+      this.guppyInitializationService.findActiveGuppyObject();
     if (showOSK && activeGuppyObject !== undefined) {
       this.guppyInstance = activeGuppyObject.guppyInstance;
       this.engine = this.guppyInstance.engine;
@@ -139,5 +155,9 @@ export class OnScreenKeyboardComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaOnScreenKeyboard',
-  downgradeComponent({ component: OnScreenKeyboardComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaOnScreenKeyboard',
+    downgradeComponent({component: OnScreenKeyboardComponent})
+  );

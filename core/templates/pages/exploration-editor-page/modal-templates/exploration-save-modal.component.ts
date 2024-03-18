@@ -16,19 +16,18 @@
  * @fileoverview Component for exploration save modal.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AppConstants } from 'app.constants';
-import { DiffNodeData } from 'components/version-diff-visualization/version-diff-visualization.component';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AppConstants} from 'app.constants';
+import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
 
 @Component({
   selector: 'oppia-exploration-save-modal',
-  templateUrl: './exploration-save-modal.component.html'
+  templateUrl: './exploration-save-modal.component.html',
 })
-export class ExplorationSaveModalComponent
-  extends ConfirmOrCancelModal {
+export class ExplorationSaveModalComponent extends ConfirmOrCancelModal {
   earlierVersionHeader: string = 'Last saved';
   laterVersionHeader: string = 'New changes';
   commitMessage: string = '';
@@ -41,9 +40,7 @@ export class ExplorationSaveModalComponent
   @Input() isExplorationPrivate!: boolean;
   @Input() diffData!: DiffNodeData;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
@@ -52,7 +49,9 @@ export class ExplorationSaveModalComponent
   }
 }
 
-angular.module('oppia').directive('oppiaExplorationSaveModal',
+angular.module('oppia').directive(
+  'oppiaExplorationSaveModal',
   downgradeComponent({
-    component: ExplorationSaveModalComponent
-  }) as angular.IDirectiveFactory);
+    component: ExplorationSaveModalComponent,
+  }) as angular.IDirectiveFactory
+);

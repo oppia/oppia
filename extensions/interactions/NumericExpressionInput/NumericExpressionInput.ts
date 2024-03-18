@@ -18,16 +18,21 @@
 
 require(
   'interactions/NumericExpressionInput/directives/' +
-  'numeric-expression-input-rules.service.ts');
+    'numeric-expression-input-rules.service.ts'
+);
 require(
   'interactions/NumericExpressionInput/directives/' +
-  'numeric-expression-input-validation.service.ts');
+    'numeric-expression-input-validation.service.ts'
+);
 require(
   'interactions/NumericExpressionInput/directives/' +
-  'oppia-interactive-numeric-expression-input.component.ts');
+    'oppia-interactive-numeric-expression-input.component.ts'
+);
 require(
   'interactions/NumericExpressionInput/directives/' +
-  'oppia-response-numeric-expression-input.component.ts');
+    'oppia-response-numeric-expression-input.component.ts'
+);
 require(
   'interactions/NumericExpressionInput/directives/' +
-  'oppia-short-response-numeric-expression-input.component.ts');
+    'oppia-short-response-numeric-expression-input.component.ts'
+);

@@ -17,27 +17,32 @@
  */
 
 export interface StateStatsBackendDict {
-  'total_answers_count': number;
-  'useful_feedback_count': number;
-  'total_hit_count': number;
-  'first_hit_count': number;
-  'num_times_solution_viewed': number;
-  'num_completions': number;
+  total_answers_count: number;
+  useful_feedback_count: number;
+  total_hit_count: number;
+  first_hit_count: number;
+  num_times_solution_viewed: number;
+  num_completions: number;
 }
 
 export class StateStats {
   constructor(
-      public readonly totalAnswersCount: number,
-      public readonly usefulFeedbackCount: number,
-      public readonly totalHitCount: number,
-      public readonly firstHitCount: number,
-      public readonly numTimesSolutionViewed: number,
-      public readonly numCompletions: number) {}
+    public readonly totalAnswersCount: number,
+    public readonly usefulFeedbackCount: number,
+    public readonly totalHitCount: number,
+    public readonly firstHitCount: number,
+    public readonly numTimesSolutionViewed: number,
+    public readonly numCompletions: number
+  ) {}
 
   static createFromBackendDict(backendDict: StateStatsBackendDict): StateStats {
     return new StateStats(
-      backendDict.total_answers_count, backendDict.useful_feedback_count,
-      backendDict.total_hit_count, backendDict.first_hit_count,
-      backendDict.num_times_solution_viewed, backendDict.num_completions);
+      backendDict.total_answers_count,
+      backendDict.useful_feedback_count,
+      backendDict.total_hit_count,
+      backendDict.first_hit_count,
+      backendDict.num_times_solution_viewed,
+      backendDict.num_completions
+    );
   }
 }

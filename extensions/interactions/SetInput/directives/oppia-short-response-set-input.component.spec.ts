@@ -16,10 +16,10 @@
  * @fileoverview Component for the Set Input short response.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseSetInputComponent } from './oppia-short-response-set-input.component';
-import { TranslateModule } from '@ngx-translate/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseSetInputComponent} from './oppia-short-response-set-input.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 describe('ShortResponseSetInputComponent', () => {
   let component: ShortResponseSetInputComponent;
@@ -38,16 +38,16 @@ describe('ShortResponseSetInputComponent', () => {
           useDefaultLang: true,
           isolate: false,
           extend: false,
-          defaultLanguage: 'en'
+          defaultLanguage: 'en',
         }),
       ],
       declarations: [ShortResponseSetInputComponent],
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
-      ]
+          useClass: mockHtmlEscaperService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -61,8 +61,9 @@ describe('ShortResponseSetInputComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.displayedAnswer)
-      .toBe('I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
+    expect(component.displayedAnswer).toBe(
+      'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER'
+    );
   });
 
   it('should initialise component when user submits answer', () => {
@@ -70,7 +71,6 @@ describe('ShortResponseSetInputComponent', () => {
 
     component.ngOnInit();
 
-    expect(component.displayedAnswer)
-      .toBe('answer1, answer2');
+    expect(component.displayedAnswer).toBe('answer1, answer2');
   });
 });

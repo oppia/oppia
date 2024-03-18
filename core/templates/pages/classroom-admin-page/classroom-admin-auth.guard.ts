@@ -17,8 +17,8 @@
  * if the user is not a curriculum admin.
  */
 
-import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import {Location} from '@angular/common';
+import {Injectable} from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivate,
@@ -26,11 +26,11 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { UserService } from 'services/user.service';
+import {AppConstants} from 'app.constants';
+import {UserService} from 'services/user.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ClassroomAdminAuthGuard implements CanActivate {
   constructor(
@@ -40,19 +40,21 @@ export class ClassroomAdminAuthGuard implements CanActivate {
   ) {}
 
   async canActivate(
-      route: ActivatedRouteSnapshot,
-      state: RouterStateSnapshot
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
   ): Promise<boolean> {
     const userInfo = await this.userService.getUserInfoAsync();
     if (userInfo.isCurriculumAdmin()) {
       return true;
     }
 
-    this.router.navigate(
-      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .ERROR.ROUTE}/401`]).then(() => {
-      this.location.replaceState(state.url);
-    });
+    this.router
+      .navigate([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+      ])
+      .then(() => {
+        this.location.replaceState(state.url);
+      });
     return false;
   }
 }

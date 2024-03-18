@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { BackgroundBannerComponent } from './background-banner.component';
-
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {BackgroundBannerComponent} from './background-banner.component';
 
 /**
  * @fileoverview Unit tests for BackgroundBannerComponent.
@@ -26,7 +25,7 @@ describe('BackgroundBannerComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [BackgroundBannerComponent]
+      declarations: [BackgroundBannerComponent],
     }).compileComponents();
   }));
 
@@ -41,11 +40,13 @@ describe('BackgroundBannerComponent', () => {
     spyOn(Math, 'random').and.returnValues(0.5, 0.3);
 
     component.ngOnInit();
-    expect(component.bannerImageFileUrl)
-      .toBe('/assets/images/background/bannerC.svg');
+    expect(component.bannerImageFileUrl).toBe(
+      '/assets/images/background/bannerC.svg'
+    );
 
     component.ngOnInit();
-    expect(component.bannerImageFileUrl)
-      .toBe('/assets/images/background/bannerB.svg');
+    expect(component.bannerImageFileUrl).toBe(
+      '/assets/images/background/bannerB.svg'
+    );
   });
 });

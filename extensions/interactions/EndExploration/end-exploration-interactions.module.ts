@@ -16,34 +16,29 @@
  * @fileoverview Module for the end exploration extension components.
  */
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { InteractiveEndExplorationComponent } from './directives/oppia-interactive-end-exploration.component';
-import { ResponseEndExplorationComponent } from './directives/oppia-response-end-exploration.component';
-import { ShortResponseEndExplorationComponent } from './directives/oppia-short-response-end-exploration.component';
-import { MaterialModule } from 'modules/material.module';
-
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {InteractiveEndExplorationComponent} from './directives/oppia-interactive-end-exploration.component';
+import {ResponseEndExplorationComponent} from './directives/oppia-response-end-exploration.component';
+import {ShortResponseEndExplorationComponent} from './directives/oppia-short-response-end-exploration.component';
+import {MaterialModule} from 'modules/material.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MaterialModule
-  ],
+  imports: [CommonModule, MaterialModule],
   declarations: [
     InteractiveEndExplorationComponent,
     ResponseEndExplorationComponent,
-    ShortResponseEndExplorationComponent
+    ShortResponseEndExplorationComponent,
   ],
   entryComponents: [
     InteractiveEndExplorationComponent,
     ResponseEndExplorationComponent,
-    ShortResponseEndExplorationComponent
+    ShortResponseEndExplorationComponent,
   ],
   exports: [
     InteractiveEndExplorationComponent,
     ResponseEndExplorationComponent,
-    ShortResponseEndExplorationComponent
+    ShortResponseEndExplorationComponent,
   ],
 })
-
-export class EndExplorationExtensionsModule { }
+export class EndExplorationExtensionsModule {}

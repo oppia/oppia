@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for user info.
  */
 
-import { UserInfo } from 'domain/user/user-info.model';
+import {UserInfo} from 'domain/user/user-info.model';
 
 describe('User info model', () => {
   let sampleUserInfoBackendObject = {
@@ -29,20 +29,19 @@ describe('User info model', () => {
     preferred_site_language_code: 'en',
     username: 'tester',
     email: 'tester@example.org',
-    user_is_logged_in: true
+    user_is_logged_in: true,
   };
 
   it('should create correct UserInfo object from backend dict', () => {
-    let userInfo = UserInfo.createFromBackendDict(
-      sampleUserInfoBackendObject);
+    let userInfo = UserInfo.createFromBackendDict(sampleUserInfoBackendObject);
 
     expect(userInfo.isModerator()).toBe(true);
     expect(userInfo.isCurriculumAdmin()).toBe(false);
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
     expect(userInfo.isBlogAdmin()).toBe(false),
-    expect(userInfo.isBlogPostEditor()).toBe(false),
-    expect(userInfo.isTranslationAdmin()).toBe(false);
+      expect(userInfo.isBlogPostEditor()).toBe(false),
+      expect(userInfo.isTranslationAdmin()).toBe(false);
     expect(userInfo.isQuestionAdmin()).toBe(false);
     expect(userInfo.isQuestionCoordinator()).toBe(false);
     expect(userInfo.isTranslationCoordinator()).toBe(false);
@@ -60,8 +59,8 @@ describe('User info model', () => {
     expect(userInfo.isSuperAdmin()).toBe(false);
     expect(userInfo.isTopicManager()).toBe(false);
     expect(userInfo.isBlogAdmin()).toBe(false),
-    expect(userInfo.isBlogPostEditor()).toBe(false),
-    expect(userInfo.canCreateCollections()).toBe(false);
+      expect(userInfo.isBlogPostEditor()).toBe(false),
+      expect(userInfo.canCreateCollections()).toBe(false);
     expect(userInfo.getPreferredSiteLanguageCode()).toBeNull();
     expect(userInfo.getUsername()).toBeNull();
     expect(userInfo.getEmail()).toBeNull();

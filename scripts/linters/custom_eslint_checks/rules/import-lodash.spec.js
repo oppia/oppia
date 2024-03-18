@@ -25,36 +25,37 @@ var ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2016,
   },
-  parser: require.resolve('@typescript-eslint/parser')
+  parser: require.resolve('@typescript-eslint/parser'),
 });
 ruleTester.run('import-lodash', rule, {
   valid: [
     {
-      code:
-      'import cloneDeep from "lodash/cloneDeep";'
-    }
+      code: 'import cloneDeep from "lodash/cloneDeep";',
+    },
   ],
 
   invalid: [
     {
-      code:
-      'import { cloneDeep }  from "lodash";',
-      errors: [{
-        message: (
-          'Please do not use "import { someFunction } from \'lodash\'" and' +
-          ' "import _ from \'lodash\'". Use "import someFunction from' +
-          ' \'lodash/someFunction\'" instead.')
-      }],
+      code: 'import { cloneDeep }  from "lodash";',
+      errors: [
+        {
+          message:
+            'Please do not use "import { someFunction } from \'lodash\'" and' +
+            ' "import _ from \'lodash\'". Use "import someFunction from' +
+            " 'lodash/someFunction'\" instead.",
+        },
+      ],
     },
     {
-      code:
-      'import _ from "lodash";',
-      errors: [{
-        message: (
-          'Please do not use "import { someFunction } from \'lodash\'" and' +
-          ' "import _ from \'lodash\'". Use "import someFunction from' +
-          ' \'lodash/someFunction\'" instead.')
-      }],
-    }
-  ]
+      code: 'import _ from "lodash";',
+      errors: [
+        {
+          message:
+            'Please do not use "import { someFunction } from \'lodash\'" and' +
+            ' "import _ from \'lodash\'". Use "import someFunction from' +
+            " 'lodash/someFunction'\" instead.",
+        },
+      ],
+    },
+  ],
 });

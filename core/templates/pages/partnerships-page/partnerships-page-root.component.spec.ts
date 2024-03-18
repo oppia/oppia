@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the partnerships page root component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { PartnershipsPageRootComponent } from './partnerships-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PartnershipsPageRootComponent} from './partnerships-page-root.component';
 
 describe('Partnerships Page Root', () => {
   let fixture: ComponentFixture<PartnershipsPageRootComponent>;
@@ -31,14 +31,9 @@ describe('Partnerships Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        PartnershipsPageRootComponent,
-        MockTranslatePipe
-      ],
-      providers: [
-        PageHeadService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [PartnershipsPageRootComponent, MockTranslatePipe],
+      providers: [PageHeadService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -48,10 +43,9 @@ describe('Partnerships Page Root', () => {
     pageHeadService = TestBed.inject(PageHeadService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
@@ -60,6 +54,7 @@ describe('Partnerships Page Root', () => {
 
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.META
+    );
   });
 });

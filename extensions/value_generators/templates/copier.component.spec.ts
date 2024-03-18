@@ -16,20 +16,18 @@
  * @fileoverview Unit test for copier value generator.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { CopierComponent } from './copier.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {CopierComponent} from './copier.component';
 
-describe('copier value generator component', function() {
+describe('copier value generator component', function () {
   let component: CopierComponent;
   let fixture: ComponentFixture<CopierComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CopierComponent
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [CopierComponent],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -42,7 +40,7 @@ describe('copier value generator component', function() {
     component.objType = 'objType';
     component.customizationArgs = {
       value: 'value',
-      list_of_values: ['list_of_values']
+      list_of_values: ['list_of_values'],
     };
 
     fixture.detectChanges();

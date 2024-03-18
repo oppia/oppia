@@ -16,27 +16,47 @@
  * @fileoverview Service for initializing Guppy instances.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 const SYMBOLS_TO_REMOVE = [
-  'norm', 'utf8', 'text', 'sym_name', 'eval', 'floor', 'factorial', 'sub',
-  'int', 'defi', 'deriv', 'sum', 'prod', 'root', 'vec', 'point',
-  'infinity', 'leq', 'less', 'geq', 'greater', 'neq'];
+  'norm',
+  'utf8',
+  'text',
+  'sym_name',
+  'eval',
+  'floor',
+  'factorial',
+  'sub',
+  'int',
+  'defi',
+  'deriv',
+  'sum',
+  'prod',
+  'root',
+  'vec',
+  'point',
+  'infinity',
+  'leq',
+  'less',
+  'geq',
+  'greater',
+  'neq',
+];
 
 const MULTIPLICATION_SYMBOL_DICT = {
   output: {
     latex: '\\times',
-    asciimath: '*'
+    asciimath: '*',
   },
   keys: ['*'],
   attrs: {
     group: 'operations',
-    type: '*'
+    type: '*',
   },
   ast: {
-    type: 'operator'
-  }
+    type: 'operator',
+  },
 };
 
 const FRACTION_SYMBOL_DICT = {
@@ -44,46 +64,49 @@ const FRACTION_SYMBOL_DICT = {
     latex: '\\frac{{$1}}{{$2}}',
     small_latex: '\\frac{{$1}}{{$2}}',
     asciimath: '/',
-    text: '({$1})/({$2})'
+    text: '({$1})/({$2})',
   },
   input: 1,
   keys: ['/'],
   attrs: {
     type: 'fraction',
-    group: 'functions'
+    group: 'functions',
   },
-  args: [{
-    up: '1',
-    down: '2',
-    name: 'numerator',
-    small: 'yes'
-  }, {
-    up: '1',
-    down: '2',
-    'delete': '1',
-    name: 'denominator',
-    small: 'yes'
-  }]
+  args: [
+    {
+      up: '1',
+      down: '2',
+      name: 'numerator',
+      small: 'yes',
+    },
+    {
+      up: '1',
+      down: '2',
+      delete: '1',
+      name: 'denominator',
+      small: 'yes',
+    },
+  ],
 };
 
 const DIVISION_SYMBOL_DICT = {
   output: {
     latex: '\\div',
     asciimath: '/',
-    text: '/'
+    text: '/',
   },
   keys: ['/'],
   attrs: {
     group: 'operations',
-    type: '/'
+    type: '/',
   },
   ast: {
-    type: 'operator'
-  }
+    type: 'operator',
+  },
 };
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GuppyConfigurationService {
   static serviceIsInitialized = false;
@@ -105,17 +128,22 @@ export class GuppyConfigurationService {
     Guppy.configure('buttons', ['controls']);
     Guppy.configure(
       'empty_content',
-      '\\color{grey}{\\text{\\small{Type a formula here.}}}');
+      '\\color{grey}{\\text{\\small{Type a formula here.}}}'
+    );
     GuppyConfigurationService.serviceIsInitialized = true;
   }
 
-  changeDivSymbol(useFraction: (boolean | { value: boolean }) = false): void {
+  changeDivSymbol(useFraction: boolean | {value: boolean} = false): void {
     Guppy.add_global_symbol(
-      '/', useFraction ? FRACTION_SYMBOL_DICT : DIVISION_SYMBOL_DICT
+      '/',
+      useFraction ? FRACTION_SYMBOL_DICT : DIVISION_SYMBOL_DICT
     );
   }
 }
 
-angular.module('oppia').factory(
-  'GuppyConfigurationService',
-  downgradeInjectable(GuppyConfigurationService));
+angular
+  .module('oppia')
+  .factory(
+    'GuppyConfigurationService',
+    downgradeInjectable(GuppyConfigurationService)
+  );
