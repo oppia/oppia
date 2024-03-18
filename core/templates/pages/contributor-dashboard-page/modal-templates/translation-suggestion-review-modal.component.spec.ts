@@ -1011,6 +1011,144 @@ describe('Translation Suggestion Review Modal Component', function () {
     });
   });
 
+  describe(
+    'when reviewing suggestions' + ' with deleted opportunites',
+    function () {
+      const reviewable = true;
+      const subheading = 'topic_1 / story_1 / chapter_1';
+
+      const suggestion1 = {
+        suggestion_id: 'suggestion_1',
+        target_id: '1',
+        suggestion_type: 'translate_content',
+        change_cmd: {
+          content_id: 'hint_1',
+          content_html: ['Translation1', 'Translation2'],
+          translation_html: 'Tradução',
+          state_name: 'StateName',
+          cmd: 'edit_state_property',
+          data_format: 'html',
+          language_code: 'language_code',
+        },
+        exploration_content_html: ['Translation1', 'Translation2 CHANGED'],
+        status: 'rejected',
+        author_name: 'author_name',
+        language_code: 'language_code',
+        last_updated_msecs: 1559074000000,
+        target_type: 'target_type',
+      };
+      const suggestion2 = {
+        suggestion_id: 'suggestion_2',
+        target_id: '2',
+        suggestion_type: 'translate_content',
+        change_cmd: {
+          content_id: 'hint_1',
+          content_html: 'Translation',
+          translation_html: 'Tradução',
+          state_name: 'StateName',
+          cmd: 'edit_state_property',
+          data_format: 'html',
+          language_code: 'language_code',
+        },
+        exploration_content_html: 'Translation',
+        status: 'rejected',
+        author_name: 'author_name',
+        language_code: 'language_code',
+        last_updated_msecs: 1559074000000,
+        target_type: 'target_type',
+      };
+
+      const contribution1 = {
+        suggestion: suggestion1,
+        details: {
+          topic_name: 'topic_1',
+          story_title: 'story_1',
+          chapter_title: 'chapter_1',
+        },
+      };
+
+      const deletedContribution = {
+        suggestion: suggestion2,
+        details: null,
+      };
+
+      const suggestionIdToContribution = {
+        suggestion_1: contribution1,
+        suggestion_deleted: deletedContribution,
+      };
+
+      beforeEach(() => {
+        component.initialSuggestionId = 'suggestion_1';
+        component.subheading = subheading;
+        component.reviewable = reviewable;
+        component.suggestionIdToContribution = angular.copy(
+          suggestionIdToContribution
+        );
+        component.ngOnInit();
+      });
+
+      it(
+        'should reject suggestion in suggestion modal service when clicking ' +
+          'on reject and review next suggestion button',
+        function () {
+          expect(component.activeSuggestionId).toBe('suggestion_1');
+          expect(component.activeSuggestion).toEqual(suggestion1);
+          expect(component.reviewable).toBe(reviewable);
+          expect(component.reviewMessage).toBe('');
+
+          spyOn(
+            contributionAndReviewService,
+            'reviewExplorationSuggestion'
+          ).and.callFake(
+            (
+              targetId,
+              suggestionId,
+              action,
+              reviewMessage,
+              commitMessage,
+              successCallback,
+              errorCallback
+            ) => {
+              return Promise.resolve(successCallback(suggestionId));
+            }
+          );
+          spyOn(
+            siteAnalyticsService,
+            'registerContributorDashboardRejectSuggestion'
+          );
+          spyOn(activeModal, 'close');
+          spyOn(alertsService, 'addSuccessMessage');
+
+          spyOn(component, 'startCommitTimeout');
+          spyOn(component, 'showSnackbar');
+          spyOn(component, 'resolveSuggestionAndUpdateModal');
+
+          component.reviewMessage = 'Review message example';
+          component.rejectAndReviewNext(component.reviewMessage);
+          component.commitQueuedSuggestion();
+
+          expect(
+            siteAnalyticsService.registerContributorDashboardRejectSuggestion
+          ).toHaveBeenCalledWith('Translation');
+          expect(
+            contributionAndReviewService.reviewExplorationSuggestion
+          ).toHaveBeenCalledWith(
+            '1',
+            'suggestion_1',
+            'reject',
+            'Review message example',
+            null,
+            jasmine.any(Function),
+            jasmine.any(Function)
+          );
+          expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+            'Suggestion rejected.'
+          );
+        }
+      );
+    }
+  );
+
   describe('when viewing suggestion', function () {
     const reviewable = false;
     const subheading = 'topic_1 / story_1 / chapter_1';
