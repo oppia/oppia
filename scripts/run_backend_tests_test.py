@@ -895,7 +895,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(returned_output, coverage_report_output)
         self.assertEqual(coverage, 86)
 
-    def test_coverage_calculated_correctly_for_uncovered_file(self) -> None:
+    def test_coverage_is_calculated_correctly_for_a_single_file(self) -> None:
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         data_file = '.coverage.hostname.12345.987654321'
