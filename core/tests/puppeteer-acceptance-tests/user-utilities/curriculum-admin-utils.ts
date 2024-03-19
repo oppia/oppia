@@ -26,7 +26,9 @@ const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 const richTextAreaField = 'div.e2e-test-rte';
-const floatTextField = 'input.e2e-test-float-form-input';
+const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
+const solutionFloatTextField =
+  'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'button.e2e-test-save-state-content';
 
@@ -45,7 +47,6 @@ const chapterPhotoBoxButton =
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
 
 const createQuestionButton = 'div.e2e-test-create-question';
-const easyQuestionDifficultyOption = 'div.e2e-test-skill-difficulty-easy';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
@@ -57,9 +58,9 @@ const responseRuleDropdown =
 const equalsRuleButtonText = 'is equal to ... ';
 const answersInGroupAreCorrectToggle =
   'input.e2e-test-editor-correctness-toggle';
-const saveResponseButton = 'div.e2e-test-add-new-response';
-const openOutcomeFeedBackEditor = 'div.e2e-test-add-new-response';
-const saveOutcomeFeedbackButton = 'div.e2e-test-save-outcome-feedback';
+const saveResponseButton = 'button.e2e-test-add-new-response';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
 const saveHintButton = 'button.e2e-test-save-hint';
 const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
@@ -175,11 +176,16 @@ export class CurriculumAdmin extends BaseUser {
     await this.openTopicEditor();
     await this.clickOn(addSkillButton);
     await this.type(skillDescriptionField, skill.description);
+    await this.page.waitForSelector(skillReviewMaterialHeader);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, skill.reviewMaterial);
     await this.clickAfterWaiting(confirmSkillCreationButton);
     await this.page.bringToFront();
+
+    for (let i = 0; i < skill.questionCount; i++) {
+      await this.createQuestion();
+    }
   }
 
   /**
@@ -188,13 +194,14 @@ export class CurriculumAdmin extends BaseUser {
   async createQuestion(): Promise<void> {
     await this.openSkillEditor();
     await this.clickOn(createQuestionButton);
-    await this.clickOn(easyQuestionDifficultyOption);
     await this.clickOn(textStateEditSelector);
+    await this.page.waitForTimeout(500);
     await this.type(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
+    await this.page.waitForTimeout(500);
     await this.clickOn(interactionNumberInputButton);
     await this.clickOn(saveInteractionButton);
     await this.clickOn(responseRuleDropdown);
@@ -203,7 +210,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(answersInGroupAreCorrectToggle);
     await this.clickOn(saveResponseButton);
 
+    await this.page.waitForTimeout(500);
+    await this.clickOn('a.e2e-test-default-response-tab');
     await this.clickOn(openOutcomeFeedBackEditor);
+    await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, 'The answer is 3');
     await this.clickOn(saveOutcomeFeedbackButton);
 
@@ -211,14 +221,19 @@ export class CurriculumAdmin extends BaseUser {
     await this.type(richTextAreaField, '3');
     await this.clickOn(saveHintButton);
 
+    await this.page.waitForTimeout(500);
     await this.clickOn(addSolutionButton);
+    await this.page.waitForSelector(answerTypeDropdown);
     await this.page.select(answerTypeDropdown, 'The only');
-    await this.type(floatTextField, '3');
+    await this.page.waitForSelector(solutionFloatTextField);
+    await this.type(solutionFloatTextField, '3');
+    await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
     await this.type(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
 
+    await this.page.waitForTimeout(500);
     await this.clickOn(saveQuestionButton);
   }
 
@@ -384,6 +399,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async publishStory(): Promise<void> {
     await this.clickAfterWaiting(saveStoryButton);
+    await this.page.waitForTimeout(500);
     await this.type(
       saveStoryMessageInput,
       'Test publishing story as curriculum admin.'
