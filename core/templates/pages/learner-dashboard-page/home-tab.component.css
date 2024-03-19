@@ -219,7 +219,7 @@
 }
 
 /*REDESIGN CLASSES - can be used for other tabs*/
-.oppia-learner-dash_greeting { 
+.oppia-learner-dash_greeting {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
@@ -233,13 +233,13 @@
 }
 
 .oppia-learner-dash-section_heading {
-  color: #205D86;
+  color: #205d86;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 24px;
 }
 
 .oppia-learner-dash-section_subheading {
-  color: #333333;
+  color: #333;
   font-size: 20px;
   font-weight: 500;
   margin-bottom: 0;
@@ -253,9 +253,9 @@
 
 .oppia-learner-dash-home_button {
   background-color: #fff;
-  border: 2px solid #205D86;
+  border: 2px solid #205d86;
   border-radius: .25em;
-  color: #205D86;
+  color: #205d86;
   font-weight: 700;
   padding: 10px 0;
   text-decoration: none;
@@ -263,8 +263,8 @@
 }
 
 .oppia-learner-dash-home_button:hover {
-  background-color: #CADBDA;
-  color: #205D86;
+  background-color: #cadbda;
+  color: #205d86;
   text-decoration: none;
 }
 /******************/
