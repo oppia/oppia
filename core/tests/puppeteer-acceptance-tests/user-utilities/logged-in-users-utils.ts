@@ -721,8 +721,8 @@ export class LoggedInUser extends BaseUser {
     );
     const newTabPage = await newTarget.page();
     expect(newTabPage).toBeDefined();
-    expect(newTabPage.url()).toContain(expectedDestinationPageUrl);
-    await newTabPage.close();
+    expect(newTabPage?.url()).toContain(expectedDestinationPageUrl);
+    await newTabPage?.close();
   }
 
   /**
