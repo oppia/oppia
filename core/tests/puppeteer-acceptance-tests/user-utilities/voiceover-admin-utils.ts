@@ -52,7 +52,6 @@ const errorToastMessage = 'div.e2e-test-toast-warning-message';
 const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
 
 const updatedVoiceoverArtist = 'div.e2e-test-voice-artist-voiceoverartist';
-// const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -66,9 +65,9 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.page.waitForTimeout(200);
+    await this.page.waitForTimeout(500);
     await this.clickOn(explorationSettingsTab);
-    await this.page.waitForTimeout(200);
+    await this.page.waitForTimeout(500);
   }
 
   /**
@@ -110,6 +109,7 @@ export class VoiceoverAdmin extends BaseUser {
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(closeShareModalButton);
     await this.clickOn(closeShareModalButton);
+    await this.page.waitForTimeout(500);
   }
 
   /**

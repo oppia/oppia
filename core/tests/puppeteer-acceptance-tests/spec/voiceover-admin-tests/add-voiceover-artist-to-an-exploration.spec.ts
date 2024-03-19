@@ -57,7 +57,7 @@ describe('Voiceover Admin', function () {
         'voiceoverartist',
         'voiceoverartist@example.com'
       );
-
+      await testUser.page.reload();
       await testUser.editVoiceoverArtist('voiceoverartist');
       await testUser.expectToSeeUpdatedVoiceoverArtist();
     },
