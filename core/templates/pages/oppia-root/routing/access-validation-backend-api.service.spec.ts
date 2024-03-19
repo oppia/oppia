@@ -271,10 +271,27 @@ describe('Access validation backend api service', () => {
       );
 
       flushMicrotasks();
-      expect(successSpy).toHaveBeenCalled();
-      expect(failSpy).not.toHaveBeenCalled();
+      expect(successSpy).not.toHaveBeenCalled();
+      expect(failSpy).toHaveBeenCalled();
     })
   );
+
+  it('should validate access to blog author profile page with valid access', fakeAsync(() => {
+    avbas
+      .validateAccessToBlogAuthorProfilePage('username')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_blog_author_profile_page/' +
+        'username'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
 
   it('should not validate access to collection player page with invalid access', fakeAsync(() => {
     avbas
