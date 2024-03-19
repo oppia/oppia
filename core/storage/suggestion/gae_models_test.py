@@ -3632,7 +3632,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
-                page_size=2,
+                page_size=1,
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
@@ -3640,11 +3640,10 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 max_days_since_last_activity=90,
                 language_code='es'
             ))
-        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_2')
-        self.assertEqual(sorted_results[1].id, 'model_1')
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 3)
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 2)
 
         # Check for no sorted_results in given time.
         sorted_results, next_offset, more = (
@@ -3662,6 +3661,22 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
+         # Check for no activity before last 8 days.
+        sorted_results, next_offset, more = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .fetch_page(
+                page_size=1,
+                offset=0,
+                sort_by=None,
+                topic_ids=None,
+                max_days_since_first_activity=8,
+                max_days_since_last_activity=None,
+                language_code='de'
+            ))
+        self.assertEqual(len(sorted_results), 0)
+        self.assertFalse(more)
+        self.assertEqual(next_offset, 2)
+
         # Check for activites before last 5 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
@@ -3672,23 +3687,6 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 topic_ids=None,
                 max_days_since_first_activity=5,
                 max_days_since_last_activity=None,
-                language_code='de'
-            ))
-        self.assertEqual(len(sorted_results), 1)
-        self.assertEqual(sorted_results[0].id, 'model_5')
-        self.assertTrue(more)
-        self.assertEqual(next_offset, 1)
-
-        # Check for activites before last 5 days and after last 130 days.
-        sorted_results, next_offset, more = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel
-            .fetch_page(
-                page_size=1,
-                offset=0,
-                sort_by=None,
-                topic_ids=None,
-                max_days_since_first_activity=5,
-                max_days_since_last_activity=130,
                 language_code='de'
             ))
         self.assertEqual(len(sorted_results), 1)
@@ -3712,7 +3710,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 2)
 
-        # Check for no activity before last 8 days.
+        # Check for activites before last 5 days and after last 130 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
@@ -3720,13 +3718,14 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
                 offset=0,
                 sort_by=None,
                 topic_ids=None,
-                max_days_since_first_activity=8,
-                max_days_since_last_activity=None,
+                max_days_since_first_activity=5,
+                max_days_since_last_activity=130,
                 language_code='de'
             ))
-        self.assertEqual(len(sorted_results), 0)
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 2)
+        self.assertEqual(len(sorted_results), 1)
+        self.assertEqual(sorted_results[0].id, 'model_5')
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 1)
 
     def test_fetch_page_with_sorting_and_filtering(self) -> None:
         suggestion_models.TranslationSubmitterTotalContributionStatsModel(
@@ -4613,18 +4612,17 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
-                page_size=4,
+                page_size=1,
                 offset=0,
                 sort_by=None,
                 max_days_since_first_activity=None,
                 max_days_since_last_activity=90,
                 language_code='es'
             ))
-        self.assertEqual(len(sorted_results), 2)
+        self.assertEqual(len(sorted_results), 1)
         self.assertEqual(sorted_results[0].id, 'model_3')
-        self.assertEqual(sorted_results[1].id, 'model_2')
-        self.assertFalse(more)
-        self.assertEqual(next_offset, 3)
+        self.assertTrue(more)
+        self.assertEqual(next_offset, 1)
 
         # Check for no sorted_results within 7 days.
         sorted_results, next_offset, more = (
