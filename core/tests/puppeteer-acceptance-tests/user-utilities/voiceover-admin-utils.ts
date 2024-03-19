@@ -42,7 +42,7 @@ const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const closeShareModalButton = 'button.e2e-test-share-publish-close';
 
-const explorationSettingsTab = 'a.e2e-test-settings-tab-icon';
+const explorationSettingsTab = '.e2e-test-settings-tab';
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistEditSelector = 'input.e2e-test-new-voice-artist-username';
 const saveVoiceoverArtistEditButton =
@@ -59,15 +59,16 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to creator dashboard page
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
-    await this.goto(creatorDashboardPage);
+    await this.page.goto(creatorDashboardPage);
   }
 
   /**
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.page.waitForSelector(explorationSettingsTab);
+    await this.page.waitForTimeout(200);
     await this.clickOn(explorationSettingsTab);
+    await this.page.waitForTimeout(200);
   }
 
   /**
