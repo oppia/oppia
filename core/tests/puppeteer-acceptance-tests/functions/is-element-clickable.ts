@@ -23,19 +23,19 @@ export default function isElementClickable(element: Element): boolean {
    *
    * @param {Element} element The target element to check for overlapping
    * elements.
-   * @param {ShadowRoot | Document} parent The parent element to check for
+   * @param {ShadowRoot | Document} rootElement The root element to check for
    * the overlapping element at the center of the target element.
    * @returns {Element | null} The overlapping element if any.
    */
   const getOverlappingElement = (
     element: Element,
-    parent: ShadowRoot | Document = document
+    rootElement: ShadowRoot | Document = document
   ): Element | null => {
     const elementDimensions = element.getBoundingClientRect();
     const x = elementDimensions.left + element.clientWidth / 2;
     const y = elementDimensions.top + element.clientHeight / 2;
 
-    return parent.elementFromPoint(x, y);
+    return rootElement.elementFromPoint(x, y);
   };
 
   /**
@@ -47,20 +47,20 @@ export default function isElementClickable(element: Element): boolean {
    *
    * @param {Element} element The target element to check for overlapping
    * elements.
-   * @param {ShadowRoot | Document} parent The parent element to check for
+   * @param {ShadowRoot | Document} rootElement The root element to check for
    * the overlapping element at the center of the target element.
    * @returns {Element | null} The overlapping element if any.
    */
   const getOverlappingRect = (
     element: Element,
-    parent: ShadowRoot | Document = document
+    rootElement: ShadowRoot | Document = document
   ): Element | null => {
     const rects = element.getClientRects();
     const rect = rects[0];
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
 
-    return parent.elementFromPoint(x, y);
+    return rootElement.elementFromPoint(x, y);
   };
 
   /**
@@ -70,16 +70,16 @@ export default function isElementClickable(element: Element): boolean {
    *
    * @param {Element} element The target element to check for overlapping
    * elements.
-   * @param {ShadowRoot | Document} parent The parent element to check for
+   * @param {ShadowRoot | Document} rootElement The root element to check for
    * the overlapping element at the center of the target element.
    * @returns {Element[]} - The overlapping elements if any.
    */
   const getTopmostOverlappingElements = (
     element: Element,
-    parent: ShadowRoot | Document = document
+    rootElement: ShadowRoot | Document = document
   ): Element[] => {
-    const overlappingElement = getOverlappingElement(element, parent);
-    const overlappingRect = getOverlappingRect(element, parent);
+    const overlappingElement = getOverlappingElement(element, rootElement);
+    const overlappingRect = getOverlappingRect(element, rootElement);
     const overlappingElements: Element[] = [];
     if (overlappingElement) {
       overlappingElements.push(overlappingElement);
@@ -95,21 +95,19 @@ export default function isElementClickable(element: Element): boolean {
    * overlapping element meaning there are no other elements blocking
    * the target element.
    *
-   * @param {Element} targetElement The element to compare with the other
+   * @param {Element} element The target element to compare with the other
    * overlapping elements.
    * @param {Element[]} overlappingElements The overlapping elements to compare
    * against the target element.
    * @returns {boolean} Whether the target element is the only overlapping
    * element.
    */
-  const isTargetTheOnlyOverlappingElement = (
-    targetElement: Element,
+  const isElementNotOverlappedByOtherElements = (
+    element: Element,
     overlappingElements: Element[]
   ): boolean => {
     if (
-      overlappingElements.some(
-        el => el === targetElement || targetElement.contains(el)
-      )
+      overlappingElements.some(el => el === element || element.contains(el))
     ) {
       return true;
     }
@@ -123,7 +121,7 @@ export default function isElementClickable(element: Element): boolean {
     for (const shadowEl of elementsWithShadow) {
       if (shadowEl.shadowRoot) {
         shadowElements.push(
-          ...getTopmostOverlappingElements(targetElement, shadowEl.shadowRoot)
+          ...getTopmostOverlappingElements(element, shadowEl.shadowRoot)
         );
       }
     }
@@ -136,7 +134,7 @@ export default function isElementClickable(element: Element): boolean {
       return false;
     }
 
-    return isTargetTheOnlyOverlappingElement(targetElement, shadowElements);
+    return isElementNotOverlappedByOtherElements(element, shadowElements);
   };
 
   /**
@@ -190,7 +188,7 @@ export default function isElementClickable(element: Element): boolean {
     return (
       !isElementDisabled(element) &&
       isElementInViewport(element) &&
-      isTargetTheOnlyOverlappingElement(
+      isElementNotOverlappedByOtherElements(
         element,
         getTopmostOverlappingElements(element)
       )
