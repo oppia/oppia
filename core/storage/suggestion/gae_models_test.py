@@ -3661,7 +3661,7 @@ class TranslationSubmitterTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-         # Check for no activity before last 8 days.
+        # Check for no activity before last 8 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationSubmitterTotalContributionStatsModel
             .fetch_page(
