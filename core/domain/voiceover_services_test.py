@@ -323,6 +323,30 @@ class VoiceArtistMetadataTests(test_utils.GenericTestBase):
             voice_artist_metadata_model.language_code_to_accent[language_code],
             final_language_accent_code)
 
+    def test_should_create_and_update_voice_artist_language_mapping(
+        self
+    ) -> None:
+        language_code = 'en'
+        language_accent_code = 'en-US'
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+
+        self.assertIsNone(voice_artist_metadata_model)
+
+        voiceover_services.update_voice_artist_language_mapping(
+            self.voice_artist_id, language_code, language_accent_code)
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+        assert voice_artist_metadata_model is not None
+
+        self.assertEqual(
+            voice_artist_metadata_model.language_code_to_accent[language_code],
+            language_accent_code)
+
     def test_should_create_voice_artist_metadata_model_successfully(
         self
     ) -> None:
@@ -382,6 +406,12 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
         }
         self.voiceover7: voiceover_models.VoiceoverDict = {
             'filename': 'filename7.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        self.voiceover8: voiceover_models.VoiceoverDict = {
+            'filename': 'filename8.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
             'duration_secs': 5.0
@@ -539,7 +569,8 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                         'en': ('voice_artist_1', self.voiceover2),
                     },
                     'content_1': {
-                        'en': ('voice_artist_1', self.voiceover7)
+                        'en': ('voice_artist_1', self.voiceover7),
+                        'ar': ('voice_artist_1', self.voiceover8)
                     }
                 }
             )
