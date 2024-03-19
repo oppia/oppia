@@ -198,6 +198,7 @@ CHROME_PATHS = [
     # Unix.
     '/usr/bin/google-chrome',
     '/usr/bin/chromium-browser',
+    '/usr/bin/google-chrome-stable',
     # Arch Linux.
     '/usr/bin/brave',
     '/usr/bin/chromium',
