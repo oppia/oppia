@@ -4826,6 +4826,16 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
 
+    def test_one_side_string_concatenation(self) -> None:
+        node = astroid.extract_node(
+            """
+            result = 'super' + 500 #@
+            """)
+
+        expression_node = node.value
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_binop(expression_node)
+            
     def test_infererence_exception(self) -> None:
         node = astroid.extract_node(
             """
