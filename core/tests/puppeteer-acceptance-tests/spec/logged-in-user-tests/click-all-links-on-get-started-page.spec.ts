@@ -36,7 +36,7 @@ describe('Logged-in Users on the Get Started page ', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'can click the "create one here" link',
+    'should be able to use the "create one here" link',
     async function () {
       await testUser.clickCreateOneHereLinkInGetStartedPage();
     },
@@ -44,7 +44,7 @@ describe('Logged-in Users on the Get Started page ', function () {
   );
 
   it(
-    'can click the "Welcome to Oppia" link',
+    'should be able to use the "Welcome to Oppia" link',
     async function () {
       await testUser.clickWelcomeToOppiaLinkInGetStartedPage();
     },
@@ -52,7 +52,7 @@ describe('Logged-in Users on the Get Started page ', function () {
   );
 
   it(
-    'can click the "Get Electrified!" link',
+    'should be able to use the "Get Electrified!" link',
     async function () {
       await testUser.clickGetElectrifiedLinkInGetStartedPage();
     },
