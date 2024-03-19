@@ -806,7 +806,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "سيؤدي هذا إلى تنزيل بيانات حساب اوبيا كملف نصي بتنسيق JSON.",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT": "من فضلك لا تترك هذه الصفحة. يتم حاليًا تحميل بياناتك وسيتم تنزيلها كملف نصي بتنسيق JSON عند الانتهاء. إذا حدث خطأ ما ، يرجى الاتصال",
 	"I18N_PREFERENCES_HEADING": "تفضيلات",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "أي تغييرات تجريها على هذه الصفحة سيتم حفظها تلقائيا.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "لم تشترك في أي منشئ محتوى حتى الآن.لا تتردد للاشتراك في مؤلفك المفضل عم طريق النقر على زو \"اشتراك\" على صفحة المؤلف.عنطريق الاشتراك سيتم اعلامك عن طريق البريد الاكتروني عندما يقوم المؤلف بنشر درساً جديداً.",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "التأثير",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "تفضيلات | أوبيا",
