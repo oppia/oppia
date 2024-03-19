@@ -255,7 +255,6 @@
   font-size: 24px;
 }
 
-/*move to card-display*/
 .subsection-heading {
   color: #333333;
   font-size: 20px;
@@ -265,15 +264,4 @@
 
 .topic-summary-tile-section-1 {
   -webkit-appearance: none;
-}
-
-.topic-summary-tile-1 {
-  border-radius: .25em;
-  height: 220px;
-  margin-right: 16px;
-  width: 210px;
-}
-
-.topic-summary-tile-1:not(:last-child) {
-  margin-right: 16px;
 }

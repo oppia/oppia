@@ -24,24 +24,18 @@
     </a>
   </mat-card>
   <!--REDESIGN-->
-  <a *ngIf="featureFlag" class="d-flex flex-column summary-tile text-decoration-none w-100" [href]="getTopicLink()" target="_blank">
-    <div class="summary-tile_img" [ngStyle]="{'background-color': thumbnailBgColor}">
+  <a *ngIf="featureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none w-100" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+    <div class="oppia-class-card_img" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
-    <div class="summary-tile_info">
-      <p class="mb-2 summary-tile_title e2e-test-learner-topic-summary-tile-title">
+    <div class="oppia-class-card_info">
+      <p class="mb-2 oppia-class-card_title e2e-test-learner-topic-summary-tile-title">
         {{topicTitle}}
       </p>
-      <p class="summary-tile_text">
+      <p class="oppia-class-card_text">
         {{totalPublishedNodeCount}}
         {{(totalPublishedNodeCount === 1 ? 'I18N_TOPIC_VIEWER_LESSON' : 'I18N_TOPIC_VIEWER_LESSONS' ) | translate }}
       </p>
-      <div class="d-flex justify-content-evenly"> 
-        <a [href]="getTopicLink()"
-        target="{{ openInNewWindow ? '_blank' : '_self' }}"
-        class="text-decoration-none">
-        </a>
-      </div>
     </div>
   </a>
   <!------------>
@@ -97,38 +91,45 @@
   }
 
   /*REDESIGN CLASSES*/
-  .summary-tile {
+  .oppia-class-card {
     background-color: #205d86;
     border-radius: 0 0 .25em .25em;
     box-shadow: 0px 2px 2px 0px #00000040;
-    padding: 0px;
+    height: 220px;
+    margin-right: 16px;
+    padding: 0;
+    width: 210px;
   }
 
-  .summary-tile:hover {
+  .oppia-class-card:hover {
     background-color: #00609c;
     box-shadow: 0px 0px 8px 0px #00000040;
   }
 
-  .summary-tile_button {
+  .oppia-class-card:not(:last-child) {
+    margin-right: 16px;
+  }
+
+  .oppia-class-card_button {
     border: 1px solid #00645c;
     font-size: 14px;
   }
 
-  .summary-tile_img {
+  .oppia-class-card_img {
     height: 120px;
   }
 
-  .summary-tile_info {
+  .oppia-class-card_info {
     color: #fff;
     height: 100px;
     padding: 8px 16px;
   }
 
-  .summary-tile_text {
+  .oppia-class-card_text {
     font-size: 12px;
   }
 
-  .summary-tile_title {
+  .oppia-class-card_title {
     font-size: 16px;
     font-weight: 700;
   }

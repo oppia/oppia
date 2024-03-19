@@ -122,7 +122,7 @@
           <p *ngIf="item.value.length !== 0" class="subsection-heading"> Basic {{item.key}} </p>
           <hr width="100%" color="#00645c" class="mt-2" size="2">
           <div class="topic-summary-tile-section-1 d-flex gap-4 mt-4 w-100">
-            <div *ngFor="let topicSummaryTile of item.value.slice(0,3)" class="topic-summary-tile-1 flex-shrink-0">
+            <div *ngFor="let topicSummaryTile of item.value.slice(0,3)">
               <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [featureFlag]="featureFlag">
               </oppia-learner-topic-summary-tile>
             </div>
@@ -136,15 +136,6 @@
           </a>
         </ng-container>
       </div>
-    </div>
-    <div class="learner-section_container px-3 py-4 w-100" *ngIf="isGoalLimitReached()">
-      <p class="learner-section_heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
-      <p class="mt-4"> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
-      <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
-        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-        href="/community-library"
-        [oppiaFocusOn]="'ourLessonsBtn'">
-      </a>
     </div>
     <div class="learner-section_container px-3 py-4 w-100"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
