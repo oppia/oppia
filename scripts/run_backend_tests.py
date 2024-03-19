@@ -645,42 +645,6 @@ def main(args: Optional[List[str]] = None) -> None:
     print('Done!')
 
 
-def generate_incomplete_coverage_output(
-    coverage_output_lines: List[str]
-) -> str:
-    """Format coverage report with incomplete coverage lines.
-       separated by dashed line(--).
-
-    Args:
-        coverage_output_lines: List[str]. List of lines with
-            incomplete coverage report.
-
-    Returns:
-        str. Final coverage report with incomplete coverage lines
-        separated by a separator.
-    """
-    # Determine the coverage lines separator.
-    coverage_lines_separator = ''
-    if len(coverage_output_lines) > 1:
-        coverage_lines_separator = coverage_output_lines[1]
-
-    # Initialize the uncovered lines output.
-    uncovered_lines_output = ''
-
-    # Concatenate each uncovered line with the coverage lines separator.
-    for uncovered_line in coverage_output_lines:
-        if (uncovered_line.strip() and '-----' not in uncovered_line):
-            uncovered_lines_output += (
-                f'{uncovered_line}\n'
-                f'{coverage_lines_separator}\n'
-            )
-
-    # Remove the last separator.
-    uncovered_lines_output = uncovered_lines_output.rstrip('\n')
-
-    return uncovered_lines_output
-
-
 def check_coverage(
     combine: bool,
     data_file: Optional[str] = None,
@@ -728,12 +692,6 @@ def check_coverage(
     process = subprocess.run(
         cmd, capture_output=True, encoding='utf-8', env=env,
         check=False)
-
-    coverage_output_lines = process.stdout.split('\n')
-
-    uncovered_lines_output = generate_incomplete_coverage_output(
-        coverage_output_lines
-    )
     if process.stdout.strip() == 'No data to report.':
         # File under test is exempt from coverage according to the
         # --omit flag or .coveragerc.
@@ -751,7 +709,6 @@ def check_coverage(
             float(coverage_result.group('total')) if coverage_result else 0.0
         )
 
-    process.stdout = uncovered_lines_output
     return process.stdout, coverage
 
 
