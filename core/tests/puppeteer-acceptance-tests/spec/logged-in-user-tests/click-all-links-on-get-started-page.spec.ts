@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance Test for checking if logged-in users
- * can open link by clicking all buttons on navbar
+ * can open all the links on the "Get Started" page.
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -23,7 +23,7 @@ import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Logged-in User', function () {
+describe('Logged-in Users on the Get Started page ', function () {
   let testUser: LoggedInUser;
 
   beforeAll(async function () {
@@ -36,57 +36,57 @@ describe('Logged-in User', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'clicks "create one here" link',
+    'can click the "create one here" link',
     async function () {
-      await testUser.clickCreateOneHereLink();
+      await testUser.clickCreateOneHereLinkInGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   it(
-    'clicks "Welcome to Oppia" link',
+    'can click the "Welcome to Oppia" link',
     async function () {
-      await testUser.clickWelcomeToOppiaLink();
+      await testUser.clickWelcomeToOppiaLinkInGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   it(
-    'clicks "Get Electrified!" link',
+    'can click the "Get Electrified!" link',
     async function () {
-      await testUser.clickGetElectrifiedLink();
+      await testUser.clickGetElectrifiedLinkInGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   it(
-    'clicks "Programming with Carla" link',
+    'can click the "Programming with Carla" link',
     async function () {
-      await testUser.clickProgrammingWithCarlaLink();
+      await testUser.clickProgrammingWithCarlaLinkInGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   it(
-    'clicks "in our user documentation" link',
+    'can click the "in our user documentation" link',
     async function () {
-      await testUser.clickInOurUserDocumentationLink();
+      await testUser.clickInOurUserDocumentationLinkInGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   it(
-    'clicks "embed it in your own web page" link',
+    'can click the "embed it in your own web page" link',
     async function () {
-      await testUser.clickEmbedItInYourOwnWebPageLink();
+      await testUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   it(
-    'clicks "discover more ways to get involved" link',
+    'can click the "discover more ways to get involved" link',
     async function () {
-      await testUser.clickDiscoverMoreWaysToGetInvolvedLink();
+      await testUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT
   );

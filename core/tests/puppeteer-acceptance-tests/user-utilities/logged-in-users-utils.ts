@@ -41,6 +41,11 @@ const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
 const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
 const watchAVideoUrl = testConstants.URLs.ExternalLinkWatchAVideo;
 const getStartedUrl = testConstants.URLs.GetStarted;
+const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
+const electromagnetismUrl = testConstants.URLs.Electromagnetism;
+const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
+const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
+const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -124,197 +129,6 @@ export class LoggedInUser extends BaseUser {
       this.page.waitForNavigation(),
       this.page.goto(thanksForDonatingUrl),
     ]);
-  }
-
-  async navigateToAboutPageViaFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerAboutLink,
-      'About Oppia button in the About Menu on navbar',
-      aboutUrl,
-      'About'
-    );
-  }
-
-  async navigateToAboutFoundationPageViaFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerAboutFoundationLink,
-      'About Oppia button in the About Menu on navbar',
-      aboutFoundationUrl,
-      'About Foundation'
-    );
-  }
-
-  async navigateToBlogPageViaFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerBlogLink,
-      'About Oppia button in the About Menu on navbar',
-      blogUrl,
-      'Blog'
-    );
-  }
-
-  async navigateToForumPageViaFooter(): Promise<void> {
-    await Promise.all([
-      this.page
-        .waitForNavigation()
-        .then(async () => await this.page.waitForNavigation()),
-      await this.clickOn(footerForumlink),
-    ]);
-
-    if (this.page.url() !== 'https://groups.google.com/g/oppia') {
-      throw new Error(
-        'The ' +
-          'About Oppia button in the About Menu on navbar' +
-          ' does not open the ' +
-          'Oopia - Google Groups' +
-          ' page!'
-      );
-    } else {
-      showMessage(
-        'The ' +
-          'About Oppia button in the About Menu on navbar' +
-          ' opens the ' +
-          'Oopia - Google Groups' +
-          ' page.'
-      );
-    }
-  }
-
-  async navigateToGetStartedPageViaFooter(): Promise<void> {
-    await this.page.waitForSelector(footerGetStartedLink);
-    await this.clickButtonToNavigateToNewPage(
-      footerGetStartedLink,
-      'About Oppia button in the About Menu on navbar',
-      getStartedUrl,
-      'Get Started'
-    );
-  }
-
-  async clickCreateOneHereLink(): Promise<void> {
-    await this.page.waitForXPath('//a[contains(text(),"create one here")]');
-    const pageTarget = this.page.target();
-    await this.clickOn('create one here');
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newPage = await newTarget.page();
-    showMessage(newPage!.url());
-    if (!newPage!.url().includes('https://accounts.google.com/')) {
-      throw new Error('Error');
-    } else {
-      showMessage('Success');
-    }
-    newPage!.close();
-  }
-
-  async clickWelcomeToOppiaLink(): Promise<void> {
-    await this.page.waitForXPath('//a[contains(text(),"Welcome to Oppia")]');
-    const pageTarget = this.page.target();
-    await this.clickOn('Welcome to Oppia');
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newPage = await newTarget.page();
-    showMessage(newPage!.url());
-    if (newPage!.url() !== 'https://www.oppia.org/explore/0') {
-      throw new Error('Error');
-    } else {
-      showMessage('Success');
-    }
-    await newPage!.close();
-  }
-
-  async clickGetElectrifiedLink(): Promise<void> {
-    await this.page.waitForXPath('//a[contains(text(),"Get Electrified!")]');
-    const pageTarget = this.page.target();
-    await this.clickOn('Get Electrified!');
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newPage = await newTarget.page();
-    showMessage(newPage!.url());
-    if (newPage!.url() !== 'https://www.oppia.org/collection/wqCTKpKA0LBe') {
-      throw new Error('Error');
-    } else {
-      showMessage('Success');
-    }
-    await newPage!.close();
-  }
-
-  async clickProgrammingWithCarlaLink(): Promise<void> {
-    await this.page.waitForXPath(
-      '//a[contains(text(),"Programming with Carla")]'
-    );
-    const pageTarget = this.page.target();
-    await this.clickOn('Programming with Carla');
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newPage = await newTarget.page();
-    showMessage(newPage!.url());
-    if (newPage!.url() !== 'https://www.oppia.org/collection/inDXV0w8-p1C') {
-      throw new Error('Error');
-    } else {
-      showMessage('Success');
-    }
-    await newPage!.close();
-  }
-
-  async clickInOurUserDocumentationLink(): Promise<void> {
-    await this.page.waitForXPath(
-      '//a[contains(text(),"in our user documentation")]'
-    );
-    const pageTarget = this.page.target();
-    await this.clickOn('in our user documentation');
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newPage = await newTarget.page();
-    showMessage(newPage!.url());
-    if (newPage!.url() !== 'https://oppia.github.io/#/CreatingAnExploration') {
-      throw new Error('Error');
-    } else {
-      showMessage('Success');
-    }
-    await newPage!.close();
-  }
-
-  async clickEmbedItInYourOwnWebPageLink(): Promise<void> {
-    await this.page.waitForXPath(
-      '//a[contains(text(),"embed it in your own web page")]'
-    );
-    const pageTarget = this.page.target();
-    await this.clickOn('embed it in your own web page');
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newPage = await newTarget.page();
-    showMessage(newPage!.url());
-    if (newPage!.url() !== 'https://oppia.github.io/#/EmbeddingAnExploration') {
-      throw new Error('Error');
-    } else {
-      showMessage('Success');
-    }
-    await newPage!.close();
-  }
-
-  async clickDiscoverMoreWaysToGetInvolvedLink(): Promise<void> {
-    await this.page.waitForXPath(
-      '//a[contains(text(),"discover more ways to get involved")]'
-    );
-    const pageTarget = this.page.target();
-    await this.clickOn('embed it in your own web page');
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
-    );
-    const newPage = await newTarget.page();
-    showMessage(newPage!.url());
-    if (newPage!.url() !== 'https://oppia.github.io/#/EmbeddingAnExploration') {
-      throw new Error('Error');
-    } else {
-      showMessage('Success');
-    }
-    await newPage!.close();
   }
 
   /**
@@ -851,6 +665,160 @@ export class LoggedInUser extends BaseUser {
           'and if the Donate page is shown.'
       );
     }
+  }
+
+  async navigateToAboutPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerAboutLink,
+      'About Oppia button in the About Menu on navbar',
+      aboutUrl,
+      'About'
+    );
+  }
+
+  async navigateToAboutFoundationPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerAboutFoundationLink,
+      'About Oppia button in the About Menu on navbar',
+      aboutFoundationUrl,
+      'About Foundation'
+    );
+  }
+
+  async navigateToBlogPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerBlogLink,
+      'About Oppia button in the About Menu on navbar',
+      blogUrl,
+      'Blog'
+    );
+  }
+
+  async navigateToForumPageViaFooter(): Promise<void> {
+    await Promise.all([
+      this.page
+        .waitForNavigation()
+        .then(async () => await this.page.waitForNavigation()),
+      await this.clickOn(footerForumlink),
+    ]);
+
+    if (this.page.url() !== 'https://groups.google.com/g/oppia') {
+      throw new Error(
+        'The ' +
+          'About Oppia button in the About Menu on navbar' +
+          ' does not open the ' +
+          'Oopia - Google Groups' +
+          ' page!'
+      );
+    } else {
+      showMessage(
+        'The ' +
+          'About Oppia button in the About Menu on navbar' +
+          ' opens the ' +
+          'Oopia - Google Groups' +
+          ' page.'
+      );
+    }
+  }
+
+  async navigateToGetStartedPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerGetStartedLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerGetStartedLink,
+      'About Oppia button in the About Menu on navbar',
+      getStartedUrl,
+      'Get Started'
+    );
+  }
+
+  /**
+   * Function to click an anchor tag and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+
+    expect(newTabPage?.url()).toContain(expectedDestinationPageUrl);
+    await newTabPage!.close();
+  }
+
+  /**
+   * Clicks the link with the text "create on here" on the Get Stated page.
+   */
+  async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'create one here',
+      'https://accounts.google.com/'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Welcome to Oppia" on the Get Stated page.
+   */
+  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab('Welcome to Oppia', welcomeToOppiaUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Get Electrified!" on the Get Stated page.
+   */
+  async clickGetElectrifiedLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab('Get Electrified!', electromagnetismUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Programming with Carla" on the Get Stated page.
+   */
+  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'Programming with Carla',
+      programmingWithCarlaUrl
+    );
+  }
+
+  /**
+   * Clicks the link with the text "in our user documentation" on the Get Stated page.
+   */
+  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'in our user documentation',
+      creatingAnExplorationUrl
+    );
+  }
+
+  /**
+   * Clicks the link with the text "embed it in your own web page" on the Get Stated page.
+   */
+  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'embed it in your own web page',
+      embeddingAnExplorationUrl
+    );
+  }
+
+  /**
+   * Clicks the link with the text "discover more ways to get involved" on the Get Stated page.
+   */
+  async clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"discover more ways to get involved")]'
+    );
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('discover more ways to get involved'),
+    ]);
+
+    expect(this.page.url()).toContain(contactUrl);
   }
 }
 
