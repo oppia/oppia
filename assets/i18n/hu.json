@@ -311,7 +311,6 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Hírek és fejlemények fogadása az oldalról",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "E-mail fogadása, amikor egy készítő, akire feliratkoztál, közzé tesz egy új felfedezést",
 	"I18N_PREFERENCES_HEADING": "Beállítások",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Minden változtatásod automatikusan elmentődik.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Egyelőre egy létrehozóra sem iratkoztál fel. Kedvenc szerzőidre feliratkozhatsz az oldalukon található 'feliratkozás' gomb lenyomásával, s amint új leckét töltenek fel, arról e-mailben kapsz majd értesítést.",
 	"I18N_PREFERENCES_PAGE_TITLE": "Profilbeállítások megváltoztatása - Oppia",
 	"I18N_PREFERENCES_PICTURE": "Kép",
