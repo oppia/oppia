@@ -15,10 +15,6 @@
   <oppia-admin-prod-mode-activities-tab *ngIf="isActivitiesTabOpen() && !inDevMode">
   </oppia-admin-prod-mode-activities-tab>
 
-  <oppia-admin-config-tab *ngIf="isConfigTabOpen()"
-                          (setStatusMessage)="setStatusMessage($event)">
-  </oppia-admin-config-tab>
-
   <oppia-admin-platform-parameters-tab *ngIf="isPlatformParamsTabOpen()"
                                        (setStatusMessage)="setStatusMessage($event)">
   </oppia-admin-platform-parameters-tab>
