@@ -35,21 +35,36 @@ describe('Voiceover Admin', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should be able to see error while adding `xyz` voiceover artist to an exploration', async function () {
-    await testUser.navigateToCreatorDashboardPage();
-    await testUser.createExplorationWithTitle();
+  it(
+    'should be able to see error while adding `xyz` voiceover artist to an exploration',
+    async function () {
+      await testUser.navigateToCreatorDashboardPage();
+      await testUser.createExplorationWithTitle();
 
-    await testUser.editVoiceoverArtist('xyz');
-    await testUser.expectToSeeErrorToastMessage();
-    await testUser.closeToastMessage();
-  });
+      await testUser.navigateToExplorationSettingsTab();
+      await testUser.editVoiceoverArtist('xyz');
 
-  it('should be able to add regular user as voiceover artist to an exploration', async function () {
-    await UserFactory.createNewUser(
-      'voiceoverartist',
-      'voiceoverartist@example.com'
-    );
-    await testUser.editVoiceoverArtist('voiceoverartist');
-    await testUser.expectToSeeUpdatedVoiceoverArtist();
+      await testUser.expectToSeeErrorToastMessage();
+      await testUser.closeToastMessage();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
+
+  it(
+    'should be able to add regular user as voiceover artist to an exploration',
+    async function () {
+      await UserFactory.createNewUser(
+        'voiceoverartist',
+        'voiceoverartist@example.com'
+      );
+
+      await testUser.editVoiceoverArtist('voiceoverartist');
+      await testUser.expectToSeeUpdatedVoiceoverArtist();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

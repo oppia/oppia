@@ -42,8 +42,8 @@ const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const closeShareModalButton = 'button.e2e-test-share-publish-close';
 
-const explorationSettingsTab = 'li.e2e-test-settings-tab';
-const editVoiceoverArtistButton = 'div.e2e-test-edit-voice-artist-roles';
+const explorationSettingsTab = 'a.e2e-test-settings-tab-icon';
+const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistEditSelector = 'input.e2e-test-new-voice-artist-username';
 const saveVoiceoverArtistEditButton =
   'button.e2e-test-add-voice-artist-role-button';
@@ -51,14 +51,23 @@ const saveVoiceoverArtistEditButton =
 const errorToastMessage = 'div.e2e-test-toast-warning-message';
 const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
 
-const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
+const updatedVoiceoverArtist = 'div.e2e-test-voice-artist-voiceoverartist';
+// const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
    * Function to navigate to creator dashboard page
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
-    await this.page.goto(creatorDashboardPage);
+    await this.goto(creatorDashboardPage);
+  }
+
+  /**
+   * Function to navigate to exploration settings tab
+   */
+  async navigateToExplorationSettingsTab(): Promise<void> {
+    await this.page.waitForSelector(explorationSettingsTab);
+    await this.clickOn(explorationSettingsTab);
   }
 
   /**
@@ -106,10 +115,9 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to edit voiceover artist
    */
   async editVoiceoverArtist(artistUsername: string): Promise<void> {
-    await this.clickOn(explorationSettingsTab);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(editVoiceoverArtistButton);
     await this.clickOn(editVoiceoverArtistButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(voiceArtistEditSelector);
     await this.type(voiceArtistEditSelector, artistUsername);
     await this.clickOn(saveVoiceoverArtistEditButton);
   }
@@ -138,4 +146,4 @@ export class VoiceoverAdmin extends BaseUser {
   }
 }
 
-export let voiceoverAdminFactory = (): VoiceoverAdmin => new VoiceoverAdmin();
+export let VoiceoverAdminFactory = (): VoiceoverAdmin => new VoiceoverAdmin();
