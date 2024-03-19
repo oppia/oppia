@@ -283,7 +283,7 @@
            (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
            (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
         <div *ngIf="getTileType(summaryTile) === 'exploration'">
-          <i class="remove-icon fa fa-times"
+          <i class="remove-icon fa fa-times e2e-test-remove-from-playlist-btn"
              *ngIf="summaryTile.toggle || windowIsNarrow"
              aria-hidden="true"
              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"
