@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if logged-in users
- * can open link by clicking all buttons on navbar
+ * @fileoverview Acceptance Test for checking if logged-in users can
+ * navigate using all the links under the "About Oppia" footer section.
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -41,7 +41,6 @@ describe('Logged-in User', function () {
   it(
     'should open About page via the footer',
     async function () {
-      // Navigate to a page that has the footer.
       await testUser.navigateToAboutPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT
@@ -50,7 +49,6 @@ describe('Logged-in User', function () {
   it(
     'should open "About Foundation" page via the footer',
     async function () {
-      // Navigate to a page that has the footer.
       await testUser.navigateToAboutFoundationPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT
@@ -59,7 +57,6 @@ describe('Logged-in User', function () {
   it(
     'should open "Blog" page via the footer',
     async function () {
-      // Navigate to a page that has the footer.
       await testUser.navigateToBlogPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT
@@ -68,7 +65,6 @@ describe('Logged-in User', function () {
   it(
     'should open "Forum" page via the footer',
     async function () {
-      // Navigate to a page that has the footer.
       await testUser.navigateToForumPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT

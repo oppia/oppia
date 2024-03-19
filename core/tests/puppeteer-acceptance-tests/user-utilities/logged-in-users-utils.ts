@@ -144,7 +144,11 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(button),
     ]);
 
-    expect(this.page.url()).toBe(expectedDestinationPageUrl);
+    expect(this.page.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toBe(expectedDestinationPageUrl);
   }
 
   /**
@@ -652,7 +656,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToAboutPageViaFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerAboutLink,
-      'About Oppia button in the About Menu on navbar',
+      'About Oppia link in the About Oppia section in the footer',
       aboutUrl,
       'About'
     );
@@ -663,7 +667,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToAboutFoundationPageViaFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerAboutFoundationLink,
-      'About Oppia button in the About Menu on navbar',
+      'About Foundation link in the About Oppia section in the footer',
       aboutFoundationUrl,
       'About Foundation'
     );
@@ -674,7 +678,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToBlogPageViaFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerBlogLink,
-      'About Oppia button in the About Menu on navbar',
+      'Blog  link in the About Oppia section in the footer',
       blogUrl,
       'Blog'
     );
