@@ -290,7 +290,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             remaining_voice_artist_for_identification: int. The number of
                 remaining voice artists that still need to be identified for
                 voiceovers in the latest version of exploration.
-            voiceover_mapping: VoiceoverMappingType. A dictionary maps content
+            voiceover_mapping: VoiceoverMappingType. A dictionary with content
                 IDs as keys and nested dicts as values. Each nested dict
                 contains language codes as keys and voiceover dicts as values.
             voice_artist_id: str. The voice artist ID for the given voiceover
