@@ -1832,7 +1832,8 @@ def get_all_published_story_exploration_ids(
     """
     fetched_topic_summaries = (
         [topic_fetchers.get_topic_summary_by_id(topic_id)] if topic_id
-        else topic_fetchers.get_all_topic_summaries())
+        else topic_fetchers.get_all_topic_summaries()
+    )
 
     # Keep each summary's mapping. For those without a mapping,
     # record their ids, fetch their corresponding topics with them, and then
@@ -1849,21 +1850,43 @@ def get_all_published_story_exploration_ids(
     if len(ids_of_summaries_without_persisted_mapping) > 0:
         topics = topic_fetchers.get_topics_by_ids(
             ids_of_summaries_without_persisted_mapping)
-        for topic in topics:
-            assert topic is not None
-            published_story_ids = [
+
+        published_story_ids = [
+            [
                 story_ref.story_id for story_ref
                 in topic.canonical_story_references +
                     topic.additional_story_references
                 if story_ref.story_is_published
             ]
-            published_stories_query_result = story_fetchers.get_stories_by_ids(
-                published_story_ids, strict=False)
-            published_stories = [
-                story for story in published_stories_query_result
-                if story is not None]
+            for topic in topics if topic is not None
+        ]
+        published_story_accumulative_counts = [0] + list(
+            itertools.accumulate([
+                len(topic_published_story_ids)
+                for topic_published_story_ids in published_story_ids
+            ])
+        )
+
+        published_stories_in_all_topics = [
+            story for story in story_fetchers.get_stories_by_ids(
+                list(itertools.chain.from_iterable(published_story_ids)),
+                strict=False
+            )
+            if story is not None
+        ]
+        published_stories = [
+            [
+                published_stories_in_all_topics[
+                    published_story_accumulative_counts[i] + j
+                ]
+                for j in range(len(published_story_ids[i]))
+            ]
+            for i in range(len(published_story_ids))
+        ]
+
+        for topic_published_stories in published_stories:
             mappings.append(_compute_story_exploration_mapping(
-                published_stories))
+                topic_published_stories))
 
     exp_ids = itertools.chain.from_iterable(
         itertools.chain.from_iterable(mapping.values())
