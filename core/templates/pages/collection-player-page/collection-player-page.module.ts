@@ -16,19 +16,19 @@
  * @fileoverview Module for the collection player page.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
 
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { CollectionFooterComponent } from './collection-footer/collection-footer.component';
-import { CollectionLocalNavComponent } from './collection-local-nav/collection-local-nav.component';
-import { CollectionNavbarComponent } from './collection-navbar/collection-navbar.component';
-import { CollectionNodeListComponent } from './collection-node-list/collection-node-list.component';
-import { CollectionPlayerPageComponent } from './collection-player-page.component';
-import { CollectionPlayerAuthGuard } from './collection-player-auth.guard';
-import { CollectionPlayerPageRootComponent } from './collection-player-page-root.component';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { ToastrModule } from 'ngx-toastr';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {CollectionFooterComponent} from './collection-footer/collection-footer.component';
+import {CollectionLocalNavComponent} from './collection-local-nav/collection-local-nav.component';
+import {CollectionNavbarComponent} from './collection-navbar/collection-navbar.component';
+import {CollectionNodeListComponent} from './collection-node-list/collection-node-list.component';
+import {CollectionPlayerPageComponent} from './collection-player-page.component';
+import {CollectionPlayerAuthGuard} from './collection-player-auth.guard';
+import {CollectionPlayerPageRootComponent} from './collection-player-page-root.component';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {ToastrModule} from 'ngx-toastr';
 
 @NgModule({
   imports: [
@@ -38,9 +38,9 @@ import { ToastrModule } from 'ngx-toastr';
       {
         path: '',
         component: CollectionPlayerPageRootComponent,
-        canActivate: [CollectionPlayerAuthGuard]
-      }
-    ])
+        canActivate: [CollectionPlayerAuthGuard],
+      },
+    ]),
   ],
   declarations: [
     CollectionFooterComponent,
@@ -48,7 +48,7 @@ import { ToastrModule } from 'ngx-toastr';
     CollectionNavbarComponent,
     CollectionNodeListComponent,
     CollectionPlayerPageComponent,
-    CollectionPlayerPageRootComponent
+    CollectionPlayerPageRootComponent,
   ],
   entryComponents: [
     CollectionFooterComponent,
@@ -56,6 +56,6 @@ import { ToastrModule } from 'ngx-toastr';
     CollectionNodeListComponent,
     CollectionNavbarComponent,
     CollectionPlayerPageComponent,
-  ]
+  ],
 })
 export class CollectionPlayerPageModule {}

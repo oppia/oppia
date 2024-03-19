@@ -16,7 +16,7 @@
  * @fileoverview Component for the collection player navbar
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 
 import {Subscription} from 'rxjs';
 

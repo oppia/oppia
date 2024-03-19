@@ -17,43 +17,44 @@
  * collection player page.
  */
 
-import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import {Location} from '@angular/common';
+import {Injectable} from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivate,
   Router,
-  RouterStateSnapshot
+  RouterStateSnapshot,
 } from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CollectionPlayerAuthGuard implements CanActivate {
   constructor(
-    private accessValidationBackendApiService:
-    AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
     private location: Location
   ) {}
 
   async canActivate(
-      route: ActivatedRouteSnapshot,
-      state: RouterStateSnapshot
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
   ): Promise<boolean> {
-    return new Promise<boolean>((resolve) => {
+    return new Promise<boolean>(resolve => {
       const collectionId = route.paramMap.get('collection_id') || '';
       this.accessValidationBackendApiService
         .validateAccessToCollectionPlayerPage(collectionId)
         .then(() => {
           resolve(true);
         })
-        .catch((err) => {
-          this.router.navigate(
-            [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`])
+        .catch(err => {
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+            ])
             .then(() => {
               this.location.replaceState(state.url);
               resolve(false);

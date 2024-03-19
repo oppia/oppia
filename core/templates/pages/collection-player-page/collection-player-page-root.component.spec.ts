@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the Collection player page root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-import { CollectionPlayerPageRootComponent } from './collection-player-page-root.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {CollectionPlayerPageRootComponent} from './collection-player-page-root.component';
+import {TranslateModule} from '@ngx-translate/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('CollectionPlayerPageRootComponent', () => {
   let component: CollectionPlayerPageRootComponent;
@@ -45,11 +45,11 @@ describe('CollectionPlayerPageRootComponent', () => {
   });
 
   it('should have correct title and meta tag', () => {
-    expect(component.title)
-      .toEqual(
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.TITLE);
-    expect(component.meta)
-      .toEqual(
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.META);
+    expect(component.title).toEqual(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.TITLE
+    );
+    expect(component.meta).toEqual(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.META
+    );
   });
 });

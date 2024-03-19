@@ -378,19 +378,19 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/blog-post-page/blog-post-page.module')
-      .then(m => m.BlogPostPageModule)
+    loadChildren: () =>
+      import('pages/blog-post-page/blog-post-page.module').then(
+        m => m.BlogPostPageModule
+      ),
   },
   {
-    path: (
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.ROUTE
-    ),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.ROUTE,
     pathMatch: 'full',
-    loadChildren: () => import(
-      'pages/collection-player-page/collection-player-page.module')
-      .then(m => m.CollectionPlayerPageModule)
-  }
+    loadChildren: () =>
+      import('pages/collection-player-page/collection-player-page.module').then(
+        m => m.CollectionPlayerPageModule
+      ),
+  },
 ];
 
 // Register stewards landing pages.
