@@ -149,10 +149,6 @@ export class UserFactory {
     return await UserFactory.assignRolesToUser(user, roles);
   };
 
-  static createLoggedOutUser = async function() {
-    
-  }
-
   /**
    * The function creates a new super admin user and returns the instance
    * of that user.

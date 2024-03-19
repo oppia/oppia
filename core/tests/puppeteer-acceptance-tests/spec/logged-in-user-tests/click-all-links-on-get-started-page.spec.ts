@@ -60,7 +60,7 @@ describe('Logged-in Users on the Get Started page ', function () {
   );
 
   it(
-    'can click the "Programming with Carla" link',
+    'should be able to use the "Programming with Carla" link',
     async function () {
       await testUser.clickProgrammingWithCarlaLinkInGetStartedPage();
     },
@@ -68,7 +68,7 @@ describe('Logged-in Users on the Get Started page ', function () {
   );
 
   it(
-    'can click the "in our user documentation" link',
+    'should be able to use "in our user documentation" link',
     async function () {
       await testUser.clickInOurUserDocumentationLinkInGetStartedPage();
     },
@@ -76,7 +76,7 @@ describe('Logged-in Users on the Get Started page ', function () {
   );
 
   it(
-    'can click the "embed it in your own web page" link',
+    'should be able to use the "embed it in your own web page" link',
     async function () {
       await testUser.clickEmbedItInYourOwnWebPageLinkInGetStartedPage();
     },
@@ -84,7 +84,7 @@ describe('Logged-in Users on the Get Started page ', function () {
   );
 
   it(
-    'can click the "discover more ways to get involved" link',
+    'should be able to use the "discover more ways to get involved" link',
     async function () {
       await testUser.clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage();
     },

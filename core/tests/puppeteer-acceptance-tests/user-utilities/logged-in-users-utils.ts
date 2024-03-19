@@ -19,6 +19,7 @@
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
+import {Page} from 'puppeteer';
 
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
@@ -720,9 +721,9 @@ export class LoggedInUser extends BaseUser {
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
-
-    expect(newTabPage?.url()).toContain(expectedDestinationPageUrl);
-    await newTabPage!.close();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage.url()).toContain(expectedDestinationPageUrl);
+    await newTabPage.close();
   }
 
   /**
