@@ -81,7 +81,8 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
 
-class CollectionViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+class CollectionViewerPageAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
     """Test for collection page access validation."""
 
     COLLECTION_ID: Final = 'cid'

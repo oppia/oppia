@@ -270,10 +270,11 @@ describe('Access validation backend api service', () => {
         }
       );
 
-    flushMicrotasks();
-    expect(successSpy).toHaveBeenCalled();
-    expect(failSpy).not.toHaveBeenCalled();
-  }));
+      flushMicrotasks();
+      expect(successSpy).toHaveBeenCalled();
+      expect(failSpy).not.toHaveBeenCalled();
+    })
+  );
 
   it('should not validate access to collection player page with invalid access', fakeAsync(() => {
     avbas
