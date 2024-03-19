@@ -29,28 +29,30 @@ module.exports = {
     fixable: null,
     schema: [],
     messages: {
-      disallowRelativeImport: "Please don't use relative imports in require()."
-    }
+      disallowRelativeImport: "Please don't use relative imports in require().",
+    },
   },
 
-  create: function(context) {
-    var requireSelector = (
-      'CallExpression[callee.name=require][arguments.length=1]');
+  create: function (context) {
+    var requireSelector =
+      'CallExpression[callee.name=require][arguments.length=1]';
 
-    var catchAndReportRelativeImport = function(node) {
-      if (node.arguments[0].type === 'Literal' &&
-       node.arguments[0].value.startsWith('..')) {
+    var catchAndReportRelativeImport = function (node) {
+      if (
+        node.arguments[0].type === 'Literal' &&
+        node.arguments[0].value.startsWith('..')
+      ) {
         context.report({
           node: node,
-          messageId: 'disallowRelativeImport'
+          messageId: 'disallowRelativeImport',
         });
       }
     };
 
     return {
-      [requireSelector]: function(node) {
+      [requireSelector]: function (node) {
         catchAndReportRelativeImport(node);
-      }
+      },
     };
-  }
+  },
 };

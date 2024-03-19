@@ -61,8 +61,7 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.playthrough_id = stats_models.PlaythroughModel.create(
             'exp_id1', 1, 'EarlyQuit', {}, [])
         self.save_new_valid_exploration(
-            self.exp_id, 'admin', title='Title 1', end_state_name='End',
-            correctness_feedback_enabled=True)
+            self.exp_id, 'admin', title='Title 1', end_state_name='End')
 
     def test_raises_error_if_playthrough_model_fetched_with_invalid_id_and_strict(  # pylint: disable=line-too-long
         self

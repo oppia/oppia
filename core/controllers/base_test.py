@@ -1047,7 +1047,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         structure.
         """
         # For this test, show the entire diff if there is a mismatch.
-        self.maxDiff = 0
+        self.maxDiff = None
 
         master_translation_dict = json.loads(utils.get_file_contents(
             os.path.join(os.getcwd(), 'assets', 'i18n', 'en.json')))

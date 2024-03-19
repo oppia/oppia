@@ -22,6 +22,8 @@ from core import feconf
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -165,3 +167,159 @@ class VoiceoverAutogenerationPolicyModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             model_cls.get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+
+class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
+    """Unit tests for VoiceArtistMetadataModel class."""
+
+    def test_get_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'voiceovers_and_contents_mapping': (
+                base_models.EXPORT_POLICY.EXPORTED)
+        }
+        self.assertDictEqual(
+            voiceover_models.VoiceArtistMetadataModel.get_export_policy(),
+            expected_export_policy_dict
+        )
+
+    def test_has_reference_to_user_id(self) -> None:
+        user_id = 'user_id'
+        self.assertFalse(
+            voiceover_models.VoiceArtistMetadataModel.
+            has_reference_to_user_id(user_id))
+
+        voiceover_models.VoiceArtistMetadataModel.create(
+            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
+
+        self.assertTrue(
+            voiceover_models.VoiceArtistMetadataModel.
+            has_reference_to_user_id(user_id))
+
+    def test_should_raise_error_if_user_id_already_exists(self) -> None:
+        user_id = 'user_id'
+        voiceover_models.VoiceArtistMetadataModel.create(
+            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
+
+        with self.assertRaisesRegex(
+            Exception,
+            'A voice artist metadata model with a given voice'
+            'artist ID already exists'
+        ):
+            voiceover_models.VoiceArtistMetadataModel.create(
+            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
+
+    def test_export_data_trivial(self) -> None:
+        non_existent_user_id = 'non_existent_user_id'
+        user_data = (
+            voiceover_models.VoiceArtistMetadataModel.export_data(
+                non_existent_user_id)
+        )
+        test_data: Dict[
+            str, voiceover_models.VoiceoversAndContentsMappingType] = {}
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self) -> None:
+        voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': ['content_1', 'content_2', 'content_3']
+                },
+                'voiceovers': [voiceover1, voiceover2, voiceover3]
+            }
+        }
+        user_id = 'user_id'
+        voiceover_models.VoiceArtistMetadataModel.create(
+            voice_artist_id=user_id,
+            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
+        user_data = (
+            voiceover_models.VoiceArtistMetadataModel.export_data(
+                user_id))
+        test_data: Dict[
+            str, voiceover_models.VoiceoversAndContentsMappingType] = {
+                'voiceovers_and_contents_mapping':
+                voiceovers_and_contents_mapping
+            }
+        self.assertDictEqual(user_data, test_data)
+
+    def test_get_deletion_policy_is_to_keep(self) -> None:
+        self.assertEqual(
+            voiceover_models.VoiceArtistMetadataModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            voiceover_models.VoiceArtistMetadataModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
+
+    def test_should_create_model_successfully(self) -> None:
+        voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        user_id = 'user_id'
+        voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': ['content_1', 'content_2', 'content_3']
+                },
+                'voiceovers': [voiceover1, voiceover2, voiceover3]
+            }
+        }
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.create(
+                voice_artist_id=user_id,
+                voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
+            )
+        )
+        retrieved_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                user_id, strict=False))
+        assert retrieved_model
+
+        self.assertEqual(
+            voice_artist_metadata_model.id, retrieved_model.id)
+        self.assertDictEqual(
+            voice_artist_metadata_model.voiceovers_and_contents_mapping,
+            retrieved_model.voiceovers_and_contents_mapping
+        )

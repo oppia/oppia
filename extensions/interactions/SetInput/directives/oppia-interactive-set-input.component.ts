@@ -20,19 +20,19 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { SetInputRulesService } from './set-input-rules.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {SetInputRulesService} from './set-input-rules.service';
 import eq from 'lodash/eq';
-import { SetInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { Schema } from 'services/schema-default-value.service';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SetInputAnswer } from 'interactions/answer-defs';
+import {SetInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {Schema} from 'services/schema-default-value.service';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SetInputAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'oppia-interactive-set-input',
-  templateUrl: './set-input-interaction.component.html'
+  templateUrl: './set-input-interaction.component.html',
 })
 export class InteractiveSetInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -44,11 +44,13 @@ export class InteractiveSetInputComponent implements OnInit {
   answer!: SetInputAnswer;
   schema!: {
     type: string;
-    items: {
-      type: string;
-    } | Schema;
-    'ui_config': {
-      'add_element_text': string;
+    items:
+      | {
+          type: string;
+        }
+      | Schema;
+    ui_config: {
+      add_element_text: string;
     };
   };
 
@@ -56,10 +58,9 @@ export class InteractiveSetInputComponent implements OnInit {
 
   constructor(
     private currentInteractionService: CurrentInteractionService,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService,
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private setInputRulesService: SetInputRulesService
-  ) { }
+  ) {}
 
   private hasDuplicates(answer: SetInputAnswer): boolean {
     for (var i = 0; i < answer.length; i++) {
@@ -73,13 +74,16 @@ export class InteractiveSetInputComponent implements OnInit {
   }
 
   private hasBlankOption(answer: SetInputAnswer): boolean {
-    return answer.some((element) => {
-      return (element === '');
+    return answer.some(element => {
+      return element === '';
     });
   }
 
   updateAnswer(answer: SetInputAnswer): void {
     this.answer = answer;
+    this.errorMessage = this.hasDuplicates(answer)
+      ? 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR'
+      : '';
   }
 
   getSchema(): Schema {
@@ -87,56 +91,55 @@ export class InteractiveSetInputComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const {
-      buttonText
-    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'SetInput',
-      {buttonTextWithValue: this.buttonTextWithValue}
-    ) as SetInputCustomizationArgs;
+    const {buttonText} =
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        'SetInput',
+        {buttonTextWithValue: this.buttonTextWithValue}
+      ) as SetInputCustomizationArgs;
     this.buttonText = buttonText.value.unicode;
     this.schema = {
       type: 'list',
       items: {
-        type: 'unicode'
+        type: 'unicode',
       },
       ui_config: {
         // TODO(mili): Translate this in the HTML.
-        add_element_text: 'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM'
-      }
+        add_element_text: 'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM',
+      },
     };
     if (this.buttonText) {
       this.schema.ui_config.add_element_text = this.buttonText;
     }
 
     // Adds an input field by default.
-    this.answer = (
-      this.savedSolution !== undefined ?
-      this.savedSolution : ['']
-    );
+    this.answer = this.savedSolution !== undefined ? this.savedSolution : [''];
 
     this.currentInteractionService.registerCurrentInteraction(
-      () => this.submitAnswer(this.answer), () => this.isAnswerValid());
+      () => this.submitAnswer(this.answer),
+      () => this.isAnswerValid()
+    );
   }
 
   submitAnswer(answer: SetInputAnswer): void {
     if (this.hasDuplicates(answer)) {
-      this.errorMessage = (
-        'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+      this.errorMessage = 'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR';
     } else {
       this.errorMessage = '';
       this.currentInteractionService.onSubmit(
-        answer, this.setInputRulesService);
+        answer,
+        this.setInputRulesService
+      );
     }
   }
 
   isAnswerValid(): boolean {
-    return (
-      this.answer.length > 0 && !this.hasBlankOption(this.answer));
+    return this.answer.length > 0 && !this.hasBlankOption(this.answer);
   }
 }
 
 angular.module('oppia').directive(
   'oppiaInteractiveSetInput',
   downgradeComponent({
-    component: InteractiveSetInputComponent
-  }));
+    component: InteractiveSetInputComponent,
+  })
+);

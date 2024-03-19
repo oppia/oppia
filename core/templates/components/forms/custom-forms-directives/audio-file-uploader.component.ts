@@ -16,13 +16,20 @@
  * @fileoverview Component that enables the user to upload audio files.
  */
 
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-audio-file-uploader',
-  templateUrl: './audio-file-uploader.component.html'
+  templateUrl: './audio-file-uploader.component.html',
 })
 export class AudioFileUploaderComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -78,7 +85,9 @@ export class AudioFileUploaderComponent {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaAudioFileUploader',
-  downgradeComponent({ component: AudioFileUploaderComponent })
-);
+angular
+  .module('oppia')
+  .directive(
+    'oppiaAudioFileUploader',
+    downgradeComponent({component: AudioFileUploaderComponent})
+  );

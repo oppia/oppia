@@ -17,7 +17,7 @@
  */
 
 export interface BeamJobBackendDict {
-  'name': string;
+  name: string;
 }
 
 export class BeamJob {

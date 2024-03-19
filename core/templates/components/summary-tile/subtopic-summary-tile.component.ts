@@ -16,19 +16,22 @@
  * @fileoverview Component for a subtopic tile.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { TopicViewerDomainConstants } from 'domain/topic_viewer/topic-viewer-domain.constants';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { AppConstants } from 'app.constants';
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-subtopic-summary-tile',
-  templateUrl: './subtopic-summary-tile.component.html'
+  templateUrl: './subtopic-summary-tile.component.html',
 })
 export class SubtopicSummaryTileComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -61,12 +64,14 @@ export class SubtopicSummaryTileComponent implements OnInit {
     }
     this.windowRef.nativeWindow.open(
       this.urlInterpolationService.interpolateUrl(
-        TopicViewerDomainConstants.SUBTOPIC_VIEWER_URL_TEMPLATE, {
+        TopicViewerDomainConstants.SUBTOPIC_VIEWER_URL_TEMPLATE,
+        {
           classroom_url_fragment: this.classroomUrlFragment,
           topic_url_fragment: this.topicUrlFragment,
-          subtopic_url_fragment: urlFragment
+          subtopic_url_fragment: urlFragment,
         }
-      ), '_self'
+      ),
+      '_self'
     );
   }
 
@@ -75,17 +80,23 @@ export class SubtopicSummaryTileComponent implements OnInit {
     this.subtopicTitle = this.subtopic.getTitle();
     let thumbnailFileName = this.subtopic.getThumbnailFilename();
     if (thumbnailFileName) {
-      this.thumbnailUrl = (
+      this.thumbnailUrl =
         this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.TOPIC, this.topicId, thumbnailFileName));
+          AppConstants.ENTITY_TYPE.TOPIC,
+          this.topicId,
+          thumbnailFileName
+        );
     }
     const urlFragment = this.subtopic.getUrlFragment();
     if (urlFragment === null) {
       throw new Error('Expected subtopic to have a URL fragment');
     }
-    this.subtopicTitleTranslationKey = this.i18nLanguageCodeService.
-      getSubtopicTranslationKey(
-        this.topicId, urlFragment, TranslationKeyType.TITLE);
+    this.subtopicTitleTranslationKey =
+      this.i18nLanguageCodeService.getSubtopicTranslationKey(
+        this.topicId,
+        urlFragment,
+        TranslationKeyType.TITLE
+      );
   }
 
   isHackySubtopicTitleTranslationDisplayed(): boolean {
@@ -98,6 +109,8 @@ export class SubtopicSummaryTileComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'oppiaSubtopicSummaryTile', downgradeComponent({
-    component: SubtopicSummaryTileComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaSubtopicSummaryTile',
+  downgradeComponent({
+    component: SubtopicSummaryTileComponent,
+  }) as angular.IDirectiveFactory
+);

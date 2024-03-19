@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for Delete Answer Group Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteAnswerGroupModalComponent } from './delete-answer-group-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteAnswerGroupModalComponent} from './delete-answer-group-modal.component';
 
 describe('Delete Answer Group Modal Component', () => {
   let fixture: ComponentFixture<DeleteAnswerGroupModalComponent>;
@@ -26,12 +26,8 @@ describe('Delete Answer Group Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        DeleteAnswerGroupModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      declarations: [DeleteAnswerGroupModalComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

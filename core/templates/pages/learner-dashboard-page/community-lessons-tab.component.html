@@ -29,7 +29,7 @@
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
-       [smartRouterLink]="communityLibraryUrl"
+       [routerLink]="communityLibraryUrl"
        [oppiaFocusOn]="'ourLessonsBtn'">
     </a>
   </div>
@@ -258,7 +258,7 @@
     <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
        href="/community-library"
-       [smartRouterLink]="communityLibraryUrl">
+       [routerLink]="communityLibraryUrl">
     </a>
   </div>
   <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
@@ -283,7 +283,7 @@
            (mouseenter)="summaryTile.toggle = !summaryTile.toggle"
            (mouseleave)="summaryTile.toggle = !summaryTile.toggle">
         <div *ngIf="getTileType(summaryTile) === 'exploration'">
-          <i class="remove-icon fa fa-times"
+          <i class="remove-icon fa fa-times e2e-test-remove-from-playlist-btn"
              *ngIf="summaryTile.toggle || windowIsNarrow"
              aria-hidden="true"
              (click)="openRemoveActivityModal('I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION', 'I18N_DASHBOARD_EXPLORATIONS', summaryTile)"

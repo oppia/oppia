@@ -16,9 +16,12 @@
  * @fileoverview Tests for the donation box component
  */
 
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
-import { DonationBoxComponent } from './donation-box.component';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
+import {DonationBoxComponent} from './donation-box.component';
 
 describe('Donation box', () => {
   let component: DonationBoxComponent;
@@ -40,6 +43,7 @@ describe('Donation box', () => {
     component.ngOnInit();
 
     expect(insertScriptService.loadScript).toHaveBeenCalledOnceWith(
-      KNOWN_SCRIPTS.DONORBOX);
+      KNOWN_SCRIPTS.DONORBOX
+    );
   });
 });

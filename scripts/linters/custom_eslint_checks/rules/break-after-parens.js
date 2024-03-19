@@ -24,25 +24,25 @@ module.exports = {
   meta: {
     type: 'layout',
     docs: {
-      description: (
+      description:
         'Lint check to ensure that there is a break after parenthesis in case' +
-        ' of multiline hanging indentation'),
+        ' of multiline hanging indentation',
       category: 'Stylistic Issues',
-      recommended: true
+      recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      expectedAfter: 'Expected newline after \'(\'.'
-    }
+      expectedAfter: "Expected newline after '('.",
+    },
   },
 
-  create: function(context) {
+  create: function (context) {
     const sourceCode = context.getSourceCode();
     const lines = sourceCode.lines;
 
     return {
-      Program: function(node) {
+      Program: function (node) {
         const tokens = sourceCode.tokensAndComments;
         var parensCount = 0;
         const separators = ['(', '{', '[', ' '];
@@ -59,12 +59,19 @@ module.exports = {
           const nextParen = parens[i + 1];
           // TODO(#10479): Consider 'it' and 'describe' as a normal function
           // call instead of an exception.
-          if (line.startsWith('it(') || line.startsWith('describe(') ||
-            line.startsWith('angular.module(\'oppia\').')) {
+          if (
+            line.startsWith('it(') ||
+            line.startsWith('describe(') ||
+            line.startsWith("angular.module('oppia').")
+          ) {
             return true;
           }
-          if (line.startsWith('if (') || line.startsWith('} else if (') ||
-            line.startsWith('while (') || line.startsWith('for (')) {
+          if (
+            line.startsWith('if (') ||
+            line.startsWith('} else if (') ||
+            line.startsWith('while (') ||
+            line.startsWith('for (')
+          ) {
             excluded = true;
           }
           if (excluded && line.endsWith(') {')) {
@@ -85,8 +92,10 @@ module.exports = {
           if (nextParen) {
             // If the current and next token are not on same line check if the
             // number of parenthesis is greater than 0 and raise a lint error.
-            if (paren.loc.start.line !== nextParen.loc.start.line &&
-              parensCount > 0) {
+            if (
+              paren.loc.start.line !== nextParen.loc.start.line &&
+              parensCount > 0
+            ) {
               // Allow '[', '{', '(' at the end of line.
               if (separators.includes(line[line.length - 1])) {
                 parensCount = 0;
@@ -95,12 +104,12 @@ module.exports = {
               context.report({
                 node,
                 loc: paren.loc,
-                messageId: 'expectedAfter'
+                messageId: 'expectedAfter',
               });
             }
           }
         });
-      }
+      },
     };
-  }
+  },
 };

@@ -16,16 +16,16 @@
  * @fileoverview Module for the item selection input interaction components.
  */
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { InteractiveItemSelectionInputComponent } from './directives/oppia-interactive-item-selection-input.component';
-import { ShortResponseItemSelectionInputComponent } from './directives/oppia-short-response-item-selection-input.component';
-import { ResponseItemSelectionInputComponent } from './directives/oppia-response-item-selection-input.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {InteractiveItemSelectionInputComponent} from './directives/oppia-interactive-item-selection-input.component';
+import {ShortResponseItemSelectionInputComponent} from './directives/oppia-short-response-item-selection-input.component';
+import {ResponseItemSelectionInputComponent} from './directives/oppia-response-item-selection-input.component';
+import {TranslateModule} from '@ngx-translate/core';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [
@@ -52,5 +52,4 @@ import { RichTextComponentsModule } from 'rich_text_components/rich-text-compone
     ShortResponseItemSelectionInputComponent,
   ],
 })
-
-export class ItemSelectionInputInteractionModule { }
+export class ItemSelectionInputInteractionModule {}

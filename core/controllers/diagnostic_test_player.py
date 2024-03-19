@@ -18,8 +18,8 @@ from __future__ import annotations
 
 import collections
 
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -44,7 +44,7 @@ class DiagnosticTestPlayerPage(
         """Handles GET requests."""
         if feature_flag_services.is_feature_flag_enabled(
             self.user_id,
-            platform_feature_list.FeatureNames.DIAGNOSTIC_TEST.value
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
         ):
             self.render_template('diagnostic-test-player-page.mainpage.html')
         else:

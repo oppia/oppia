@@ -18,21 +18,21 @@
  */
 
 var waitFor = require('../webdriverio_utils/waitFor.js');
-var ExplorationEditorImprovementsTab = function() {
+var ExplorationEditorImprovementsTab = function () {
   /*
    * Interactive elements
    */
   var explorationHealth = $('.e2e-test-improvements-tab-health');
-  var explorationImprovementTabSelector = function() {
+  var explorationImprovementTabSelector = function () {
     return $$('.e2e-test-improvements-tab');
   };
 
-  this.expectToBeHidden = async function() {
+  this.expectToBeHidden = async function () {
     var explorationImprovementTab = await explorationImprovementTabSelector();
     expect(explorationImprovementTab.length).toEqual(0);
   };
 
-  this.expectHealthyExploration = async function() {
+  this.expectHealthyExploration = async function () {
     await waitFor.visibilityOf(
       explorationHealth,
       'Exploration health is taking too long to appear'
@@ -40,7 +40,7 @@ var ExplorationEditorImprovementsTab = function() {
     expect(await explorationHealth.getText()).toEqual('HEALTHY');
   };
 
-  this.expectWarningExploration = async function() {
+  this.expectWarningExploration = async function () {
     await waitFor.visibilityOf(
       explorationHealth,
       'Exploration health is taking too long to appear'
@@ -48,7 +48,7 @@ var ExplorationEditorImprovementsTab = function() {
     expect(await explorationHealth.getText()).toEqual('WARNING');
   };
 
-  this.expectCriticalExploration = async function() {
+  this.expectCriticalExploration = async function () {
     await waitFor.visibilityOf(
       explorationHealth,
       'Exploration health is taking too long to appear'

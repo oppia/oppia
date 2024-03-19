@@ -16,15 +16,20 @@
  * @fileoverview Unit tests for the delete account modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { UserService } from 'services/user.service';
-import { DeleteAccountModalComponent } from './delete-account-modal.component';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { UserInfo } from 'domain/user/user-info.model';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {UserService} from 'services/user.service';
+import {DeleteAccountModalComponent} from './delete-account-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {UserInfo} from 'domain/user/user-info.model';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 class MockActiveModal {
   dismiss(): void {
@@ -50,10 +55,10 @@ describe('Delete account modal', () => {
         UserService,
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
+          useClass: MockActiveModal,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -75,11 +80,12 @@ describe('Delete account modal', () => {
       preferred_site_language_code: null,
       username: 'username',
       email: 'test@test.com',
-      user_is_logged_in: true
+      user_is_logged_in: true,
     };
 
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject)));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(UserInfo.createFromBackendDict(UserInfoObject))
+    );
 
     component.ngOnInit();
     component.expectedUsername = 'username';
@@ -96,10 +102,9 @@ describe('Delete account modal', () => {
     let userInfo = {
       isModerator: () => true,
       getUsername: () => null,
-      isSuperAdmin: () => true
+      isSuperAdmin: () => true,
     };
-    spyOn(userService, 'getUserInfoAsync')
-      .and.resolveTo(userInfo as UserInfo);
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo as UserInfo);
 
     expect(() => {
       component.ngOnInit();
@@ -118,11 +123,12 @@ describe('Delete account modal', () => {
       preferred_site_language_code: null,
       username: 'username',
       email: 'test@test.com',
-      user_is_logged_in: true
+      user_is_logged_in: true,
     };
 
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject)));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(UserInfo.createFromBackendDict(UserInfoObject))
+    );
 
     component.ngOnInit();
     const closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
@@ -141,11 +147,12 @@ describe('Delete account modal', () => {
       preferred_site_language_code: null,
       username: 'username',
       email: 'test@test.com',
-      user_is_logged_in: true
+      user_is_logged_in: true,
     };
 
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(Promise.resolve(
-      UserInfo.createFromBackendDict(UserInfoObject)));
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(UserInfo.createFromBackendDict(UserInfoObject))
+    );
 
     component.ngOnInit();
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();

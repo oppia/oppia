@@ -21,15 +21,12 @@ var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
-var CreatorDashboardPage =
-  require('../webdriverio_utils/CreatorDashboardPage.js');
-var ExplorationEditorPage =
-  require('../webdriverio_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage =
-  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
-describe('ExplorationFeedback', function() {
+describe('ExplorationFeedback', function () {
   var EXPLORATION_TITLE_1 = 'Exploration with Feedback';
   var EXPLORATION_TITLE_2 = 'Exploration to test feedback status';
   var EXPLORATION_TITLE_3 = 'Exploration to test feedback message';
@@ -42,7 +39,7 @@ describe('ExplorationFeedback', function() {
   var libraryPage = null;
   var explorationPlayerPage = null;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -51,28 +48,29 @@ describe('ExplorationFeedback', function() {
 
     await users.createUser(
       'user1@ExplorationFeedback.com',
-      'creatorExplorationFeedback');
+      'creatorExplorationFeedback'
+    );
     await users.createUser(
       'user2@ExplorationFeedback.com',
-      'learnerExplorationFeedback');
+      'learnerExplorationFeedback'
+    );
     await users.createUser(
       'user3@ExplorationFeedback.com',
-      'creatorExplorationFBStatChange');
+      'creatorExplorationFBStatChange'
+    );
     await users.createUser(
       'user4@ExplorationFeedback.com',
-      'learnerExplorationFBStatChange');
-    await users.createUser(
-      'user5@ExplorationFeedback.com',
-      'creatorFeedback');
-    await users.createUser(
-      'user6@ExplorationFeedback.com',
-      'learnerFeedback');
+      'learnerExplorationFBStatChange'
+    );
+    await users.createUser('user5@ExplorationFeedback.com', 'creatorFeedback');
+    await users.createUser('user6@ExplorationFeedback.com', 'learnerFeedback');
     await users.createAdmin(
       'user7@ExplorationFeedback.com',
-      'superUserExplorationFeedback');
+      'superUserExplorationFeedback'
+    );
   });
 
-  it('should add feedback to an exploration', async function() {
+  it('should add feedback to an exploration', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
@@ -86,9 +84,7 @@ describe('ExplorationFeedback', function() {
       true
     );
     await creatorDashboardPage.get();
-    expect(
-      await creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(0);
+    expect(await creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(0);
     await users.logout();
 
     // Learner plays the exploration and submits a feedback.
@@ -102,9 +98,7 @@ describe('ExplorationFeedback', function() {
     // Creator reads the feedback and responds.
     await users.login('user1@ExplorationFeedback.com');
     await creatorDashboardPage.get();
-    expect(
-      await creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(1);
+    expect(await creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(1);
     await creatorDashboardPage.navigateToExplorationEditor();
 
     await explorationEditorPage.navigateToFeedbackTab();
@@ -114,11 +108,12 @@ describe('ExplorationFeedback', function() {
     expect(messages[0]).toEqual(feedback);
     await explorationEditorPage.navigateToFeedbackTab();
     await explorationEditorFeedbackTab.sendResponseToLatestFeedback(
-      feedbackResponse);
+      feedbackResponse
+    );
     await users.logout();
   });
 
-  it('should change status of feedback thread', async function() {
+  it('should change status of feedback thread', async function () {
     var feedback = 'Hey! This exploration looks awesome';
     var feedbackResponse = 'Thanks for the feedback!';
 
@@ -132,9 +127,7 @@ describe('ExplorationFeedback', function() {
       true
     );
     await creatorDashboardPage.get();
-    expect(
-      await creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(0);
+    expect(await creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(0);
     await users.logout();
 
     // Learner plays the exploration and submits a feedback.
@@ -148,9 +141,7 @@ describe('ExplorationFeedback', function() {
     // Creator reads the feedback and responds.
     await users.login('user3@ExplorationFeedback.com');
     await creatorDashboardPage.get();
-    expect(
-      await creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(1);
+    expect(await creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(1);
     await creatorDashboardPage.navigateToExplorationEditor();
 
     await explorationEditorPage.navigateToFeedbackTab();
@@ -161,19 +152,23 @@ describe('ExplorationFeedback', function() {
     await explorationEditorFeedbackTab.selectLatestFeedbackThread();
     await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
     await explorationEditorFeedbackTab.changeFeedbackStatus(
-      'Fixed', feedbackResponse);
+      'Fixed',
+      feedbackResponse
+    );
     await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Fixed');
     await browser.refresh();
     await explorationEditorFeedbackTab.selectLatestFeedbackThread();
     await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Fixed');
     await explorationEditorFeedbackTab.changeFeedbackStatus(
-      'Open', feedbackResponse);
+      'Open',
+      feedbackResponse
+    );
     await explorationEditorFeedbackTab.expectFeedbackStatusNameToBe('Open');
 
     await users.logout();
   });
 
-  it('should send message to feedback thread', async function() {
+  it('should send message to feedback thread', async function () {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
@@ -187,9 +182,7 @@ describe('ExplorationFeedback', function() {
       true
     );
     await creatorDashboardPage.get();
-    expect(
-      await creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(0);
+    expect(await creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(0);
     await users.logout();
 
     // Learner plays the exploration and submits a feedback.
@@ -203,9 +196,7 @@ describe('ExplorationFeedback', function() {
     // Creator reads the feedback and responds.
     await users.login('user5@ExplorationFeedback.com');
     await creatorDashboardPage.get();
-    expect(
-      await creatorDashboardPage.getNumberOfFeedbackMessages()
-    ).toEqual(1);
+    expect(await creatorDashboardPage.getNumberOfFeedbackMessages()).toEqual(1);
     await creatorDashboardPage.navigateToExplorationEditor();
 
     await explorationEditorPage.navigateToFeedbackTab();
@@ -215,25 +206,26 @@ describe('ExplorationFeedback', function() {
     expect(messages[0]).toEqual(feedback);
     await explorationEditorPage.navigateToFeedbackTab();
     await explorationEditorFeedbackTab.sendResponseToLatestFeedback(
-      feedbackResponse);
+      feedbackResponse
+    );
     await explorationEditorFeedbackTab.expectNumberOfFeedbackMessagesToBe(2);
-    messages = (
-      await explorationEditorFeedbackTab.readFeedbackMessagesFromThread());
+    messages =
+      await explorationEditorFeedbackTab.readFeedbackMessagesFromThread();
     expect(messages.length).toEqual(2);
     expect(await messages[0].getText()).toEqual(feedback);
     expect(await messages[1].getText()).toEqual(feedbackResponse);
     await browser.refresh();
     await explorationEditorFeedbackTab.selectLatestFeedbackThread();
     await explorationEditorFeedbackTab.expectNumberOfFeedbackMessagesToBe(2);
-    messages = (
-      await explorationEditorFeedbackTab.readFeedbackMessagesFromThread());
+    messages =
+      await explorationEditorFeedbackTab.readFeedbackMessagesFromThread();
     expect(messages.length).toEqual(2);
     expect(await messages[0].getText()).toEqual(feedback);
     expect(await messages[1].getText()).toEqual(feedbackResponse);
     await users.logout();
   });
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

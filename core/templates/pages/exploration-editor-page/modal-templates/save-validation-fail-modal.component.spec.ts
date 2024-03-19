@@ -16,18 +16,23 @@
  * @fileoverview Unit tests for SaveValidationFailModalComponent.
  */
 
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SaveValidationFailModalComponent } from './save-validation-fail-modal.component';
+import {Component, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SaveValidationFailModalComponent} from './save-validation-fail-modal.component';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
-  template: ''
+  template: '',
 })
-class ChangesInHumanReadableFormComponentStub {
-}
+class ChangesInHumanReadableFormComponentStub {}
 
 class MockActiveModal {
   close(): void {
@@ -55,7 +60,7 @@ class MockWindowRef {
           return;
         }
       },
-      reload: (val: number) => val
+      reload: (val: number) => val,
     },
     get onhashchange() {
       return this.location._hashChange;
@@ -63,7 +68,7 @@ class MockWindowRef {
 
     set onhashchange(val) {
       this.location._hashChange = val;
-    }
+    },
   };
 
   get nativeWindow() {
@@ -83,18 +88,16 @@ describe('Save Validation Fail Modal Component', () => {
     TestBed.configureTestingModule({
       declarations: [
         SaveValidationFailModalComponent,
-        ChangesInHumanReadableFormComponentStub
+        ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
-        { provide: WindowRef,
-          useValue: windowRef
-        }
+        {provide: WindowRef, useValue: windowRef},
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -128,21 +131,19 @@ describe('Save Validation Fail Modal Component', () => {
     expect(reloadSpy).toHaveBeenCalled();
   }));
 
-
   it('should contain correct modal header', () => {
     const modalHeader =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-header').innerText;
+      fixture.debugElement.nativeElement.querySelector(
+        '.modal-header'
+      ).innerText;
 
     expect(modalHeader).toBe('Error Saving Exploration');
   });
 
   it('should contain correct modal body', () => {
     const modalBody =
-    fixture.debugElement.nativeElement
-      .querySelector('.modal-body').innerText;
+      fixture.debugElement.nativeElement.querySelector('.modal-body').innerText;
 
-    expect(modalBody).toContain(
-      'Sorry, an unexpected error occurred.');
+    expect(modalBody).toContain('Sorry, an unexpected error occurred.');
   });
 });

@@ -186,7 +186,7 @@ oppia-learner-dashboard-page .oppia-updated-status {
   margin-right: 15px;
 }
 
-oppia-learner-dashboard-page .learner-groups-icon {
+oppia-learner-dashboard-page .oppia-learner-groups-icon {
   font-size: 44px;
 }
 
@@ -253,11 +253,11 @@ oppia-learner-dashboard-page .learner-groups-icon {
   oppia-learner-dashboard-page .home-button,
   oppia-learner-dashboard-page .goals-button,
   oppia-learner-dashboard-page .progress-button,
-  oppia-learner-dashboard-page .learner-groups-button {
+  oppia-learner-dashboard-page .oppia-learner-groups-button {
     font-size: 14px;
   }
 
-  oppia-learner-dashboard-page .learner-groups-icon {
+  oppia-learner-dashboard-page .oppia-learner-groups-icon {
     font-size: 36px;
   }
 }
@@ -313,33 +313,22 @@ oppia-learner-dashboard-page .learner-groups-icon {
 
 
 /*REDESIGN CLASSES*/
-/*
- - remove oppia-row, replace with bootstrap classes
- - remove .oppia-learner-dashboard-menu
- - replace .oppia-learner-dashborad-menu-hover with pseudoclasses
- - remove footer component completely
-*/
-
-.learner-dash-container {
+.oppia-learner-dash-container {
   padding: 0 16px;
 }
 
-/*.learner-dash-content {
-  height: 92vh;
-}*/
-
-.learner-dash-sidebar {
+.oppia-learner-dash-sidebar {
   background-color: #00645c;
   border-radius: 4px;
   height: 95%;
   list-style-type: none;
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
   max-height: 706px;
   padding: 16px;
-  width: 248px !important;
+  width: 248px;
 }
 
-.learner-dash-sidebar_btn {
+.oppia-learner-dash-sidebar_btn {
   background-color: transparent;
   border: 1px solid #fff;
   color: #fff;
@@ -347,67 +336,56 @@ oppia-learner-dashboard-page .learner-groups-icon {
   padding: 12px 8px;
 }
 
-.learner-dash-sidebar_btn:not(.learner-dash-sidebar_btn--active):hover {
+.oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover {
   background-color: #004d45;
 }
 
-.learner-dash-sidebar_btn path {
-  fill: currentColor !important;
+.oppia-learner-dash-sidebar_btn span {
+  margin-right: .5em;
 }
 
-.learner-dash-sidebar_btn svg {
-  margin-right: .25em;
-}
-
-.learner-dash-sidebar_btn--active {
+.oppia-learner-dash-sidebar_btn--active {
   background-color: #fff;
   box-shadow: 0 4px 4px 0 #00000040;
   color: #00645c;
 }
 
-.learner-dash-sidebar_pic-frame {
+.oppia-learner-dash-sidebar_pic-frame {
   height: 72px;
   width: 72px;
 }
 
-.learner-dash-sidebar_position {
+.oppia-learner-dash-sidebar_position {
   height: 92vh;
   max-height: 750px;
 }
 
-.learner-dash-tab {
+.oppia-learner-dash-tab {
   flex-grow: 1;
   max-width: 1216px;
 }
 
 @media screen and (max-width: 767px) {
-  .learner-dash-container {
-    max-width: none !important;
-    padding: 0 !important;
-    width: 100% !important;
+  .oppia-learner-dash-container {
+    padding: 0;
   }
 
-  .learner-dash-content {
+  .oppia-learner-dash-content {
     align-content: flex-start;
     flex-direction: column;
   }
 
-  .progress-icon {
-    height: 24px;
-    width: 24px;
-  }
-
-  .learner-dash-sidebar {
+  .oppia-learner-dash-sidebar {
     background-color: #a5d3ec;
     border-radius: 0;
     display: flex;
     height: max-content;
     justify-content: space-around;
-    padding: 0 !important;
-    width: 100% !important;
+    padding: 0;
+    width: 100%;
   }
 
-  .learner-dash-sidebar_btn {
+  .oppia-learner-dash-sidebar_btn {
     background-color: transparent;
     border: 0;
     border-bottom: 2px solid transparent;
@@ -421,58 +399,60 @@ oppia-learner-dashboard-page .learner-groups-icon {
     width: 120px !important;
   }
 
-  .learner-dash-sidebar_btn--active {
+  .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover {
+    background-color: transparent;
+    border-bottom-color: #00645c;
+    color: #00645c;
+  }
+
+  .oppia-learner-dash-sidebar_btn span {
+    color: #fff;
+    margin-bottom: .5em;
+    margin-right: 0;
+  }
+
+  .oppia-learner-dash-sidebar_btn--active {
     background-color: transparent;
     border-bottom-color: #00645c;
     box-shadow: none;
     color: #00645c;
   }
 
-  .learner-dash-sidebar_btn--active path {
-    fill: #00645c;
-  }
-
-  .learner-dash-sidebar_btn:not(.learner-dash-sidebar_btn--active):hover {
-    background-color: transparent;
-    border-bottom-color: #00645c;
+  .oppia-learner-dash-sidebar_btn--active span {
     color: #00645c;
   }
 
-  .learner-dash-sidebar_btn:not(.learner-dash-sidebar_btn--active) path {
-    fill: #fff !important;
+  .oppia-learner-dash-sidebar_btn:not(.oppia-learner-dash-sidebar_btn--active):hover span {
+    color: #00645c;
   }
 
-  .learner-dash-sidebar_btn svg {
-    margin-right: 0;
-  }
-
-  .learner-dash-sidebar_pic {
+  .oppia-learner-dash-sidebar_pic {
     display: none;
   }
 
-  .learner-dash-sidebar_position {
+  .oppia-learner-dash-sidebar_position {
     height: max-content;
-    padding: 0 !important;
+    padding: 0;
     position: relative;
     top: 0;
   }
 
-  .learner-dash-sidebar > ol li {
+  .oppia-learner-dash-sidebar > ol li {
     width: max-content;
   }
 }
 
 @media screen and (min-width: 1513px) {
-  .learner-dash-container {
+  .oppia-learner-dash-container {
     display: flex;
     justify-content: center;
   }
   
-  .learner-dash-sidebar {
+  .oppia-learner-dash-sidebar {
     max-height: 100%;
   }
 
-  .learner-dash-sidebar_position {
+  .oppia-learner-dash-sidebar_position {
     max-height: 100%;
   }
 }

@@ -17,29 +17,34 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   ParamChangeBackendDict,
   ParamChange,
-  ParamChangeObjectFactory
+  ParamChangeObjectFactory,
 } from 'domain/exploration/ParamChangeObjectFactory';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ParamChangesObjectFactory {
   constructor(private paramChangeObjectFactory: ParamChangeObjectFactory) {}
   createFromBackendList(
-      paramChangeBackendList: readonly ParamChangeBackendDict[]
+    paramChangeBackendList: readonly ParamChangeBackendDict[]
   ): ParamChange[] {
-    return paramChangeBackendList.map((paramChangeBackendDict) => {
+    return paramChangeBackendList.map(paramChangeBackendDict => {
       return this.paramChangeObjectFactory.createFromBackendDict(
-        paramChangeBackendDict);
+        paramChangeBackendDict
+      );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'ParamChangesObjectFactory', downgradeInjectable(ParamChangesObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'ParamChangesObjectFactory',
+    downgradeInjectable(ParamChangesObjectFactory)
+  );

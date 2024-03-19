@@ -31,8 +31,8 @@ from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_cleaner
 from core.domain import opportunity_services
-from core.domain import platform_feature_services
 from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -46,8 +46,8 @@ from core.platform import models
 from extensions import domain
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Set, Type, TypedDict, Union,
-    cast)
+    Any, Callable, Dict, List, Mapping, Optional, Set, Type,
+    TypedDict, Union, cast)
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1379,7 +1379,7 @@ class CommunityContributionStats:
         suggestions in a given language need more reviewers if the number of
         translation suggestions in that language divided by the number of
         translation reviewers in that language is greater than
-        ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+        ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Args:
             lang_code: str. The language code of the translation
@@ -1400,8 +1400,8 @@ class CommunityContributionStats:
         number_of_suggestions = (
             self.translation_suggestion_counts_by_lang_code[lang_code])
         max_number_of_suggestions_per_reviewer = (
-            platform_feature_services.get_platform_parameter_value(
-                platform_parameter_list.ParamNames.
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.
                 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
             )
         )
@@ -1418,7 +1418,7 @@ class CommunityContributionStats:
         given language need more reviewers if the number of translation
         suggestions in that language divided by the number of translation
         reviewers in that language is greater than
-        ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+        ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
             set. A set of of the language codes where more translation reviewers
@@ -1435,7 +1435,7 @@ class CommunityContributionStats:
         """Returns whether or not more reviewers are needed to review question
         suggestions. Question suggestions need more reviewers if the number of
         question suggestions divided by the number of question reviewers is
-        greater than ParamNames.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
+        greater than ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.
 
         Returns:
             bool. Whether or not more reviewers are needed to review
@@ -1448,8 +1448,8 @@ class CommunityContributionStats:
             return True
 
         max_number_of_suggestions_per_reviewer = (
-            platform_feature_services.get_platform_parameter_value(
-                platform_parameter_list.ParamNames.
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.
                 MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER.value
             )
         )

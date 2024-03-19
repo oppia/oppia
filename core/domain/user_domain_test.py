@@ -1718,3 +1718,37 @@ class TranslationCoordinatorStatsUnitTests(
 
         self.assertDictEqual(
             actual_stats.to_dict(), self.expected_stats_dict)
+
+
+class UserContributionRightsUnitTest(
+    test_utils.GenericTestBase
+):
+    """Tests for the UserContributionRights class."""
+
+    def test_initialization(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', ['en', 'es'], ['fr'], True, False))
+
+        self.assertEqual(user_contribution_rights.id, 'a')
+        self.assertEqual(user_contribution_rights.can_review_questions, True)
+        self.assertEqual(user_contribution_rights.can_submit_questions, False)
+        self.assertEqual(
+            user_contribution_rights.can_review_translation_for_language_codes,
+            ['en', 'es'])
+        self.assertEqual(
+            user_contribution_rights.can_review_voiceover_for_language_codes,
+             ['fr'])
+
+    def test_can_review_at_least_one_item(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', [], [], True, True))
+        self.assertTrue(user_contribution_rights.can_review_at_least_one_item())
+
+    def test_can_submit_at_least_one_item(self) -> None:
+        user_contribution_rights = (
+            user_domain.UserContributionRights(
+                'a', [], [], True, False))
+        self.assertFalse(
+            user_contribution_rights.can_submit_at_least_one_item())

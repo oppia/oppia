@@ -15,30 +15,29 @@
  * @fileoverview Unit tests for story editor staleness detection service.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { Story } from 'domain/story/story.model';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { FaviconService } from 'services/favicon.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { StalenessDetectionService } from 'services/staleness-detection.service';
-import { StoryEditorStalenessDetectionService } from './story-editor-staleness-detection.service';
-import { StoryEditorStateService } from './story-editor-state.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import {Story} from 'domain/story/story.model';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {FaviconService} from 'services/favicon.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {StalenessDetectionService} from 'services/staleness-detection.service';
+import {StoryEditorStalenessDetectionService} from './story-editor-staleness-detection.service';
+import {StoryEditorStateService} from './story-editor-state.service';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
-      reload: () => {}
-    }
+      reload: () => {},
+    },
   };
 }
 
 describe('Story editor staleness detection service', () => {
-  let storyEditorStalenessDetectionService:
-    StoryEditorStalenessDetectionService;
+  let storyEditorStalenessDetectionService: StoryEditorStalenessDetectionService;
   let storyEditorStateService: StoryEditorStateService;
   let localStorageService: LocalStorageService;
   let ngbModal: NgbModal;
@@ -60,13 +59,14 @@ describe('Story editor staleness detection service', () => {
         UndoRedoService,
         {
           provide: WindowRef,
-          useValue: mockWindowRef
-        }
-      ]
+          useValue: mockWindowRef,
+        },
+      ],
     }).compileComponents();
 
-    storyEditorStalenessDetectionService =
-      TestBed.inject(StoryEditorStalenessDetectionService);
+    storyEditorStalenessDetectionService = TestBed.inject(
+      StoryEditorStalenessDetectionService
+    );
     storyEditorStateService = TestBed.inject(StoryEditorStateService);
     localStorageService = TestBed.inject(LocalStorageService);
     ngbModal = TestBed.inject(NgbModal);
@@ -100,8 +100,9 @@ describe('Story editor staleness detection service', () => {
             planned_publication_date_msecs: 100,
             last_modified_msecs: 100,
             first_publication_date_msecs: 200,
-            unpublishing_reason: null
-          }, {
+            unpublishing_reason: null,
+          },
+          {
             id: 'node_2',
             title: 'Title 2',
             description: 'Description 2',
@@ -117,32 +118,39 @@ describe('Story editor staleness detection service', () => {
             planned_publication_date_msecs: 100,
             last_modified_msecs: 100,
             first_publication_date_msecs: 200,
-            unpublishing_reason: null
-          }],
-        next_node_id: 'node_3'
+            unpublishing_reason: null,
+          },
+        ],
+        next_node_id: 'node_3',
       },
       language_code: 'en',
       thumbnail_filename: 'fileName',
       thumbnail_bg_color: 'blue',
       url_fragment: 'url',
-      meta_tag_content: 'meta'
+      meta_tag_content: 'meta',
     };
 
-    sampleStory = Story.createFromBackendDict(
-      sampleStoryBackendObject);
+    sampleStory = Story.createFromBackendDict(sampleStoryBackendObject);
   });
 
   it('should show stale tab info modal and change the favicon', () => {
     spyOn(storyEditorStateService, 'getStory').and.returnValue(sampleStory);
     let storyEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'story', 'story_id', 2, 1, false);
+      'story',
+      'story_id',
+      2,
+      1,
+      false
+    );
     spyOn(
-      localStorageService, 'getEntityEditorBrowserTabsInfo'
+      localStorageService,
+      'getEntityEditorBrowserTabsInfo'
     ).and.returnValue(storyEditorBrowserTabsInfo);
     spyOn(mockWindowRef.nativeWindow.location, 'reload');
     spyOn(faviconService, 'setFavicon').and.callFake(() => {});
     spyOn(
-      storyEditorStalenessDetectionService, 'showStaleTabInfoModal'
+      storyEditorStalenessDetectionService,
+      'showStaleTabInfoModal'
     ).and.callThrough();
     class MockNgbModalRef {
       result = Promise.resolve();
@@ -158,7 +166,8 @@ describe('Story editor staleness detection service', () => {
       storyEditorStalenessDetectionService.showStaleTabInfoModal
     ).toHaveBeenCalled();
     expect(faviconService.setFavicon).toHaveBeenCalledWith(
-      '/assets/images/favicon_alert/favicon_alert.ico');
+      '/assets/images/favicon_alert/favicon_alert.ico'
+    );
     expect(ngbModal.open).toHaveBeenCalled();
 
     storyEditorStateService.onStoryInitialized.emit();
@@ -168,63 +177,73 @@ describe('Story editor staleness detection service', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should open or close presence of unsaved changes info modal ' +
-  'depending on the presence of unsaved changes on some other tab', () => {
-    spyOn(storyEditorStateService, 'getStory').and.returnValue(sampleStory);
-    let storyEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
-      'story', 'story_id', 2, 2, true);
-    spyOn(
-      localStorageService, 'getEntityEditorBrowserTabsInfo'
-    ).and.returnValue(storyEditorBrowserTabsInfo);
-    spyOn(mockWindowRef.nativeWindow.location, 'reload');
-    spyOn(
-      storyEditorStalenessDetectionService, 'showPresenceOfUnsavedChangesModal'
-    ).and.callThrough();
-    class MockNgbModalRef {
-      result = Promise.resolve();
-      componentInstance = {};
-      dismiss() {}
+  it(
+    'should open or close presence of unsaved changes info modal ' +
+      'depending on the presence of unsaved changes on some other tab',
+    () => {
+      spyOn(storyEditorStateService, 'getStory').and.returnValue(sampleStory);
+      let storyEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
+        'story',
+        'story_id',
+        2,
+        2,
+        true
+      );
+      spyOn(
+        localStorageService,
+        'getEntityEditorBrowserTabsInfo'
+      ).and.returnValue(storyEditorBrowserTabsInfo);
+      spyOn(mockWindowRef.nativeWindow.location, 'reload');
+      spyOn(
+        storyEditorStalenessDetectionService,
+        'showPresenceOfUnsavedChangesModal'
+      ).and.callThrough();
+      class MockNgbModalRef {
+        result = Promise.resolve();
+        componentInstance = {};
+        dismiss() {}
+      }
+      const ngbModalRef = new MockNgbModalRef() as NgbModalRef;
+      spyOn(ngbModalRef, 'dismiss');
+      spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
+      spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+      spyOn(
+        stalenessDetectionService,
+        'doesSomeOtherEntityEditorPageHaveUnsavedChanges'
+      ).and.returnValues(true, false);
+
+      storyEditorStalenessDetectionService.init();
+      storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+
+      expect(
+        storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal
+      ).toHaveBeenCalled();
+      expect(ngbModal.open).toHaveBeenCalled();
+
+      storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+
+      expect(ngbModalRef.dismiss).toHaveBeenCalled();
     }
-    const ngbModalRef = new MockNgbModalRef() as NgbModalRef;
-    spyOn(ngbModalRef, 'dismiss');
-    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
-    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
-    spyOn(
-      stalenessDetectionService,
-      'doesSomeOtherEntityEditorPageHaveUnsavedChanges'
-    ).and.returnValues(true, false);
+  );
 
-    storyEditorStalenessDetectionService.init();
-    storyEditorStalenessDetectionService
-      .presenceOfUnsavedChangesEventEmitter.emit();
+  it(
+    'should not show the presence of unsaved changes modal on the page' +
+      'which itself contains those unsaved changes',
+    () => {
+      class MockNgbModalRef {
+        result = Promise.resolve();
+        componentInstance = {};
+        dismiss() {}
+      }
+      const ngbModalRef = new MockNgbModalRef() as NgbModalRef;
+      spyOn(ngbModalRef, 'dismiss');
+      spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
+      spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
-    expect(
-      storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal
-    ).toHaveBeenCalled();
-    expect(ngbModal.open).toHaveBeenCalled();
+      storyEditorStalenessDetectionService.init();
+      storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
 
-    storyEditorStalenessDetectionService
-      .presenceOfUnsavedChangesEventEmitter.emit();
-
-    expect(ngbModalRef.dismiss).toHaveBeenCalled();
-  });
-
-  it('should not show the presence of unsaved changes modal on the page' +
-  'which itself contains those unsaved changes', () => {
-    class MockNgbModalRef {
-      result = Promise.resolve();
-      componentInstance = {};
-      dismiss() {}
+      expect(ngbModal.open).not.toHaveBeenCalled();
     }
-    const ngbModalRef = new MockNgbModalRef() as NgbModalRef;
-    spyOn(ngbModalRef, 'dismiss');
-    spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
-    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-
-    storyEditorStalenessDetectionService.init();
-    storyEditorStalenessDetectionService
-      .presenceOfUnsavedChangesEventEmitter.emit();
-
-    expect(ngbModal.open).not.toHaveBeenCalled();
-  });
+  );
 });

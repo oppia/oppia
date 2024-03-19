@@ -17,10 +17,10 @@
  * modal component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmQuestionExitModalComponent } from './confirm-question-exit-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmQuestionExitModalComponent} from './confirm-question-exit-modal.component';
 
 describe('Confirm Question Exit Modal Component', () => {
   let component: ConfirmQuestionExitModalComponent;
@@ -28,11 +28,9 @@ describe('Confirm Question Exit Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ConfirmQuestionExitModalComponent
-      ],
+      declarations: [ConfirmQuestionExitModalComponent],
       providers: [NgbActiveModal],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

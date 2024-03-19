@@ -86,9 +86,14 @@ OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
 GOOGLE_CLOUD_SDK_HOME = (
-    '/google-cloud-sdk' if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
-        OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-364.0.0', 'google-cloud-sdk'
-    ))
+    '/app/vm_deps/google-cloud-sdk'
+    if feconf.OPPIA_IS_DOCKERIZED
+    else os.path.join(
+        OPPIA_TOOLS_DIR_ABS_PATH,
+        'google-cloud-sdk-364.0.0',
+        'google-cloud-sdk'
+    )
+)
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine')
 GOOGLE_CLOUD_SDK_BIN = os.path.join(GOOGLE_CLOUD_SDK_HOME, 'bin')
@@ -206,13 +211,15 @@ CHROME_PATHS = [
 ]
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
-    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties.spec.js',
-    'blog-editor-tests/check-blog-editor-unable-to-publish-' +
-    'duplicate-blog-post.spec.js',
-    'practice-question-admin-tests/add-and-remove-contribution-rights.spec.js',
-    'translation-admin-tests/add-translation-rights.spec.js',
-    'translation-admin-tests/remove-translation-rights.spec.js'
-
+    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'logged-in-user-tests/click-all-buttons-on-navbar',
+    'logged-in-user-tests/click-all-buttons-in-about-page',
+    'logged-in-user-tests/click-all-buttons-in-about-foundation-page',
+    'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page',
+    'practice-question-admin-tests/add-and-remove-contribution-rights',
+    'translation-admin-tests/add-translation-rights',
+    'translation-admin-tests/remove-translation-rights'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181

@@ -53,7 +53,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.story_url_fragment_2 = 'private-story-title'
 
         self.save_new_valid_exploration(
-            self.exp_id, self.owner_id, correctness_feedback_enabled=True)
+            self.exp_id, self.owner_id)
         self.publish_exploration(self.owner_id, self.exp_id)
 
         self.node_1: story_domain.StoryNodeDict = {

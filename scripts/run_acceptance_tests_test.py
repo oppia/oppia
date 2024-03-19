@@ -28,7 +28,18 @@ from scripts import run_acceptance_tests
 from scripts import scripts_test_utils
 from scripts import servers
 
-from typing import ContextManager, Optional
+from typing import ContextManager, List, Optional, Tuple
+
+
+class PopenErrorReturn:
+    """Popen return object."""
+
+    def __init__(self) -> None:
+        self.returncode = 1
+
+    def communicate(self) -> Tuple[str, bytes]:
+        """Returns some error."""
+        return '', 'Some error'.encode('utf-8')
 
 
 def mock_managed_long_lived_process(
@@ -90,6 +101,18 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         finally:
             super().tearDown()
 
+    def test_compile_test_ts_files_with_error(self) -> None:
+        def mock_popen_error_call(
+            unused_cmd_tokens: List[str], *args: str, **kwargs: str # pylint: disable=unused-argument
+        ) -> PopenErrorReturn:
+            return PopenErrorReturn()
+
+        popen_error_swap = self.swap(
+            subprocess, 'Popen', mock_popen_error_call)
+        with popen_error_swap:
+            with self.assertRaisesRegex(Exception, 'Some error'):
+                run_acceptance_tests.compile_test_ts_files()
+
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(self.swap_with_checks(
             common, 'is_oppia_server_already_running', lambda *_: True))
@@ -126,6 +149,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
+                    'headless': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -165,6 +189,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
+                    'headless': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -206,6 +231,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
+                    'headless': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -237,6 +263,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
+                    'headless': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -271,6 +298,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
+                    'headless': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -304,6 +332,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[
                 {
                     'suite_name': 'testSuite',
+                    'headless': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))

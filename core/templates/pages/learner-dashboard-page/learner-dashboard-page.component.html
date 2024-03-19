@@ -1,8 +1,8 @@
 <background-banner *ngIf="!windowIsNarrow || (windowIsNarrow && !isShowRedesignedLearnerDashboardActive && activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"></background-banner>
 <div [ngStyle]="{'min-height': windowIsNarrow ? '85.5vh': 'auto'}"
-     class="position-relative" [ngClass]="{'learner-dash-container' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
+     class="position-relative" [ngClass]="{'oppia-learner-dash-container w-100' : isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dashboard-container' : !isShowRedesignedLearnerDashboardActive()}">
   <div [ngStyle]="windowIsNarrow ? {'display': 'block'} : {'display': 'flex'}"
-       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'row oppia-row': !isShowRedesignedLearnerDashboardActive() ,'d-flex justify-content-center learner-dash-content': isShowRedesignedLearnerDashboardActive()}">
+       [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'row oppia-row': !isShowRedesignedLearnerDashboardActive() ,'d-flex justify-content-center oppia-learner-dash-content': isShowRedesignedLearnerDashboardActive()}">
     <div class="col-md-3 oppia-learner-dashboard-side-content"
          *ngIf="!windowIsNarrow && !isShowRedesignedLearnerDashboardActive()">
       <mat-card class="oppia-learner-dashboard-main-menu">
@@ -40,10 +40,10 @@
       </mat-card>
     </div>
     <!--REDESIGN-->
-    <nav class="align-items-center d-flex flex-md-column justify-content-center learner-dash-sidebar_position" role="navigation" *ngIf="isShowRedesignedLearnerDashboardActive()">
-      <ol class="learner-dash-sidebar w-100">
-        <li class="learner-dash-sidebar_pic">
-          <!--if want frame, div w/ "border border-2 border-white mb-5 rounded-circle learner-dash-sidebar_pic-frame" style-->
+    <nav class="align-items-center d-flex flex-md-column justify-content-center oppia-learner-dash-sidebar_position" role="navigation" *ngIf="isShowRedesignedLearnerDashboardActive()">
+      <ol class="oppia-learner-dash-sidebar">
+        <li class="oppia-learner-dash-sidebar_pic">
+          <!--if want frame, div w/ "border border-2 border-white mb-5 rounded-circle oppia-learner-dash-sidebar_pic-frame" style-->
           <picture>
             <source type="image/webp" [srcset]="profilePictureWebpDataUrl" >
             <source type="image/png" [srcset]="profilePicturePngDataUrl" >
@@ -51,44 +51,35 @@
           </picture>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-home-section rounded learner-dash-sidebar_btn text-left w-100" tabindex="0"
-                  [ngClass]="{'learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
+          <button class="align-items-center d-inline-flex e2e-test-home-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" [ngClass]="{'mb-2' : windowIsNarrow}" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 21.0078V9.00781L12 3.00781L20 9.00781V21.0078H14V14.0078H10V21.0078H4Z" fill="#205D86"/>
-            </svg>
+            <span class="fa fa-home fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME | translate }}
           </button>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-goals-section rounded learner-dash-sidebar_btn text-left w-100" tabindex="0"
-                  [ngClass]="{'learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
+          <button class="align-items-center d-inline-flex e2e-test-goals-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)"
                   (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS)">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" [ngClass]="{'mb-2' : windowIsNarrow}" xmlns="http://www.w3.org/2000/svg">
-              <path d="M18.7503 5.25089H18.7491L20.759 5.65267C20.8669 5.67426 20.9557 5.75341 20.9868 5.86016C21.0026 5.91201 21.004 5.96716 20.9909 6.01974C20.9778 6.07232 20.9507 6.12038 20.9125 6.15879L19.266 7.80667C19.069 8.00332 18.802 8.11375 18.5236 8.1137H17.1589L13.7291 11.545C13.7946 11.7921 13.8066 12.0503 13.7644 12.3024C13.7223 12.5545 13.6269 12.7947 13.4846 13.007C13.3423 13.2194 13.1564 13.399 12.9393 13.5338C12.7222 13.6687 12.4788 13.7557 12.2254 13.7891C11.972 13.8225 11.7144 13.8016 11.4698 13.7276C11.2251 13.6537 10.999 13.5284 10.8066 13.3602C10.6141 13.192 10.4597 12.9847 10.3536 12.7522C10.2476 12.5196 10.1923 12.2671 10.1914 12.0115C10.1916 11.7355 10.2552 11.4633 10.3774 11.2158C10.4995 10.9684 10.6769 10.7523 10.8959 10.5843C11.1148 10.4164 11.3695 10.301 11.6401 10.2471C11.9108 10.1933 12.1902 10.2024 12.4567 10.2737L15.8877 6.84121V5.47757C15.8877 5.19932 15.9981 4.93187 16.1947 4.73518L17.8425 3.0873C17.8809 3.04908 17.9289 3.02198 17.9815 3.00888C18.0341 2.99579 18.0892 2.99719 18.1411 3.01294C18.2478 3.04412 18.327 3.13287 18.3485 3.24081L18.7503 5.25089Z" fill="white"/>
-              <path d="M4.79497 12.0115C4.7962 13.0405 5.01808 14.0573 5.44563 14.9932C5.87318 15.9291 6.49647 16.7625 7.27344 17.437C8.05042 18.1116 8.96301 18.6116 9.94965 18.9034C10.9363 19.1953 11.974 19.2721 12.9929 19.1287C14.0118 18.9853 14.988 18.6251 15.8558 18.0723C16.7236 17.5195 17.4628 16.787 18.0235 15.9243C18.5842 15.0615 18.9533 14.0885 19.106 13.0709C19.2587 12.0533 19.1914 11.0148 18.9087 10.0255C18.869 9.90986 18.8532 9.7874 18.8624 9.66553C18.8715 9.54366 18.9053 9.42492 18.9618 9.31654C19.0183 9.20817 19.0963 9.11242 19.1909 9.03513C19.2856 8.95785 19.395 8.90064 19.5125 8.86699C19.63 8.83334 19.7531 8.82395 19.8743 8.8394C19.9955 8.85484 20.1123 8.8948 20.2176 8.95684C20.3229 9.01888 20.4145 9.1017 20.4867 9.20025C20.559 9.29881 20.6105 9.41105 20.638 9.53013C21.1854 11.4461 21.0814 13.4896 20.3423 15.3401C19.6031 17.1906 18.2707 18.7433 16.5539 19.7547C14.8371 20.7661 12.8332 21.1789 10.8565 20.9283C8.87984 20.6778 7.04225 19.7781 5.63203 18.3704C4.22335 16.9604 3.32277 15.1225 3.07168 13.1452C2.8206 11.1679 3.23323 9.16315 4.24479 7.44578C5.25635 5.7284 6.80956 4.39562 8.66055 3.65669C10.5115 2.91775 12.5555 2.81451 14.4715 3.36316C14.6997 3.42986 14.8921 3.58416 15.0069 3.79235C15.1216 4.00053 15.1493 4.24567 15.0838 4.4742C15.0184 4.70272 14.8652 4.89604 14.6576 5.01192C14.4501 5.1278 14.2051 5.1568 13.9763 5.0926C12.9048 4.78517 11.7767 4.73084 10.6807 4.93389C9.58468 5.13694 8.55083 5.59182 7.66063 6.26267C6.77043 6.93351 6.04821 7.80199 5.55091 8.79964C5.05362 9.79728 4.79483 10.8968 4.79497 12.0115Z" fill="white"/>
-              <path d="M8.39219 12.0119C8.39226 12.6675 8.57129 13.3105 8.90997 13.8718C9.24865 14.4331 9.73413 14.8912 10.314 15.1968C10.8939 15.5024 11.5463 15.6438 12.2007 15.6059C12.855 15.5679 13.4867 15.352 14.0274 14.9815C14.568 14.61 14.9967 14.0977 15.2673 13.5001C15.5378 12.9025 15.6399 12.2423 15.5624 11.591C15.5414 11.4329 15.563 11.2721 15.6248 11.1251C15.6866 10.9781 15.7865 10.8503 15.9142 10.7548C16.0418 10.6592 16.1926 10.5994 16.3511 10.5816C16.5095 10.5637 16.6698 10.5884 16.8156 10.6531C16.9613 10.7169 17.0874 10.8183 17.1812 10.9468C17.2749 11.0753 17.3329 11.2264 17.3492 11.3847C17.4795 12.4978 17.2601 13.6238 16.7214 14.6066C16.1828 15.5893 15.3516 16.3799 14.3432 16.8688C13.3348 17.3576 12.1992 17.5204 11.0942 17.3345C9.98908 17.1486 8.96927 16.6232 8.17628 15.8314C7.38329 15.0395 6.85646 14.0204 6.6689 12.9155C6.48134 11.8106 6.64237 10.6748 7.12962 9.66554C7.61688 8.65633 8.4062 7.82384 9.38802 7.28363C10.3698 6.74342 11.4955 6.52228 12.6087 6.6509C12.7279 6.66196 12.8437 6.69671 12.9493 6.75311C13.0549 6.8095 13.1481 6.88641 13.2236 6.97932C13.2991 7.07224 13.3553 7.17929 13.3889 7.2942C13.4225 7.40911 13.4328 7.52957 13.4192 7.64852C13.4056 7.76747 13.3685 7.88251 13.3098 7.9869C13.2512 8.0913 13.1724 8.18294 13.0779 8.25646C12.9834 8.32998 12.8752 8.3839 12.7597 8.41506C12.6441 8.44622 12.5234 8.45398 12.4048 8.43791C11.9007 8.37937 11.3899 8.42815 10.9061 8.58105C10.4222 8.73394 9.97607 8.98748 9.59711 9.32502C9.21814 9.66256 8.91487 10.0765 8.7072 10.5395C8.49954 11.0026 8.39218 11.5044 8.39219 12.0119Z" fill="white"/>
-            </svg>
+            <span class="fa fa-bullseye fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS | translate }}
           </button>
         </li>
         <li>
-          <button class="align-items-center d-inline-flex e2e-test-progress-section rounded learner-dash-sidebar_btn text-left w-100" tabindex="0"
-                  [ngClass]="{'learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
+          <button class="align-items-center d-inline-flex e2e-test-progress-section rounded oppia-learner-dash-sidebar_btn text-left w-100" tabindex="0"
+                  [ngClass]="{'oppia-learner-dash-sidebar_btn--active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS}"
                   (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)"
-                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)" >
-            <svg width="24" height="22" viewBox="0 0 22 22" fill="currentColor" [ngClass]="{'mb-2' : windowIsNarrow}" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.0714 0L11.368 2.13478L13.4149 3.42104C9.75838 8.01071 4.46905 10.8378 0 11.9139L1.26604 14.2126C6.28762 12.5811 11.604 9.63831 15.0284 4.43925L16.5877 5.4189L17.0714 0ZM17.3693 4.50096L17.1836 6.61453L15.1986 5.3649C15.129 5.46904 15.0555 5.56932 14.9819 5.67345V18H18V4.50096H17.3693ZM11.5421 9.43775C11.0507 9.86201 10.5439 10.2631 10.0292 10.6411V18H13.0473V9.43775H11.5421ZM6.7558 12.6775C6.19862 12.9706 5.64144 13.2406 5.07653 13.4952V18H8.09458V12.6775H6.7558ZM0.123818 14.3745V18H3.14187V14.3745H2.9221C2.34867 14.5867 1.77562 14.7834 1.20606 14.9646L0.932889 15.0495L0.561436 14.3745H0.123818Z" fill="white"/>
-            </svg>
+                  (keyup.enter)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS)">
+            <span class="fa fa-chart-line fa-lg"></span>
             {{ LEARNER_DASHBOARD_SECTION_I18N_IDS.PROGRESS | translate }}
           </button>
         </li>
       </ol>
     </nav>
     <!---->
-    <!--Delete after redesign-->
     <footer class="oppia-learner-dashboard-buttons" *ngIf="windowIsNarrow && !isShowRedesignedLearnerDashboardActive()" headroom>
       <mat-card class="oppia-learner-dashboard-button-menu d-flex justify-content-around">
         <div class="oppia-buttons" (click)="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME)" [ngClass]="{'oppia-learner-dashboard-section-active-button': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME, 'oppia-learner-dashboard-section-not-active-button': activeSection !== LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME}">
@@ -126,11 +117,10 @@
         </div>
       </mat-card>
     </div>
-    <!--Change all tab width to 100-->
-    <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'learner-dash-tab ml-md-4 px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
+    <div [ngClass]="{'oppia-learner-dashboard-mobile-mode': windowIsNarrow, 'oppia-learner-dashboard-main-content col-md-8' : !isShowRedesignedLearnerDashboardActive(), 'oppia-learner-dash-tab overflow-hidden ml-md-4 px-4 px-md-0' : isShowRedesignedLearnerDashboardActive() }">
       <div class="d-flex"
            [ngClass]="{'oppia-learner-dashboard-main-content-container pl-5': !windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'justify-content-center': windowIsNarrow}">
-        <div [ngClass]="{'w-100' : isShowRedesignedLearnerDashboardActive()}" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
+        <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
                           [featureFlag]="isShowRedesignedLearnerDashboardActive()"
                           [goalTopics]="allTopics"

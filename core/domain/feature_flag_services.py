@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import hashlib
 
-from core import platform_feature_list
+from core import feature_flag_list
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.platform import models
@@ -33,10 +33,10 @@ if MYPY: # pragma: no cover
 
 (config_models,) = models.Registry.import_models([models.Names.CONFIG])
 
-ALL_FEATURE_FLAGS: List[platform_feature_list.FeatureNames] = (
-    platform_feature_list.DEV_FEATURES_LIST +
-    platform_feature_list.TEST_FEATURES_LIST +
-    platform_feature_list.PROD_FEATURES_LIST
+ALL_FEATURE_FLAGS: List[feature_flag_list.FeatureNames] = (
+    feature_flag_list.DEV_FEATURES_LIST +
+    feature_flag_list.TEST_FEATURES_LIST +
+    feature_flag_list.PROD_FEATURES_LIST
 )
 
 ALL_FEATURES_NAMES_SET: Set[str] = set(
@@ -44,7 +44,7 @@ ALL_FEATURES_NAMES_SET: Set[str] = set(
 )
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = (
-    platform_feature_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
+    feature_flag_list.FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE
 )
 
 

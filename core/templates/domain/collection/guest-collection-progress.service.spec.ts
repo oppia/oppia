@@ -16,14 +16,11 @@
  * @fileoverview Tests for GuestCollectionProgressService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { CollectionNode } from
-  'domain/collection/collection-node.model';
-import { Collection } from
-  'domain/collection/collection.model';
-import { GuestCollectionProgressService } from
-  'domain/collection/guest-collection-progress.service';
+import {CollectionNode} from 'domain/collection/collection-node.model';
+import {Collection} from 'domain/collection/collection.model';
+import {GuestCollectionProgressService} from 'domain/collection/guest-collection-progress.service';
 
 describe('Guest collection progress service', () => {
   let guestCollectionProgressService: GuestCollectionProgressService;
@@ -39,11 +36,12 @@ describe('Guest collection progress service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [GuestCollectionProgressService]
+      providers: [GuestCollectionProgressService],
     });
 
     guestCollectionProgressService = TestBed.get(
-      GuestCollectionProgressService);
+      GuestCollectionProgressService
+    );
 
     _collectionId0 = 'sample_collection_id0';
     _collectionId1 = 'sample_collection_id1';
@@ -55,7 +53,8 @@ describe('Guest collection progress service', () => {
     _expTitle2 = 'Exp 2';
     _collection0 = _createCollection(_collectionId0, 'a title');
     _collection0.addCollectionNode(
-      CollectionNode.createFromExplorationId(_expId0));
+      CollectionNode.createFromExplorationId(_expId0)
+    );
   });
 
   afterEach(() => {
@@ -73,11 +72,11 @@ describe('Guest collection progress service', () => {
       nodes: [],
       playthrough_dict: {
         next_exploration_id: 'expId',
-        completed_exploration_ids: ['expId2']
+        completed_exploration_ids: ['expId2'],
       },
       tags: null,
       language_code: null,
-      schema_version: null
+      schema_version: null,
     };
     return Collection.create(collectionBackendObject);
   };
@@ -101,18 +100,17 @@ describe('Guest collection progress service', () => {
           2: 0,
           3: 0,
           4: 0,
-          5: 0
+          5: 0,
         },
         status: 'public',
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
-        title: expTitle
-      }
+        title: expTitle,
+      },
     };
     return CollectionNode.create(collectionNodeBackendObject);
   };
-
 
   // TODO(bhenning): Find a way to de-duplicate & share this with
   // CollectionLinearizerServiceSpec.
@@ -132,67 +130,77 @@ describe('Guest collection progress service', () => {
 
   describe('hasCompletedSomeExploration', () => {
     it('should initially not have any stored progress', () => {
-      var hasProgress = (
+      var hasProgress =
         guestCollectionProgressService.hasCompletedSomeExploration(
-          _collectionId0));
+          _collectionId0
+        );
       expect(hasProgress).toBe(false);
     });
 
     it('should have progress after recording an exploration', () => {
       guestCollectionProgressService.recordExplorationCompletedInCollection(
-        _collectionId0, _expId0);
-      var hasProgress = (
+        _collectionId0,
+        _expId0
+      );
+      var hasProgress =
         guestCollectionProgressService.hasCompletedSomeExploration(
-          _collectionId0));
+          _collectionId0
+        );
       expect(hasProgress).toBe(true);
     });
 
-    it('should not have progress after exp completed for another collection',
-      () => {
-        guestCollectionProgressService.recordExplorationCompletedInCollection(
-          _collectionId1, _expId0);
-        var hasProgress = (
-          guestCollectionProgressService.hasCompletedSomeExploration(
-            _collectionId0));
-        expect(hasProgress).toBe(false);
-      }
-    );
+    it('should not have progress after exp completed for another collection', () => {
+      guestCollectionProgressService.recordExplorationCompletedInCollection(
+        _collectionId1,
+        _expId0
+      );
+      var hasProgress =
+        guestCollectionProgressService.hasCompletedSomeExploration(
+          _collectionId0
+        );
+      expect(hasProgress).toBe(false);
+    });
   });
 
   describe('getCompletedExplorationIds', () => {
     it('should initially provide no completed exploration ids', () => {
-      var completedIds = (
-        guestCollectionProgressService.getCompletedExplorationIds(
-          _collection0));
+      var completedIds =
+        guestCollectionProgressService.getCompletedExplorationIds(_collection0);
       expect(completedIds).toEqual([]);
     });
 
     it('should provide completed exploration ID after completion', () => {
       guestCollectionProgressService.recordExplorationCompletedInCollection(
-        _collectionId0, _expId0);
-      var completedIds = (
-        guestCollectionProgressService.getCompletedExplorationIds(
-          _collection0));
+        _collectionId0,
+        _expId0
+      );
+      var completedIds =
+        guestCollectionProgressService.getCompletedExplorationIds(_collection0);
       expect(completedIds).toEqual([_expId0]);
     });
 
     it('should not provide completed ID for exp not in collection', () => {
       guestCollectionProgressService.recordExplorationCompletedInCollection(
-        _collectionId0, _expId1);
-      var completedIds = (
-        guestCollectionProgressService.getCompletedExplorationIds(
-          _collection0));
+        _collectionId0,
+        _expId1
+      );
+      var completedIds =
+        guestCollectionProgressService.getCompletedExplorationIds(_collection0);
       expect(completedIds).toEqual([]);
     });
 
     it('should provide multiple completed exploration IDs', () => {
       var collection = _createLinearCollection(_collectionId1);
       guestCollectionProgressService.recordExplorationCompletedInCollection(
-        _collectionId1, _expId0);
+        _collectionId1,
+        _expId0
+      );
       guestCollectionProgressService.recordExplorationCompletedInCollection(
-        _collectionId1, _expId2);
-      var completedIds = (
-        guestCollectionProgressService.getCompletedExplorationIds(collection));
+        _collectionId1,
+        _expId2
+      );
+      var completedIds =
+        guestCollectionProgressService.getCompletedExplorationIds(collection);
       expect(completedIds).toEqual([_expId0, _expId2]);
     });
 
@@ -207,16 +215,18 @@ describe('Guest collection progress service', () => {
   describe('getNextExplorationId', () => {
     it('should provide the first exploration ID with no progress', () => {
       var collection = _createLinearCollection(_collectionId1);
-      var nextExplorationId = (
-        guestCollectionProgressService.getNextExplorationId(collection, []));
+      var nextExplorationId =
+        guestCollectionProgressService.getNextExplorationId(collection, []);
       expect(nextExplorationId).toEqual(_expId0);
     });
 
     it('should provide the third exp ID with first two exps done', () => {
       var collection = _createLinearCollection(_collectionId1);
-      var nextExplorationId = (
-        guestCollectionProgressService.getNextExplorationId(
-          collection, [_expId0, _expId1]));
+      var nextExplorationId =
+        guestCollectionProgressService.getNextExplorationId(collection, [
+          _expId0,
+          _expId1,
+        ]);
 
       // First two explorations are completed, so return the third.
       expect(nextExplorationId).toEqual(_expId2);
@@ -224,9 +234,12 @@ describe('Guest collection progress service', () => {
 
     it('should return null for fully completed collection', () => {
       var collection = _createLinearCollection(_collectionId1);
-      var nextExplorationId = (
-        guestCollectionProgressService.getNextExplorationId(
-          collection, [_expId0, _expId1, _expId2]));
+      var nextExplorationId =
+        guestCollectionProgressService.getNextExplorationId(collection, [
+          _expId0,
+          _expId1,
+          _expId2,
+        ]);
 
       // There are no explorations left to play.
       expect(nextExplorationId).toEqual(null);
