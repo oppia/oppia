@@ -53,7 +53,8 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
             | 'Get users with null bio or length of bio greater than 2000' >>
                 beam.Filter(
                 lambda user_pair:
-                    not isinstance(user_pair[1], str) or len(user_pair[1]) > 2000)
+                    not isinstance(user_pair[1], str)
+                    or len(user_pair[1]) > 2000)
         )
 
         report_number_of_users_queried = (
