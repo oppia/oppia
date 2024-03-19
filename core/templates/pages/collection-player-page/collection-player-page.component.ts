@@ -20,20 +20,19 @@ import {Component, OnInit, OnDestroy} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
-import { GuestCollectionProgressService } from 'domain/collection/guest-collection-progress.service';
-import { ReadOnlyCollectionBackendApiService } from 'domain/collection/read-only-collection-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { UserService } from 'services/user.service';
-import { CollectionNode } from 'domain/collection/collection-node.model';
-import { AppConstants } from 'app.constants';
-import { Collection } from 'domain/collection/collection.model';
-import { CollectionPlayerBackendApiService } from './services/collection-player-backend-api.service';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-
+import {GuestCollectionProgressService} from 'domain/collection/guest-collection-progress.service';
+import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {UserService} from 'services/user.service';
+import {CollectionNode} from 'domain/collection/collection-node.model';
+import {AppConstants} from 'app.constants';
+import {Collection} from 'domain/collection/collection.model';
+import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 
 import './collection-player-page.component.css';
 
