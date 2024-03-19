@@ -16,10 +16,10 @@
  * @fileoverview Detail service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { GraphAnswer } from 'interactions/answer-defs';
+import {GraphAnswer} from 'interactions/answer-defs';
 
 export interface EdgeCentre {
   x: number;
@@ -27,7 +27,7 @@ export interface EdgeCentre {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
@@ -54,14 +54,19 @@ export class GraphDetailService {
     var endY = dstVertex.y - 4 * dy;
 
     var ret = '';
+    ret += endX + ',' + endY + ' ';
     ret +=
-      endX + ',' +
-      endY + ' ';
+      endX -
+      ARROW_HEIGHT * dx +
+      ARROW_WIDTH * dy +
+      ',' +
+      (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) +
+      ' ';
     ret +=
-      (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' +
-      (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
-    ret +=
-      (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' +
+      endX -
+      ARROW_HEIGHT * dx -
+      ARROW_WIDTH * dy +
+      ',' +
       (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
     return ret;
   }
@@ -72,10 +77,11 @@ export class GraphDetailService {
     var dstVertex = graph.vertices[edge.dst];
     return {
       x: (srcVertex.x + dstVertex.x) / 2.0,
-      y: (srcVertex.y + dstVertex.y) / 2.0
+      y: (srcVertex.y + dstVertex.y) / 2.0,
     };
   }
 }
 
-angular.module('oppia').factory(
-  'GraphDetailService', downgradeInjectable(GraphDetailService));
+angular
+  .module('oppia')
+  .factory('GraphDetailService', downgradeInjectable(GraphDetailService));

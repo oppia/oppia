@@ -16,32 +16,32 @@
  * @fileoverview Module for the voicover-admin page.
  */
 
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {APP_INITIALIZER, DoBootstrap, NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {downgradeComponent, downgradeModule} from '@angular/upgrade/static';
+import {RouterModule} from '@angular/router';
+import {APP_BASE_HREF} from '@angular/common';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { VoiceoverAdminPageComponent } from './voiceover-admin-page.component';
-import { VoiceoverAdminNavbarComponent } from './navbar/voiceover-admin-navbar.component';
-import { VoiceoverRemovalConfirmModalComponent } from './modals/language-accent-removal-confirm-modal.component';
-
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {
+  platformFeatureInitFactory,
+  PlatformFeatureService,
+} from 'services/platform-feature.service';
+import {RequestInterceptor} from 'services/request-interceptor.service';
+import {ToastrModule} from 'ngx-toastr';
+import {MyHammerConfig, toastrConfig} from 'pages/oppia-root/app.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
+import {VoiceoverAdminPageComponent} from './voiceover-admin-page.component';
+import {VoiceoverAdminNavbarComponent} from './navbar/voiceover-admin-navbar.component';
+import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
 
 declare var angular: ng.IAngularStatic;
 
@@ -59,17 +59,17 @@ declare var angular: ng.IAngularStatic;
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
-    VoiceoverRemovalConfirmModalComponent
+    VoiceoverRemovalConfirmModalComponent,
   ],
   entryComponents: [
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
-    VoiceoverRemovalConfirmModalComponent
+    VoiceoverRemovalConfirmModalComponent,
   ],
   providers: [
     {
@@ -85,24 +85,29 @@ declare var angular: ng.IAngularStatic;
     },
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
+      useClass: MyHammerConfig,
     },
     AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
-      useValue: '/'
-    }
+      useValue: '/',
+    },
   ],
 })
 class VoiceoverAdminPageModule implements DoBootstrap {
   ngDoBootstrap() {}
 }
 
-angular.module('oppia').requires.push(downgradeModule(extraProviders => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(VoiceoverAdminPageModule);
-}));
+angular.module('oppia').requires.push(
+  downgradeModule(extraProviders => {
+    const platformRef = platformBrowserDynamic(extraProviders);
+    return platformRef.bootstrapModule(VoiceoverAdminPageModule);
+  })
+);
 
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}));
+angular.module('oppia').directive(
+  'oppiaAngularRoot',
+  downgradeComponent({
+    component: OppiaAngularRootComponent,
+  })
+);

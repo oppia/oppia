@@ -16,22 +16,20 @@
  * @fileoverview Ck editor copy toolbar component.
  */
 
-import { Component, Inject } from '@angular/core';
-import { DOCUMENT } from '@angular/common';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Inject} from '@angular/core';
+import {DOCUMENT} from '@angular/common';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { CkEditorCopyContentService } from
-  'components/ck-editor-helpers/ck-editor-copy-content.service';
-
+import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
 
 @Component({
   selector: 'ck-editor-copy-toolbar',
-  templateUrl: './ck-editor-copy-toolbar.component.html'
+  templateUrl: './ck-editor-copy-toolbar.component.html',
 })
 export class CkEditorCopyToolbarComponent {
   constructor(
-      public ckEditorCopyContentService: CkEditorCopyContentService,
-      @Inject(DOCUMENT) private document: Document
+    public ckEditorCopyContentService: CkEditorCopyContentService,
+    @Inject(DOCUMENT) private document: Document
   ) {
     ckEditorCopyContentService.copyModeActive = false;
   }
@@ -44,12 +42,12 @@ export class CkEditorCopyToolbarComponent {
 
     if (this.ckEditorCopyContentService.copyModeActive) {
       this.document.body.style.cursor = 'copy';
-      element.forEach((editor) => {
+      element.forEach(editor => {
         editor.focus();
       });
     } else {
       this.document.body.style.cursor = '';
-      element.forEach((editor) => {
+      element.forEach(editor => {
         editor.blur();
       });
     }
@@ -60,6 +58,9 @@ export class CkEditorCopyToolbarComponent {
   }
 }
 
-angular.module('oppia').directive(
-  'ckEditorCopyToolbar',
-  downgradeComponent({component: CkEditorCopyToolbarComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'ckEditorCopyToolbar',
+    downgradeComponent({component: CkEditorCopyToolbarComponent})
+  );

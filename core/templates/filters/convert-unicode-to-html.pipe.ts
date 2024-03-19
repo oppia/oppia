@@ -16,9 +16,9 @@
  * @fileoverview Converts unicode to HTML Pipe.
  */
 
-import { Pipe, PipeTransform, SecurityContext } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Pipe, PipeTransform, SecurityContext} from '@angular/core';
+import {DomSanitizer} from '@angular/platform-browser';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Pipe({name: 'convertUnicodeToHtml'})
 export class ConvertUnicodeToHtml implements PipeTransform {
@@ -30,6 +30,7 @@ export class ConvertUnicodeToHtml implements PipeTransform {
   transform(text: string): string | null {
     return this._sanitizer.sanitize(
       SecurityContext.HTML,
-      this.htmlEscaperService.unescapedStrToEscapedStr(text));
+      this.htmlEscaperService.unescapedStrToEscapedStr(text)
+    );
   }
 }

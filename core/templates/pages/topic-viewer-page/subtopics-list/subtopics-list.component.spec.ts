@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for subtopicsList.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { SubtopicSummaryTileComponent } from 'components/summary-tile/subtopic-summary-tile.component';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { SubtopicsListComponent } from './subtopics-list.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {SubtopicSummaryTileComponent} from 'components/summary-tile/subtopic-summary-tile.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SubtopicsListComponent} from './subtopics-list.component';
 
 describe('Subtopics List Component', () => {
   let component: SubtopicsListComponent;
@@ -33,9 +33,9 @@ describe('Subtopics List Component', () => {
       declarations: [
         MockTranslatePipe,
         SubtopicsListComponent,
-        SubtopicSummaryTileComponent
+        SubtopicSummaryTileComponent,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -49,7 +49,8 @@ describe('Subtopics List Component', () => {
     component.topicName = 'Topic Name';
     component.topicId = 'topicId';
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   it('should create', () => {
@@ -57,27 +58,29 @@ describe('Subtopics List Component', () => {
   });
 
   it('should initialize properties after successfully', () => {
-    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-      .and.returnValue('I18N_TOPIC_123abcd_TITLE');
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
+      'I18N_TOPIC_123abcd_TITLE'
+    );
 
     component.ngOnInit();
 
-    expect(component.topicNameTranslationKey).toBe(
-      'I18N_TOPIC_123abcd_TITLE');
+    expect(component.topicNameTranslationKey).toBe('I18N_TOPIC_123abcd_TITLE');
   });
 
-  it('should check if topic name, desc translation is displayed correctly',
-    () => {
-      spyOn(i18nLanguageCodeService, 'getTopicTranslationKey')
-        .and.returnValue('I18N_TOPIC_123abcd_TITLE');
-      spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-        .and.returnValue(true);
-      spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-        .and.returnValue(false);
+  it('should check if topic name, desc translation is displayed correctly', () => {
+    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
+      'I18N_TOPIC_123abcd_TITLE'
+    );
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
 
-      component.ngOnInit();
+    component.ngOnInit();
 
-      expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
-    }
-  );
+    expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
+  });
 });

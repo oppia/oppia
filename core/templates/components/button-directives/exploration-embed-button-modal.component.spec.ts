@@ -16,14 +16,17 @@
  * @fileoverview Unit tests for ExplorationEmbedButtonModalComponent.
  */
 
-import { ComponentFixture, fakeAsync, TestBed, async } from
-  '@angular/core/testing';
-import { By } from '@angular/platform-browser';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  async,
+} from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ExplorationEmbedButtonModalComponent } from
-  './exploration-embed-button-modal.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
+import {ExplorationEmbedButtonModalComponent} from './exploration-embed-button-modal.component';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockActiveModal {
   dismiss(): void {
@@ -48,13 +51,13 @@ describe('ExplorationEmbedButtonModalComponent', () => {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: SiteAnalyticsService,
-          useClass: MockSiteAnalyticsService
-        }
-      ]
+          useClass: MockSiteAnalyticsService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -70,7 +73,8 @@ describe('ExplorationEmbedButtonModalComponent', () => {
 
   it('should call the site analytics service when initialized', () => {
     const registerOpenEmbedInfoEventSpy = spyOn(
-      siteAnalyticsService, 'registerOpenEmbedInfoEvent'
+      siteAnalyticsService,
+      'registerOpenEmbedInfoEvent'
     ).and.callThrough();
     component.ngOnInit();
     expect(registerOpenEmbedInfoEventSpy).toHaveBeenCalledWith('3f6cD869');
@@ -79,7 +83,8 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   it('should dismiss the modal when clicked on cancel', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
     let closeButtonDE = fixture.debugElement.query(
-      By.css('.modal-footer .btn.btn-secondary'));
+      By.css('.modal-footer .btn.btn-secondary')
+    );
     closeButtonDE.nativeElement.click();
     fixture.detectChanges();
     expect(dismissSpy).toHaveBeenCalled();
@@ -98,11 +103,12 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     // @ts-expect-error
     spyOn(window, 'getSelection').and.returnValue({
       removeAllRanges: removeAllRanges,
-      addRange: addRange
+      addRange: addRange,
     });
 
     let embedUrlDiv = fixture.debugElement.query(
-      By.css('.oppia-embed-modal-code'));
+      By.css('.oppia-embed-modal-code')
+    );
     embedUrlDiv.nativeElement.click();
     fixture.detectChanges();
     expect(addRange).toHaveBeenCalled();
@@ -112,7 +118,7 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   it('should throw Error if codeDiv is null', () => {
     let event = {
       type: 'click',
-      currentTarget: null
+      currentTarget: null,
     };
     expect(() => {
       // This throws "Argument of type '{ type: string; currentTarget:
@@ -130,7 +136,8 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     spyOn(window, 'getSelection').and.returnValue(null);
 
     let embedUrlDiv = fixture.debugElement.query(
-      By.css('.oppia-embed-modal-code'));
+      By.css('.oppia-embed-modal-code')
+    );
     embedUrlDiv.nativeElement.click();
     fixture.detectChanges();
     expect(addRange).not.toHaveBeenCalled();

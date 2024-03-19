@@ -16,26 +16,16 @@
  * @fileoverview Module for the license page.
  */
 
-import { LicensePageComponent } from './license-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { LicensePageRootComponent } from './license-page-root.component';
-import { CommonModule } from '@angular/common';
-import { LicensePageRoutingModule } from './license-page-routing.module';
-import { NgModule } from '@angular/core';
+import {LicensePageComponent} from './license-page.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {LicensePageRootComponent} from './license-page-root.component';
+import {CommonModule} from '@angular/common';
+import {LicensePageRoutingModule} from './license-page-routing.module';
+import {NgModule} from '@angular/core';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    LicensePageRoutingModule
-  ],
-  declarations: [
-    LicensePageComponent,
-    LicensePageRootComponent
-  ],
-  entryComponents: [
-    LicensePageComponent,
-    LicensePageRootComponent,
-  ]
+  imports: [CommonModule, SharedComponentsModule, LicensePageRoutingModule],
+  declarations: [LicensePageComponent, LicensePageRootComponent],
+  entryComponents: [LicensePageComponent, LicensePageRootComponent],
 })
 export class LicensePageModule {}

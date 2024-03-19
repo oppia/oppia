@@ -17,15 +17,19 @@
  * from backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { UrlInterpolationService }
-  from 'domain/utilities/url-interpolation.service';
-import { LearnerGroupSyllabus, LearnerGroupSyllabusBackendDict }
-  from './learner-group-syllabus.model';
-import { LearnerGroupUserProgress, LearnerGroupUserProgressBackendDict } from './learner-group-user-progress.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  LearnerGroupSyllabus,
+  LearnerGroupSyllabusBackendDict,
+} from './learner-group-syllabus.model';
+import {
+  LearnerGroupUserProgress,
+  LearnerGroupUserProgressBackendDict,
+} from './learner-group-user-progress.model';
 
 interface SyllabusFilterDetails {
   description: string;
@@ -55,7 +59,7 @@ export interface LearnerGroupSyllabusFilter {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LearnerGroupSyllabusBackendApiService {
   constructor(
@@ -64,7 +68,7 @@ export class LearnerGroupSyllabusBackendApiService {
   ) {}
 
   async searchNewSyllabusItemsAsync(
-      syllabusFilter: LearnerGroupSyllabusFilter
+    syllabusFilter: LearnerGroupSyllabusFilter
   ): Promise<LearnerGroupSyllabus> {
     return new Promise((resolve, reject) => {
       const learnerGroupUrl = '/learner_group_search_syllabus_handler';
@@ -74,92 +78,94 @@ export class LearnerGroupSyllabusBackendApiService {
         search_type: syllabusFilter.type,
         search_category: syllabusFilter.category,
         search_language_code: syllabusFilter.languageCode,
-        learner_group_id: syllabusFilter.learnerGroupId
+        learner_group_id: syllabusFilter.learnerGroupId,
       };
 
-      this.http.get<LearnerGroupSyllabusBackendDict>(
-        learnerGroupUrl, {
-          params: filterData
-        }
-      ).toPromise().then(matchingSyllabus => {
-        resolve(LearnerGroupSyllabus.createFromBackendDict(matchingSyllabus));
-      });
+      this.http
+        .get<LearnerGroupSyllabusBackendDict>(learnerGroupUrl, {
+          params: filterData,
+        })
+        .toPromise()
+        .then(matchingSyllabus => {
+          resolve(LearnerGroupSyllabus.createFromBackendDict(matchingSyllabus));
+        });
     });
   }
 
   async fetchLearnersProgressInAssignedSyllabus(
-      learnerGroupId: string,
-      learnerUsernames: string[]
+    learnerGroupId: string,
+    learnerUsernames: string[]
   ): Promise<LearnerGroupUserProgress[]> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          '/learner_group_user_progress_handler/<learner_group_id>', {
-            learner_group_id: learnerGroupId
-          }
-        )
+      const learnerGroupUrl = this.urlInterpolationService.interpolateUrl(
+        '/learner_group_user_progress_handler/<learner_group_id>',
+        {
+          learner_group_id: learnerGroupId,
+        }
       );
 
-      this.http.get<LearnerGroupUserProgressBackendDict[]>(
-        learnerGroupUrl, {
+      this.http
+        .get<LearnerGroupUserProgressBackendDict[]>(learnerGroupUrl, {
           params: {
-            learner_usernames: JSON.stringify(learnerUsernames)
-          }
-        }).toPromise().then(usersProgressInfo => {
-        resolve(
-          usersProgressInfo.map(
-            progressInfo => LearnerGroupUserProgress.createFromBackendDict(
-              progressInfo)
-          )
-        );
-      });
+            learner_usernames: JSON.stringify(learnerUsernames),
+          },
+        })
+        .toPromise()
+        .then(usersProgressInfo => {
+          resolve(
+            usersProgressInfo.map(progressInfo =>
+              LearnerGroupUserProgress.createFromBackendDict(progressInfo)
+            )
+          );
+        });
     });
   }
 
   async fetchLearnerSpecificProgressInAssignedSyllabus(
-      learnerGroupId: string
+    learnerGroupId: string
   ): Promise<LearnerGroupUserProgress> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          '/learner_group_learner_specific_progress_handler/' +
-          '<learner_group_id>', {
-            learner_group_id: learnerGroupId
-          }
-        )
+      const learnerGroupUrl = this.urlInterpolationService.interpolateUrl(
+        '/learner_group_learner_specific_progress_handler/' +
+          '<learner_group_id>',
+        {
+          learner_group_id: learnerGroupId,
+        }
       );
 
-      this.http.get<LearnerGroupUserProgressBackendDict>(
-        learnerGroupUrl).toPromise().then(progressInfo => {
-        resolve(
-          LearnerGroupUserProgress.createFromBackendDict(progressInfo)
-        );
-      });
+      this.http
+        .get<LearnerGroupUserProgressBackendDict>(learnerGroupUrl)
+        .toPromise()
+        .then(progressInfo => {
+          resolve(LearnerGroupUserProgress.createFromBackendDict(progressInfo));
+        });
     });
   }
 
   async fetchLearnerGroupSyllabus(
-      learnerGroupId: string
+    learnerGroupId: string
   ): Promise<LearnerGroupSyllabus> {
     return new Promise((resolve, reject) => {
-      const learnerGroupUrl = (
-        this.urlInterpolationService.interpolateUrl(
-          '/learner_group_syllabus_handler/<learner_group_id>', {
-            learner_group_id: learnerGroupId
-          }
-        )
+      const learnerGroupUrl = this.urlInterpolationService.interpolateUrl(
+        '/learner_group_syllabus_handler/<learner_group_id>',
+        {
+          learner_group_id: learnerGroupId,
+        }
       );
 
-      this.http.get<LearnerGroupSyllabusBackendDict>(
-        learnerGroupUrl).toPromise().then(syllabusInfo => {
-        resolve(
-          LearnerGroupSyllabus.createFromBackendDict(syllabusInfo)
-        );
-      });
+      this.http
+        .get<LearnerGroupSyllabusBackendDict>(learnerGroupUrl)
+        .toPromise()
+        .then(syllabusInfo => {
+          resolve(LearnerGroupSyllabus.createFromBackendDict(syllabusInfo));
+        });
     });
   }
 }
 
-angular.module('oppia').factory(
-  'LearnerGroupSyllabusBackendApiService',
-  downgradeInjectable(LearnerGroupSyllabusBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'LearnerGroupSyllabusBackendApiService',
+    downgradeInjectable(LearnerGroupSyllabusBackendApiService)
+  );

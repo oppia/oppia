@@ -16,13 +16,21 @@
  * @fileoverview Component for the animated score ring.
  */
 
-import { Component, Input, OnChanges, AfterViewInit, ViewChild, ElementRef, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { QuestionPlayerConstants } from '../question-directives/question-player/question-player.constants';
+import {
+  Component,
+  Input,
+  OnChanges,
+  AfterViewInit,
+  ViewChild,
+  ElementRef,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {QuestionPlayerConstants} from '../question-directives/question-player/question-player.constants';
 
 @Component({
   selector: 'oppia-score-ring',
-  templateUrl: './score-ring.component.html'
+  templateUrl: './score-ring.component.html',
 })
 export class ScoreRingComponent implements AfterViewInit, OnChanges {
   constructor() {}
@@ -39,7 +47,7 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
 
   setScore(percent: number): void {
     setTimeout(() => {
-      const offset = this.circumference - percent / 100 * this.circumference;
+      const offset = this.circumference - (percent / 100) * this.circumference;
       this.circle.style.strokeDashoffset = offset.toString();
     }, 2000);
   }
@@ -75,10 +83,9 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
   ngAfterViewInit(): void {
     this.circle = this.scoreRingElement.nativeElement;
     this.radius = this.circle.r.baseVal.value;
-    this.circumference = (this.radius * 2 * Math.PI);
+    this.circumference = this.radius * 2 * Math.PI;
 
-    this.circle.style.strokeDasharray = (
-      `${this.circumference} ${this.circumference}`);
+    this.circle.style.strokeDasharray = `${this.circumference} ${this.circumference}`;
     this.circle.style.strokeDashoffset = this.circumference.toString();
     // A reflow needs to be triggered so that the browser picks up the
     // assigned starting values of stroke-dashoffset and stroke-dasharray before
@@ -92,6 +99,8 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
 }
 
 angular.module('oppia').directive(
-  'oppiaScoreRing', downgradeComponent({
-    component: ScoreRingComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaScoreRing',
+  downgradeComponent({
+    component: ScoreRingComponent,
+  }) as angular.IDirectiveFactory
+);

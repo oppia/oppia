@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for valueGeneratorEditor.
  */
 
-import { NO_ERRORS_SCHEMA, SimpleChange } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
-import { CopierComponent } from 'value_generators/templates/copier.component';
-import { RandomSelectorComponent } from 'value_generators/templates/random-selector.component';
-import { ValueGeneratorEditorComponent } from './value-generator-editor.component';
+import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {CopierComponent} from 'value_generators/templates/copier.component';
+import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
+import {ValueGeneratorEditorComponent} from './value-generator-editor.component';
 
-describe('Value Generator Editor Component', function() {
+describe('Value Generator Editor Component', function () {
   let component: ValueGeneratorEditorComponent;
   let fixture: ComponentFixture<ValueGeneratorEditorComponent>;
 
@@ -32,16 +32,16 @@ describe('Value Generator Editor Component', function() {
       declarations: [
         ValueGeneratorEditorComponent,
         RandomSelectorComponent,
-        CopierComponent
+        CopierComponent,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    }).overrideModule(BrowserDynamicTestingModule, {
-      set: {
-        entryComponents: [
-          CopierComponent,
-          RandomSelectorComponent],
-      }
-    }).compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    })
+      .overrideModule(BrowserDynamicTestingModule, {
+        set: {
+          entryComponents: [CopierComponent, RandomSelectorComponent],
+        },
+      })
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe('Value Generator Editor Component', function() {
     component.objType = 'objType';
     component.customizationArgs = {
       value: 'value',
-      list_of_values: ['list_of_values']
+      list_of_values: ['list_of_values'],
     };
 
     fixture.detectChanges();
@@ -65,9 +65,9 @@ describe('Value Generator Editor Component', function() {
     component.ngOnChanges({
       generatorId: {
         currentValue: 'currentValue',
-        previousValue: 'previousValue'
-      }
-    } as { generatorId: SimpleChange});
+        previousValue: 'previousValue',
+      },
+    } as {generatorId: SimpleChange});
 
     expect(component).toBeDefined();
   });

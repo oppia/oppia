@@ -27,35 +27,35 @@ var Constants = require('./WebdriverioConstants');
 var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 var DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB = 15000;
 
-var alertToBePresent = async() => {
-  await browser.waitUntil(
-    await until.alertIsPresent(),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'Alert box took too long to appear.\n' +
-      new Error().stack + '\n'
-    });
+var alertToBePresent = async () => {
+  await browser.waitUntil(await until.alertIsPresent(), {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg:
+      'Alert box took too long to appear.\n' + new Error().stack + '\n',
+  });
 };
 
 // Wait for current url to change to a specific url.
-var urlToBe = async function(url) {
-  await browser.waitUntil(async function() {
-    return await browser.getUrl() === url;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: 'Url takes too long to change'
-  });
+var urlToBe = async function (url) {
+  await browser.waitUntil(
+    async function () {
+      return (await browser.getUrl()) === url;
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: 'Url takes too long to change',
+    }
+  );
 };
 
 /**
  * @param {Object} element - Clickable element such as button, link or tab.
  * @param {string} errorMessage - Error message when element is not clickable.
  */
-var elementToBeClickable = async function(element, errorMessage) {
+var elementToBeClickable = async function (element, errorMessage) {
   await element.waitForClickable({
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
   });
   var enabled = await element.isEnabled();
   if (!enabled) {
@@ -68,11 +68,11 @@ var elementToBeClickable = async function(element, errorMessage) {
  *                           have height or width.
  * @param {string} errorMessage - Error message when element is still visible.
  */
-var invisibilityOf = async function(element, errorMessage) {
+var invisibilityOf = async function (element, errorMessage) {
   await element.waitForDisplayed({
     timeout: DEFAULT_WAIT_TIME_MSECS,
     reverse: true,
-    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
   });
 };
 
@@ -83,15 +83,16 @@ var invisibilityOf = async function(element, errorMessage) {
  * method that verify the visibility of elements that are guaranteed to be
  * on that page.
  */
-var pageToFullyLoad = async function() {
+var pageToFullyLoad = async function () {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
   // Wait for the message to disappear.
   await loadingMessage.waitForDisplayed({
     timeout: 15000,
     reverse: true,
-    timeoutMsg: (
+    timeoutMsg:
       'Loading message takes more than 15 sec to disappear\n' +
-      new Error().stack + '\n')
+      new Error().stack +
+      '\n',
   });
 };
 
@@ -101,13 +102,11 @@ var pageToFullyLoad = async function() {
  * @param {string} errorMessage - Error message when element does not contain
  *                                provided text.
  */
-var textToBePresentInElement = async function(element, text, errorMessage) {
-  await browser.waitUntil(
-    await until.textToBePresentInElement(element, text),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
-    });
+var textToBePresentInElement = async function (element, text, errorMessage) {
+  await browser.waitUntil(await until.textToBePresentInElement(element, text), {
+    timeout: DEFAULT_WAIT_TIME_MSECS,
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
+  });
 };
 
 /**
@@ -115,10 +114,10 @@ var textToBePresentInElement = async function(element, text, errorMessage) {
  *                           This does not mean that the element is visible.
  * @param {string} errorMessage - Error message when element is not present.
  */
-var presenceOf = async function(element, errorMessage) {
+var presenceOf = async function (element, errorMessage) {
   await element.waitForExist({
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
   });
 };
 
@@ -127,10 +126,10 @@ var presenceOf = async function(element, errorMessage) {
  *                           height and width that is greater than 0.
  * @param {string} errorMessage - Error message when element is invisible.
  */
-var visibilityOf = async function(element, errorMessage) {
+var visibilityOf = async function (element, errorMessage) {
   await element.waitForDisplayed({
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
+    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
   });
 };
 
@@ -141,159 +140,177 @@ var visibilityOf = async function(element, errorMessage) {
  * @param {Object} value - Value we are waiting attribute to have
  * @param {Object} errorMessage - Error message in case wait times out
  */
-var elementAttributeToBe = async function(
-    element, attribute, value, errorMessage
+var elementAttributeToBe = async function (
+  element,
+  attribute,
+  value,
+  errorMessage
 ) {
-  await browser.waitUntil(async function() {
-    return await element.getAttribute(attribute) === value;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
-  });
+  await browser.waitUntil(
+    async function () {
+      return (await element.getAttribute(attribute)) === value;
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
+    }
+  );
 };
 
-var rightTransistionToComplete = async function(
-    element, errorMessage
-) {
-  await browser.waitUntil(async function() {
-    var firstValue = await element.getLocation('x');
-    // We need to pause the browser before getting the next
-    // location of element to make sure the elements provide equal
-    // location points only when they stopped moving.
-    // eslint-disable-next-line oppia/e2e-practices
-    await browser.pause(1000);
-    var secondValue = await element.getLocation('x');
-    return await firstValue === secondValue;
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
-  });
+var rightTransistionToComplete = async function (element, errorMessage) {
+  await browser.waitUntil(
+    async function () {
+      var firstValue = await element.getLocation('x');
+      // We need to pause the browser before getting the next
+      // location of element to make sure the elements provide equal
+      // location points only when they stopped moving.
+      // eslint-disable-next-line oppia/e2e-practices
+      await browser.pause(1000);
+      var secondValue = await element.getLocation('x');
+      return (await firstValue) === secondValue;
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
+    }
+  );
 };
 
 /**
-* Wait for new tab is opened
-*/
-var newTabToBeCreated = async function(errorMessage, urlToMatch) {
-  await browser.waitUntil(async function() {
-    var handles = await browser.getWindowHandles();
-    await browser.switchToWindow(await handles.pop());
-    var url = await browser.getUrl();
-    return await url.match(urlToMatch);
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
-    timeoutMsg: errorMessage + '\n' + new Error().stack + '\n'
-  });
+ * Wait for new tab is opened
+ */
+var newTabToBeCreated = async function (errorMessage, urlToMatch) {
+  await browser.waitUntil(
+    async function () {
+      var handles = await browser.getWindowHandles();
+      await browser.switchToWindow(await handles.pop());
+      var url = await browser.getUrl();
+      return await url.match(urlToMatch);
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS_FOR_NEW_TAB,
+      timeoutMsg: errorMessage + '\n' + new Error().stack + '\n',
+    }
+  );
 };
 
 /**
  * @param {string} url - URL to redirect
  */
-var urlRedirection = async function(url) {
+var urlRedirection = async function (url) {
   // Checks that the current URL matches the expected text.
-  await browser.waitUntil(
-    await until.urlIs(url),
-    {
-      timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: 'URL redirection took too long\n' + new Error().stack + '\n'
-    });
-};
-
-var numberOfElementsToBe = async function(
-    elementSelector, elementName, number, childSelector = null) {
-  await browser.waitUntil(async function() {
-    var element = childSelector ? await elementSelector.$$(
-      childSelector) : await $$(elementSelector);
-    return element.length === number;
-  },
-  {
+  await browser.waitUntil(await until.urlIs(url), {
     timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: `Number of ${elementName} is not equal to ${number}\n` +
-    new Error().stack + '\n'
+    timeoutMsg: 'URL redirection took too long\n' + new Error().stack + '\n',
   });
 };
 
-var visibilityOfInfoToast = async function(errorMessage) {
+var numberOfElementsToBe = async function (
+  elementSelector,
+  elementName,
+  number,
+  childSelector = null
+) {
+  await browser.waitUntil(
+    async function () {
+      var element = childSelector
+        ? await elementSelector.$$(childSelector)
+        : await $$(elementSelector);
+      return element.length === number;
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg:
+        `Number of ${elementName} is not equal to ${number}\n` +
+        new Error().stack +
+        '\n',
+    }
+  );
+};
+
+var visibilityOfInfoToast = async function (errorMessage) {
   var toastInfoElement = $('.toast-info');
   await visibilityOf(toastInfoElement, errorMessage);
 };
 
-var invisibilityOfInfoToast = async function(errorMessage) {
+var invisibilityOfInfoToast = async function (errorMessage) {
   var toastInfoElement = $('.toast-info');
   await invisibilityOf(toastInfoElement, errorMessage);
 };
 
-var invisibilityOfLoadingMessage = async function(errorMessage) {
+var invisibilityOfLoadingMessage = async function (errorMessage) {
   var loadingMessage = $('.e2e-test-loading-message');
   await invisibilityOf(loadingMessage, errorMessage);
 };
 
-var visibilityOfSuccessToast = async function(errorMessage) {
+var visibilityOfSuccessToast = async function (errorMessage) {
   var toastSuccessElement = await $('.toast-success');
   await visibilityOf(toastSuccessElement, errorMessage);
 };
 
-var invisibilityOfSuccessToast = async function(errorMessage) {
+var invisibilityOfSuccessToast = async function (errorMessage) {
   var toastSuccessElement = await $('.toast-success');
   await invisibilityOf(toastSuccessElement, errorMessage);
 };
 
-var modalPopupToAppear = async function() {
-  await visibilityOf(
-    $('.modal-body'), 'Modal taking too long to appear.');
+var modalPopupToAppear = async function () {
+  await visibilityOf($('.modal-body'), 'Modal taking too long to appear.');
 };
 
 /**
  * Check if a file has been downloaded
  */
-var fileToBeDownloaded = async function(filename) {
+var fileToBeDownloaded = async function (filename) {
   var name = Constants.DOWNLOAD_PATH + '/' + filename;
-  await browser.waitUntil(function() {
-    return fs.existsSync(name);
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS,
-    timeoutMsg: 'File was not downloaded!\n' + new Error().stack + '\n'
-  });
+  await browser.waitUntil(
+    function () {
+      return fs.existsSync(name);
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg: 'File was not downloaded!\n' + new Error().stack + '\n',
+    }
+  );
 };
 
-
-var clientSideRedirection = async function(
-    action, check, waitForCallerSpecifiedConditions) {
+var clientSideRedirection = async function (
+  action,
+  check,
+  waitForCallerSpecifiedConditions
+) {
   // Action triggering redirection.
   await action();
 
   // The action only triggers the redirection but does not wait for it to
   // complete. Manually waiting for redirection here.
-  await browser.waitUntil(async() => {
-    var url = await browser.getUrl();
-    // Condition to wait on.
-    return check(decodeURIComponent(url));
-  },
-  {
-    timeout: DEFAULT_WAIT_TIME_MSECS
-  });
+  await browser.waitUntil(
+    async () => {
+      var url = await browser.getUrl();
+      // Condition to wait on.
+      return check(decodeURIComponent(url));
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+    }
+  );
 
   // Waiting for caller specified conditions.
   await waitForCallerSpecifiedConditions();
 };
 
-var nonEmptyText = async function(elementName, element) {
-  await visibilityOf(
-    element, `${elementName} is not visible for getText()`);
+var nonEmptyText = async function (elementName, element) {
+  await visibilityOf(element, `${elementName} is not visible for getText()`);
   await browser.waitUntil(
-    async function() {
+    async function () {
       return await element.getText();
-    }, {
+    },
+    {
       timeout: DEFAULT_WAIT_TIME_MSECS,
-      timeoutMsg: `Text in ${elementName} is empty!\n` +
-                  new Error().stack + '\n'
+      timeoutMsg:
+        `Text in ${elementName} is empty!\n` + new Error().stack + '\n',
     }
   );
 };
-
 
 exports.DEFAULT_WAIT_TIME_MSECS = DEFAULT_WAIT_TIME_MSECS;
 exports.alertToBePresent = alertToBePresent;

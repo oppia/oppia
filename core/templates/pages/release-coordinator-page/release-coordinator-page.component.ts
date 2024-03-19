@@ -16,24 +16,23 @@
  * @fileoverview Component for the release coordinator page.
  */
 
-import { Component, OnInit, } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { VoiceoverContributionBackendApiService } from '../../services/voiceover-contribution-backend-api.services';
+import {VoiceoverContributionBackendApiService} from '../../services/voiceover-contribution-backend-api.services';
 
+import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
-import { ReleaseCoordinatorBackendApiService } from './services/release-coordinator-backend-api.service';
-import { ReleaseCoordinatorPageConstants } from './release-coordinator-page.constants';
+import {ReleaseCoordinatorBackendApiService} from './services/release-coordinator-backend-api.service';
+import {ReleaseCoordinatorPageConstants} from './release-coordinator-page.constants';
 
 interface MemoryCacheProfile {
   totalAllocatedInBytes: string;
   peakAllocatedInBytes: string;
   totalKeysStored: string;
 }
-
 
 @Component({
   selector: 'oppia-release-coordinator-page',
@@ -61,56 +60,72 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     private platformFeatureService: PlatformFeatureService,
     private backendApiService: ReleaseCoordinatorBackendApiService,
     private promoBarBackendApiService: PromoBarBackendApiService,
-    private voiceoverContributionBackendApiService:
-      VoiceoverContributionBackendApiService
+    private voiceoverContributionBackendApiService: VoiceoverContributionBackendApiService
   ) {}
 
   flushMemoryCache(): void {
-    this.backendApiService.flushMemoryCacheAsync().then(() => {
-      this.statusMessage = 'Success! Memory Cache Flushed.';
-      this.memoryCacheDataFetched = false;
-    }, errorResponse => {
-      this.statusMessage = 'Server error: ' + errorResponse;
-    });
+    this.backendApiService.flushMemoryCacheAsync().then(
+      () => {
+        this.statusMessage = 'Success! Memory Cache Flushed.';
+        this.memoryCacheDataFetched = false;
+      },
+      errorResponse => {
+        this.statusMessage = 'Server error: ' + errorResponse;
+      }
+    );
   }
 
   getMemoryCacheProfile(): void {
-    this.backendApiService.getMemoryCacheProfileAsync().then(response => {
-      this.memoryCacheProfile = {
-        totalAllocatedInBytes: response.total_allocation,
-        peakAllocatedInBytes: response.peak_allocation,
-        totalKeysStored: response.total_keys_stored
-      };
-      this.memoryCacheDataFetched = true;
-      this.statusMessage = 'Success!';
-    }, errorResponse => {
-      this.statusMessage = 'Server error: ' + errorResponse;
-    });
+    this.backendApiService.getMemoryCacheProfileAsync().then(
+      response => {
+        this.memoryCacheProfile = {
+          totalAllocatedInBytes: response.total_allocation,
+          peakAllocatedInBytes: response.peak_allocation,
+          totalKeysStored: response.total_keys_stored,
+        };
+        this.memoryCacheDataFetched = true;
+        this.statusMessage = 'Success!';
+      },
+      errorResponse => {
+        this.statusMessage = 'Server error: ' + errorResponse;
+      }
+    );
   }
 
   updatePromoBarParameter(): void {
     this.statusMessage = 'Updating promo-bar platform parameter...';
-    this.promoBarBackendApiService.updatePromoBarDataAsync(
-      this.promoBarConfigForm.controls.enabled.value,
-      this.promoBarConfigForm.controls.message.value).then(() => {
-      this.statusMessage = 'Success!';
-      this.promoBarConfigForm.markAsPristine();
-    }, errorResponse => {
-      this.statusMessage = 'Server error: ' + errorResponse;
-    });
+    this.promoBarBackendApiService
+      .updatePromoBarDataAsync(
+        this.promoBarConfigForm.controls.enabled.value,
+        this.promoBarConfigForm.controls.message.value
+      )
+      .then(
+        () => {
+          this.statusMessage = 'Success!';
+          this.promoBarConfigForm.markAsPristine();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
   }
 
   updateVoiceoverContributionParameter(): void {
-    this.statusMessage = (
-      'Updating voiceover contribution platform parameter...');
-    this.voiceoverContributionBackendApiService.
-      updateVoiceoverContributionDataAsync(
-        this.voiceoverContributionForm.controls.enabled.value).then(() => {
-        this.statusMessage = 'Success!';
-        this.voiceoverContributionForm.markAsPristine();
-      }, errorResponse => {
-        this.statusMessage = 'Server error: ' + errorResponse;
-      });
+    this.statusMessage =
+      'Updating voiceover contribution platform parameter...';
+    this.voiceoverContributionBackendApiService
+      .updateVoiceoverContributionDataAsync(
+        this.voiceoverContributionForm.controls.enabled.value
+      )
+      .then(
+        () => {
+          this.statusMessage = 'Success!';
+          this.voiceoverContributionForm.markAsPristine();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
   }
 
   ngOnInit(): void {
@@ -119,11 +134,11 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     this.voiceoverContributionButtonDisabled = true;
     this.promoBarConfigForm = this.formBuilder.group({
       enabled: false,
-      message: ''
+      message: '',
     });
 
     this.voiceoverContributionForm = this.formBuilder.group({
-      enabled: true
+      enabled: true,
     });
 
     this.promoBarConfigForm.valueChanges.subscribe(() => {
@@ -135,24 +150,26 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     });
     this.memoryCacheDataFetched = false;
     this.activeTab = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
-    this.promoBarBackendApiService.getPromoBarDataAsync().then((promoBar) => {
+    this.promoBarBackendApiService.getPromoBarDataAsync().then(promoBar => {
       this.promoBarConfigForm.patchValue({
         enabled: promoBar.promoBarEnabled,
-        message: promoBar.promoBarMessage
+        message: promoBar.promoBarMessage,
       });
     });
 
-    this.voiceoverContributionBackendApiService.
-      getVoiceoverContributionDataAsync().then(
-        (voiceoverContributionEnabled) => {
-          this.voiceoverContributionForm.patchValue({
-            enabled: voiceoverContributionEnabled
-          });
-        }
-      );
+    this.voiceoverContributionBackendApiService
+      .getVoiceoverContributionDataAsync()
+      .then(voiceoverContributionEnabled => {
+        this.voiceoverContributionForm.patchValue({
+          enabled: voiceoverContributionEnabled,
+        });
+      });
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaReleaseCoordinatorPage', downgradeComponent(
-    {component: ReleaseCoordinatorPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaReleaseCoordinatorPage',
+    downgradeComponent({component: ReleaseCoordinatorPageComponent})
+  );

@@ -21,7 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 export enum PlatformParameterFilterType {
   PlatformType = 'platform_type',
   AppVersion = 'app_version',
-  AppVersionFlavor = 'app_version_flavor'
+  AppVersionFlavor = 'app_version_flavor',
 }
 
 /**
@@ -32,8 +32,8 @@ export enum PlatformParameterFilterType {
  * platform parameter filters in the admin page.
  */
 export interface PlatformParameterFilterBackendDict {
-  'type': PlatformParameterFilterType;
-  'conditions': [string, string][];
+  type: PlatformParameterFilterType;
+  conditions: [string, string][];
 }
 
 export class PlatformParameterFilter {
@@ -41,17 +41,20 @@ export class PlatformParameterFilter {
   conditions: [string, string][];
 
   constructor(
-      type: PlatformParameterFilterType, conditions: [string, string][]) {
+    type: PlatformParameterFilterType,
+    conditions: [string, string][]
+  ) {
     this.type = type;
     this.conditions = conditions;
   }
 
   static createFromBackendDict(
-      platformParameterFiliterBackendDict: PlatformParameterFilterBackendDict):
-      PlatformParameterFilter {
+    platformParameterFiliterBackendDict: PlatformParameterFilterBackendDict
+  ): PlatformParameterFilter {
     return new PlatformParameterFilter(
       platformParameterFiliterBackendDict.type,
-      platformParameterFiliterBackendDict.conditions);
+      platformParameterFiliterBackendDict.conditions
+    );
   }
 
   /**
@@ -63,7 +66,7 @@ export class PlatformParameterFilter {
   toBackendDict(): PlatformParameterFilterBackendDict {
     return {
       type: this.type,
-      conditions: cloneDeep(this.conditions)
+      conditions: cloneDeep(this.conditions),
     };
   }
 }

@@ -33,7 +33,7 @@ export const InteractionsExtensionsConstants = {
     F4: 65,
     E4: 64,
     D4: 62,
-    C4: 60
+    C4: 60,
   },
 
   // Minimum confidence required for a predicted answer group to be shown to

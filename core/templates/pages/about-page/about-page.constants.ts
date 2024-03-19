@@ -199,7 +199,7 @@ export const AboutPageConstants = {
     'Elizabeth Kemp',
     'Emil Brynielsson',
     'Emily Glue',
-    'Eric L\'Heureux',
+    "Eric L'Heureux",
     'Eric Lou',
     'Eric Yang',
     'Eshaan Aggarwal',
@@ -707,5 +707,5 @@ export const AboutPageConstants = {
     'Zhan Liang',
     'Zhu Chu',
     'Zoe Madden-Wood',
-  ]
+  ],
 } as const;

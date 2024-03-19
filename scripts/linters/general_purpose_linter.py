@@ -85,6 +85,7 @@ EXCLUDED_PATHS: Final = (
     'core/templates/google-analytics.initializer.ts',
     'extensions/classifiers/proto/*',
     'core/tests/puppeteer-acceptance-tests/build/*',
+    'docker/patched_wsgi_server.py',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS: Final = (

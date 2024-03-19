@@ -16,36 +16,33 @@
  * @fileoverview Service for admin to update feature flag rules.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AdminPageConstants } from
-  'pages/admin-page/admin-page.constants';
-import { PlatformParameterDomainConstants } from
-  'domain/platform-parameter/platform-parameter-domain.constants';
-import { PlatformParameterRule, PlatformParameterValue } from
-  'domain/platform-parameter/platform-parameter-rule.model';
+import {AdminPageConstants} from 'pages/admin-page/admin-page.constants';
+import {PlatformParameterDomainConstants} from 'domain/platform-parameter/platform-parameter-domain.constants';
+import {
+  PlatformParameterRule,
+  PlatformParameterValue,
+} from 'domain/platform-parameter/platform-parameter-rule.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlatformParameterAdminBackendApiService {
-  constructor(
-    private http: HttpClient,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   async updatePlatformParameter(
-      name: string, message: string, newRules: PlatformParameterRule[],
-      defaultValue: PlatformParameterValue
-  ):
-      Promise<void> {
-    await this.http.post(
-      AdminPageConstants.ADMIN_HANDLER_URL,
-      {
-        action: (
-          PlatformParameterDomainConstants.
-            UPDATE_PLATFORM_PARAMETER_RULES_ACTION),
+    name: string,
+    message: string,
+    newRules: PlatformParameterRule[],
+    defaultValue: PlatformParameterValue
+  ): Promise<void> {
+    await this.http
+      .post(AdminPageConstants.ADMIN_HANDLER_URL, {
+        action:
+          PlatformParameterDomainConstants.UPDATE_PLATFORM_PARAMETER_RULES_ACTION,
         platform_param_name: name,
         commit_message: message,
         new_rules: newRules.map(rule => rule.toBackendDict()),
@@ -54,12 +51,15 @@ export class PlatformParameterAdminBackendApiService {
         // string and boolean and to handle this part we are passing a map
         // so we can declare the schema for the incoming value as a map and
         // then further validate the actual value.
-        default_value: {value: defaultValue}
-      }
-    ).toPromise();
+        default_value: {value: defaultValue},
+      })
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'PlatformParameterAdminBackendApiService',
-  downgradeInjectable(PlatformParameterAdminBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'PlatformParameterAdminBackendApiService',
+    downgradeInjectable(PlatformParameterAdminBackendApiService)
+  );

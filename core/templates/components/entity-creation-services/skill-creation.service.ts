@@ -16,24 +16,23 @@
  * @fileoverview Functionality for creating a new skill.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { TopicsAndSkillsDashboardPageConstants } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {TopicsAndSkillsDashboardPageConstants} from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkillCreationService {
   CREATE_NEW_SKILL_URL_TEMPLATE: string = '/skill_editor/<skill_id>';
   skillCreationInProgress: boolean = false;
-  skillDescriptionStatusMarker: string = (
-    TopicsAndSkillsDashboardPageConstants
-      .SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED);
+  skillDescriptionStatusMarker: string =
+    TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
+      .STATUS_UNCHANGED;
 
   markChangeInSkillDescription(): void {
-    this.skillDescriptionStatusMarker = (
-      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_CHANGED);
+    this.skillDescriptionStatusMarker =
+      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES.STATUS_CHANGED;
   }
 
   getSkillDescriptionStatus(): string {
@@ -41,17 +40,16 @@ export class SkillCreationService {
   }
 
   disableSkillDescriptionStatusMarker(): void {
-    this.skillDescriptionStatusMarker = (
-      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_DISABLED);
+    this.skillDescriptionStatusMarker =
+      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES.STATUS_DISABLED;
   }
 
   resetSkillDescriptionStatusMarker(): void {
-    this.skillDescriptionStatusMarker = (
-      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-        .STATUS_UNCHANGED);
+    this.skillDescriptionStatusMarker =
+      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES.STATUS_UNCHANGED;
   }
 }
 
-angular.module('oppia').service('SkillCreationService',
-  downgradeInjectable(SkillCreationService));
+angular
+  .module('oppia')
+  .service('SkillCreationService', downgradeInjectable(SkillCreationService));

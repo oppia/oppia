@@ -16,11 +16,11 @@
  * @fileoverview Component for the InteractiveMap response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { icon, LatLng, tileLayer } from 'leaflet';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseInteractiveMapComponent } from './oppia-response-interactive-map.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {icon, LatLng, tileLayer} from 'leaflet';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseInteractiveMapComponent} from './oppia-response-interactive-map.component';
 
 describe('ResponseInteractiveMapComponent', () => {
   let component: ResponseInteractiveMapComponent;
@@ -38,10 +38,10 @@ describe('ResponseInteractiveMapComponent', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
+          useClass: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -55,35 +55,40 @@ describe('ResponseInteractiveMapComponent', () => {
   it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
-    expect(component.mapOptions).toEqual(jasmine.objectContaining({
-      layers: [tileLayer(
-        'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        { attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
-      )
-      ],
-      zoom: 8,
-      center: {
-        lat: 50,
-        lng: 55
-      }
-    }));
-    expect(component.mapMarkers.getLatLng())
-      .toEqual(new LatLng(50, 55));
+    expect(component.mapOptions).toEqual(
+      jasmine.objectContaining({
+        layers: [
+          tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution:
+              '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          }),
+        ],
+        zoom: 8,
+        center: {
+          lat: 50,
+          lng: 55,
+        },
+      })
+    );
+    expect(component.mapMarkers.getLatLng()).toEqual(new LatLng(50, 55));
     expect(component.mapMarkers.options).toEqual({
       icon: icon({
-        iconUrl: '/extensions/interactions/InteractiveMap/static' +
-      '/marker-icon.png',
+        iconUrl:
+          '/extensions/interactions/InteractiveMap/static' + '/marker-icon.png',
         iconSize: [25, 41],
         iconAnchor: [12, 41],
-        shadowUrl: '/extensions/interactions/InteractiveMap/static' +
-       '/marker-shadow.png',
+        shadowUrl:
+          '/extensions/interactions/InteractiveMap/static' +
+          '/marker-shadow.png',
         shadowSize: [41, 41],
         shadowAnchor: [13, 41],
-        iconRetinaUrl: '/extensions/interactions/InteractiveMap/' +
-        'static/marker-icon-2x.png',
-        shadowRetinaUrl: '/extensions/interactions/InteractiveMap/' +
-        'static/marker-shadow.png'
-      })
+        iconRetinaUrl:
+          '/extensions/interactions/InteractiveMap/' +
+          'static/marker-icon-2x.png',
+        shadowRetinaUrl:
+          '/extensions/interactions/InteractiveMap/' +
+          'static/marker-shadow.png',
+      }),
     });
   });
 });

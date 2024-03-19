@@ -16,25 +16,21 @@
  * @fileoverview Service for recording and scrutinizing playthroughs.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
+import {AppConstants} from 'app.constants';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {
   CyclicStateTransitionsCustomizationArgs,
   EarlyQuitCustomizationArgs,
-  MultipleIncorrectSubmissionsCustomizationArgs
+  MultipleIncorrectSubmissionsCustomizationArgs,
 } from 'domain/statistics/playthrough-issue.model';
-import { LearnerAction } from
-  'domain/statistics/learner-action.model';
-import { Playthrough } from
-  'domain/statistics/playthrough.model';
-import { PlaythroughBackendApiService } from
-  'domain/statistics/playthrough-backend-api.service';
-import { ServicesConstants } from 'services/services.constants';
-import { Stopwatch } from 'domain/utilities/stopwatch.model';
+import {LearnerAction} from 'domain/statistics/learner-action.model';
+import {Playthrough} from 'domain/statistics/playthrough.model';
+import {PlaythroughBackendApiService} from 'domain/statistics/playthrough-backend-api.service';
+import {ServicesConstants} from 'services/services.constants';
+import {Stopwatch} from 'domain/utilities/stopwatch.model';
 
 class CyclicStateTransitionsTracker {
   /** A path of visited states without any repeats. */
@@ -85,8 +81,9 @@ class CyclicStateTransitionsTracker {
       return;
     }
     if (this.pathOfVisitedStates.includes(destStateName)) {
-      const cycleOfVisitedStates = (
-        this.makeCycle(this.pathOfVisitedStates.indexOf(destStateName)));
+      const cycleOfVisitedStates = this.makeCycle(
+        this.pathOfVisitedStates.indexOf(destStateName)
+      );
       if (angular.equals(this.cycleOfVisitedStates, cycleOfVisitedStates)) {
         this.numLoops += 1;
       } else {
@@ -100,7 +97,7 @@ class CyclicStateTransitionsTracker {
 
   generateIssueCustomizationArgs(): CyclicStateTransitionsCustomizationArgs {
     return {
-      state_names: {value: this.cycleOfVisitedStates}
+      state_names: {value: this.cycleOfVisitedStates},
     };
   }
 
@@ -124,7 +121,8 @@ class EarlyQuitTracker {
 
   foundAnIssue(): boolean {
     return (
-      this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS);
+      this.expDurationInSecs < ServicesConstants.EARLY_QUIT_THRESHOLD_IN_SECS
+    );
   }
 
   recordExplorationQuit(stateName: string, expDurationInSecs: number): void {
@@ -162,8 +160,7 @@ class MultipleIncorrectAnswersTracker {
     }
   }
 
-  generateIssueCustomizationArgs(
-  ): MultipleIncorrectSubmissionsCustomizationArgs {
+  generateIssueCustomizationArgs(): MultipleIncorrectSubmissionsCustomizationArgs {
     return {
       state_name: {value: this.currStateName},
       num_times_answered_incorrectly: {value: this.numTries},
@@ -172,7 +169,7 @@ class MultipleIncorrectAnswersTracker {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlaythroughService {
   // These properties are initialized using initSession method
@@ -189,17 +186,19 @@ export class PlaythroughService {
   private learnerIsInSamplePopulation: boolean = false;
 
   constructor(
-      private explorationFeaturesService: ExplorationFeaturesService,
-      private playthroughBackendApiService: PlaythroughBackendApiService,
+    private explorationFeaturesService: ExplorationFeaturesService,
+    private playthroughBackendApiService: PlaythroughBackendApiService
   ) {}
 
   initSession(
-      explorationId: string, explorationVersion: number,
-      sampleSizePopulationProportion: number): void {
+    explorationId: string,
+    explorationVersion: number,
+    sampleSizePopulationProportion: number
+  ): void {
     this.explorationId = explorationId;
     this.explorationVersion = explorationVersion;
-    this.learnerIsInSamplePopulation = (
-      Math.random() < sampleSizePopulationProportion);
+    this.learnerIsInSamplePopulation =
+      Math.random() < sampleSizePopulationProportion;
   }
 
   recordExplorationStartAction(initStateName: string): void {
@@ -210,7 +209,7 @@ export class PlaythroughService {
     this.recordedLearnerActions = [
       LearnerAction.createNewExplorationStartAction({
         state_name: {value: initStateName},
-      })
+      }),
     ];
 
     this.eqTracker = new EarlyQuitTracker();
@@ -223,8 +222,13 @@ export class PlaythroughService {
   }
 
   recordAnswerSubmitAction(
-      stateName: string, destStateName: string, interactionId: string,
-      answer: string, feedback: string, timeSpentInStateSecs: number): void {
+    stateName: string,
+    destStateName: string,
+    interactionId: string,
+    answer: string,
+    feedback: string,
+    timeSpentInStateSecs: number
+  ): void {
     if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
@@ -236,15 +240,18 @@ export class PlaythroughService {
         interaction_id: {value: interactionId},
         submitted_answer: {value: answer},
         feedback: {value: feedback},
-        time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-      }));
+        time_spent_state_in_msecs: {value: 1000 * timeSpentInStateSecs},
+      })
+    );
 
     this.misTracker.recordStateTransition(destStateName);
     this.cstTracker.recordStateTransition(destStateName);
   }
 
   recordExplorationQuitAction(
-      stateName: string, timeSpentInStateSecs: number): void {
+    stateName: string,
+    timeSpentInStateSecs: number
+  ): void {
     if (!this.hasRecordingBegun() || this.hasRecordingFinished()) {
       return;
     }
@@ -252,13 +259,15 @@ export class PlaythroughService {
     this.recordedLearnerActions.push(
       LearnerAction.createNewExplorationQuitAction({
         state_name: {value: stateName},
-        time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs}
-      }));
+        time_spent_in_state_in_msecs: {value: 1000 * timeSpentInStateSecs},
+      })
+    );
 
-    this.playthroughDurationInSecs = (
-      this.playthroughStopwatch.getTimeInSecs());
+    this.playthroughDurationInSecs = this.playthroughStopwatch.getTimeInSecs();
     this.eqTracker.recordExplorationQuit(
-      stateName, this.playthroughDurationInSecs);
+      stateName,
+      this.playthroughDurationInSecs
+    );
   }
 
   storePlaythrough(): void {
@@ -281,23 +290,26 @@ export class PlaythroughService {
    */
   private createNewPlaythrough(): Playthrough | null {
     if (this.misTracker && this.misTracker.foundAnIssue()) {
-      return Playthrough
-        .createNewMultipleIncorrectSubmissionsPlaythrough(
-          this.explorationId, this.explorationVersion,
-          this.misTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions);
+      return Playthrough.createNewMultipleIncorrectSubmissionsPlaythrough(
+        this.explorationId,
+        this.explorationVersion,
+        this.misTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions
+      );
     } else if (this.cstTracker && this.cstTracker.foundAnIssue()) {
-      return Playthrough
-        .createNewCyclicStateTransitionsPlaythrough(
-          this.explorationId, this.explorationVersion,
-          this.cstTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions);
+      return Playthrough.createNewCyclicStateTransitionsPlaythrough(
+        this.explorationId,
+        this.explorationVersion,
+        this.cstTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions
+      );
     } else if (this.eqTracker && this.eqTracker.foundAnIssue()) {
-      return Playthrough
-        .createNewEarlyQuitPlaythrough(
-          this.explorationId, this.explorationVersion,
-          this.eqTracker.generateIssueCustomizationArgs(),
-          this.recordedLearnerActions);
+      return Playthrough.createNewEarlyQuitPlaythrough(
+        this.explorationId,
+        this.explorationVersion,
+        this.eqTracker.generateIssueCustomizationArgs(),
+        this.recordedLearnerActions
+      );
     }
     return null;
   }
@@ -305,15 +317,15 @@ export class PlaythroughService {
   private isPlaythroughRecordingEnabled(): boolean {
     return (
       this.explorationFeaturesService.isPlaythroughRecordingEnabled() &&
-      this.learnerIsInSamplePopulation === true);
+      this.learnerIsInSamplePopulation === true
+    );
   }
 
   private hasRecordingBegun(): boolean {
     return (
       // Check this.recordedLearnerActions because
       // it could be null before recording begun.
-      this.recordedLearnerActions &&
-      this.isPlaythroughRecordingEnabled()
+      this.recordedLearnerActions && this.isPlaythroughRecordingEnabled()
     );
   }
 
@@ -322,7 +334,8 @@ export class PlaythroughService {
       this.hasRecordingBegun() &&
       this.recordedLearnerActions.length > 1 &&
       this.recordedLearnerActions[this.recordedLearnerActions.length - 1]
-        .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT);
+        .actionType === AppConstants.ACTION_TYPE_EXPLORATION_QUIT
+    );
   }
 
   private isRecordedPlaythroughHelpful(): boolean {
@@ -331,13 +344,15 @@ export class PlaythroughService {
       this.hasRecordingFinished() &&
       // Playthroughs are only helpful if learners have attempted an answer.
       this.recordedLearnerActions.some(
-        a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT) &&
+        a => a.actionType === AppConstants.ACTION_TYPE_ANSWER_SUBMIT
+      ) &&
       // Playthroughs are only helpful if learners have invested enough time.
       this.playthroughDurationInSecs >=
-          ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS);
+        ServicesConstants.MIN_PLAYTHROUGH_DURATION_IN_SECS
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'PlaythroughService',
-  downgradeInjectable(PlaythroughService));
+angular
+  .module('oppia')
+  .factory('PlaythroughService', downgradeInjectable(PlaythroughService));

@@ -23,33 +23,33 @@ var RuleTester = require('eslint').RuleTester;
 
 var ruleTester = new RuleTester();
 ruleTester.run('disallow-flags', rule, {
-  valid: [
-    'var checking = (true);'
-  ],
+  valid: ['var checking = (true);'],
 
   invalid: [
     {
-      code:
-        `// eslint-enable-next-line camelcase
+      code: `// eslint-enable-next-line camelcase
         var checkingcamel = 6;`,
-      errors: [{
-        message: (
-          'Please do not use eslint enable|disable for camelcase. If' +
-          ' you are using this statement to define properties in an interface' +
-          ' for a backend dict. Wrap the property name in single quotes' +
-          ' instead.'),
-      }]
+      errors: [
+        {
+          message:
+            'Please do not use eslint enable|disable for camelcase. If' +
+            ' you are using this statement to define properties in an interface' +
+            ' for a backend dict. Wrap the property name in single quotes' +
+            ' instead.',
+        },
+      ],
     },
     {
-      code:
-        `// eslint @typescript-eslint/no-explicit-any
+      code: `// eslint @typescript-eslint/no-explicit-any
         var checkingcamel = 6;`,
-      errors: [{
-        message: (
-          'Please do not define "any" types. You can' +
-          ' refer https://github.com/oppia/oppia/wiki/Guide-on-defining-types' +
-          ' if you\'re having trouble declaring types.')
-      }]
-    }
-  ]
+      errors: [
+        {
+          message:
+            'Please do not define "any" types. You can' +
+            ' refer https://github.com/oppia/oppia/wiki/Guide-on-defining-types' +
+            " if you're having trouble declaring types.",
+        },
+      ],
+    },
+  ],
 });

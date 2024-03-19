@@ -32,16 +32,15 @@ export const ServicesConstants = {
     TOPICS_AND_SKILLS_DASHBOARD: 'topics_and_skills_dashboard',
     CONTRIBUTOR_DASHBOARD: 'contributor_dashboard',
     BLOG_DASHBOARD: 'blog_dashboard',
-    OTHER: 'other'
+    OTHER: 'other',
   },
 
   EXPLORATION_EDITOR_TAB_CONTEXT: {
     EDITOR: 'editor',
-    PREVIEW: 'preview'
+    PREVIEW: 'preview',
   },
 
-  EXPLORATION_FEATURES_URL:
-    '/explorehandler/features/<exploration_id>',
+  EXPLORATION_FEATURES_URL: '/explorehandler/features/<exploration_id>',
 
   FETCH_ISSUES_URL: '/issuesdatahandler/<exploration_id>',
 
@@ -54,8 +53,7 @@ export const ServicesConstants = {
 
   VOICEOVER_CONTRIBUTION_IS_ENABLED_URL: '/voiceover_contribution_handler',
 
-  STORE_PLAYTHROUGH_URL:
-    '/explorehandler/store_playthrough/<exploration_id>',
+  STORE_PLAYTHROUGH_URL: '/explorehandler/store_playthrough/<exploration_id>',
 
   // Enables recording playthroughs from learner sessions.
   MIN_PLAYTHROUGH_DURATION_IN_SECS: 45,
@@ -73,8 +71,7 @@ export const ServicesConstants = {
 
   SEARCH_DATA_URL: '/searchhandler/data',
 
-  STATE_ANSWER_STATS_URL:
-    '/createhandler/state_answer_stats/<exploration_id>',
+  STATE_ANSWER_STATS_URL: '/createhandler/state_answer_stats/<exploration_id>',
 
   RTE_COMPONENT_SPECS: RTE_COMPONENT_SPECS,
 
@@ -83,7 +80,6 @@ export const ServicesConstants = {
     EXPLORATION_LOADED: 'explorationLoaded',
     STATE_TRANSITION: 'stateTransition',
     EXPLORATION_RESET: 'explorationReset',
-    EXPLORATION_COMPLETED: 'explorationCompleted'
+    EXPLORATION_COMPLETED: 'explorationCompleted',
   },
-
 } as const;

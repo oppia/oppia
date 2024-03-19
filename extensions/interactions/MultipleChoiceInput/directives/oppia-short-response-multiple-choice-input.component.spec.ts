@@ -15,12 +15,12 @@
 /**
  * @fileoverview Unit tests for the MultipleChoiceInput response.
  */
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseMultipleChoiceInputComponent } from './oppia-short-response-multiple-choice-input.component';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseMultipleChoiceInputComponent} from './oppia-short-response-multiple-choice-input.component';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {TruncateAtFirstLinePipe} from 'filters/string-utility-filters/truncate-at-first-line.pipe';
 
 describe('ShortResponseMultipleChoiceInputComponent', () => {
   let component: ShortResponseMultipleChoiceInputComponent;
@@ -40,42 +40,44 @@ describe('ShortResponseMultipleChoiceInputComponent', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: mockHtmlEscaperService,
         },
         ConvertToPlainTextPipe,
-        TruncateAtFirstLinePipe
+        TruncateAtFirstLinePipe,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     convertToPlainTextPipe = TestBed.inject(ConvertToPlainTextPipe);
     truncateAtFirstLinePipe = TestBed.inject(TruncateAtFirstLinePipe);
-    fixture = TestBed
-      .createComponent(ShortResponseMultipleChoiceInputComponent);
+    fixture = TestBed.createComponent(
+      ShortResponseMultipleChoiceInputComponent
+    );
     component = fixture.componentInstance;
     component.answer = '1';
-    component.choices = '[{' +
+    component.choices =
+      '[{' +
       '"_html": "opt1",' +
       '"_contentId": "ca_choices_1"' +
-    '}, {' +
+      '}, {' +
       '"_html": "opt2",' +
       '"_contentId": "ca_choices_2"' +
-    '}, {' +
+      '}, {' +
       '"_html": "opt3",' +
       '"_contentId": "ca_choices_3"' +
-    '}, {' +
+      '}, {' +
       '"_html": "opt4",' +
       '"_contentId": "ca_choices_4"' +
-    '}]';
+      '}]';
   });
 
   it('should initialise component when user submits answer', () => {
-    spyOn(convertToPlainTextPipe, 'transform').and.callFake((response) => {
+    spyOn(convertToPlainTextPipe, 'transform').and.callFake(response => {
       return response;
     });
-    spyOn(truncateAtFirstLinePipe, 'transform').and.callFake((response) => {
+    spyOn(truncateAtFirstLinePipe, 'transform').and.callFake(response => {
       return response;
     });
 

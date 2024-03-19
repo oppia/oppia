@@ -16,7 +16,7 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, { Page, Browser } from 'puppeteer';
+import puppeteer, {Page, Browser} from 'puppeteer';
 import testConstants from './test-constants';
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
@@ -26,32 +26,10 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
-  'This action is irreversible. Are you sure?'
+  'This action is irreversible. Are you sure?',
 ];
 
-interface IUserProperties {
-  page: Page;
-  browserObject: Browser;
-  userHasAcceptedCookies: boolean;
-  username: string;
-  email: string;
-}
-
-export interface IBaseUser extends IUserProperties {
-  openBrowser: () => Promise<Page>;
-  signInWithEmail: (email: string) => Promise<void>;
-  signUpNewUser: (userName: string, signInEmail: string) => Promise<void>;
-  reloadPage: () => Promise<void>;
-  clickOn: (selector: string) => Promise<void>;
-  type: (selector: string, text: string) => Promise<void>;
-  select: (selector: string, option: string) => Promise<void>;
-  goto: (url: string) => Promise<void>;
-  uploadFile: (filePath: string) => Promise<void>;
-  logout: () => Promise<void>;
-  closeBrowser: () => Promise<void>;
-}
-
-export class BaseUser implements IBaseUser {
+export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
@@ -66,7 +44,7 @@ export class BaseUser implements IBaseUser {
   async openBrowser(): Promise<Page> {
     const args: string[] = [
       '--start-fullscreen',
-      '--use-fake-ui-for-media-stream'
+      '--use-fake-ui-for-media-stream',
     ];
 
     const headless = process.env.HEADLESS === 'true';
@@ -85,13 +63,13 @@ export class BaseUser implements IBaseUser {
          * headless mode. As per the expected behavior we need to make sure
          * every test passes on both modes. */
         headless,
-        args
+        args,
       })
-      .then(async(browser) => {
+      .then(async browser => {
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({ width: 1920, height: 1080 });
-        this.page.on('dialog', async(dialog) => {
+        await this.page.setViewport({width: 1920, height: 1080});
+        this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
             await dialog.accept();
@@ -126,7 +104,8 @@ export class BaseUser implements IBaseUser {
     await this.type('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])');
+      'button.e2e-test-register-user:not([disabled])'
+    );
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
 
@@ -150,7 +129,8 @@ export class BaseUser implements IBaseUser {
        * Check the documentation for the normalize-space function here :
        * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
       const [button] = await this.page.$x(
-        `\/\/*[contains(text(), normalize-space('${selector}'))]`);
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`
+      );
       await button.click();
     } catch (error) {
       await this.page.waitForSelector(selector);
@@ -194,6 +174,28 @@ export class BaseUser implements IBaseUser {
   }
 
   /**
+   * This function validates whether an anchor tag is correctly linked
+   * to external PDFs or not. Use this particularly when interacting with
+   * buttons associated with external PDF links, because Puppeteer,
+   * in headless-mode, does not natively support the opening of external PDFs.
+   */
+  async openExternalPdfLink(
+    selector: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.waitForSelector(selector);
+    const href = await this.page.$eval(selector, element =>
+      element.getAttribute('href')
+    );
+    if (href === null) {
+      throw new Error(`The ${selector} does not have a href attribute!`);
+    }
+    if (href !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
+    }
+  }
+
+  /**
    * This function logs out the current user.
    */
   async logout(): Promise<void> {
@@ -209,4 +211,4 @@ export class BaseUser implements IBaseUser {
   }
 }
 
-export const BaseUserFactory = (): IBaseUser => new BaseUser();
+export const BaseUserFactory = (): BaseUser => new BaseUser();

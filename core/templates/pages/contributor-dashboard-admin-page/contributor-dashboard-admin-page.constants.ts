@@ -17,18 +17,15 @@
  */
 
 export const ContributorDashboardAdminPageConstants = {
-  CONTRIBUTION_RIGHTS_HANDLER_URL: (
-    '/contributionrightshandler/<category>'),
+  CONTRIBUTION_RIGHTS_HANDLER_URL: '/contributionrightshandler/<category>',
   CONTRIBUTION_RIGHTS_DATA_HANDLER_URL: '/contributionrightsdatahandler',
   GET_CONTRIBUTOR_USERS_HANDLER_URL: '/getcontributorusershandler/<category>',
-  TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL: (
-    '/translationcontributionstatshandler'
-  ),
-  CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL: (
+  TRANSLATION_CONTRIBUTION_STATS_HANDLER_URL:
+    '/translationcontributionstatshandler',
+  CONTRIBUTOR_ADMIN_STATS_SUMMARIES_URL:
     '/contributor-dashboard-admin-stats/<contribution_type>' +
-    '/<contribution_subtype>'
-  ),
+    '/<contribution_subtype>',
   COMMUNITY_CONTRIBUTION_STATS_URL: '/community-contribution-stats',
   ADMIN_ROLE_HANDLER_URL: '/adminrolehandler',
-  DEFAULT_LANGUAGE_FILTER: 'en'
+  DEFAULT_LANGUAGE_FILTER: 'en',
 } as const;

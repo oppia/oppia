@@ -17,10 +17,10 @@
  * OppiaNoninteractiveSkillreviewConceptCardModalComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia-noninteractive-skillreview-concept-card-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from './oppia-noninteractive-skillreview-concept-card-modal.component';
 class MockNgbActiveModal {
   dismiss(reason: string): Promise<string> {
     return Promise.reject(reason);
@@ -31,40 +31,37 @@ class MockNgbActiveModal {
   }
 }
 
-describe(
-  'Oppia Noninteractive Skillreview Concept Card Modal Component', () => {
-    const skillId = 'skill1';
+describe('Oppia Noninteractive Skillreview Concept Card Modal Component', () => {
+  const skillId = 'skill1';
 
-    let component: OppiaNoninteractiveSkillreviewConceptCardModalComponent;
-    let fixture: ComponentFixture<
-    OppiaNoninteractiveSkillreviewConceptCardModalComponent>;
+  let component: OppiaNoninteractiveSkillreviewConceptCardModalComponent;
+  let fixture: ComponentFixture<OppiaNoninteractiveSkillreviewConceptCardModalComponent>;
 
-    beforeEach(waitForAsync(() => {
-      TestBed.configureTestingModule({
-        declarations: [
-          OppiaNoninteractiveSkillreviewConceptCardModalComponent
-        ],
-        providers: [{provide: NgbActiveModal, useClass: MockNgbActiveModal}],
-        schemas: [NO_ERRORS_SCHEMA]}).compileComponents();
-    }));
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      declarations: [OppiaNoninteractiveSkillreviewConceptCardModalComponent],
+      providers: [{provide: NgbActiveModal, useClass: MockNgbActiveModal}],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+  }));
 
-    beforeEach(() => {
-      fixture = TestBed.createComponent(
-        OppiaNoninteractiveSkillreviewConceptCardModalComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-      component.skillId = skillId;
-    });
-
-    it('should initialize $scope properties after controller is initialized',
-      () => {
-        component.ngOnInit();
-        component.retryTest();
-        component.goToNextConceptCard();
-        expect(component.isLastConceptCard()).toBe(true);
-        expect(component.skillIds[0]).toEqual(skillId);
-        expect(component.index).toBe(0);
-        expect(component.modalHeader).toBe('Concept Card');
-        expect(component.isInTestMode).toBe(false);
-      });
+  beforeEach(() => {
+    fixture = TestBed.createComponent(
+      OppiaNoninteractiveSkillreviewConceptCardModalComponent
+    );
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    component.skillId = skillId;
   });
+
+  it('should initialize $scope properties after controller is initialized', () => {
+    component.ngOnInit();
+    component.retryTest();
+    component.goToNextConceptCard();
+    expect(component.isLastConceptCard()).toBe(true);
+    expect(component.skillIds[0]).toEqual(skillId);
+    expect(component.index).toBe(0);
+    expect(component.modalHeader).toBe('Concept Card');
+    expect(component.isInTestMode).toBe(false);
+  });
+});

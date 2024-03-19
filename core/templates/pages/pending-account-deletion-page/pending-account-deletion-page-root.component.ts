@@ -16,16 +16,16 @@
  * @fileoverview Root component for pending account deletion Page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-pending-account-deletion-page-root',
-  templateUrl: './pending-account-deletion-page-root.component.html'
+  templateUrl: './pending-account-deletion-page-root.component.html',
 })
 export class PendingAccountDeletionPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -41,9 +41,12 @@ export class PendingAccountDeletionPageRootComponent implements OnDestroy {
     let pendingAccountDeletionPage =
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PENDING_ACCOUNT_DELETION;
     let translatedTitle = this.translateService.instant(
-      pendingAccountDeletionPage.TITLE);
+      pendingAccountDeletionPage.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
-      translatedTitle, pendingAccountDeletionPage.META);
+      translatedTitle,
+      pendingAccountDeletionPage.META
+    );
   }
 
   ngOnInit(): void {

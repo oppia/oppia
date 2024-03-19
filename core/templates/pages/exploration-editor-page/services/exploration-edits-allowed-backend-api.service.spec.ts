@@ -15,10 +15,12 @@
  * @fileoverview Unit tests for ExplorationEditsAllowedBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { ExplorationEditsAllowedBackendApiService } from './exploration-edits-allowed-backend-api.service';
-
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {ExplorationEditsAllowedBackendApiService} from './exploration-edits-allowed-backend-api.service';
 
 describe('Exploration edits allowed backend API service', () => {
   let eeabas: ExplorationEditsAllowedBackendApiService;
@@ -26,7 +28,7 @@ describe('Exploration edits allowed backend API service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     eeabas = TestBed.get(ExplorationEditsAllowedBackendApiService);
@@ -42,8 +44,9 @@ describe('Exploration edits allowed backend API service', () => {
     let failHandler = jasmine.createSpy('fail');
 
     let handlerUrl = '/editsallowedhandler/123';
-    eeabas.setEditsAllowed(true, '123', () => {}).then(
-      successHandler, failHandler);
+    eeabas
+      .setEditsAllowed(true, '123', () => {})
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(handlerUrl);
     expect(req.request.method).toEqual('PUT');
@@ -61,8 +64,9 @@ describe('Exploration edits allowed backend API service', () => {
     let failHandler = jasmine.createSpy('fail');
 
     let handlerUrl = '/editsallowedhandler/123';
-    eeabas.setEditsAllowed(false, '123', () => {}).then(
-      successHandler, failHandler);
+    eeabas
+      .setEditsAllowed(false, '123', () => {})
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(handlerUrl);
     expect(req.request.method).toEqual('PUT');

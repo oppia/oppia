@@ -16,14 +16,14 @@
  * @fileoverview Component for skill preview modal.
  */
 
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { WorkedExample } from 'domain/skill/worked-example.model';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {WorkedExample} from 'domain/skill/worked-example.model';
 
 @Component({
   selector: 'skill-preview-modal',
-  templateUrl: './skill-preview-modal.component.html'
+  templateUrl: './skill-preview-modal.component.html',
 })
 export class SkillPreviewModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
@@ -33,9 +33,7 @@ export class SkillPreviewModalComponent extends ConfirmOrCancelModal {
   @Input() skillExplanation!: string;
   @Input() skillWorkedExamples!: WorkedExample[];
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }
