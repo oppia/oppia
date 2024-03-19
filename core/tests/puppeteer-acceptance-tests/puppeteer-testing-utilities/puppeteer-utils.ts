@@ -35,6 +35,7 @@ interface IUserProperties {
   userHasAcceptedCookies: boolean;
   username: string;
   email: string;
+  debug: DebugTools;
 }
 
 export interface IBaseUser extends IUserProperties {
@@ -70,7 +71,7 @@ export type ModalUserInteractions = (
   container: string
 ) => Promise<void>;
 
-export interface DebugTools {
+interface DebugTools {
   capturePageConsoleLogs: () => void;
   setupClickLogger: () => Promise<void>;
   logClickEventsFrom: (selector: string) => Promise<void>;

@@ -5,13 +5,13 @@
     <mat-radio-button *ngIf="rubric.getExplanations().length > 0"
                       [value]="availableDifficultyValues[idx]"
                       class="e2e-test-skill-difficulty-{{rubric.getDifficulty().toLowerCase()}} mat-radio-button">
-      <strong>{{ rubric.getDifficulty() }}</strong>
+      <strong class="e2e-test-skill-difficulty-name">{{ rubric.getDifficulty() }}</strong>
       <mat-list>
         <mat-list-item *ngFor="let explanation of rubric.getExplanations()">
           <div class="oppia-difficulty-container">
             <div class="oppia-skill-description-label">Skill description:</div>
             <div class="oppia-skill-description-container">
-              <oppia-rte-output-display class="oppia-skill-description-text"
+              <oppia-rte-output-display class="oppia-skill-description-text e2e-test-skill-rubric-explanation"
                                         [rteString]="explanation">
               </oppia-rte-output-display>
             </div>

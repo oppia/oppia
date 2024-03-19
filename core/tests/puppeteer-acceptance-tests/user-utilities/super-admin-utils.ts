@@ -436,7 +436,7 @@ class SuperAdmin extends BaseUser implements ISuperAdmin {
     description,
     reviewMaterial,
     misconception,
-    difficulties,
+    rubricNotesBySkillDifficulty,
     questionCount,
   }: SkillDetails): Promise<void> {
     await this.goto('http://localhost:8181/topics-and-skills-dashboard');
