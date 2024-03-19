@@ -255,7 +255,8 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
         """The model contains data corresponding to a user: user_id and their
-        provided language code for in which they contributed to voiceovers.
+        provided language code for in which they contributed to voiceovers. This
+        model is a transient one and is expected to be deleted by June 30, 2024.
         """
         return base_models.DELETION_POLICY.DELETE
 
@@ -357,7 +358,9 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model doesn't contain any data directly corresponding to a user."""
+        """Model doesn't contain any data directly corresponding to a user. This
+        model is a transient one and is expected to be deleted by June 30, 2024.
+        """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod

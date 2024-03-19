@@ -32,10 +32,11 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Sequence, Type
+from typing import Dict, List, Sequence, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
     from mypy_imports import voiceover_models
 
 (voiceover_models, exp_models) = models.Registry.import_models([
@@ -619,7 +620,7 @@ class AuditVoiceArtistMetadataModelsJobTests(
         # Deleting an exploration commit log entry model.
         snapshot_model_id: str = 'exploration_id_1-3'
         snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
-            exp_models.ExplorationSnapshotMetadataModel.get(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                 snapshot_model_id))
         snapshot_model.delete()
 
@@ -687,3 +688,203 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
         )
         self.assertDictEqual(
             expected_voiceover_mapping_diff, voiceover_mapping_diff)
+
+    def test_should_update_content_id_to_voiceovers_mapping(self) -> None:
+        voiceover_mapping = {
+            'content_0': {
+                'en': self.voiceover_dict_1,
+                'hi': self.voiceover_dict_2
+            },
+            'content_1': {
+                'en': self.voiceover_dict_3
+            },
+            'content_2': {
+                'en': self.voiceover_dict_4,
+                'hi': self.voiceover_dict_6
+            },
+            'content_3': {
+                'en': self.voiceover_dict_5
+            }
+        }
+        latest_content_id_to_language_codes = {
+            'content_0': ['en', 'hi'],
+            'content_1': ['en'],
+            'content_2': ['en']
+        }
+        content_id_to_voiceovers_mapping = {
+            'content_2': {
+                'en': ('voice_artist_1', self.voiceover_dict_4)
+            }
+        }
+        remaining_voice_artist_for_identification = 3
+        voice_artist_id = 'voice_artist_1'
+
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_1', self.voiceover_dict_1),
+                'hi': ('voice_artist_1', self.voiceover_dict_2)
+            },
+            'content_1': {
+                'en': ('voice_artist_1', self.voiceover_dict_3)
+            },
+            'content_2': {
+                'en': ('voice_artist_1', self.voiceover_dict_4)
+            }
+        }
+
+        (
+            updated_content_id_to_voiceovers_mapping,
+            updated_remaining_voice_artist_for_identification
+        ) = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            update_content_id_to_voiceovers_mapping(
+                latest_content_id_to_language_codes,
+                content_id_to_voiceovers_mapping,
+                remaining_voice_artist_for_identification,
+                voiceover_mapping,
+                voice_artist_id
+            )
+        )
+
+        self.assertDictEqual(
+            updated_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+        self.assertEqual(
+            updated_remaining_voice_artist_for_identification, 0)
+
+    def test_should_create_empty_exploration_voice_artist_link_model(
+        self
+    ) -> None:
+        exploration = self.save_new_valid_exploration(
+            self.CURATED_EXPLORATION_ID_1,
+            self.owner_id,
+            title='title1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.CURATED_EXPLORATION_ID_1,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': '<p>A content to translate.</p>'
+                }
+            })],
+            'Changes content.'
+        )
+
+        exploration_models: List[exp_models.ExplorationModel] = list(
+            exp_models.ExplorationModel.get_all().fetch())
+
+        snapshot_models: List[
+            exp_models.ExplorationSnapshotContentModel] = list(
+                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+
+        elements: Tuple[
+            str,
+            manual_voice_artist_name_job.ExplorationAndSnapshotModelDict] = (
+                self.CURATED_EXPLORATION_ID_1, {
+                    'exploration_models': exploration_models,
+                    'snapshot_models': snapshot_models
+                }
+            )
+
+        exp_link_model: voiceover_models.ExplorationVoiceArtistsLinkModel = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_exploration_voice_artists_link_model(elements))
+
+        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
+        self.assertDictEqual(
+            exp_link_model.content_id_to_voiceovers_mapping, {})
+
+    def test_should_create_exploration_link_for_voice_artist(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            self.CURATED_EXPLORATION_ID_1,
+            self.owner_id,
+            title='title1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.CURATED_EXPLORATION_ID_1,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': '<p>A content to translate.</p>'
+                }
+            })],
+            'Changes content.'
+        )
+
+        new_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content_0': {
+                    'en': self.voiceover_dict_1
+                },
+                'ca_placeholder_2': {},
+                'default_outcome_1': {}
+            }
+        }
+        old_voiceover_dict: Dict[str, Dict[str, Dict[
+            str, voiceover_models.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict,
+            'old_value': old_voiceover_dict
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
+            change_list, 'Translation commits')
+
+        exploration_models: List[exp_models.ExplorationModel] = list(
+            exp_models.ExplorationModel.get_all().fetch())
+        snapshot_models: List[
+            exp_models.ExplorationSnapshotContentModel] = list(
+                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': (self.editor_id_1, self.voiceover_dict_1)
+            }
+        }
+
+        elements: Tuple[
+            str,
+            manual_voice_artist_name_job.ExplorationAndSnapshotModelDict] = (
+                self.CURATED_EXPLORATION_ID_1, {
+                    'exploration_models': exploration_models,
+                    'snapshot_models': snapshot_models
+                })
+
+        exp_link_model = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_exploration_voice_artists_link_model(elements))
+
+        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
+        self.assertDictEqual(
+            exp_link_model.content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )

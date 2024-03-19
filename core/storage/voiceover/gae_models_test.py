@@ -239,7 +239,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy_is_to_keep(self) -> None:
         self.assertEqual(
             voiceover_models.VoiceArtistMetadataModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP)
+            base_models.DELETION_POLICY.DELETE)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -307,7 +307,7 @@ class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             voiceover_models.ExplorationVoiceArtistsLinkModel.
             get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP
+            base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
     def test_get_model_association_to_user(self) -> None:

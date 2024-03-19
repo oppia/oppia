@@ -27,7 +27,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional, Tuple, TypedDict
+from typing import Dict, List, Tuple, TypedDict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -73,9 +73,10 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 is_exploration_available_for_contribution(exploration_id)
             )
 
+    @classmethod
     def get_user_id_for_given_snapshot(
-        self, snapshot_model_id: str
-    ) -> Optional[str]:
+        cls, snapshot_model_id: str
+    ) -> str:
         """The method returns the commiter ID for a given snapshot model using
         the snapshot metadata model.
 
@@ -89,7 +90,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             Exception. The exploration commit log entry model for the given ID
                 does not exist.
         """
-
+        user_id: str = ''
         try:
             with datastore_services.get_ndb_context():
                 exp_snapshot_metadata_model = (
@@ -97,13 +98,12 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                         snapshot_model_id))
 
                 user_id = exp_snapshot_metadata_model.committer_id
-
-            return user_id
         except Exception as e:
             raise Exception(
                 'The exploration commit log entry model for the given ID: %s, '
                 'does not exist' % snapshot_model_id
             ) from e
+        return user_id
 
     @classmethod
     def get_voiceover_from_recorded_voiceover_diff(
@@ -146,7 +146,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             for lang_code, voiceover_dict in (
                 lang_code_to_voiceover_dict.items()):
 
-                if lang_code not in old_voiceover_mapping.get(content_id):
+                if lang_code not in old_voiceover_mapping.get(content_id, {}):
 
                     if content_id not in voiceover_mapping_diff:
                         voiceover_mapping_diff[content_id] = {}
@@ -168,8 +168,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         return voiceover_mapping_diff
 
+    @classmethod
     def get_voiceover_diff(
-        self,
+        cls,
         new_snapshot: exp_models.ExplorationSnapshotContentModel,
         old_snapshot: exp_models.ExplorationSnapshotContentModel
     ) -> Dict[str, Dict[str, voiceover_models.VoiceoverDict]]:
@@ -218,7 +219,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
     def get_latest_content_ids_and_voice_artist_count(
         cls,
         exploration: exp_models.ExplorationModel
-    ) -> Dict[str, List[str]]:
+    ) -> Tuple[Dict[str, List[str]], int]:
         """This function generates a dictionary containing content IDs as keys
         and a list of language codes as values, representing the languages
         available in the latest version of the provided exploration.
@@ -261,15 +262,16 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             voice_artist_for_identification
         )
 
+    @classmethod
     def update_content_id_to_voiceovers_mapping(
-        self,
+        cls,
         latest_content_id_to_language_codes: Dict[str, List[str]],
         content_id_to_voiceovers_mapping: (
             voiceover_models.ContentIdToVoiceoverMappingType),
         remaining_voice_artist_for_identification: int,
         voiceover_mapping: voiceover_models.VoiceoverMappingType,
         voice_artist_id: str
-    ) -> voiceover_models.ContentIdToVoiceoverMappingType:
+    ) -> Tuple[voiceover_models.ContentIdToVoiceoverMappingType, int]:
         """The function iterates through voiceover mapping dictionaries, adding
         the voice artist ID and voiceover to the
         `content_id_to_voiceovers_mapping` if both the content ID and language
@@ -344,8 +346,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             content_id_to_voiceovers_mapping,
             remaining_voice_artist_for_identification)
 
+    @classmethod
     def get_exploration_voice_artists_link_model(
-        self,
+        cls,
         elements: Tuple[str, ExplorationAndSnapshotModelDict]
     ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
         """The method creates an exploration voice artist link model using the
@@ -378,6 +381,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # The number of remaining voice artists that still need to be
         # identified for voiceovers in the latest version of exploration.
         remaining_voice_artist_for_identification: int = 0
+        latest_content_id_to_language_codes: Dict[str, List[str]] = {}
 
         (
             latest_content_id_to_language_codes,
@@ -394,7 +398,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         for index, new_snapshot_model in enumerate(snapshot_models[:-1]):
             old_snapshot_model = snapshot_models[index + 1]
 
-            voiceover_mapping_diff = self.get_voiceover_diff(
+            voiceover_mapping_diff = cls.get_voiceover_diff(
                 new_snapshot_model, old_snapshot_model)
 
             # If the voiceover mapping difference dictionary is empty, this
@@ -404,20 +408,14 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 continue
 
             try:
-                voice_artist_id = self.get_user_id_for_given_snapshot(
+                voice_artist_id = cls.get_user_id_for_given_snapshot(
                     new_snapshot_model.id)
-
-                # Once all voice artists for the latest exploration version are
-                # identified, further iteration over the remaining unexplored
-                # snapshot models can be avoided.
-                if remaining_voice_artist_for_identification == 0:
-                    break
 
                 (
                     content_id_to_voiceovers_mapping,
                     remaining_voice_artist_for_identification
                 ) = (
-                    self.update_content_id_to_voiceovers_mapping(
+                    cls.update_content_id_to_voiceovers_mapping(
                         latest_content_id_to_language_codes,
                         content_id_to_voiceovers_mapping,
                         remaining_voice_artist_for_identification,
@@ -425,6 +423,12 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                         voice_artist_id
                     )
                 )
+
+                # Once all voice artists for the latest exploration version are
+                # identified, further iteration over the remaining unexplored
+                # snapshot models can be avoided.
+                if remaining_voice_artist_for_identification == 0:
+                    break
 
             except Exception:
                 # If exception is raised, this means the exploration
@@ -512,7 +516,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                     exploration_id=element[0])
                 )
             | 'Get exploration voice artist link models' >> beam.Map(
-                self.get_exploration_voice_artists_link_model)
+                CreateExplorationVoiceArtistLinkModelsJob.
+                get_exploration_voice_artists_link_model)
         )
 
         exploration_voice_artist_link_result = (
