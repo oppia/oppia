@@ -218,14 +218,40 @@
   }
 }
 
-/*Redesign classes*/
-.learner-home_greeting { 
+/*REDESIGN CLASSES - can be used for other tabs*/
+.oppia-learner-dash_greeting { 
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
 }
 
-.section-button {
+.oppia-learner-dash-section {
+  background-color: #fff;
+  border-radius: .25em;
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.oppia-learner-dash-section_heading {
+  color: #205D86;
+  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+  font-size: 24px;
+}
+
+.oppia-learner-dash-section_subheading {
+  color: #333333;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+/******************/
+
+/*REDESIGN CLASSES - exclusively for home*/
+.oppia-learner-dash-home_classes {
+  -webkit-appearance: none;
+}
+
+.oppia-learner-dash-home_button {
   background-color: #fff;
   border: 2px solid #205D86;
   border-radius: .25em;
@@ -236,32 +262,9 @@
   width: 344px;
 }
 
-.section-button:hover {
+.oppia-learner-dash-home_button:hover {
   background-color: #CADBDA;
   color: #205D86;
   text-decoration: none;
 }
-
-.learner-section_container {
-  background-color: #fff;
-  border-radius: .25em;
-  margin-bottom: 16px;
-  padding: 16px;
-}
-
-.learner-section_heading {
-  color: #205D86;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 24px;
-}
-
-.subsection-heading {
-  color: #333333;
-  font-size: 20px;
-  font-weight: 500;
-  margin-bottom: 0;
-}
-
-.topic-summary-tile-section-1 {
-  -webkit-appearance: none;
-}
+/******************/

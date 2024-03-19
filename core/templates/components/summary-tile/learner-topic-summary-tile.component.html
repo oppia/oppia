@@ -24,7 +24,7 @@
     </a>
   </mat-card>
   <!--REDESIGN-->
-  <a *ngIf="featureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none w-100" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+  <a *ngIf="featureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
     <div class="oppia-class-card_img" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
