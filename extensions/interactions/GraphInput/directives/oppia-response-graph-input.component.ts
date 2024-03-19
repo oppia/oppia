@@ -25,16 +25,16 @@ require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/html-escaper.service.ts');
 
 import 'interactions/interactions-extension.constants';
-import { Component, Input } from '@angular/core';
-import { GraphAnswer } from 'interactions/answer-defs';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { EdgeCentre, GraphDetailService } from './graph-detail.service';
-import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input} from '@angular/core';
+import {GraphAnswer} from 'interactions/answer-defs';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {EdgeCentre, GraphDetailService} from './graph-detail.service';
+import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
+import {downgradeComponent} from '@angular/upgrade/static';
 @Component({
   selector: 'oppia-response-graph-input',
   templateUrl: './graph-input-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseGraphInput {
   // These properties are initialized using Angular lifecycle hooks
@@ -44,24 +44,26 @@ export class ResponseGraphInput {
   graph!: GraphAnswer;
   VERTEX_RADIUS!: number;
   EDGE_WIDTH!: number;
-  GRAPH_INPUT_LEFT_MARGIN = (
-    InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN);
+  GRAPH_INPUT_LEFT_MARGIN =
+    InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN;
 
   constructor(
     private graphDetailService: GraphDetailService,
-    private htmlEscaperService: HtmlEscaperService,
+    private htmlEscaperService: HtmlEscaperService
   ) {}
 
   ngOnInit(): void {
-    this.graph = (
-      this.htmlEscaperService.escapedJsonToObj(this.answer) as GraphAnswer);
+    this.graph = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as GraphAnswer;
     this.VERTEX_RADIUS = this.graphDetailService.VERTEX_RADIUS;
     this.EDGE_WIDTH = this.graphDetailService.EDGE_WIDTH;
   }
 
   getDirectedEdgeArrowPoints(index: number): string {
     return this.graphDetailService.getDirectedEdgeArrowPoints(
-      this.graph, index
+      this.graph,
+      index
     );
   }
 
@@ -70,5 +72,8 @@ export class ResponseGraphInput {
   }
 }
 angular.module('oppia').directive(
-  'oppiaResponseGraphInput', downgradeComponent(
-    {component: ResponseGraphInput}) as angular.IDirectiveFactory);
+  'oppiaResponseGraphInput',
+  downgradeComponent({
+    component: ResponseGraphInput,
+  }) as angular.IDirectiveFactory
+);

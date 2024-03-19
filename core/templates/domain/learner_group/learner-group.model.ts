@@ -18,7 +18,7 @@
  */
 
 export interface LearnerGroupBackendDict {
-  id: string ;
+  id: string;
   title: string;
   description: string;
   facilitator_usernames: string[];
@@ -39,14 +39,14 @@ export class LearnerGroupData {
   _storyIds: string[];
 
   constructor(
-      id: string,
-      title: string,
-      description: string,
-      facilitatorUsernames: string[],
-      learnerUsernames: string[],
-      invitedLearnerUsernames: string[],
-      subtopicPageIds: string[],
-      storyIds: string[]
+    id: string,
+    title: string,
+    description: string,
+    facilitatorUsernames: string[],
+    learnerUsernames: string[],
+    invitedLearnerUsernames: string[],
+    subtopicPageIds: string[],
+    storyIds: string[]
   ) {
     this._id = id;
     this._title = title;
@@ -147,28 +147,23 @@ export class LearnerGroupData {
   validate(creationMode: boolean): string[] {
     let issues = [];
     if (this._title === '') {
-      issues.push(
-        'Learner Group title should not be empty.');
+      issues.push('Learner Group title should not be empty.');
     }
     if (this._description === '') {
-      issues.push(
-        'Learner Group description should not be empty.');
+      issues.push('Learner Group description should not be empty.');
     }
     if (this._facilitatorUsernames.length === 0) {
-      issues.push(
-        'Learner Group should have at least one facilitator.');
+      issues.push('Learner Group should have at least one facilitator.');
     }
     if (this._subtopicPageIds.length + this._storyIds.length === 0) {
-      issues.push(
-        'Learner Group should have at least one syllabus item.');
+      issues.push('Learner Group should have at least one syllabus item.');
     }
     if (creationMode && this._learnerUsernames.length > 0) {
-      issues.push(
-        'Learner Group cannot have any learners while creation.');
+      issues.push('Learner Group cannot have any learners while creation.');
     }
     if (!creationMode) {
-      const commonUsernames = this.learnerUsernames.filter(
-        username => this.invitedLearnerUsernames.includes(username)
+      const commonUsernames = this.learnerUsernames.filter(username =>
+        this.invitedLearnerUsernames.includes(username)
       );
       if (commonUsernames.length > 0) {
         issues.push(
@@ -180,8 +175,9 @@ export class LearnerGroupData {
   }
 
   static createFromBackendDict(
-      learnerGroupBackendDict: LearnerGroupBackendDict): LearnerGroupData {
-    return new LearnerGroupData (
+    learnerGroupBackendDict: LearnerGroupBackendDict
+  ): LearnerGroupData {
+    return new LearnerGroupData(
       learnerGroupBackendDict.id,
       learnerGroupBackendDict.title,
       learnerGroupBackendDict.description,

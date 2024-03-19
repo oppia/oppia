@@ -20,11 +20,11 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { ChangeDetectorRef } from '@angular/core';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
+import {ChangeDetectorRef} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
 
 interface SetOfAlgebraicIdentifierEditorSchema {
   type: 'list';
@@ -32,15 +32,17 @@ interface SetOfAlgebraicIdentifierEditorSchema {
     type: 'unicode';
     choices: string[];
   };
-  validators: [{
-    id: 'is_uniquified';
-  }];
+  validators: [
+    {
+      id: 'is_uniquified';
+    },
+  ];
 }
 
 @Component({
   selector: 'set-of-algebraic-identifier-editor',
   templateUrl: './set-of-algebraic-identifier-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -50,33 +52,35 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
   @Input() value!: string[];
   SCHEMA!: SetOfAlgebraicIdentifierEditorSchema;
   @Output() valueChanged = new EventEmitter();
-  PLACEHOLDER_INFO = (
+  PLACEHOLDER_INFO =
     'NOTE: This rule will consider each side of the equation ' +
-    'independently and won\'t allow reordering of terms ' +
-    'around the = sign.');
+    "independently and won't allow reordering of terms " +
+    'around the = sign.';
 
   constructor(
     private guppyInitializationService: GuppyInitializationService,
     private changeDetectorRef: ChangeDetectorRef
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    let allowedVariables = (
-      this.guppyInitializationService.getAllowedVariables());
+    let allowedVariables =
+      this.guppyInitializationService.getAllowedVariables();
 
-    let choices = (
-      allowedVariables ? allowedVariables :
-      AppConstants.VALID_ALGEBRAIC_IDENTIFIERS);
+    let choices = allowedVariables
+      ? allowedVariables
+      : AppConstants.VALID_ALGEBRAIC_IDENTIFIERS;
 
     this.SCHEMA = {
       type: 'list',
       items: {
         type: 'unicode',
-        choices: choices as string[]
+        choices: choices as string[],
       },
-      validators: [{
-        id: 'is_uniquified'
-      }]
+      validators: [
+        {
+          id: 'is_uniquified',
+        },
+      ],
     };
 
     if (!this.value) {
@@ -98,6 +102,8 @@ export class SetOfAlgebraicIdentifierEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'setOfAlgebraicIdentifierEditor', downgradeComponent({
-    component: SetOfAlgebraicIdentifierEditorComponent
-  }) as angular.IDirectiveFactory);
+  'setOfAlgebraicIdentifierEditor',
+  downgradeComponent({
+    component: SetOfAlgebraicIdentifierEditorComponent,
+  }) as angular.IDirectiveFactory
+);

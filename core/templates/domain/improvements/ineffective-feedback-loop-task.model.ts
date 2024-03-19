@@ -17,35 +17,47 @@
  *    task.
  */
 
-import { TaskEntryBackendDict, TaskEntry } from 'domain/improvements/task-entry.model';
-import { ImprovementsConstants } from 'domain/improvements/improvements.constants';
+import {
+  TaskEntryBackendDict,
+  TaskEntry,
+} from 'domain/improvements/task-entry.model';
+import {ImprovementsConstants} from 'domain/improvements/improvements.constants';
 
-export class IneffectiveFeedbackLoopTask extends TaskEntry<
-    'ineffective_feedback_loop'> {
+export class IneffectiveFeedbackLoopTask extends TaskEntry<'ineffective_feedback_loop'> {
   constructor(backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>) {
-    if (backendDict.entity_type !==
-            ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION) {
+    if (
+      backendDict.entity_type !==
+      ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION
+    ) {
       throw new Error(
         `backend dict has entity_type "${backendDict.entity_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`);
+          `but expected "${ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION}"`
+      );
     }
-    if (backendDict.task_type !==
-            ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP) {
+    if (
+      backendDict.task_type !==
+      ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP
+    ) {
       throw new Error(
         `backend dict has task_type "${backendDict.task_type}" but expected ` +
-        `"${ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP}"`);
+          `"${ImprovementsConstants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP}"`
+      );
     }
-    if (backendDict.target_type !==
-            ImprovementsConstants.TASK_TARGET_TYPE_STATE) {
+    if (
+      backendDict.target_type !== ImprovementsConstants.TASK_TARGET_TYPE_STATE
+    ) {
       throw new Error(
         `backend dict has target_type "${backendDict.target_type}" ` +
-        `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`);
+          `but expected "${ImprovementsConstants.TASK_TARGET_TYPE_STATE}"`
+      );
     }
     super(backendDict);
   }
 
   private static createNewObsoleteTask(
-      expId: string, expVersion: number, stateName: string
+    expId: string,
+    expVersion: number,
+    stateName: string
   ): IneffectiveFeedbackLoopTask {
     return new IneffectiveFeedbackLoopTask({
       entity_type: ImprovementsConstants.TASK_ENTITY_TYPE_EXPLORATION,
@@ -62,17 +74,22 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
   }
 
   static createNew(
-      expId: string, expVersion: number, stateName: string,
-      numCyclicStateTransitionsPlaythroughs: number
+    expId: string,
+    expVersion: number,
+    stateName: string,
+    numCyclicStateTransitionsPlaythroughs: number
   ): IneffectiveFeedbackLoopTask {
     const task = IneffectiveFeedbackLoopTask.createNewObsoleteTask(
-      expId, expVersion, stateName);
+      expId,
+      expVersion,
+      stateName
+    );
     task.refreshStatus(numCyclicStateTransitionsPlaythroughs);
     return task;
   }
 
   static createFromBackendDict(
-      backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>
+    backendDict: TaskEntryBackendDict<'ineffective_feedback_loop'>
   ): IneffectiveFeedbackLoopTask {
     return new IneffectiveFeedbackLoopTask(backendDict);
   }
@@ -89,9 +106,10 @@ export class IneffectiveFeedbackLoopTask extends TaskEntry<
   }
 
   private generateIssueDescription(
-      numCyclicStateTransitionsPlaythroughs: number): void {
-    this.issueDescription = (
+    numCyclicStateTransitionsPlaythroughs: number
+  ): void {
+    this.issueDescription =
       `At least ${numCyclicStateTransitionsPlaythroughs} learners had quit ` +
-      'after revisiting this card several times.');
+      'after revisiting this card several times.';
   }
 }

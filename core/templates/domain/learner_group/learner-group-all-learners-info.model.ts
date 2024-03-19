@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { LearnerGroupUserInfo, LearnerGroupUserInfoBackendDict } from
-  './learner-group-user-info.model';
+import {
+  LearnerGroupUserInfo,
+  LearnerGroupUserInfoBackendDict,
+} from './learner-group-user-info.model';
 
 /**
  * @fileoverview Model for displaying instances of frontend domain objects of
@@ -30,8 +32,8 @@ export class LearnerGroupAllLearnersInfo {
   _invitedLearnersInfo: LearnerGroupUserInfo[];
 
   constructor(
-      learnersInfo: LearnerGroupUserInfo[],
-      invitedLearnersInfo: LearnerGroupUserInfo[]
+    learnersInfo: LearnerGroupUserInfo[],
+    invitedLearnersInfo: LearnerGroupUserInfo[]
   ) {
     this._learnersInfo = learnersInfo;
     this._invitedLearnersInfo = invitedLearnersInfo;
@@ -46,14 +48,15 @@ export class LearnerGroupAllLearnersInfo {
   }
 
   static createFromBackendDict(
-      infoBackendDict: LearnerGroupAllLearnersInfoBackendDict
+    infoBackendDict: LearnerGroupAllLearnersInfoBackendDict
   ): LearnerGroupAllLearnersInfo {
     return new LearnerGroupAllLearnersInfo(
-      infoBackendDict.learners_info.map((info) => {
+      infoBackendDict.learners_info.map(info => {
         return LearnerGroupUserInfo.createFromBackendDict(info);
       }),
-      infoBackendDict.invited_learners_info.map((info) => {
+      infoBackendDict.invited_learners_info.map(info => {
         return LearnerGroupUserInfo.createFromBackendDict(info);
-      }));
+      })
+    );
   }
 }

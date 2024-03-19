@@ -16,7 +16,7 @@
  * @fileoverview Test for type definitions in customization-args-defs.ts.
  */
 
-import { IsExact, AssertTrue } from 'conditional-type-checks';
+import {IsExact, AssertTrue} from 'conditional-type-checks';
 import {
   AlgebraicExpressionInputCustomizationArgs,
   AlgebraicExpressionInputCustomizationArgsBackendDict,
@@ -57,11 +57,10 @@ import {
   SetInputCustomizationArgs,
   SetInputCustomizationArgsBackendDict,
   TextInputCustomizationArgs,
-  TextInputCustomizationArgsBackendDict
+  TextInputCustomizationArgsBackendDict,
 } from 'interactions/customization-args-defs';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 /**
  * These dtslint type tests check that for each interaction, its frontend
@@ -78,13 +77,10 @@ import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 // This generic type compares the customization argument frontend dict and
 // backend dict after replacing properties of the backend dict by properties in
 // the Replacements interface.
-type IsExactAfterReplacement<BackendDict, Replacements, FrontendDict> = (
-  IsExact<
-    FrontendDict,
-    Omit<BackendDict, keyof Replacements> & Replacements
-  >
-);
-
+type IsExactAfterReplacement<BackendDict, Replacements, FrontendDict> = IsExact<
+  FrontendDict,
+  Omit<BackendDict, keyof Replacements> & Replacements
+>;
 
 type TestAlgebraicExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
@@ -209,7 +205,7 @@ type TestNumericExpressionInputCustomizationArgsInterfacesMatch = AssertTrue<
 type TestNumericInputCustomizationArgsInterfacesMatch = AssertTrue<
   IsExactAfterReplacement<
     NumericInputCustomizationArgsBackendDict,
-    { requireNonnegativeInput: { value: boolean } },
+    {requireNonnegativeInput: {value: boolean}},
     NumericInputCustomizationArgs
   >
 >;

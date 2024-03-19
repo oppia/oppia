@@ -16,26 +16,27 @@
  * @fileoverview Unit tests for VisualizationInfo.
  */
 
-import { VisualizationInfo } from
-  'domain/exploration/visualization-info.model';
-import { AnswerStats } from
-  'domain/exploration/answer-stats.model';
+import {VisualizationInfo} from 'domain/exploration/visualization-info.model';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
 
 describe('Visualization info model', () => {
   it('should correctly convert backend dict in visualization object.', () => {
     let backendDict = {
       addressed_info_is_supported: true,
-      data: [{
-        answer: 'hello',
-        frequency: 0,
-        is_addressed: false
-      }],
+      data: [
+        {
+          answer: 'hello',
+          frequency: 0,
+          is_addressed: false,
+        },
+      ],
       id: 'testId',
-      options: {}
+      options: {},
     };
 
     let answerStatObjects = backendDict.data.map(
-      AnswerStats.createFromBackendDict);
+      AnswerStats.createFromBackendDict
+    );
     let visualizationInfoObject =
       VisualizationInfo.createFromBackendDict(backendDict);
 
@@ -43,10 +44,13 @@ describe('Visualization info model', () => {
     expect(visualizationInfoObject.id).toEqual('testId');
     expect(visualizationInfoObject.options).toEqual({});
     expect(visualizationInfoObject.data[0].answer).toEqual(
-      answerStatObjects[0].answer);
+      answerStatObjects[0].answer
+    );
     expect(visualizationInfoObject.data[0].answerHtml).toEqual(
-      answerStatObjects[0].answerHtml);
+      answerStatObjects[0].answerHtml
+    );
     expect(visualizationInfoObject.data[0].frequency).toEqual(
-      answerStatObjects[0].frequency);
+      answerStatObjects[0].frequency
+    );
   });
 });

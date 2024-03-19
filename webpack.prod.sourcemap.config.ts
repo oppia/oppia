@@ -17,9 +17,9 @@
  * proper source maps.
  */
 
-var { merge } = require('webpack-merge');
+var {merge} = require('webpack-merge');
 const prod = require('./webpack.prod.config.ts');
 
 module.exports = merge(prod, {
-  devtool: 'source-map'
+  devtool: 'source-map',
 });

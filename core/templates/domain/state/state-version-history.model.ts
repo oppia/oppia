@@ -18,9 +18,9 @@
  */
 
 export interface StateVersionHistoryBackendDict {
-  'previously_edited_in_version': number;
-  'state_name_in_previous_version': string;
-  'committer_username': string;
+  previously_edited_in_version: number;
+  state_name_in_previous_version: string;
+  committer_username: string;
 }
 
 export class StateVersionHistory {
@@ -29,9 +29,9 @@ export class StateVersionHistory {
   _committerUsername: string;
 
   constructor(
-      previouslyEditedInVersion: number,
-      stateNameInPreviousVersion: string,
-      committerUsername: string
+    previouslyEditedInVersion: number,
+    stateNameInPreviousVersion: string,
+    committerUsername: string
   ) {
     this._previouslyEditedInVersion = previouslyEditedInVersion;
     this._stateNameInPreviousVersion = stateNameInPreviousVersion;
@@ -66,16 +66,17 @@ export class StateVersionHistory {
     return {
       previously_edited_in_version: this._previouslyEditedInVersion,
       state_name_in_previous_version: this._stateNameInPreviousVersion,
-      committer_username: this._committerUsername
+      committer_username: this._committerUsername,
     };
   }
 
   static fromBackendDict(
-      stateVersionHistoryBackendDict: StateVersionHistoryBackendDict
+    stateVersionHistoryBackendDict: StateVersionHistoryBackendDict
   ): StateVersionHistory {
     return new StateVersionHistory(
       stateVersionHistoryBackendDict.previously_edited_in_version,
       stateVersionHistoryBackendDict.state_name_in_previous_version,
-      stateVersionHistoryBackendDict.committer_username);
+      stateVersionHistoryBackendDict.committer_username
+    );
   }
 }

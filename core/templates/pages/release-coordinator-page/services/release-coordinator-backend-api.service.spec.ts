@@ -16,15 +16,17 @@
  * @fileoverview Unit tests for ReleaseCoordinatorBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { ReleaseCoordinatorBackendApiService } from './release-coordinator-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
-import { BeamJob } from 'domain/jobs/beam-job.model';
-import { BeamJobRunResult } from 'domain/jobs/beam-job-run-result.model';
+import {ReleaseCoordinatorBackendApiService} from './release-coordinator-backend-api.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
+import {BeamJob} from 'domain/jobs/beam-job.model';
+import {BeamJobRunResult} from 'domain/jobs/beam-job-run-result.model';
 
 describe('Release coordinator backend api service', () => {
   let rcbas: ReleaseCoordinatorBackendApiService;
@@ -35,7 +37,7 @@ describe('Release coordinator backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     rcbas = TestBed.get(ReleaseCoordinatorBackendApiService);
@@ -44,7 +46,7 @@ describe('Release coordinator backend api service', () => {
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
-    spyOn(csrfService, 'getTokenAsync').and.callFake(async() => {
+    spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');
     });
   });
@@ -53,89 +55,96 @@ describe('Release coordinator backend api service', () => {
     httpTestingController.verify();
   });
 
-  it('should flush the memory cache when calling' +
-   'flushMemoryCacheAsync', fakeAsync(() => {
-    rcbas.flushMemoryCacheAsync()
-      .then(successHandler, failHandler);
+  it(
+    'should flush the memory cache when calling' + 'flushMemoryCacheAsync',
+    fakeAsync(() => {
+      rcbas.flushMemoryCacheAsync().then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/memorycachehandler');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush(200);
-    flushMicrotasks();
+      let req = httpTestingController.expectOne('/memorycachehandler');
+      expect(req.request.method).toEqual('DELETE');
+      req.flush(200);
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should fail to flush the memory cache when calling' +
-   'flushMemoryCacheAsync', fakeAsync(() => {
-    rcbas.flushMemoryCacheAsync()
-      .then(successHandler, failHandler);
+  it(
+    'should fail to flush the memory cache when calling' +
+      'flushMemoryCacheAsync',
+    fakeAsync(() => {
+      rcbas.flushMemoryCacheAsync().then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/memorycachehandler');
-    expect(req.request.method).toEqual('DELETE');
-    req.flush({
-      error: 'Failed to flush memory cache.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
+      let req = httpTestingController.expectOne('/memorycachehandler');
+      expect(req.request.method).toEqual('DELETE');
+      req.flush(
+        {
+          error: 'Failed to flush memory cache.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to flush memory cache.');
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to flush memory cache.');
+    })
+  );
 
-  it('should get the data of memory cache profile when' +
-   'calling getMemoryCacheProfileAsync', fakeAsync(() => {
-    rcbas.getMemoryCacheProfileAsync()
-      .then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/memorycachehandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(200);
-    flushMicrotasks();
+  it(
+    'should get the data of memory cache profile when' +
+      'calling getMemoryCacheProfileAsync',
+    fakeAsync(() => {
+      rcbas.getMemoryCacheProfileAsync().then(successHandler, failHandler);
+      let req = httpTestingController.expectOne('/memorycachehandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(200);
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should fail to get the data of memory cache profile' +
-   'when calling getMemoryCacheProfileAsync', fakeAsync(() => {
-    rcbas.getMemoryCacheProfileAsync()
-      .then(successHandler, failHandler);
-    let req = httpTestingController.expectOne(
-      '/memorycachehandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Failed to get data.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
+  it(
+    'should fail to get the data of memory cache profile' +
+      'when calling getMemoryCacheProfileAsync',
+    fakeAsync(() => {
+      rcbas.getMemoryCacheProfileAsync().then(successHandler, failHandler);
+      let req = httpTestingController.expectOne('/memorycachehandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 'Failed to get data.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Failed to get data.');
+    })
+  );
 
-  it('should get all beam jobs', fakeAsync(async() => {
+  it('should get all beam jobs', fakeAsync(async () => {
     const beamJobsPromise = rcbas.getBeamJobs().toPromise();
     const req = httpTestingController.expectOne('/beam_job');
     expect(req.request.method).toEqual('GET');
     req.flush({
-      jobs: [
-        { name: 'FooJob' },
-      ],
+      jobs: [{name: 'FooJob'}],
     });
     flushMicrotasks();
 
-    expect(await beamJobsPromise).toEqual([
-      new BeamJob('FooJob'),
-    ]);
+    expect(await beamJobsPromise).toEqual([new BeamJob('FooJob')]);
   }));
 
-  it('should get all beam job runs', fakeAsync(async() => {
+  it('should get all beam job runs', fakeAsync(async () => {
     const beamJobRunsPromise = rcbas.getBeamJobRuns().toPromise();
     const req = httpTestingController.expectOne('/beam_job_run');
     expect(req.request.method).toEqual('GET');
@@ -149,7 +158,7 @@ describe('Release coordinator backend api service', () => {
           job_updated_on_msecs: 0,
           job_is_synchronous: false,
         },
-      ]
+      ],
     });
     flushMicrotasks();
 
@@ -158,7 +167,7 @@ describe('Release coordinator backend api service', () => {
     ]);
   }));
 
-  it('should start a new job', fakeAsync(async() => {
+  it('should start a new job', fakeAsync(async () => {
     const beamJob = new BeamJob('FooJob');
     const beamJobRunPromise = rcbas.startNewBeamJob(beamJob).toPromise();
     const req = httpTestingController.expectOne('/beam_job_run');
@@ -175,12 +184,12 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunPromise).toEqual(
-      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false));
+      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false)
+    );
   }));
 
-  it('should cancel a running beam job', fakeAsync(async() => {
-    const beamJobRun = (
-      new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false));
+  it('should cancel a running beam job', fakeAsync(async () => {
+    const beamJobRun = new BeamJobRun('abc', 'FooJob', 'RUNNING', 0, 0, false);
     const beamJobRunPromise = rcbas.cancelBeamJobRun(beamJobRun).toPromise();
     const req = httpTestingController.expectOne('/beam_job_run?job_id=abc');
     expect(req.request.method).toEqual('DELETE');
@@ -195,15 +204,16 @@ describe('Release coordinator backend api service', () => {
     flushMicrotasks();
 
     expect(await beamJobRunPromise).toEqual(
-      new BeamJobRun('abc', 'FooJob', 'CANCELLING', 0, 0, false));
+      new BeamJobRun('abc', 'FooJob', 'CANCELLING', 0, 0, false)
+    );
   }));
 
-  it('should get the output of a beam job run', fakeAsync(async() => {
-    const beamJobRun = (
-      new BeamJobRun('abc', 'FooJob', 'DONE', 0, 0, false));
+  it('should get the output of a beam job run', fakeAsync(async () => {
+    const beamJobRun = new BeamJobRun('abc', 'FooJob', 'DONE', 0, 0, false);
     const resultPromise = rcbas.getBeamJobRunOutput(beamJobRun).toPromise();
-    const req = (
-      httpTestingController.expectOne('/beam_job_run_result?job_id=abc'));
+    const req = httpTestingController.expectOne(
+      '/beam_job_run_result?job_id=abc'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({
       stdout: '123',

@@ -16,24 +16,19 @@
  * @fileoverview Routing module for feedback-updates page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { FeedbackUpdatesPageRootComponent } from './feedback-updates-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {FeedbackUpdatesPageRootComponent} from './feedback-updates-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: FeedbackUpdatesPageRootComponent
-  }
+    component: FeedbackUpdatesPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class FeedbackUpdatesPageRoutingModule {}

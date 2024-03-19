@@ -12,20 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Unit tests for the skill editor main tab component.
  */
 
-import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { NgbModal, NgbModalRef, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { SkillEditorMainTabComponent } from './skill-editor-main-tab.component';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { SkillEditorRoutingService } from '../services/skill-editor-routing.service';
-import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {SkillEditorMainTabComponent} from './skill-editor-main-tab.component';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {SkillEditorRoutingService} from '../services/skill-editor-routing.service';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 
 class MockNgbModalRef {
   componentInstance!: {
@@ -51,9 +55,9 @@ describe('Skill editor main tab component', () => {
         UndoRedoService,
         SkillEditorRoutingService,
         SkillEditorStateService,
-        FocusManagerService
+        FocusManagerService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -76,18 +80,20 @@ describe('Skill editor main tab component', () => {
     expect(component.subtopicName).toBeUndefined();
   });
 
-  it('should navigate to questions tab when unsaved changes are not present',
-    () => {
-      spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
-      let routingSpy = spyOn(
-        skillEditorRoutingService, 'navigateToQuestionsTab').and.callThrough();
-      component.createQuestion(),
-      expect(routingSpy).toHaveBeenCalled();
-      let createQuestionEventSpyon = spyOn(
-        skillEditorRoutingService, 'creatingNewQuestion').and.callThrough();
-      component.createQuestion();
-      expect(createQuestionEventSpyon).toHaveBeenCalled();
-    });
+  it('should navigate to questions tab when unsaved changes are not present', () => {
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    let routingSpy = spyOn(
+      skillEditorRoutingService,
+      'navigateToQuestionsTab'
+    ).and.callThrough();
+    component.createQuestion(), expect(routingSpy).toHaveBeenCalled();
+    let createQuestionEventSpyon = spyOn(
+      skillEditorRoutingService,
+      'creatingNewQuestion'
+    ).and.callThrough();
+    component.createQuestion();
+    expect(createQuestionEventSpyon).toHaveBeenCalled();
+  });
 
   it('should return if skill has been loaded', () => {
     expect(component.hasLoadedSkill()).toBe(false);
@@ -95,40 +101,45 @@ describe('Skill editor main tab component', () => {
     expect(component.hasLoadedSkill()).toBe(true);
   });
 
-  it('should open save changes modal with ngbModal when unsaved changes are' +
-  ' present', () => {
-    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.resolve()
-      }) as NgbModalRef;
-    });
+  it(
+    'should open save changes modal with ngbModal when unsaved changes are' +
+      ' present',
+    () => {
+      spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
 
-    component.createQuestion(),
-    expect(modalSpy).toHaveBeenCalled();
-  });
+      component.createQuestion(), expect(modalSpy).toHaveBeenCalled();
+    }
+  );
 
-  it('should close save changes modal with ngbModal when cancel button is' +
-  ' clicked', () => {
-    spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-        componentInstance: MockNgbModalRef,
-        result: Promise.reject()
-      }) as NgbModalRef;
-    });
+  it(
+    'should close save changes modal with ngbModal when cancel button is' +
+      ' clicked',
+    () => {
+      spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject(),
+        } as NgbModalRef;
+      });
 
-    component.createQuestion(),
-    expect(modalSpy).toHaveBeenCalled();
-  });
+      component.createQuestion(), expect(modalSpy).toHaveBeenCalled();
+    }
+  );
 
   it('should return assigned Skill Topic Data', () => {
     expect(component.assignedSkillTopicData).toBeUndefined();
     expect(component.getAssignedSkillTopicData()).toBeNull();
     component.assignedSkillTopicData = assignedSkillTopicData;
-    expect(
-      component.getAssignedSkillTopicData()).toEqual(assignedSkillTopicData);
+    expect(component.getAssignedSkillTopicData()).toEqual(
+      assignedSkillTopicData
+    );
   });
 
   it('should return subtopic name', () => {

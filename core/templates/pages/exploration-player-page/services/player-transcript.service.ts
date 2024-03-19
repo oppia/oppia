@@ -21,16 +21,16 @@
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { LoggerService } from 'services/contextual/logger.service';
-import { StateCard } from 'domain/state_card/state-card.model';
+import {LoggerService} from 'services/contextual/logger.service';
+import {StateCard} from 'domain/state_card/state-card.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlayerTranscriptService {
   constructor(private log: LoggerService) {}
@@ -75,12 +75,14 @@ export class PlayerTranscriptService {
     if (this.transcript.length === 1) {
       throw new Error(
         'Exploration player is on the first card and hence no previous ' +
-          'card exists.');
+          'card exists.'
+      );
     }
     // TODO(aks681): Once worked examples are introduced, modify the below
     // line to take into account the number of worked examples displayed.
-    let copyOfPreviousCard =
-        cloneDeep(this.transcript[this.transcript.length - 2]);
+    let copyOfPreviousCard = cloneDeep(
+      this.transcript[this.transcript.length - 2]
+    );
     copyOfPreviousCard.markAsNotCompleted();
     this.transcript.push(copyOfPreviousCard);
   }
@@ -100,7 +102,7 @@ export class PlayerTranscriptService {
     this.transcript[this.transcript.length - 1].addInputResponsePair({
       learnerInput: input,
       oppiaResponse: null,
-      isHint: isHint
+      isHint: isHint,
     });
   }
 
@@ -121,25 +123,29 @@ export class PlayerTranscriptService {
   getCard(index: number): StateCard {
     if (index !== null && (index < 0 || index >= this.transcript.length)) {
       this.log.error(
-        'Requested card with index ' + index +
+        'Requested card with index ' +
+          index +
           ', but transcript only has length ' +
-          this.transcript.length + ' cards.');
+          this.transcript.length +
+          ' cards.'
+      );
     }
     return this.transcript[index];
   }
 
   getLastAnswerOnDisplayedCard(
-      displayedCardIndex: number
-  ): { answerDetails: string } | string | null {
+    displayedCardIndex: number
+  ): {answerDetails: string} | string | null {
     if (
       this.isLastCard(displayedCardIndex) ||
-        this.transcript[displayedCardIndex].getStateName() === null ||
-        this.transcript[displayedCardIndex].getInputResponsePairs().length ===
-        0) {
+      this.transcript[displayedCardIndex].getStateName() === null ||
+      this.transcript[displayedCardIndex].getInputResponsePairs().length === 0
+    ) {
       return null;
     } else {
-      return this.transcript[displayedCardIndex].
-        getInputResponsePairs().slice(-1)[0].learnerInput;
+      return this.transcript[displayedCardIndex]
+        .getInputResponsePairs()
+        .slice(-1)[0].learnerInput;
     }
   }
 
@@ -173,6 +179,9 @@ export class PlayerTranscriptService {
   }
 }
 
-angular.module('oppia').factory(
-  'PlayerTranscriptService',
-  downgradeInjectable(PlayerTranscriptService));
+angular
+  .module('oppia')
+  .factory(
+    'PlayerTranscriptService',
+    downgradeInjectable(PlayerTranscriptService)
+  );

@@ -16,19 +16,21 @@
  * @fileoverview Component for the donate volunteer links in the footer.
  */
 
-import { Component, ViewEncapsulation } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, ViewEncapsulation} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-footer-donate-volunteer',
   templateUrl: './footer-donate-volunteer.component.html',
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
 export class FooterDonateVolunteerComponent {
   constructor() {}
 }
 
-angular.module('oppia').directive('footerDonateVolunteer',
+angular.module('oppia').directive(
+  'footerDonateVolunteer',
   downgradeComponent({
-    component: FooterDonateVolunteerComponent
-  }) as angular.IDirectiveFactory);
+    component: FooterDonateVolunteerComponent,
+  }) as angular.IDirectiveFactory
+);

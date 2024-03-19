@@ -16,35 +16,34 @@
  * @fileoverview Component for create feedback thread modal.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AlertsService } from 'services/alerts.service';
+import {Component, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-create-feedback-thread-modal',
-  templateUrl: './create-feedback-thread-modal.component.html'
+  templateUrl: './create-feedback-thread-modal.component.html',
 })
-
 export class CreateFeedbackThreadModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   constructor(
-      private ngbActiveModal: NgbActiveModal,
-      private alertsService: AlertsService
+    private ngbActiveModal: NgbActiveModal,
+    private alertsService: AlertsService
   ) {
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   newThreadSubject = '';
   newThreadText = '';
 
   create(newThreadSubject: string, newThreadText: string): void {
     if (!newThreadSubject) {
-      this.alertsService.addWarning(
-        'Please specify a thread subject.');
+      this.alertsService.addWarning('Please specify a thread subject.');
       return;
     }
     if (!newThreadText) {
@@ -53,7 +52,7 @@ export class CreateFeedbackThreadModalComponent
     }
     this.ngbActiveModal.close({
       newThreadSubject: newThreadSubject,
-      newThreadText: newThreadText
+      newThreadText: newThreadText,
     });
   }
 }

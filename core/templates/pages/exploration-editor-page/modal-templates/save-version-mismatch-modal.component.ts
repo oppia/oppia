@@ -16,20 +16,25 @@
  * @fileoverview Component for version mismatch modal.
  */
 
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { LostChange, LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, ElementRef, Input, OnInit} from '@angular/core';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {
+  LostChange,
+  LostChangeObjectFactory,
+} from 'domain/exploration/LostChangeObjectFactory';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-save-version-mismatch-modal',
-  templateUrl: './save-version-mismatch-modal.component.html'
+  templateUrl: './save-version-mismatch-modal.component.html',
 })
 export class SaveVersionMismatchModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   MSECS_TO_REFRESH: number = 20;
   hasLostChanges: boolean = false;
   // The property is initialized using Angular lifecycle hooks
@@ -43,16 +48,17 @@ export class SaveVersionMismatchModalComponent
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
     private lostChangeObjectFactory: LostChangeObjectFactory,
-    private ngbActiveModal: NgbActiveModal,
+    private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.hasLostChanges = (this.lostChanges && this.lostChanges.length > 0);
+    this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     if (this.hasLostChanges) {
       this.lostChanges = this.lostChanges.map(
-        this.lostChangeObjectFactory.createNew);
+        this.lostChangeObjectFactory.createNew
+      );
     }
   }
 
@@ -72,9 +78,9 @@ export class SaveVersionMismatchModalComponent
     // 'getElementsByClassName' returns null if the class name is not
     // found, here we know that the class name is available, so we
     // are explicitly typecasting it to remove type error.
-    let lostChangesData = (
-      this.elRef.nativeElement.getElementsByClassName(
-        'oppia-lost-changes')[0]) as HTMLInputElement;
+    let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
+      'oppia-lost-changes'
+    )[0] as HTMLInputElement;
     let blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
     var elem = document.createElement('a');
     elem.href = URL.createObjectURL(blob);

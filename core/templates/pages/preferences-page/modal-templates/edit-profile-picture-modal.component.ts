@@ -16,19 +16,24 @@
  * @fileoverview Component for edit profile picture modal.
  */
 
-import { ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
-import { SafeResourceUrl } from '@angular/platform-browser';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  ViewChild,
+} from '@angular/core';
+import {SafeResourceUrl} from '@angular/platform-browser';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import Cropper from 'cropperjs';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 require('cropperjs/dist/cropper.min.css');
 
 @Component({
   selector: 'oppia-edit-profile-picture-modal',
-  templateUrl: './edit-profile-picture-modal.component.html'
+  templateUrl: './edit-profile-picture-modal.component.html',
 })
 export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   // 'uploadedImage' will be null if the uploaded svg is invalid or not trusted.
@@ -37,9 +42,9 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   invalidImageWarningIsShown: boolean = false;
   windowIsNarrow: boolean = false;
   allowedImageFormats: readonly string[] = AppConstants.ALLOWED_IMAGE_FORMATS;
-  invalidTagsAndAttributes: { tags: string[]; attrs: string[] } = {
+  invalidTagsAndAttributes: {tags: string[]; attrs: string[]} = {
     tags: [],
-    attrs: []
+    attrs: [],
   };
 
   // 'cropper' is initialized before it is to be used, hence we need to do
@@ -52,7 +57,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     private changeDetectorRef: ChangeDetectorRef,
     private ngbActiveModal: NgbActiveModal,
     private windowDimensionService: WindowDimensionsService,
-    private svgSanitizerService: SvgSanitizerService,
+    private svgSanitizerService: SvgSanitizerService
   ) {
     super(ngbActiveModal);
   }
@@ -64,13 +69,13 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
         this.cropper = new Cropper(profilePicture, {
           minContainerWidth: 500,
           minContainerHeight: 350,
-          aspectRatio: 1
+          aspectRatio: 1,
         });
       } else {
         this.cropper = new Cropper(profilePicture, {
           minContainerWidth: 200,
           minContainerHeight: 200,
-          aspectRatio: 1
+          aspectRatio: 1,
         });
       }
     }
@@ -79,21 +84,24 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   onFileChanged(file: Blob): void {
     this.invalidImageWarningIsShown = false;
     let reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       this.invalidTagsAndAttributes = {
         tags: [],
-        attrs: []
+        attrs: [],
       };
       let imageData = (e.target as FileReader).result as string;
       if (this.svgSanitizerService.isBase64Svg(imageData)) {
-        this.invalidTagsAndAttributes = this.svgSanitizerService
-          .getInvalidSvgTagsAndAttrsFromDataUri(imageData);
-        this.uploadedImage = this.svgSanitizerService.getTrustedSvgResourceUrl(
-          imageData);
+        this.invalidTagsAndAttributes =
+          this.svgSanitizerService.getInvalidSvgTagsAndAttrsFromDataUri(
+            imageData
+          );
+        this.uploadedImage =
+          this.svgSanitizerService.getTrustedSvgResourceUrl(imageData);
       }
       if (!this.uploadedImage) {
         this.uploadedImage = decodeURIComponent(
-          (e.target as FileReader).result as string);
+          (e.target as FileReader).result as string
+        );
       }
       try {
         this.changeDetectorRef.detectChanges();
@@ -112,7 +120,7 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
   reset(): void {
     this.invalidTagsAndAttributes = {
       tags: [],
-      attrs: []
+      attrs: [],
     };
     this.uploadedImage = null;
     this.cropppedImageDataUrl = '';
@@ -127,11 +135,12 @@ export class EditProfilePictureModalComponent extends ConfirmOrCancelModal {
     if (this.cropper === undefined) {
       throw new Error('Cropper has not been initialized');
     }
-    this.cropppedImageDataUrl = (
-      this.cropper.getCroppedCanvas({
+    this.cropppedImageDataUrl = this.cropper
+      .getCroppedCanvas({
         height: 150,
-        width: 150
-      }).toDataURL());
+        width: 150,
+      })
+      .toDataURL();
     super.confirm(this.cropppedImageDataUrl);
   }
 
