@@ -45,6 +45,7 @@ import {UserExplorationPermissionsService} from '../../services/user-exploration
 import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 
 class MockNgbModal {
   open() {
@@ -74,12 +75,49 @@ describe('Translator Overview component', () => {
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
 
+  class MockUserExplorationPermissionsService {
+    getPermissionsAsync() {
+      return Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
+        canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false,
+      } as ExplorationPermissions);
+    }
+
+    fetchPermissionsAsync() {
+      return Promise.resolve({
+        canUnpublish: false,
+        canReleaseOwnership: false,
+        canPublish: false,
+        canVoiceover: true,
+        canDelete: false,
+        canModifyRoles: false,
+        canEdit: false,
+        canManageVoiceArtist: false,
+      } as ExplorationPermissions);
+    }
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [TranslatorOverviewComponent],
       providers: [
         ExplorationLanguageCodeService,
+        // The UserExplorationPermissionsService has been
+        // mocked here because spying the function of
+        // UserExplorationPermissionsService is not able to
+        // stop afterAll error i.e. ContextService should not
+        // be used outside the context of an exploration or a question.
+        {
+          provide: UserExplorationPermissionsService,
+          useClass: MockUserExplorationPermissionsService,
+        },
         {
           provide: NgbModal,
           useClass: MockNgbModal,
