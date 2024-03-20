@@ -274,7 +274,8 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         voice_artist_id: str,
         language_code_to_accent: Dict[str, str]
     ) -> VoiceArtistMetadataModel:
-        """Creates a new VoiceArtistMetadataModel instance.
+        """Creates a new VoiceArtistMetadataModel instance. This method will
+        only be used to put only a single instance of the model.
 
         Args:
             voice_artist_id: str. User ID of the voice artist.
@@ -379,7 +380,8 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
         exploration_id: str,
         content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType,
     ) -> ExplorationVoiceArtistsLinkModel:
-        """Creates a new ExplorationVoiceArtistsLinkModel instance.
+        """Creates a new ExplorationVoiceArtistsLinkModel instance. This method
+        will only be used to put only a single instance of the model.
 
         Args:
             exploration_id: str. The ID of the exploration for which new model

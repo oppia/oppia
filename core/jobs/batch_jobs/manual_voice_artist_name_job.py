@@ -93,7 +93,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 user_id = exp_snapshot_metadata_model.committer_id
         except Exception as e:
             raise Exception(
-                'The exploration commit log entry model for the given ID: %s, '
+                'The exploration snapshot metadata model for the given ID: %s, '
                 'does not exist' % snapshot_model_id
             ) from e
 
@@ -233,7 +233,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 latest version of an exploration.
             voiceover_mapping: VoiceoverMappingType. A dictionary with content
                 IDs as keys and nested dicts as values. Each nested dictionary
-                maps language codes to voiceover dicts that are present in
+                maps language codes to voiceover dicts that are added in
                 some version of an exploration.
             content_id_to_voiceovers_mapping_tuple:
                 ContentIdToVoiceoverMappingType. A dictionary with content IDs
@@ -290,7 +290,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                     latest_content_id_to_voiceover_mapping[
                         content_id][lang_code])
 
-                # If some old exploration commits contains voiceovers that do
+                # If some old exploration commit contains voiceovers that do
                 # not match the latest voiceover, then we should skip the
                 # iteration.
                 if voiceover_dict != latest_voiceover_dict_in_given_language:

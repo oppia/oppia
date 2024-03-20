@@ -260,7 +260,7 @@ def create_exploration_voice_artists_link_model_instance(
 ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
     """This method instantiates an ExplorationVoiceArtistsLinkModel,
     establishing a link between the latest content IDs within an exploration
-    and the corresponding voice artist IDs who provided voiceovers in the
+    and the corresponding IDs of voice artists who provided voiceovers in the
     specified language code. Instances of this class are keyed by the
     exploration ID.
 
@@ -271,11 +271,14 @@ def create_exploration_voice_artists_link_model_instance(
             dictionary with content IDs as keys and nested dicts as values. Each
             nested dict contains language codes as keys and a 2-tuple as values.
             The 2-tuple contains voice artist ID as the first element and
-            VoiceoverDict as the second element.
+            VoiceoverDict as the second element. The dict is used to establish
+            a link between exploration ID and all the contents and voiceovers
+            mapping.
 
     Returns:
-        ExplorationVoiceArtistsLinkModel. A newly created
-        ExplorationVoiceArtistsLinkModel instance.
+        ExplorationVoiceArtistsLinkModel. An instance of
+        ExplorationVoiceArtistsLinkModel to find out which voice artists
+        worked on the latest voiceovers of an exploration.
     """
     exploration_voice_artists_link_model = (
         voiceover_models.ExplorationVoiceArtistsLinkModel(
