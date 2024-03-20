@@ -188,7 +188,12 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in selecting a category from dropdawn.
    */
   async selectACategory(category: string): Promise<void> {
-    await this.page.waitForSelector(`${categoryDropDawn}`, {visible: true});
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
+    await this.page.waitForTimeout(500);
     await this.clickOn(categoryDropDawn);
     await this.clickOn(category);
   }
