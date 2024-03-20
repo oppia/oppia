@@ -153,10 +153,10 @@ export class BaseUser {
     selector: string | ElementHandle<Element>
   ): Promise<void> {
     try {
-      const element =
+      const element = (
         typeof selector === 'string'
           ? await this.page.waitForSelector(selector)
-          : selector;
+          : selector);
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       throw new Error(`Element ${selector} took too long to be clickable.`);
