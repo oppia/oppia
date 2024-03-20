@@ -266,7 +266,7 @@ class VoiceoverContributionHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    voiceover_contribution_enabled: bool
+    enable_voiceover_contribution: bool
 
 
 class VoiceoverContributionHandler(
@@ -280,7 +280,7 @@ class VoiceoverContributionHandler(
     HANDLER_ARGS_SCHEMAS = {
         'GET': {},
         'PUT': {
-            'voiceover_contribution_enabled': {
+            'enable_voiceover_contribution': {
                 'schema': {
                     'type': 'bool'
                 },
@@ -297,9 +297,9 @@ class VoiceoverContributionHandler(
     def get(self) -> None:
         """Retrieves the configuration values for voiceover contribution."""
         self.render_json({
-            'voiceover_contribution_enabled': (
+            'enable_voiceover_contribution': (
                 platform_parameter_services.get_platform_parameter_value(
-                    'voiceover_contribution_enabled'))
+                    'enable_voiceover_contribution'))
         })
 
     @acl_decorators.can_access_release_coordinator_page
@@ -308,29 +308,29 @@ class VoiceoverContributionHandler(
         assert self.user_id is not None
         assert self.normalized_payload is not None
 
-        voiceover_contribution_enabled_value = (
-            self.normalized_payload['voiceover_contribution_enabled'])
+        enable_voiceover_contribution_value = (
+            self.normalized_payload['enable_voiceover_contribution'])
 
-        rules_for_voiceover_contribution_enabled_value = [
+        rules_for_enable_voiceover_contribution_value = [
             platform_parameter_domain.PlatformParameterRule.from_dict({
                 'filters': [],
-                'value_when_matched': voiceover_contribution_enabled_value
+                'value_when_matched': enable_voiceover_contribution_value
             })
         ]
 
-        voiceover_contribution_enabled_parameter = (
+        enable_voiceover_contribution_parameter = (
             registry.Registry.get_platform_parameter(
                 platform_parameter_list.ParamName.
-                VOICEOVER_CONTRIBUTION_ENABLED.value
+                ENABLE_VOICEOVER_CONTRIBUTION.value
             )
         )
 
         registry.Registry.update_platform_parameter(
-            'voiceover_contribution_enabled',
+            'enable_voiceover_contribution',
             self.user_id,
-            'Update voiceover_contribution_enabled property from release '
+            'Update enable_voiceover_contribution property from release '
             'coordinator page.',
-            rules_for_voiceover_contribution_enabled_value,
-            voiceover_contribution_enabled_parameter.default_value)
+            rules_for_enable_voiceover_contribution_value,
+            enable_voiceover_contribution_parameter.default_value)
 
         self.render_json({})

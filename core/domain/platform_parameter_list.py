@@ -54,7 +54,7 @@ class ParamName(enum.Enum):
     UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY = (
         'unpublish_exploration_email_html_body')
     RECORD_PLAYTHROUGH_PROBABILITY = 'record_playthrough_probability'
-    VOICEOVER_CONTRIBUTION_ENABLED = 'voiceover_contribution_enabled'
+    ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
 
 
 ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
@@ -82,5 +82,5 @@ ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
     ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
     ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,
     ParamName.RECORD_PLAYTHROUGH_PROBABILITY,
-    ParamName.VOICEOVER_CONTRIBUTION_ENABLED
+    ParamName.ENABLE_VOICEOVER_CONTRIBUTION
 ]

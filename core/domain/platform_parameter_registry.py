@@ -356,7 +356,7 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamName.VOICEOVER_CONTRIBUTION_ENABLED,
+    ParamName.ENABLE_VOICEOVER_CONTRIBUTION,
     'Whether the voiceover contribution should be enabled for all users',
     platform_parameter_domain.DataTypes.BOOL,
     default=True

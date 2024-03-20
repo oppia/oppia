@@ -23,7 +23,7 @@ import {Injectable} from '@angular/core';
 import {ServicesConstants} from 'services/services.constants';
 
 export interface VoiceoverContributionBackendDict {
-  voiceover_contribution_enabled: boolean;
+  enable_voiceover_contribution: boolean;
 }
 
 @Injectable({
@@ -42,7 +42,7 @@ export class VoiceoverContributionBackendApiService {
         .toPromise()
         .then(
           response => {
-            resolve(response.voiceover_contribution_enabled);
+            resolve(response.enable_voiceover_contribution);
           },
           errorResponse => {
             reject(errorResponse.error.error);
@@ -52,14 +52,14 @@ export class VoiceoverContributionBackendApiService {
   }
 
   async updateVoiceoverContributionDataAsync(
-    voiceoverContributionEnabled: boolean
+    enableVoiceoverContribution: boolean
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http
         .put<VoiceoverContributionBackendDict>(
           ServicesConstants.VOICEOVER_CONTRIBUTION_IS_ENABLED_URL,
           {
-            voiceover_contribution_enabled: voiceoverContributionEnabled,
+            enable_voiceover_contribution: enableVoiceoverContribution,
           }
         )
         .toPromise()

@@ -94,10 +94,10 @@ describe('Voiceover contribution backend api service', () => {
   it('should make request to update voiceover contribution is enabled data', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    let voiceoverContributionEnabled = true;
+    let enableVoiceoverContribution = true;
 
     voiceoverContributionBackendApiService
-      .updateVoiceoverContributionDataAsync(voiceoverContributionEnabled)
+      .updateVoiceoverContributionDataAsync(enableVoiceoverContribution)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -106,7 +106,7 @@ describe('Voiceover contribution backend api service', () => {
 
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual({
-      voiceover_contribution_enabled: voiceoverContributionEnabled,
+      enable_voiceover_contribution: enableVoiceoverContribution,
     });
     req.flush({status: 200, statusText: 'Success.'});
     flushMicrotasks();
@@ -118,10 +118,10 @@ describe('Voiceover contribution backend api service', () => {
   it('should use reject hanlder while updating voiceover contribution data', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
-    let voiceoverContributionEnabled = true;
+    let enableVoiceoverContribution = true;
 
     voiceoverContributionBackendApiService
-      .updateVoiceoverContributionDataAsync(voiceoverContributionEnabled)
+      .updateVoiceoverContributionDataAsync(enableVoiceoverContribution)
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
@@ -129,7 +129,7 @@ describe('Voiceover contribution backend api service', () => {
     );
     expect(req.request.method).toEqual('PUT');
     expect(req.request.body).toEqual({
-      voiceover_contribution_enabled: voiceoverContributionEnabled,
+      enable_voiceover_contribution: enableVoiceoverContribution,
     });
 
     req.flush(

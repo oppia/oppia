@@ -930,7 +930,7 @@ class VoiceoverContributionHandlerTest(test_utils.GenericTestBase):
         response = self.get_json('/voiceover_contribution_handler')
         self.assertEqual(
             response, {
-                'voiceover_contribution_enabled': True,
+                'enable_voiceover_contribution': True,
             })
 
     def test_release_coordinator_able_to_update_voiceover_enable_config(
@@ -942,19 +942,19 @@ class VoiceoverContributionHandlerTest(test_utils.GenericTestBase):
         response = self.get_json('/voiceover_contribution_handler')
         self.assertEqual(
             response, {
-                'voiceover_contribution_enabled': True,
+                'enable_voiceover_contribution': True,
             })
 
         response = self.put_json(
             '/voiceover_contribution_handler', {
-                'voiceover_contribution_enabled': False,
+                'enable_voiceover_contribution': False,
             }, csrf_token=csrf_token)
         self.assertEqual(response, {})
 
         response = self.get_json('/voiceover_contribution_handler')
         self.assertEqual(
             response, {
-                'voiceover_contribution_enabled': False,
+                'enable_voiceover_contribution': False,
             })
 
         self.logout()
