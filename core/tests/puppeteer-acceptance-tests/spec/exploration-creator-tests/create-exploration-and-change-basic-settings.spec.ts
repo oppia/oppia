@@ -25,7 +25,7 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Creator', function () {
   let explorationCreator: ExplorationCreator;
-  let explorationVisitor: ExplorationCreator;
+  let exploration_visitor: ExplorationCreator;
   let superAdmin: SuperAdmin;
 
   beforeAll(async function () {
@@ -33,8 +33,8 @@ describe('Exploration Creator', function () {
       'explorationAdm',
       'exploration_creator@example.com'
     );
-    explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor',
+    exploration_visitor = await UserFactory.createNewUser(
+      'explorationVisit',
       'exploration_visitor@example.com'
     );
     superAdmin = await UserFactory.createNewSuperAdmin('Leader');
@@ -51,8 +51,8 @@ describe('Exploration Creator', function () {
       'guest_user3@example.com'
     );
 
-    await guestUser2.closeBrowser();
     await guestUser1.closeBrowser();
+    await guestUser2.closeBrowser();
     await guestUser3.closeBrowser();
 
     await superAdmin.assignRoleToUser('explorationAdm', 'voiceover admin');
@@ -84,13 +84,14 @@ describe('Exploration Creator', function () {
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
       await explorationCreator.expectGoalToEqual('OppiaAcceptanceTestsCheck');
 
-      await explorationCreator.selectAlgebraAsACategory();
+      await explorationCreator.selectACategory('Algebra');
       await explorationCreator.expectSelectedCategoryToBe('Algebra');
 
-      await explorationCreator.selectEnglishAsLanguage();
+      await explorationCreator.selectALanguage('English');
       await explorationCreator.expectSelectedLanguageToBe('English');
 
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
+      await explorationCreator.expectTagsToBeAdded(['TagA', 'TagB', 'TagC']);
 
       await explorationCreator.updateSettingsSuccessfully();
 
@@ -115,7 +116,7 @@ describe('Exploration Creator', function () {
       await explorationCreator.expectEmailNotificationToBeActivated();
 
       await explorationCreator.deleteExploration();
-      await explorationVisitor.expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
+      await exploration_visitor.expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
     },
     DEFAULT_SPEC_TIMEOUT
   );

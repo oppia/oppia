@@ -16,9 +16,9 @@
  * @fileoverview exploration management test file
  */
 
+import {error} from 'console';
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
-import {error} from 'console';
 
 const creatorDashboardUrl = 'http://localhost:8181/creator-dashboard';
 const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
@@ -44,8 +44,8 @@ const feedbackToggleOff = 'label[for="feedback-switch"]';
 const editbutton = '.oppia-edit-roles-btn';
 const addUserName = '#newMemberUsername';
 const addRoleBar = '#mat-select-value-11';
-const collaboratorRoleOption = ' Collaborator ';
-const playTesterRoleOption = ' Playtester ';
+const collaborator = 'Collaborator (can make changes)';
+const playtester = 'Playtester (can give feedback)';
 const saveRole = '.e2e-test-save-role';
 const deleteExplorationButton = '.oppia-delete-button';
 const saveDraftButton = '.oppia-save-draft-button';
@@ -172,7 +172,7 @@ export class ExplorationCreator extends BaseUser {
    * This function checks if the goal has been set in the exploration.
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
-    await this.clickOn(addGoal);
+    await this.page.waitForSelector('.e2e-test-exploration-objective-input');
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input'
     );
@@ -187,23 +187,20 @@ export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in selecting a category from dropdawn.
    */
-  async selectAlgebraAsACategory(): Promise<void> {
+  async selectACategory(category: string): Promise<void> {
     await this.clickOn(categoryDropDawn);
-    await this.clickOn('Algebra');
+    await this.clickOn(category);
   }
 
   /**
    * This function checks if a category has been selected for the exploration.
    */
   async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
-    const categoryDropdown = await this.page.$('.mat-select-arrow-wrapper');
-    if (!categoryDropdown) {
-      throw new Error('Category dropdown not found.');
-    }
-    await categoryDropdown.click();
+    await this.page.waitForSelector('.mat-select-value');
     const selectedCategory = await this.page.evaluate(() => {
-      return (document.querySelector('mat-option-230') as HTMLElement)
-        .innerText;
+      return (
+        document.querySelector('.mat-select-value') as HTMLElement
+      ).innerText.trim();
     });
     if (selectedCategory === expectedCategory) {
       showMessage(
@@ -212,24 +209,24 @@ export class ExplorationCreator extends BaseUser {
     } else {
       throw new Error('Category is not correct.');
     }
-    await categoryDropdown.click();
   }
 
   /**
    * This function helps in selecting language from dropdawn.
    */
-  async selectEnglishAsLanguage(): Promise<void> {
+  async selectALanguage(language: string): Promise<void> {
     await this.page.evaluate(() => {
       window.scrollTo(0, 350);
     });
     await this.clickOn(languageUpdateBar);
-    await this.clickOn('English');
+    await this.clickOn(language);
   }
 
   /**
    *  This function verifies that the selected language is displayed correctly.
    */
   async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
+    await this.page.waitForSelector(languageUpdateBar);
     const languageDropdown = await this.page.$(languageUpdateBar);
     if (!languageDropdown) {
       throw new Error('Category dropdown not found.');
@@ -237,7 +234,9 @@ export class ExplorationCreator extends BaseUser {
     await languageDropdown.click();
 
     const selectedLanguage = await this.page.evaluate(() => {
-      return (document.querySelector('#mat-option-6') as HTMLElement).innerText;
+      return (
+        document.querySelector('.mat-option.mat-selected') as HTMLElement
+      ).innerText.trim();
     });
     if (selectedLanguage === expectedLanguage) {
       showMessage(
@@ -254,7 +253,7 @@ export class ExplorationCreator extends BaseUser {
   async addTags(TagNames: string[]): Promise<void> {
     for (let i = 0; i < 3; i++) {
       await this.clickOn(addTags);
-      await this.type(addTags, TagNames[i]);
+      await this.type(addTags, TagNames[i].toLowerCase());
       await this.clickOn('.secondary-info-text');
     }
   }
@@ -266,13 +265,27 @@ export class ExplorationCreator extends BaseUser {
   /**
    * This function checks if tags are successfully added.
    */
-  async expectTagsToBeAdded(): Promise<void> {
-    const tags = await this.page.$$('#mat-chip-list-input-0');
-    if (tags.length > 0) {
-      showMessage(`${tags.length} tags added successfully.`);
-    } else {
-      throw new Error('Tags are not added.');
+  async expectTagsToBeAdded(expectedTags: string[]): Promise<void> {
+    const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
+    await this.page.waitForSelector('mat-chip-list');
+
+    const addedTags = await this.page.evaluate(() => {
+      const tagElements = Array.from(document.querySelectorAll('mat-chip'));
+      return tagElements
+        .map(tag => {
+          const textContent =
+            tag.querySelector('.mat-chip-remove')?.previousSibling?.textContent;
+          return textContent ? textContent.trim() : '';
+        })
+        .filter(Boolean);
+    });
+    for (const expectedTag of lowercaseExpectedTags) {
+      if (!addedTags.includes(expectedTag)) {
+        throw new Error(`Tag "${expectedTag}" was not added.`);
+      }
     }
+
+    showMessage('All expected tags were added successfully.');
   }
 
   /**
@@ -291,6 +304,7 @@ export class ExplorationCreator extends BaseUser {
    * This function verifies that the preview summary is visible.
    */
   async expectPreviewSummaryToBeVisible(): Promise<void> {
+    await this.page.waitForSelector('.e2e-test-open-preview-summary-modal');
     const previewSummary = await this.page.$(
       '.e2e-test-open-preview-summary-modal'
     );
@@ -315,6 +329,7 @@ export class ExplorationCreator extends BaseUser {
    * setting is enabled or disabled.
    */
   async expectAutomaticTextToSpeechToBeEnabled(): Promise<void> {
+    await this.page.waitForSelector('#text-speech-switch');
     const autoTTSwitch = await this.page.$('#text-speech-switch');
     const isAutoTTSwitchOn = await this.page.evaluate(
       switchElement => switchElement.checked,
@@ -332,10 +347,10 @@ export class ExplorationCreator extends BaseUser {
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
     await this.clickOn(editbutton);
-    await this.clickOn(addUserName);
+    await this.clickOn(addUserName); //can be deleted
     await this.type(addUserName, username);
     await this.clickOn(addRoleBar);
-    await this.clickOn(collaboratorRoleOption);
+    await this.clickOn(collaborator);
     await this.clickOn(saveRole);
   }
 
@@ -347,7 +362,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(addUserName);
     await this.type(addUserName, username);
     await this.clickOn(addRoleBar);
-    await this.clickOn(playTesterRoleOption);
+    await this.clickOn(playtester);
     await this.clickOn(saveRole);
   }
 
@@ -393,6 +408,7 @@ export class ExplorationCreator extends BaseUser {
    * and suggestion notifications via email
    */
   async expectEmailNotificationToBeActivated(): Promise<void> {
+    await this.page.waitForSelector('input[id="feedback-switch"]');
     const input = await this.page.$('input[id="feedback-switch"]');
 
     if (!input) {
@@ -444,6 +460,7 @@ export class ExplorationCreator extends BaseUser {
    * This function checks whether changes has been drafted or not.
    */
   async expectExplorationToBeDraftedSuccessfully(): Promise<void> {
+    await this.page.waitForSelector('#tutorialSaveButton');
     const button = await this.page.$('#tutorialSaveButton');
 
     if (!button) {
@@ -497,9 +514,12 @@ export class ExplorationCreator extends BaseUser {
   async discardCurrentChanges(): Promise<void> {
     await this.clickOn('.e2e-test-settings-container');
     await this.clickOn('button.e2e-test-save-discard-toggle');
-    await this.page.waitForSelector(
-      'a.e2e-test-discard-changes:not([disabled])'
-    );
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
+    await this.page.waitForTimeout(400);
     await this.clickOn(discardDraftButton);
     await this.page.waitForSelector('.e2e-test-confirm-discard-changes', {
       visible: true,
@@ -513,12 +533,7 @@ export class ExplorationCreator extends BaseUser {
    *This function checks whether changes has discarded successfully or not.
    */
   async expectTitleToBe(titleBeforeChanges: string): Promise<void> {
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(400);
+    await this.page.waitForSelector('.e2e-test-exploration-title-input');
     const titleInput = await this.page.$('.e2e-test-exploration-title-input');
     const titleAfterChanges = await this.page.evaluate(
       input => input.value,
