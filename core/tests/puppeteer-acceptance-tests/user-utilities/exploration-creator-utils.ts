@@ -188,6 +188,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in selecting a category from dropdawn.
    */
   async selectACategory(category: string): Promise<void> {
+    await this.page.waitForSelector(`${categoryDropDawn}`, {visible: true});
     await this.clickOn(categoryDropDawn);
     await this.clickOn(category);
   }
