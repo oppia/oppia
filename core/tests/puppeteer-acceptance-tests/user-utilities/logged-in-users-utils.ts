@@ -534,7 +534,7 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Blog page.
    */
   async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
+    if (!this.isViewportAtMobileWidth()) {
       await this.clickOn(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabBlogButton,
