@@ -1840,56 +1840,62 @@ def get_all_published_story_exploration_ids(
     # use the topic to compute the mapping. Add each computed mapping to
     # the list of persisted mappings.
     mappings = []
-    ids_of_summaries_without_persisted_mapping: List[str] = []
+    ids_of_topic_summaries_without_mapping: List[str] = []
     for summary in fetched_topic_summaries:
         if summary.published_story_exploration_mapping is None:
-            ids_of_summaries_without_persisted_mapping.append(summary.id)
+            ids_of_topic_summaries_without_mapping.append(summary.id)
         else:
             mappings.append(
                 summary.published_story_exploration_mapping)
-    if len(ids_of_summaries_without_persisted_mapping) > 0:
-        topics = topic_fetchers.get_topics_by_ids(
-            ids_of_summaries_without_persisted_mapping)
+    if len(ids_of_topic_summaries_without_mapping) > 0:
+        topics_without_mapping = topic_fetchers.get_topics_by_ids(
+            ids_of_topic_summaries_without_mapping
+        )
 
-        published_story_ids = [
+        published_story_ids_grouped_by_topic = [
             [
                 story_ref.story_id for story_ref
                 in topic.canonical_story_references +
                     topic.additional_story_references
                 if story_ref.story_is_published
             ]
-            for topic in topics if topic is not None
+            for topic in topics_without_mapping if topic is not None
         ]
-        published_story_accumulative_counts = [0] + list(
-            itertools.accumulate([
+        accumulative_published_story_counts_by_topic = list(
+            itertools.accumulate([0] + [
                 len(topic_published_story_ids)
-                for topic_published_story_ids in published_story_ids
+                for topic_published_story_ids
+                in published_story_ids_grouped_by_topic[:-1]
             ])
         )
 
-        published_stories_in_all_topics = [
+        published_stories_in_all_topics_without_mapping = [
             story for story in story_fetchers.get_stories_by_ids(
-                list(itertools.chain.from_iterable(published_story_ids)),
+                list(itertools.chain.from_iterable(
+                    published_story_ids_grouped_by_topic
+                )),
                 strict=False
             )
             if story is not None
         ]
-        published_stories = [
+        published_stories_grouped_by_topic = [
             [
-                published_stories_in_all_topics[
-                    published_story_accumulative_counts[i] + j
+                published_stories_in_all_topics_without_mapping[
+                    accumulative_published_story_counts_by_topic[i] + j
                 ]
-                for j in range(len(published_story_ids[i]))
+                for j in range(len(published_story_ids_grouped_by_topic[i]))
             ]
-            for i in range(len(published_story_ids))
+            for i in range(len(published_story_ids_grouped_by_topic))
         ]
 
-        for topic_published_stories in published_stories:
+        for published_stories_in_topic in published_stories_grouped_by_topic:
             mappings.append(_compute_story_exploration_mapping(
-                topic_published_stories))
+                published_stories_in_topic
+            ))
 
     exp_ids = itertools.chain.from_iterable(
         itertools.chain.from_iterable(mapping.values())
-        for mapping in mappings)
+        for mapping in mappings
+    )
 
     return list(set(exp_ids))
