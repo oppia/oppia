@@ -16,43 +16,49 @@
  * @fileoverview Diagnostic Test Player page root component.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { MetaTagData } from 'pages/base-root.component';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { PageHeadService } from 'services/page-head.service';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {AppConstants} from 'app.constants';
+import {MetaTagData} from 'pages/base-root.component';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-diagnostic-test-player-page-root',
   templateUrl: './diagnostic-test-player-page-root.component.html',
 })
 export class DiagnosticTestPlayerPageRootComponent implements OnInit {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-    .DIAGNOSTIC_TEST_PLAYER.TITLE;
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.TITLE;
 
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .DIAGNOSTIC_TEST_PLAYER.META as unknown as Readonly<MetaTagData>[];
 
   errorPageIsShown: boolean = false;
   pageIsShown: boolean = false;
 
   constructor(
     private avbas: AccessValidationBackendApiService,
-    private pageHeadService: PageHeadService
+    private pageHeadService: PageHeadService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.avbas.validateAccessToDiagnosticTestPlayerPage().then(() => {
-      this.errorPageIsShown = false;
-      this.pageIsShown = true;
-      this.pageHeadService.updateTitleAndMetaTags(
-        AppConstants.
-          PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.TITLE,
-        AppConstants.
-          PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER.META);
-    }, () => {
-      this.errorPageIsShown = true;
-    });
+    this.avbas.validateAccessToDiagnosticTestPlayerPage().then(
+      () => {
+        this.pageIsShown = true;
+        this.pageHeadService.updateTitleAndMetaTags(
+          AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
+            .TITLE,
+          AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
+            .META
+        );
+      },
+      () => {
+        this.router.navigate([
+          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+        ]);
+      }
+    );
   }
 }
