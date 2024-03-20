@@ -16,33 +16,21 @@
  * @fileoverview Module for the diagnostic test player page.
  */
 
-import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
-import {APP_INITIALIZER, DoBootstrap, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
-import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
-import {downgradeComponent, downgradeModule} from '@angular/upgrade/static';
-import {RouterModule} from '@angular/router';
-import {APP_BASE_HREF} from '@angular/common';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import {NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTooltipModule } from '@angular/material/tooltip';
-
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { DiagnosticTestPlayerComponent } from './diagnostic-test-player.component';
-import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { SummaryTilesModule } from 'components/summary-tile/summary-tile.module';
-import { DiagnosticTestPlayerPageRootComponent } from './diagnostic-test-player-page-root.component';
-import { CommonModule } from '@angular/common';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
-import { DiagnosticTestPlayerPageRoutingModule } from './diagnostic-test-player-page-routing.module';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {DiagnosticTestPlayerComponent} from './diagnostic-test-player.component';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
+import {SummaryTilesModule} from 'components/summary-tile/summary-tile.module';
+import {DiagnosticTestPlayerPageRootComponent} from './diagnostic-test-player-page-root.component';
+import {CommonModule} from '@angular/common';
+import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
+import {DiagnosticTestPlayerPageRoutingModule} from './diagnostic-test-player-page-routing.module';
 
 @NgModule({
   imports: [
@@ -59,15 +47,15 @@ import { DiagnosticTestPlayerPageRoutingModule } from './diagnostic-test-player-
     SummaryTilesModule,
     ToastrModule.forRoot(toastrConfig),
     Error404PageModule,
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
   declarations: [
     DiagnosticTestPlayerComponent,
-    DiagnosticTestPlayerPageRootComponent
+    DiagnosticTestPlayerPageRootComponent,
   ],
   entryComponents: [
     DiagnosticTestPlayerComponent,
-    DiagnosticTestPlayerPageRootComponent
+    DiagnosticTestPlayerPageRootComponent,
   ],
 })
 export class DiagnosticTestPlayerPageModule {}
