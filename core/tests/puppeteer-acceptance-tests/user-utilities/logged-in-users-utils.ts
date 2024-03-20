@@ -101,9 +101,6 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
-
-const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
-
 export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -170,7 +167,7 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the About page.
    */
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
-    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
@@ -291,7 +288,7 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens The About Foundation page.
    */
   async clickAboutFoundationButtonInAboutMenuOnNavbar(): Promise<void> {
-    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarAboutFoundationButton);
     } else {
@@ -537,7 +534,7 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Blog page.
    */
   async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
-    if (this.viewport.width >= VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabBlogButton,
@@ -553,7 +550,7 @@ export class LoggedInUser extends BaseUser {
    * Get Involved Menu on navbar and check if it opens the Partnerships page.
    */
   async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -578,7 +575,7 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Volunteer page.
    */
   async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -603,7 +600,7 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Donate page.
    */
   async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -628,7 +625,7 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Partnerships page.
    */
   async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -653,7 +650,7 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Donate page.
    */
   async clickDonateButtonOnNavbar(): Promise<void> {
-    if (this.viewport.width >= VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (!this.isViewportAtMobileWidth()) {
       await this.clickButtonToNavigateToNewPage(
         navbarDonateButton,
         'Donate button on navbar',
@@ -682,9 +679,7 @@ export class LoggedInUser extends BaseUser {
     ]);
 
     const url = this.page.url().split('?')[0];
-    const deviceHasMobileWidth =
-      this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX;
-    const expectedWatchAVideoUrl = deviceHasMobileWidth
+    const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
       ? mobileWatchAVideoUrl
       : desktopWatchAVideoUrl;
     if (url !== expectedWatchAVideoUrl) {

@@ -21,6 +21,8 @@ import testConstants from './test-constants';
 import isElementClickable from '../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
 
+const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
  * 'beforeunload' due to an issue with Chromium (see
@@ -151,12 +153,11 @@ export class BaseUser {
     selector: string | ElementHandle<Element>
   ): Promise<void> {
     try {
-      if (typeof selector === 'string') {
-        const element = await this.page.waitForSelector(selector);
-        await this.page.waitForFunction(isElementClickable, {}, element);
-      } else {
-        await this.page.waitForFunction(isElementClickable, {}, selector);
-      }
+      const element =
+        typeof selector === 'string'
+          ? await this.page.waitForSelector(selector)
+          : selector;
+      await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       throw new Error(`Element ${selector} took too long to be clickable.`);
     }
@@ -233,12 +234,29 @@ export class BaseUser {
     await this.browserObject.close();
   }
 
+  /**
+   * This function returns the current viewport of the page.
+   */
   get viewport(): Viewport {
     const viewport = this.page.viewport();
     if (viewport === null) {
       throw new Error('Viewport is not defined.');
     }
     return viewport;
+  }
+
+  /**
+   * This function checks if the viewport is at mobile width.
+   */
+  isViewportAtMobileWidth(): boolean {
+    return this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX;
+  }
+
+  /**
+   * This function gets the current URL of the page without parameters.
+   */
+  async getCurrentUrlWithoutParameters(): Promise<string> {
+    return this.page.url().split('?')[0];
   }
 }
 

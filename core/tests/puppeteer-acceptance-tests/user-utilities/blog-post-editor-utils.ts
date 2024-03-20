@@ -38,8 +38,6 @@ const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
 
-const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
-
 export class BlogPostEditor extends BaseUser {
   /**
    * Function for adding blog post author bio in blog dashboard.
@@ -131,7 +129,7 @@ export class BlogPostEditor extends BaseUser {
    * This function uploads a blog post thumbnail image.
    */
   async uploadBlogPostThumbnailImage(): Promise<void> {
-    if (this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX) {
+    if (this.isViewportAtMobileWidth()) {
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
     } else {

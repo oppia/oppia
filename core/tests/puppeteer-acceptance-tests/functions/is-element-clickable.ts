@@ -166,13 +166,11 @@ export default function isElementClickable(element: Element): boolean {
    * then it checks if it is disabled.
    */
   const isElementDisabled = (element: Element): boolean => {
-    if (
-      element instanceof HTMLFormElement ||
-      element instanceof HTMLButtonElement
-    ) {
-      return element.disabled;
-    }
-    return false;
+    return (
+      (element instanceof HTMLFormElement ||
+        element instanceof HTMLButtonElement) &&
+      element.disabled
+    );
   };
 
   /**
