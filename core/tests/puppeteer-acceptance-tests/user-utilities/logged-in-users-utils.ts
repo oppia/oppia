@@ -678,7 +678,7 @@ export class LoggedInUser extends BaseUser {
       this.clickOn(watchAVideoButton),
     ]);
 
-    const url = this.page.url().split('?')[0];
+    const url = this.getCurrentUrlWithoutParameters();
     const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
       ? mobileWatchAVideoUrl
       : desktopWatchAVideoUrl;
