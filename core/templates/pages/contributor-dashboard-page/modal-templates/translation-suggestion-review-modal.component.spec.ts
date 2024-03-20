@@ -734,6 +734,7 @@ describe('Translation Suggestion Review Modal Component', function () {
         reviewer_message:
           '(Note: This suggestion was submitted with' + 'reviewer edits.)',
       };
+      component.removedSuggestion = contribution1;
       component.undoReviewAction();
 
       expect(component.hasQueuedSuggestion).toBeFalse();
