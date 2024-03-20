@@ -274,7 +274,7 @@ class VoiceoverContributionHandler(
         VoiceoverContributionHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
-    """Handler for the promo-bar."""
+    """Handler for the voiceover contribution data."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {

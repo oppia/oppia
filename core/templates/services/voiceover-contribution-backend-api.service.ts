@@ -36,7 +36,7 @@ export class VoiceoverContributionBackendApiService {
     return new Promise((resolve, reject) => {
       this.http
         .get<VoiceoverContributionBackendDict>(
-          ServicesConstants.VOICEOVER_CONTRIBUTION_IS_ENABLED_URL,
+          ServicesConstants.ENABLE_VOICEOVER_CONTRIBUTION_URL,
           {}
         )
         .toPromise()
@@ -57,7 +57,7 @@ export class VoiceoverContributionBackendApiService {
     return new Promise((resolve, reject) => {
       this.http
         .put<VoiceoverContributionBackendDict>(
-          ServicesConstants.VOICEOVER_CONTRIBUTION_IS_ENABLED_URL,
+          ServicesConstants.ENABLE_VOICEOVER_CONTRIBUTION_URL,
           {
             enable_voiceover_contribution: enableVoiceoverContribution,
           }

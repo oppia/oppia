@@ -51,7 +51,7 @@ export const ServicesConstants = {
 
   PROMO_BAR_URL: '/promo_bar_handler',
 
-  VOICEOVER_CONTRIBUTION_IS_ENABLED_URL: '/voiceover_contribution_handler',
+  ENABLE_VOICEOVER_CONTRIBUTION_URL: '/voiceover_contribution_handler',
 
   STORE_PLAYTHROUGH_URL: '/explorehandler/store_playthrough/<exploration_id>',
 
