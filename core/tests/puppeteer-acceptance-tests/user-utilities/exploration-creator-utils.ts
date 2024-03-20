@@ -488,6 +488,7 @@ export class ExplorationCreator extends BaseUser {
       '.oppia-editor-publish-button:not([disabled])'
     );
     await this.clickOn(publishButton);
+    await this.page.waitForSelector(`${saveChangesButton}`, {visible: true});
     await this.clickOn(saveChangesButton);
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
