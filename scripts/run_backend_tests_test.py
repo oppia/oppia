@@ -925,8 +925,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             returned_output, coverage = run_backend_tests.check_coverage(
                 False, data_file=data_file)
 
-        returned_res = returned_output
-        self.assertEqual(coverage_report_output, returned_res)
+        self.assertEqual(coverage_report_output, returned_output)
         self.assertEqual(coverage, 62.0)
 
     def test_no_data_to_report_returns_full_coverage(self) -> None:
