@@ -83,8 +83,11 @@
           </mat-slide-toggle>
         </div>
         <div>
-          <p>
+          <p *ngIf="voiceoverContributionForm.controls.enabled.value">
             The field is used to disable voiceover contributions on the exploration editor page during voiceover migration.
+          </p>
+          <p *ngIf="!voiceoverContributionForm.controls.enabled.value">
+            Re-enable voiceover contributions on the exploration editor page.
           </p>
         </div>
         <mat-divider></mat-divider>

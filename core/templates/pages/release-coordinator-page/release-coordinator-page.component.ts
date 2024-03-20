@@ -159,9 +159,9 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
 
     this.voiceoverContributionBackendApiService
       .getVoiceoverContributionDataAsync()
-      .then(voiceoverContributionEnabled => {
+      .then(enableVoiceoverContribution => {
         this.voiceoverContributionForm.patchValue({
-          enabled: voiceoverContributionEnabled,
+          enabled: enableVoiceoverContribution,
         });
       });
   }

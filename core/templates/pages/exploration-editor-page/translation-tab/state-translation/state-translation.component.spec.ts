@@ -62,6 +62,7 @@ import {RouterService} from 'pages/exploration-editor-page/services/router.servi
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {VoiceoverContributionBackendApiService} from 'services/voiceover-contribution-backend-api.service';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -118,6 +119,7 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let voiceoverContributionBackendApiService: VoiceoverContributionBackendApiService;
 
   let explorationState1 = {
     Introduction: {
@@ -299,6 +301,7 @@ describe('State translation component', () => {
         TranslationLanguageService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService,
+        VoiceoverContributionBackendApiService,
         {
           provide: NgbModal,
           useClass: MockNgbModal,
@@ -338,6 +341,10 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
+    voiceoverContributionBackendApiService = TestBed.inject(
+      VoiceoverContributionBackendApiService
+    );
+
     explorationStatesService.init(explorationState1, false);
     stateRecordedVoiceoversService.init(
       'Introduction',
@@ -369,6 +376,10 @@ describe('State translation component', () => {
       translationTabActiveModeService,
       'isVoiceoverModeActive'
     ).and.returnValue(true);
+    spyOn(
+      voiceoverContributionBackendApiService,
+      'getVoiceoverContributionDataAsync'
+    ).and.returnValue(Promise.resolve(true));
 
     explorationStatesService.init(explorationState1, false);
     stateRecordedVoiceoversService.init(

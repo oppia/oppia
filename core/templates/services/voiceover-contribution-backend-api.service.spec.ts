@@ -54,8 +54,8 @@ describe('Voiceover contribution backend api service', () => {
       '/voiceover_contribution_handler'
     );
     expect(req.request.method).toEqual('GET');
-    let voiceoverContributionEnabled = true;
-    req.flush(voiceoverContributionEnabled);
+    let enableVoiceoverContribution = true;
+    req.flush(enableVoiceoverContribution);
 
     flushMicrotasks();
 
