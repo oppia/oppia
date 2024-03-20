@@ -266,7 +266,7 @@ class VoiceoverContributionHandlerNormalizedPayloadDict(TypedDict):
     normalized_payload dictionary.
     """
 
-    voiceover_allowed: bool
+    voiceover_contribution_enabled: bool
 
 
 class VoiceoverContributionHandler(

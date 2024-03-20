@@ -322,7 +322,7 @@
 /core/templates/services/page-title.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/prevent-page-unload-event.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/promo-bar-backend-api.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/voiceover-contribution-backend-api.services*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/voiceover-contribution-backend-api.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/site-analytics.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/utils.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/stateful/background-mask.service*.ts @oppia/lace-frontend-reviewers

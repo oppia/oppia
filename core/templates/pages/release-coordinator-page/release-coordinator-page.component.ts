@@ -20,7 +20,7 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {downgradeComponent} from '@angular/upgrade/static';
 
-import {VoiceoverContributionBackendApiService} from '../../services/voiceover-contribution-backend-api.services';
+import {VoiceoverContributionBackendApiService} from '../../services/voiceover-contribution-backend-api.service';
 
 import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';

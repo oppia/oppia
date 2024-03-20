@@ -328,7 +328,7 @@ import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-
 import { PlaythroughService } from 'services/playthrough.service';
 import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
 import { PromoBarBackendApiService } from 'services/promo-bar-backend-api.service';
-import { VoiceoverContributionBackendApiService } from 'services/voiceover-contribution-backend-api.services';
+import { VoiceoverContributionBackendApiService } from 'services/voiceover-contribution-backend-api.service';
 import { QuestionsListService } from 'services/questions-list.service';
 import { SchemaDefaultValueService } from 'services/schema-default-value.service';
 import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';

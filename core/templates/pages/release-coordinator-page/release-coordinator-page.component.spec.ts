@@ -29,7 +29,7 @@ import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service'
 import {ReleaseCoordinatorBackendApiService} from './services/release-coordinator-backend-api.service';
 import {ReleaseCoordinatorPageConstants} from './release-coordinator-page.constants';
 import {ReleaseCoordinatorPageComponent} from './release-coordinator-page.component';
-import {VoiceoverContributionBackendApiService} from '../../services/voiceover-contribution-backend-api.services';
+import {VoiceoverContributionBackendApiService} from '../../services/voiceover-contribution-backend-api.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {PromoBar} from 'domain/promo_bar/promo-bar.model';
 
@@ -183,12 +183,6 @@ describe('Release coordinator page', () => {
 
     expect(vbas.updateVoiceoverContributionDataAsync).toHaveBeenCalled();
     expect(component.statusMessage).toEqual('Server error: failed to update');
-  }));
-
-  it('should flush memory cache and set success status', fakeAsync(() => {
-    spyOn(rcbas, 'flushMemoryCacheAsync').and.returnValue(Promise.resolve());
-    expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
-    expect(component.statusMessage).toEqual('Server error: failed to flush');
   }));
 
   it('should fetch memory cache profile and set success status', fakeAsync(() => {
