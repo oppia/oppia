@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for collection editor save modal.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { CollectionEditorSaveModalComponent } from './collection-editor-save-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {CollectionEditorSaveModalComponent} from './collection-editor-save-modal.component';
 
 describe('Collection editor save modal component', () => {
   let fixture: ComponentFixture<CollectionEditorSaveModalComponent>;
@@ -27,13 +27,9 @@ describe('Collection editor save modal component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        CollectionEditorSaveModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [CollectionEditorSaveModalComponent],
+      providers: [NgbActiveModal],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

@@ -1,5 +1,11 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Apie Oppia fondą",
+	"I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM": "Sukurta iš vieningos aistros švietimo lygybei",
+	"I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_BUTTON": "TAPKITE SAVANORIU",
+	"I18N_ABOUT_FOUNDATION_PAGE_BUILT_FROM_CONTENT": "Mūsų platforma ir visa kita, ką iki šiol pasiekėme, yra dešimčių aistringų savanorių sunkaus darbo ir bendradarbiavimo dėka. Ženkite kitą žingsnį ir prisijunkite prie mūsų bendruomenės šiandien!",
+	"I18N_ABOUT_FOUNDATION_PAGE_CREATING": "Kuriame sąlygas įdomiam ir veiksmingam mokymuisi nepalankioje padėtyje esantiems pasaulio studentams",
+	"I18N_ABOUT_FOUNDATION_PAGE_CREATING_BUTTON": "SUŽINOKITE DAUGIAU APIE OPPIA",
+	"I18N_ABOUT_FOUNDATION_PAGE_HEADING": "Oppia fondas",
 	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "Apie Oppia fondą | Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "apie jums rūpimą temą.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Gaukite atsiliepimų",

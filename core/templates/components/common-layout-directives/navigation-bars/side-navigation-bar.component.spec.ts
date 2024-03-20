@@ -16,33 +16,38 @@
  * @fileoverview Unit tests for SideNavigationBarComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed, fakeAsync, tick, waitForAsync } from '@angular/core/testing';
-import { APP_BASE_HREF } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {HttpClientModule} from '@angular/common/http';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {APP_BASE_HREF} from '@angular/common';
+import {RouterModule} from '@angular/router';
 
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { SideNavigationBarComponent } from './side-navigation-bar.component';
-import { UserService } from 'services/user.service';
-import { UserInfo } from 'domain/user/user-info.model';
-import { SidebarStatusService } from 'services/sidebar-status.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SideNavigationBarComponent} from './side-navigation-bar.component';
+import {UserService} from 'services/user.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {SidebarStatusService} from 'services/sidebar-status.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 class MockWindowRef {
   nativeWindow = {
     location: {
       pathname: '/test',
-      href: ''
+      href: '',
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 }
-
 
 describe('Side Navigation Bar Component', () => {
   let fixture: ComponentFixture<SideNavigationBarComponent>;
@@ -70,26 +75,23 @@ describe('Side Navigation Bar Component', () => {
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
         SmartRouterModule,
-        RouterModule.forRoot([])
+        RouterModule.forRoot([]),
       ],
-      declarations: [
-        SideNavigationBarComponent,
-        MockTranslatePipe
-      ],
+      declarations: [SideNavigationBarComponent, MockTranslatePipe],
       providers: [
         {
           provide: WindowRef,
-          useValue: mockWindowRef
+          useValue: mockWindowRef,
         },
         {
           provide: UrlInterpolationService,
-          useClass: MockUrlInterpolationService
+          useClass: MockUrlInterpolationService,
         },
         {
           provide: APP_BASE_HREF,
-          useValue: '/'
-        }
-      ]
+          useValue: '/',
+        },
+      ],
     });
   }));
 
@@ -102,7 +104,8 @@ describe('Side Navigation Bar Component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   it('should create', () => {
@@ -147,74 +150,100 @@ describe('Side Navigation Bar Component', () => {
     expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
   });
 
-  it('should navigate to default dashboard when user clicks on ' +
-  'HOME, when not on the default dashboard', fakeAsync(() => {
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
-      Promise.resolve('contributor'));
-    spyOn(sidebarStatusService, 'closeSidebar');
-
-    componentInstance.currentUrl = '/learner-dashboard';
-    componentInstance.navigateToDefaultDashboard();
-    tick();
-
-    expect(sidebarStatusService.closeSidebar).not.toHaveBeenCalled();
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/');
-  }));
-
-  it('should not navigate to default dashboard when user clicks on ' +
-  'HOME, when on the default dashboard', fakeAsync(() => {
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
-    spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
-      Promise.resolve('creator'));
-    spyOn(sidebarStatusService, 'closeSidebar');
-
-    componentInstance.currentUrl = '/creator-dashboard';
-    componentInstance.navigateToDefaultDashboard();
-    tick();
-
-    expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
-  }));
-
-  it('should navigate to classroom page when user clicks on' +
-  '\'Basic Mathematics\'', fakeAsync(() => {
-    expect(mockWindowRef.nativeWindow.location.href).toBe('');
-
-    componentInstance.navigateToClassroomPage('/classroom/url');
-    tick(151);
-
-    expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-  }));
-
-  it('should registers classroom header click event when user clicks' +
-  ' on \'Basic Mathematics\'', () => {
-    spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
-
-    componentInstance.navigateToClassroomPage('/classroom/url');
-
-    expect(siteAnalyticsService.registerClassroomHeaderClickEvent)
-      .toHaveBeenCalled();
-  });
-
-  it('should populate properties properly on component initialization',
+  it(
+    'should navigate to default dashboard when user clicks on ' +
+      'HOME, when not on the default dashboard',
     fakeAsync(() => {
-      let userInfo = new UserInfo(
-        ['USER_ROLE'], true, false, false, false, true,
-        'en', 'username1', 'tester@example.com', true
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+      spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+        Promise.resolve('contributor')
       );
-      spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
-      componentInstance.ngOnInit();
+      spyOn(sidebarStatusService, 'closeSidebar');
+
+      componentInstance.currentUrl = '/learner-dashboard';
+      componentInstance.navigateToDefaultDashboard();
       tick();
-      expect(componentInstance.userIsLoggedIn).toBeTrue();
-    }));
+
+      expect(sidebarStatusService.closeSidebar).not.toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.href).toBe('/');
+    })
+  );
+
+  it(
+    'should not navigate to default dashboard when user clicks on ' +
+      'HOME, when on the default dashboard',
+    fakeAsync(() => {
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+      spyOn(userService, 'getUserPreferredDashboardAsync').and.returnValue(
+        Promise.resolve('creator')
+      );
+      spyOn(sidebarStatusService, 'closeSidebar');
+
+      componentInstance.currentUrl = '/creator-dashboard';
+      componentInstance.navigateToDefaultDashboard();
+      tick();
+
+      expect(sidebarStatusService.closeSidebar).toHaveBeenCalled();
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+    })
+  );
+
+  it(
+    'should navigate to classroom page when user clicks on' +
+      "'Basic Mathematics'",
+    fakeAsync(() => {
+      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+      componentInstance.navigateToClassroomPage('/classroom/url');
+      tick(151);
+
+      expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
+    })
+  );
+
+  it(
+    'should registers classroom header click event when user clicks' +
+      " on 'Basic Mathematics'",
+    () => {
+      spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
+
+      componentInstance.navigateToClassroomPage('/classroom/url');
+
+      expect(
+        siteAnalyticsService.registerClassroomHeaderClickEvent
+      ).toHaveBeenCalled();
+    }
+  );
+
+  it('should populate properties properly on component initialization', fakeAsync(() => {
+    let userInfo = new UserInfo(
+      ['USER_ROLE'],
+      true,
+      false,
+      false,
+      false,
+      true,
+      'en',
+      'username1',
+      'tester@example.com',
+      true
+    );
+    spyOn(userService, 'getUserInfoAsync').and.resolveTo(userInfo);
+    componentInstance.ngOnInit();
+    tick();
+    expect(componentInstance.userIsLoggedIn).toBeTrue();
+  }));
 
   it('should check whether hacky translations are displayed or not', () => {
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValues(false, true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValues(false, false);
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValues(false, true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValues(
+      false,
+      false
+    );
 
     let hackyStoryTitleTranslationIsDisplayed =
       componentInstance.isHackyTopicTitleTranslationDisplayed(0);

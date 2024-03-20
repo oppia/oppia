@@ -16,6 +16,17 @@
  * @fileoverview Module for the diagnostic test player page.
  */
 
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {APP_INITIALIZER, DoBootstrap, NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {downgradeComponent, downgradeModule} from '@angular/upgrade/static';
+import {RouterModule} from '@angular/router';
+import {APP_BASE_HREF} from '@angular/common';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';

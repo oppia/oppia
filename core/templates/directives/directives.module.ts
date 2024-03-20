@@ -18,20 +18,17 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 
-import { FocusOnDirective } from './focus-on.directive';
-import { HeadroomDirective } from './headroom.directive';
-import { MathJaxDirective } from './mathjax.directive';
-import { NgInitDirective } from './ng-init.directive';
+import {FocusOnDirective} from './focus-on.directive';
+import {HeadroomDirective} from './headroom.directive';
+import {MathJaxDirective} from './mathjax.directive';
+import {NgInitDirective} from './ng-init.directive';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-  ],
+  imports: [CommonModule, FormsModule],
   declarations: [
     FocusOnDirective,
     HeadroomDirective,
@@ -46,5 +43,4 @@ import { NgInitDirective } from './ng-init.directive';
     NgInitDirective,
   ],
 })
-
-export class DirectivesModule { }
+export class DirectivesModule {}

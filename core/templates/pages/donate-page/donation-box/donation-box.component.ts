@@ -16,23 +16,27 @@
  * @fileoverview Donation box component
  */
 
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
 
 @Component({
   selector: 'donation-box',
   template: `
     <iframe
       src="https://donorbox.org/embed/oppia-annual-fundraising-campaign-2024"
-      class='e2e-test-donate-page-iframe'
+      class="e2e-test-donate-page-iframe"
       name="donorbox"
       allow="payment"
       seamless="seamless"
       frameborder="0"
       scrolling="no"
       width="100%"
-      title="donorbox">
+      title="donorbox"
+    >
     </iframe>
   `,
 })

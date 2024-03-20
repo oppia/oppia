@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for EmailDashboardQueryModel.
  */
 
-import { EmailDashboardQuery } from
-  'domain/email-dashboard/email-dashboard-query.model';
+import {EmailDashboardQuery} from 'domain/email-dashboard/email-dashboard-query.model';
 
 describe('Email dashboard query model', () => {
   let queryDict = {
@@ -25,10 +24,10 @@ describe('Email dashboard query model', () => {
     status: 'processing',
     submitter_username: 'testUser',
     id: 'buQW4Qhoxpjg',
-    num_qualified_users: 0
+    num_qualified_users: 0,
   };
   let backendDict = {
-    query: queryDict
+    query: queryDict,
   };
 
   it('should correctly convert query dict to query object', () => {

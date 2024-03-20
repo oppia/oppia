@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
  * @fileoverview Utility function for logging the progress of the tests.
  */
 
-let showMessage = function(message) {
+export let showMessage = function (message: string): void {
   // We use console statements to log the progress or feedback of the tests.
   // eslint-disable-next-line no-console
   console.log('LOG: ' + message);
 };
-
-module.exports = { showMessage };

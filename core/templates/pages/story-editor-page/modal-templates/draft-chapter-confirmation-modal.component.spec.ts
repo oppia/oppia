@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for draft chapter confirmation modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { DraftChapterConfirmationModalComponent } from './draft-chapter-confirmation-modal.component';
-
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {DraftChapterConfirmationModalComponent} from './draft-chapter-confirmation-modal.component';
 
 class MockActiveModal {
   dismiss(): void {
@@ -42,15 +41,14 @@ describe('Draft Chapter Confirmation Modal Component', () => {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
-      ]
+          useClass: MockActiveModal,
+        },
+      ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      DraftChapterConfirmationModalComponent);
+    fixture = TestBed.createComponent(DraftChapterConfirmationModalComponent);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
   });

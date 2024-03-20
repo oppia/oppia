@@ -28,26 +28,26 @@ ruleTester.run('disallow-angularjs-properties', rule, {
     var ParentCtrl = function($scope) {
       $scope.cities = ['NY', 'Amsterdam', 'Barcelona'];
     };
-    `
+    `,
   ],
 
   invalid: [
     {
-      code:
-      `
+      code: `
       var ChildCtrl = function($scope) {
         $scope.parentcities = $scope.$parent.cities;
       };
       `,
-      errors: [{
-        message: (
-          'Please do not access parent properties using $parent.' +
-          ' Use the scope object for this purpose.')
-      }]
+      errors: [
+        {
+          message:
+            'Please do not access parent properties using $parent.' +
+            ' Use the scope object for this purpose.',
+        },
+      ],
     },
     {
-      code:
-      `
+      code: `
       angular.module('oppia').directive('sampleDirective', [
       function() {
         return {
@@ -59,11 +59,13 @@ ruleTester.run('disallow-angularjs-properties', rule, {
         };
       }]);
       `,
-      errors: [{
-        message: (
-          'Please do not use $broadcast/$on for propagating events.' +
-        ' Use @Input/@Output instead')
-      }]
-    }
-  ]
+      errors: [
+        {
+          message:
+            'Please do not use $broadcast/$on for propagating events.' +
+            ' Use @Input/@Output instead',
+        },
+      ],
+    },
+  ],
 });

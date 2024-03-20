@@ -16,14 +16,14 @@
  * @fileoverview Component for collection editor save modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-collection-editor-save-modal',
-  templateUrl: './collection-editor-save-modal.component.html'
+  templateUrl: './collection-editor-save-modal.component.html',
 })
 export class CollectionEditorSaveModalComponent extends ConfirmOrCancelModal {
   collectionIsPrivate: boolean = false;

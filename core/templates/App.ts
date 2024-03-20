@@ -23,26 +23,30 @@
  * It won't be required in Angular 9.
  * TODO(#9172): Remove the import when upgraded to Angular 9.
  */
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import 'firebase/auth';
 import 'leaflet/dist/leaflet.css';
-import { ContextService } from 'services/context.service';
+import {ContextService} from 'services/context.service';
 require('app.constants.ajs.ts');
 
 require('components/button-directives/create-activity-button.component.ts');
 require('components/button-directives/social-buttons.component.ts');
 require(
   'components/common-layout-directives/common-elements/' +
-  'alert-message.component.ts');
+    'alert-message.component.ts'
+);
 require(
   'components/common-layout-directives/common-elements/' +
-  'promo-bar.component.ts');
+    'promo-bar.component.ts'
+);
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'side-navigation-bar.component.ts');
+    'side-navigation-bar.component.ts'
+);
 require(
   'components/common-layout-directives/navigation-bars/' +
-  'top-navigation-bar.component.ts');
+    'top-navigation-bar.component.ts'
+);
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
 require('directives/focus-on.directive.ts');
@@ -74,18 +78,29 @@ require('default-passive-events');
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import {UpgradedServices} from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import sourceMappedStackTrace from 'sourcemapped-stacktrace';
 
 angular.module('oppia').config([
-  '$compileProvider', '$cookiesProvider', '$httpProvider',
-  '$interpolateProvider', '$locationProvider', '$provide', '$sanitizeProvider',
-  function(
-      $compileProvider, $cookiesProvider, $httpProvider,
-      $interpolateProvider, $locationProvider, $provide, $sanitizeProvider) {
-    var ugs = (new UpgradedServices()).getUpgradedServices();
+  '$compileProvider',
+  '$cookiesProvider',
+  '$httpProvider',
+  '$interpolateProvider',
+  '$locationProvider',
+  '$provide',
+  '$sanitizeProvider',
+  function (
+    $compileProvider,
+    $cookiesProvider,
+    $httpProvider,
+    $interpolateProvider,
+    $locationProvider,
+    $provide,
+    $sanitizeProvider
+  ) {
+    var ugs = new UpgradedServices().getUpgradedServices();
     // We need to provide these services and pipes separately since they are
     // used in the directives imported in this file and cannot be
     // injected before bootstrapping of oppia module.
@@ -100,15 +115,15 @@ angular.module('oppia').config([
       'TranslationFileHashLoaderBackendApiService',
       'UrlInterpolationService',
       'HtmlEscaperService',
-      'ContextService'
+      'ContextService',
     ];
     for (let [key, value] of Object.entries(ugs)) {
       if (servicesToProvide.includes(key)) {
         $provide.value(key, value);
       }
     }
-    OppiaAngularRootComponent.contextService = (
-      ugs.ContextService as ContextService);
+    OppiaAngularRootComponent.contextService =
+      ugs.ContextService as ContextService;
     // Refer: https://docs.angularjs.org/guide/migration
     // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
@@ -137,24 +152,28 @@ angular.module('oppia').config([
     $cookiesProvider.defaults.path = '/';
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded',
     };
     $httpProvider.defaults.headers.put = {
-      'Content-Type': 'application/x-www-form-urlencoded'
+      'Content-Type': 'application/x-www-form-urlencoded',
     };
 
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$exceptionHandler', '$q', '$log', 'AlertsService', 'CsrfTokenService',
-      function($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
+      '$exceptionHandler',
+      '$q',
+      '$log',
+      'AlertsService',
+      'CsrfTokenService',
+      function ($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
         return {
-          request: function(config) {
+          request: function (config) {
             if (config.data) {
-              return $q(function(resolve, reject) {
+              return $q(function (resolve, reject) {
                 // Get CSRF token before sending the request.
-                CsrfTokenService.getTokenAsync().then(function(token) {
-                  if ((config.data instanceof FormData)) {
+                CsrfTokenService.getTokenAsync().then(function (token) {
+                  if (config.data instanceof FormData) {
                     var hasPayload = false;
                     // Check whether the FormData has payload in it.
                     for (var key of config.data.keys()) {
@@ -167,16 +186,21 @@ angular.module('oppia').config([
                     // to the request data.
                     if (!hasPayload) {
                       config.data.append(
-                        'payload', JSON.stringify(config.data));
+                        'payload',
+                        JSON.stringify(config.data)
+                      );
                     }
                     config.data.append('csrf_token', token);
                     config.data.append('source', document.URL);
                   } else {
-                    config.data = $.param({
-                      csrf_token: token,
-                      payload: JSON.stringify(config.data),
-                      source: document.URL
-                    }, true);
+                    config.data = $.param(
+                      {
+                        csrf_token: token,
+                        payload: JSON.stringify(config.data),
+                        source: document.URL,
+                      },
+                      true
+                    );
                   }
                   resolve(config);
                 });
@@ -184,7 +208,7 @@ angular.module('oppia').config([
             }
             return config;
           },
-          responseError: function(rejection) {
+          responseError: function (rejection) {
             // A rejection status of -1 seems to indicate (it's hard to find
             // documentation) that the response has not completed,
             // which can occur if the user navigates away from the page
@@ -192,8 +216,8 @@ angular.module('oppia').config([
             // an error.
             if (rejection.status !== -1) {
               $log.error(rejection.data);
-              var warningMessage = (
-                'Error communicating with server. Please try again.');
+              var warningMessage =
+                'Error communicating with server. Please try again.';
               // When the status is >= 500 it is usually related to some outage
               // and we do not want to resurface the error to the user.
               if (
@@ -206,11 +230,16 @@ angular.module('oppia').config([
               AlertsService.addWarning(warningMessage);
               // The rejection.config is an optional parameter.
               // see https://docs.angularjs.org/api/ng/service/$http
-              var rejectionUrl = typeof rejection.config !== 'undefined' ? (
-                rejection.config.url) : '';
-              var additionalLoggingInfo = warningMessage +
-                '\n URL: ' + rejectionUrl +
-                '\n data: ' + JSON.stringify(rejection.data);
+              var rejectionUrl =
+                typeof rejection.config !== 'undefined'
+                  ? rejection.config.url
+                  : '';
+              var additionalLoggingInfo =
+                warningMessage +
+                '\n URL: ' +
+                rejectionUrl +
+                '\n data: ' +
+                JSON.stringify(rejection.data);
               // $exceptionHandler is called directly instead of
               // throwing an error to invoke it because the return
               // statement below must execute. There are tests
@@ -218,25 +247,28 @@ angular.module('oppia').config([
               $exceptionHandler(new Error(additionalLoggingInfo));
             }
             return $q.reject(rejection);
-          }
+          },
         };
-      }
+      },
     ]);
-  }
+  },
 ]);
 
-angular.module('oppia').config(['$provide', function($provide) {
-  $provide.decorator(
-    '$log', ['$delegate', 'DEV_MODE',
-      function($delegate, DEV_MODE) {
+angular.module('oppia').config([
+  '$provide',
+  function ($provide) {
+    $provide.decorator('$log', [
+      '$delegate',
+      'DEV_MODE',
+      function ($delegate, DEV_MODE) {
         var _originalError = $delegate.error;
 
         if (!DEV_MODE) {
-          $delegate.log = function() {};
-          $delegate.info = function() {};
+          $delegate.log = function () {};
+          $delegate.info = function () {};
           // TODO(sll): Send errors (and maybe warnings) to the backend.
-          $delegate.warn = function() { };
-          $delegate.error = function(message) {
+          $delegate.warn = function () {};
+          $delegate.error = function (message) {
             if (String(message).indexOf('$digest already in progress') === -1) {
               _originalError(message);
             }
@@ -246,10 +278,10 @@ angular.module('oppia').config(['$provide', function($provide) {
         }
 
         return $delegate;
-      }
+      },
     ]);
-}]);
-
+  },
+]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
@@ -259,8 +291,11 @@ angular.module('oppia').config(['$provide', function($provide) {
 // spread over multiple lines. The errored file may be viewed on the
 // browser console where the line number should match.
 angular.module('oppia').factory('$exceptionHandler', [
-  '$log', 'CsrfTokenService', 'UtilsService', 'DEV_MODE',
-  function($log, CsrfTokenService, UtilsService, DEV_MODE) {
+  '$log',
+  'CsrfTokenService',
+  'UtilsService',
+  'DEV_MODE',
+  function ($log, CsrfTokenService, UtilsService, DEV_MODE) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
@@ -268,13 +303,14 @@ angular.module('oppia').factory('$exceptionHandler', [
     // So, the code that matches errors of the form [$compile:tpload]
     // will no longer run in v1.7. It should be changed to match
     // [$templateRequest:tpload].
-    var TPLOAD_STATUS_CODE_REGEX = (
-      new RegExp(/\[\$templateRequest:tpload\].*p1=(.*?)&p2=/));
-    var UNHANDLED_REJECTION_STATUS_CODE_REGEX = (
-      /Possibly unhandled rejection: {.*"status":-1/);
+    var TPLOAD_STATUS_CODE_REGEX = new RegExp(
+      /\[\$templateRequest:tpload\].*p1=(.*?)&p2=/
+    );
+    var UNHANDLED_REJECTION_STATUS_CODE_REGEX =
+      /Possibly unhandled rejection: {.*"status":-1/;
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
-    return function(exception, cause) {
+    return function (exception, cause) {
       // Suppress unhandled rejection errors status code -1
       // because -1 is the status code for aborted requests.
       if (UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(exception)) {
@@ -317,13 +353,14 @@ angular.module('oppia').factory('$exceptionHandler', [
       }
       if (!DEV_MODE) {
         sourceMappedStackTrace.mapStackTrace(
-          exception.stack, function(mappedStack) {
+          exception.stack,
+          function (mappedStack) {
             var messageAndSourceAndStackTrace = [
               '',
               'Cause: ' + cause,
               exception.message,
               mappedStack.join('\n'),
-              '    at URL: ' + window.location.href
+              '    at URL: ' + window.location.href,
             ].join('\n');
             var timeDifference = Date.now() - timeOfLastPostedError;
             // To prevent an overdose of errors, throttle to at most 1 error
@@ -333,20 +370,23 @@ angular.module('oppia').factory('$exceptionHandler', [
               try {
                 // We use jQuery here instead of Angular's $http, since the
                 // latter creates a circular dependency.
-                CsrfTokenService.getTokenAsync().then(function(token) {
+                CsrfTokenService.getTokenAsync().then(function (token) {
                   $.ajax({
                     type: 'POST',
                     url: '/frontend_errors',
-                    data: $.param({
-                      csrf_token: token,
-                      payload: JSON.stringify({
-                        error: messageAndSourceAndStackTrace
-                      }),
-                      source: document.URL
-                    }, true),
+                    data: $.param(
+                      {
+                        csrf_token: token,
+                        payload: JSON.stringify({
+                          error: messageAndSourceAndStackTrace,
+                        }),
+                        source: document.URL,
+                      },
+                      true
+                    ),
                     contentType: 'application/x-www-form-urlencoded',
                     dataType: 'text',
-                    async: true
+                    async: true,
                   });
 
                   timeOfLastPostedError = Date.now();
@@ -360,16 +400,21 @@ angular.module('oppia').factory('$exceptionHandler', [
       }
       $log.error(exception);
     };
-  }
+  },
 ]);
 
 angular.module('oppia').config([
-  '$translateProvider', 'DEFAULT_TRANSLATIONS', 'SUPPORTED_SITE_LANGUAGES',
-  function(
-      $translateProvider, DEFAULT_TRANSLATIONS, SUPPORTED_SITE_LANGUAGES) {
+  '$translateProvider',
+  'DEFAULT_TRANSLATIONS',
+  'SUPPORTED_SITE_LANGUAGES',
+  function (
+    $translateProvider,
+    DEFAULT_TRANSLATIONS,
+    SUPPORTED_SITE_LANGUAGES
+  ) {
     var availableLanguageKeys = [];
     var availableLanguageKeysMap = {};
-    SUPPORTED_SITE_LANGUAGES.forEach(function(language) {
+    SUPPORTED_SITE_LANGUAGES.forEach(function (language) {
       availableLanguageKeys.push(language.id);
       availableLanguageKeysMap[language.id + '*'] = language.id;
     });
@@ -377,10 +422,12 @@ angular.module('oppia').config([
 
     $translateProvider
       .registerAvailableLanguageKeys(
-        availableLanguageKeys, availableLanguageKeysMap)
+        availableLanguageKeys,
+        availableLanguageKeysMap
+      )
       .useLoader('TranslationFileHashLoaderBackendApiService', {
         prefix: '/i18n/',
-        suffix: '.json'
+        suffix: '.json',
       })
       // The use of default translation improves the loading time when English
       // is selected.
@@ -397,5 +444,5 @@ angular.module('oppia').config([
       // hyperlinks.
       .useSanitizeValueStrategy('sanitizeParameters')
       .forceAsyncReload(true);
-  }
+  },
 ]);

@@ -16,23 +16,24 @@
  * @fileoverview Unit tests for the positive int component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { PositiveIntEditorComponent } from './positive-int-editor.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {PositiveIntEditorComponent} from './positive-int-editor.component';
 
-describe('PositiveInt', function() {
+describe('PositiveInt', function () {
   let component: PositiveIntEditorComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PositiveIntEditorComponent],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
     component = TestBed.createComponent(
-      PositiveIntEditorComponent).componentInstance;
+      PositiveIntEditorComponent
+    ).componentInstance;
   }));
 
   it('should initialize the value', () => {

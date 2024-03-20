@@ -39,7 +39,7 @@
                 <span *ngIf="editabilityService.isEditable()" class="fas fa-grip-vertical draggable-icon-indicator"></span>
               </span>
 
-              <div class="oppia-rule-header-warning-placement" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
+              <div class="oppia-rule-header-warning-placement e2e-test-response-self-loop-warning" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
                    ngbTooltip="{{getOutcomeTooltip(answerGroup.outcome)}}"
                    tabindex="0"
                    data-container="body"

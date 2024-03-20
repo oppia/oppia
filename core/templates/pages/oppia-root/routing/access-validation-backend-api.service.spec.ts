@@ -31,12 +31,8 @@ describe('Access validation backend api service', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      providers: [
-        UrlInterpolationService
-      ]
+      imports: [HttpClientTestingModule],
+      providers: [UrlInterpolationService],
     }).compileComponents();
   }));
 
@@ -58,7 +54,9 @@ describe('Access validation backend api service', () => {
 
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_classroom_page?' +
-      'classroom_url_fragment=' + fragment);
+        'classroom_url_fragment=' +
+        fragment
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -71,7 +69,8 @@ describe('Access validation backend api service', () => {
     avbas.validateCanManageOwnAccount().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_manage_own_account');
+      '/access_validation_handler/can_manage_own_account'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -90,7 +89,8 @@ describe('Access validation backend api service', () => {
     avbas.doesProfileExist(username).then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/does_profile_exist/' + username);
+      '/access_validation_handler/does_profile_exist/' + username
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -103,7 +103,8 @@ describe('Access validation backend api service', () => {
     avbas.validateAccessToReleaseCoordinatorPage().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_release_coordinator_page');
+      '/access_validation_handler/can_access_release_coordinator_page'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -115,11 +116,13 @@ describe('Access validation backend api service', () => {
   it('should validate access to learner group editor page', fakeAsync(() => {
     let learnerGroupId = 'test_id';
 
-    avbas.validateAccessToLearnerGroupEditorPage(learnerGroupId)
+    avbas
+      .validateAccessToLearnerGroupEditorPage(learnerGroupId)
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_edit_learner_group_page/test_id');
+      '/access_validation_handler/can_access_edit_learner_group_page/test_id'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -132,7 +135,8 @@ describe('Access validation backend api service', () => {
     avbas.validateAccessToLearnerGroupCreatorPage().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_create_learner_group_page');
+      '/access_validation_handler/can_access_create_learner_group_page'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -164,7 +168,8 @@ describe('Access validation backend api service', () => {
     avbas.doesLearnerGroupExist(learnerGroupId).then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/does_learner_group_exist/' + learnerGroupId);
+      '/access_validation_handler/does_learner_group_exist/' + learnerGroupId
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -173,112 +178,124 @@ describe('Access validation backend api service', () => {
     expect(failSpy).not.toHaveBeenCalled();
   }));
 
-  it('should not validate access to blog home page with invalid access',
-    fakeAsync (() => {
-      avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
-
-      const req = httpTestingController.expectOne(
-        '/access_validation_handler/can_access_blog_home_page');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Access Denied.'
-      }, {
-        status: 401, statusText: 'Access Denied.'
-      });
-
-      flushMicrotasks();
-      expect(successSpy).not.toHaveBeenCalled();
-      expect(failSpy).toHaveBeenCalled();
-    })
-  );
-
-  it('should validate access to blog home page with valid access', fakeAsync (
-    () => {
-      avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
-
-      const req = httpTestingController.expectOne(
-        '/access_validation_handler/can_access_blog_home_page');
-      expect(req.request.method).toEqual('GET');
-      req.flush({});
-
-      flushMicrotasks();
-      expect(successSpy).toHaveBeenCalled();
-      expect(failSpy).not.toHaveBeenCalled();
-    }));
-
-  it('should not validate access to blog post page with invalid access',
-    fakeAsync (() => {
-      avbas.validateAccessToBlogPostPage('invalid-post').then(
-        successSpy, failSpy
-      );
-
-      const req = httpTestingController.expectOne(
-        '/access_validation_handler/can_access_blog_post_page?' +
-        'blog_post_url_fragment=invalid-post');
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        error: 'Access Denied.'
-      }, {
-        status: 401, statusText: 'Access Denied.'
-      });
-
-      flushMicrotasks();
-      expect(successSpy).not.toHaveBeenCalled();
-      expect(failSpy).toHaveBeenCalled();
-    })
-  );
-
-  it('should validate access to blog post page with valid access', fakeAsync (
-    () => {
-      avbas.validateAccessToBlogPostPage('sample-post').then(
-        successSpy, failSpy);
-
-      const req = httpTestingController.expectOne(
-        '/access_validation_handler/can_access_blog_post_page?' +
-        'blog_post_url_fragment=sample-post');
-      expect(req.request.method).toEqual('GET');
-      req.flush({});
-
-      flushMicrotasks();
-      expect(successSpy).toHaveBeenCalled();
-      expect(failSpy).not.toHaveBeenCalled();
-    }));
-
-  it('should not validate access to blog author profile page with invalid ' +
-  'access', fakeAsync (() => {
-    avbas.validateAccessToBlogAuthorProfilePage('username').then(
-      successSpy, failSpy);
+  it('should not validate access to blog home page with invalid access', fakeAsync(() => {
+    avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_blog_author_profile_page/username'
+      '/access_validation_handler/can_access_blog_home_page'
     );
     expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Access Denied.'
-    }, {
-      status: 401, statusText: 'Access Denied.'
-    });
+    req.flush(
+      {
+        error: 'Access Denied.',
+      },
+      {
+        status: 401,
+        statusText: 'Access Denied.',
+      }
+    );
 
     flushMicrotasks();
     expect(successSpy).not.toHaveBeenCalled();
     expect(failSpy).toHaveBeenCalled();
-  })
-  );
+  }));
 
-  it('should validate access to blog author profile page with valid access',
-    fakeAsync (() => {
-      avbas.validateAccessToBlogAuthorProfilePage('username').then(
-        successSpy, failSpy);
+  it('should validate access to blog home page with valid access', fakeAsync(() => {
+    avbas.validateAccessToBlogHomePage().then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_blog_home_page'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should not validate access to blog post page with invalid access', fakeAsync(() => {
+    avbas
+      .validateAccessToBlogPostPage('invalid-post')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_blog_post_page?' +
+        'blog_post_url_fragment=invalid-post'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Access Denied.',
+      },
+      {
+        status: 401,
+        statusText: 'Access Denied.',
+      }
+    );
+
+    flushMicrotasks();
+    expect(successSpy).not.toHaveBeenCalled();
+    expect(failSpy).toHaveBeenCalled();
+  }));
+
+  it('should validate access to blog post page with valid access', fakeAsync(() => {
+    avbas.validateAccessToBlogPostPage('sample-post').then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_blog_post_page?' +
+        'blog_post_url_fragment=sample-post'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should not validate access to blog author profile page with invalid ' +
+      'access',
+    fakeAsync(() => {
+      avbas
+        .validateAccessToBlogAuthorProfilePage('username')
+        .then(successSpy, failSpy);
 
       const req = httpTestingController.expectOne(
-        '/access_validation_handler/can_access_blog_author_profile_page/' +
-        'username'
+        '/access_validation_handler/can_access_blog_author_profile_page/username'
       );
       expect(req.request.method).toEqual('GET');
-      req.flush({});
+      req.flush(
+        {
+          error: 'Access Denied.',
+        },
+        {
+          status: 401,
+          statusText: 'Access Denied.',
+        }
+      );
 
       flushMicrotasks();
-      expect(successSpy).toHaveBeenCalled();
-      expect(failSpy).not.toHaveBeenCalled();
-    }));
+      expect(successSpy).not.toHaveBeenCalled();
+      expect(failSpy).toHaveBeenCalled();
+    })
+  );
+
+  it('should validate access to blog author profile page with valid access', fakeAsync(() => {
+    avbas
+      .validateAccessToBlogAuthorProfilePage('username')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_blog_author_profile_page/' +
+        'username'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
 });

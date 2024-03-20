@@ -16,12 +16,18 @@
  * @fileoverview Unit tests for BeamJobRun.
  */
 
-import { BeamJobRun } from 'domain/jobs/beam-job-run.model';
+import {BeamJobRun} from 'domain/jobs/beam-job-run.model';
 
 describe('Beam Job Run', () => {
   it('should copy values from arguments', () => {
     const beamJobRun = new BeamJobRun(
-      '123', 'FooJob', 'RUNNING', 123, 456, true);
+      '123',
+      'FooJob',
+      'RUNNING',
+      123,
+      456,
+      true
+    );
 
     expect(beamJobRun.jobId).toEqual('123');
     expect(beamJobRun.jobName).toEqual('FooJob');
@@ -217,8 +223,9 @@ describe('Beam Job Run', () => {
     });
 
     it('should return the appropriate material icon code', () => {
-      expect(beamJobRun.getJobStatusMaterialIconCode())
-        .toEqual('published_with_changes');
+      expect(beamJobRun.getJobStatusMaterialIconCode()).toEqual(
+        'published_with_changes'
+      );
     });
 
     it('should return the appropriate material theme color', () => {
@@ -250,8 +257,9 @@ describe('Beam Job Run', () => {
     });
 
     it('should return the appropriate material icon code', () => {
-      expect(beamJobRun.getJobStatusMaterialIconCode())
-        .toEqual('hourglass_top');
+      expect(beamJobRun.getJobStatusMaterialIconCode()).toEqual(
+        'hourglass_top'
+      );
     });
 
     it('should return the appropriate material theme color', () => {
@@ -283,8 +291,9 @@ describe('Beam Job Run', () => {
     });
 
     it('should return the appropriate material icon code', () => {
-      expect(beamJobRun.getJobStatusMaterialIconCode())
-        .toEqual('hourglass_bottom');
+      expect(beamJobRun.getJobStatusMaterialIconCode()).toEqual(
+        'hourglass_bottom'
+      );
     });
 
     it('should return the appropriate material theme color', () => {
@@ -373,8 +382,14 @@ describe('Beam Job Run', () => {
   });
 
   describe('That is cancelling', () => {
-    const beamJobRun = (
-      new BeamJobRun('123', 'FooJob', 'CANCELLING', 0, 0, true));
+    const beamJobRun = new BeamJobRun(
+      '123',
+      'FooJob',
+      'CANCELLING',
+      0,
+      0,
+      true
+    );
 
     it('should return the appropriate material tooltip', () => {
       expect(beamJobRun.getJobStatusTooltipString()).toEqual('Cancelling...');

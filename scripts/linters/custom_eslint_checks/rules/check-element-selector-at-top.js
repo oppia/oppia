@@ -23,73 +23,77 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'Lint check to ensure that element selector or locator in the topmost' +
-        ' scope of the module function.'),
+        ' scope of the module function.',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      defineLocatorOnTop: (
+      defineLocatorOnTop:
         'Please declare element locator in the topmost scope of' +
-        ' the module function.'),
-      defineSelectorOnTop: (
+        ' the module function.',
+      defineSelectorOnTop:
         'Please declare element selector in the topmost scope of' +
-        ' the module function.')
+        ' the module function.',
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     var elementSelector = 'CallExpression[callee.name=element]';
-    var elmentAllSelector = (
-      'CallExpression[callee.object.name=element][callee.property.name=all]');
+    var elmentAllSelector =
+      'CallExpression[callee.object.name=element][callee.property.name=all]';
     var subElementSelector = 'CallExpression[callee.property.name=element]';
-    var subElmentAllSelector = (
+    var subElmentAllSelector =
       'CallExpression[callee.object.property.name=element]' +
-      '[callee.property.name=all]');
+      '[callee.property.name=all]';
 
-    var checkLocator = function(selectorNode, inNestedSelector) {
+    var checkLocator = function (selectorNode, inNestedSelector) {
       var locatorNode = selectorNode.arguments[0];
       var upperScopeType = context.getScope().upper.type;
       if (['global', 'module'].includes(upperScopeType)) {
         return;
       }
-      if (locatorNode.type !== 'CallExpression' ||
-          locatorNode.arguments[0].type !== 'Literal') {
+      if (
+        locatorNode.type !== 'CallExpression' ||
+        locatorNode.arguments[0].type !== 'Literal'
+      ) {
         return;
       }
-      if (locatorNode.callee.property.name !== 'css' ||
-          locatorNode.callee.object.name !== 'by') {
+      if (
+        locatorNode.callee.property.name !== 'css' ||
+        locatorNode.callee.object.name !== 'by'
+      ) {
         return;
       }
       if (inNestedSelector) {
-        context.report ({
+        context.report({
           node: locatorNode,
-          messageId: 'defineLocatorOnTop'
+          messageId: 'defineLocatorOnTop',
         });
       } else {
-        context.report ({
+        context.report({
           node: selectorNode,
-          messageId: 'defineSelectorOnTop'
+          messageId: 'defineSelectorOnTop',
         });
       }
     };
 
     return {
-      [elementSelector]: function(node) {
+      [elementSelector]: function (node) {
         checkLocator(node, false);
       },
-      [elmentAllSelector]: function(node) {
+      [elmentAllSelector]: function (node) {
         checkLocator(node, false);
       },
-      [subElementSelector]: function(node) {
+      [subElementSelector]: function (node) {
         checkLocator(node, true);
       },
-      [subElmentAllSelector]: function(node) {
+      [subElmentAllSelector]: function (node) {
         checkLocator(node, true);
-      }
+      },
     };
-  }
+  },
 };

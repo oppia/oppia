@@ -22,16 +22,15 @@ import {
   TranslatedContentBackendDict,
 } from 'domain/exploration/TranslatedContentObjectFactory';
 
-
 interface TranslationMappingDict {
   [contentId: string]: TranslatedContentBackendDict;
 }
 export interface EntityTranslationBackendDict {
-  'entity_id': string;
-  'entity_type': string;
-  'entity_version': number;
-  'language_code': string;
-  'translations': TranslationMappingDict;
+  entity_id: string;
+  entity_type: string;
+  entity_version: number;
+  language_code: string;
+  translations: TranslationMappingDict;
 }
 
 interface TranslationMapping {
@@ -63,7 +62,8 @@ export class EntityTranslation {
   }
 
   updateTranslation(
-      contentId: string, translatedContent: TranslatedContent
+    contentId: string,
+    translatedContent: TranslatedContent
   ): void {
     this.translationMapping[contentId] = translatedContent;
   }
@@ -77,18 +77,20 @@ export class EntityTranslation {
   }
 
   static createTranslationMappingFromBackendDict(
-      backendDict: TranslationMappingDict): TranslationMapping {
+    backendDict: TranslationMappingDict
+  ): TranslationMapping {
     const translationsMapping: TranslationMapping = {};
-    Object.keys(backendDict).forEach((contentId) => {
+    Object.keys(backendDict).forEach(contentId => {
       translationsMapping[contentId] = TranslatedContent.createFromBackendDict(
-        backendDict[contentId]);
+        backendDict[contentId]
+      );
     });
 
     return translationsMapping;
   }
 
   static createFromBackendDict(
-      backendDict: EntityTranslationBackendDict
+    backendDict: EntityTranslationBackendDict
   ): EntityTranslation {
     return new EntityTranslation(
       backendDict.entity_id,
@@ -96,7 +98,8 @@ export class EntityTranslation {
       backendDict.entity_version,
       backendDict.language_code,
       EntityTranslation.createTranslationMappingFromBackendDict(
-        backendDict.translations)
+        backendDict.translations
+      )
     );
   }
 }

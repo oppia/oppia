@@ -15,10 +15,12 @@
  * @fileoverview Unit tests for LearnerViewInfoBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { LearnerLocalNavBackendApiService } from './learner-local-nav-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {LearnerLocalNavBackendApiService} from './learner-local-nav-backend-api.service';
 
 describe('Learner Local Nav Backend Api Service', () => {
   let llnba: LearnerLocalNavBackendApiService;
@@ -33,7 +35,7 @@ describe('Learner Local Nav Backend Api Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [LearnerLocalNavBackendApiService]
+      providers: [LearnerLocalNavBackendApiService],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     llnba = TestBed.inject(LearnerLocalNavBackendApiService);
@@ -43,11 +45,13 @@ describe('Learner Local Nav Backend Api Service', () => {
   });
 
   it('should post report', fakeAsync(() => {
-    llnba.postReportAsync(
-      expId, {
+    llnba
+      .postReportAsync(expId, {
         report_type: reportType,
         report_text: reportText,
-        state}).then(successHandler, failHandler);
+        state,
+      })
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(llnba.flagExplorationUrl);
     expect(req.request.method).toEqual('POST');
@@ -57,6 +61,5 @@ describe('Learner Local Nav Backend Api Service', () => {
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 });

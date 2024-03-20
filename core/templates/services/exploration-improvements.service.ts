@@ -17,26 +17,26 @@
  * of data related to exploration improvement tasks.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { merge } from 'd3-array';
-import { ExplorationImprovementsConfig } from 'domain/improvements/exploration-improvements-config.model';
-import { HighBounceRateTask } from 'domain/improvements/high-bounce-rate-task.model';
-import { NeedsGuidingResponsesTask } from 'domain/improvements/needs-guiding-response-task.model';
-import { State } from 'domain/state/StateObjectFactory';
-import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { UserExplorationPermissionsService } from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import { ContextService } from 'services/context.service';
-import { ExplorationImprovementsBackendApiService } from 'services/exploration-improvements-backend-api.service';
-import { ExplorationImprovementsTaskRegistryService } from 'services/exploration-improvements-task-registry.service';
-import { ExplorationStatsService } from 'services/exploration-stats.service';
-import { StateTopAnswersStatsService } from 'services/state-top-answers-stats.service';
-import { PlaythroughIssuesService } from 'services/playthrough-issues.service';
-import { ExplorationTaskType } from 'domain/improvements/exploration-task.model';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {merge} from 'd3-array';
+import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
+import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
+import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
+import {State} from 'domain/state/StateObjectFactory';
+import {ExplorationRightsService} from 'pages/exploration-editor-page/services/exploration-rights.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import {ContextService} from 'services/context.service';
+import {ExplorationImprovementsBackendApiService} from 'services/exploration-improvements-backend-api.service';
+import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
+import {ExplorationStatsService} from 'services/exploration-stats.service';
+import {StateTopAnswersStatsService} from 'services/state-top-answers-stats.service';
+import {PlaythroughIssuesService} from 'services/playthrough-issues.service';
+import {ExplorationTaskType} from 'domain/improvements/exploration-task.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationImprovementsService {
   // These properties are initialized using int method and we need to do
@@ -54,16 +54,13 @@ export class ExplorationImprovementsService {
   constructor(
     private explorationRightsService: ExplorationRightsService,
     private explorationStatesService: ExplorationStatesService,
-    private userExplorationPermissionsService:
-      UserExplorationPermissionsService,
+    private userExplorationPermissionsService: UserExplorationPermissionsService,
     private contextService: ContextService,
-    private explorationImprovementsBackendApiService:
-      ExplorationImprovementsBackendApiService,
-    private explorationImprovementsTaskRegistryService:
-      ExplorationImprovementsTaskRegistryService,
+    private explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService,
+    private explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService,
     private explorationStatsService: ExplorationStatsService,
     private stateTopAnswersStatsService: StateTopAnswersStatsService,
-    private playthroughIssuesService: PlaythroughIssuesService,
+    private playthroughIssuesService: PlaythroughIssuesService
   ) {
     this.openHbrTasks = [];
     this.ngrTasksOpenSinceInit = [];
@@ -83,13 +80,12 @@ export class ExplorationImprovementsService {
   }
 
   async flushUpdatedTasksToBackend(): Promise<void> {
-    if (!await this.isImprovementsTabEnabledAsync()) {
+    if (!(await this.isImprovementsTabEnabledAsync())) {
       return;
     }
 
-    const hbrTasksStillOpen = (
-      this.explorationImprovementsTaskRegistryService
-        .getOpenHighBounceRateTasks());
+    const hbrTasksStillOpen =
+      this.explorationImprovementsTaskRegistryService.getOpenHighBounceRateTasks();
 
     await this.explorationImprovementsBackendApiService.postTasksAsync(
       this.config.explorationId,
@@ -97,92 +93,112 @@ export class ExplorationImprovementsService {
         this.openHbrTasks.filter(t => t.isObsolete()),
         hbrTasksStillOpen.filter(t => !this.openHbrTasks.includes(t)),
         this.ngrTasksOpenSinceInit.filter(t => t.isResolved()),
-      ]));
+      ])
+    );
 
     this.openHbrTasks = hbrTasksStillOpen;
-    this.ngrTasksOpenSinceInit =
-      this.ngrTasksOpenSinceInit.filter(t => t.isOpen());
+    this.ngrTasksOpenSinceInit = this.ngrTasksOpenSinceInit.filter(t =>
+      t.isOpen()
+    );
   }
 
   async isImprovementsTabEnabledAsync(): Promise<boolean> {
     await this.initAsync();
 
     return (
-      this.improvementsTabIsAccessible &&
-      this.config.improvementsTabIsEnabled);
+      this.improvementsTabIsAccessible && this.config.improvementsTabIsEnabled
+    );
   }
 
   async doInitAsync(): Promise<void> {
-    const userPermissions = (
-      await this.userExplorationPermissionsService.getPermissionsAsync());
+    const userPermissions =
+      await this.userExplorationPermissionsService.getPermissionsAsync();
 
-    this.improvementsTabIsAccessible = (
-      this.explorationRightsService.isPublic() && userPermissions.canEdit);
+    this.improvementsTabIsAccessible =
+      this.explorationRightsService.isPublic() && userPermissions.canEdit;
 
     if (!this.improvementsTabIsAccessible) {
       return;
     }
 
     const expId = this.contextService.getExplorationId();
-    this.config = (
-      await this.explorationImprovementsBackendApiService
-        .getConfigAsync(expId));
+    this.config =
+      await this.explorationImprovementsBackendApiService.getConfigAsync(expId);
 
     if (!this.config.improvementsTabIsEnabled) {
       return;
     }
 
-    this.playthroughIssuesService
-      .initSession(expId, this.config.explorationVersion);
+    this.playthroughIssuesService.initSession(
+      expId,
+      this.config.explorationVersion
+    );
 
     const states = this.explorationStatesService.getStates();
-    const expStats = (
-      await this.explorationStatsService.getExplorationStatsAsync(expId));
-    const {openTasks, resolvedTaskTypesByStateName} = (
-      await this.explorationImprovementsBackendApiService.getTasksAsync(expId));
-    const topAnswersByStateName = (
+    const expStats =
+      await this.explorationStatsService.getExplorationStatsAsync(expId);
+    const {openTasks, resolvedTaskTypesByStateName} =
+      await this.explorationImprovementsBackendApiService.getTasksAsync(expId);
+    const topAnswersByStateName =
       await this.stateTopAnswersStatsService.getTopAnswersByStateNameAsync(
-        expId, states));
+        expId,
+        states
+      );
     const playthroughIssues = await this.playthroughIssuesService.getIssues();
 
-    this.openHbrTasks = (
-      openTasks.filter(t => t.taskType === 'high_bounce_rate') as
-      HighBounceRateTask[]);
+    this.openHbrTasks = openTasks.filter(
+      t => t.taskType === 'high_bounce_rate'
+    ) as HighBounceRateTask[];
 
     this.explorationImprovementsTaskRegistryService.initialize(
-      this.config, states, expStats, openTasks,
-      resolvedTaskTypesByStateName as
-      Map<string, ExplorationTaskType[]>,
-      topAnswersByStateName, playthroughIssues);
+      this.config,
+      states,
+      expStats,
+      openTasks,
+      resolvedTaskTypesByStateName as Map<string, ExplorationTaskType[]>,
+      topAnswersByStateName,
+      playthroughIssues
+    );
 
-    this.ngrTasksOpenSinceInit = (
-      this.explorationImprovementsTaskRegistryService
-        .getOpenNeedsGuidingResponsesTasks());
+    this.ngrTasksOpenSinceInit =
+      this.explorationImprovementsTaskRegistryService.getOpenNeedsGuidingResponsesTasks();
 
     this.explorationStatesService.registerOnStateAddedCallback(
       (stateName: string) => {
         this.explorationImprovementsTaskRegistryService.onStateAdded(stateName);
-      });
+      }
+    );
 
     this.explorationStatesService.registerOnStateDeletedCallback(
       (stateName: string) => {
-        this.explorationImprovementsTaskRegistryService
-          .onStateDeleted(stateName);
-      });
+        this.explorationImprovementsTaskRegistryService.onStateDeleted(
+          stateName
+        );
+      }
+    );
 
     this.explorationStatesService.registerOnStateRenamedCallback(
       (oldName: string, newName: string) => {
         this.explorationImprovementsTaskRegistryService.onStateRenamed(
-          oldName, newName);
-      });
+          oldName,
+          newName
+        );
+      }
+    );
 
     this.explorationStatesService.registerOnStateInteractionSavedCallback(
       (state: State) => {
         this.explorationImprovementsTaskRegistryService.onStateInteractionSaved(
-          state);
-      });
+          state
+        );
+      }
+    );
   }
 }
 
-angular.module('oppia').factory('ExplorationImprovementsService',
-  downgradeInjectable(ExplorationImprovementsService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationImprovementsService',
+    downgradeInjectable(ExplorationImprovementsService)
+  );

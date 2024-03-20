@@ -16,24 +16,19 @@
  * @fileoverview Routing module for get started page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { GetStartedPageRootComponent } from './get-started-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {GetStartedPageRootComponent} from './get-started-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: GetStartedPageRootComponent
-  }
+    component: GetStartedPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class GetStartedPageRoutingModule {}

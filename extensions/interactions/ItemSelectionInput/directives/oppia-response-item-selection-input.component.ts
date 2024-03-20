@@ -20,14 +20,14 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-response-item-selection-input',
   templateUrl: './item-selection-input-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ResponseItemSelectionInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -46,17 +46,21 @@ export class ResponseItemSelectionInputComponent implements OnInit {
     if (!answer) {
       answer = [];
     }
-    const choices = this.htmlEscaperService.escapedJsonToObj(
-      this.choices
-    ) as { _html: string; _contentId: string }[];
+    const choices = this.htmlEscaperService.escapedJsonToObj(this.choices) as {
+      _html: string;
+      _contentId: string;
+    }[];
 
     const choicesContentIds = choices.map(choice => choice._contentId);
     this.responses = answer.map(
-      contentId => choices[choicesContentIds.indexOf(contentId)]._html);
+      contentId => choices[choicesContentIds.indexOf(contentId)]._html
+    );
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaResponseItemSelectionInput', downgradeComponent({
-    component: ResponseItemSelectionInputComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaResponseItemSelectionInput',
+  downgradeComponent({
+    component: ResponseItemSelectionInputComponent,
+  }) as angular.IDirectiveFactory
+);

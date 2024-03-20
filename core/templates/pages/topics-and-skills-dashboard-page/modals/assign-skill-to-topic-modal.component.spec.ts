@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for Assign Skill To Topic Modal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { SelectTopicsComponent } from '../topic-selector/select-topics.component';
-import { AssignSkillToTopicModalComponent } from './assign-skill-to-topic-modal.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {SelectTopicsComponent} from '../topic-selector/select-topics.component';
+import {AssignSkillToTopicModalComponent} from './assign-skill-to-topic-modal.component';
 
 describe('Assign Skill to Topic Modal Component', () => {
   let fixture: ComponentFixture<AssignSkillToTopicModalComponent>;
@@ -28,16 +28,9 @@ describe('Assign Skill to Topic Modal Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        FormsModule
-      ],
-      declarations: [
-        AssignSkillToTopicModalComponent,
-        SelectTopicsComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      imports: [FormsModule],
+      declarations: [AssignSkillToTopicModalComponent, SelectTopicsComponent],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 

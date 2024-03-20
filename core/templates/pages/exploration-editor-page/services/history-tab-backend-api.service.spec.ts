@@ -16,10 +16,12 @@
  * @fileoverview Unit tests for HistoryTabBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { HistoryTabBackendApiService } from './history-tab-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {HistoryTabBackendApiService} from './history-tab-backend-api.service';
 
 describe('History Tab Backend Api Service', () => {
   let service: HistoryTabBackendApiService;
@@ -30,7 +32,7 @@ describe('History Tab Backend Api Service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [HistoryTabBackendApiService]
+      providers: [HistoryTabBackendApiService],
     });
     httpTestingController = TestBed.get(HttpTestingController);
     service = TestBed.get(HistoryTabBackendApiService);
@@ -40,65 +42,55 @@ describe('History Tab Backend Api Service', () => {
     httpTestingController.verify();
   });
 
-  it('should get history data when getData called',
-    fakeAsync(() => {
-      let stringifiedExpIds = 'check';
-      service.getData(
-        stringifiedExpIds
-      ).then(successHandler, failHandler);
+  it('should get history data when getData called', fakeAsync(() => {
+    let stringifiedExpIds = 'check';
+    service.getData(stringifiedExpIds).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('check');
-      expect(req.request.method).toEqual('GET');
-      req.flush([]);
+    let req = httpTestingController.expectOne('check');
+    expect(req.request.method).toEqual('GET');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should get check revert valid data when getCheckRevertValidData called',
-    fakeAsync(() => {
-      const url = 'url';
-      service.getCheckRevertValidData(url).then(successHandler, failHandler);
+  it('should get check revert valid data when getCheckRevertValidData called', fakeAsync(() => {
+    const url = 'url';
+    service.getCheckRevertValidData(url).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(url);
-      expect(req.request.method).toEqual('GET');
-      req.flush([]);
+    let req = httpTestingController.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should post history data when postData called',
-    fakeAsync(() => {
-      let data = {
-        revertExplorationUrl: 'check',
-        currentVersion: 5,
-        revertToVersion: 3
-      };
-      let recivedData = {
-        current_version: 5,
-        revert_to_version: 3
-      };
+  it('should post history data when postData called', fakeAsync(() => {
+    let data = {
+      revertExplorationUrl: 'check',
+      currentVersion: 5,
+      revertToVersion: 3,
+    };
+    let recivedData = {
+      current_version: 5,
+      revert_to_version: 3,
+    };
 
-      service.postData(
-        data
-      ).then(successHandler, failHandler);
+    service.postData(data).then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne('check');
-      expect(req.request.method).toEqual('POST');
-      expect(req.request.body).toEqual(recivedData);
-      req.flush([]);
+    let req = httpTestingController.expectOne('check');
+    expect(req.request.method).toEqual('POST');
+    expect(req.request.body).toEqual(recivedData);
+    req.flush([]);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

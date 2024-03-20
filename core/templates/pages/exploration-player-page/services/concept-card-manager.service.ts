@@ -16,16 +16,16 @@
  * @fileoverview Utility service for Concept Card in the learner's view.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { StateCard } from 'domain/state_card/state-card.model';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {StateCard} from 'domain/state_card/state-card.model';
 
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { ExplorationEngineService } from './exploration-engine.service';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {ExplorationEngineService} from './exploration-engine.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ConceptCardManagerService {
   // The following are set to null when the timeouts are cleared
@@ -47,7 +47,6 @@ export class ConceptCardManagerService {
   wrongAnswersSinceConceptCardConsumed: number = 0;
   learnerIsReallyStuck: boolean = false;
 
-
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
   tooltipIsOpen: boolean = false;
@@ -56,7 +55,7 @@ export class ConceptCardManagerService {
   conceptCardDiscovered: boolean = false;
 
   constructor(
-      playerPositionService: PlayerPositionService,
+    playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService
   ) {
     // TODO(#10904): Refactor to move subscriptions into components.
@@ -87,7 +86,9 @@ export class ConceptCardManagerService {
     this.conceptCardReleased = true;
     if (!this.conceptCardDiscovered && !this.tooltipTimeout) {
       this.tooltipTimeout = setTimeout(
-        this.showTooltip.bind(this), this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+        this.showTooltip.bind(this),
+        this.WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC
+      );
     }
     this._timeoutElapsedEventEmitter.emit();
   }
@@ -110,7 +111,8 @@ export class ConceptCardManagerService {
     this.wrongAnswersSinceConceptCardConsumed = 0;
     this.enqueueTimeout(
       this.emitLearnerStuckedness,
-      ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+      ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC
+    );
   }
 
   reset(newCard: StateCard): void {
@@ -132,13 +134,15 @@ export class ConceptCardManagerService {
     if (this.conceptCardForStateExists(newCard)) {
       this.enqueueTimeout(
         this.releaseConceptCard,
-        ExplorationPlayerConstants.WAIT_FOR_CONCEPT_CARD_MSEC);
+        ExplorationPlayerConstants.WAIT_FOR_CONCEPT_CARD_MSEC
+      );
     }
   }
 
   conceptCardForStateExists(newCard: StateCard): boolean {
     let state = this.explorationEngineService.getStateFromStateName(
-      newCard.getStateName());
+      newCard.getStateName()
+    );
     return state.linkedSkillId !== null;
   }
 
@@ -158,9 +162,10 @@ export class ConceptCardManagerService {
     if (this.isConceptCardViewable()) {
       this.wrongAnswersSinceConceptCardConsumed++;
     }
-    if (this.wrongAnswersSinceConceptCardConsumed >
-    ExplorationPlayerConstants.
-      MAX_INCORRECT_ANSWERS_BEFORE_REALLY_STUCK) {
+    if (
+      this.wrongAnswersSinceConceptCardConsumed >
+      ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_REALLY_STUCK
+    ) {
       // Learner is really stuck.
       this.emitLearnerStuckedness();
     }
@@ -171,6 +176,9 @@ export class ConceptCardManagerService {
   }
 }
 
-angular.module('oppia').factory(
-  'ConceptCardManagerService',
-  downgradeInjectable(ConceptCardManagerService));
+angular
+  .module('oppia')
+  .factory(
+    'ConceptCardManagerService',
+    downgradeInjectable(ConceptCardManagerService)
+  );

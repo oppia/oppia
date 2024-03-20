@@ -17,21 +17,21 @@
  * domain objects.
  */
 
-import { ThreadMessageSummary } from 'domain/feedback_message/ThreadMessageSummary.model';
+import {ThreadMessageSummary} from 'domain/feedback_message/ThreadMessageSummary.model';
 
 export interface ThreadMessageBackendDict {
-  'author_username': string;
-  'created_on_msecs': number;
-  'entity_type': string;
-  'entity_id': string;
-  'message_id': number;
-  'text': string;
+  author_username: string;
+  created_on_msecs: number;
+  entity_type: string;
+  entity_id: string;
+  message_id: number;
+  text: string;
   // Status and Subject for frontend instances of thread message domain objects
   // are null and are only required to be supplied if the message is first
   // message of the thread. Otherwise, these properties are only non-null
   // when the status or subject changes, respectively.
-  'updated_status': string | null;
-  'updated_subject': string | null;
+  updated_status: string | null;
+  updated_subject: string | null;
 }
 
 export class ThreadMessage {
@@ -46,10 +46,16 @@ export class ThreadMessage {
   summary: ThreadMessageSummary;
 
   constructor(
-      authorUsername: string, createdOnMsecs: number, entityType: string,
-      entityId: string, messageId: number, text: string,
-      updatedStatus: string | null, updatedSubject: string | null,
-      summary: ThreadMessageSummary) {
+    authorUsername: string,
+    createdOnMsecs: number,
+    entityType: string,
+    entityId: string,
+    messageId: number,
+    text: string,
+    updatedStatus: string | null,
+    updatedSubject: string | null,
+    summary: ThreadMessageSummary
+  ) {
     this.authorUsername = authorUsername;
     this.createdOnMsecs = createdOnMsecs;
     this.entityType = entityType;
@@ -74,16 +80,21 @@ export class ThreadMessage {
   }
 
   static createFromBackendDict(
-      threadMessageBackendDict: ThreadMessageBackendDict): ThreadMessage {
+    threadMessageBackendDict: ThreadMessageBackendDict
+  ): ThreadMessage {
     return new ThreadMessage(
       threadMessageBackendDict.author_username,
       threadMessageBackendDict.created_on_msecs,
-      threadMessageBackendDict.entity_type, threadMessageBackendDict.entity_id,
-      threadMessageBackendDict.message_id, threadMessageBackendDict.text,
+      threadMessageBackendDict.entity_type,
+      threadMessageBackendDict.entity_id,
+      threadMessageBackendDict.message_id,
+      threadMessageBackendDict.text,
       threadMessageBackendDict.updated_status,
       threadMessageBackendDict.updated_subject,
       new ThreadMessageSummary(
         threadMessageBackendDict.author_username,
-        threadMessageBackendDict.text));
+        threadMessageBackendDict.text
+      )
+    );
   }
 }
