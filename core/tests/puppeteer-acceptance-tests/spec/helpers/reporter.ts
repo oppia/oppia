@@ -171,6 +171,10 @@ const Reporter: jasmine.CustomReporter = {
     try {
       ConsoleReporter.reportConsoleErrors();
     } catch (error) {
+      // Here we catch the error and add it to the failed expectations.
+      // We do not set any of the stack or actual/expected values as they
+      // are not relevant since the error message is just showing the console
+      // errors that were found during the test.
       result.failedExpectations.push({
         message: error,
         stack: '',
