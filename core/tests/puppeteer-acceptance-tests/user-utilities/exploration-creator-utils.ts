@@ -172,7 +172,12 @@ export class ExplorationCreator extends BaseUser {
    * This function checks if the goal has been set in the exploration.
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
-    await this.page.waitForSelector('.e2e-test-exploration-objective-input');
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
+    await this.page.waitForTimeout(400);
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input'
     );
@@ -493,7 +498,6 @@ export class ExplorationCreator extends BaseUser {
       '.oppia-editor-publish-button:not([disabled])'
     );
     await this.clickOn(publishButton);
-    await this.page.waitForSelector(`${saveChangesButton}`, {visible: true});
     await this.clickOn(saveChangesButton);
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
