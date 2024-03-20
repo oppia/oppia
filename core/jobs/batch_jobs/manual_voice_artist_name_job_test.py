@@ -32,7 +32,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Sequence, Tuple, Type
+from typing import Dict, List, Sequence, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -482,7 +482,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         self._create_non_curated_exploration()
 
         job_result_template = (
-            'Generated exploration voice artist link for '
+            'Generated exploration voice artist link model for '
             'exploration %s.'
         )
         self.assert_job_output_is([
@@ -497,23 +497,22 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         expected_exp_id_to_content_id_to_voiceovers_mapping = {
             self.CURATED_EXPLORATION_ID_1: {
                 'content_0': {
-                    'en': (self.editor_id_1, self.voiceover_dict_1),
-                    'hi': (self.editor_id_2, self.voiceover_dict_2)
+                    'en': [self.editor_id_1, self.voiceover_dict_1],
+                    'hi': [self.editor_id_2, self.voiceover_dict_2]
                 },
                 'ca_placeholder_2': {
-                    'en': (self.editor_id_1, self.voiceover_dict_3)
-                },
-                'default_outcome_1': {}
+                    'en': [self.editor_id_1, self.voiceover_dict_3]
+                }
             },
             self.CURATED_EXPLORATION_ID_2: {
                 'content_0': {
-                    'en': (self.editor_id_4, self.voiceover_dict_6),
+                    'en': [self.editor_id_4, self.voiceover_dict_6],
                 },
                 'ca_placeholder_2': {
-                    'en': (self.editor_id_1, self.voiceover_dict_4)
+                    'en': [self.editor_id_1, self.voiceover_dict_4]
                 },
                 'default_outcome_1': {
-                    'en': (self.editor_id_1, self.voiceover_dict_7),
+                    'en': [self.editor_id_1, self.voiceover_dict_7],
                 }
             }
         }
@@ -532,40 +531,10 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             expected_content_id_voiceovers_mapping = (
                 expected_exp_id_to_content_id_to_voiceovers_mapping[exp_id])
 
-            for content_id, lang_code_to_voiceover_mapping in (
-                    content_id_to_voiceovers_mapping.items()):
-
-                assert isinstance(expected_content_id_voiceovers_mapping, dict)
-
-                self.assertIn(
-                    content_id,
-                    list(expected_content_id_voiceovers_mapping.keys())
-                )
-
-                for lang_code, voiceover_tuple in (
-                        lang_code_to_voiceover_mapping.items()):
-
-                    self.assertIn(
-                        lang_code,
-                        list(expected_content_id_voiceovers_mapping[
-                            content_id].keys()
-                        )
-                    )
-
-                    expected_voiceover_tuple = (
-                        expected_content_id_voiceovers_mapping[
-                            content_id][lang_code]
-                    )
-
-                    self.assertEqual(
-                        voiceover_tuple[0],
-                        expected_voiceover_tuple[0]
-                    )
-
-                    self.assertDictEqual(
-                        voiceover_tuple[1],
-                        expected_voiceover_tuple[1]
-                    )
+            self.assertDictEqual(
+                content_id_to_voiceovers_mapping,
+                expected_content_id_voiceovers_mapping
+            )
 
         self.assertEqual(len(exploration_voice_artist_link_models), 2)
 
@@ -587,7 +556,7 @@ class AuditVoiceArtistMetadataModelsJobTests(
         self._create_non_curated_exploration()
 
         job_result_template = (
-            'Generated exploration voice artist link for '
+            'Generated exploration voice artist link model for '
             'exploration %s.'
         )
         self.assert_job_output_is([
@@ -613,7 +582,7 @@ class AuditVoiceArtistMetadataModelsJobTests(
         self._create_non_curated_exploration()
 
         job_result_template = (
-            'Generated exploration voice artist link for '
+            'Generated exploration voice artist link model for '
             'exploration %s.'
         )
 
@@ -639,56 +608,6 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
 ):
     """Test class to validate helper methods."""
 
-    def test_should_get_voiceover_difference_succssfully(self) -> None:
-        new_voiceover_mapping: Dict[
-            str, Dict[str, voiceover_models.VoiceoverDict]] = {
-                'content_0': {
-                    'en': self.voiceover_dict_1,
-                    'hi': self.voiceover_dict_4
-                },
-                'content_1': {
-                    'en': self.voiceover_dict_2,
-                    'hi': self.voiceover_dict_5
-                },
-                'content_2': {
-                    'en': self.voiceover_dict_7
-                }
-            }
-        old_voiceover_mapping: Dict[
-            str, Dict[str, voiceover_models.VoiceoverDict]] = {
-                'content_0': {},
-                'content_1': {
-                    'en': self.voiceover_dict_3,
-                    'hi': self.voiceover_dict_6
-                },
-                'content_2': {
-                    'en': self.voiceover_dict_7
-                }
-            }
-
-        expected_voiceover_mapping_diff = {
-            'content_0': {
-                'en': self.voiceover_dict_1,
-                'hi': self.voiceover_dict_4
-            },
-            'content_1': {
-                'en': self.voiceover_dict_2,
-                'hi': self.voiceover_dict_5
-            },
-
-        }
-
-        voiceover_mapping_diff = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            get_voiceover_from_recorded_voiceover_diff(
-                new_voiceover_mapping,
-                old_voiceover_mapping
-            )
-        )
-        self.assertDictEqual(
-            expected_voiceover_mapping_diff, voiceover_mapping_diff)
-
     def test_should_update_content_id_to_voiceovers_mapping(self) -> None:
         voiceover_mapping = {
             'content_0': {
@@ -706,17 +625,23 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
                 'en': self.voiceover_dict_5
             }
         }
-        latest_content_id_to_language_codes = {
-            'content_0': ['en', 'hi'],
-            'content_1': ['en'],
-            'content_2': ['en']
+        latest_content_id_to_voiceover_mapping = {
+            'content_0': {
+                'en': self.voiceover_dict_1,
+                'hi': self.voiceover_dict_2
+            },
+            'content_1': {
+                'en': self.voiceover_dict_3
+            },
+            'content_2': {
+                'en': self.voiceover_dict_4,
+            }
         }
         content_id_to_voiceovers_mapping = {
             'content_2': {
                 'en': ('voice_artist_1', self.voiceover_dict_4)
             }
         }
-        remaining_voice_artist_for_identification = 3
         voice_artist_id = 'voice_artist_1'
 
         expected_content_id_to_voiceovers_mapping = {
@@ -734,15 +659,14 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
 
         (
             updated_content_id_to_voiceovers_mapping,
-            updated_remaining_voice_artist_for_identification
+            number_of_voiceovers_identified
         ) = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             update_content_id_to_voiceovers_mapping(
-                latest_content_id_to_language_codes,
-                content_id_to_voiceovers_mapping,
-                remaining_voice_artist_for_identification,
+                latest_content_id_to_voiceover_mapping,
                 voiceover_mapping,
+                content_id_to_voiceovers_mapping,
                 voice_artist_id
             )
         )
@@ -752,7 +676,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             expected_content_id_to_voiceovers_mapping
         )
         self.assertEqual(
-            updated_remaining_voice_artist_for_identification, 0)
+            number_of_voiceovers_identified, 4)
 
     def test_should_create_empty_exploration_voice_artist_link_model(
         self
@@ -787,19 +711,12 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             exp_models.ExplorationSnapshotContentModel] = list(
                 exp_models.ExplorationSnapshotContentModel.get_all().fetch())
 
-        elements: Tuple[
-            str,
-            manual_voice_artist_name_job.ExplorationAndSnapshotModelDict] = (
-                self.CURATED_EXPLORATION_ID_1, {
-                    'exploration_models': exploration_models,
-                    'snapshot_models': snapshot_models
-                }
-            )
-
         exp_link_model: voiceover_models.ExplorationVoiceArtistsLinkModel = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
-            get_exploration_voice_artists_link_model(elements))
+            get_exploration_voice_artists_link_model(
+                exploration_models[0], snapshot_models
+            ))
 
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
@@ -870,18 +787,11 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             }
         }
 
-        elements: Tuple[
-            str,
-            manual_voice_artist_name_job.ExplorationAndSnapshotModelDict] = (
-                self.CURATED_EXPLORATION_ID_1, {
-                    'exploration_models': exploration_models,
-                    'snapshot_models': snapshot_models
-                })
-
         exp_link_model = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
-            get_exploration_voice_artists_link_model(elements))
+            get_exploration_voice_artists_link_model(
+                exploration_models[0], snapshot_models))
 
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
