@@ -33,6 +33,9 @@ export type ContributorStats =
   | QuestionSubmitterStats
   | QuestionReviewerStats;
 
+let formatContributorAttributesService: FormatContributorAttributesService =
+  new FormatContributorAttributesService();
+
 export class TranslationSubmitterStats {
   constructor(
     public contributorName: string,
@@ -73,8 +76,7 @@ export class TranslationSubmitterStats {
   }
 
   getContributorAttributes(
-    contributorStats: ContributorStats,
-    formatContributorAttributesService: FormatContributorAttributesService
+    contributorStats: ContributorStats
   ): ContributorAttribute[] {
     return formatContributorAttributesService.getTranslationSubmitterContributorAttributes(
       contributorStats as TranslationSubmitterStats
@@ -114,8 +116,7 @@ export class TranslationReviewerStats {
   }
 
   getContributorAttributes(
-    contributorStats: ContributorStats,
-    formatContributorAttributesService: FormatContributorAttributesService
+    contributorStats: ContributorStats
   ): ContributorAttribute[] {
     return formatContributorAttributesService.getTranslationReviewerContributorAttributes(
       contributorStats as TranslationReviewerStats
@@ -155,8 +156,7 @@ export class QuestionSubmitterStats {
   }
 
   getContributorAttributes(
-    contributorStats: ContributorStats,
-    formatContributorAttributesService: FormatContributorAttributesService
+    contributorStats: ContributorStats
   ): ContributorAttribute[] {
     return formatContributorAttributesService.getQuestionSubmitterContributorAttributes(
       contributorStats as QuestionSubmitterStats
@@ -192,8 +192,7 @@ export class QuestionReviewerStats {
   }
 
   getContributorAttributes(
-    contributorStats: ContributorStats,
-    formatContributorAttributesService: FormatContributorAttributesService
+    contributorStats: ContributorStats
   ): ContributorAttribute[] {
     return formatContributorAttributesService.getQuestionReviewerContributorAttributes(
       contributorStats as QuestionReviewerStats

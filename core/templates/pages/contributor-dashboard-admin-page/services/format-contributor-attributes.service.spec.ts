@@ -25,66 +25,28 @@ import {
 } from '../contributor-dashboard-admin-summary.model';
 
 describe('Format contribution attributes service', () => {
-  let formatContributionAttributesService: FormatContributorAttributesService =
-    new FormatContributorAttributesService();
-
-  let translationSubmitterStats: TranslationSubmitterStats =
-    new TranslationSubmitterStats(
-      'user1',
-      'en',
-      ['topic1', 'topic2'],
-      2,
-      1.0,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      'firstcontributiondate',
-      10
-    );
-  let translationReviewerStats: TranslationReviewerStats =
-    new TranslationReviewerStats(
-      'user1',
-      'en',
-      ['topic1', 'topic2'],
-      2,
-      1.0,
-      3,
-      4,
-      5,
-      'firstcontributiondate',
-      10
-    );
-  let questionSubmitterStats: QuestionSubmitterStats =
-    new QuestionSubmitterStats(
-      'user1',
-      ['topic1', 'topic2'],
-      6,
-      2,
-      1.0,
-      3,
-      4,
-      5,
-      'firstcontributiondate',
-      10
-    );
-  const questionReviewerStats: QuestionReviewerStats =
-    new QuestionReviewerStats(
-      'user1',
-      ['topic1', 'topic2'],
-      2,
-      1,
-      4,
-      6,
-      'firstcontributiondate',
-      2
-    );
-
   describe('when displaying the stats table', () => {
     it('should return the translation submitter stats attributes correctly', () => {
+      let formatContributionAttributesService: FormatContributorAttributesService =
+        new FormatContributorAttributesService();
+
+      let translationSubmitterStats: TranslationSubmitterStats =
+        new TranslationSubmitterStats(
+          'user1',
+          'en',
+          ['topic1', 'topic2'],
+          2,
+          1.0,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          'firstcontributiondate',
+          10
+        );
       expect(
         formatContributionAttributesService.getTranslationSubmitterContributorAttributes(
           translationSubmitterStats
@@ -114,6 +76,21 @@ describe('Format contribution attributes service', () => {
     });
 
     it('should return the translation reviewer stats attributes correctly', () => {
+      let formatContributionAttributesService: FormatContributorAttributesService =
+        new FormatContributorAttributesService();
+      let translationReviewerStats: TranslationReviewerStats =
+        new TranslationReviewerStats(
+          'user1',
+          'en',
+          ['topic1', 'topic2'],
+          2,
+          1.0,
+          3,
+          4,
+          5,
+          'firstcontributiondate',
+          10
+        );
       expect(
         formatContributionAttributesService.getTranslationReviewerContributorAttributes(
           translationReviewerStats
@@ -139,6 +116,21 @@ describe('Format contribution attributes service', () => {
     });
 
     it('should return the question submitter stats attributes correctly', () => {
+      let formatContributionAttributesService: FormatContributorAttributesService =
+        new FormatContributorAttributesService();
+      let questionSubmitterStats: QuestionSubmitterStats =
+        new QuestionSubmitterStats(
+          'user1',
+          ['topic1', 'topic2'],
+          6,
+          2,
+          1.0,
+          3,
+          4,
+          5,
+          'firstcontributiondate',
+          10
+        );
       expect(
         formatContributionAttributesService.getQuestionSubmitterContributorAttributes(
           questionSubmitterStats
@@ -168,6 +160,19 @@ describe('Format contribution attributes service', () => {
     });
 
     it('should return the question reviewer stats attributes correctly', () => {
+      let formatContributionAttributesService: FormatContributorAttributesService =
+        new FormatContributorAttributesService();
+      const questionReviewerStats: QuestionReviewerStats =
+        new QuestionReviewerStats(
+          'user1',
+          ['topic1', 'topic2'],
+          2,
+          1,
+          4,
+          6,
+          'firstcontributiondate',
+          2
+        );
       expect(
         formatContributionAttributesService.getQuestionReviewerContributorAttributes(
           questionReviewerStats

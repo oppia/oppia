@@ -23,10 +23,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ContributorDashboardAdminStatsBackendApiService} from '../services/contributor-dashboard-admin-stats-backend-api.service';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
-import {
-  ContributorAttribute,
-  FormatContributorAttributesService,
-} from '../services/format-contributor-attributes.service';
+import {ContributorAttribute} from '../services/format-contributor-attributes.service';
 import {ContributorAdminDashboardFilter} from '../contributor-admin-dashboard-filter.model';
 import {AppConstants} from 'app.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -80,7 +77,7 @@ export class ContributorAdminStatsTable implements OnInit {
   nextOffset: number = 0;
   more: boolean = true;
 
-  expandedElement: ContributorStats[] | null | [] = null;
+  expandedElement: ContributorStats[] | null = null;
 
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
@@ -101,7 +98,6 @@ export class ContributorAdminStatsTable implements OnInit {
     private windowRef: WindowRef,
     private ContributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
     private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
-    private formatContributorAttributesService: FormatContributorAttributesService,
     private modalService: NgbModal
   ) {}
 
@@ -183,10 +179,7 @@ export class ContributorAdminStatsTable implements OnInit {
   getFormattedContributorAttributes(
     contributorStats: ContributorStats
   ): ContributorAttribute[] {
-    return contributorStats.getContributorAttributes(
-      contributorStats,
-      this.formatContributorAttributesService
-    );
+    return contributorStats.getContributorAttributes(contributorStats);
   }
 
   openCdAdminQuestionRoleEditorModal(username: string): void {
