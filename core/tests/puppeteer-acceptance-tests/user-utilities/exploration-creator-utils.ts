@@ -347,7 +347,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
     await this.clickOn(editbutton);
-    await this.clickOn(addUserName); //can be deleted
+    await this.clickOn(addUserName);
     await this.type(addUserName, username);
     await this.clickOn(addRoleBar);
     await this.clickOn(collaborator);

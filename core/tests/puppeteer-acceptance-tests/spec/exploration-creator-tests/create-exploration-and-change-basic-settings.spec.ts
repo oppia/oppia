@@ -25,7 +25,7 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Creator', function () {
   let explorationCreator: ExplorationCreator;
-  let exploration_visitor: ExplorationCreator;
+  let explorationVisitor: ExplorationCreator;
   let superAdmin: SuperAdmin;
 
   beforeAll(async function () {
@@ -33,8 +33,8 @@ describe('Exploration Creator', function () {
       'explorationAdm',
       'exploration_creator@example.com'
     );
-    exploration_visitor = await UserFactory.createNewUser(
-      'explorationVisit',
+    explorationVisitor = await UserFactory.createNewUser(
+      'explorationSeeker',
       'exploration_visitor@example.com'
     );
     superAdmin = await UserFactory.createNewSuperAdmin('Leader');
@@ -116,7 +116,7 @@ describe('Exploration Creator', function () {
       await explorationCreator.expectEmailNotificationToBeActivated();
 
       await explorationCreator.deleteExploration();
-      await exploration_visitor.expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
+      await explorationVisitor.expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
     },
     DEFAULT_SPEC_TIMEOUT
   );
