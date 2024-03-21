@@ -33,7 +33,7 @@ const endInteractionTab = '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
-const addGoal = 'input.e2e-test-exploration-objective-input';
+const addGoal = '.e2e-test-exploration-objective-input';
 const categoryDropDawn = 'mat-select.e2e-test-exploration-category-dropdown';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
@@ -138,7 +138,9 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating Title.
    */
   async addTitle(Title: string): Promise<void> {
+    await this.page.waitForSelector(`${addTitleBar}:not([disabled])`);
     await this.type(addTitleBar, Title);
+    showMessage('Title has been updated to ' + Title);
   }
 
   /**
@@ -146,6 +148,10 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectTitleToHaveMaxLength(maxLength: number): Promise<void> {
     const titleInput = await this.page.$('.e2e-test-exploration-title-input');
+    /**
+     * Debugging.
+     */
+    showMessage('titleInput->' + titleInput);
     const title = await this.page.evaluate(input => input.value, titleInput);
     const titleLength = title.length;
 
@@ -166,7 +172,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding a goal.
    */
   async updateGoal(goal: string): Promise<void> {
-    await this.page.waitForSelector(`${addGoal}`, {visible: true});
+    await this.clickOn(addGoal);
     await this.type(addGoal, goal);
     showMessage('Goal has been filled');
   }
