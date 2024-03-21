@@ -267,18 +267,17 @@ def create_exploration_voice_artists_link_model_instance(
     Args:
         exploration_id: str. The ID of the exploration for which new model will
             be created.
-        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. A
-            dictionary with content IDs as keys and nested dicts as values. Each
-            nested dict contains language codes as keys and a 2-tuple as values.
-            The 2-tuple contains voice artist ID as the first element and
-            VoiceoverDict as the second element. The dict is used to establish
-            a link between exploration ID and all the contents and voiceovers
-            mapping.
+        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. The
+            dictionary contains information about voice artists and their
+            provided voiceovers in an exploration with the given exploration ID.
+            The dict maps content IDs to nested dicts. Each nested dicts maps
+            language code to voice artist and voiceover tuple.
 
     Returns:
         ExplorationVoiceArtistsLinkModel. An instance of
-        ExplorationVoiceArtistsLinkModel to find out which voice artists
-        worked on the latest voiceovers of an exploration.
+        ExplorationVoiceArtistsLinkModel, establishing a link between the latest
+        content IDs within an exploration and the corresponding IDs of
+        voice artists who provided voiceovers.
     """
     exploration_voice_artists_link_model = (
         voiceover_models.ExplorationVoiceArtistsLinkModel(
