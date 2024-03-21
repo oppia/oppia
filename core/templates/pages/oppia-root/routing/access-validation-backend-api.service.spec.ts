@@ -16,11 +16,18 @@
  * @fileoverview Unit tests for access validation backend api service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing';
-import { UrlInterpolationService } from '../../../domain/utilities/url-interpolation.service';
-import { AccessValidationBackendApiService } from './access-validation-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  waitForAsync,
+} from '@angular/core/testing';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
+import {AccessValidationBackendApiService} from './access-validation-backend-api.service';
 
 describe('Access validation backend api service', () => {
   let avbas: AccessValidationBackendApiService;
@@ -149,7 +156,8 @@ describe('Access validation backend api service', () => {
     avbas.validateAccessToDiagnosticTestPlayerPage().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_diagnostic_test_player_page');
+      '/access_validation_handler/can_access_diagnostic_test_player_page'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
