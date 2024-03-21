@@ -265,7 +265,7 @@ describe('Contributor dashboard admin backend api service', () => {
         language_code: languageCode,
       };
       cdabas
-        .removeContributionReviewerAsync(username, category, languageCode)
+        .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
       const query = new URLSearchParams(payload);
@@ -293,7 +293,7 @@ describe('Contributor dashboard admin backend api service', () => {
         language_code: languageCode,
       };
       cdabas
-        .removeContributionReviewerAsync(username, category, languageCode)
+        .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
       const query = new URLSearchParams(payload);
@@ -330,7 +330,7 @@ describe('Contributor dashboard admin backend api service', () => {
         username: username,
       };
       cdabas
-        .removeContributionReviewerAsync(username, category, null)
+        .removeContributionReviewerAsync(category, username, null)
         .then(successHandler, failHandler);
 
       const query = new URLSearchParams(payload);

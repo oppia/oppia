@@ -148,8 +148,8 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async removeContributionReviewerAsync(
-    username: string,
     category: string,
+    username: string,
     languageCode: string | null
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -223,8 +223,8 @@ export class ContributorDashboardAdminBackendApiService {
         );
       } else {
         await this.removeContributionReviewerAsync(
-          username,
           AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+          username,
           null
         );
       }
@@ -240,8 +240,8 @@ export class ContributorDashboardAdminBackendApiService {
         );
       } else {
         await this.removeContributionReviewerAsync(
-          username,
           AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+          username,
           null
         );
       }
