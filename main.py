@@ -268,6 +268,12 @@ URLS = [
     ),
 
     get_redirect_route(
+    r'%s/can_access_facilitator_dashboard_page' %
+    feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+    access_validators.FacilitatorDashboardPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_create_learner_group_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CreateLearnerGroupPageAccessValidationHandler

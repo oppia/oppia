@@ -100,7 +100,7 @@ class CollectionViewerPageAccessValidationHandler(
         pass
 
 
-class FacilitatorDashboardAccessValidationHandler(
+class FacilitatorDashboardPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Validates access to facilitator dashboard page."""
