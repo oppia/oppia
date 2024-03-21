@@ -172,11 +172,24 @@ export class ExplorationCreator extends BaseUser {
    * This function checks if the goal has been set in the exploration.
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
-    await this.page.waitForSelector('.e2e-test-exploration-objective-input');
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
+    await this.page.waitForTimeout(400);
+    /**
+     * Debugging.
+     */
+    showMessage('expectedGoal->' + expectedGoal);
     const goalInput = await this.page.$(
       '.e2e-test-exploration-objective-input'
     );
     const goal = await this.page.evaluate(input => input.value, goalInput);
+    /**
+     * Debugging.
+     */
+    showMessage('goal->' + goal);
     if (goal === expectedGoal) {
       showMessage('The goal has been set for the exploration.');
     } else {
@@ -188,13 +201,11 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in selecting a category from dropdawn.
    */
   async selectACategory(category: string): Promise<void> {
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(500);
     await this.clickOn(categoryDropDawn);
+    /**
+     * Debugging.
+     */
+    showMessage('category dropdawn is visible.');
     await this.clickOn(category);
   }
 
@@ -203,11 +214,19 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
     await this.page.waitForSelector('.mat-select-value');
+    /**
+     * Debugging.
+     */
+    showMessage('expectedCategory->' + expectedCategory);
     const selectedCategory = await this.page.evaluate(() => {
       return (
         document.querySelector('.mat-select-value') as HTMLElement
       ).innerText.trim();
     });
+    /**
+     * Debugging.
+     */
+    showMessage('selectedCategory->' + selectedCategory);
     if (selectedCategory === expectedCategory) {
       showMessage(
         `The category ${selectedCategory}` + ' is same as expectedCategory.'
@@ -224,8 +243,17 @@ export class ExplorationCreator extends BaseUser {
     await this.page.evaluate(() => {
       window.scrollTo(0, 350);
     });
+
     await this.clickOn(languageUpdateBar);
+    /**
+     * Debugging.
+     */
+    showMessage('language update bar is visible');
     await this.clickOn(language);
+    /**
+     * Debugging.
+     */
+    showMessage('language is visible and clicked.');
   }
 
   /**
@@ -238,12 +266,19 @@ export class ExplorationCreator extends BaseUser {
       throw new Error('Category dropdown not found.');
     }
     await languageDropdown.click();
-
+    /**
+     * Debugging.
+     */
+    showMessage('expectedLanguage->' + expectedLanguage);
     const selectedLanguage = await this.page.evaluate(() => {
       return (
         document.querySelector('.mat-option.mat-selected') as HTMLElement
       ).innerText.trim();
     });
+    /**
+     * Debugging.
+     */
+    showMessage('selectedLanguage->' + selectedLanguage);
     if (selectedLanguage === expectedLanguage) {
       showMessage(
         `The language ${selectedLanguage}` + ' is same as expectedLanguage.'
@@ -260,6 +295,10 @@ export class ExplorationCreator extends BaseUser {
     for (let i = 0; i < 3; i++) {
       await this.clickOn(addTags);
       await this.type(addTags, TagNames[i].toLowerCase());
+      /**
+       * Debugging.
+       */
+      showMessage('tagsArray->' + addTags);
       await this.clickOn('.secondary-info-text');
     }
   }
@@ -274,6 +313,10 @@ export class ExplorationCreator extends BaseUser {
   async expectTagsToBeAdded(expectedTags: string[]): Promise<void> {
     const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
     await this.page.waitForSelector('mat-chip-list');
+    /**
+     * Debugging.
+     */
+    showMessage('expectedTags->' + expectedTags);
 
     const addedTags = await this.page.evaluate(() => {
       const tagElements = Array.from(document.querySelectorAll('mat-chip'));
@@ -285,6 +328,10 @@ export class ExplorationCreator extends BaseUser {
         })
         .filter(Boolean);
     });
+    /**
+     * Debugging.
+     */
+    showMessage('addedTags->' + addedTags);
     for (const expectedTag of lowercaseExpectedTags) {
       if (!addedTags.includes(expectedTag)) {
         throw new Error(`Tag "${expectedTag}" was not added.`);
@@ -302,7 +349,15 @@ export class ExplorationCreator extends BaseUser {
       '.e2e-test-open-preview-summary-modal:not([disabled])'
     );
     await this.clickOn(previewSummaryButton);
+    /**
+     * Debugging.
+     */
+    showMessage('previewSummary button is visible.');
     await this.clickOn(dismissPreviewButton);
+    /**
+     * Debugging.
+     */
+    showMessage('Summary has been discarded.');
     await this.expectPreviewSummaryToBeVisible();
   }
 
@@ -314,6 +369,10 @@ export class ExplorationCreator extends BaseUser {
     const previewSummary = await this.page.$(
       '.e2e-test-open-preview-summary-modal'
     );
+    /**
+     * Debugging.
+     */
+    showMessage('previewSummary->' + previewSummary);
     if (previewSummary) {
       showMessage('Preview summary is visible.');
     } else {
@@ -353,11 +412,20 @@ export class ExplorationCreator extends BaseUser {
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
     await this.clickOn(editbutton);
+    /**
+     * Debugging.
+     */
+    showMessage('edit button is visible.');
     await this.clickOn(addUserName);
     await this.type(addUserName, username);
+    /**
+     * Debugging.
+     */
+    showMessage(username + 'has been added.');
     await this.clickOn(addRoleBar);
     await this.clickOn(collaborator);
     await this.clickOn(saveRole);
+    showMessage('Collaborator has been added.');
   }
 
   /**
@@ -370,6 +438,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(addRoleBar);
     await this.clickOn(playtester);
     await this.clickOn(saveRole);
+    showMessage('Playtester has been added.');
   }
 
   /**
@@ -399,6 +468,10 @@ export class ExplorationCreator extends BaseUser {
       await this.clickOn(addVoiceArtistUserName);
       await this.type(addVoiceArtistUserName, voiceArtists[i]);
       await this.clickOn(voiceArtistSaveButton);
+      /**
+       * Debugging.
+       */
+      showMessage(voiceArtists[i] + 'has been added successfully.');
     }
   }
 
@@ -416,6 +489,10 @@ export class ExplorationCreator extends BaseUser {
   async expectEmailNotificationToBeActivated(): Promise<void> {
     await this.page.waitForSelector('input[id="feedback-switch"]');
     const input = await this.page.$('input[id="feedback-switch"]');
+    /**
+     * Debugging.
+     */
+    showMessage(input + '-> it is the email toggle which needs to be enabled.');
 
     if (!input) {
       throw new Error('Feedback switch input element not found.');
@@ -457,9 +534,14 @@ export class ExplorationCreator extends BaseUser {
    */
   async saveDraftExploration(): Promise<void> {
     await this.clickOn(saveDraftButton);
+    /**
+     * Debugging.
+     */
+    showMessage(saveDraftButton + 'is visible.');
     await this.clickOn(commitMessage);
     await this.type(commitMessage, 'Testing Testing');
     await this.clickOn('.e2e-test-save-draft-button');
+    showMessage('Successfully drafted.');
   }
 
   /**
@@ -493,7 +575,6 @@ export class ExplorationCreator extends BaseUser {
       '.oppia-editor-publish-button:not([disabled])'
     );
     await this.clickOn(publishButton);
-    await this.page.waitForSelector(`${saveChangesButton}`, {visible: true});
     await this.clickOn(saveChangesButton);
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
