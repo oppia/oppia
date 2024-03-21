@@ -7308,7 +7308,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # We calculate the time taken to translate
         # a word according to the following document.
         # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 4 words.
+        # The translation in this test has 3 words.
         # Therefore the contribution_hours = 3 * 1 /300 = 0.01.
         self.assertEqual(response['contribution_hours'], '0.01')
         self.assertEqual(response['language'], 'Hindi')
@@ -7378,7 +7378,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # We calculate the time taken to translate
         # a word according to the following document.
         # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 4 words.
+        # The translation in this test has 3 words.
         # Therefore the contribution_hours = 3 * 1 /300 = 0.01.
         self.assertEqual(response['contribution_hours'], '0.01')
         self.assertEqual(response['language'], 'English')
