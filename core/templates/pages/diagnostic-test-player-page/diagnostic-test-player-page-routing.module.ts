@@ -16,24 +16,19 @@
  * @fileoverview Routing module for Diagnostic Test Player page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { DiagnosticTestPlayerPageRootComponent } from './diagnostic-test-player-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {DiagnosticTestPlayerPageRootComponent} from './diagnostic-test-player-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: DiagnosticTestPlayerPageRootComponent
-  }
+    component: DiagnosticTestPlayerPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class DiagnosticTestPlayerPageRoutingModule {}

@@ -16,16 +16,15 @@
  * @fileoverview Diagnostic test player component.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { PreventPageUnloadEventService } from 'services/prevent-page-unload-event.service';
-import { DiagnosticTestTopicTrackerModel } from './diagnostic-test-topic-tracker.model';
-import { Subscription } from 'rxjs';
-import { DiagnosticTestPlayerStatusService } from './diagnostic-test-player-status.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-import { TranslateService } from '@ngx-translate/core';
-
+import {Component, OnInit} from '@angular/core';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {DiagnosticTestTopicTrackerModel} from './diagnostic-test-topic-tracker.model';
+import {Subscription} from 'rxjs';
+import {DiagnosticTestPlayerStatusService} from './diagnostic-test-player-status.service';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {TranslateService} from '@ngx-translate/core';
 
 @Component({
   selector: 'oppia-diagnostic-test-player',
