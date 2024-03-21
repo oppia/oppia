@@ -29,7 +29,7 @@ if MYPY: # pragma: no cover
 
 
 class VoiceoverAdminPageHandlerTests(test_utils.GenericTestBase):
-    """Checks the voiceover admin page functionality and its rendering."""
+    """Checks the voiceover admin page functionality."""
 
     def test_get_voiceover_admin_data(self) -> None:
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
