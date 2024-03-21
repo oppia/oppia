@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Validation Jobs for blog models"""
+"""Deletion Jobs for edit state content suggestion models"""
 
 from __future__ import annotations
 
@@ -36,8 +36,8 @@ if MYPY:  # pragma: no cover
 
 
 class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
-    """Job that deletes emails models that belonged to users that were deleted
-    as part of the wipeout process.
+    """Job that deletes edit state content suggestion models as these are
+    deprecated.
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
