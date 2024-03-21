@@ -19,7 +19,6 @@
 import {error} from 'console';
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
-import {add} from 'lodash';
 
 const creatorDashboardUrl = 'http://localhost:8181/creator-dashboard';
 const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
@@ -33,7 +32,7 @@ const endInteractionTab = '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
-const addGoal = '.e2e-test-exploration-objective-input';
+const addGoal = '#explorationObjective';
 const categoryDropDawn = 'mat-select.e2e-test-exploration-category-dropdown';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
@@ -172,7 +171,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding a goal.
    */
   async updateGoal(goal: string): Promise<void> {
-    await this.clickOn(addGoal);
+    await this.page.waitForSelector(addGoal);
     await this.type(addGoal, goal);
     showMessage('Goal has been filled');
   }
