@@ -16,11 +16,11 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import blog_services
+from core.domain import blog_services, feature_flag_services
 from core.domain import classroom_config_services
 from core.domain import learner_group_services
 from core.domain import user_services
@@ -98,6 +98,26 @@ class CollectionViewerPageAccessValidationHandler(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
+
+
+class FacilitatorDashboardAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to facilitator dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Handles GET requests."""
+        if not feature_flag_services.is_feature_flag_enabled(
+            self.user_id,
+            feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED.value
+        ):
+            raise self.PageNotFoundException
 
 
 class ManageOwnAccountValidationHandler(
