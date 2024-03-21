@@ -120,7 +120,7 @@ export class HtmlLengthService {
       sanitizedHtml: string, calculationType: CalculationType): number {
     let domparser = new DOMParser();
     let dom: Document;
-    dom = domparsesr.parseFromString(sanitizedHtml, 'text/html');
+    dom = domparser.parseFromString(sanitizedHtml, 'text/html');
 
     let totalLength = 0;
     for (let tag of Array.from(dom.body.children)) {
