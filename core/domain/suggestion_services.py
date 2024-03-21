@@ -250,11 +250,6 @@ def create_suggestion(
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
     suggestion.validate()
-    print(change_cmd)
-    print(change_cmd)
-    print(change_cmd)
-    print(change_cmd)
-    print(suggestion_type)
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
