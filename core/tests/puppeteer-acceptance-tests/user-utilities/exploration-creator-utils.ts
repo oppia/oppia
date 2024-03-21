@@ -33,7 +33,8 @@ const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
 const addGoal = '#explorationObjective';
-const categoryDropDawn = 'mat-select.e2e-test-exploration-category-dropdown';
+const categoryDropDawn =
+  'mat-form-field.e2e-test-exploration-category .mat-select';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
 const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
@@ -190,11 +191,13 @@ export class ExplorationCreator extends BaseUser {
      * Debugging.
      */
     showMessage('expectedGoal->' + expectedGoal);
-    const goalInput = await this.page.$('#explorationObjective');
     await this.page.waitForTimeout(500);
-    const goal = await this.page.evaluate(
-      input => input.getAttribute('ng-reflect-model'),
-      goalInput
+    const goal = await this.page.$eval(
+      '#explorationObjective',
+      (input: Element) => {
+        const goalInput = input as HTMLInputElement;
+        return goalInput.value;
+      }
     );
     /**
      * Debugging.
