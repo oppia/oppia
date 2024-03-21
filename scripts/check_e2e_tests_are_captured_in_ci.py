@@ -56,7 +56,8 @@ def get_e2e_suite_names_from_ci_config_file() -> List[str]:
         workflow_dict = yaml.load(file_content, Loader=yaml.Loader)
         suites += workflow_dict[
             'jobs']['e2e_test']['strategy']['matrix']['suite']
-    return sorted(suites)
+    suite_names = map(lambda x: str(x['name']), suites)
+    return list(sorted(suite_names))
 
 
 def get_e2e_suite_names_from_webdriverio_file() -> List[str]:

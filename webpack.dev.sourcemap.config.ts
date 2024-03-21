@@ -17,9 +17,9 @@
  * proper source maps.
  */
 
-var { merge } = require('webpack-merge');
+var {merge} = require('webpack-merge');
 const dev = require('./webpack.dev.config.ts');
 
 module.exports = merge(dev, {
-  devtool: 'inline-source-map'
+  devtool: 'inline-source-map',
 });

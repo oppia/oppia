@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for the error 404 page root component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { LoggerService } from 'services/contextual/logger.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { Error404PageRootComponent } from './error-404-page-root.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {LoggerService} from 'services/contextual/logger.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {Error404PageRootComponent} from './error-404-page-root.component';
 
 describe('Error 404 Page Root', () => {
   let fixture: ComponentFixture<Error404PageRootComponent>;
@@ -31,24 +31,22 @@ describe('Error 404 Page Root', () => {
   class MockWindowRef {
     nativeWindow = {
       location: {
-        pathname
-      }
+        pathname,
+      },
     };
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        Error404PageRootComponent
-      ],
+      declarations: [Error404PageRootComponent],
       providers: [
         LoggerService,
         {
           provide: WindowRef,
-          useClass: MockWindowRef
-        }
+          useClass: MockWindowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -66,6 +64,7 @@ describe('Error 404 Page Root', () => {
     spyOn(loggerService, 'error');
     component.ngOnInit();
     expect(loggerService.error).toHaveBeenCalledWith(
-      `The requested path ${pathname} is not found.`);
+      `The requested path ${pathname} is not found.`
+    );
   });
 });

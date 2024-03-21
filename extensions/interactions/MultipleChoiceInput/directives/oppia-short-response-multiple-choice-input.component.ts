@@ -20,16 +20,16 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { TruncateAtFirstLinePipe } from 'filters/string-utility-filters/truncate-at-first-line.pipe';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {TruncateAtFirstLinePipe} from 'filters/string-utility-filters/truncate-at-first-line.pipe';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-multiple-choice-input',
   templateUrl: './multiple-choice-input-short-response.component.html',
-  providers: [TruncateAtFirstLinePipe]
+  providers: [TruncateAtFirstLinePipe],
 })
 export class ShortResponseMultipleChoiceInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -43,13 +43,16 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
     private htmlEscaperService: HtmlEscaperService,
     private convertToPlainText: ConvertToPlainTextPipe,
     private truncateAtFirstLine: TruncateAtFirstLinePipe
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const _answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as number;
-    const _choices = this.htmlEscaperService.escapedJsonToObj(
-      this.choices) as { _html: string; _contentId: string }[];
+      this.answer
+    ) as number;
+    const _choices = this.htmlEscaperService.escapedJsonToObj(this.choices) as {
+      _html: string;
+      _contentId: string;
+    }[];
     const response = this.convertToPlainText.transform(_choices[_answer]._html);
     this.response = this.truncateAtFirstLine.transform(response);
   }
@@ -58,5 +61,6 @@ export class ShortResponseMultipleChoiceInputComponent implements OnInit {
 angular.module('oppia').directive(
   'oppiaShortResponseMultipleChoiceInput',
   downgradeComponent({
-    component: ShortResponseMultipleChoiceInputComponent
-  }));
+    component: ShortResponseMultipleChoiceInputComponent,
+  })
+);

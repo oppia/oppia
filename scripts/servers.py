@@ -737,6 +737,7 @@ def managed_webdriverio_server(
 @contextlib.contextmanager
 def managed_acceptance_tests_server(
     suite_name: str,
+    headless: bool = False,
     stdout: int = subprocess.PIPE,
 ) -> Iterator[psutil.Process]:
     """Returns context manager to start/stop the acceptance tests
@@ -745,6 +746,7 @@ def managed_acceptance_tests_server(
 
     Args:
         suite_name: str. The suite name whose tests should be run.
+        headless: bool. Whether to run the acceptance tests in headless mode.
         stdout: int. This parameter specifies the executed program's standard
             output file handle.
 
@@ -755,23 +757,32 @@ def managed_acceptance_tests_server(
         Exception. The suite_name is not in the list of the acceptance tests
             suite names.
     """
+    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
+        raise Exception('Invalid suite name: %s' % suite_name)
+
+    if headless:
+        os.environ['HEADLESS'] = 'true'
+    else:
+        os.environ['HEADLESS'] = 'false'
+
     nodemodules_jasmine_bin_path = os.path.join(
         common.NODE_MODULES_PATH, '.bin', 'jasmine')
     puppeteer_acceptance_tests_dir_path = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests')
+    puppeteer_build_dir_path = os.path.join(
+        puppeteer_acceptance_tests_dir_path, 'build')
     spec_dir_path = os.path.join(
-        puppeteer_acceptance_tests_dir_path, 'spec')
+        puppeteer_build_dir_path, 'spec')
     jasmine_config_file_path = os.path.join(
         puppeteer_acceptance_tests_dir_path, 'jasmine.json')
+
+    suite_name_with_extension = '%s.spec.js' % suite_name
 
     acceptance_tests_args = [
         nodemodules_jasmine_bin_path,
         '--config="%s"' % jasmine_config_file_path,
-        '%s' % os.path.join(spec_dir_path, suite_name)
+        '%s' % os.path.join(spec_dir_path, suite_name_with_extension)
     ]
-
-    if suite_name not in common.ACCEPTANCE_TESTS_SUITE_NAMES:
-        raise Exception('Invalid suite name: %s' % suite_name)
 
     # OK to use shell=True here because we are passing string literals,
     # and verifying that the passed suite-name are within the list of

@@ -74,7 +74,7 @@ services:
       - firebase
       - redis
     healthcheck:
-      test: curl -f http://localhost:8181/ || exit 1
+      test: ["CMD", "bash", "docker/dev-server.healthcheck.sh"]
       timeout: 10s
       interval: 30s
       retries: 5

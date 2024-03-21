@@ -21,9 +21,9 @@
 // use these here because we are explicitly specifying the dependencies of a
 // provider, which cannot be done using a injectable (service).
 // eslint-disable-next-line oppia/disallow-httpclient
-import { HttpClient } from '@angular/common/http';
-import { ErrorHandler } from '@angular/core';
-import { LoggerService } from 'services/contextual/logger.service';
+import {HttpClient} from '@angular/common/http';
+import {ErrorHandler} from '@angular/core';
+import {LoggerService} from 'services/contextual/logger.service';
 import firebase from 'firebase/app';
 
 export class AppErrorHandler extends ErrorHandler {
@@ -48,12 +48,12 @@ export class AppErrorHandler extends ErrorHandler {
     'auth/user-not-found',
   ];
 
-  private readonly UNHANDLED_REJECTION_STATUS_CODE_REGEX = (
-    /Possibly unhandled rejection: {.*"status":-1/);
+  private readonly UNHANDLED_REJECTION_STATUS_CODE_REGEX =
+    /Possibly unhandled rejection: {.*"status":-1/;
 
   MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
-  timeOfLastPostedError: number = (
-    Date.now() - this.MIN_TIME_BETWEEN_ERRORS_MSEC);
+  timeOfLastPostedError: number =
+    Date.now() - this.MIN_TIME_BETWEEN_ERRORS_MSEC;
 
   constructor(
     private http: HttpClient,
@@ -63,19 +63,19 @@ export class AppErrorHandler extends ErrorHandler {
   }
 
   handleError(error: Error): void {
-    if (AppErrorHandler.EXPECTED_ERROR_CODES.includes(
-      // The firebase.auth.Error is not compatible with javascript's Error type.
-      // That's why explicit type conversion is used here.
-      (error as unknown as firebase.auth.Error).code)
+    if (
+      AppErrorHandler.EXPECTED_ERROR_CODES.includes(
+        // The firebase.auth.Error is not compatible with javascript's Error type.
+        // That's why explicit type conversion is used here.
+        (error as unknown as firebase.auth.Error).code
+      )
     ) {
       return;
     }
 
     // Suppress unhandled rejection errors status code -1, because -1 is the
     // status code for aborted requests.
-    if (this.UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(
-      error.message
-    )) {
+    if (this.UNHANDLED_REJECTION_STATUS_CODE_REGEX.test(error.message)) {
       return;
     }
 
@@ -101,19 +101,25 @@ export class AppErrorHandler extends ErrorHandler {
       '',
       error.message,
       '',
-      '    at URL: ' + window.location.href
+      '    at URL: ' + window.location.href,
     ].join('\n');
     let timeDifference = Date.now() - this.timeOfLastPostedError;
     // To prevent an overdose of errors, throttle to at most 1 error
     // every MIN_TIME_BETWEEN_ERRORS_MSEC.
     if (timeDifference > this.MIN_TIME_BETWEEN_ERRORS_MSEC) {
-      this.http.post('/frontend_errors', {
-        error: messageAndStackTrace
-      }).toPromise().then(() => {
-        this.timeOfLastPostedError = Date.now();
-      }, () => {
-        this.loggerService.warn('Error logging failed.');
-      });
+      this.http
+        .post('/frontend_errors', {
+          error: messageAndStackTrace,
+        })
+        .toPromise()
+        .then(
+          () => {
+            this.timeOfLastPostedError = Date.now();
+          },
+          () => {
+            this.loggerService.warn('Error logging failed.');
+          }
+        );
     }
 
     this.loggerService.error(error.message);
@@ -125,5 +131,5 @@ export class AppErrorHandler extends ErrorHandler {
 export const AppErrorHandlerProvider = {
   provide: ErrorHandler,
   useClass: AppErrorHandler,
-  deps: [HttpClient, LoggerService]
+  deps: [HttpClient, LoggerService],
 };

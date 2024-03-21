@@ -21,24 +21,26 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {
   RecordedVoiceOverBackendDict,
-  RecordedVoiceovers
+  RecordedVoiceovers,
 } from 'domain/exploration/recorded-voiceovers.model';
 
 import {
   SubtitledHtmlBackendDict,
-  SubtitledHtml
+  SubtitledHtml,
 } from 'domain/exploration/subtitled-html.model';
 
 export interface SubtopicPageContentsBackendDict {
-  'subtitled_html': SubtitledHtmlBackendDict;
-  'recorded_voiceovers': RecordedVoiceOverBackendDict;
+  subtitled_html: SubtitledHtmlBackendDict;
+  recorded_voiceovers: RecordedVoiceOverBackendDict;
 }
 
 export class SubtopicPageContents {
   _subtitledHtml: SubtitledHtml;
   _recordedVoiceovers: RecordedVoiceovers;
   constructor(
-      subtitledHtml: SubtitledHtml, recordedVoiceovers: RecordedVoiceovers) {
+    subtitledHtml: SubtitledHtml,
+    recordedVoiceovers: RecordedVoiceovers
+  ) {
     this._subtitledHtml = subtitledHtml;
     this._recordedVoiceovers = recordedVoiceovers;
   }
@@ -70,7 +72,7 @@ export class SubtopicPageContents {
   toBackendDict(): SubtopicPageContentsBackendDict {
     return {
       subtitled_html: this._subtitledHtml.toBackendDict(),
-      recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
+      recorded_voiceovers: this._recordedVoiceovers.toBackendDict(),
     };
   }
 
@@ -79,15 +81,16 @@ export class SubtopicPageContents {
     recordedVoiceovers.addContentId('content');
     return new SubtopicPageContents(
       SubtitledHtml.createDefault('', 'content'),
-      recordedVoiceovers);
+      recordedVoiceovers
+    );
   }
 
   static createFromBackendDict(
-      backendDict: SubtopicPageContentsBackendDict): SubtopicPageContents {
+    backendDict: SubtopicPageContentsBackendDict
+  ): SubtopicPageContents {
     return new SubtopicPageContents(
-      SubtitledHtml.createFromBackendDict(
-        backendDict.subtitled_html),
-      RecordedVoiceovers.createFromBackendDict(
-        backendDict.recorded_voiceovers));
+      SubtitledHtml.createFromBackendDict(backendDict.subtitled_html),
+      RecordedVoiceovers.createFromBackendDict(backendDict.recorded_voiceovers)
+    );
   }
 }

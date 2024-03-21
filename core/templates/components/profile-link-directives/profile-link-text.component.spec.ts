@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {RouterModule} from '@angular/router';
+import {APP_BASE_HREF} from '@angular/common';
 
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { ProfileLinkTextComponent } from './profile-link-text.component';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {ProfileLinkTextComponent} from './profile-link-text.component';
 
 /**
  * @fileoverview Unit tests for ProfileLinkTextComponent
@@ -35,13 +35,15 @@ describe('ProfileLinkTextComponent', () => {
         // TODO(#13443): Remove hybrid router module provider once all pages are
         // migrated to angular router.
         SmartRouterModule,
-        RouterModule.forRoot([])
+        RouterModule.forRoot([]),
       ],
       declarations: [ProfileLinkTextComponent],
-      providers: [{
-        provide: APP_BASE_HREF,
-        useValue: '/'
-      }]
+      providers: [
+        {
+          provide: APP_BASE_HREF,
+          useValue: '/',
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -58,7 +60,6 @@ describe('ProfileLinkTextComponent', () => {
     expect(component.isUsernameLinkable('linkableUsername')).toBe(true);
   });
 
-
   it('should set profile URL when the username is set', () => {
     expect(component.profileUrl).not.toBeDefined();
 
@@ -66,8 +67,10 @@ describe('ProfileLinkTextComponent', () => {
 
     expect(component.profileUrl).toEqual(
       '/' +
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
-        ':username_fragment', 'dummy')
+        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PROFILE.ROUTE.replace(
+          ':username_fragment',
+          'dummy'
+        )
     );
   });
 

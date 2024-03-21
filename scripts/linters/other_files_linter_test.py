@@ -28,10 +28,10 @@ from core.tests import test_utils
 from typing import Final, List, Tuple
 
 from . import other_files_linter
-from . import pre_commit_linter
+from . import run_lint_checks
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
-NAME_SPACE.files = pre_commit_linter.FileCache()
+NAME_SPACE.files = run_lint_checks.FileCache()
 FILE_CACHE: Final = NAME_SPACE.files
 
 LINTER_TESTS_DIR: Final = os.path.join(
@@ -84,7 +84,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '- third_party/static/bootstrap-4.3.1/')
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
@@ -102,7 +102,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '# Third party files:', '- third_party/static/bootstrap-4.3/')
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_skip_files_in_app_dev_yaml()
@@ -131,7 +131,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             )
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
@@ -156,7 +156,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             )
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()
@@ -180,7 +180,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             )
 
         readlines_swap = self.swap(
-            pre_commit_linter.FileCache, 'readlines', mock_readlines)
+            run_lint_checks.FileCache, 'readlines', mock_readlines)
         with readlines_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE).check_webpack_config_file()

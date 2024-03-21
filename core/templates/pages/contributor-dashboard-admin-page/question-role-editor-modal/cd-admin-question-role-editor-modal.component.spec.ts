@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for CdAdminQuestionRoleEditorModal.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import { CdAdminQuestionRoleEditorModal } from './cd-admin-question-role-editor-modal.component';
+import {CdAdminQuestionRoleEditorModal} from './cd-admin-question-role-editor-modal.component';
 
 describe('CdAdminQuestionRoleEditorModal', () => {
   let component: CdAdminQuestionRoleEditorModal;
@@ -30,22 +30,14 @@ describe('CdAdminQuestionRoleEditorModal', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        FormsModule,
-        HttpClientTestingModule
-      ],
-      declarations: [
-        CdAdminQuestionRoleEditorModal
-      ],
-      providers: [
-        NgbActiveModal
-      ]
+      imports: [FormsModule, HttpClientTestingModule],
+      declarations: [CdAdminQuestionRoleEditorModal],
+      providers: [NgbActiveModal],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(
-      CdAdminQuestionRoleEditorModal);
+    fixture = TestBed.createComponent(CdAdminQuestionRoleEditorModal);
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
     component.ngOnInit();
@@ -54,7 +46,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
   it('should properly toggle Question Submitter checkbox', () => {
     component.rights = {
       isQuestionSubmitter: true,
-      isQuestionReviewer: false
+      isQuestionReviewer: false,
     };
     fixture.detectChanges();
 
@@ -62,14 +54,14 @@ describe('CdAdminQuestionRoleEditorModal', () => {
 
     expect(component.rights).toEqual({
       isQuestionSubmitter: false,
-      isQuestionReviewer: false
+      isQuestionReviewer: false,
     });
   });
 
   it('should properly toggle Question reviewer checkbox', () => {
     component.rights = {
       isQuestionSubmitter: true,
-      isQuestionReviewer: false
+      isQuestionReviewer: false,
     };
     fixture.detectChanges();
 
@@ -77,14 +69,14 @@ describe('CdAdminQuestionRoleEditorModal', () => {
 
     expect(component.rights).toEqual({
       isQuestionSubmitter: true,
-      isQuestionReviewer: true
+      isQuestionReviewer: true,
     });
   });
 
   it('should save and close modal and return selected rights', () => {
     component.rights = {
       isQuestionSubmitter: true,
-      isQuestionReviewer: false
+      isQuestionReviewer: false,
     };
     const modalCloseSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
 
@@ -96,7 +88,7 @@ describe('CdAdminQuestionRoleEditorModal', () => {
   it('should close modal without returning anything', () => {
     component.rights = {
       isQuestionSubmitter: true,
-      isQuestionReviewer: false
+      isQuestionReviewer: false,
     };
     const modalCloseSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
 

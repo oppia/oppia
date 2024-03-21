@@ -24,13 +24,16 @@
 var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 
-var MathEditor = function(elem) {
+var MathEditor = function (elem) {
   return {
-    setValue: async function(text) {
+    setValue: async function (text) {
       await waitFor.elementToBeClickable(
-        elem, `"${await elem.getTagName()}" takes too long to be clickable`);
+        elem,
+        `"${await elem.getTagName()}" takes too long to be clickable`
+      );
       await action.click('Maths Editor', elem);
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
@@ -39,12 +42,17 @@ var MathEditor = function(elem) {
       var present = await mathInputElem[lastElement].isExisting();
       if (present) {
         await action.addValue(
-          'Maths Input Element', mathInputElem[lastElement], text);
+          'Maths Input Element',
+          mathInputElem[lastElement],
+          text
+        );
       }
     },
-    getValue: async function() {
+    getValue: async function () {
       await waitFor.elementToBeClickable(
-        elem, `"${elem.getTagName()}" takes too long to be clickable`);
+        elem,
+        `"${elem.getTagName()}" takes too long to be clickable`
+      );
       // The active guppy div will be the one that is created last which is why
       // we fetch the last element.
       var mathInputElem = await $$('.e2e-test-guppy-div');
@@ -57,248 +65,307 @@ var MathEditor = function(elem) {
           return await action.getText('Maths Input Element', contentElem);
         }
       }
-    }
+    },
   };
 };
 
-var BooleanEditor = function(elem) {
+var BooleanEditor = function (elem) {
   return {
-    setValue: async function(value) {
+    setValue: async function (value) {
       currentValue = await elem.$('<input>').isSelected();
       if (value !== currentValue) {
         await action.click('Boolean Editor', elem.$('<input>'));
       }
-    }
+    },
   };
 };
 
-var CoordTwoDim = function(elem) {
+var CoordTwoDim = function (elem) {
   return {
     // The 'coordinates' arg is a two-element list whose elements represent
     // latitude and longitude respectively.
-    setValue: async function(coordinates) {
+    setValue: async function (coordinates) {
       var coordTwoDimInput = await elem.$$('<input>');
       var count = coordTwoDimInput.length;
-      await action.clear(
-        'Coord Two Dim Input', coordTwoDimInput[0]);
+      await action.clear('Coord Two Dim Input', coordTwoDimInput[0]);
       await action.setValue(
-        'Coord Two Dim Input', coordTwoDimInput[0], coordinates[0]);
-      await action.clear(
-        'Coord Two Dim Input', coordTwoDimInput[count - 1]);
+        'Coord Two Dim Input',
+        coordTwoDimInput[0],
+        coordinates[0]
+      );
+      await action.clear('Coord Two Dim Input', coordTwoDimInput[count - 1]);
       await action.setValue(
-        'Coord Two Dim Input', coordTwoDimInput[count - 1], coordinates[1]);
-    }
+        'Coord Two Dim Input',
+        coordTwoDimInput[count - 1],
+        coordinates[1]
+      );
+    },
   };
 };
 
-var FilepathEditor = function(elem) {
+var FilepathEditor = function (elem) {
   return {
-    upload: async function(filepath) {
+    upload: async function (filepath) {
       // TODO(Jacob): Modify filepath relative to the directory from which the
       // webdriverio code is operating.
       await action.setValue(
-        'Filepath Editor Input', elem.$('.e2e-test-file-upload'), filepath);
+        'Filepath Editor Input',
+        elem.$('.e2e-test-file-upload'),
+        filepath
+      );
     },
-    setName: async function(name) {
+    setName: async function (name) {
       var fileNameInput = elem.$('.e2e-test-file-name');
-      await action.clear(
-        'Filepath Editor Input', fileNameInput);
-      await action.setValue(
-        'Filepath Editor Input', fileNameInput, name);
-    }
-  };
-};
-
-var FractionEditor = function(elem) {
-  return {
-    setValue: async function(value) {
-      await action.clear(
-        'Fraction Editor Input', elem.$('<input>'));
-      await action.setValue(
-        'Fraction Editor Input', elem.$('<input>'), value);
+      await action.clear('Filepath Editor Input', fileNameInput);
+      await action.setValue('Filepath Editor Input', fileNameInput, name);
     },
-    expectValueToBe: async function(expectedValue) {
-      var value = await action.getAttribute(
-        'Fraction Editor Input', elem.$('<input>'), 'value');
-      expect(value).toEqual(expectedValue);
-    }
   };
 };
 
-var IntEditor = function(elem) {
+var FractionEditor = function (elem) {
   return {
-    setValue: async function(value) {
-      await action.clear(
-        'Int Editor Input', elem.$('<input>'));
-      await action.setValue(
-        'Int Editor Input', elem.$('<input>'), value);
+    setValue: async function (value) {
+      await action.clear('Fraction Editor Input', elem.$('<input>'));
+      await action.setValue('Fraction Editor Input', elem.$('<input>'), value);
     },
-    expectValueToBe: async function(expectedValue) {
+    expectValueToBe: async function (expectedValue) {
       var value = await action.getAttribute(
-        'Int Editor Input', elem.$('<input>'), 'value');
+        'Fraction Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
       expect(value).toEqual(expectedValue);
-    }
-  };
-};
-
-var MathExpressionContentEditor = function(elem) {
-  return {
-    setValue: async function(rawLatex) {
-      await action.clear(
-        'MathExpression Content Editor Input', elem.$('<textarea>'));
-      await action.setValue(
-        'MathExpression Content Editor Input', elem.$('<textarea>'), rawLatex);
-    }
-  };
-};
-
-var NonnegativeIntEditor = function(elem) {
-  return {
-    setValue: async function(value) {
-      await action.clear(
-        'Nonnegative Int Editor Input', elem.$('<input>'));
-      await action.setValue(
-        'Nonnegative Int Editor Input', elem.$('<input>'), value);
     },
-    expectValueToBe: async function(expectedValue) {
-      var value = await action.getAttribute(
-        'Nonnegative Int Editor Input', elem.$('<input>'), 'value');
-      expect(value).toEqual(expectedValue);
-    }
   };
 };
 
-var NormalizedStringEditor = function(elem) {
+var IntEditor = function (elem) {
   return {
-    setValue: async function(value) {
-      await action.clear(
-        'Normalized String Editor Input', elem.$('<input>'));
-      await action.setValue(
-        'Normalized String Editor Input', elem.$('<input>'), value);
+    setValue: async function (value) {
+      await action.clear('Int Editor Input', elem.$('<input>'));
+      await action.setValue('Int Editor Input', elem.$('<input>'), value);
     },
-    expectValueToBe: async function(expectedValue) {
+    expectValueToBe: async function (expectedValue) {
       var value = await action.getAttribute(
-        'Normalized String Editor Input', elem.$('<input>'), 'value');
+        'Int Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
       expect(value).toEqual(expectedValue);
-    }
-  };
-};
-
-var NumberWithUnitsEditor = function(elem) {
-  return {
-    setValue: async function(value) {
-      await action.clear(
-        'Number With Units Editor Input', elem.$('<input>'));
-      await action.setValue(
-        'Number With Units Editor Input', elem.$('<input>'), value);
     },
-    expectValueToBe: async function(expectedValue) {
-      var value = await action.getAttribute(
-        'Number With Units Editor Input', elem.$('<input>'), 'value');
-      expect(value).toEqual(expectedValue);
-    }
   };
 };
 
-var ParameterNameEditor = function(elem) {
+var MathExpressionContentEditor = function (elem) {
   return {
-    setValue: async function(text) {
+    setValue: async function (rawLatex) {
+      await action.clear(
+        'MathExpression Content Editor Input',
+        elem.$('<textarea>')
+      );
+      await action.setValue(
+        'MathExpression Content Editor Input',
+        elem.$('<textarea>'),
+        rawLatex
+      );
+    },
+  };
+};
+
+var NonnegativeIntEditor = function (elem) {
+  return {
+    setValue: async function (value) {
+      await action.clear('Nonnegative Int Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Nonnegative Int Editor Input',
+        elem.$('<input>'),
+        value
+      );
+    },
+    expectValueToBe: async function (expectedValue) {
+      var value = await action.getAttribute(
+        'Nonnegative Int Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
+      expect(value).toEqual(expectedValue);
+    },
+  };
+};
+
+var NormalizedStringEditor = function (elem) {
+  return {
+    setValue: async function (value) {
+      await action.clear('Normalized String Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Normalized String Editor Input',
+        elem.$('<input>'),
+        value
+      );
+    },
+    expectValueToBe: async function (expectedValue) {
+      var value = await action.getAttribute(
+        'Normalized String Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
+      expect(value).toEqual(expectedValue);
+    },
+  };
+};
+
+var NumberWithUnitsEditor = function (elem) {
+  return {
+    setValue: async function (value) {
+      await action.clear('Number With Units Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Number With Units Editor Input',
+        elem.$('<input>'),
+        value
+      );
+    },
+    expectValueToBe: async function (expectedValue) {
+      var value = await action.getAttribute(
+        'Number With Units Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
+      expect(value).toEqual(expectedValue);
+    },
+  };
+};
+
+var ParameterNameEditor = function (elem) {
+  return {
+    setValue: async function (text) {
       var parameterSelector = await elem.$('<select>');
       await parameterSelector.selectByVisibleText(text);
-    }
+    },
   };
 };
 
-var PositiveIntEditor = function(elem) {
+var PositiveIntEditor = function (elem) {
   return {
-    setValue: async function(value) {
-      await action.clear(
-        'Positive Int Editor Input', elem.$('<input>'));
+    setValue: async function (value) {
+      await action.clear('Positive Int Editor Input', elem.$('<input>'));
       await action.setValue(
-        'Positive Int Editor Input', elem.$('<input>'), value);
+        'Positive Int Editor Input',
+        elem.$('<input>'),
+        value
+      );
     },
-    expectValueToBe: async function(expectedValue) {
+    expectValueToBe: async function (expectedValue) {
       await waitFor.visibilityOf(
-        elem, `"${elem.getTagName()}" takes too long to be visible`);
+        elem,
+        `"${elem.getTagName()}" takes too long to be visible`
+      );
       var value = await action.getAttribute(
-        'Positive Int Editor Input', elem.$('<input>'), 'value');
+        'Positive Int Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
       expect(value).toEqual(expectedValue);
-    }
-  };
-};
-
-var RatioExpressionEditor = function(elem) {
-  return {
-    setValue: async function(value) {
-      await action.clear(
-        'Ratio Expression Editor Input', elem.$('<input>'));
-      await action.setValue(
-        'Ratio Expression Editor Input', elem.$('<input>'), value);
     },
-    expectValueToBe: async function(expectedValue) {
-      var value = await action.getAttribute(
-        'Ratio Expression Editor Input', elem.$('<input>'), 'value');
-      expect(value).toEqual(expectedValue);
-    }
   };
 };
 
-var SanitizedUrlEditor = function(elem) {
+var RatioExpressionEditor = function (elem) {
   return {
-    setValue: async function(text) {
-      await action.clear(
-        'Sanitized Url Editor Input', elem.$('<input>'));
+    setValue: async function (value) {
+      await action.clear('Ratio Expression Editor Input', elem.$('<input>'));
       await action.setValue(
-        'Sanitized Url Editor Input', elem.$('<input>'), text);
+        'Ratio Expression Editor Input',
+        elem.$('<input>'),
+        value
+      );
     },
-    expectValueToBe: async function(expectedValue) {
+    expectValueToBe: async function (expectedValue) {
       var value = await action.getAttribute(
-        'Sanitized Url Editor Input', elem.$('<input>'), 'value');
+        'Ratio Expression Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
       expect(value).toEqual(expectedValue);
-    }
+    },
   };
 };
 
-var TranslatableSetOfNormalizedStringEditor = function(elem) {
+var SanitizedUrlEditor = function (elem) {
   return {
-    setValue: async function(normalizedStrings) {
+    setValue: async function (text) {
+      await action.clear('Sanitized Url Editor Input', elem.$('<input>'));
+      await action.setValue(
+        'Sanitized Url Editor Input',
+        elem.$('<input>'),
+        text
+      );
+    },
+    expectValueToBe: async function (expectedValue) {
+      var value = await action.getAttribute(
+        'Sanitized Url Editor Input',
+        elem.$('<input>'),
+        'value'
+      );
+      expect(value).toEqual(expectedValue);
+    },
+  };
+};
+
+var TranslatableSetOfNormalizedStringEditor = function (elem) {
+  return {
+    setValue: async function (normalizedStrings) {
       // Clear all entries.
       await forms.ListEditor(elem).setLength(0);
       for (let i = 0; i < normalizedStrings.length; i++) {
-        const normalizedStringEditor = await forms.ListEditor(elem).addItem(
-          'NormalizedString');
+        const normalizedStringEditor = await forms
+          .ListEditor(elem)
+          .addItem('NormalizedString');
         await normalizedStringEditor.setValue(normalizedStrings[i]);
       }
-    }
+    },
   };
 };
 
-var SkillSelector = function(elem) {
+var SkillSelector = function (elem) {
   return {
-    setValue: async function(skillDescription) {
+    setValue: async function (skillDescription) {
       var skillSelectorInput = elem.$('.e2e-test-skill-name-input');
       var skillSelectorItem = elem.$('.e2e-test-rte-skill-selector-item');
       await action.setValue(
-        'Skill Selector', skillSelectorInput, skillDescription);
+        'Skill Selector',
+        skillSelectorInput,
+        skillDescription
+      );
       await waitFor.visibilityOf(skillSelectorItem);
       await action.click('Skill Selector', skillSelectorItem);
-    }
+    },
   };
 };
 
-var UnicodeStringEditor = function(elem) {
+var UnicodeStringEditor = function (elem) {
   return {
-    setValue: async function(text) {
-      await action.clear(
-        'Unicode String Editor Input', elem.$('<input>'));
+    setValue: async function (text) {
+      await action.clear('Unicode String Editor Input', elem.$('<input>'));
       await action.setValue(
-        'Unicode String Editor Input', elem.$('<input>'), text);
+        'Unicode String Editor Input',
+        elem.$('<input>'),
+        text
+      );
     },
-    expectValueToBe: async function(expectedValue) {
+    getValue: async function () {
+      return await action.getValue(
+        'Unicode String Editor Input',
+        elem.$('<input>')
+      );
+    },
+    expectValueToBe: async function (expectedValue) {
       var value = await action.getAttribute(
-        'Unicode Input Element', elem.$('<input>'), 'value');
+        'Unicode Input Element',
+        elem.$('<input>'),
+        'value'
+      );
       expect(value).toEqual(expectedValue);
-    }
+    },
   };
 };
 
@@ -322,7 +389,7 @@ var OBJECT_EDITORS = {
   SanitizedUrl: SanitizedUrlEditor,
   TranslatableSetOfNormalizedString: TranslatableSetOfNormalizedStringEditor,
   SkillSelector: SkillSelector,
-  UnicodeString: UnicodeStringEditor
+  UnicodeString: UnicodeStringEditor,
 };
 
 exports.MathEditor = MathEditor;

@@ -36,36 +36,49 @@
  * on the fly.
  */
 
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, OnInit, ViewChild } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { ContextService } from 'services/context.service';
-import { CkEditorCopyContentService } from './ck-editor-copy-content.service';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { RteComponentSpecs } from './ck-editor-4-widgets.initializer';
-import { Subscription } from 'rxjs';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {ContextService} from 'services/context.service';
+import {CkEditorCopyContentService} from './ck-editor-copy-content.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {RteComponentSpecs} from './ck-editor-4-widgets.initializer';
+import {Subscription} from 'rxjs';
 
 interface UiConfig {
   (): UiConfig;
-  'hide_complex_extensions': boolean;
-  'startupFocusEnabled'?: boolean;
-  'language'?: string;
-  'languageDirection'?: string;
+  hide_complex_extensions: boolean;
+  startupFocusEnabled?: boolean;
+  language?: string;
+  languageDirection?: string;
 }
 
 interface RteConfig extends CKEDITOR.config {
-  'format_heading'?: CKEDITOR.config.styleObject;
-  'format_normal'?: CKEDITOR.config.styleObject;
+  format_heading?: CKEDITOR.config.styleObject;
+  format_normal?: CKEDITOR.config.styleObject;
 }
 
 @Component({
   selector: 'ck-editor-4-rte',
   templateUrl: './ck-editor-4-rte.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
-export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
-    OnDestroy, OnInit {
+export class CkEditor4RteComponent
+  implements AfterViewInit, OnChanges, OnDestroy, OnInit
+{
   @Input() uiConfig: UiConfig;
   @Input() value;
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
@@ -78,9 +91,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   componentsThatRequireInternet: string[] = [];
   subscriptions: Subscription;
   // A RegExp for matching rich text components.
-  componentRe = (
-    /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
-  );
+  componentRe = /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g;
 
   @ViewChild('oppiaRTE') oppiaRTE: ElementRef;
 
@@ -105,7 +116,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
             this.disableRTEicons();
             this.connectedToInternet = internetAccessible;
           }
-        }));
+        }
+      )
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -161,11 +174,11 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
    * UI elements
    */
   private _createCKEditorConfig(
-      uiConfig: UiConfig,
-      pluginNames: string,
-      buttonNames: string[],
-      extraAllowedContentRules: string,
-      sharedSpaces: CKEDITOR.sharedSpace
+    uiConfig: UiConfig,
+    pluginNames: string,
+    buttonNames: string[],
+    extraAllowedContentRules: string,
+    sharedSpaces: CKEDITOR.sharedSpace
   ): CKEDITOR.config {
     // Language configs use default language when undefined.
     const ckConfig: RteConfig = {
@@ -177,44 +190,48 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       extraAllowedContent: extraAllowedContentRules,
       forcePasteAsPlainText: true,
       sharedSpaces: sharedSpaces,
-      skin: (
+      skin:
         'bootstrapck,' +
-      '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/'
-      ),
+        '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/',
       toolbar: [
         {
           name: 'basicstyles',
-          items: ['Bold', '-', 'Italic']
+          items: ['Bold', '-', 'Italic'],
         },
         {
           name: 'paragraph',
           items: [
-            'NumberedList', '-',
-            'BulletedList', '-',
-            'Pre', '-',
-            'Blockquote', '-',
-            'Indent', '-',
+            'NumberedList',
+            '-',
+            'BulletedList',
+            '-',
+            'Pre',
+            '-',
+            'Blockquote',
+            '-',
+            'Indent',
+            '-',
             'Outdent',
             'Format',
-          ]
+          ],
         },
         {
           name: 'rtecomponents',
-          items: buttonNames
+          items: buttonNames,
         },
         {
           name: 'document',
-          items: ['Source']
-        }
+          items: ['Source'],
+        },
       ],
       format_tags: 'heading;normal',
       format_heading: {
         element: 'h1',
-        name: 'Heading'
+        name: 'Heading',
       },
       format_normal: {
         element: 'div',
-        name: 'Normal'
+        name: 'Normal',
       },
     };
 
@@ -227,8 +244,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       ckConfig.contentsLanguage = uiConfig.language;
     }
     if (uiConfig.languageDirection) {
-      ckConfig.contentsLangDirection = (
-        uiConfig.languageDirection);
+      ckConfig.contentsLangDirection = uiConfig.languageDirection;
     }
     if (uiConfig.startupFocusEnabled !== undefined) {
       ckConfig.startupFocus = uiConfig.startupFocusEnabled;
@@ -255,9 +271,13 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
       } else {
         return (
-          '<div type="oppia-noninteractive-' + p3 + '"' +
-          'class="oppia-rte-component-container">' + match +
-          '</div>');
+          '<div type="oppia-noninteractive-' +
+          p3 +
+          '"' +
+          'class="oppia-rte-component-container">' +
+          match +
+          '</div>'
+        );
       }
     });
   }
@@ -268,20 +288,23 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var icons = [];
     this.componentsThatRequireInternet = [];
 
-    _RICH_TEXT_COMPONENTS.forEach((componentDefn) => {
-      var hideComplexExtensionFlag = (
+    _RICH_TEXT_COMPONENTS.forEach(componentDefn => {
+      var hideComplexExtensionFlag =
         this.uiConfig &&
-              this.uiConfig.hide_complex_extensions &&
-              componentDefn.isComplex);
-      var notSupportedOnAndroidFlag = (
+        this.uiConfig.hide_complex_extensions &&
+        componentDefn.isComplex;
+      var notSupportedOnAndroidFlag =
         this.contextService.isExplorationLinkedToStory() &&
-              AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
-                componentDefn.id) === -1);
-      if (!(
-        hideComplexExtensionFlag ||
-        notSupportedOnAndroidFlag ||
-        this.isInvalidForBlogPostEditorRTE(componentDefn)
-      )) {
+        AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
+          componentDefn.id
+        ) === -1;
+      if (
+        !(
+          hideComplexExtensionFlag ||
+          notSupportedOnAndroidFlag ||
+          this.isInvalidForBlogPostEditorRTE(componentDefn)
+        )
+      ) {
         names.push(componentDefn.id);
         icons.push(componentDefn.iconDataUrl);
       }
@@ -294,7 +317,7 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     var resize = () => {
       // TODO(#12882): Remove the use of jQuery.
       $('.oppia-rte-resizer').css({
-        width: '100%'
+        width: '100%',
       });
     };
     for (let i of Object.keys(editable)) {
@@ -307,17 +330,20 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     }
 
     /**
-       * Create rules to allow all the rich text components and
-       * their wrappers and overlays.
-       * See format of filtering rules here:
-       * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
-       */
+     * Create rules to allow all the rich text components and
+     * their wrappers and overlays.
+     * See format of filtering rules here:
+     * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+     */
     // Allow the component tags with any attributes and classes.
-    var componentRule = names.map((name) => {
-      return 'oppia-noninteractive-ckeditor-' + name;
-    }).join(' ') + '(*)[*];';
-      // Allow the inline component wrapper, which is a
-      // span with a "type" attribute.
+    var componentRule =
+      names
+        .map(name => {
+          return 'oppia-noninteractive-ckeditor-' + name;
+        })
+        .join(' ') + '(*)[*];';
+    // Allow the inline component wrapper, which is a
+    // span with a "type" attribute.
     var inlineWrapperRule = ' span[type];';
     // Allow the block component wrapper, which is a div
     // with a "type" attribute and a CSS class.
@@ -326,16 +352,16 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     // a div with a CSS class.
     var blockOverlayRule = ' div(oppia-rte-component-overlay);';
     // Put all the rules together.
-    var extraAllowedContentRules = componentRule +
-                                         inlineWrapperRule +
-                                         blockWrapperRule +
-                                         blockOverlayRule;
-    var pluginNames = names.map((name) => {
-      return 'oppia' + name;
-    }).join(',');
+    var extraAllowedContentRules =
+      componentRule + inlineWrapperRule + blockWrapperRule + blockOverlayRule;
+    var pluginNames = names
+      .map(name => {
+        return 'oppia' + name;
+      })
+      .join(',');
     var buttonNames = [];
     if (this.contextService.canAddOrEditComponents()) {
-      names.forEach((name) => {
+      names.forEach(name => {
         buttonNames.push('Oppia' + name);
         buttonNames.push('-');
       });
@@ -349,26 +375,31 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
     CKEDITOR.plugins.addExternal(
       'sharedspace',
       '/third_party/static/ckeditor-4.12.1/plugins/sharedspace/',
-      'plugin.js');
+      'plugin.js'
+    );
     // Pre plugin is not available for 4.12.1 version of CKEditor. This is
     // a self created plugin (other plugins are provided by CKEditor).
     CKEDITOR.plugins.addExternal(
-      'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
+      'pre',
+      '/extensions/ckeditor_plugins/pre/',
+      'plugin.js'
+    );
 
     const sharedSpaces = {
-      top: (
-        this.elementRef.nativeElement.children[0].children[0] as HTMLElement)
+      top: this.elementRef.nativeElement.children[0].children[0] as HTMLElement,
     };
 
     const ckConfig = this._createCKEditorConfig(
-      this.uiConfig, pluginNames, buttonNames, extraAllowedContentRules,
-      sharedSpaces);
+      this.uiConfig,
+      pluginNames,
+      buttonNames,
+      extraAllowedContentRules,
+      sharedSpaces
+    );
 
     // Initialize CKEditor.
     var ck = CKEDITOR.inline(
-      (
-        this.elementRef.nativeElement.children[0].children[1] as HTMLElement
-      ),
+      this.elementRef.nativeElement.children[0].children[1] as HTMLElement,
       ckConfig
     );
 
@@ -383,9 +414,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     ck.on('instanceReady', () => {
       // Show the editor now that it is fully loaded.
-      (
-        this.elementRef.nativeElement as HTMLElement
-      ).setAttribute('style', 'display: block');
+      (this.elementRef.nativeElement as HTMLElement).setAttribute(
+        'style',
+        'display: block'
+      );
       // Remove the loading text.
       this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
       // Set the css and icons for each toolbar button.
@@ -402,19 +434,14 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       });
 
       // TODO(#12882): Remove the use of jQuery.
-      $('.cke_toolbar_separator')
-        .css('height', '22px');
+      $('.cke_toolbar_separator').css('height', '22px');
 
       // TODO(#12882): Remove the use of jQuery.
-      $('.cke_button_icon')
-        .css('height', '24px')
-        .css('width', '24px');
+      $('.cke_button_icon').css('height', '24px').css('width', '24px');
 
       var changeComboPanel = () => {
         // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combopanel')
-          .css('height', '100px')
-          .css('width', '120px');
+        $('.cke_combopanel').css('height', '100px').css('width', '120px');
       };
 
       // TODO(#12882): Remove the use of jQuery.
@@ -429,18 +456,14 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
         });
 
       // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_open')
-        .css('margin-left', '-20px')
-        .css('margin-top', '2px');
+      $('.cke_combo_open').css('margin-left', '-20px').css('margin-top', '2px');
 
       // TODO(#12882): Remove the use of jQuery.
-      $('.cke_combo_text')
-        .css('padding', '2px 5px 0px');
+      $('.cke_combo_text').css('padding', '2px 5px 0px');
 
       if (!this.headersEnabled) {
         // TODO(#12882): Remove the use of jQuery.
-        $('.cke_combo__format')
-          .css('display', 'none');
+        $('.cke_combo__format').css('display', 'none');
       }
 
       if (!this.internetConnectivityService.isOnline()) {
@@ -452,14 +475,20 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
     // Angular rendering of components confuses CKEditor's undo system, so
     // we hide all of that stuff away from CKEditor.
-    ck.on('getSnapshot', (event) => {
-      if (event.data === undefined) {
-        return;
-      }
-      event.data = event.data.replace(this.componentRe, (match, p1, p2) => {
-        return p1 + '</' + p2 + '>';
-      });
-    }, null, null, 20);
+    ck.on(
+      'getSnapshot',
+      event => {
+        if (event.data === undefined) {
+          return;
+        }
+        event.data = event.data.replace(this.componentRe, (match, p1, p2) => {
+          return p1 + '</' + p2 + '>';
+        });
+      },
+      null,
+      null,
+      20
+    );
 
     ck.on('change', () => {
       if (ck.getData() === this.value) {
@@ -471,19 +500,23 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
       var textElt = elt[0].childNodes;
       for (var i = textElt.length; i > 0; i--) {
         for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
-          if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
-                  (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
-                    textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
+          if (
+            textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
+            (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
+              textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')
+          ) {
             textElt[i - 1].childNodes[j - 1].remove();
           } else {
             break;
           }
         }
         if (textElt[i - 1].childNodes.length === 0) {
-          if (textElt[i - 1].nodeName === 'BR' ||
-                  (textElt[i - 1].nodeName === '#text' &&
-                    textElt[i - 1].nodeValue.trim() === '') ||
-                    textElt[i - 1].nodeName === 'P') {
+          if (
+            textElt[i - 1].nodeName === 'BR' ||
+            (textElt[i - 1].nodeName === '#text' &&
+              textElt[i - 1].nodeValue.trim() === '') ||
+            textElt[i - 1].nodeName === 'P'
+          ) {
             textElt[i - 1].remove();
             continue;
           }
@@ -513,9 +546,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
 
   disableRTEicons(): void {
     // Add disabled cursor pointer to the icons.
-    this.componentsThatRequireInternet.forEach((name) => {
+    this.componentsThatRequireInternet.forEach(name => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(
-        'cke_button__oppia' + name);
+        'cke_button__oppia' + name
+      );
       for (let i = 0; i < buttons.length; i++) {
         buttons[i].style.backgroundColor = '#cccccc';
         buttons[i].style.pointerEvents = 'none';
@@ -524,9 +558,10 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   }
 
   enableRTEicons(): void {
-    this.componentsThatRequireInternet.forEach((name) => {
+    this.componentsThatRequireInternet.forEach(name => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(
-        'cke_button__oppia' + name);
+        'cke_button__oppia' + name
+      );
       for (let i = 0; i < buttons.length; i++) {
         buttons[i].style.backgroundColor = '';
         buttons[i].style.pointerEvents = '';
@@ -537,13 +572,12 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   // Returns whether the component should be shown in the 'Blog Post Editor
   // RTE'. Return true if component should be hidden in the RTE.
   isInvalidForBlogPostEditorRTE(compDefn: RteComponentSpecs): boolean {
-    let invalidComponents = (
-      AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR);
+    let invalidComponents =
+      AppConstants.INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR;
     return (
-      this.contextService.isInBlogPostEditorPage() && (
-        invalidComponents.some(
-          (invalidComponents) => invalidComponents === compDefn.id
-        )
+      this.contextService.isInBlogPostEditorPage() &&
+      invalidComponents.some(
+        invalidComponents => invalidComponents === compDefn.id
       )
     );
   }
@@ -554,6 +588,9 @@ export class CkEditor4RteComponent implements AfterViewInit, OnChanges,
   }
 }
 
-angular.module('oppia').directive('ckEditor4Rte', downgradeComponent({
-  component: CkEditor4RteComponent
-}));
+angular.module('oppia').directive(
+  'ckEditor4Rte',
+  downgradeComponent({
+    component: CkEditor4RteComponent,
+  })
+);

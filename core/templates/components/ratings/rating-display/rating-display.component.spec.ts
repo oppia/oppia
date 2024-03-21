@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for rating display component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { RatingDisplayComponent } from './rating-display.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {RatingDisplayComponent} from './rating-display.component';
 
 describe('Rating display component', () => {
   let componentInstance: RatingDisplayComponent;
@@ -27,11 +27,9 @@ describe('Rating display component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [],
-      declarations: [
-        RatingDisplayComponent
-      ],
+      declarations: [RatingDisplayComponent],
       providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -55,7 +53,6 @@ describe('Rating display component', () => {
 
     componentInstance.displayValue(4);
 
-
     expect(componentInstance.stars).toBeDefined();
   });
 
@@ -69,7 +66,8 @@ describe('Rating display component', () => {
     componentInstance.clickStar(4);
 
     expect(componentInstance.status).toEqual(
-      componentInstance.STATUS_RATING_SET);
+      componentInstance.STATUS_RATING_SET
+    );
     expect(componentInstance.ratingValue).toEqual(4);
     expect(componentInstance.edit.emit).toHaveBeenCalled();
   });

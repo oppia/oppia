@@ -34,7 +34,7 @@ from .. import concurrent_task_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from scripts.linters import pre_commit_linter
+    from scripts.linters import run_lint_checks
 
 ParsedExpressionsType = Dict[str, Dict[str, List[esprima.nodes.Node]]]
 
@@ -159,7 +159,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         self,
         js_files: List[str],
         ts_files: List[str],
-        file_cache: pre_commit_linter.FileCache
+        file_cache: run_lint_checks.FileCache
     ) -> None:
         """Constructs a JsTsLintChecksManager object.
 
@@ -593,7 +593,7 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
 def get_linters(
     js_filepaths: List[str],
     ts_filepaths: List[str],
-    file_cache: pre_commit_linter.FileCache
+    file_cache: run_lint_checks.FileCache
 ) -> Tuple[JsTsLintChecksManager, ThirdPartyJsTsLintChecksManager]:
     """Creates JsTsLintChecksManager and ThirdPartyJsTsLintChecksManager
         objects and return them.

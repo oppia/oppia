@@ -112,8 +112,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
-                ['TextInput'], category='Algebra',
-                correctness_feedback_enabled=True))
+                ['TextInput'], category='Algebra'))
         self.old_content_html = '<p>old content html</p>'
         self.exploration.states['State 1'].content.html = self.old_content_html
         self.exploration.states['State 2'].content.html = self.old_content_html
@@ -246,7 +245,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': self.exploration.version,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 3',
                     'content_id': (
@@ -270,7 +269,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': 'exp1',
                 'target_version_at_submission': 2,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'State 1',
@@ -629,8 +628,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.states[suggestion_to_accept[
-                'change']['state_name']].content.html,
-            suggestion_to_accept['change']['new_value']['html'])
+                'change_cmd']['state_name']].content.html,
+            suggestion_to_accept['change_cmd']['new_value']['html'])
         self.logout()
 
         # Testing user without permissions cannot accept.
@@ -744,7 +743,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_ACTION_URL_PREFIX, 'invalid_suggestion_id'), {
                     'summary_message': 'summary message',
                     'action': u'resubmit',
-                    'change': {
+                    'change_cmd': {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                         'state_name': 'State 1',
@@ -785,7 +784,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_ACTION_URL_PREFIX, suggestion.suggestion_id), {
                 'summary_message': 'summary message',
                 'action': 'resubmit',
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'state_name': 'State 1',
@@ -812,14 +811,15 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(
-            suggestion.change.new_value['html'],
+            suggestion.change_cmd.new_value['html'],
             resubmit_change_content_html)
         self.assertEqual(
-            suggestion.change.cmd, exp_domain.CMD_EDIT_STATE_PROPERTY)
+            suggestion.change_cmd.cmd, exp_domain.CMD_EDIT_STATE_PROPERTY)
         self.assertEqual(
-            suggestion.change.property_name, exp_domain.STATE_PROPERTY_CONTENT)
+            suggestion.change_cmd.property_name,
+            exp_domain.STATE_PROPERTY_CONTENT)
         self.assertEqual(
-            suggestion.change.state_name, 'State 1')
+            suggestion.change_cmd.state_name, 'State 1')
         self.logout()
 
     def test_translation_accept_suggestion_by_reviewer(self) -> None:
@@ -860,8 +860,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         exploration = (
             self.save_new_linear_exp_with_state_names_and_interactions(
                 exp_id, self.editor_id, ['State 1'],
-                ['EndExploration'], category='Algebra',
-                correctness_feedback_enabled=True))
+                ['EndExploration'], category='Algebra'))
 
         state_content_dict = {
             'content_id': 'content_0',
@@ -934,7 +933,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': exp_id,
                 'target_version_at_submission': exploration.version,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content_0',
@@ -1003,7 +1002,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': self.exploration.version,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content_0',
@@ -1036,7 +1035,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': self.exploration.version,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content_0',
@@ -1103,7 +1102,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.translator_id), ('target_id', self.EXP_ID)])[0]
         self.assertEqual(
-            suggestion.change.translation_html, '<p>Updated In Hindi</p>')
+            suggestion.change_cmd.translation_html, '<p>Updated In Hindi</p>')
         self.logout()
 
     def test_cannot_update_already_handled_translation(self) -> None:
@@ -1245,7 +1244,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = suggestion.change.question_dict[
+        question_state_data = suggestion.change_cmd.question_dict[
             'question_state_data']
         question_state_data['content']['html'] = (
             '<p>Updated question</p>'
@@ -1276,7 +1275,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         assert isinstance(
             updated_suggestion, suggestion_registry.SuggestionAddQuestion
         )
-        new_question_state_data = updated_suggestion.change.question_dict[
+        new_question_state_data = updated_suggestion.change_cmd.question_dict[
             'question_state_data']
 
         self.assertEqual(
@@ -1321,7 +1320,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = suggestion.change.question_dict[
+        question_state_data = suggestion.change_cmd.question_dict[
             'question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         new_solution_dict: state_domain.SolutionDict = {
@@ -1396,7 +1395,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = suggestion.change.question_dict[
+        question_state_data = suggestion.change_cmd.question_dict[
             'question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         question_state_data['interaction']['solution'] = new_solution_dict
@@ -1462,7 +1461,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = suggestion.change.question_dict[
+        question_state_data = suggestion.change_cmd.question_dict[
             'question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         question_state_data['interaction']['solution'] = new_solution_dict
@@ -1529,7 +1528,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_SKILL, skill_id, 1,
             self.author_id, suggestion_change, 'test description')
 
-        question_state_data = suggestion.change.question_dict[
+        question_state_data = suggestion.change_cmd.question_dict[
             'question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         question_state_data['interaction']['solution'] = new_solution_dict
@@ -1597,7 +1596,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             suggestion.suggestion_id, self.reviewer_id, 'Accepted', 'Done'
         )
 
-        question_state_data = suggestion.change.question_dict[
+        question_state_data = suggestion.change_cmd.question_dict[
             'question_state_data']
         question_state_data['content']['html'] = '<p>Updated question</p>'
         question_state_data['interaction']['solution'] = new_solution_dict
@@ -1739,7 +1738,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': exp_id,
                 'target_version_at_submission': exploration.version,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content_0',
@@ -1815,7 +1814,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': exp_id,
                 'target_version_at_submission': exploration.version,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'State 1',
                     'content_id': 'content_0',
@@ -1876,7 +1875,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
-                'change': {
+                'change_cmd': {
                     'cmd': (
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -1912,7 +1911,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion['target_type'], feconf.ENTITY_TYPE_SKILL)
         self.assertEqual(
-            suggestion['change']['cmd'],
+            suggestion['change_cmd']['cmd'],
             question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION)
 
     def test_accept_question_suggestion(self) -> None:
@@ -2144,7 +2143,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 'invalid_target_version',
-                'change': {
+                'change_cmd': {
                     'cmd': (
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2209,7 +2208,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
-                'change': {
+                'change_cmd': {
                     'cmd': (
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2268,7 +2267,7 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.skill_id,
                 'target_version_at_submission': 1,
-                'change': {
+                'change_cmd': {
                     'cmd': (
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2509,8 +2508,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -2585,7 +2583,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_type': (feconf.ENTITY_TYPE_EXPLORATION),
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
-                'change': {
+                'change_cmd': {
                     'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
                     'state_name': 'Introduction',
                     'content_id': 'content_0',
@@ -2616,7 +2614,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
-                'change': {
+                'change_cmd': {
                     'cmd': (
                         question_domain
                         .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
@@ -2742,8 +2740,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
-            category='Algebra',
-            correctness_feedback_enabled=True
+            category='Algebra'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -2832,8 +2829,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_id = 'exp2'
         self.save_new_valid_exploration(
             exp_id, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, exp_id)
         self.create_story_for_translation_opportunity(
             self.owner_id, self.admin_id, 'story_id_2', self.TOPIC_ID, exp_id)
@@ -2866,7 +2862,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         # filtered out, the controller performs another fetch.
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(
-            response['suggestions'][0]['change']['translation_html'],
+            response['suggestions'][0]['change_cmd']['translation_html'],
             '<p>new content html in Hindi</p>')
         # Offset reflects the extra fetch.
         self.assertEqual(response['next_offset'], 2)
@@ -2938,8 +2934,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.SKILL_DESCRIPTION = 'skill to link question to'
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.owner_id, title='Exploration title',
-            category='Algebra', end_state_name='End State',
-            correctness_feedback_enabled=True)
+            category='Algebra', end_state_name='End State')
         self.publish_exploration(self.owner_id, self.EXP_ID)
 
         topic = topic_domain.Topic.create_default_topic(
@@ -3019,7 +3014,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_EXPLORATION,
                 'target_id': self.EXP_ID,
                 'target_version_at_submission': exploration.version,
-                'change': self.translate_suggestion_change,
+                'change_cmd': self.translate_suggestion_change,
                 'description': 'Adds translation',
             }, csrf_token=csrf_token
         )
@@ -3048,7 +3043,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': 'skill_without_topic',
                 'target_version_at_submission': 1,
-                'change': self.translate_question_change,
+                'change_cmd': self.translate_question_change,
                 'description': 'Add question for a skill without topic'
             }, csrf_token=csrf_token)
         self.post_json(
@@ -3058,7 +3053,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'target_type': feconf.ENTITY_TYPE_SKILL,
                 'target_id': self.SKILL_ID,
                 'target_version_at_submission': 1,
-                'change': self.translate_question_change,
+                'change_cmd': self.translate_question_change,
                 'description': 'Add new question for a skill with topic'
             }, csrf_token=csrf_token)
 
@@ -3092,7 +3087,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['next_offset'], 1)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
-            suggestion['change'], self.translate_suggestion_change)
+            suggestion['change_cmd'], self.translate_suggestion_change)
         self.assertEqual(
             suggestion['suggestion_type'],
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
@@ -3139,7 +3134,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['suggestions']), 2)
         suggestion = response['suggestions'][0]
         self.assertDictEqual(
-            suggestion['change'], self.translate_question_change)
+            suggestion['change_cmd'], self.translate_question_change)
         self.assertEqual(
             suggestion['suggestion_type'], feconf.SUGGESTION_TYPE_ADD_QUESTION)
         self.assertEqual(

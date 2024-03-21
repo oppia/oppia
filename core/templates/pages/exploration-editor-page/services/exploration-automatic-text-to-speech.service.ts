@@ -17,35 +17,34 @@
  * text to speech data.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
-import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ChangeListService } from './change-list.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationPropertyService} from 'pages/exploration-editor-page/services/exploration-property.service';
+import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ChangeListService} from './change-list.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class ExplorationAutomaticTextToSpeechService
-  extends ExplorationPropertyService {
+export class ExplorationAutomaticTextToSpeechService extends ExplorationPropertyService {
   propertyName: string = 'auto_tts_enabled';
 
   constructor(
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
-    protected loggerService: LoggerService,
+    protected loggerService: LoggerService
   ) {
     super(alertsService, changeListService, loggerService);
   }
 
   // Type unknown is used here to check validity of the input.
   _isValid(value: unknown): boolean {
-    return (typeof value === 'boolean');
+    return typeof value === 'boolean';
   }
 
   isAutomaticTextToSpeechEnabled(): boolean {
-    return (this.savedMemento as boolean);
+    return this.savedMemento as boolean;
   }
 
   toggleAutomaticTextToSpeech(): void {
@@ -54,7 +53,9 @@ export class ExplorationAutomaticTextToSpeechService
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationAutomaticTextToSpeechService',
-  downgradeInjectable(
-    ExplorationAutomaticTextToSpeechService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationAutomaticTextToSpeechService',
+    downgradeInjectable(ExplorationAutomaticTextToSpeechService)
+  );

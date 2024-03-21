@@ -18,7 +18,6 @@
     "LABEL_FOR_RELEASED_PRS": "PR: released",
     "NEW_RELEASE_URL": "https://github.com/oppia/oppia/releases/new",
     "OPPIA_DEV_GROUP_URL": "https://groups.google.com/forum/#!forum/oppia-dev",
-    "PY_GITHUB_PATH": "../oppia_tools/PyGithub-1.45",
     "RELEASE_DRIVE_URL": "https://drive.google.com/drive/folders/0B9KSjiibL_WDNjJyYlEtbTNvY3c",
     "RELEASE_NOTES_EXAMPLE_URL": "https://docs.google.com/document/d/1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M",
     "REMOTE_URLS": ["git@github.com:oppia/oppia.git", "https://github.com/oppia/oppia.git"],

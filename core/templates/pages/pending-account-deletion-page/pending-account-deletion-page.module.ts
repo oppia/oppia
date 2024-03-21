@@ -16,15 +16,15 @@
  * @fileoverview Module for the pending account deletion page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { PendingAccountDeletionPageComponent } from './pending-account-deletion-page.component';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { TranslateModule } from '@ngx-translate/core';
-import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
-import { CommonModule } from '@angular/common';
-import { PendingAccountDeletionPageRoutingModule } from './pending-account-deletion-page-routing.module';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {PendingAccountDeletionPageComponent} from './pending-account-deletion-page.component';
+import {SharedPipesModule} from 'filters/shared-pipes.module';
+import {TranslateModule} from '@ngx-translate/core';
+import {PendingAccountDeletionPageRootComponent} from './pending-account-deletion-page-root.component';
+import {CommonModule} from '@angular/common';
+import {PendingAccountDeletionPageRoutingModule} from './pending-account-deletion-page-routing.module';
+import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
 
 @NgModule({
   imports: [
@@ -33,7 +33,7 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
     SharedPipesModule,
     TranslateModule,
     PendingAccountDeletionPageRoutingModule,
-    Error404PageModule
+    Error404PageModule,
   ],
   declarations: [
     PendingAccountDeletionPageComponent,
@@ -42,6 +42,6 @@ import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.m
   entryComponents: [
     PendingAccountDeletionPageComponent,
     PendingAccountDeletionPageRootComponent,
-  ]
+  ],
 })
 export class PendingAccountDeletionPageModule {}

@@ -16,37 +16,42 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Injectable} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { LearnerDashboardSuggestionModalComponent } from './learner-dashboard-suggestion-modal.component';
+import {LearnerDashboardSuggestionModalComponent} from './learner-dashboard-suggestion-modal.component';
 interface ExtraParams {
-  'newContent': string;
-  'oldContent': string;
-  'description': string;
+  newContent: string;
+  oldContent: string;
+  description: string;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SuggestionModalForLearnerDashboardService {
-  constructor(
-    private ngbModal: NgbModal,
-  ) {}
+  constructor(private ngbModal: NgbModal) {}
 
   private _showEditStateContentSuggestionModal(
-      newContent: string, oldContent: string, description: string): void {
+    newContent: string,
+    oldContent: string,
+    description: string
+  ): void {
     const modelRef = this.ngbModal.open(
-      LearnerDashboardSuggestionModalComponent, {backdrop: true});
+      LearnerDashboardSuggestionModalComponent,
+      {backdrop: true}
+    );
     modelRef.componentInstance.newContent = newContent;
     modelRef.componentInstance.oldContent = oldContent;
     modelRef.componentInstance.description = description;
-    modelRef.result.then(() => {}, () => {
-      // Note to developers:
-      // This callback is triggered when the Cancel button is clicked.
-      // No further action is needed.
-    });
+    modelRef.result.then(
+      () => {},
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
+      }
+    );
   }
 
   showSuggestionModal(suggestionType: string, extraParams: ExtraParams): void {
@@ -59,8 +64,3 @@ export class SuggestionModalForLearnerDashboardService {
     }
   }
 }
-
-angular.module('oppia').factory(
-  'SuggestionModalForLearnerDashboardService',
-  downgradeInjectable(SuggestionModalForLearnerDashboardService)
-);

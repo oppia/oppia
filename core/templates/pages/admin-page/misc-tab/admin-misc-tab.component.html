@@ -267,6 +267,31 @@
   </div>
 </mat-card>
 
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Lookup exploration interactions</h3>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="retrieveExplorationInteractionIds()">
+      <div class="form-group row">
+        <label>Exploration ID:</label>
+        <input type="text"
+               [(ngModel)]="expIdToGetInteractions"
+               [ngModelOptions]="{standalone: true}"
+               required="true">
+      </div>
+      <div class="form-group row">
+        <input type="submit" value="Get">
+      </div>
+    </form>
+  </div>
+
+  <div>
+    <p *ngIf="explorationInteractions.length > 0">Exploration IDs:</p>
+    <ul>
+      <li *ngFor="let interaction of explorationInteractions" [innerHTML]="interaction.id"></li>
+    </ul>
+  </div>
+</mat-card>
+
 <style>
   .oppia-admin-page-card {
     max-width: 700px

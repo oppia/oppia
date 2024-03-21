@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers for the scripts.linters.pre_commit_linter module.
+"""Helpers for the scripts.linters.run_lint_checks module.
 
 Do not use this module anywhere else in the code base!
 """

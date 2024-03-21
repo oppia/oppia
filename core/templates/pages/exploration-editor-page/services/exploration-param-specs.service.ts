@@ -17,19 +17,18 @@
  * the specification of the parameters.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from 'pages/exploration-editor-page/services/exploration-property.service';
-import { AlertsService } from 'services/alerts.service';
-import { ChangeListService } from './change-list.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ParamSpecs } from 'domain/exploration/ParamSpecsObjectFactory';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationPropertyService} from 'pages/exploration-editor-page/services/exploration-property.service';
+import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from './change-list.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class ExplorationParamSpecsService extends
-  ExplorationPropertyService {
+export class ExplorationParamSpecsService extends ExplorationPropertyService {
   propertyName: string = 'param_specs';
   // This property is initialized using init method and we need to do
   // non-null assertion. For more information, see
@@ -44,5 +43,9 @@ export class ExplorationParamSpecsService extends
   }
 }
 
-angular.module('oppia').factory('ExplorationParamSpecsService',
-  downgradeInjectable(ExplorationParamSpecsService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationParamSpecsService',
+    downgradeInjectable(ExplorationParamSpecsService)
+  );

@@ -148,15 +148,15 @@
     color: #767676;
     font-family: "Roboto", Arial, sans-serif;
     margin-top: 2px;
-    width: 75%;
+    width: 85%;
   }
   .oppia-sidebar-menu li {
     border-bottom: 1px solid #e3e3e3;
   }
-  .oppia-submenu-image-position {
-    float: right;
-    margin-right: 5%;
-    margin-top: 2.5%;
+  .oppia-submenu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
   }
   .oppia-submenu-image {
     height: 80px;
@@ -236,22 +236,16 @@
         </span>
       </div>
       <div [hidden]="!learnSubmenuIsShown" class="oppia-sidebar-submenu-upperborder">
-        <div class="oppia-submenu-image-position">
-          <picture>
-            <source type="image/webp"
-                    [srcset]="this.getStaticImageUrl('/sidebar/learn-math-logo.webp')">
-            <source type="image/png"
-                    [srcset]="this.getStaticImageUrl('/sidebar/learn-math-logo.png')">
-            <img [src]="getStaticImageUrl('/sidebar/learn-math-logo.png')"
-                 class="oppia-submenu-image"
-                 alt="learn-math-logo">
-          </picture>
+        <div class="oppia-submenu">
+          <!-- We set tabindex to -1 because this should not be focusable while tabbing on desktop -->
+          <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" tabindex="-1" smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="e2e-mobile-test-mathematics-link mb-1">
+            <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
+            <p class="oppia-sidebar-learn-subtext mt-2">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
+          </a>
+          <div class="w-50">
+            <img [src]="getStaticImageUrl('/sidebar/learn-math-logo.svg')" class="w-100" alt="learn-math-logo">
+          </div>
         </div>
-        <!-- We set tabindex to -1 because this should not be focusable while tabbing on desktop -->
-        <a href="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" tabindex="-1" smartRouterLink="/learn/{{DEFAULT_CLASSROOM_URL_FRAGMENT}}" class="e2e-mobile-test-mathematics-link mb-1">
-          <span>{{ 'I18N_SIDEBAR_CLASSROOM_BASIC_MATHS' | translate }}</span>
-          <p class="oppia-sidebar-learn-subtext mt-2">{{ 'I18N_SIDEBAR_MATH_FOUNDATIONS_DESCRIPTION' | translate }}</p>
-        </a>
         <div *ngIf="classroomData.length > 0">
           <div *ngFor="let topicSummary of classroomData.slice(0, 3); index as idx">
             <div class="submenu-notop-margin">

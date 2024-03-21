@@ -17,13 +17,13 @@
  * the training modal used for unresolved answers.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
-import { AlertsService } from 'services/alerts.service';
-import { ExternalSaveService } from 'services/external-save.service';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TrainingModalComponent } from './training-modal.component';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {AlertsService} from 'services/alerts.service';
+import {ExternalSaveService} from 'services/external-save.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {TrainingModalComponent} from './training-modal.component';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 interface FinishTrainingResult {
   answer: InteractionAnswer;
@@ -32,14 +32,14 @@ interface FinishTrainingResult {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TrainingModalService {
   constructor(
     private alertsService: AlertsService,
     private externalSaveService: ExternalSaveService,
-    private ngbModal: NgbModal,
-  ) { }
+    private ngbModal: NgbModal
+  ) {}
 
   private _finishTrainingCallbackEmitter = new EventEmitter();
 
@@ -54,36 +54,39 @@ export class TrainingModalService {
       answer has been trained.
   */
   openTrainUnresolvedAnswerModal(
-      unhandledAnswer: InteractionAnswer,
-      interactionId: string,
-      answerIndex: number): void {
+    unhandledAnswer: InteractionAnswer,
+    interactionId: string,
+    answerIndex: number
+  ): void {
     this.alertsService.clearWarnings();
 
     let modalRef: NgbModalRef = this.ngbModal.open(TrainingModalComponent, {
       backdrop: 'static',
       windowClass: 'skill-select-modal',
-      size: 'xl'
+      size: 'xl',
     });
 
     modalRef.componentInstance.unhandledAnswer = unhandledAnswer;
-    modalRef.componentInstance.finishTrainingCallback.subscribe(
-      () => {
-        let finishTrainingResult: FinishTrainingResult = {
-          answer: unhandledAnswer,
-          interactionId: interactionId,
-          answerIndex: answerIndex
-        };
+    modalRef.componentInstance.finishTrainingCallback.subscribe(() => {
+      let finishTrainingResult: FinishTrainingResult = {
+        answer: unhandledAnswer,
+        interactionId: interactionId,
+        answerIndex: answerIndex,
+      };
 
-        this.onFinishTrainingCallback.emit(finishTrainingResult);
-      });
+      this.onFinishTrainingCallback.emit(finishTrainingResult);
+    });
 
-    modalRef.result.then(() => { }, () => { });
-
+    modalRef.result.then(
+      () => {},
+      () => {}
+    );
 
     // Save the modified training data externally in state content.
     this.externalSaveService.onExternalSave.emit();
   }
 }
 
-angular.module('oppia').factory('TrainingModalService',
-  downgradeInjectable(TrainingModalService));
+angular
+  .module('oppia')
+  .factory('TrainingModalService', downgradeInjectable(TrainingModalService));

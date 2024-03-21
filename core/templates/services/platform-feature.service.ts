@@ -34,19 +34,20 @@
  * values in a new tab.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { ClientContext } from 'domain/platform_feature/client-context.model';
-import { FeatureStatusChecker, FeatureStatusSummary } from 'domain/platform_feature/feature-status-summary.model';
-import { PlatformFeatureBackendApiService } from 'domain/platform_feature/platform-feature-backend-api.service';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {
+  FeatureStatusChecker,
+  FeatureStatusSummary,
+} from 'domain/feature-flag/feature-status-summary.model';
+import {FeatureFlagBackendApiService} from 'domain/feature-flag/feature-flag-backend-api.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlatformFeatureService {
   private static SESSION_STORAGE_KEY = 'SAVED_FEATURE_FLAGS';
@@ -59,12 +60,11 @@ export class PlatformFeatureService {
   static _isSkipped = false;
 
   constructor(
-      private platformFeatureBackendApiService:
-        PlatformFeatureBackendApiService,
-      private windowRef: WindowRef,
-      private loggerService: LoggerService,
-      private urlService: UrlService,
-      private browserCheckerService: BrowserCheckerService) {
+    private featureFlagBackendApiService: FeatureFlagBackendApiService,
+    private windowRef: WindowRef,
+    private loggerService: LoggerService,
+    private urlService: UrlService
+  ) {
     this.initialize();
   }
 
@@ -135,30 +135,30 @@ export class PlatformFeatureService {
       // erased, leading to the 'Registration session expired' error.
       if (this.urlService.getPathname() === '/signup') {
         PlatformFeatureService._isSkipped = true;
-        PlatformFeatureService.featureStatusSummary = (
-          FeatureStatusSummary.createDefault());
+        PlatformFeatureService.featureStatusSummary =
+          FeatureStatusSummary.createDefault();
         return;
       }
 
-      PlatformFeatureService.featureStatusSummary = (
-        await this.loadFeatureFlagsFromServer());
+      PlatformFeatureService.featureStatusSummary =
+        await this.loadFeatureFlagsFromServer();
     } catch (err: unknown) {
       if (err instanceof Error) {
         this.loggerService.error(
           'Error during initialization of PlatformFeatureService: ' +
-          `${err.message ? err.message : err}`);
+            `${err.message ? err.message : err}`
+        );
       }
       // If any error, just disable all features.
-      PlatformFeatureService.featureStatusSummary = (
-        FeatureStatusSummary.createDefault());
+      PlatformFeatureService.featureStatusSummary =
+        FeatureStatusSummary.createDefault();
       PlatformFeatureService._isInitializedWithError = true;
       this.clearSavedResults();
     }
   }
 
   private async loadFeatureFlagsFromServer(): Promise<FeatureStatusSummary> {
-    const context = this.generateClientContext();
-    return this.platformFeatureBackendApiService.fetchFeatureFlags(context);
+    return this.featureFlagBackendApiService.fetchFeatureFlags();
   }
 
   /**
@@ -166,26 +166,18 @@ export class PlatformFeatureService {
    */
   private clearSavedResults(): void {
     this.windowRef.nativeWindow.sessionStorage.removeItem(
-      PlatformFeatureService.SESSION_STORAGE_KEY);
-  }
-
-  /**
-   * Generates context containing the client side information required to
-   * request feature flag values.
-   *
-   * @returns {ClientContext} - The ClientContext instance containing required
-   * client information.
-   */
-  private generateClientContext(): ClientContext {
-    const platformType = 'Web';
-
-    return ClientContext.create(platformType);
+      PlatformFeatureService.SESSION_STORAGE_KEY
+    );
   }
 }
 
 export const platformFeatureInitFactory = (service: PlatformFeatureService) => {
-  return async(): Promise<void> => service.initialize();
+  return async (): Promise<void> => service.initialize();
 };
 
-angular.module('oppia').factory(
-  'PlatformFeatureService', downgradeInjectable(PlatformFeatureService));
+angular
+  .module('oppia')
+  .factory(
+    'PlatformFeatureService',
+    downgradeInjectable(PlatformFeatureService)
+  );

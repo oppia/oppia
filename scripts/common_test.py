@@ -34,32 +34,15 @@ import tempfile
 import time
 from urllib import request as urlrequest
 
-from core import constants
 from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 from scripts import servers
 
-import github
 from typing import Generator, List, Literal, NoReturn
 
 from . import common
-
-
-_MOCK_REQUESTER = github.Requester.Requester(
-    login_or_token=None,
-    password=None,
-    jwt=None,
-    app_auth=None,
-    base_url='https://github.com',
-    timeout=0,
-    user_agent='user',
-    per_page=0,
-    verify=False,
-    retry=None,
-    pool_size=None,
-)
 
 
 class MockCompiler:
@@ -826,111 +809,6 @@ class CommonTests(test_utils.GenericTestBase):
             'the script'):
             common.get_personal_access_token()
 
-    def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
-        self
-    ) -> None:
-        mock_repo = github.Repository.Repository(
-            requester=_MOCK_REQUESTER, headers={}, attributes={},
-            completed=True)
-        label_for_released_prs = (
-            constants.release_constants.LABEL_FOR_RELEASED_PRS)
-        label_for_current_release_prs = (
-            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-        pull1 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        pull2 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        label = github.Label.Label(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'name': label_for_current_release_prs},
-            completed=True)
-
-        def mock_get_issues(
-            unused_self: str, state: str, labels: List[github.Label.Label]  # pylint: disable=unused-argument
-        ) -> List[github.PullRequest.PullRequest]:
-            return [pull1, pull2]
-
-        def mock_get_label(
-            unused_self: str, unused_name: str
-        ) -> List[github.Label.Label]:
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        with get_issues_swap, get_label_swap:
-            common.check_prs_for_current_release_are_released(mock_repo)
-
-    def test_check_prs_for_current_release_are_released_with_unreleased_prs(
-        self
-    ) -> None:
-        mock_repo = github.Repository.Repository(
-            requester=_MOCK_REQUESTER, headers={}, attributes={},
-            completed=True)
-
-        def mock_open_tab(unused_url: str) -> None:
-            pass
-        label_for_released_prs = (
-            constants.release_constants.LABEL_FOR_RELEASED_PRS)
-        label_for_current_release_prs = (
-            constants.release_constants.LABEL_FOR_CURRENT_RELEASE_PRS)
-        pull1 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR1', 'number': 1, 'labels': [
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        pull2 = github.PullRequest.PullRequest(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'title': 'PR2', 'number': 2, 'labels': [
-                    {'name': label_for_released_prs},
-                    {'name': label_for_current_release_prs}]},
-            completed=True)
-        label = github.Label.Label(
-            requester=_MOCK_REQUESTER, headers={},
-            attributes={
-                'name': label_for_current_release_prs},
-            completed=True)
-
-        def mock_get_issues(
-            unused_self: str, state: str, labels: List[str]  # pylint: disable=unused-argument
-        ) -> List[github.PullRequest.PullRequest]:
-            return [pull1, pull2]
-
-        def mock_get_label(
-            unused_self: str, unused_name: str
-        ) -> List[github.Label.Label]:
-            return [label]
-
-        get_issues_swap = self.swap(
-            github.Repository.Repository, 'get_issues', mock_get_issues)
-        get_label_swap = self.swap(
-            github.Repository.Repository, 'get_label', mock_get_label)
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        with get_issues_swap, get_label_swap, open_tab_swap:
-            with self.assertRaisesRegex(
-                Exception, (
-                    'There are PRs for current release which do not '
-                    'have a \'%s\' label. Please ensure that '
-                    'they are released before release summary '
-                    'generation.') % (
-                        constants.release_constants.LABEL_FOR_RELEASED_PRS)):
-                common.check_prs_for_current_release_are_released(mock_repo)
-
     def test_inplace_replace_file(self) -> None:
         origin_filepath = os.path.join(
             'core', 'tests', 'data', 'inplace_replace_test.json')
@@ -1379,67 +1257,70 @@ class CommonTests(test_utils.GenericTestBase):
             common, 'CONSTANTS_FILE_PATH', mock_constants_path)
         feconf_path_swap = self.swap(common, 'FECONF_PATH', mock_feconf_path)
 
-        def mock_check_output(
-            unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
-        ) -> str:
-            return 'test'
-        check_output_swap = self.swap(
-            subprocess, 'check_output', mock_check_output
-        )
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            def mock_check_output(
+                unused_cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+            ) -> str:
+                return 'test'
+            check_output_swap = self.swap(
+                subprocess, 'check_output', mock_check_output
+            )
 
-        constants_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(
-            constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
-            tmp.write('export = {\n')
-            tmp.write('  "DEV_MODE": true,\n')
-            tmp.write('  "EMULATOR_MODE": false,\n')
-            tmp.write('  "BRANCH_NAME": "",\n')
-            tmp.write('  "SHORT_COMMIT_HASH": ""\n')
-            tmp.write('};')
+            constants_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
+            setattr(
+                constants_temp_file, 'name', mock_constants_path)
+            with utils.open_file(mock_constants_path, 'w') as tmp:
+                tmp.write('export = {\n')
+                tmp.write('  "DEV_MODE": true,\n')
+                tmp.write('  "EMULATOR_MODE": false,\n')
+                tmp.write('  "BRANCH_NAME": "",\n')
+                tmp.write('  "SHORT_COMMIT_HASH": ""\n')
+                tmp.write('};')
 
-        feconf_temp_file = tempfile.NamedTemporaryFile()
-        # Here MyPy assumes that the 'name' attribute is read-only. In order to
-        # silence the MyPy complaints `setattr` is used to set the attribute.
-        setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
-            tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
+            feconf_temp_file = tempfile.NamedTemporaryFile()
+            # Here MyPy assumes that the 'name' attribute is read-only.
+            # In order to silence the MyPy complaints `setattr` is used
+            # to set the attribute.
+            setattr(feconf_temp_file, 'name', mock_feconf_path)
+            with utils.open_file(mock_feconf_path, 'w') as tmp:
+                tmp.write(u'ENABLE_MAINTENANCE_MODE = False')
 
-        with constants_path_swap, feconf_path_swap, check_output_swap:
-            common.modify_constants(prod_env=True, maintenance_mode=False)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": false,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "test",\n'
-                    '  "SHORT_COMMIT_HASH": "test"\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+            with constants_path_swap, feconf_path_swap, check_output_swap:
+                common.modify_constants(prod_env=True, maintenance_mode=False)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": false,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "test",\n'
+                        '  "SHORT_COMMIT_HASH": "test"\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
 
-            common.modify_constants(prod_env=False, maintenance_mode=True)
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "test",\n'
-                    '  "SHORT_COMMIT_HASH": "test"\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
+                common.modify_constants(prod_env=False, maintenance_mode=True)
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "test",\n'
+                        '  "SHORT_COMMIT_HASH": "test"\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True')
 
-        constants_temp_file.close()
-        feconf_temp_file.close()
+            constants_temp_file.close()
+            feconf_temp_file.close()
 
         # Clean up spare files.
         os.remove(mock_constants_path)
@@ -1472,21 +1353,22 @@ class CommonTests(test_utils.GenericTestBase):
         with utils.open_file(mock_feconf_path, 'w') as tmp:
             tmp.write(u'ENABLE_MAINTENANCE_MODE = True')
         self.contextManager.__exit__(None, None, None)
-        with constants_path_swap, feconf_path_swap:
-            common.set_constants_to_default()
-            with utils.open_file(
-                mock_constants_path, 'r') as constants_file:
-                self.assertEqual(
-                    constants_file.read(),
-                    'export = {\n'
-                    '  "DEV_MODE": true,\n'
-                    '  "EMULATOR_MODE": true,\n'
-                    '  "BRANCH_NAME": "",\n'
-                    '  "SHORT_COMMIT_HASH": ""\n'
-                    '};')
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
-                self.assertEqual(
-                    feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
+        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
+            with constants_path_swap, feconf_path_swap:
+                common.set_constants_to_default()
+                with utils.open_file(
+                    mock_constants_path, 'r') as constants_file:
+                    self.assertEqual(
+                        constants_file.read(),
+                        'export = {\n'
+                        '  "DEV_MODE": true,\n'
+                        '  "EMULATOR_MODE": true,\n'
+                        '  "BRANCH_NAME": "",\n'
+                        '  "SHORT_COMMIT_HASH": ""\n'
+                        '};')
+                with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+                    self.assertEqual(
+                        feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False')
         constants_temp_file.close()
         feconf_temp_file.close()
 

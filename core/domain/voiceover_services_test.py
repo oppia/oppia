@@ -18,12 +18,18 @@
 
 from __future__ import annotations
 
+import json
+import os
+
 from core import feconf
+from core import schema_utils
+from core import utils
 from core.domain import state_domain
 from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 
+from typing import Dict
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -88,3 +94,154 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             entity_voiceovers_instance.language_accent_code, 'en-US')
         self.assertDictEqual(entity_voiceovers_instance.voiceovers, {})
+
+
+class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
+    """Unit tests to validate the saving and fetching behavior in the
+    VoiceoverAutogenerationPolicyModel.
+    """
+
+    def test_save_and_get_language_accent_codes_works_correctly(self) -> None:
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {
+                'en-US': True
+            },
+            'hi': {
+                'hi-IN': False
+            }
+        }
+        retrieved_language_codes_mapping: Dict[str, Dict[str, bool]] = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+        expected_language_codes_mapping: Dict[str, Dict[str, bool]] = {}
+        self.assertDictEqual(
+            retrieved_language_codes_mapping, expected_language_codes_mapping)
+
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping)
+
+        retrieved_language_codes_mapping = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers())
+        self.assertDictEqual(
+            retrieved_language_codes_mapping, language_codes_mapping)
+
+
+class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
+    """Unit tests to validate the language-accent information saved as
+    constants in the JSON files.
+    """
+
+    def test_get_language_accent_master_list_works_correctly(self) -> None:
+        file_path = os.path.join(
+            feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json')
+        with utils.open_file(file_path, 'r') as f:
+            language_accent_master_list: Dict[str, Dict[str, str]] = (
+                json.loads(f.read()))
+            expected_language_accent_master_list = (
+                voiceover_services.get_language_accent_master_list())
+
+            self.assertDictEqual(
+                language_accent_master_list,
+                expected_language_accent_master_list)
+
+    def test_get_autogeneratable_language_accent_list_works_correctly(
+        self
+    ) -> None:
+        file_path = os.path.join(
+            feconf.VOICEOVERS_DATA_DIR,
+            'autogeneratable_language_accent_list.json')
+        with utils.open_file(file_path, 'r') as f:
+            autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
+                json.loads(f.read()))
+            expected_autogeneratable_language_accent_list = (
+                voiceover_services.get_autogeneratable_language_accent_list())
+
+            self.assertDictEqual(
+                autogeneratable_language_accent_list,
+                expected_autogeneratable_language_accent_list)
+
+    def test_validate_data_format_stored_in_master_list_is_correct(
+        self
+    ) -> None:
+        valid_schema = {
+            'type': 'variable_keys_dict',
+            'keys': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'values': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    },
+                    'values': {
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }
+                }
+            }
+        }
+        try:
+            schema_utils.normalize_against_schema(
+                voiceover_services.get_language_accent_master_list(),
+                valid_schema)
+        except Exception:
+            self.fail(
+                'get_language_accent_master_list() raised '
+                'ExceptionType unexpectedly!')
+
+    def test_validate_data_format_stored_in_autogeneratable_list_is_correct(
+        self
+    ) -> None:
+        valid_schema = {
+            'type': 'variable_keys_dict',
+            'keys': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'values': {
+                'schema': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'service',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }, {
+                        'name': 'voice_code',
+                        'schema': {
+                            'type': 'basestring'
+                        }
+                    }]
+                }
+            }
+        }
+        try:
+            schema_utils.normalize_against_schema(
+                voiceover_services.get_autogeneratable_language_accent_list(),
+                valid_schema)
+        except Exception:
+            self.fail(
+                'get_autogeneratable_language_accent_list() raised '
+                'ExceptionType unexpectedly!')
+
+    def test_validate_autogeneratable_list_is_subset_of_master_list(
+        self
+    ) -> None:
+        language_accent_master_list = []
+        for accent_code_to_description in (
+                voiceover_services.get_language_accent_master_list().values()):
+            for lang_accent_code in accent_code_to_description.keys():
+                language_accent_master_list.append(lang_accent_code)
+        autogeneratable_langauge_accent_codes = list(
+            voiceover_services.
+            get_autogeneratable_language_accent_list().keys())
+
+        self.assertTrue(
+            set(language_accent_master_list).issuperset(
+                set(autogeneratable_langauge_accent_codes)))

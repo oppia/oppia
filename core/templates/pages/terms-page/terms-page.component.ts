@@ -16,23 +16,23 @@
  * @fileoverview Component for the 'terms' page.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'terms-page',
   templateUrl: './terms-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class TermsPageComponent {
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   scrollTo(el: HTMLElement): void {
     el.scrollIntoView({behavior: 'smooth'});
   }
 }
 
-angular.module('oppia').directive(
-  'termsPage', downgradeComponent({component: TermsPageComponent}));
+angular
+  .module('oppia')
+  .directive('termsPage', downgradeComponent({component: TermsPageComponent}));

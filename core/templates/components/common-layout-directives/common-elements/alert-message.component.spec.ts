@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for WarningsAndAlertsComponent.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ToastrService } from 'ngx-toastr';
-import { AlertsService } from 'services/alerts.service';
-import { AlertMessageComponent } from './alert-message.component';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ToastrService} from 'ngx-toastr';
+import {AlertsService} from 'services/alerts.service';
+import {AlertMessageComponent} from './alert-message.component';
 
 describe('Alert Message Component', () => {
   let fixture: ComponentFixture<AlertMessageComponent>;
@@ -34,10 +34,10 @@ describe('Alert Message Component', () => {
             return {
               then: (callb: () => void) => {
                 callb();
-              }
+              },
             };
-          }
-        }
+          },
+        },
       };
     }
 
@@ -48,10 +48,10 @@ describe('Alert Message Component', () => {
             return {
               then: (callb: () => void) => {
                 callb();
-              }
+              },
             };
-          }
-        }
+          },
+        },
       };
     }
   }
@@ -64,19 +64,17 @@ describe('Alert Message Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AlertMessageComponent,
-      ],
+      declarations: [AlertMessageComponent],
       providers: [
         {
           provide: ToastrService,
-          useClass: MockToastrService
+          useClass: MockToastrService,
         },
         {
           provide: AlertsService,
-          useClass: MockAlertsService
-        }
-      ]
+          useClass: MockAlertsService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -90,12 +88,18 @@ describe('Alert Message Component', () => {
   });
 
   it('should initialize', () => {
-    componentInstance.messageObject = { type: 'info', content: 'Test',
-      timeout: 0 };
+    componentInstance.messageObject = {
+      type: 'info',
+      content: 'Test',
+      timeout: 0,
+    };
     componentInstance.ngOnInit();
     expect(numOfCalls).toEqual(1);
-    componentInstance.messageObject = { type: 'success', content: 'Test',
-      timeout: 0 };
+    componentInstance.messageObject = {
+      type: 'success',
+      content: 'Test',
+      timeout: 0,
+    };
     componentInstance.ngOnInit();
     expect(numOfCalls).toEqual(2);
   });

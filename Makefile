@@ -1,14 +1,26 @@
 SHELL := /bin/bash
 
-SHELL_PREFIX=docker compose exec
+SHELL_PREFIX = docker compose exec
+
 ALL_SERVICES = datastore dev-server firebase elasticsearch webpack-compiler angular-build redis
 
+OS_NAME := $(shell uname)
+
 FLAGS = save_datastore disable_host_checking no_auto_restart prod_env maintenance_mode source_maps
+
+sharding_instances := 3
+
+ifeq ($(OS_NAME),Darwin)
+    CHROME_VERSION := $(shell /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --version | awk '{print $$3}')
+else
+    CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
+endif
+
 $(foreach flag, $(FLAGS), $(eval $(flag) = false))
 
 .PHONY: help run-devserver build clean terminal stop-devserver \
-	$(addsuffix stop., $(ALL_SERVICES)) $(addsuffix logs., $(ALL_SERVICES)) \
-	$(addsuffix restart., $(ALL_SERVICES))
+    $(addsuffix stop., $(ALL_SERVICES)) $(addsuffix logs., $(ALL_SERVICES)) \
+    $(addsuffix restart., $(ALL_SERVICES))
 
 echo_flags:
 	@echo "Flags:"
@@ -30,24 +42,24 @@ build: ## Builds the all docker setup.
 	docker compose build
 
 run-devserver: ## Runs the dev-server
+# TODO(#19888): Implement a more efficient method for connecting the folders rather than resorting to copying using docker cp.
 	docker compose up angular-build -d
 	$(MAKE) update.package
 	docker cp oppia-angular-build:/app/oppia/node_modules .
 	docker compose stop angular-build
 	docker compose up dev-server -d --no-deps
 	$(MAKE) update.requirements
-	$(MAKE) run-offline
+	$(MAKE) start-devserver
 
 run-offline: ## Runs the dev-server in offline mode
+	## Users can pass this check by simply running `make start-devserver`
+	$(MAKE) check.dev-container-healthy
 	$(MAKE) start-devserver
-	@echo 'Please visit http://localhost:8181 to access the development server.'
-	@echo 'Check dev-server logs using "make logs.dev-server"'
-	@echo 'Stop the development server using "make stop"'
 
-start-devserver: ## Starts the development server for the tests
+start-devserver: ## Starts the development server
 	docker compose up dev-server -d
 	@printf 'Please wait while the development server starts...\n\n'
-	@while [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o /tmp/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
+	@while [[ $$(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
 		printf "▓"; \
 		if [[ "$(prod_env)" = 'true' ]] && [[ -n $$(docker ps -q -f status=exited -f name=webpack-compiler) ]]; then \
 			${SHELL_PREFIX} dev-server python -m scripts.generate_build_directory; \
@@ -55,9 +67,14 @@ start-devserver: ## Starts the development server for the tests
 		sleep 1; \
 	done
 	@printf '\n\n'
-	@echo 'Development server started at port 8181.'
+	@echo 'Please visit http://localhost:8181 to access the development server.'
+	@echo 'Check dev-server logs using "make logs.dev-server"'
+	@echo 'Stop the development server using "make stop"'
 
-init: build run-devserver ## Initializes the build and runs dev-server.
+init: install-hooks build run-devserver ## Initializes the build and runs dev-server.
+
+install-hooks:  ## Install required hooks
+	bash ./docker/pre_push_hook.sh --install
 
 clean: ## Cleans the docker containers and volumes.
 	docker compose down --rmi all --volumes
@@ -85,6 +102,20 @@ update.package: ## Installs the npm requirements for the project
 	@echo 'yarn-path "../oppia_tools/yarn-1.22.15/bin/yarn"' > .yarnrc
 	@echo 'cache-folder "../yarn_cache"' >> .yarnrc
 
+check.dev-container-healthy:
+	@run_devserver_prompt="Please, run \`make run-devserver\` (requires internet) once before running \`make run-offline\`"; \
+	if [ -f ".dev/containers-health.json" ]; then \
+		if jq -e ".devserver != true" ".dev/containers-health.json" > /dev/null; then \
+			echo "Container is unhealthy"; \
+			echo $$run_devserver_prompt; \
+			exit 1; \
+		fi \
+	else \
+		echo "Can't check container health!"; \
+		echo $$run_devserver_prompt; \
+		exit 1; \
+	fi
+
 logs.%: ## Shows the logs of the given docker service. Example: make logs.datastore
 	docker compose logs -f $*
 
@@ -92,40 +123,46 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
 run_tests.lint: ## Runs the linter tests
-	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.pre_commit_linter $(PYTHON_ARGS)'" dev-server
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
 
 run_tests.backend: ## Runs the backend tests
+	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
-	docker compose up datastore dev-server redis firebase -d --no-deps
+	docker compose up datastore dev-server redis firebase -d --no-deps || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Backend tests started....'
 	@echo '------------------------------------------------------'
-	$(SHELL_PREFIX) dev-server python -m scripts.run_backend_tests $(PYTHON_ARGS)
+	$(SHELL_PREFIX) dev-server sh -c "git config --global --add safe.directory /app/oppia && python -m scripts.run_backend_tests $(PYTHON_ARGS)"
 	@echo '------------------------------------------------------'
-	@echo '  Backend tests has been executed successfully....'
+	@echo '  Backend tests have been executed successfully....'
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
+run_tests.check_overall_backend_test_coverage: ## Runs the check for overall backend test coverage
+	$(MAKE) start-devserver
+	$(SHELL_PREFIX) dev-server python -m scripts.check_overall_backend_test_coverage
+	$(MAKE) stop
+
 run_tests.frontend: ## Runs the frontend unit tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks $(PYTHON_ARGS)" dev-server || $(MAKE) stop
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
-	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || $(MAKE) stop
 
 run_tests.mypy: ## Runs mypy checks
-	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server
+	docker compose run --no-deps --entrypoint "python -m scripts.run_mypy_checks" dev-server || $(MAKE) stop
 
 run_tests.check_backend_associated_tests: ## Runs the backend associate tests
-	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server
+	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.check_backend_associated_test_file'" dev-server || $(MAKE) stop
 
 run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 ## Flag for Acceptance tests
 ## suite: The suite to run the acceptance tests
 	@echo 'Shutting down any previously started server.'
-	$(MAKE) stop 
+	$(MAKE) stop
 # Adding node to the path.
 	@if [ "$(OS_NAME)" = "Windows" ]; then \
 		export PATH=$(cd .. && pwd)/oppia_tools/node-16.13.0:$(PATH); \
@@ -137,13 +174,11 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting acceptance test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite)
+	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite) || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
-
-CHROME_VERSION := $(shell google-chrome --version | awk '{print $$3}')
 
 run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## Flags for the e2e tests
@@ -152,6 +187,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 ## CHROME_VERSION: Uses the specified version of the chrome driver.
 ## MOBILE: Run e2e test in mobile viewport.
 ## DEBUG: Runs the webdriverio test in debugging mode.
+## VIDEO_RECORDING_IS_ENABLED: Record the e2e test.
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -161,22 +197,31 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 		export PATH=$(shell cd .. && pwd)/oppia_tools/node-16.13.0/bin:$(PATH); \
 	fi
 # Adding env variable for the mobile view
-	@export MOBILE=${MOBILE}
+	@export MOBILE=${MOBILE:-false}
+# Adding env variable for the video recording
+	@export VIDEO_RECORDING_IS_ENABLED=${VIDEO_RECORDING_IS_ENABLED:-0}
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
 	@echo '  Starting e2e test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	sharding_instances := 3
-	../oppia_tools/node-16.13.0/bin/npx wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG}
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/wdio ./core/tests/wdio.conf.js --suite $(suite) $(CHROME_VERSION) --params.devMode=True --capabilities[0].maxInstances=${sharding_instances} DEBUG=${DEBUG:-false} || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  e2e test has been executed successfully....'
 	@echo '------------------------------------------------------'
 	$(MAKE) stop
 
+run_tests.check_e2e_tests_are_captured_in_ci: ## Runs the check to ensure that all e2e tests are captured in CI
+	@echo 'Shutting down any previously started server.'
+	$(MAKE) stop
+	docker compose up dev-server -d --no-deps
+	$(SHELL_PREFIX) dev-server python -m scripts.check_e2e_tests_are_captured_in_ci
+	$(MAKE) stop
+
 run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests for the parsed shard
 ## Flag for Lighthouse test
 ## shard: The shard number to run the lighthouse tests
+## RECORD_SCREEN: Record the lighthouse test
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -190,8 +235,12 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Starting Lighthouse Accessibility tests -- shard number: $(shard)'
 	@echo '-----------------------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096
+	@if [ "$(RECORD_SCREEN)" = "true" ]; then \
+		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js ../lhci-puppeteer-video/video.mp4; \
+	else \
+		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
+	fi
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-accessibility-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
@@ -200,6 +249,7 @@ run_tests.lighthouse_accessibility: ## Runs the lighthouse accessibility tests f
 run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for the parsed shard
 ## Flag for Lighthouse test
 ## shard: The shard number to run the lighthouse tests
+## RECORD_SCREEN: Record the lighthouse test
 	@echo 'Shutting down any previously started server.'
 	$(MAKE) stop
 # Adding node to the path.
@@ -213,14 +263,16 @@ run_tests.lighthouse_performance: ## Runs the lighthouse performance tests for t
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Starting Lighthouse Performance tests -- shard number: $(shard)'
 	@echo '-----------------------------------------------------------------------'
-	../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js
-	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096
+	@if [ "$(RECORD_SCREEN)" = "true" ]; then \
+		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js ../lhci-puppeteer-video/video.mp4; \
+	else \
+		../oppia_tools/node-16.13.0/bin/node ./core/tests/puppeteer/lighthouse_setup.js; \
+	fi
+	../oppia_tools/node-16.13.0/bin/node node_modules/@lhci/cli/src/cli.js autorun --config=.lighthouserc-${shard}.js --max-old-space-size=4096 || $(MAKE) stop
 	@echo '-----------------------------------------------------------------------'
 	@echo '  Lighthouse tests has been executed successfully....'
 	@echo '-----------------------------------------------------------------------'
 	$(MAKE) stop
-
-OS_NAME := $(shell uname)
 
 install_node: ## Installs node-16.13.0 in the oppia_tools directory
 	sh ./docker/install_node.sh

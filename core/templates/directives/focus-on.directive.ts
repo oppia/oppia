@@ -29,15 +29,15 @@
  * AngularJS codebase.
  */
 
-import { Directive, ElementRef, Input, OnDestroy } from '@angular/core';
+import {Directive, ElementRef, Input, OnDestroy} from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import {AppConstants} from 'app.constants';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
 @Directive({
-  selector: '[oppiaFocusOn]'
+  selector: '[oppiaFocusOn]',
 })
 export class FocusOnDirective implements OnDestroy {
   // This property is initialized using component interactions
@@ -46,21 +46,21 @@ export class FocusOnDirective implements OnDestroy {
   @Input('oppiaFocusOn') focusOn!: string;
   directiveSubscriptions = new Subscription();
   constructor(
-    private el: ElementRef, private focusManagerService: FocusManagerService) {
+    private el: ElementRef,
+    private focusManagerService: FocusManagerService
+  ) {
     this.directiveSubscriptions.add(
-      this.focusManagerService.onFocus.subscribe(
-        (name: string) => {
-          if (name === this.focusOn) {
-            this.el.nativeElement.focus();
-          }
-
-          // If the purpose of the focus switch was to clear focus, blur the
-          // element.
-          if (name === AppConstants.LABEL_FOR_CLEARING_FOCUS) {
-            this.el.nativeElement.blur();
-          }
+      this.focusManagerService.onFocus.subscribe((name: string) => {
+        if (name === this.focusOn) {
+          this.el.nativeElement.focus();
         }
-      )
+
+        // If the purpose of the focus switch was to clear focus, blur the
+        // element.
+        if (name === AppConstants.LABEL_FOR_CLEARING_FOCUS) {
+          this.el.nativeElement.blur();
+        }
+      })
     );
   }
 

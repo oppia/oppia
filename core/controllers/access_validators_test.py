@@ -18,13 +18,12 @@ from __future__ import annotations
 
 import datetime
 
+from core import feature_flag_list
 from core import feconf
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
-from core.domain import platform_feature_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
@@ -53,14 +52,6 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL))
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        config_services.set_property(
-            self.user_id_admin, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math',
-                'topic_ids': [],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
         math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
             'name': 'math',
@@ -214,45 +205,107 @@ class ViewLearnerGroupPageAccessValidationHandlerTests(
     def test_validation_returns_false_with_learner_groups_feature_disabled(
         self
     ) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            False
-        )
-        with swap_is_feature_enabled:
-            self.get_json(
-                '%s/does_learner_group_exist/%s' % (
-                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
-                    expected_status_int=404)
+        self.get_json(
+            '%s/does_learner_group_exist/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_false_with_user_not_being_a_learner(
         self
     ) -> None:
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
-        )
-        with swap_is_feature_enabled:
-            self.get_json(
-                '%s/does_learner_group_exist/%s' % (
-                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
-                    expected_status_int=404)
+        self.get_json(
+            '%s/does_learner_group_exist/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
         self.logout()
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
     def test_validation_returns_true_for_valid_learner(self) -> None:
         learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.learner_id, False)
-        swap_is_feature_enabled = self.swap_to_always_return(
-            platform_feature_services,
-            'is_feature_enabled',
-            True
+        self.get_html_response(
+            '%s/does_learner_group_exist/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+
+
+class EditLearnerGroupPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase
+):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.facilitator_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+
+        self.LEARNER_GROUP_ID = (
+            learner_group_fetchers.get_new_learner_group_id()
         )
-        with swap_is_feature_enabled:
-            self.get_html_response(
-                '%s/does_learner_group_exist/%s' % (
-                    ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+        learner_group_services.create_learner_group(
+            self.LEARNER_GROUP_ID, 'Learner Group Title', 'Description',
+            [self.facilitator_id], [],
+            ['subtopic_id_1'], ['story_id_1'])
+
+    def test_validation_returns_false_with_learner_groups_feature_disabled(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_json(
+            '%s/can_access_edit_learner_group_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_validation_returns_false_with_user_not_being_a_facilitator(
+        self
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_edit_learner_group_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_validation_returns_true_for_valid_facilitator(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/can_access_edit_learner_group_page/%s' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+
+
+class CreateLearnerGroupPageAccessValidationHandlerTests(
+    test_utils.GenericTestBase
+):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+
+    def test_validation_returns_false_with_learner_groups_feature_disabled(
+        self
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_create_learner_group_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_validation_returns_true_for_valid_user(self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_create_learner_group_page' %
+            ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
 
 
 class BlogHomePageAccessValidationHandlerTests(test_utils.GenericTestBase):

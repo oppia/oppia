@@ -15,85 +15,87 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { CodeNormalizerService } from 'services/code-normalizer.service';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { NormalizeWhitespacePunctuationAndCasePipe } from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
-import { PencilCodeEditorAnswer } from 'interactions/answer-defs';
-import { PencilCodeEditorRuleInputs } from 'interactions/rule-input-defs';
+import {CodeNormalizerService} from 'services/code-normalizer.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {NormalizeWhitespacePunctuationAndCasePipe} from 'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+import {PencilCodeEditorAnswer} from 'interactions/answer-defs';
+import {PencilCodeEditorRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PencilCodeEditorRulesService {
   constructor(
     private nwp: NormalizeWhitespacePipe,
     private nwpac: NormalizeWhitespacePunctuationAndCasePipe,
-    private cn: CodeNormalizerService) {}
+    private cn: CodeNormalizerService
+  ) {}
 
   CodeEquals(
-      answer: PencilCodeEditorAnswer,
-      inputs: PencilCodeEditorRuleInputs): boolean {
-    var normalizedCode =
-      this.cn.getNormalizedCode(answer.code);
-    var normalizedExpectedCode =
-      this.cn.getNormalizedCode(inputs.x);
+    answer: PencilCodeEditorAnswer,
+    inputs: PencilCodeEditorRuleInputs
+  ): boolean {
+    var normalizedCode = this.cn.getNormalizedCode(answer.code);
+    var normalizedExpectedCode = this.cn.getNormalizedCode(inputs.x);
     return normalizedCode === normalizedExpectedCode;
   }
 
   CodeContains(
-      answer: PencilCodeEditorAnswer,
-      inputs: PencilCodeEditorRuleInputs): boolean {
-    var normalizedCode =
-      this.cn.getNormalizedCode(answer.code);
-    var normalizedSnippet =
-      this.cn.getNormalizedCode(inputs.x);
+    answer: PencilCodeEditorAnswer,
+    inputs: PencilCodeEditorRuleInputs
+  ): boolean {
+    var normalizedCode = this.cn.getNormalizedCode(answer.code);
+    var normalizedSnippet = this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) !== -1;
   }
 
   CodeDoesNotContain(
-      answer: PencilCodeEditorAnswer,
-      inputs: PencilCodeEditorRuleInputs): boolean {
-    var normalizedCode =
-      this.cn.getNormalizedCode(answer.code);
-    var normalizedSnippet =
-      this.cn.getNormalizedCode(inputs.x);
+    answer: PencilCodeEditorAnswer,
+    inputs: PencilCodeEditorRuleInputs
+  ): boolean {
+    var normalizedCode = this.cn.getNormalizedCode(answer.code);
+    var normalizedSnippet = this.cn.getNormalizedCode(inputs.x);
     return normalizedCode.indexOf(normalizedSnippet) === -1;
   }
 
   OutputEquals(
-      answer: PencilCodeEditorAnswer,
-      inputs: PencilCodeEditorRuleInputs): boolean {
+    answer: PencilCodeEditorAnswer,
+    inputs: PencilCodeEditorRuleInputs
+  ): boolean {
     var normalizedOutput = this.nwp.transform(answer.output);
-    var normalizedExpectedOutput =
-      this.nwp.transform(inputs.x);
+    var normalizedExpectedOutput = this.nwp.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
 
   OutputRoughlyEquals(
-      answer: PencilCodeEditorAnswer,
-      inputs: PencilCodeEditorRuleInputs): boolean {
+    answer: PencilCodeEditorAnswer,
+    inputs: PencilCodeEditorRuleInputs
+  ): boolean {
     var normalizedOutput = this.nwpac.transform(answer.output);
     var normalizedExpectedOutput = this.nwpac.transform(inputs.x);
     return normalizedOutput === normalizedExpectedOutput;
   }
 
   ResultsInError(answer: PencilCodeEditorAnswer): boolean {
-    return !!(answer.error.trim());
+    return !!answer.error.trim();
   }
 
   ErrorContains(
-      answer: PencilCodeEditorAnswer,
-      inputs: PencilCodeEditorRuleInputs): boolean {
+    answer: PencilCodeEditorAnswer,
+    inputs: PencilCodeEditorRuleInputs
+  ): boolean {
     var normalizedError = this.nwp.transform(answer.error);
     var normalizedSnippet = this.nwp.transform(inputs.x);
     return normalizedError.indexOf(normalizedSnippet) !== -1;
   }
 }
 
-angular.module('oppia').factory(
-  'PencilCodeEditorRulesService', downgradeInjectable(
-    PencilCodeEditorRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'PencilCodeEditorRulesService',
+    downgradeInjectable(PencilCodeEditorRulesService)
+  );
