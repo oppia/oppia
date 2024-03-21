@@ -250,6 +250,11 @@ def create_suggestion(
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
     suggestion.validate()
+    print(change_cmd)
+    print(change_cmd)
+    print(change_cmd)
+    print(change_cmd)
+    print(suggestion_type)
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
@@ -3965,14 +3970,18 @@ def _generate_translation_contributor_certificate_data(
     words_count = 0
     for model in suggestions:
         suggestion = get_suggestion_from_model(model)
-        suggestion_change = suggestion.change
+        suggestion_change = suggestion.change_cmd
+        data_is_list = (
+            translation_domain.TranslatableContentFormat
+            .is_data_format_list(suggestion_change.data_format)
+        )
         if (
-                suggestion_change.cmd == 'add_written_translation' and (
-                    translation_domain.TranslatableContentFormat
-                    .is_data_format_list(suggestion_change.data_format)
-                )
+                suggestion_change.cmd == 'add_written_translation' and
+                data_is_list
         ):
-            words_count += len(suggestion_change.translation_html)
+            words_count += sum(
+                len(item) for item in suggestion_change.translation_html
+            )
         else:
             # Retrieve the html content that is emphasized on the
             # Contributor Dashboard pages. This content is what stands

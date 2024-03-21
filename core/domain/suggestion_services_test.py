@@ -7258,17 +7258,36 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         self.from_date = datetime.datetime.today() - datetime.timedelta(days=1)
         self.to_date = datetime.datetime.today() + datetime.timedelta(days=1)
 
+    def _get_change_with_normalized_string(self) -> Mapping[
+        str, change_domain.AcceptableChangeDictTypes]:
+        """Provides change_cmd dictionary with normalized translation html.
+
+        Returns:
+            Mapping[str, change_domain.AcceptableChangeDictTypes]. A dictionary
+            of the change_cmd object for the translations.
+        """
+        return {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': '<p>A content to translate.</p>',
+            'state_name': 'Introduction',
+            'translation_html': ['translated text1', 'translated text2'],
+            'data_format': 'set_of_normalized_string'
+        }
+
     def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
         change_cmd = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -7286,6 +7305,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
+        self.assertEqual(response['contribution_hours'], '0.01')
+        self.assertEqual(response['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_rule_translation(
         self
@@ -7293,15 +7314,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         score_category: str = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
-        change_cmd = {
-            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-            'state_name': 'Introduction',
-            'content_id': 'content',
-            'language_code': 'hi',
-            'content_html': ['text1', 'text2'],
-            'translation_html': ['translated text1', 'translated text2'],
-            'data_format': 'set_of_normalized_string'
-        }
+        change_cmd = self._get_change_with_normalized_string()
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             feconf.ENTITY_TYPE_EXPLORATION,
@@ -7318,6 +7331,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
+        self.assertEqual(response['contribution_hours'], '0.11')
+        self.assertEqual(response['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_english(
         self
@@ -7326,12 +7341,13 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
         change_cmd = {
-            'cmd': 'add_translation',
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
             'content_id': 'content',
             'language_code': 'en',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -7349,6 +7365,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
+        self.assertEqual(response['contribution_hours'], '0.01')
+        self.assertEqual(response['language'], 'English')
 
     def test_create_question_contributor_certificate(self) -> None:
         content_id_generator = translation_domain.ContentIdGenerator()
@@ -7399,6 +7417,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
+        self.assertEqual(response['contribution_hours'], '0.2')
 
     def test_create_question_contributor_certificate_with_image_content(
         self
@@ -7452,6 +7471,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
+        self.assertEqual(response['contribution_hours'], '0.33')
 
     def test_create_contributor_certificate_raises_exception_for_no_suggestions(
         self
