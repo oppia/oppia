@@ -16,11 +16,18 @@
  * @fileoverview Unit tests for access validation backend api service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks, waitForAsync } from '@angular/core/testing';
-import { UrlInterpolationService } from '../../../domain/utilities/url-interpolation.service';
-import { AccessValidationBackendApiService } from './access-validation-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+  waitForAsync,
+} from '@angular/core/testing';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
+import {AccessValidationBackendApiService} from './access-validation-backend-api.service';
 
 describe('Access validation backend api service', () => {
   let avbas: AccessValidationBackendApiService;
@@ -149,7 +156,8 @@ describe('Access validation backend api service', () => {
     avbas.validateAccessToDiagnosticTestPlayerPage().then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_diagnostic_test_player_page');
+      '/access_validation_handler/can_access_diagnostic_test_player_page'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
@@ -290,6 +298,48 @@ describe('Access validation backend api service', () => {
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_blog_author_profile_page/' +
         'username'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(successSpy).toHaveBeenCalled();
+    expect(failSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should not validate access to collection player page with invalid access', fakeAsync(() => {
+    avbas
+      .validateAccessToCollectionPlayerPage('invalid-collection')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_collection_player_page/' +
+        'invalid-collection'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(
+      {
+        error: 'Access Denied.',
+      },
+      {
+        status: 401,
+        statusText: 'Access Denied.',
+      }
+    );
+
+    flushMicrotasks();
+    expect(successSpy).not.toHaveBeenCalled();
+    expect(failSpy).toHaveBeenCalled();
+  }));
+
+  it('should validate access to collection player page with valid access', fakeAsync(() => {
+    avbas
+      .validateAccessToCollectionPlayerPage('valid-collection')
+      .then(successSpy, failSpy);
+
+    const req = httpTestingController.expectOne(
+      '/access_validation_handler/can_access_collection_player_page/' +
+        'valid-collection'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});

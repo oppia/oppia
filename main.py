@@ -285,6 +285,11 @@ URLS = [
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
 
     get_redirect_route(
+        r'%s/can_access_collection_player_page/<collection_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CollectionViewerPageAccessValidationHandler),
+
+    get_redirect_route(
         r'%s/can_access_diagnostic_test_player_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.DiagnosticTestPlayerAccessValidationHandler
@@ -867,9 +872,6 @@ URLS = [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
-    get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
-        collection_viewer.CollectionPage),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler),

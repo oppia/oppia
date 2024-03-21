@@ -65,11 +65,12 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .DIAGNOSTIC_TEST_PLAYER.ROUTE,
-    loadChildren: () => import(
-      'pages/diagnostic-test-player-page/diagnostic-test-player-page.module')
-      .then(m => m.DiagnosticTestPlayerPageModule),
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/diagnostic-test-player-page/diagnostic-test-player-page.module'
+      ).then(m => m.DiagnosticTestPlayerPageModule),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
@@ -388,6 +389,14 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/blog-post-page/blog-post-page.module').then(
         m => m.BlogPostPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/collection-player-page/collection-player-page.module').then(
+        m => m.CollectionPlayerPageModule
       ),
   },
 ];

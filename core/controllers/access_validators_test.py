@@ -24,6 +24,8 @@ from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
@@ -77,6 +79,98 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             '%s/can_access_classroom_page?classroom_url_fragment=%s' %
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
             expected_status_int=404)
+
+
+class CollectionViewerPageAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
+    """Test for collection page access validation."""
+
+    COLLECTION_ID: Final = 'cid'
+    OTHER_EDITOR_EMAIL: Final = 'another@example.com'
+
+    def setUp(self) -> None:
+        """Before each individual test, create a dummy collection."""
+        super().setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.get_user_actions_info(self.editor_id)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
+        self.save_new_valid_collection(self.COLLECTION_ID, self.editor_id)
+
+    def test_unpublished_collections_are_invisible_to_logged_out_users(
+        self
+    ) -> None:
+        self.get_json(
+            '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+            expected_status_int=404)
+
+    def test_unpublished_collections_are_invisible_to_unconnected_users(
+        self
+    ) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+        '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+        expected_status_int=404)
+        self.logout()
+
+    def test_unpublished_collections_are_invisible_to_other_editors(
+        self
+    ) -> None:
+        self.signup(self.OTHER_EDITOR_EMAIL, 'othereditorusername')
+        self.save_new_valid_collection('cid2', self.OTHER_EDITOR_EMAIL)
+        self.login(self.OTHER_EDITOR_EMAIL)
+        self.get_json(
+        '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID),
+        expected_status_int=404)
+        self.logout()
+
+    def test_unpublished_collections_are_visible_to_their_editors(
+        self
+    ) -> None:
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response(
+            '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
+        self.logout()
+
+    def test_unpublished_collections_are_visible_to_admins(self) -> None:
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.login(self.MODERATOR_EMAIL)
+        self.get_html_response(
+            '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
+        self.logout()
+
+    def test_published_collections_are_visible_to_logged_out_users(
+        self
+    ) -> None:
+        rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
+
+        self.get_html_response(
+            '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
+
+    def test_published_collections_are_visible_to_logged_in_users(
+        self
+    ) -> None:
+        rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID))
+
+    def test_invalid_collection_error(self) -> None:
+        self.login(self.EDITOR_EMAIL)
+        self.get_json(
+            '%s/can_access_collection_player_page/%s' %
+            (ACCESS_VALIDATION_HANDLER_PREFIX, 'none'),
+            expected_status_int=404)
+        self.logout()
 
 
 class ReleaseCoordinatorAccessValidationHandlerTests(
