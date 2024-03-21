@@ -242,8 +242,9 @@ def create_voice_artist_metadata_model_instance(
             corresponding value.
 
     Returns:
-        VoiceArtistMetadataModel. A newly created VoiceArtistMetadataModel
-        instance.
+        VoiceArtistMetadataModel. A new VoiceArtistMetadataModel instance
+        connects voiceover artists with the languages in which they have
+        provided voiceovers.
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
         id=voice_artist_id,
