@@ -77,15 +77,15 @@ describe('Curriculum Admin', function () {
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       await curriculumAdmin.createTopic(topic);
-      await curriculumAdmin.createSubTopic(subtopic);
+      await curriculumAdmin.createSubtopic(subtopic);
       await curriculumAdmin.createSkill(skill);
+      await curriculumAdmin.addDiagnosticTestSkillAndPublishTopic();
       await curriculumAdmin.createAndPublishStoryWithChapter(
         story,
         explorationId
       );
 
       await curriculumAdmin.expectPublishedTopicToBePresent();
-      await curriculumAdmin.expectPublishedStoryToBePresent();
     },
     DEFAULT_SPEC_TIMEOUT
   );

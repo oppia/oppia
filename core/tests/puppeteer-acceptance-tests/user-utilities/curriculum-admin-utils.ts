@@ -88,6 +88,8 @@ const topicWebFragmentField = 'input.e2e-test-new-page-title-fragm-field';
 const topicDescriptionField = 'textarea.e2e-test-new-topic-description-field';
 const createTopicButton = 'button.e2e-test-confirm-topic-creation-button';
 const saveTopicButton = 'button.e2e-test-save-topic-button';
+const topicMetaTagInput = '.e2e-test-topic-meta-tag-content-field';
+const publishTopicButton = 'button.e2e-test-publish-topic-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
 const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
@@ -104,6 +106,16 @@ const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
 
+const assignSkillButton = 'i.e2e-test-skill-item-edit-btn';
+const subtopicRadioButton = '.mat-radio-button';
+const confirmSkillAssignationButton =
+  'button.e2e-test-skill-assign-subtopic-confirm';
+
+const addDiagnosticTestSkillButton =
+  'button.e2e-test-add-diagnostic-test-skill';
+const diagnosticTestSkillSelector = '.e2e-test-diagnostic-test-skill-selector';
+const diagnosticSkillOption = '.e2e-test-diagnostic-test-skill-option';
+
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
 const storyDescriptionField = 'textarea.e2e-test-new-story-description-field';
@@ -112,6 +124,8 @@ const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const saveStoryMessageInput = 'textarea.e2e-test-commit-message-input';
 const publishStoryButton = 'button.e2e-test-publish-story-button';
+const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
+const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
 
 const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
@@ -171,6 +185,7 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for creating a skill in the topics and skills dashboard.
+   * Handles creating questions for the relevant skills.
    */
   async createSkill(skill: Skill): Promise<void> {
     await this.openTopicEditor();
@@ -186,6 +201,7 @@ export class CurriculumAdmin extends BaseUser {
     for (let i = 0; i < skill.questionCount; i++) {
       await this.createQuestion();
     }
+    await this.assignSkillToSubtopic();
   }
 
   /**
@@ -314,7 +330,13 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.clickAfterWaiting(createTopicButton);
-    await this.page.bringToFront();
+
+    await this.openTopicEditor();
+    await this.page.waitForSelector(topicMetaTagInput);
+    await this.page.focus(topicMetaTagInput);
+    await this.page.type(topicMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+    await this.saveTopicDraft();
   }
 
   /**
@@ -337,10 +359,16 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(skill);
   }
 
+  async saveTopicDraft(): Promise<void> {
+    await this.clickAfterWaiting(saveTopicButton);
+    await this.clickOn(closeSaveModalButton);
+    await this.page.waitForTimeout(500);
+  }
+
   /**
    * Function for creating a subtopic as a curriculum admin.
    */
-  async createSubTopic(subtopic: Subtopic): Promise<void> {
+  async createSubtopic(subtopic: Subtopic): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addSubtopicButton);
     await this.type(subtopicTitleField, subtopic.title);
@@ -353,8 +381,32 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.clickAfterWaiting(createSubtopicButton);
-    await this.clickAfterWaiting(saveTopicButton);
-    await this.clickOn(closeSaveModalButton);
+    await this.saveTopicDraft();
+  }
+
+  async assignSkillToSubtopic() {
+    await this.openTopicEditor();
+    await this.clickOn(assignSkillButton);
+    await this.page.waitForTimeout(500);
+    await this.clickOn('Assign to Subtopic');
+    await this.page.waitForTimeout(500);
+    await this.clickOn(subtopicRadioButton);
+    await this.page.waitForSelector(
+      `${confirmSkillAssignationButton}:not([disabled])`
+    );
+    await this.clickOn(confirmSkillAssignationButton);
+    await this.page.waitForTimeout(500);
+    await this.saveTopicDraft();
+  }
+
+  async addDiagnosticTestSkillAndPublishTopic() {
+    await this.openTopicEditor();
+    await this.clickOn(addDiagnosticTestSkillButton);
+    await this.page.waitForTimeout(500);
+    await this.clickOn(diagnosticTestSkillSelector);
+    await this.clickOn(diagnosticSkillOption[0]);
+    await this.saveTopicDraft();
+    await this.clickOn(publishTopicButton);
   }
 
   /**
@@ -375,8 +427,14 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(uploadPhotoButton);
     await this.clickAfterWaiting(createStoryButton);
 
+    await this.page.waitForSelector(storyMetaTagInput);
+    await this.page.focus(storyMetaTagInput);
+    await this.page.type(storyMetaTagInput, 'meta');
+    await this.page.keyboard.press('Tab');
+
     await this.createChapter(explorationId);
-    await this.publishStory();
+    await this.clickOn(publishStoryButton);
+    await this.page.waitForSelector(unpublishStoryButton);
   }
 
   /**
@@ -391,86 +449,63 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
     await this.clickAfterWaiting(createChapterButton);
+    await this.saveStoryDraft();
   }
 
   /**
-   * Function for publishing a story as a curriculum admin.
+   * Function for saving a story as a curriculum admin.
    * Timeout here is necessary for the closing modal transition.
    */
-  async publishStory(): Promise<void> {
+  async saveStoryDraft(): Promise<void> {
     await this.clickAfterWaiting(saveStoryButton);
+    await this.clickOn(closeSaveModalButton);
+    await this.page.waitForTimeout(500);
     await this.page.waitForTimeout(500);
     await this.type(
       saveStoryMessageInput,
-      'Test publishing story as curriculum admin.'
+      'Test saving story as curriculum admin.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
     await this.page.waitForTimeout(500);
-    await this.clickOn(publishStoryButton);
   }
 
   /**
-   * This function checks if the topic with given subtopic and skill is published.
+   * This function checks if the topic has been published successfully.
    */
   async expectPublishedTopicToBePresent(): Promise<void> {
-    let expectedSubtopicName = 'Test Subtopic 1';
-    let expectedSkillName = 'Test Skill 1';
+    await this.navigateToTopicAndSkillsDashboardPage();
+    await this.page.waitForSelector('.e2e-test-topics-table');
 
-    await this.openTopicEditor();
-    await this.page.waitForSelector('.e2e-test-subtopic');
+    let topicStatus = document.querySelector(
+      '.e2e-test-topics-table .list-item .topic-list-status-text'
+    );
+    const topicDetails = await this.page.evaluate(() => {
+      const tr = document.querySelector('.e2e-test-topics-table .list-item');
+      if (!tr) {
+        throw new Error('Cannot find topic details in dashboard!');
+      }
+      const tds = tr.querySelectorAll('td');
+      return {
+        publishedStoryCount: tds[2].textContent,
+        subtopicCount: tds[3].textContent,
+        skillsCount: tds[4].textContent,
+      };
+    });
 
-    let subtopicName = await this.page.$eval(
-      '.e2e-test-subtopic',
-      element => (element as HTMLElement).innerText
-    );
-    let skillName = await this.page.$eval(
-      '.e2e-test-skill-item',
-      element => (element as HTMLElement).innerText
-    );
-    if (subtopicName !== expectedSubtopicName) {
-      throw new Error(
-        `Subtopic with title ${expectedSubtopicName} does not exist!`
-      );
-    } else if (skillName !== expectedSkillName) {
-      throw new Error(
-        `Skill with title ${expectedSubtopicName} does not exist!`
-      );
+    if (!topicDetails || !topicStatus) {
+      throw new Error('Cannot find topic details in dashboard!');
     }
-    showMessage(
-      `Published topic with subtopic ${expectedSubtopicName} and skill ${skillName} exists!`
-    );
-  }
 
-  /**
-   * This function checks if the story with given chapter is published.
-   */
-  async expectPublishedStoryToBePresent(): Promise<void> {
-    let expectedStoryName = 'Test Story 1';
-    let expectedChapterName = 'Test Chapter 1';
-
-    await this.page.waitForSelector('.e2e-test-story-title');
-    let storyName = await this.page.$eval(
-      '.e2e-test-story-title',
-      element => (element as HTMLElement).innerText
-    );
-
-    await this.clickOn('.e2e-test-story-title');
-    await this.page.waitForSelector('.e2e-test-chapter-title');
-    let chapterName = await this.page.$eval(
-      '.e2e-test-chapter-title',
-      element => (element as HTMLElement).innerText
-    );
-    if (storyName !== expectedStoryName) {
-      throw new Error(`Story with title ${expectedStoryName} does not exist!`);
-    } else if (chapterName !== expectedChapterName) {
-      throw new Error(
-        `Chapter with title ${expectedChapterName} does not exist!`
-      );
+    expect(topicStatus.textContent).toBe('Published');
+    if (topicDetails.publishedStoryCount != '1') {
+      throw new Error('Incorrect story count for topic! Expected 1 story.');
+    } else if (topicDetails.subtopicCount != '1') {
+      throw new Error('Incorrect subtopic count for topic! Expected 1 topic.');
+    } else if (topicDetails.skillsCount != '1') {
+      throw new Error('Incorrect skills count for topic! Expected 1 skill.');
     }
-    showMessage(
-      `Published story with title ${expectedStoryName} and chapter with title ${expectedChapterName} exists!`
-    );
+    showMessage(`Topic has been published successfully!`);
   }
 }
 
