@@ -192,7 +192,10 @@ export class ExplorationCreator extends BaseUser {
     showMessage('expectedGoal->' + expectedGoal);
     const goalInput = await this.page.$('#explorationObjective');
     await this.page.waitForTimeout(500);
-    const goal = await this.page.evaluate(input => input.value, goalInput);
+    const goal = await this.page.evaluate(
+      input => input.getAttribute('ng-reflect-model'),
+      goalInput
+    );
     /**
      * Debugging.
      */
@@ -208,6 +211,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in selecting a category from dropdawn.
    */
   async selectACategory(category: string): Promise<void> {
+    await this.page.waitForTimeout(1000);
     await this.clickOn(categoryDropDawn);
     /**
      * Debugging.
