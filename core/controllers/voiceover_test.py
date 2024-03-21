@@ -28,7 +28,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
 
 
-class VoiceoverAdminPageTests(test_utils.GenericTestBase):
+class VoiceoverAdminPageHandlerTests(test_utils.GenericTestBase):
     """Checks the voiceover admin page functionality and its rendering."""
 
     def test_get_voiceover_admin_data(self) -> None:
