@@ -7308,8 +7308,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # We calculate the time taken to translate
         # a word according to the following document.
         # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 4 words. 
-        # Therefore the contribution_hours = 3 * 1 /300 = 0.01
+        # The translation in this test has 4 words.
+        # Therefore the contribution_hours = 3 * 1 /300 = 0.01.
         self.assertEqual(response['contribution_hours'], '0.01')
         self.assertEqual(response['language'], 'Hindi')
 
@@ -7339,8 +7339,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # We calculate the time taken to translate
         # a word according to the following document.
         # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 4 words. 
-        # Therefore the contribution_hours = 4 * 1 /300 = 0.01
+        # The translation in this test has 4 words.
+        # Therefore the contribution_hours = 4 * 1 /300 = 0.01.
         self.assertEqual(response['contribution_hours'], '0.01')
         self.assertEqual(response['language'], 'Hindi')
 
@@ -7378,8 +7378,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # We calculate the time taken to translate
         # a word according to the following document.
         # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 4 words. 
-        # Therefore the contribution_hours = 3 * 1 /300 = 0.01
+        # The translation in this test has 4 words.
+        # Therefore the contribution_hours = 3 * 1 /300 = 0.01.
         self.assertEqual(response['contribution_hours'], '0.01')
         self.assertEqual(response['language'], 'English')
 
@@ -7435,8 +7435,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # We calculate the time taken to create a question without images
         # according to the following document.
         # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # We create 1 question in this test. 
-        # Therefore the contribution_hours = 1 * 1 / 5 = 0.2
+        # We create 1 question in this test.
+        # Therefore the contribution_hours = 1 * 1 / 5 = 0.2.
         self.assertEqual(response['contribution_hours'], '0.2')
 
     def test_create_question_contributor_certificate_with_image_content(
@@ -7494,8 +7494,8 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         # We calculate the time taken to create a question with images
         # according to the following document.
         # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # We create 1 question in this test. 
-        # Therefore the contribution_hours = 1 * 1 / 3 = 0.33
+        # We create 1 question in this test.
+        # Therefore the contribution_hours = 1 * 1 / 3 = 0.33.
         self.assertEqual(response['contribution_hours'], '0.33')
 
     def test_create_contributor_certificate_raises_exception_for_no_suggestions(
