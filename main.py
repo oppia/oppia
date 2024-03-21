@@ -1105,9 +1105,6 @@ URLS = [
         learner_group.LearnerGroupLearnerSpecificProgressHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
-        learner_group.FacilitatorDashboardPage),
-    get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),
     get_redirect_route(
