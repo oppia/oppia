@@ -19,8 +19,6 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -32,12 +30,9 @@ import apache_beam as beam
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import suggestion_models
-    from mypy_imports import feedback_models
-    from mypy_imports import user_models
 
-(email_models, feedback_models, user_models) = models.Registry.import_models([
-    models.Names.EMAIL, models.Names.FEEDBACK, models.Names.USER
-])
+(suggestion_models, ) = models.Registry.import_models([
+    models.Names.SUGGESTION])
 
 
 class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
@@ -53,9 +48,9 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
             | 'Filter edit state content suggestion' >> (
                 beam.Filter(
                     lambda model: ((
-                        model.suggestion_type === (
+                        model.suggestion_type == (
                             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)) and (
-                                model.target_type === (
+                                model.target_type == (
                                     feconf.ENTITY_TYPE_EXPLORATION)))
                 ))
         )
@@ -71,7 +66,6 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
             (
                 suggestion_edit_state_content_model_to_delete
             )
-            | 'Merge models' >> beam.Flatten()
             | 'Extract keys' >> beam.Map(lambda model: model.key)
             | 'Delete models' >> ndb_io.DeleteModels()
         )
