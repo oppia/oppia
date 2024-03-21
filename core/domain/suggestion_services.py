@@ -3975,7 +3975,7 @@ def _generate_translation_contributor_certificate_data(
                 data_is_list
         ):
             words_count += sum(
-                len(item) for item in suggestion_change.translation_html
+                len(item.split()) for item in suggestion_change.translation_html
             )
         else:
             # Retrieve the html content that is emphasized on the
