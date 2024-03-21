@@ -18,6 +18,7 @@
 
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 
@@ -65,27 +66,28 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(explorationSettingsTab);
     await this.clickOn(explorationSettingsTab);
-    await this.page.waitForTimeout(500);
   }
 
   /**
    * Function to create exploration with title
    * @param explorationTitle - title of the exploration
    */
-  async createExplorationWithTitle(): Promise<void> {
+  async createExplorationWithTitle(explorationTitle: string): Promise<void> {
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
       `${dismissWelcomeModalSelector}:not([disabled])`
     );
     await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
+    await this.page.waitForSelector(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
-    await this.page.waitForTimeout(500);
-    await this.type(richTextAreaField, 'First Exploration');
+    await this.page.waitForSelector(richTextAreaField);
+    await this.type(richTextAreaField, `${explorationTitle}`);
     await this.clickOn(saveContentButton);
-
     await this.clickOn(addInteractionButton);
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
@@ -97,8 +99,8 @@ export class VoiceoverAdmin extends BaseUser {
       `${publishExplorationButton}:not([disabled])`
     );
     await this.clickOn(publishExplorationButton);
-    await this.type(explorationTitleInput, 'First Exploration');
-    await this.type(explorationGoalInput, 'First Exploration');
+    await this.type(explorationTitleInput, `${explorationTitle}`);
+    await this.type(explorationGoalInput, `${explorationTitle}`);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
@@ -109,13 +111,12 @@ export class VoiceoverAdmin extends BaseUser {
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(closeShareModalButton);
     await this.clickOn(closeShareModalButton);
-    await this.page.waitForTimeout(500);
   }
 
   /**
    * Function to edit voiceover artist
    */
-  async editVoiceoverArtist(artistUsername: string): Promise<void> {
+  async addVoiceoverArtistToExploration(artistUsername: string): Promise<void> {
     await this.page.waitForSelector(editVoiceoverArtistButton);
     await this.clickOn(editVoiceoverArtistButton);
     await this.page.waitForSelector(voiceArtistEditSelector);
@@ -125,9 +126,23 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to expect to see error toast message
+   * @param expectedErrorMessage - expected error message
    */
-  async expectToSeeErrorToastMessage(): Promise<void> {
+  async expectToSeeErrorToastMessage(
+    expectedErrorMessage: string
+  ): Promise<void> {
     await this.page.waitForSelector(errorToastMessage);
+    const errorMessage = await this.page.$eval(
+      errorToastMessage,
+      element => (element as HTMLElement).innerText
+    );
+    if (errorMessage !== expectedErrorMessage) {
+      throw new Error(
+        `Expected error message to be ${expectedErrorMessage} but got ${errorMessage}`
+      );
+    } else {
+      showMessage(`Error message is ${errorMessage}`);
+    }
   }
 
   /**
@@ -135,15 +150,26 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async closeToastMessage(): Promise<void> {
     await this.page.waitForSelector(errorToastMessage);
-    await this.page.waitForTimeout(500);
     await this.clickOn(closeToastMessageButton);
   }
 
   /**
    * Function to expect to see updated voiceover artist
+   * @param artistUsername - username of the artist
    */
-  async expectToSeeUpdatedVoiceoverArtist(): Promise<void> {
+  async expectVoiceoverArtistToBe(artistUsername: string): Promise<void> {
     await this.page.waitForSelector(updatedVoiceoverArtist);
+    const displayedArtist = await this.page.$eval(
+      updatedVoiceoverArtist,
+      element => (element as HTMLElement).innerText
+    );
+    if (!displayedArtist.includes(artistUsername)) {
+      throw new Error(
+        `Expected artist to be ${artistUsername} but got ${displayedArtist}`
+      );
+    } else {
+      showMessage(`Artist is ${displayedArtist}`);
+    }
   }
 }
 

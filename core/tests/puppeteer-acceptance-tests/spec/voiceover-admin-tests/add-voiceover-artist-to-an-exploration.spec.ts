@@ -39,12 +39,14 @@ describe('Voiceover Admin', function () {
     'should be able to see error while adding `xyz` voiceover artist to an exploration',
     async function () {
       await testUser.navigateToCreatorDashboardPage();
-      await testUser.createExplorationWithTitle();
+      await testUser.createExplorationWithTitle('Test Exploration');
 
       await testUser.navigateToExplorationSettingsTab();
-      await testUser.editVoiceoverArtist('xyz');
+      await testUser.addVoiceoverArtistToExploration('xyz');
 
-      await testUser.expectToSeeErrorToastMessage();
+      await testUser.expectToSeeErrorToastMessage(
+        'Sorry, we could not find the specified user.'
+      );
       await testUser.closeToastMessage();
     },
     DEFAULT_SPEC_TIMEOUT
@@ -58,8 +60,8 @@ describe('Voiceover Admin', function () {
         'voiceoverartist@example.com'
       );
       await testUser.page.reload();
-      await testUser.editVoiceoverArtist('voiceoverartist');
-      await testUser.expectToSeeUpdatedVoiceoverArtist();
+      await testUser.addVoiceoverArtistToExploration('voiceoverartist');
+      await testUser.expectVoiceoverArtistToBe('voiceoverartist');
     },
     DEFAULT_SPEC_TIMEOUT
   );
