@@ -19,6 +19,7 @@
 import {error} from 'console';
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
+import {add} from 'lodash';
 
 const creatorDashboardUrl = 'http://localhost:8181/creator-dashboard';
 const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
@@ -165,7 +166,9 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding a goal.
    */
   async updateGoal(goal: string): Promise<void> {
+    await this.page.waitForSelector(`${addGoal}`, {visible: true});
     await this.type(addGoal, goal);
+    showMessage('Goal has been filled');
   }
 
   /**
@@ -177,7 +180,7 @@ export class ExplorationCreator extends BaseUser {
      * using its selector as it is instantly loaded in the DOM but cannot
      * be clicked until the transition is completed.
      */
-    await this.page.waitForTimeout(400);
+    await this.page.waitForTimeout(600);
     /**
      * Debugging.
      */
