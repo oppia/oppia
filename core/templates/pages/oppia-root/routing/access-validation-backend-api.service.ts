@@ -55,6 +55,9 @@ export class AccessValidationBackendApiService {
   BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'; // eslint-disable-line max-len
 
+  COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
+    '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -100,6 +103,17 @@ export class AccessValidationBackendApiService {
     return this.http
       .get<void>(this.CAN_MANAGE_OWN_ACCOUNT_VALIDATOR)
       .toPromise();
+  }
+
+  validateAccessToCollectionPlayerPage(collectionId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE,
+      {
+        collection_id: collectionId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
   }
 
   doesProfileExist(username: string): Promise<void> {

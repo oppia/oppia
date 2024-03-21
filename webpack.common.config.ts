@@ -190,23 +190,6 @@ module.exports = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      chunks: ['collection_player'],
-      filename: 'collection-player-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.',
-      },
-      template:
-        commonPrefix +
-        '/pages/collection-player-page/' +
-        'collection-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['console_errors'],
       filename: 'console_errors.html',
       hybrid: true,

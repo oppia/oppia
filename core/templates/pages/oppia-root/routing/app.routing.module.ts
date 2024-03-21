@@ -383,6 +383,14 @@ const routes: Route[] = [
         m => m.BlogPostPageModule
       ),
   },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/collection-player-page/collection-player-page.module').then(
+        m => m.CollectionPlayerPageModule
+      ),
+  },
 ];
 
 // Register stewards landing pages.
