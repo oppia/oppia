@@ -932,12 +932,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        config_models.ConfigPropertySnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
-            commit_cmds=self.COMMIT_CMDS
-        ).put()
-
         exploration_models.ExplorationRightsSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
@@ -1228,7 +1222,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_exploration_rights_sm: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1314,8 +1307,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
@@ -1850,12 +1841,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
-        expected_config_property_sm = {
-            self.GENERIC_MODEL_ID: {
-                'commit_type': self.COMMIT_TYPE,
-                'commit_message': self.COMMIT_MESSAGE,
-            }
-        }
 
         expected_exploration_rights_sm = {
             self.GENERIC_MODEL_ID: {
@@ -2183,8 +2168,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'pinned_opportunity': expected_pinned_opportunities_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
