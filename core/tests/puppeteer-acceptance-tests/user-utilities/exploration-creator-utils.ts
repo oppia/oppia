@@ -185,14 +185,13 @@ export class ExplorationCreator extends BaseUser {
      * using its selector as it is instantly loaded in the DOM but cannot
      * be clicked until the transition is completed.
      */
-    await this.page.waitForTimeout(600);
+    await this.page.waitForTimeout(1000);
     /**
      * Debugging.
      */
     showMessage('expectedGoal->' + expectedGoal);
-    const goalInput = await this.page.$(
-      '.e2e-test-exploration-objective-input'
-    );
+    const goalInput = await this.page.$('#explorationObjective');
+    await this.page.waitForTimeout(500);
     const goal = await this.page.evaluate(input => input.value, goalInput);
     /**
      * Debugging.
