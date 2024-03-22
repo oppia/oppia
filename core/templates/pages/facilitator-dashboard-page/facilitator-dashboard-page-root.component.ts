@@ -27,7 +27,7 @@ import {PageHeadService} from 'services/page-head.service';
   selector: 'oppia-facilitator-dashboard-page-root',
   templateUrl: './facilitator-dashboard-page-root.component.html',
 })
-export class FacilitatorDashboardrPageRootComponent implements OnInit {
+export class FacilitatorDashboardPageRootComponent implements OnInit {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD.TITLE;
 
