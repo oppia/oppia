@@ -22,6 +22,7 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 
+import {AppConstants} from 'app.constants';
 import {
   ContributionOpportunitiesBackendApiService,
   // eslint-disable-next-line max-len
@@ -31,7 +32,10 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
 import {FeaturedTranslationLanguage} from 'domain/opportunity/featured-translation-language.model';
-import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
+import {
+  ExplorationOpportunitySummary,
+  TranslationCountsDict,
+} from 'domain/opportunity/exploration-opportunity-summary.model';
 
 describe('Contribution Opportunities backend API service', function () {
   let contributionOpportunitiesBackendApiService: ContributionOpportunitiesBackendApiService;
