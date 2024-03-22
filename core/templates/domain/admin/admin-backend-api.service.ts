@@ -97,7 +97,7 @@ export interface AdminPageData {
 }
 
 export interface ExplorationInteractionIdsBackendResponse {
-  interactions: string[];
+  interaction_ids: string[];
 }
 
 @Injectable({

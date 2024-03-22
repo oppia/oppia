@@ -2299,4 +2299,4 @@ class InteractionsByExplorationIdHandler(
             if state.interaction.id is not None
         ]
 
-        self.render_json({'interactions': interaction_ids})
+        self.render_json({'interaction_ids': interaction_ids})

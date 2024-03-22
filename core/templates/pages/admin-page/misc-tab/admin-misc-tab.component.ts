@@ -58,8 +58,8 @@ export class AdminMiscTabComponent {
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   message: string = '';
-  expIdToGetInteractions!: string;
-  explorationInteractions: string[] = [];
+  expIdToGetInteractionIdsFor!: string;
+  explorationInteractionIds: string[] = [];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -330,19 +330,21 @@ export class AdminMiscTabComponent {
   }
 
   retrieveExplorationInteractionIds(): void {
-    this.explorationInteractions = [];
+    this.explorationInteractionIds = [];
     this.setStatusMessage.emit('Retrieving interactions in exploration ...');
     this.adminBackendApiService
-      .retrieveExplorationInteractionIdsAsync(this.expIdToGetInteractions)
+      .retrieveExplorationInteractionIdsAsync(this.expIdToGetInteractionIdsFor)
       .then(
         response => {
-          if (response.interactions.length > 0) {
+          if (response.interaction_ids.length > 0) {
             this.setStatusMessage.emit(
-              'Successfully fetched interactions in exploration.'
+              'Successfully fetched interactionIds in exploration.'
             );
-            this.explorationInteractions = response.interactions;
+            this.explorationInteractionIds = response.interaction_ids;
           } else {
-            this.setStatusMessage.emit('No interactions found in exploration.');
+            this.setStatusMessage.emit(
+              'No interactionIds found in exploration.'
+            );
           }
         },
         errorResponse => {
