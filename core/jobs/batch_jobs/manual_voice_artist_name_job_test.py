@@ -22,6 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -88,43 +89,43 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.voiceover_dict_1: voiceover_models.VoiceoverDict = {
+        self.voiceover_dict_1: state_domain.VoiceoverDict = {
             'filename': 'filename1.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
             'duration_secs': 42.43
         }
-        self.voiceover_dict_2: voiceover_models.VoiceoverDict = {
+        self.voiceover_dict_2: state_domain.VoiceoverDict = {
             'filename': 'filename2.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
             'duration_secs': 40
         }
-        self.voiceover_dict_3: voiceover_models.VoiceoverDict = {
+        self.voiceover_dict_3: state_domain.VoiceoverDict = {
             'filename': 'filename3.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
             'duration_secs': 20
         }
-        self.voiceover_dict_4: voiceover_models.VoiceoverDict = {
+        self.voiceover_dict_4: state_domain.VoiceoverDict = {
             'filename': 'filename4.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
             'duration_secs': 20
         }
-        self.voiceover_dict_5: voiceover_models.VoiceoverDict = {
+        self.voiceover_dict_5: state_domain.VoiceoverDict = {
             'filename': 'filename5.mp3',
             'file_size_bytes': 5000,
             'needs_update': False,
             'duration_secs': 42.43
         }
-        self.voiceover_dict_6: voiceover_models.VoiceoverDict = {
+        self.voiceover_dict_6: state_domain.VoiceoverDict = {
             'filename': 'filename6.mp3',
             'file_size_bytes': 1000,
             'needs_update': False,
             'duration_secs': 25
         }
-        self.voiceover_dict_7: voiceover_models.VoiceoverDict = {
+        self.voiceover_dict_7: state_domain.VoiceoverDict = {
             'filename': 'filename7.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
@@ -154,7 +155,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             }
         }
         old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]]] = {
+            str, state_domain.VoiceoverDict]]] = {
                 'voiceovers_mapping': {
                     'content_0': {},
                     'ca_placeholder_2': {},
@@ -756,7 +757,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             }
         }
         old_voiceover_dict: Dict[str, Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]]] = {
+            str, state_domain.VoiceoverDict]]] = {
                 'voiceovers_mapping': {
                     'content_0': {},
                     'ca_placeholder_2': {},

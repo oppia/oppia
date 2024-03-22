@@ -21,10 +21,12 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, Tuple, TypedDict
+from typing import Dict, Final, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, 'state_domain' is imported only for type checking.
+    from core.domain import state_domain # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
 
@@ -36,20 +38,9 @@ datastore_services = models.Registry.import_datastore_services()
 VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
 
 
-class VoiceoverDict(TypedDict):
-    """Dictionary representing Voiceover object."""
-
-    filename: str
-    file_size_bytes: int
-    needs_update: bool
-    duration_secs: float
-
-
 ContentIdToVoiceoverMappingType = Dict[
-    str, Dict[str, Tuple[str, VoiceoverDict]]
+    str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
 ]
-
-VoiceoverMappingType = Dict[str, Dict[str, VoiceoverDict]]
 
 
 class EntityVoiceoversModel(base_models.BaseModel):
@@ -155,7 +146,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers: Dict[str, Dict[str, VoiceoverDict]]
+        voiceovers: Dict[str, Dict[str, state_domain.VoiceoverDict]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 

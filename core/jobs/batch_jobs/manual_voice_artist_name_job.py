@@ -22,6 +22,7 @@ from __future__ import annotations
 import collections
 
 from core.domain import opportunity_services
+from core.domain import state_domain
 from core.domain import voiceover_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -95,7 +96,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         cls,
         new_snapshot_model: exp_models.ExplorationSnapshotContentModel,
         old_snapshot_model: exp_models.ExplorationSnapshotContentModel
-    ) -> Dict[str, Dict[str, voiceover_models.VoiceoverDict]]:
+    ) -> Dict[str, Dict[str, state_domain.VoiceoverDict]]:
         """Compares two successive versions of snapshot models and
         extracts voiceovers that have been added in the later version of the
         exploration snapshot.
@@ -116,11 +117,11 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         # The voiceover mapping that is present in the new snapshot model.
         new_voiceover_mapping: Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]] = {}
+            str, state_domain.VoiceoverDict]] = {}
 
         # The voiceover mapping that is present in the old snapshot model.
         old_voiceover_mapping: Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]] = {}
+            str, state_domain.VoiceoverDict]] = {}
 
         for state in new_snapshot_model.content['states'].values():
             new_voiceover_mapping.update(
@@ -133,7 +134,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # The voiceover mapping that has been added to this version of the
         # exploration snapshot.
         voiceovers_added_in_this_version: Dict[
-            str, Dict[str, voiceover_models.VoiceoverDict]] = (
+            str, Dict[str, state_domain.VoiceoverDict]] = (
                 collections.defaultdict(dict)
             )
 
@@ -159,7 +160,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
     def get_content_id_mapping_and_voiceovers_count(
         cls,
         exploration: exp_models.ExplorationModel
-    ) -> Tuple[Dict[str, Dict[str, voiceover_models.VoiceoverDict]], int]:
+    ) -> Tuple[Dict[str, Dict[str, state_domain.VoiceoverDict]], int]:
         """Retrieves and merges voiceover data from all the states within the
         specified exploration. Additionally, it calculates the total count of
         voiceovers present in the exploration.
@@ -178,7 +179,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         """
         number_of_voiceovers: int = 0
         content_id_to_voiceover_mapping: Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]] = (
+            str, state_domain.VoiceoverDict]] = (
                 collections.defaultdict(dict))
 
         for state in exploration.states.values():
@@ -197,8 +198,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
     @classmethod
     def update_content_id_to_voiceovers_mapping(
         cls,
-        voiceover_mapping_1: voiceover_models.VoiceoverMappingType,
-        voiceover_mapping_2: voiceover_models.VoiceoverMappingType,
+        voiceover_mapping_1: Dict[str, Dict[str, state_domain.VoiceoverDict]],
+        voiceover_mapping_2: Dict[str, Dict[str, state_domain.VoiceoverDict]],
         voiceover_artist_and_voiceover_mapping: (
             voiceover_models.ContentIdToVoiceoverMappingType),
         voice_artist_id: str
@@ -209,16 +210,16 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         both the `voiceover_mapping_1` and `voiceover_mapping_2` dictionaries.
 
         Args:
-            voiceover_mapping_1: VoiceoverMappingType. The dictionary contains
-                voiceover data for some version of exploration, say N. This
-                dict maps content IDs as keys and nested dicts as values. Each
-                nested dict contains language codes as keys and voiceover dicts
-                as values.
-            voiceover_mapping_2: VoiceoverMappingType. The dictionary contains
-                voiceover data for some other version of exploration, say M.
-                This dict maps content IDs as keys and nested dicts as values.
-                Each nested dict contains language codes as keys and voiceover
-                dicts as values.
+            voiceover_mapping_1: dict(str, dict(str, VoiceoverDict)). The
+                dictionary contains voiceover data for some version of
+                exploration, say N. This dict maps content IDs as keys and
+                nested dicts as values. Each nested dict contains language codes
+                as keys and voiceover dicts as values.
+            voiceover_mapping_2: dict(str, dict(str, VoiceoverDict)). The
+                dictionary contains voiceover data for some other version of
+                exploration, say M. This dict maps content IDs as keys and
+                nested dicts as values. Each nested dict contains language
+                codes as keys and voiceover dicts as values.
             voiceover_artist_and_voiceover_mapping:
                 ContentIdToVoiceoverMappingType. The dictionary contains
                 voiceovers and voice artists information about an exploration.
@@ -334,7 +335,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # A dictionary mapping all the content IDs and voiceovers of the latest
         # exploration.
         latest_content_id_to_voiceover_mapping: Dict[str, Dict[
-            str, voiceover_models.VoiceoverDict]] = {}
+            str, state_domain.VoiceoverDict]] = {}
 
         # The dictionary contains information about voice artists and their
         # provided voiceovers in the given exploration. This dict is built
