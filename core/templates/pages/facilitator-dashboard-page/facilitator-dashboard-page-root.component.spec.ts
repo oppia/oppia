@@ -108,7 +108,7 @@ describe('Facilitator Dashboard Root Page', () => {
     spyOn(pageHeadService, 'updateTitleAndMetaTags');
     spyOn(
       accessValidationBackendApiService,
-      'validateAccessToFacilitatorPage'
+      'validateAccessToFacilitatorDashboardPage'
     ).and.returnValue(Promise.reject());
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(
       Promise.resolve(true)
