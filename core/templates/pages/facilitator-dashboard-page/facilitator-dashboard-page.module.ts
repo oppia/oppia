@@ -37,7 +37,13 @@ import {FacilitatorDashboardPageRootComponent} from './facilitator-dashboard-pag
       },
     ]),
   ],
-  declarations: [FacilitatorDashboardPageComponent],
-  entryComponents: [FacilitatorDashboardPageComponent],
+  declarations: [
+    FacilitatorDashboardPageRootComponent,
+    FacilitatorDashboardPageComponent,
+  ],
+  entryComponents: [
+    FacilitatorDashboardPageRootComponent,
+    FacilitatorDashboardPageComponent,
+  ],
 })
 export class FacilitatorDashboardPageModule {}
