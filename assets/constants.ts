@@ -6631,7 +6631,7 @@ export default {
     },
     "FACILITATOR_DASHBOARD": {
       "ROUTE": "facilitator-dashboard",
-      "TITLE": "Email Dashboard - Oppia",
+      "TITLE": "Facilitator Dashboard - Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
