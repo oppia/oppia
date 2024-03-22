@@ -171,7 +171,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding a goal.
    */
   async updateGoal(goal: string): Promise<void> {
-    await this.page.waitForSelector(addGoal);
+    await this.page.waitForTimeout(1000);
     await this.type(addGoal, goal);
     showMessage('Goal has been filled');
   }
