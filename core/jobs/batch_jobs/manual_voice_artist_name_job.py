@@ -23,6 +23,7 @@ import collections
 
 from core.domain import opportunity_services
 from core.domain import state_domain
+from core.domain import voiceover_domain
 from core.domain import voiceover_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -201,9 +202,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         voiceover_mapping_1: Dict[str, Dict[str, state_domain.VoiceoverDict]],
         voiceover_mapping_2: Dict[str, Dict[str, state_domain.VoiceoverDict]],
         voiceover_artist_and_voiceover_mapping: (
-            voiceover_models.ContentIdToVoiceoverMappingType),
+            voiceover_domain.ContentIdToVoiceoverMappingType),
         voice_artist_id: str
-    ) -> Tuple[voiceover_models.ContentIdToVoiceoverMappingType, int]:
+    ) -> Tuple[voiceover_domain.ContentIdToVoiceoverMappingType, int]:
         """Adds new voiceover entries to the
         `voiceover_artist_and_voiceover_mapping` dictionary with their
         respective voice artists. Only include voiceovers that are present in
@@ -252,7 +253,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         number_of_voiceovers_identified = 0
 
         updated_voiceover_artist_and_voiceover_mapping: (
-            voiceover_models.ContentIdToVoiceoverMappingType) = (
+            voiceover_domain.ContentIdToVoiceoverMappingType) = (
                 collections.defaultdict(dict))
         updated_voiceover_artist_and_voiceover_mapping.update(
             voiceover_artist_and_voiceover_mapping)
@@ -341,7 +342,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # provided voiceovers in the given exploration. This dict is built
         # iteratively using exploration snapshot models.
         voiceover_artist_and_voiceover_mapping: (
-            voiceover_models.ContentIdToVoiceoverMappingType) = (
+            voiceover_domain.ContentIdToVoiceoverMappingType) = (
                 collections.defaultdict(dict)
             )
 

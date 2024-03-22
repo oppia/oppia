@@ -21,14 +21,19 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, Final, Tuple
+from typing import Dict, Final
 
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'state_domain' is imported only for type checking.
     from core.domain import state_domain # pylint: disable=invalid-import # isort:skip
+    # Here, 'voiceover_domain' is imported only for type checking.
+    from core.domain import voiceover_domain # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
+
+    ContentIdToVoiceoverMappingType = (
+        voiceover_domain.ContentIdToVoiceoverMappingType)
 
 (base_models,) = models.Registry.import_models([
     models.Names.BASE_MODEL])
@@ -36,11 +41,6 @@ if MYPY: # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
-
-
-ContentIdToVoiceoverMappingType = Dict[
-    str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
-]
 
 
 class EntityVoiceoversModel(base_models.BaseModel):
