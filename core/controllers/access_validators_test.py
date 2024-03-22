@@ -384,7 +384,7 @@ class FacilitatorDashboardPageAccessValidationHandlerTests(
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
-    def test_should_not_access_facilitator_dashboard_page_when_feature_is_disabled(
+    def test_should_not_access_facilitator_dashboard_when_feature_is_disabled(
         self) -> None:
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
