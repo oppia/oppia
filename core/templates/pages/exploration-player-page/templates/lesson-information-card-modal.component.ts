@@ -279,4 +279,8 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   closeSaveProgressMenu(): void {
     this.saveProgressMenuIsShown = false;
   }
+
+  closeModal(): void{
+    this.ngbActiveModal.close();
+  }
 }

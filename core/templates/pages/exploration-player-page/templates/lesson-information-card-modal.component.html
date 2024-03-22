@@ -104,7 +104,8 @@
             </span>
             {{ lastUpdatedString }}
           </li>
-          <ul tabindex="0" class="oppia-info-card-exploration-contributors-profile row center row-item">
+          <ul tabindex="0" class="oppia-info-card-exploration-contributors-profile row center row-item"
+          (click)="closeModal()">
             <i class="material-icons oppia-contributors-icon"
                [ngbTooltip]="'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate"
                placement="top">
