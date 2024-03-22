@@ -733,7 +733,7 @@ export class LoggedInUser extends BaseUser {
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
   async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"create one here")]`);
+    await this.page.waitForXPath('//a[contains(text(),"create one here")]');
     const pageTarget = this.page.target();
     await this.clickOn('create one here');
     const newTarget = await this.browserObject.waitForTarget(
