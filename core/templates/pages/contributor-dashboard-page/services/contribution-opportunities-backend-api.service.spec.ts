@@ -190,9 +190,10 @@ describe('Contribution Opportunities backend API service', function () {
         .then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
-          '/opportunitiessummaryhandler/<opportunityType>',
-          {opportunityType: 'skill'}
-        ) + '?cursor=invalidCursor'
+          '/opportunitiessummaryhandler/<opportunityType>' +
+            '?cursor=<invalidCursor>',
+          {opportunityType: 'skill', invalidCursor}
+        )
       );
 
       expect(req.request.method).toEqual('GET');
@@ -263,9 +264,11 @@ describe('Contribution Opportunities backend API service', function () {
         .then(successHandler, failHandler);
       const req = httpTestingController.expectOne(
         urlInterpolationService.interpolateUrl(
-          '/opportunitiessummaryhandler/<opportunityType>',
-          {opportunityType: 'translation'}
-        ) + '?language_code=invlaidCode&topic_name=Topic&cursor=invalidCursor'
+          '/opportunitiessummaryhandler/<opportunityType>' +
+            '?language_code=invlaidCode' +
+            '&topic_name=<topicName>&cursor=<invalidCursor>',
+          {opportunityType: 'translation', topicName, invalidCursor}
+        )
       );
 
       expect(req.request.method).toEqual('GET');
