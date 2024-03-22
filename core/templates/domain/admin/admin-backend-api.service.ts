@@ -96,12 +96,8 @@ export interface AdminPageData {
   platformParameters: PlatformParameter[];
 }
 
-export interface Interaction {
-  id: string;
-}
-
 export interface ExplorationInteractionIdsBackendResponse {
-  interactions: Interaction[];
+  interactions: string[];
 }
 
 @Injectable({

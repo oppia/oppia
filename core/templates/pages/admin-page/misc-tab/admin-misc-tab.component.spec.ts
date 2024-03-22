@@ -760,9 +760,7 @@ describe('Admin misc tab component ', () => {
       let interactionSpy = spyOn(
         adminBackendApiService,
         'retrieveExplorationInteractionIdsAsync'
-      ).and.returnValue(
-        Promise.resolve({interactions: [{id: 'EndExploration'}]})
-      );
+      ).and.returnValue(Promise.resolve({interactions: ['EndExploration']}));
 
       component.retrieveExplorationInteractionIds();
       tick();
@@ -771,9 +769,7 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith(
         'Successfully fetched interactions in exploration.'
       );
-      expect(component.explorationInteractions).toEqual([
-        {id: 'EndExploration'},
-      ]);
+      expect(component.explorationInteractions).toEqual(['EndExploration']);
     }));
 
     it(

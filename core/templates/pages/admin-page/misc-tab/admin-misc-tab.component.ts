@@ -18,10 +18,7 @@
 
 import {Component, EventEmitter, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import {
-  AdminBackendApiService,
-  Interaction,
-} from 'domain/admin/admin-backend-api.service';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminPageConstants} from '../admin-page.constants';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
@@ -62,7 +59,7 @@ export class AdminMiscTabComponent {
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   message: string = '';
   expIdToGetInteractions!: string;
-  explorationInteractions: Interaction[] = [];
+  explorationInteractions: string[] = [];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
