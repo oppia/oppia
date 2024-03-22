@@ -112,11 +112,9 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
       enabled: false,
       message: '',
     });
-
     this.promoBarConfigForm.valueChanges.subscribe(() => {
       this.submitButtonDisabled = false;
     });
-
     this.memoryCacheDataFetched = false;
     this.activeTab = ReleaseCoordinatorPageConstants.TAB_ID_BEAM_JOBS;
     this.promoBarBackendApiService.getPromoBarDataAsync().then(promoBar => {

@@ -53,8 +53,7 @@ class ExistingPlatformParameterValidityTests(test_utils.GenericTestBase):
                             'record_playthrough_probability',
                             'signup_email_body_content',
                             'signup_email_subject_content',
-                            'unpublish_exploration_email_html_body',
-                            'enable_voiceover_contribution']
+                            'unpublish_exploration_email_html_body']
 
     def test_all_defined_parameters_are_valid(self) -> None:
         all_names = (

@@ -338,7 +338,6 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
-
     explorationStatesService.init(explorationState1, false);
     stateRecordedVoiceoversService.init(
       'Introduction',
