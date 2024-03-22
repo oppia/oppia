@@ -539,6 +539,97 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
 
         self.assertEqual(len(exploration_voice_artist_link_models), 2)
 
+    def test_should_not_create_model_for_invalid_exploration(self) -> None:
+        self._create_curated_explorations()
+
+        exploration_model = exp_models.ExplorationModel.get(
+            self.CURATED_EXPLORATION_ID_1)
+
+        # Deleting recorded voiceovers field make this exploration invalid.
+        del exploration_model.states['Introduction']['recorded_voiceovers']
+        exploration_model.update_timestamps()
+        exploration_model.commit(
+            self.owner_id, 'exploration model updated', [])
+
+        job_result_template = (
+            'Generated exploration voice artist link model for '
+            'exploration %s.'
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                stderr='')]
+        )
+
+    def test_should_skip_voiceover_if_specific_snapshot_model_is_invalid(
+        self
+    ) -> None:
+        self._create_curated_explorations()
+        self._create_non_curated_exploration()
+
+        job_result_template = (
+            'Generated exploration voice artist link model for '
+            'exploration %s.'
+        )
+
+        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model: exp_models.ExplorationSnapshotContentModel = (
+            exp_models.ExplorationSnapshotContentModel.get_by_id(
+                snapshot_model_id))
+        # Deleting recorded voiceovers field to make this snapshot invalid.
+        del snapshot_model.content['states'][
+            'Introduction']['recorded_voiceovers']
+        snapshot_model.update_timestamps()
+        snapshot_model.put()
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                stderr='')
+        ])
+
+        expected_exp_id_to_content_id_to_voiceovers_mapping = {
+            self.CURATED_EXPLORATION_ID_1: {
+                'content_0': {
+                    'en': [self.editor_id_1, self.voiceover_dict_1]
+                }
+            },
+            self.CURATED_EXPLORATION_ID_2: {
+                'content_0': {
+                    'en': [self.editor_id_4, self.voiceover_dict_6],
+                },
+                'ca_placeholder_2': {
+                    'en': [self.editor_id_1, self.voiceover_dict_4]
+                },
+                'default_outcome_1': {
+                    'en': [self.editor_id_1, self.voiceover_dict_7],
+                }
+            }
+        }
+
+        exploration_voice_artist_link_models: Sequence[
+            voiceover_models.ExplorationVoiceArtistsLinkModel] = (
+                voiceover_models.ExplorationVoiceArtistsLinkModel.
+                get_all().fetch()
+            )
+
+        for exp_link_model in exploration_voice_artist_link_models:
+            exp_id = exp_link_model.id
+            content_id_to_voiceovers_mapping = (
+                exp_link_model.content_id_to_voiceovers_mapping)
+
+            expected_content_id_voiceovers_mapping = (
+                expected_exp_id_to_content_id_to_voiceovers_mapping[exp_id])
+
+            self.assertDictEqual(
+                content_id_to_voiceovers_mapping,
+                expected_content_id_voiceovers_mapping
+            )
+
 
 class AuditVoiceArtistMetadataModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
@@ -712,12 +803,13 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             exp_models.ExplorationSnapshotContentModel] = list(
                 exp_models.ExplorationSnapshotContentModel.get_all().fetch())
 
-        exp_link_model: voiceover_models.ExplorationVoiceArtistsLinkModel = (
+        exp_link_model = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             get_exploration_voice_artists_link_model(
                 exploration_models[0], snapshot_models
             ))
+        assert exp_link_model is not None
 
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
@@ -793,6 +885,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             CreateExplorationVoiceArtistLinkModelsJob.
             get_exploration_voice_artists_link_model(
                 exploration_models[0], snapshot_models))
+        assert exp_link_model is not None
 
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertDictEqual(
