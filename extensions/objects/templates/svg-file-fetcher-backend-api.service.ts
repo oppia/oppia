@@ -16,48 +16,55 @@
  * @fileoverview Service for fetching svg.
  */
 
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Dimensions } from './svg-editor.component';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
+import {Dimensions} from './svg-editor.component';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SvgFileFetcherBackendApiService {
   constructor(
     private httpClient: HttpClient,
     private imageUploadHelperService: ImageUploadHelperService,
-    private urlInterpolationService: UrlInterpolationService) { }
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   fetchSvg(savedSvgUrl: string): Observable<string> {
     return this.httpClient.get(savedSvgUrl, {
-      responseType: 'text'
+      responseType: 'text',
     });
   }
 
   postSvgFile(
-      resampledFile: Blob,
-      dimensions: Dimensions,
-      entityType: string,
-      entityId: string
+    resampledFile: Blob,
+    dimensions: Dimensions,
+    entityType: string,
+    entityId: string
   ): Observable<{filename: string}> {
     let form = new FormData();
     form.append('image', resampledFile);
-    form.append('payload', JSON.stringify({
-      filename: this.imageUploadHelperService.generateImageFilename(
-        dimensions.height, dimensions.width, 'svg')})
+    form.append(
+      'payload',
+      JSON.stringify({
+        filename: this.imageUploadHelperService.generateImageFilename(
+          dimensions.height,
+          dimensions.width,
+          'svg'
+        ),
+      })
     );
-    var imageUploadUrlTemplate = (
-      '/createhandler/imageupload/<entity_type>/<entity_id>');
+    var imageUploadUrlTemplate =
+      '/createhandler/imageupload/<entity_type>/<entity_id>';
     return this.httpClient.post<{filename: string}>(
-      this.urlInterpolationService.interpolateUrl(
-        imageUploadUrlTemplate, {
-          entity_type: entityType,
-          entity_id: entityId
-        }
-      ), form);
+      this.urlInterpolationService.interpolateUrl(imageUploadUrlTemplate, {
+        entity_type: entityType,
+        entity_id: entityId,
+      }),
+      form
+    );
   }
 }

@@ -16,13 +16,11 @@
  * @fileoverview Unit tests for improvements service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { ImprovementsService } from 'services/improvements.service';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {ImprovementsService} from 'services/improvements.service';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 
 describe('ImprovementsService', () => {
   let improvementsService: ImprovementsService;
@@ -30,7 +28,7 @@ describe('ImprovementsService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CamelCaseToHyphensPipe]
+      providers: [CamelCaseToHyphensPipe],
     });
 
     improvementsService = new ImprovementsService();
@@ -43,23 +41,23 @@ describe('ImprovementsService', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
         },
         interaction: {
           id: 'TextInput',
           customization_args: {
             rows: {
-              value: 1
+              value: 1,
             },
             placeholder: {
               value: {
                 unicode_str: 'Type your answer here.',
-                content_id: ''
-              }
+                content_id: '',
+              },
             },
             catchMisspellings: {
-              value: false
-            }
+              value: false,
+            },
           },
           answer_groups: [],
           default_outcome: {
@@ -67,35 +65,38 @@ describe('ImprovementsService', () => {
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
             },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
+            missing_prerequisite_skill_id: null,
           },
           confirmed_unclassified_answers: [],
           hints: [],
-          solution: null
+          solution: null,
         },
         linked_skill_id: null,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
-            default_outcome: {}
-          }
+            default_outcome: {},
+          },
         },
         solicit_answer_details: false,
-        card_is_checkpoint: false
+        card_is_checkpoint: false,
       };
 
       let mockState = stateObjectFactory.createFromBackendDict(
-        'stateName', mockStateBackendDict);
+        'stateName',
+        mockStateBackendDict
+      );
 
       expect(
-        improvementsService
-          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
+        improvementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+          mockState
+        )
       ).toBe(true);
     });
 
@@ -104,18 +105,20 @@ describe('ImprovementsService', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
         },
         interaction: {
           id: 'FractionInput',
           customization_args: {
-            requireSimplestForm: { value: false },
-            allowImproperFraction: { value: true },
-            allowNonzeroIntegerPart: { value: true },
-            customPlaceholder: { value: {
-              content_id: '',
-              unicode_str: ''
-            } },
+            requireSimplestForm: {value: false},
+            allowImproperFraction: {value: true},
+            allowNonzeroIntegerPart: {value: true},
+            customPlaceholder: {
+              value: {
+                content_id: '',
+                unicode_str: '',
+              },
+            },
           },
           answer_groups: [],
           default_outcome: {
@@ -123,35 +126,38 @@ describe('ImprovementsService', () => {
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
             },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
+            missing_prerequisite_skill_id: null,
           },
           confirmed_unclassified_answers: [],
           hints: [],
-          solution: null
+          solution: null,
         },
         linked_skill_id: null,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
-            default_outcome: {}
-          }
+            default_outcome: {},
+          },
         },
         solicit_answer_details: false,
-        card_is_checkpoint: false
+        card_is_checkpoint: false,
       };
 
       let mockState = stateObjectFactory.createFromBackendDict(
-        'stateName', mockStateBackendDict);
+        'stateName',
+        mockStateBackendDict
+      );
 
       expect(
-        improvementsService
-          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
+        improvementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+          mockState
+        )
       ).toBe(false);
     });
 
@@ -160,18 +166,20 @@ describe('ImprovementsService', () => {
         classifier_model_id: null,
         content: {
           html: '',
-          content_id: 'content'
+          content_id: 'content',
         },
         interaction: {
           id: null,
           customization_args: {
-            requireSimplestForm: { value: false },
-            allowImproperFraction: { value: true },
-            allowNonzeroIntegerPart: { value: true },
-            customPlaceholder: { value: {
-              content_id: '',
-              unicode_str: ''
-            } },
+            requireSimplestForm: {value: false},
+            allowImproperFraction: {value: true},
+            allowNonzeroIntegerPart: {value: true},
+            customPlaceholder: {
+              value: {
+                content_id: '',
+                unicode_str: '',
+              },
+            },
           },
           answer_groups: [],
           default_outcome: {
@@ -179,34 +187,37 @@ describe('ImprovementsService', () => {
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
             },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
+            missing_prerequisite_skill_id: null,
           },
           confirmed_unclassified_answers: [],
           hints: [],
-          solution: null
+          solution: null,
         },
         linked_skill_id: null,
         param_changes: [],
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
-            default_outcome: {}
-          }
+            default_outcome: {},
+          },
         },
         solicit_answer_details: false,
-        card_is_checkpoint: false
+        card_is_checkpoint: false,
       };
 
       let mockState = stateObjectFactory.createFromBackendDict(
-        'stateName', mockStateBackendDict);
+        'stateName',
+        mockStateBackendDict
+      );
       expect(
-        improvementsService
-          .isStateForcedToResolveOutstandingUnaddressedAnswers(mockState)
+        improvementsService.isStateForcedToResolveOutstandingUnaddressedAnswers(
+          mockState
+        )
       ).toBeFalse();
     });
   });

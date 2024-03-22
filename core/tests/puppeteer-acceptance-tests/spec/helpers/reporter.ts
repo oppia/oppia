@@ -37,23 +37,23 @@ let suiteCount: number,
     red: '\x1B[31;40m',
     yellow: '\x1B[33;40m',
     cyan: '\x1B[36;40m',
-    none: '\x1B[0m'
+    none: '\x1B[0m',
   };
 
-let print = function(message: string): void {
+let print = function (message: string): void {
   process.stdout.write(util.format(message));
 };
 
-let printNewline = function(): void {
+let printNewline = function (): void {
   print('\n');
 };
 
-let colored = function(color: keyof typeof ansi, str: string): string {
-  return (ansi[color] + str + ansi.none);
+let colored = function (color: keyof typeof ansi, str: string): string {
+  return ansi[color] + str + ansi.none;
 };
 
-let printFailures = function(
-    result: jasmine.JasmineDoneInfo | jasmine.SpecResult | jasmine.SuiteResult
+let printFailures = function (
+  result: jasmine.JasmineDoneInfo | jasmine.SpecResult | jasmine.SuiteResult
 ): void {
   for (let i = 0; i < result.failedExpectations.length; i++) {
     printNewline();
@@ -67,11 +67,13 @@ let printFailures = function(
   }
 };
 
-let printSpecLog = function(result: jasmine.SpecResult): void {
+let printSpecLog = function (result: jasmine.SpecResult): void {
   printFailures(result);
 
-  if (result.failedExpectations.length === 0 &&
-    result.passedExpectations.length === 0) {
+  if (
+    result.failedExpectations.length === 0 &&
+    result.passedExpectations.length === 0
+  ) {
     printNewline();
     print('Message:');
     printNewline();
@@ -81,17 +83,17 @@ let printSpecLog = function(result: jasmine.SpecResult): void {
   printNewline();
 };
 
-let printSuiteLog = function(
-    result: jasmine.JasmineDoneInfo | jasmine.SuiteResult
+let printSuiteLog = function (
+  result: jasmine.JasmineDoneInfo | jasmine.SuiteResult
 ): void {
   printFailures(result);
 
   printNewline();
 };
 
-let pendingSpecTrace = function(
-    result: jasmine.SpecResult,
-    pendingSpecNumber: number
+let pendingSpecTrace = function (
+  result: jasmine.SpecResult,
+  pendingSpecNumber: number
 ): void {
   printNewline();
   print(pendingSpecNumber + '. ' + result.fullName);
@@ -106,17 +108,17 @@ let pendingSpecTrace = function(
   printNewline();
 };
 
-let specFailureTrace = function(
-    result: jasmine.SpecResult,
-    failedSpecNumber: number
+let specFailureTrace = function (
+  result: jasmine.SpecResult,
+  failedSpecNumber: number
 ): void {
   printNewline();
   print(failedSpecNumber + '. ' + result.fullName);
   printSpecLog(result);
 };
 
-let suiteFailureTrace = function(
-    result: SuiteFailureResult | jasmine.SuiteResult
+let suiteFailureTrace = function (
+  result: SuiteFailureResult | jasmine.SuiteResult
 ): void {
   printNewline();
   print('Suite error: ' + result.fullName);
@@ -124,7 +126,7 @@ let suiteFailureTrace = function(
 };
 
 const Reporter: jasmine.CustomReporter = {
-  jasmineStarted: function(suiteInfo: jasmine.JasmineStartedInfo): void {
+  jasmineStarted: function (suiteInfo: jasmine.JasmineStartedInfo): void {
     suiteCount = 0;
     specCount = 0;
     executedSpecCount = 0;
@@ -134,11 +136,14 @@ const Reporter: jasmine.CustomReporter = {
     printNewline();
   },
 
-  suiteStarted: function(result: jasmine.SuiteResult): void {
+  suiteStarted: function (result: jasmine.SuiteResult): void {
     suiteCount++;
     const heading = '. Suite started: ';
-    const length = suiteCount.toString().length + heading.length +
-      result.description.length + 4;
+    const length =
+      suiteCount.toString().length +
+      heading.length +
+      result.description.length +
+      4;
     let border = '';
     for (let i = 0; i < length; i++) {
       border += '-';
@@ -152,13 +157,13 @@ const Reporter: jasmine.CustomReporter = {
     printNewline();
   },
 
-  specStarted: function(result: jasmine.SpecResult): void {
+  specStarted: function (result: jasmine.SpecResult): void {
     printNewline();
     print('Spec started : ' + result.fullName);
     printNewline();
   },
 
-  specDone: function(result: jasmine.SpecResult) {
+  specDone: function (result: jasmine.SpecResult) {
     specCount++;
     const seconds = result?.duration ? result.duration / 1000 : 0;
 
@@ -166,15 +171,13 @@ const Reporter: jasmine.CustomReporter = {
       case 'pending':
         pendingSpecs.push(result);
         executedSpecCount++;
-        print(colored(
-          'yellow', '-> Pending [ Took ' + seconds + ' seconds ]'));
+        print(colored('yellow', '-> Pending [ Took ' + seconds + ' seconds ]'));
         printNewline();
         return;
 
       case 'passed':
         executedSpecCount++;
-        print(colored(
-          'green', '-> Passed [ Took ' + seconds + ' seconds ]'));
+        print(colored('green', '-> Passed [ Took ' + seconds + ' seconds ]'));
         printNewline();
         return;
 
@@ -182,25 +185,23 @@ const Reporter: jasmine.CustomReporter = {
         failureCount++;
         failedSpecs.push(result);
         executedSpecCount++;
-        print(colored(
-          'red', '-> Failed [ Took ' + seconds + ' seconds ]'));
+        print(colored('red', '-> Failed [ Took ' + seconds + ' seconds ]'));
         printNewline();
         return;
     }
 
-    print(colored(
-      'cyan', '-> Skipped [ Took ' + seconds + ' seconds ]'));
+    print(colored('cyan', '-> Skipped [ Took ' + seconds + ' seconds ]'));
     printNewline();
   },
 
-  suiteDone: function(result: jasmine.SuiteResult): void {
+  suiteDone: function (result: jasmine.SuiteResult): void {
     if (result.failedExpectations && result.failedExpectations.length > 0) {
       failureCount++;
       failedSuites.push(result);
     }
   },
 
-  jasmineDone: function(result: jasmine.JasmineDoneInfo): void {
+  jasmineDone: function (result: jasmine.JasmineDoneInfo): void {
     printNewline();
     printNewline();
     if (failedSpecs.length > 0) {
@@ -214,9 +215,12 @@ const Reporter: jasmine.CustomReporter = {
       suiteFailureTrace(failedSuites[i]);
     }
 
-    if (result && result.failedExpectations &&
-      result.failedExpectations.length > 0) {
-      suiteFailureTrace({ fullName: 'top suite', ...result });
+    if (
+      result &&
+      result.failedExpectations &&
+      result.failedExpectations.length > 0
+    ) {
+      suiteFailureTrace({fullName: 'top suite', ...result});
     }
 
     if (pendingSpecs.length > 0) {
@@ -234,8 +238,8 @@ const Reporter: jasmine.CustomReporter = {
         printNewline();
       }
 
-      let specCounts = executedSpecCount + ' specs, ' + failureCount +
-        ' failures';
+      let specCounts =
+        executedSpecCount + ' specs, ' + failureCount + ' failures';
 
       if (pendingSpecs.length) {
         specCounts += ', ' + pendingSpecs.length + ' pending specs';
@@ -255,7 +259,7 @@ const Reporter: jasmine.CustomReporter = {
       print('Incomplete: ' + result.incompleteReason);
       printNewline();
     }
-  }
+  },
 };
 
 jasmine.getEnv().clearReporters();

@@ -16,12 +16,9 @@
  * @fileoverview Super Admin users utility file.
  */
 
-import { BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const AdminPageRolesTab = testConstants.URLs.AdminPageRolesTab;
 const roleEditorInputField = 'input.e2e-test-username-for-role-editor';
@@ -42,7 +39,9 @@ export class SuperAdmin extends BaseUser {
     const allRoles = await this.page.$$('.mat-option-text');
     for (let i = 0; i < allRoles.length; i++) {
       const roleText = await this.page.evaluate(
-        (role: HTMLElement) => role.innerText, allRoles[i]);
+        (role: HTMLElement) => role.innerText,
+        allRoles[i]
+      );
       if (roleText.toLowerCase() === role) {
         await allRoles[i].click();
         await this.page.waitForNetworkIdle();
@@ -64,7 +63,9 @@ export class SuperAdmin extends BaseUser {
     const userRoles = await this.page.$$('.oppia-user-role-description');
     for (let i = 0; i < userRoles.length; i++) {
       const roleText = await this.page.evaluate(
-        (role: HTMLElement) => role.innerText, userRoles[i]);
+        (role: HTMLElement) => role.innerText,
+        userRoles[i]
+      );
       if (roleText.toLowerCase() === role) {
         showMessage(`User ${username} has the ${role} role!`);
         await this.goto(currentPageUrl);
@@ -86,7 +87,9 @@ export class SuperAdmin extends BaseUser {
     const userRoles = await this.page.$$('.oppia-user-role-description');
     for (let i = 0; i < userRoles.length; i++) {
       const roleText = await this.page.evaluate(
-        (role: HTMLElement) => role.innerText, userRoles[i]);
+        (role: HTMLElement) => role.innerText,
+        userRoles[i]
+      );
       if (roleText.toLowerCase() === role) {
         throw new Error(`User has the ${role} role!`);
       }

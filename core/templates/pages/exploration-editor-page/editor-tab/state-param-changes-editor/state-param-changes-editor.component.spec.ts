@@ -16,15 +16,16 @@
  * @fileoverview Unit tests for stateParamChangesEditor component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, async, TestBed } from '@angular/core/testing';
-import { StateParamChangesService } from
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, async, TestBed} from '@angular/core/testing';
+import {
+  StateParamChangesService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import { StateParamChangesEditorComponent } from
+} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
+import {
+  StateParamChangesEditorComponent,
   // eslint-disable-next-line max-len
-  'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component';
-
+} from 'pages/exploration-editor-page/editor-tab/state-param-changes-editor/state-param-changes-editor.component';
 
 let component: StateParamChangesEditorComponent;
 let fixture: ComponentFixture<StateParamChangesEditorComponent>;
@@ -34,10 +35,9 @@ describe('State Param Changes Editor directive', () => {
     TestBed.configureTestingModule({
       declarations: [StateParamChangesEditorComponent],
       providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    stateParamChangesService =
-      TestBed.get(StateParamChangesService);
+    stateParamChangesService = TestBed.get(StateParamChangesService);
   }));
 
   beforeEach(() => {

@@ -16,23 +16,20 @@
  * @fileoverview Component for view learner group invitation modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 
 @Component({
   selector: 'oppia-learner-group-preferences-modal',
-  templateUrl: './learner-group-preferences-modal.component.html'
+  templateUrl: './learner-group-preferences-modal.component.html',
 })
-export class LearnerGroupPreferencesModalComponent
-  extends ConfirmOrCancelModal {
+export class LearnerGroupPreferencesModalComponent extends ConfirmOrCancelModal {
   learnerGroup!: LearnerGroupData;
   progressSharingPermission: boolean = true;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

@@ -18,7 +18,8 @@
 
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { AboutPageConstants } from 'pages/about-page/about-page.constants';
+import {AboutPageConstants} from 'pages/about-page/about-page.constants';
 
-angular.module('oppia').constant(
-  'CREDITS_CONSTANTS', AboutPageConstants.CREDITS_CONSTANTS);
+angular
+  .module('oppia')
+  .constant('CREDITS_CONSTANTS', AboutPageConstants.CREDITS_CONSTANTS);

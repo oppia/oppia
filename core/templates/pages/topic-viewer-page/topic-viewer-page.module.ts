@@ -16,30 +16,31 @@
  * @fileoverview Module for the topic viewer page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
+import {APP_INITIALIZER, NgModule, StaticProvider} from '@angular/core';
+import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import {
+  platformFeatureInitFactory,
+  PlatformFeatureService,
+} from 'services/platform-feature.service';
+import {RouterModule} from '@angular/router';
+import {APP_BASE_HREF} from '@angular/common';
 
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { TopicViewerNavbarBreadcrumbComponent } from
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {
+  TopicViewerNavbarBreadcrumbComponent,
   // eslint-disable-next-line max-len
-  'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { TopicViewerPageComponent } from
-  'pages/topic-viewer-page/topic-viewer-page.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { PracticeSessionConfirmationModal } from './modals/practice-session-confirmation-modal.component';
+} from 'pages/topic-viewer-page/navbar-breadcrumb/topic-viewer-navbar-breadcrumb.component';
+import {RequestInterceptor} from 'services/request-interceptor.service';
+import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MyHammerConfig, toastrConfig} from 'pages/oppia-root/app.module';
+import {PracticeSessionConfirmationModal} from './modals/practice-session-confirmation-modal.component';
 import {SmartRouterModule} from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
 
 @NgModule({
   imports: [
@@ -52,52 +53,52 @@ import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
     RouterModule.forRoot([]),
     SharedComponentsModule,
     TopicPlayerViewerCommonModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent,
-    PracticeSessionConfirmationModal
+    PracticeSessionConfirmationModal,
   ],
   entryComponents: [
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent,
-    PracticeSessionConfirmationModal
+    PracticeSessionConfirmationModal,
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
+      multi: true,
     },
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
+      useClass: MyHammerConfig,
     },
     AppErrorHandlerProvider,
     {
       provide: APP_BASE_HREF,
-      useValue: '/'
-    }
-  ]
+      useValue: '/',
+    },
+  ],
 })
 class TopicViewerPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
-import { ToastrModule } from 'ngx-toastr';
-import { TopicPlayerViewerCommonModule } from './topic-viewer-player-common.module';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {downgradeModule} from '@angular/upgrade/static';
+import {ToastrModule} from 'ngx-toastr';
+import {TopicPlayerViewerCommonModule} from './topic-viewer-player-common.module';
 
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(TopicViewerPageModule);
 };
@@ -112,5 +113,6 @@ angular.module('oppia').directive(
   // bootstrap the Angular 8.
   'oppiaAngularRoot',
   downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+    component: OppiaAngularRootComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for the ExplorationCategoryService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ExplorationCategoryService } from './exploration-category.service';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { ExplorationRightsService } from './exploration-rights.service';
-import { ValidatorsService } from 'services/validators.service';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {TestBed} from '@angular/core/testing';
+import {ExplorationCategoryService} from './exploration-category.service';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {ExplorationRightsService} from './exploration-rights.service';
+import {ValidatorsService} from 'services/validators.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Exploration Category Service', () => {
   let service: ExplorationCategoryService;
@@ -34,8 +34,8 @@ describe('Exploration Category Service', () => {
         ExplorationRightsService,
         ValidatorsService,
         NormalizeWhitespacePipe,
-        ExplorationPropertyService
-      ]
+        ExplorationPropertyService,
+      ],
     });
 
     service = TestBed.inject(ExplorationCategoryService);

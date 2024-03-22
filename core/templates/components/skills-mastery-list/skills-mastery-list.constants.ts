@@ -19,7 +19,7 @@
 export const SkillMasteryListConstants = {
   MASTERY_CUTOFF: {
     GOOD_CUTOFF: 0.7,
-    MEDIUM_CUTOFF: 0.4
+    MEDIUM_CUTOFF: 0.4,
   },
 
   MASTERY_COLORS: {
@@ -28,6 +28,6 @@ export const SkillMasteryListConstants = {
     // Color orange.
     MEDIUM_MASTERY_COLOR: 'rgb(217, 92, 12)',
     // Color red.
-    BAD_MASTERY_COLOR: 'rgb(201, 80, 66)'
+    BAD_MASTERY_COLOR: 'rgb(201, 80, 66)',
   },
 } as const;

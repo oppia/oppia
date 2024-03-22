@@ -17,35 +17,38 @@
  * topic data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { StorySummaryBackendDict, StorySummary } from 'domain/story/story-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {
+  StorySummaryBackendDict,
+  StorySummary,
+} from 'domain/story/story-summary.model';
 import {
   SkillIdToDescriptionMap,
   SubtopicBackendDict,
-  Subtopic
+  Subtopic,
 } from 'domain/topic/subtopic.model';
-import { StoryNode } from 'domain/story/story-node.model';
+import {StoryNode} from 'domain/story/story-node.model';
 
 export interface DegreesOfMastery {
   [skillId: string]: number | null;
 }
 
 export interface ReadOnlyTopicBackendDict {
-  'subtopics': SubtopicBackendDict[];
-  'skill_descriptions': SkillIdToDescriptionMap;
-  'uncategorized_skill_ids': string[];
-  'degrees_of_mastery': DegreesOfMastery;
-  'canonical_story_dicts': StorySummaryBackendDict[];
-  'additional_story_dicts': StorySummaryBackendDict[];
-  'topic_name': string;
-  'topic_id': string;
-  'topic_description': string;
-  'practice_tab_is_displayed': boolean;
-  'meta_tag_content': string;
-  'page_title_fragment_for_web': string;
+  subtopics: SubtopicBackendDict[];
+  skill_descriptions: SkillIdToDescriptionMap;
+  uncategorized_skill_ids: string[];
+  degrees_of_mastery: DegreesOfMastery;
+  canonical_story_dicts: StorySummaryBackendDict[];
+  additional_story_dicts: StorySummaryBackendDict[];
+  topic_name: string;
+  topic_id: string;
+  topic_description: string;
+  practice_tab_is_displayed: boolean;
+  meta_tag_content: string;
+  page_title_fragment_for_web: string;
 }
 
 export class ReadOnlyTopic {
@@ -63,15 +66,19 @@ export class ReadOnlyTopic {
   _pageTitleFragmentForWeb: string;
 
   constructor(
-      topicName: string, topicId: string, topicDescription: string,
-      canonicalStorySummaries: StorySummary[],
-      additionalStorySummaries: StorySummary[],
-      uncategorizedSkillSummaries: ShortSkillSummary[],
-      subtopics: Subtopic[],
-      degreesOfMastery: DegreesOfMastery,
-      skillDescriptions: SkillIdToDescriptionMap,
-      practiceTabIsDisplayed: boolean,
-      metaTagContent: string, pageTitleFragmentForWeb: string) {
+    topicName: string,
+    topicId: string,
+    topicDescription: string,
+    canonicalStorySummaries: StorySummary[],
+    additionalStorySummaries: StorySummary[],
+    uncategorizedSkillSummaries: ShortSkillSummary[],
+    subtopics: Subtopic[],
+    degreesOfMastery: DegreesOfMastery,
+    skillDescriptions: SkillIdToDescriptionMap,
+    practiceTabIsDisplayed: boolean,
+    metaTagContent: string,
+    pageTitleFragmentForWeb: string
+  ) {
     this._topicName = topicName;
     this._topicId = topicId;
     this._topicDescription = topicDescription;
@@ -136,69 +143,104 @@ export class ReadOnlyTopic {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReadOnlyTopicObjectFactory {
   constructor() {}
 
   createFromBackendDict(
-      topicDataDict: ReadOnlyTopicBackendDict): ReadOnlyTopic {
+    topicDataDict: ReadOnlyTopicBackendDict
+  ): ReadOnlyTopic {
     let subtopics = topicDataDict.subtopics.map(subtopic => {
-      return Subtopic.create(
-        subtopic, topicDataDict.skill_descriptions);
+      return Subtopic.create(subtopic, topicDataDict.skill_descriptions);
     });
-    let uncategorizedSkills =
-        topicDataDict.uncategorized_skill_ids.map(skillId => {
-          return ShortSkillSummary.create(
-            skillId, topicDataDict.skill_descriptions[skillId]);
-        });
+    let uncategorizedSkills = topicDataDict.uncategorized_skill_ids.map(
+      skillId => {
+        return ShortSkillSummary.create(
+          skillId,
+          topicDataDict.skill_descriptions[skillId]
+        );
+      }
+    );
     let degreesOfMastery: DegreesOfMastery = topicDataDict.degrees_of_mastery;
     let skillDescriptions: SkillIdToDescriptionMap =
-        topicDataDict.skill_descriptions;
-    let canonicalStories =
-        topicDataDict.canonical_story_dicts.map(storyDict => {
-          let allNodes = (
-            storyDict.all_node_dicts.map(storyNodeDict => {
-              return StoryNode.createFromBackendDict(
-                storyNodeDict);
-            }));
-          return new StorySummary(
-            storyDict.id, storyDict.title, storyDict.node_titles,
-            storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
-            storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes, undefined, undefined, undefined,
-            storyDict.published_chapters_count, storyDict.total_chapters_count,
-            storyDict.upcoming_chapters_count,
-            storyDict.upcoming_chapters_expected_days,
-            storyDict.overdue_chapters_count, storyDict.completed_node_titles);
+      topicDataDict.skill_descriptions;
+    let canonicalStories = topicDataDict.canonical_story_dicts.map(
+      storyDict => {
+        let allNodes = storyDict.all_node_dicts.map(storyNodeDict => {
+          return StoryNode.createFromBackendDict(storyNodeDict);
         });
-    let additionalStories =
-        topicDataDict.additional_story_dicts.map(storyDict => {
-          let allNodes = (
-            storyDict.all_node_dicts.map(storyNodeDict => {
-              return StoryNode.createFromBackendDict(
-                storyNodeDict);
-            }));
-          return new StorySummary(
-            storyDict.id, storyDict.title, storyDict.node_titles,
-            storyDict.thumbnail_filename, storyDict.thumbnail_bg_color,
-            storyDict.description, true, storyDict.completed_node_titles,
-            storyDict.url_fragment, allNodes, undefined, undefined, undefined,
-            storyDict.published_chapters_count, storyDict.total_chapters_count,
-            storyDict.upcoming_chapters_count,
-            storyDict.upcoming_chapters_expected_days,
-            storyDict.overdue_chapters_count, storyDict.completed_node_titles);
+        return new StorySummary(
+          storyDict.id,
+          storyDict.title,
+          storyDict.node_titles,
+          storyDict.thumbnail_filename,
+          storyDict.thumbnail_bg_color,
+          storyDict.description,
+          true,
+          storyDict.completed_node_titles,
+          storyDict.url_fragment,
+          allNodes,
+          undefined,
+          undefined,
+          undefined,
+          storyDict.published_chapters_count,
+          storyDict.total_chapters_count,
+          storyDict.upcoming_chapters_count,
+          storyDict.upcoming_chapters_expected_days,
+          storyDict.overdue_chapters_count,
+          storyDict.completed_node_titles
+        );
+      }
+    );
+    let additionalStories = topicDataDict.additional_story_dicts.map(
+      storyDict => {
+        let allNodes = storyDict.all_node_dicts.map(storyNodeDict => {
+          return StoryNode.createFromBackendDict(storyNodeDict);
         });
+        return new StorySummary(
+          storyDict.id,
+          storyDict.title,
+          storyDict.node_titles,
+          storyDict.thumbnail_filename,
+          storyDict.thumbnail_bg_color,
+          storyDict.description,
+          true,
+          storyDict.completed_node_titles,
+          storyDict.url_fragment,
+          allNodes,
+          undefined,
+          undefined,
+          undefined,
+          storyDict.published_chapters_count,
+          storyDict.total_chapters_count,
+          storyDict.upcoming_chapters_count,
+          storyDict.upcoming_chapters_expected_days,
+          storyDict.overdue_chapters_count,
+          storyDict.completed_node_titles
+        );
+      }
+    );
     return new ReadOnlyTopic(
-      topicDataDict.topic_name, topicDataDict.topic_id,
-      topicDataDict.topic_description, canonicalStories,
-      additionalStories, uncategorizedSkills, subtopics, degreesOfMastery,
-      skillDescriptions, topicDataDict.practice_tab_is_displayed,
+      topicDataDict.topic_name,
+      topicDataDict.topic_id,
+      topicDataDict.topic_description,
+      canonicalStories,
+      additionalStories,
+      uncategorizedSkills,
+      subtopics,
+      degreesOfMastery,
+      skillDescriptions,
+      topicDataDict.practice_tab_is_displayed,
       topicDataDict.meta_tag_content,
-      topicDataDict.page_title_fragment_for_web);
+      topicDataDict.page_title_fragment_for_web
+    );
   }
 }
 
-angular.module('oppia').factory(
-  'ReadOnlyTopicObjectFactory',
-  downgradeInjectable(ReadOnlyTopicObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'ReadOnlyTopicObjectFactory',
+    downgradeInjectable(ReadOnlyTopicObjectFactory)
+  );

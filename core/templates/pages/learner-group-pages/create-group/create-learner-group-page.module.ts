@@ -16,16 +16,16 @@
  * @fileoverview Module for the create learner group page.
  */
 
-import { NgModule } from '@angular/core';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {RouterModule} from '@angular/router';
 
-import { CreateLearnerGroupPageComponent } from './create-learner-group-page.component';
-import { CreateLearnerGroupPageRootComponent } from './create-learner-group-page-root.component';
-import { CreateLearnerGroupPageAuthGuard } from './create-learner-group-page-auth.guard';
-import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/shared-learner-group-component.module';
+import {CreateLearnerGroupPageComponent} from './create-learner-group-page.component';
+import {CreateLearnerGroupPageRootComponent} from './create-learner-group-page-root.component';
+import {CreateLearnerGroupPageAuthGuard} from './create-learner-group-page-auth.guard';
+import {SharedLearnerGroupComponentsModule} from 'pages/learner-group-pages/shared-learner-group-component.module';
 
 @NgModule({
   imports: [
@@ -42,11 +42,8 @@ import { SharedLearnerGroupComponentsModule } from 'pages/learner-group-pages/sh
   ],
   declarations: [
     CreateLearnerGroupPageRootComponent,
-    CreateLearnerGroupPageComponent
-  ],
-  entryComponents: [
     CreateLearnerGroupPageComponent,
   ],
+  entryComponents: [CreateLearnerGroupPageComponent],
 })
-
 export class CreateLearnerGroupPageModule {}

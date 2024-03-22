@@ -26,20 +26,18 @@ var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 var action = require('../webdriverio_utils/action.js');
 
-var ExplorationEditorPage =
-  require('../webdriverio_utils/ExplorationEditorPage.js');
-var ExplorationPlayerPage =
-  require('../webdriverio_utils/ExplorationPlayerPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../webdriverio_utils/LibraryPage.js');
 
-describe('Full exploration editor', function() {
+describe('Full exploration editor', function () {
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var libraryPage = null;
 
-  beforeAll(function() {
+  beforeAll(function () {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -47,225 +45,293 @@ describe('Full exploration editor', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  it('should walk through the tutorial when user repeatedly clicks Next',
-    async function() {
-      await users.createUser(
-        'userTutorial@stateEditor.com', 'userTutorialStateEditor');
-      await users.login('userTutorial@stateEditor.com');
-      await workflow.createExplorationAndStartTutorial(false);
-      await explorationEditorMainTab.startTutorial();
-      await explorationEditorMainTab.playTutorial();
-      await explorationEditorMainTab.finishTutorial();
-      await users.logout();
-    }
-  );
+  it('should walk through the tutorial when user repeatedly clicks Next', async function () {
+    await users.createUser(
+      'userTutorial@stateEditor.com',
+      'userTutorialStateEditor'
+    );
+    await users.login('userTutorial@stateEditor.com');
+    await workflow.createExplorationAndStartTutorial(false);
+    await explorationEditorMainTab.startTutorial();
+    await explorationEditorMainTab.playTutorial();
+    await explorationEditorMainTab.finishTutorial();
+    await users.logout();
+  });
 
-  it('should generate warning message if card height limit is exceeded',
-    async function() {
-      await users.createUser('user@heightWarning.com', 'userHeightWarning');
-      await users.login('user@heightWarning.com');
-
-      await workflow.createExploration(true);
-
-      var postTutorialPopover = $('.joyride .popover-content');
-      var stateEditButton = $('.e2e-test-edit-content-pencil-button');
-      await waitFor.invisibilityOf(
-        postTutorialPopover, 'Post-tutorial popover does not disappear.');
-      await action.click('State Edit Button', stateEditButton);
-      var stateEditorTag = $('.e2e-test-state-content-editor');
-      var stateContentEditor = stateEditorTag.$(
-        '.e2e-test-state-content-editor');
-      await waitFor.visibilityOf(
-        stateContentEditor,
-        'stateContentEditor taking too long to appear to set content');
-      var richTextEditor = await forms.RichTextEditor(stateContentEditor);
-
-      var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
-
-      var heightMessage = $('.e2e-test-card-height-limit-warning');
-      await richTextEditor.appendPlainText(content);
-      expect(await heightMessage.isExisting()).toBe(false);
-
-      await richTextEditor.appendPlainText('\n\n\nline5');
-      await waitFor.visibilityOf(
-        heightMessage, 'Card height limit message not displayed');
-
-      await richTextEditor.appendPlainText('\b\b\b\b\b\b\b\b');
-      expect(await heightMessage.isExisting()).toBe(false);
-
-      await richTextEditor.appendPlainText('\n\n\nline5');
-      await waitFor.visibilityOf(
-        heightMessage, 'Card height limit message not displayed');
-
-      var hideHeightWarningIcon = $('.e2e-test-hide-card-height-warning-icon');
-      await action.click('Hide Height Warning icon', hideHeightWarningIcon);
-      await waitFor.invisibilityOf(
-        heightMessage, 'Height message taking too long to disappear.');
-
-      await users.logout();
-    });
-
-  it('should handle discarding changes, navigation, deleting states, ' +
-      'changing the first state, displaying content, deleting responses and ' +
-      'switching to preview mode', async function() {
-    await users.createUser('user5@editorAndPlayer.com', 'user5EditorAndPlayer');
-    await users.login('user5@editorAndPlayer.com');
+  it('should generate warning message if card height limit is exceeded', async function () {
+    await users.createUser('user@heightWarning.com', 'userHeightWarning');
+    await users.login('user@heightWarning.com');
 
     await workflow.createExploration(true);
-    await explorationEditorMainTab.setStateName('card1');
-    await explorationEditorMainTab.expectCurrentStateToBe('card1');
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('card1 content'), true);
-    await explorationEditorMainTab.setInteraction('TextInput');
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setDestination('final card', true, null);
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setDestination('card2', true, null);
-    await explorationEditorMainTab.moveToState('card2');
-    // NOTE: we must move to the state before checking state names to avoid
-    // inexplicable failures of the protractor utility that reads state names
-    // (the user-visible names are fine either way). See issue 732 for more.
-    await explorationEditorMainTab.expectStateNamesToBe(
-      ['final card', 'card1', 'card2']);
-    await explorationEditorMainTab.setInteraction('EndExploration');
 
-    // Check discarding of changes.
-    await explorationEditorPage.discardChanges();
-    await explorationEditorMainTab.expectCurrentStateToBe(
-      general.FIRST_STATE_DEFAULT_NAME);
-    await explorationEditorMainTab.setStateName('first');
-    await explorationEditorMainTab.expectCurrentStateToBe('first');
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('card1 content'), true);
-
-    // Check deletion of states and changing the first state.
-    await explorationEditorMainTab.setInteraction('TextInput');
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setDestination('final card', true, null);
-    await (
-      await explorationEditorMainTab.getResponseEditor('default')
-    ).setDestination('second', true, null);
-    await explorationEditorMainTab.moveToState('second');
-    await explorationEditorMainTab.expectStateNamesToBe(
-      ['final card', 'first', 'second']);
-    await explorationEditorMainTab.expectCurrentStateToBe('second');
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.expectAvailableFirstStatesToBe(
-      ['final card', 'first', 'second']);
-    await explorationEditorSettingsTab.setFirstState('second');
-    await explorationEditorPage.navigateToMainTab();
-    await explorationEditorMainTab.moveToState('first');
-    await explorationEditorMainTab.deleteState('first');
-    await explorationEditorMainTab.expectCurrentStateToBe('second');
-    await explorationEditorMainTab.expectStateNamesToBe([
-      'final card', 'second']);
-
-    // Check behaviour of the back button.
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setObjective('do some stuff here');
-    await explorationEditorPage.navigateToMainTab();
-    var explorationId = await general.getExplorationIdFromEditor();
-    expect(await browser.getUrl()).toEqual(
-      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-      explorationId + '#/gui/second');
-    await browser.back();
-    expect(await browser.getUrl()).toEqual(
-      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-      explorationId + '#/settings');
-    await browser.back();
-    expect(await browser.getUrl()).toEqual(
-      general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
-      explorationId + '#/gui/second');
-
-    // Refreshing to prevent stale elements after backing from previous page.
-    await browser.refresh();
-    await explorationEditorMainTab.setContent(async function(richTextEditor) {
-      await richTextEditor.appendItalicText('Welcome');
-    }, true);
-    await explorationEditorMainTab.expectContentToMatch(
-      async function(richTextChecker) {
-        await richTextChecker.readItalicText('Welcome');
-      }
+    var postTutorialPopover = $('.joyride .popover-content');
+    var stateEditButton = $('.e2e-test-edit-content-pencil-button');
+    await waitFor.invisibilityOf(
+      postTutorialPopover,
+      'Post-tutorial popover does not disappear.'
     );
-    await explorationEditorMainTab.setInteraction('NumericInput');
-    // Check display of content & interaction in the editor.
-    await explorationEditorMainTab.expectInteractionToMatch('NumericInput');
-
-    // Check deletion of groups.
-    var responseEditor = await explorationEditorMainTab.getResponseEditor(
-      'default');
-    await responseEditor.setFeedback(await forms.toRichText('Farewell'));
-    await responseEditor.setDestination(null, false, null);
-    await responseEditor.expectAvailableDestinationsToBe([
-      'second', 'final card']);
-    await responseEditor.setDestination('final card', false, null);
-    await responseEditor.expectAvailableDestinationsToBe([
-      'second', 'final card']);
-    await explorationEditorMainTab.addResponse(
-      'NumericInput', null, 'final card', false,
-      'IsGreaterThan', 2);
-    await (
-      await explorationEditorMainTab.getResponseEditor(0)
-    ).deleteResponse();
-
-    // Setup a terminating state.
-    await explorationEditorMainTab.moveToState('final card');
-    await explorationEditorMainTab.setInteraction('EndExploration');
-
-    // Check that preview/editor switch doesn't change state.
-    await explorationEditorPage.navigateToPreviewTab();
-    await explorationPlayerPage.expectExplorationToBeOver();
-    await explorationEditorPage.navigateToMainTab();
-    await explorationEditorMainTab.expectCurrentStateToBe('final card');
-    await explorationEditorMainTab.moveToState('second');
-
-    // Check editor preview tab.
-    await explorationEditorPage.navigateToPreviewTab();
-    await explorationPlayerPage.expectContentToMatch(
-      async function(richTextEditor) {
-        await richTextEditor.readItalicText('Welcome');
-      }
+    await action.click('State Edit Button', stateEditButton);
+    var stateEditorTag = $('.e2e-test-state-content-editor');
+    var stateContentEditor = stateEditorTag.$('.e2e-test-state-content-editor');
+    await waitFor.visibilityOf(
+      stateContentEditor,
+      'stateContentEditor taking too long to appear to set content'
     );
-    await explorationPlayerPage.expectInteractionToMatch('NumericInput');
-    await explorationPlayerPage.submitAnswer('NumericInput', 6);
-    // This checks the previously-deleted group no longer applies.
-    await explorationPlayerPage.expectLatestFeedbackToMatch(
-      await forms.toRichText('Farewell'));
-    await explorationPlayerPage.clickThroughToNextCard();
-    await explorationPlayerPage.expectExplorationToBeOver();
-    await explorationEditorPage.discardChanges();
+    var richTextEditor = await forms.RichTextEditor(stateContentEditor);
+
+    var content = 'line1\n\n\n\nline2\n\n\n\nline3\n\n\nline4';
+
+    var heightMessage = $('.e2e-test-card-height-limit-warning');
+    await richTextEditor.appendPlainText(content);
+    expect(await heightMessage.isExisting()).toBe(false);
+
+    await richTextEditor.appendPlainText('\n\n\nline5');
+    await waitFor.visibilityOf(
+      heightMessage,
+      'Card height limit message not displayed'
+    );
+
+    await richTextEditor.appendPlainText('\b\b\b\b\b\b\b\b');
+    expect(await heightMessage.isExisting()).toBe(false);
+
+    await richTextEditor.appendPlainText('\n\n\nline5');
+    await waitFor.visibilityOf(
+      heightMessage,
+      'Card height limit message not displayed'
+    );
+
+    var hideHeightWarningIcon = $('.e2e-test-hide-card-height-warning-icon');
+    await action.click('Hide Height Warning icon', hideHeightWarningIcon);
+    await waitFor.invisibilityOf(
+      heightMessage,
+      'Height message taking too long to disappear.'
+    );
+
     await users.logout();
   });
 
   it(
+    'should handle discarding changes, navigation, deleting states, ' +
+      'changing the first state, displaying content, deleting responses and ' +
+      'switching to preview mode',
+    async function () {
+      await users.createUser(
+        'user5@editorAndPlayer.com',
+        'user5EditorAndPlayer'
+      );
+      await users.login('user5@editorAndPlayer.com');
+
+      await workflow.createExploration(true);
+      await explorationEditorMainTab.setStateName('card1');
+      await explorationEditorMainTab.expectCurrentStateToBe('card1');
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('card1 content'),
+        true
+      );
+      await explorationEditorMainTab.setInteraction('TextInput');
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setDestination('final card', true, null);
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setDestination('card2', true, null);
+      await explorationEditorMainTab.moveToState('card2');
+      // NOTE: we must move to the state before checking state names to avoid
+      // inexplicable failures of the protractor utility that reads state names
+      // (the user-visible names are fine either way). See issue 732 for more.
+      await explorationEditorMainTab.expectStateNamesToBe([
+        'final card',
+        'card1',
+        'card2',
+      ]);
+      await explorationEditorMainTab.setInteraction('EndExploration');
+
+      // Check discarding of changes.
+      await explorationEditorPage.discardChanges();
+      await explorationEditorMainTab.expectCurrentStateToBe(
+        general.FIRST_STATE_DEFAULT_NAME
+      );
+      await explorationEditorMainTab.setStateName('first');
+      await explorationEditorMainTab.expectCurrentStateToBe('first');
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('card1 content'),
+        true
+      );
+
+      // Check deletion of states and changing the first state.
+      await explorationEditorMainTab.setInteraction('TextInput');
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setDestination('final card', true, null);
+      await (
+        await explorationEditorMainTab.getResponseEditor('default')
+      ).setDestination('second', true, null);
+      await explorationEditorMainTab.moveToState('second');
+      await explorationEditorMainTab.expectStateNamesToBe([
+        'final card',
+        'first',
+        'second',
+      ]);
+      await explorationEditorMainTab.expectCurrentStateToBe('second');
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.expectAvailableFirstStatesToBe([
+        'final card',
+        'first',
+        'second',
+      ]);
+      await explorationEditorSettingsTab.setFirstState('second');
+      await explorationEditorPage.navigateToMainTab();
+      await explorationEditorMainTab.moveToState('first');
+      await explorationEditorMainTab.deleteState('first');
+      await explorationEditorMainTab.expectCurrentStateToBe('second');
+      await explorationEditorMainTab.expectStateNamesToBe([
+        'final card',
+        'second',
+      ]);
+
+      // Check behaviour of the back button.
+      await explorationEditorPage.navigateToSettingsTab();
+      await explorationEditorSettingsTab.setObjective('do some stuff here');
+      await explorationEditorPage.navigateToMainTab();
+      var explorationId = await general.getExplorationIdFromEditor();
+      expect(await browser.getUrl()).toEqual(
+        general.SERVER_URL_PREFIX +
+          general.EDITOR_URL_SLICE +
+          explorationId +
+          '#/gui/second'
+      );
+      await browser.back();
+      expect(await browser.getUrl()).toEqual(
+        general.SERVER_URL_PREFIX +
+          general.EDITOR_URL_SLICE +
+          explorationId +
+          '#/settings'
+      );
+      await browser.back();
+      expect(await browser.getUrl()).toEqual(
+        general.SERVER_URL_PREFIX +
+          general.EDITOR_URL_SLICE +
+          explorationId +
+          '#/gui/second'
+      );
+
+      // Refreshing to prevent stale elements after backing from previous page.
+      await browser.refresh();
+      await explorationEditorMainTab.setContent(async function (
+        richTextEditor
+      ) {
+        await richTextEditor.appendItalicText('Welcome');
+      }, true);
+      await explorationEditorMainTab.expectContentToMatch(
+        async function (richTextChecker) {
+          await richTextChecker.readItalicText('Welcome');
+        }
+      );
+      await explorationEditorMainTab.setInteraction('NumericInput');
+      // Check display of content & interaction in the editor.
+      await explorationEditorMainTab.expectInteractionToMatch('NumericInput');
+
+      // Check deletion of groups.
+      var responseEditor =
+        await explorationEditorMainTab.getResponseEditor('default');
+      await responseEditor.setFeedback(await forms.toRichText('Farewell'));
+      await responseEditor.setDestination(null, false, null);
+      await responseEditor.expectAvailableDestinationsToBe([
+        'second',
+        'final card',
+      ]);
+      await responseEditor.setDestination('final card', false, null);
+      await responseEditor.expectAvailableDestinationsToBe([
+        'second',
+        'final card',
+      ]);
+      await explorationEditorMainTab.addResponse(
+        'NumericInput',
+        null,
+        'final card',
+        false,
+        'IsGreaterThan',
+        2
+      );
+      await (
+        await explorationEditorMainTab.getResponseEditor(0)
+      ).deleteResponse();
+
+      // Setup a terminating state.
+      await explorationEditorMainTab.moveToState('final card');
+      await explorationEditorMainTab.setInteraction('EndExploration');
+
+      // Check that preview/editor switch doesn't change state.
+      await explorationEditorPage.navigateToPreviewTab();
+      await explorationPlayerPage.expectExplorationToBeOver();
+      await explorationEditorPage.navigateToMainTab();
+      await explorationEditorMainTab.expectCurrentStateToBe('final card');
+      await explorationEditorMainTab.moveToState('second');
+
+      // Check editor preview tab.
+      await explorationEditorPage.navigateToPreviewTab();
+      await explorationPlayerPage.expectContentToMatch(
+        async function (richTextEditor) {
+          await richTextEditor.readItalicText('Welcome');
+        }
+      );
+      await explorationPlayerPage.expectInteractionToMatch('NumericInput');
+      await explorationPlayerPage.submitAnswer('NumericInput', 6);
+      // This checks the previously-deleted group no longer applies.
+      await explorationPlayerPage.expectLatestFeedbackToMatch(
+        await forms.toRichText('Farewell')
+      );
+      await explorationPlayerPage.clickThroughToNextCard();
+      await explorationPlayerPage.expectExplorationToBeOver();
+      await explorationEditorPage.discardChanges();
+      await users.logout();
+    }
+  );
+
+  it(
     'should handle multiple rules in an answer group and also disallow ' +
-      'editing of a read-only exploration', async function() {
+      'editing of a read-only exploration',
+    async function () {
       await users.createUser(
-        'user6@editorAndPlayer.com', 'user6EditorAndPlayer');
+        'user6@editorAndPlayer.com',
+        'user6EditorAndPlayer'
+      );
       await users.createUser(
-        'user7@editorAndPlayer.com', 'user7EditorAndPlayer');
+        'user7@editorAndPlayer.com',
+        'user7EditorAndPlayer'
+      );
       await users.login('user6@editorAndPlayer.com');
 
       await workflow.createExploration(true);
 
       // Create an exploration with multiple groups.
       await explorationEditorMainTab.setStateName('first card');
-      await explorationEditorMainTab.setContent(await forms.toRichText(
-        'How are you feeling?'), true);
+      await explorationEditorMainTab.setContent(
+        await forms.toRichText('How are you feeling?'),
+        true
+      );
       await explorationEditorMainTab.setInteraction('TextInput');
       await explorationEditorMainTab.addResponse(
-        'TextInput', await forms.toRichText('You must be happy!'),
-        null, false, 'Equals', ['happy']);
+        'TextInput',
+        await forms.toRichText('You must be happy!'),
+        null,
+        false,
+        'Equals',
+        ['happy']
+      );
       await explorationEditorMainTab.addResponse(
-        'TextInput', await forms.toRichText('No being sad!'),
-        null, false, 'Contains', ['sad']);
-      var responseEditor = await explorationEditorMainTab.getResponseEditor(
-        'default');
-      await responseEditor.setFeedback(await forms.toRichText(
-        'Okay, now this is just becoming annoying.'));
+        'TextInput',
+        await forms.toRichText('No being sad!'),
+        null,
+        false,
+        'Contains',
+        ['sad']
+      );
+      var responseEditor =
+        await explorationEditorMainTab.getResponseEditor('default');
+      await responseEditor.setFeedback(
+        await forms.toRichText('Okay, now this is just becoming annoying.')
+      );
       await responseEditor.setDestination('final card', true, null);
 
       // Now, set multiple rules to a single answer group.
@@ -305,7 +371,8 @@ describe('Full exploration editor', function() {
       await libraryPage.playExploration('Testing multiple rules');
       var explorationId = await general.getExplorationIdFromPlayer();
       await browser.url(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId);
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId
+      );
       await explorationEditorMainTab.exitTutorial();
       // Verify nothing can change with this user.
       await explorationEditorMainTab.expectInteractionToMatch('TextInput');
@@ -331,43 +398,51 @@ describe('Full exploration editor', function() {
       await responseEditor.expectCannotDeleteRule(0);
 
       // Check default outcome.
-      responseEditor = await explorationEditorMainTab.getResponseEditor(
-        'default');
+      responseEditor =
+        await explorationEditorMainTab.getResponseEditor('default');
       await responseEditor.expectCannotSetFeedback();
       await responseEditor.expectCannotSetDestination();
 
       // Check editor preview tab to verify multiple rules are working.
       await general.moveToPlayer();
       await explorationPlayerPage.expectContentToMatch(
-        await forms.toRichText('How are you feeling?'));
+        await forms.toRichText('How are you feeling?')
+      );
       await explorationPlayerPage.expectInteractionToMatch('TextInput');
 
       await explorationPlayerPage.submitAnswer(
-        'TextInput', 'Fine...I\'m doing okay');
+        'TextInput',
+        "Fine...I'm doing okay"
+      );
       await explorationPlayerPage.expectLatestFeedbackToMatch(
-        await forms.toRichText('You must be happy!'));
+        await forms.toRichText('You must be happy!')
+      );
 
-      await explorationPlayerPage.submitAnswer('TextInput', 'meh, I\'m so-so');
+      await explorationPlayerPage.submitAnswer('TextInput', "meh, I'm so-so");
       await explorationPlayerPage.expectLatestFeedbackToMatch(
-        await forms.toRichText('You must be happy!'));
+        await forms.toRichText('You must be happy!')
+      );
 
       // Finish the exploration.
       await explorationPlayerPage.submitAnswer('TextInput', 'Whatever...');
 
       await explorationPlayerPage.expectLatestFeedbackToMatch(
-        await forms.toRichText('Okay, now this is just becoming annoying.'));
+        await forms.toRichText('Okay, now this is just becoming annoying.')
+      );
       await explorationPlayerPage.clickThroughToNextCard();
       await explorationPlayerPage.expectExplorationToBeOver();
       await users.logout();
-    });
+    }
+  );
 
-  it('should delete interactions cleanly', async function() {
+  it('should delete interactions cleanly', async function () {
     await users.createUser('user8@editorAndPlayer.com', 'user8EditorAndPlayer');
     await users.login('user8@editorAndPlayer.com');
 
     await workflow.createExploration(true);
-    await explorationEditorMainTab.setContent(await forms.toRichText(
-      'How are you feeling?'));
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('How are you feeling?')
+    );
     await explorationEditorMainTab.setInteraction('EndExploration');
     await explorationEditorMainTab.deleteInteraction();
     await explorationEditorPage.navigateToPreviewTab();
@@ -375,8 +450,13 @@ describe('Full exploration editor', function() {
     await explorationEditorPage.navigateToMainTab();
     await explorationEditorMainTab.setInteraction('TextInput');
     await explorationEditorMainTab.addResponse(
-      'TextInput', await forms.toRichText('Happy!'), null, false, 'Equals',
-      ['happy']);
+      'TextInput',
+      await forms.toRichText('Happy!'),
+      null,
+      false,
+      'Equals',
+      ['happy']
+    );
     await explorationEditorMainTab.expectInteractionToMatch('TextInput');
     await explorationEditorPage.saveChanges();
     await explorationEditorMainTab.deleteInteraction();
@@ -389,7 +469,7 @@ describe('Full exploration editor', function() {
     'should merge changes when the changes are not conflicting ' +
       'and the frontend version of an exploration is not equal to ' +
       'the backend version',
-    async function() {
+    async function () {
       await users.createUser('user9@editor.com', 'user9Editor');
       await users.createUser('user10@editor.com', 'user10Editor');
 
@@ -409,7 +489,9 @@ describe('Full exploration editor', function() {
       await explorationEditorPage.navigateToMainTab();
 
       // Add a content change and does not save the draft.
-      await explorationEditorMainTab.setContent(async function(richTextEditor) {
+      await explorationEditorMainTab.setContent(async function (
+        richTextEditor
+      ) {
         await richTextEditor.appendPlainText('How are you feeling?');
       }, true);
       await action.waitForAutosave();
@@ -434,7 +516,7 @@ describe('Full exploration editor', function() {
       expect(await lostChangesModal.isExisting()).toBe(false);
       await explorationEditorPage.saveChanges();
       await explorationEditorMainTab.expectContentToMatch(
-        async function(richTextChecker) {
+        async function (richTextChecker) {
           await richTextChecker.readPlainText('How are you feeling?');
         }
       );
@@ -447,9 +529,10 @@ describe('Full exploration editor', function() {
         []
       );
       await users.logout();
-    });
+    }
+  );
 
-  afterEach(async function() {
+  afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
 });

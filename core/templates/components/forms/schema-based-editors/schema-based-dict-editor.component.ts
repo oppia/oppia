@@ -16,11 +16,21 @@
  * @fileoverview Component for a schema-based editor for dicts.
  */
 
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, ControlValueAccessor, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { IdGenerationService } from 'services/id-generation.service';
-import { Schema, SchemaDefaultValue } from 'services/schema-default-value.service';
+import {Component, forwardRef, Input, OnInit} from '@angular/core';
+import {
+  NG_VALUE_ACCESSOR,
+  NG_VALIDATORS,
+  ControlValueAccessor,
+  Validator,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {IdGenerationService} from 'services/id-generation.service';
+import {
+  Schema,
+  SchemaDefaultValue,
+} from 'services/schema-default-value.service';
 
 @Component({
   selector: 'schema-based-dict-editor',
@@ -29,18 +39,18 @@ import { Schema, SchemaDefaultValue } from 'services/schema-default-value.servic
     {
       provide: NG_VALUE_ACCESSOR,
       useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
-      multi: true
+      multi: true,
     },
     {
       provide: NG_VALIDATORS,
       useExisting: forwardRef(() => SchemaBasedDictEditorComponent),
-      multi: true
+      multi: true,
     },
-  ]
+  ],
 })
-
 export class SchemaBasedDictEditorComponent
-implements ControlValueAccessor, OnInit, Validator {
+  implements ControlValueAccessor, OnInit, Validator
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -55,7 +65,7 @@ implements ControlValueAccessor, OnInit, Validator {
   fieldIds: Record<string, string> = {};
   JSON = JSON;
   onChange: (val: Record<string, SchemaDefaultValue>) => void = () => {};
-  constructor(private idGenerationService: IdGenerationService) { }
+  constructor(private idGenerationService: IdGenerationService) {}
 
   // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: Record<string, SchemaDefaultValue>): void {
@@ -64,14 +74,13 @@ implements ControlValueAccessor, OnInit, Validator {
 
   // Implemented as a part of ControlValueAccessor interface.
   registerOnChange(
-      fn: (val: Record<string, SchemaDefaultValue>) => void
+    fn: (val: Record<string, SchemaDefaultValue>) => void
   ): void {
     this.onChange = fn;
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnTouched(): void {
-  }
+  registerOnTouched(): void {}
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
@@ -87,8 +96,8 @@ implements ControlValueAccessor, OnInit, Validator {
     this.fieldIds = {};
     for (let i = 0; i < this.propertySchemas.length; i++) {
       // Generate random IDs for each field.
-      this.fieldIds[this.propertySchemas[i].name] = (
-        this.idGenerationService.generateNewId());
+      this.fieldIds[this.propertySchemas[i].name] =
+        this.idGenerationService.generateNewId();
     }
   }
 
@@ -105,13 +114,17 @@ implements ControlValueAccessor, OnInit, Validator {
     return this.labelForFocusTarget;
   }
 
-  getHumanReadablePropertyDescription(
-      property: {description: string; name: string}
-  ): string {
+  getHumanReadablePropertyDescription(property: {
+    description: string;
+    name: string;
+  }): string {
     return property.description || '[' + property.name + ']';
   }
 }
 
-angular.module('oppia').directive('schemaBasedDictEditor', downgradeComponent({
-  component: SchemaBasedDictEditorComponent
-}));
+angular.module('oppia').directive(
+  'schemaBasedDictEditor',
+  downgradeComponent({
+    component: SchemaBasedDictEditorComponent,
+  })
+);

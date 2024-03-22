@@ -16,15 +16,21 @@
  * @fileoverview Unit tests for the DragAndDropSortInput interaction.
  */
 
-import { NO_ERRORS_SCHEMA, ElementRef, QueryList } from '@angular/core';
-import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { InteractiveDragAndDropSortInputComponent } from './oppia-interactive-drag-and-drop-sort-input.component';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CdkDragDrop, CdkDropList, CdkDrag } from '@angular/cdk/drag-drop';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { DragAndDropAnswer } from 'interactions/answer-defs';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {NO_ERRORS_SCHEMA, ElementRef, QueryList} from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {InteractiveDragAndDropSortInputComponent} from './oppia-interactive-drag-and-drop-sort-input.component';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CdkDragDrop, CdkDropList, CdkDrag} from '@angular/cdk/drag-drop';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {DragAndDropAnswer} from 'interactions/answer-defs';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 interface ContainerModel<T> {
   id: string;
@@ -39,87 +45,93 @@ describe('Drag and drop sort input interactive component', () => {
 
   class MockInteractionAttributesExtractorService {
     getValuesFromAttributes(
-        interactionId: InteractionSpecsKey, attributes: Record<string, string>
+      interactionId: InteractionSpecsKey,
+      attributes: Record<string, string>
     ) {
       return {
         choices: {
-          value: JSON.parse(attributes.choicesWithValue)
+          value: JSON.parse(attributes.choicesWithValue),
         },
         allowMultipleItemsInSamePosition: {
           value: JSON.parse(
-            attributes.allowMultipleItemsInSamePositionWithValue)
-        }
+            attributes.allowMultipleItemsInSamePositionWithValue
+          ),
+        },
       };
     }
   }
 
   class MockCurrentInteractionService {
     onSubmit(
-        answer: DragAndDropAnswer, rulesService: CurrentInteractionService
+      answer: DragAndDropAnswer,
+      rulesService: CurrentInteractionService
     ) {}
 
     registerCurrentInteraction(
-        submitAnswerFn: Function, validateExpressionFn: Function) {
+      submitAnswerFn: Function,
+      validateExpressionFn: Function
+    ) {
       submitAnswerFn();
     }
   }
   class DragAndDropEventClass<T> {
     createInContainerEvent(
-        containerId: string, data: T[], fromIndex: number, toIndex: number
+      containerId: string,
+      data: T[],
+      fromIndex: number,
+      toIndex: number
     ): CdkDragDrop<T[], T[]> {
       const event = this.createEvent(fromIndex, toIndex);
-      const container = { id: containerId, data: data };
+      const container = {id: containerId, data: data};
       event.container = container as CdkDropList<T[]>;
       event.previousContainer = event.container;
-      event.item = { data: data[fromIndex] } as CdkDrag<T>;
+      event.item = {data: data[fromIndex]} as CdkDrag<T>;
       return event;
     }
 
     createCrossContainerEvent(
-        from: ContainerModel<T>, to: ContainerModel<T>
+      from: ContainerModel<T>,
+      to: ContainerModel<T>
     ): CdkDragDrop<T[], T[]> {
       const event = this.createEvent(from.index, to.index);
       event.container = this.createContainer(to);
       event.previousContainer = this.createContainer(from);
-      event.item = { data: from.data[from.index] } as CdkDrag<T>;
+      event.item = {data: from.data[from.index]} as CdkDrag<T>;
       return event;
     }
 
     private createEvent(
-        previousIndex: number, currentIndex: number
+      previousIndex: number,
+      currentIndex: number
     ): CdkDragDrop<T[], T[]> {
       return {
         previousIndex: previousIndex,
         currentIndex: currentIndex,
         isPointerOverContainer: true,
-        distance: { x: 0, y: 0 }
+        distance: {x: 0, y: 0},
       } as CdkDragDrop<T[], T[]>;
     }
 
-    private createContainer(
-        model: ContainerModel<T>
-    ): CdkDropList<T[]> {
-      const container = { id: model.id, data: model.data };
+    private createContainer(model: ContainerModel<T>): CdkDropList<T[]> {
+      const container = {id: model.id, data: model.data};
       return container as CdkDropList<T[]>;
     }
   }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        InteractiveDragAndDropSortInputComponent,
-      ],
+      declarations: [InteractiveDragAndDropSortInputComponent],
       providers: [
         {
           provide: InteractionAttributesExtractorService,
-          useClass: MockInteractionAttributesExtractorService
+          useClass: MockInteractionAttributesExtractorService,
         },
         {
           provide: CurrentInteractionService,
-          useClass: MockCurrentInteractionService
+          useClass: MockCurrentInteractionService,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -132,9 +144,11 @@ describe('Drag and drop sort input interactive component', () => {
   describe('when multiple items in the same position are allowed', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(
-        InteractiveDragAndDropSortInputComponent);
+        InteractiveDragAndDropSortInputComponent
+      );
       component = fixture.componentInstance;
-      component.choicesWithValue = '[' +
+      component.choicesWithValue =
+        '[' +
         '{' +
         '    "html": "<p>choice 1</p>",' +
         '    "contentId": "ca_choices_1"' +
@@ -151,19 +165,12 @@ describe('Drag and drop sort input interactive component', () => {
         '    "html": "<p>choice 4</p>",' +
         '    "contentId": "ca_choices_4"' +
         '}' +
-    ']';
+        ']';
       component.allowMultipleItemsInSamePositionWithValue = 'true';
       component.savedSolution = [
-        [
-          'ca_choices_1'
-        ],
-        [
-          'ca_choices_2',
-          'ca_choices_3'
-        ],
-        [
-          'ca_choices_4'
-        ]
+        ['ca_choices_1'],
+        ['ca_choices_2', 'ca_choices_3'],
+        ['ca_choices_4'],
       ];
       component.dragStarted = false;
       component.hide = [];
@@ -180,70 +187,55 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.allowMultipleItemsInSamePosition).toBe(true);
       expect(component.multipleItemsInSamePositionArray).toEqual([
         [],
-        [
-          '<p>choice 1</p>'
-        ],
+        ['<p>choice 1</p>'],
         [],
-        [
-          '<p>choice 2</p>',
-          '<p>choice 3</p>'
-        ],
+        ['<p>choice 2</p>', '<p>choice 3</p>'],
         [],
-        [
-          '<p>choice 4</p>'
-        ],
-        []
+        ['<p>choice 4</p>'],
+        [],
       ]);
       expect(component.choices).toEqual([
         '<p>choice 1</p>',
         '<p>choice 2</p>',
         '<p>choice 3</p>',
-        '<p>choice 4</p>'
+        '<p>choice 4</p>',
       ]);
       expect(
         currentInteractionService.registerCurrentInteraction
       ).toHaveBeenCalled();
     });
 
-    it('should make a default list of lists when user did not save a solution',
-      () => {
-        component.savedSolution = null;
-        component.ngOnInit();
+    it('should make a default list of lists when user did not save a solution', () => {
+      component.savedSolution = null;
+      component.ngOnInit();
 
-        expect(component.allowMultipleItemsInSamePosition).toBe(true);
-        expect(component.multipleItemsInSamePositionArray).toEqual([
-          [],
-          [
-            '<p>choice 1</p>'
-          ],
-          [],
-          [
-            '<p>choice 2</p>'
-          ],
-          [],
-          [
-            '<p>choice 3</p>'
-          ],
-          [],
-          [
-            '<p>choice 4</p>'
-          ],
-          []
-        ]);
-      });
+      expect(component.allowMultipleItemsInSamePosition).toBe(true);
+      expect(component.multipleItemsInSamePositionArray).toEqual([
+        [],
+        ['<p>choice 1</p>'],
+        [],
+        ['<p>choice 2</p>'],
+        [],
+        ['<p>choice 3</p>'],
+        [],
+        ['<p>choice 4</p>'],
+        [],
+      ]);
+    });
 
     it('should move items inside same list', () => {
       component.noShow = 1;
       component.hide = [1, 2, 3, 4];
       component.dragStarted = true;
 
-      const containerData = [
-        '<p>choice 1</p>',
-        '<p>choice 2</p>',
-      ];
+      const containerData = ['<p>choice 1</p>', '<p>choice 2</p>'];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedItems', containerData, 1, 0);
+        'selectedItems',
+        containerData,
+        1,
+        0
+      );
 
       component.dropItemInAnyList(dragDropEvent);
 
@@ -256,19 +248,19 @@ describe('Drag and drop sort input interactive component', () => {
       component.choicesValue = [
         {
           html: '<p>choice 1</p>',
-          contentId: null
+          contentId: null,
         },
         {
           html: '<p>choice 2</p>',
-          contentId: 'ca_choices_2'
+          contentId: 'ca_choices_2',
         },
         {
           html: '<p>choice 3</p>',
-          contentId: 'ca_choices_3'
+          contentId: 'ca_choices_3',
         },
         {
           html: '<p>choice 4</p>',
-          contentId: 'ca_choices_4'
+          contentId: 'ca_choices_4',
         },
       ] as SubtitledHtml[];
 
@@ -276,7 +268,7 @@ describe('Drag and drop sort input interactive component', () => {
         '<p>choice 1</p>',
         '<p>choice 2</p>',
         '<p>choice 3</p>',
-        '<p>choice 4</p>'
+        '<p>choice 4</p>',
       ];
 
       expect(() => {
@@ -288,19 +280,19 @@ describe('Drag and drop sort input interactive component', () => {
       component.choicesValue = [
         {
           html: '<p>choice 1</p>',
-          contentId: 'ca_choices_1'
+          contentId: 'ca_choices_1',
         },
         {
           html: '<p>choice 2</p>',
-          contentId: 'ca_choices_2'
+          contentId: 'ca_choices_2',
         },
         {
           html: '<p>choice 3</p>',
-          contentId: 'ca_choices_3'
+          contentId: 'ca_choices_3',
         },
         {
           html: '<p>choice 4</p>',
-          contentId: 'ca_choices_4'
+          contentId: 'ca_choices_4',
         },
       ] as SubtitledHtml[];
 
@@ -316,60 +308,51 @@ describe('Drag and drop sort input interactive component', () => {
       component.highlightedGroup = 1;
       component.multipleItemsInSamePositionArray = [
         [],
-        [
-          '<p>choice 1</p>'
-        ],
+        ['<p>choice 1</p>'],
         [],
         [
           '<p>choice 2</p>',
           '<p>choice 3</p>',
           '<p>choice 4</p>',
-          '<p>choice 5</p>'
+          '<p>choice 5</p>',
         ],
         [],
-        [
-          '<p>choice 6</p>',
-          '<p>choice 7</p>',
-          '<p>choice 8</p>',
-        ],
-        []
+        ['<p>choice 6</p>', '<p>choice 7</p>', '<p>choice 8</p>'],
+        [],
       ];
 
       const from: ContainerModel<string> = {
         id: 'availableItems',
         data: component.multipleItemsInSamePositionArray[5],
-        index: 0
+        index: 0,
       };
       const to: ContainerModel<string> = {
         id: 'selectedItems',
         data: component.multipleItemsInSamePositionArray[3],
-        index: 3
+        index: 3,
       };
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
-      const dragDropEvent = (
-        dragAndDropEventClass.createCrossContainerEvent(from, to));
+      const dragDropEvent = dragAndDropEventClass.createCrossContainerEvent(
+        from,
+        to
+      );
 
       component.dropItemInAnyList(dragDropEvent);
 
       expect(component.multipleItemsInSamePositionArray).toEqual([
         [],
-        [
-          '<p>choice 1</p>'
-        ],
+        ['<p>choice 1</p>'],
         [],
         [
           '<p>choice 2</p>',
           '<p>choice 3</p>',
           '<p>choice 4</p>',
           '<p>choice 6</p>',
-          '<p>choice 5</p>'
+          '<p>choice 5</p>',
         ],
         [],
-        [
-          '<p>choice 7</p>',
-          '<p>choice 8</p>'
-        ],
-        []
+        ['<p>choice 7</p>', '<p>choice 8</p>'],
+        [],
       ]);
       expect(component.noShow).toBe(-1);
       expect(component.hide).toEqual([]);
@@ -382,19 +365,18 @@ describe('Drag and drop sort input interactive component', () => {
 
       component.multipleItemsInSamePositionArray = [
         [],
-        [
-          '<p>choice 1</p>'
-        ],
+        ['<p>choice 1</p>'],
         [],
-        [
-          '<p>choice 2</p>',
-          '<p>choice 3</p>'
-        ],
-        []
+        ['<p>choice 2</p>', '<p>choice 3</p>'],
+        [],
       ];
       const dragAndDropEventClass = new DragAndDropEventClass<string[]>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedlists', component.multipleItemsInSamePositionArray, 3, 0);
+        'selectedlists',
+        component.multipleItemsInSamePositionArray,
+        3,
+        0
+      );
 
       component.dropList(dragDropEvent);
       tick();
@@ -432,13 +414,13 @@ describe('Drag and drop sort input interactive component', () => {
     });
 
     it('should set root placeholder height', () => {
-      spyOn(
-        fixture.elementRef.nativeElement, 'getElementsByClassName'
-      ).withArgs('child-dnd-2').and.returnValue([
-        {
-          offsetHeight: 80
-        }
-      ]);
+      spyOn(fixture.elementRef.nativeElement, 'getElementsByClassName')
+        .withArgs('child-dnd-2')
+        .and.returnValue([
+          {
+            offsetHeight: 80,
+          },
+        ]);
 
       component.rootHeight = 40;
       component.setRootPlaceHolderHeight(2);
@@ -450,21 +432,20 @@ describe('Drag and drop sort input interactive component', () => {
       component.dragStarted = false;
       component.multipleItemsInSamePositionArray = [
         [],
-        [
-          '<p>choice 1</p>'
-        ],
+        ['<p>choice 1</p>'],
         [],
-        [
-          '<p>choice 2</p>',
-          '<p>choice 3</p>'
-        ],
-        []
+        ['<p>choice 2</p>', '<p>choice 3</p>'],
+        [],
       ];
 
       const containerData = component.multipleItemsInSamePositionArray[1];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedItems', containerData, 0, 0);
+        'selectedItems',
+        containerData,
+        0,
+        0
+      );
       component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(1);
@@ -478,7 +459,7 @@ describe('Drag and drop sort input interactive component', () => {
       component.listItems.reset([
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
-        new ElementRef(document.createElement('div'))
+        new ElementRef(document.createElement('div')),
       ]);
 
       component.ngAfterViewInit();
@@ -495,7 +476,7 @@ describe('Drag and drop sort input interactive component', () => {
       component.listItems.reset([
         new ElementRef(document.createElement('div')),
         new ElementRef(document.createElement('div')),
-        new ElementRef(document.createElement('div'))
+        new ElementRef(document.createElement('div')),
       ]);
       const listItemElements = component.listItems.toArray();
       spyOn(listItemElements[0].nativeElement, 'focus');
@@ -508,12 +489,14 @@ describe('Drag and drop sort input interactive component', () => {
     it('should not hide item when drag is started', () => {
       component.dragStarted = true;
 
-      const containerData = [
-        '<p>choice 1</p>',
-      ];
+      const containerData = ['<p>choice 1</p>'];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedItems', containerData, 0, 0);
+        'selectedItems',
+        containerData,
+        0,
+        0
+      );
       component.hideElement(dragDropEvent);
 
       expect(component.noShow).toBe(-1);
@@ -534,19 +517,19 @@ describe('Drag and drop sort input interactive component', () => {
   });
 
   it('should move the item down when ArrowDown key is pressed', () => {
-    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+    const event = new KeyboardEvent('keydown', {key: 'ArrowDown'});
     const currentIndex = 0;
     component.activeItem = 0;
     component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
     component.listItems.reset([
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div')),
-      new ElementRef(document.createElement('div'))
+      new ElementRef(document.createElement('div')),
     ]);
     component.singleItemInSamePositionArray = [
       '<p>choice 1</p>',
       '<p>choice 2</p>',
-      '<p>choice 3</p>'
+      '<p>choice 3</p>',
     ];
     spyOn(component, 'setFocus');
 
@@ -557,19 +540,19 @@ describe('Drag and drop sort input interactive component', () => {
   });
 
   it('should move item up when ArrowUp key is pressed', () => {
-    const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+    const event = new KeyboardEvent('keydown', {key: 'ArrowUp'});
     const currentIndex = 1;
     component.activeItem = 1;
     component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
     component.listItems.reset([
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div')),
-      new ElementRef(document.createElement('div'))
+      new ElementRef(document.createElement('div')),
     ]);
     component.singleItemInSamePositionArray = [
       '<p>choice 1</p>',
       '<p>choice 2</p>',
-      '<p>choice 3</p>'
+      '<p>choice 3</p>',
     ];
     spyOn(component, 'setFocus');
 
@@ -580,7 +563,7 @@ describe('Drag and drop sort input interactive component', () => {
   });
 
   it('should decrement newIndex when Shift + Tab keys are pressed', () => {
-    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true });
+    const event = new KeyboardEvent('keydown', {key: 'Tab', shiftKey: true});
     const currentIndex = 1;
     component.activeItem = 1;
     spyOn(component, 'setFocus');
@@ -592,14 +575,14 @@ describe('Drag and drop sort input interactive component', () => {
   });
 
   it('should increment newIndex when Tab key is pressed', () => {
-    const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+    const event = new KeyboardEvent('keydown', {key: 'Tab', shiftKey: false});
     const currentIndex = 1;
     component.activeItem = 1;
     component.listItems = new QueryList<ElementRef<HTMLDivElement>>();
     component.listItems.reset([
       new ElementRef(document.createElement('div')),
       new ElementRef(document.createElement('div')),
-      new ElementRef(document.createElement('div'))
+      new ElementRef(document.createElement('div')),
     ]);
 
     spyOn(component, 'setFocus');
@@ -611,9 +594,11 @@ describe('Drag and drop sort input interactive component', () => {
   describe('when multiple items in the same position are not allowed', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(
-        InteractiveDragAndDropSortInputComponent);
+        InteractiveDragAndDropSortInputComponent
+      );
       component = fixture.componentInstance;
-      component.choicesWithValue = '[' +
+      component.choicesWithValue =
+        '[' +
         '{' +
         '    "html": "<p>choice 1</p>",' +
         '    "contentId": "ca_choices_1"' +
@@ -626,18 +611,12 @@ describe('Drag and drop sort input interactive component', () => {
         '    "html": "<p>choice 3</p>",' +
         '    "contentId": "ca_choices_3"' +
         '}' +
-    ']';
+        ']';
       component.allowMultipleItemsInSamePositionWithValue = 'false';
       component.savedSolution = [
-        [
-          'ca_choices_1'
-        ],
-        [
-          'ca_choices_3',
-        ],
-        [
-          'ca_choices_2'
-        ]
+        ['ca_choices_1'],
+        ['ca_choices_3'],
+        ['ca_choices_2'],
       ];
       component.dragStarted = false;
       component.hide = [];
@@ -653,7 +632,7 @@ describe('Drag and drop sort input interactive component', () => {
       expect(component.singleItemInSamePositionArray).toEqual([
         '<p>choice 1</p>',
         '<p>choice 3</p>',
-        '<p>choice 2</p>'
+        '<p>choice 2</p>',
       ]);
       expect(component.choices).toEqual([
         '<p>choice 1</p>',
@@ -662,35 +641,38 @@ describe('Drag and drop sort input interactive component', () => {
       ]);
     });
 
-    it('should make a default list when user did not save a solution',
-      () => {
-        component.savedSolution = null;
-        component.ngOnInit();
+    it('should make a default list when user did not save a solution', () => {
+      component.savedSolution = null;
+      component.ngOnInit();
 
-        expect(component.allowMultipleItemsInSamePosition).toBe(false);
-        expect(component.singleItemInSamePositionArray).toEqual([
-          '<p>choice 1</p>',
-          '<p>choice 2</p>',
-          '<p>choice 3</p>'
-        ]);
-      });
+      expect(component.allowMultipleItemsInSamePosition).toBe(false);
+      expect(component.singleItemInSamePositionArray).toEqual([
+        '<p>choice 1</p>',
+        '<p>choice 2</p>',
+        '<p>choice 3</p>',
+      ]);
+    });
 
     it('should move item inside list', () => {
       component.singleItemInSamePositionArray = [
         '<p>choice 1</p>',
         '<p>choice 2</p>',
-        '<p>choice 3</p>'
+        '<p>choice 3</p>',
       ];
       const dragAndDropEventClass = new DragAndDropEventClass<string>();
       const dragDropEvent = dragAndDropEventClass.createInContainerEvent(
-        'selectedlists', component.singleItemInSamePositionArray, 2, 1);
+        'selectedlists',
+        component.singleItemInSamePositionArray,
+        2,
+        1
+      );
 
       component.dropItemInSameList(dragDropEvent);
 
       expect(component.singleItemInSamePositionArray).toEqual([
         '<p>choice 1</p>',
         '<p>choice 3</p>',
-        '<p>choice 2</p>'
+        '<p>choice 2</p>',
       ]);
     });
   });

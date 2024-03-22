@@ -16,19 +16,18 @@
  * @fileoverview Service to send changes to a collection to the backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { Collection, CollectionBackendDict } from
-  'domain/collection/collection.model';
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
-import { ReadOnlyCollectionBackendApiService } from
-  'domain/collection/read-only-collection-backend-api.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+import {
+  Collection,
+  CollectionBackendDict,
+} from 'domain/collection/collection.model';
+import {CollectionEditorPageConstants} from 'pages/collection-editor-page/collection-editor-page.constants';
+import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 
 interface EditableCollectionBackendResponse {
   collection: CollectionBackendDict;
@@ -47,71 +46,93 @@ interface EditableCollectionBackendResponse {
 // after deciding and acting upon the decision (which would mean implementing
 // it if it's agreed upon).
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class EditableCollectionBackendApiService {
   constructor(
     private http: HttpClient,
     private readOnlyCollectionService: ReadOnlyCollectionBackendApiService,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   private _fetchCollection(
-      collectionId: string,
-      successCallback: (value: Collection) => void,
-      errorCallback: (reason: string) => void): void {
+    collectionId: string,
+    successCallback: (value: Collection) => void,
+    errorCallback: (reason: string) => void
+  ): void {
     var collectionDataUrl = this.urlInterpolationService.interpolateUrl(
-      CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-        collection_id: collectionId
-      });
+      CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE,
+      {
+        collection_id: collectionId,
+      }
+    );
 
-    this.http.get<EditableCollectionBackendResponse>(
-      collectionDataUrl).toPromise().then(response => {
-      var collectionObject = Collection.create(
-        response.collection);
-      if (successCallback) {
-        successCallback(collectionObject);
-      }
-    }, errorResponse => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
+    this.http
+      .get<EditableCollectionBackendResponse>(collectionDataUrl)
+      .toPromise()
+      .then(
+        response => {
+          var collectionObject = Collection.create(response.collection);
+          if (successCallback) {
+            successCallback(collectionObject);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        }
+      );
   }
 
   private _updateCollection(
-      collectionId: string, collectionVersion: number,
-      commitMessage: string, changeList: BackendChangeObject[],
-      successCallback: (value: Collection) => void,
-      errorCallback: (reason: string) => void): void {
+    collectionId: string,
+    collectionVersion: number,
+    commitMessage: string,
+    changeList: BackendChangeObject[],
+    successCallback: (value: Collection) => void,
+    errorCallback: (reason: string) => void
+  ): void {
     var editableCollectionDataUrl = this.urlInterpolationService.interpolateUrl(
-      CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE, {
-        collection_id: collectionId
-      });
+      CollectionEditorPageConstants.EDITABLE_COLLECTION_DATA_URL_TEMPLATE,
+      {
+        collection_id: collectionId,
+      }
+    );
 
     var putData = {
       version: collectionVersion,
       commit_message: commitMessage,
-      change_list: changeList
+      change_list: changeList,
     };
-    this.http.put<EditableCollectionBackendResponse>(
-      editableCollectionDataUrl, putData).toPromise().then(response => {
-      // The returned data is an updated collection dict.
-      var collectionObject = Collection.create(
-        response.collection);
+    this.http
+      .put<EditableCollectionBackendResponse>(
+        editableCollectionDataUrl,
+        putData
+      )
+      .toPromise()
+      .then(
+        response => {
+          // The returned data is an updated collection dict.
+          var collectionObject = Collection.create(response.collection);
 
-      // Update the ReadOnlyCollectionBackendApiService's cache with the new
-      // collection.
-      this.readOnlyCollectionService.cacheCollection(
-        collectionId, collectionObject);
+          // Update the ReadOnlyCollectionBackendApiService's cache with the new
+          // collection.
+          this.readOnlyCollectionService.cacheCollection(
+            collectionId,
+            collectionObject
+          );
 
-      if (successCallback) {
-        successCallback(collectionObject);
-      }
-    }, errorResponse => {
-      if (errorCallback) {
-        errorCallback(errorResponse.error.error);
-      }
-    });
+          if (successCallback) {
+            successCallback(collectionObject);
+          }
+        },
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback(errorResponse.error.error);
+          }
+        }
+      );
   }
 
   async fetchCollectionAsync(collectionId: string): Promise<Collection> {
@@ -134,17 +155,27 @@ export class EditableCollectionBackendApiService {
    * not out-of-date with any updates made by this backend API service.
    */
   async updateCollectionAsync(
-      collectionId: string, collectionVersion: number,
-      commitMessage: string,
-      changeList: BackendChangeObject[]): Promise<Collection> {
+    collectionId: string,
+    collectionVersion: number,
+    commitMessage: string,
+    changeList: BackendChangeObject[]
+  ): Promise<Collection> {
     return new Promise((resolve, reject) => {
       this._updateCollection(
-        collectionId, collectionVersion, commitMessage, changeList,
-        resolve, reject);
+        collectionId,
+        collectionVersion,
+        commitMessage,
+        changeList,
+        resolve,
+        reject
+      );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'EditableCollectionBackendApiService',
-  downgradeInjectable(EditableCollectionBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'EditableCollectionBackendApiService',
+    downgradeInjectable(EditableCollectionBackendApiService)
+  );

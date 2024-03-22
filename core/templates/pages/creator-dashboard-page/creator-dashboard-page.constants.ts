@@ -18,7 +18,7 @@
 
 export const CreatorDashboardConstants = {
   EXPLORATION_DROPDOWN_STATS: {
-    OPEN_FEEDBACK: 'open_feedback'
+    OPEN_FEEDBACK: 'open_feedback',
   },
 
   EXPLORATIONS_SORT_BY_KEYS: {
@@ -26,7 +26,7 @@ export const CreatorDashboardConstants = {
     RATING: 'ratings',
     NUM_VIEWS: 'numViews',
     OPEN_FEEDBACK: 'numOpenThreads',
-    LAST_UPDATED: 'lastUpdatedMsec'
+    LAST_UPDATED: 'lastUpdatedMsec',
   },
 
   HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS: {
@@ -34,16 +34,16 @@ export const CreatorDashboardConstants = {
     RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
     NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
     OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
-    LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
+    LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED',
   },
 
   SUBSCRIPTION_SORT_BY_KEYS: {
     USERNAME: 'username',
-    IMPACT: 'impact'
+    IMPACT: 'impact',
   },
 
   HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS: {
     USERNAME: 'Username',
-    IMPACT: 'Impact'
-  }
+    IMPACT: 'Impact',
+  },
 } as const;

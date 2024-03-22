@@ -17,58 +17,76 @@
  * can open links by clicking all buttons in about foundation page
  */
 
-import { UserFactory } from
-  '../../puppeteer-testing-utilities/user-factory';
-import { LoggedInUser } from '../../user-utilities/logged-in-users-utils';
-import testConstants from
-  '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Logged-in User in About page', function() {
+describe('Logged-in User in About page', function () {
   let testUser: LoggedInUser;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      'testuser', 'testuser@example.com');
+      'testuser',
+      'testuser@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  beforeEach(async function() {
+  beforeEach(async function () {
     await testUser.navigateToAboutPage();
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open Math Classroom page with the Browse Our Lessons button.',
-    async function() {
+  it(
+    'should open Math Classroom page with the Browse Our Lessons button.',
+    async function () {
       await testUser.clickBrowseOurLessonsButtonInAboutPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Android page with the Access Android App button.',
-    async function() {
+  it(
+    'should open Android page with the Access Android App button.',
+    async function () {
       await testUser.clickAccessAndroidAppButtonInAboutPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Math Classroom page with the Visit Classroom button.',
-    async function() {
+  it(
+    'should open Math Classroom page with the Visit Classroom button.',
+    async function () {
       await testUser.clickVisitClassroomButtonInAboutPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Community Library page with the Browse Library button.',
-    async function() {
+  it(
+    'should open Community Library page with the Browse Library button.',
+    async function () {
       await testUser.clickBrowseLibraryButtonInAboutPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Creator Dashboard page and Exploration Editor ' +
-    'with the Create Lessons button',
-  async function() {
-    await testUser.clickCreateLessonsButtonInAboutPage();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should open Creator Dashboard page and Exploration Editor ' +
+      'with the Create Lessons button',
+    async function () {
+      await testUser.clickCreateLessonsButtonInAboutPage();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Math Classroom page with the Explore Lessons button.',
-    async function() {
+  it(
+    'should open Math Classroom page with the Explore Lessons button.',
+    async function () {
       await testUser.clickExploreLessonsButtonInAboutPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

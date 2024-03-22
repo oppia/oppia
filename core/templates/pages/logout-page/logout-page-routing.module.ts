@@ -16,24 +16,19 @@
  * @fileoverview Routing module for logout page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { LogoutPageRootComponent } from './logout-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {LogoutPageRootComponent} from './logout-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: LogoutPageRootComponent
-  }
+    component: LogoutPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class LogoutPageRoutingModule {}

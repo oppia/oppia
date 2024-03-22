@@ -16,27 +16,27 @@
  * @fileoverview Tests for AdminDataService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { PlatformParameterFilterType } from
-  'domain/platform-parameter/platform-parameter-filter.model';
-import { PlatformParameter } from
-  'domain/platform-parameter/platform-parameter.model';
-import { AdminDataService } from
-  'pages/admin-page/services/admin-data.service';
-import { AdminPageData, AdminPageDataBackendDict } from
-  'domain/admin/admin-backend-api.service';
-import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
-
+import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-parameter-filter.model';
+import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
+import {
+  AdminPageData,
+  AdminPageDataBackendDict,
+} from 'domain/admin/admin-backend-api.service';
+import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 
 describe('Admin Data Service', () => {
   let adminDataService: AdminDataService;
   let httpTestingController: HttpTestingController;
   var sampleAdminData: AdminPageDataBackendDict = {
     role_to_actions: {
-      guest: ['action for guest']
+      guest: ['action for guest'],
     },
     topic_summaries: [
       {
@@ -61,8 +61,8 @@ describe('Admin Data Service', () => {
         total_upcoming_chapters_count: 1,
         total_overdue_chapters_count: 1,
         total_chapter_counts_for_each_story: [5, 4],
-        published_chapter_counts_for_each_story: [3, 4]
-      }
+        published_chapter_counts_for_each_story: [3, 4],
+      },
     ],
     updatable_roles: ['TOPIC_MANAGER'],
     human_readable_current_time: 'June 03 15:31:20',
@@ -70,45 +70,46 @@ describe('Admin Data Service', () => {
     config_properties: {
       record_playthrough_probability: {
         schema: {
-          type: 'float'
+          type: 'float',
         },
         value: 0.2,
-        description: 'The record_playthrough_probability.'
-      }
+        description: 'The record_playthrough_probability.',
+      },
     },
     demo_exploration_ids: ['19'],
-    demo_explorations: [
-      [
-        '0',
-        'welcome.yaml'
-      ]
-    ],
+    demo_explorations: [['0', 'welcome.yaml']],
     viewable_roles: ['TOPIC_MANAGER'],
     human_readable_roles: {
       FULL_USER: 'full user',
-      TOPIC_MANAGER: 'topic manager'
+      TOPIC_MANAGER: 'topic manager',
     },
-    platform_params_dicts: [{
-      name: 'dummy_parameter',
-      description: 'This is a dummy platform parameter.',
-      data_type: 'string',
-      rules: [{
-        filters: [{
-          type: PlatformParameterFilterType.PlatformType,
-          conditions: [['=', 'Web'] as [string, string]]
-        }],
-        value_when_matched: ''
-      }],
-      rule_schema_version: 1,
-      default_value: ''
-    }],
+    platform_params_dicts: [
+      {
+        name: 'dummy_parameter',
+        description: 'This is a dummy platform parameter.',
+        data_type: 'string',
+        rules: [
+          {
+            filters: [
+              {
+                type: PlatformParameterFilterType.PlatformType,
+                conditions: [['=', 'Web'] as [string, string]],
+              },
+            ],
+            value_when_matched: '',
+          },
+        ],
+        rule_schema_version: 1,
+        default_value: '',
+      },
+    ],
   };
   let adminDataResponse: AdminPageData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AdminDataService]
+      providers: [AdminDataService],
     });
     adminDataService = TestBed.get(AdminDataService);
     httpTestingController = TestBed.get(HttpTestingController);
@@ -122,9 +123,11 @@ describe('Admin Data Service', () => {
       viewableRoles: sampleAdminData.viewable_roles,
       humanReadableRoles: sampleAdminData.human_readable_roles,
       topicSummaries: sampleAdminData.topic_summaries.map(
-        CreatorTopicSummary.createFromBackendDict),
-      platformParameters: sampleAdminData.platform_params_dicts.map(
-        dict => PlatformParameter.createFromBackendDict(dict))
+        CreatorTopicSummary.createFromBackendDict
+      ),
+      platformParameters: sampleAdminData.platform_params_dicts.map(dict =>
+        PlatformParameter.createFromBackendDict(dict)
+      ),
     };
   });
 
@@ -133,34 +136,30 @@ describe('Admin Data Service', () => {
   });
 
   it('should return the correct admin data', fakeAsync(() => {
-    adminDataService.getDataAsync().then(function(response) {
+    adminDataService.getDataAsync().then(function (response) {
       expect(response).toEqual(adminDataResponse);
     });
 
-    var req = httpTestingController.expectOne(
-      '/adminhandler');
+    var req = httpTestingController.expectOne('/adminhandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleAdminData);
 
     flushMicrotasks();
   }));
 
-  it('should cache the response and not make a second request',
-    fakeAsync(() => {
-      adminDataService.getDataAsync();
+  it('should cache the response and not make a second request', fakeAsync(() => {
+    adminDataService.getDataAsync();
 
-      var req = httpTestingController.expectOne(
-        '/adminhandler');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleAdminData);
+    var req = httpTestingController.expectOne('/adminhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleAdminData);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      adminDataService.getDataAsync().then(function(response) {
-        expect(response).toEqual(adminDataResponse);
-      });
+    adminDataService.getDataAsync().then(function (response) {
+      expect(response).toEqual(adminDataResponse);
+    });
 
-      httpTestingController.expectNone('/adminhandler');
-    })
-  );
+    httpTestingController.expectNone('/adminhandler');
+  }));
 });

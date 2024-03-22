@@ -33,18 +33,24 @@
  * value.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ContextService } from 'services/context.service';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { OppiaNoninteractiveSkillreviewConceptCardModalComponent } from './oppia-noninteractive-skillreview-concept-card-modal.component';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ContextService} from 'services/context.service';
+import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from './oppia-noninteractive-skillreview-concept-card-modal.component';
 
 @Component({
   selector: 'oppia-noninteractive-skillreview',
-  templateUrl: './skillreview.component.html'
+  templateUrl: './skillreview.component.html',
 })
 export class NoninteractiveSkillreview implements OnInit, OnChanges {
   // These properties are initialized using Angular lifecycle hooks
@@ -56,7 +62,6 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   linkText!: string;
   entityId!: string;
   entityType?: string;
-
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -70,9 +75,11 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
       return;
     }
     this.skillId = this.htmlEscaperService.escapedJsonToObj(
-      this.skillIdWithValue) as string;
+      this.skillIdWithValue
+    ) as string;
     this.linkText = this.htmlEscaperService.escapedJsonToObj(
-      this.textWithValue) as string;
+      this.textWithValue
+    ) as string;
   }
 
   ngOnInit(): void {
@@ -106,7 +113,9 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
     this.entityType = this.contextService.getEntityType();
 
     this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.SKILL, this.skillId);
+      AppConstants.ENTITY_TYPE.SKILL,
+      this.skillId
+    );
     // The catch at the end was needed according to this thread:
     // https://github.com/angular-ui/bootstrap/issues/6501, where in
     // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
@@ -117,21 +126,29 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
       {backdrop: true}
     );
     modalRef.componentInstance.skillId = this.skillId;
-    modalRef.result.then(() => {}, (res) => {
-      this.contextService.removeCustomEntityContext();
-      // Restore the entity context to that of the state before the concept card
-      // editor was initialized. This prevents change of context issues in
-      // calling components once the editor is closed.
-      if (this.entityId && this.entityType) {
-        this.contextService.setCustomEntityContext(
-          this.entityType, this.entityId);
+    modalRef.result.then(
+      () => {},
+      res => {
+        this.contextService.removeCustomEntityContext();
+        // Restore the entity context to that of the state before the concept card
+        // editor was initialized. This prevents change of context issues in
+        // calling components once the editor is closed.
+        if (this.entityId && this.entityType) {
+          this.contextService.setCustomEntityContext(
+            this.entityType,
+            this.entityId
+          );
+        }
+        const allowedDismissActions = [
+          'cancel',
+          'escape key press',
+          'backdrop click',
+        ];
+        if (res && !allowedDismissActions.includes(res)) {
+          throw new Error(res);
+        }
       }
-      const allowedDismissActions = (
-        ['cancel', 'escape key press', 'backdrop click']);
-      if (res && !allowedDismissActions.includes(res)) {
-        throw new Error(res);
-      }
-    });
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -142,6 +159,8 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
 }
 
 angular.module('oppia').directive(
-  'oppiaNoninteractiveSkillreview', downgradeComponent({
-    component: NoninteractiveSkillreview
-  }) as angular.IDirectiveFactory);
+  'oppiaNoninteractiveSkillreview',
+  downgradeComponent({
+    component: NoninteractiveSkillreview,
+  }) as angular.IDirectiveFactory
+);

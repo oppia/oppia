@@ -16,13 +16,15 @@
  * @fileoverview Unit tests for ClassifierDataBackendApiService
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { deflateSync } from 'zlib';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {deflateSync} from 'zlib';
 
-import { AppConstants } from 'app.constants';
-import { ClassifierDataBackendApiService } from
-  'services/classifier-data-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {ClassifierDataBackendApiService} from 'services/classifier-data-backend-api.service';
 
 describe('Classifier Data Backend API Service', () => {
   describe('on dev mode', () => {
@@ -30,18 +32,20 @@ describe('Classifier Data Backend API Service', () => {
     let httpTestingController: HttpTestingController;
 
     const classifierMetaDataRequestUrl = '/ml/trainedclassifierhandler';
-    const classifierDataRequestUrl = (
-      '/_ah/gcs/' + AppConstants.GCS_RESOURCE_BUCKET_NAME +
-      '/exploration/0/assets/classifier.pb.xz');
+    const classifierDataRequestUrl =
+      '/_ah/gcs/' +
+      AppConstants.GCS_RESOURCE_BUCKET_NAME +
+      '/exploration/0/assets/classifier.pb.xz';
     const classifierBuffer = deflateSync(Buffer.alloc(10));
 
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [ClassifierDataBackendApiService]
+        providers: [ClassifierDataBackendApiService],
       });
       classifierDataBackendApiService = TestBed.inject(
-        ClassifierDataBackendApiService);
+        ClassifierDataBackendApiService
+      );
       httpTestingController = TestBed.inject(HttpTestingController);
     });
 
@@ -53,104 +57,120 @@ describe('Classifier Data Backend API Service', () => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
 
-      classifierDataBackendApiService.getClassifierDataAsync(
-        '0', 1, 'state').then(
-        successHandler, failHandler);
+      classifierDataBackendApiService
+        .getClassifierDataAsync('0', 1, 'state')
+        .then(successHandler, failHandler);
 
       const metaDataReq = httpTestingController.expectOne(
-        req => req.url === classifierMetaDataRequestUrl);
+        req => req.url === classifierMetaDataRequestUrl
+      );
 
       expect(metaDataReq.request.method).toEqual('GET');
       expect(metaDataReq.request.params.get('exploration_id')).toEqual('0');
-      expect(metaDataReq.request.params.get(
-        'exploration_version')).toEqual('1');
+      expect(metaDataReq.request.params.get('exploration_version')).toEqual(
+        '1'
+      );
       expect(metaDataReq.request.params.get('state_name')).toEqual('state');
       metaDataReq.flush({
         algorithm_id: 'TextClassifier',
         algorithm_version: 0,
-        gcs_filename: 'classifier.pb.xz'
+        gcs_filename: 'classifier.pb.xz',
       });
       flushMicrotasks();
 
       const classifierDataReq = httpTestingController.expectOne(
-        classifierDataRequestUrl);
+        classifierDataRequestUrl
+      );
       expect(classifierDataReq.request.method).toEqual('GET');
       classifierDataReq.flush(
         classifierBuffer.buffer.slice(
           classifierBuffer.byteOffset,
-          classifierBuffer.byteOffset + classifierBuffer.byteLength));
+          classifierBuffer.byteOffset + classifierBuffer.byteLength
+        )
+      );
       flushMicrotasks();
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
     }));
 
-    it('should handle rejection when fetching meta data fails',
-      fakeAsync(() => {
-        const successHandler = jasmine.createSpy('success');
-        const failHandler = jasmine.createSpy('fail');
+    it('should handle rejection when fetching meta data fails', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
-        classifierDataBackendApiService.getClassifierDataAsync(
-          '0', 1, 'state').then(
-          successHandler, failHandler);
-        const req = httpTestingController.expectOne(
-          req => req.url === classifierMetaDataRequestUrl);
-        expect(req.request.method).toEqual('GET');
-        req.flush('', {status: 400, statusText: 'Failed'});
-        flushMicrotasks();
-        expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalled();
-      }));
+      classifierDataBackendApiService
+        .getClassifierDataAsync('0', 1, 'state')
+        .then(successHandler, failHandler);
+      const req = httpTestingController.expectOne(
+        req => req.url === classifierMetaDataRequestUrl
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush('', {status: 400, statusText: 'Failed'});
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
 
-    it('should handle rejection when fetching classifier data fails',
-      fakeAsync(() => {
-        const successHandler = jasmine.createSpy('success');
-        const failHandler = jasmine.createSpy('fail');
+    it('should handle rejection when fetching classifier data fails', fakeAsync(() => {
+      const successHandler = jasmine.createSpy('success');
+      const failHandler = jasmine.createSpy('fail');
 
-        classifierDataBackendApiService.getClassifierDataAsync(
-          '0', 1, 'state').then(
-          successHandler, failHandler);
+      classifierDataBackendApiService
+        .getClassifierDataAsync('0', 1, 'state')
+        .then(successHandler, failHandler);
 
-        const metaDataReq = httpTestingController.expectOne(
-          req => req.url === classifierMetaDataRequestUrl);
-        metaDataReq.flush({
-          algorithm_id: 'TextClassifier',
-          algorithm_version: 0,
-          gcs_filename: 'classifier.pb.xz'
-        });
-        flushMicrotasks();
+      const metaDataReq = httpTestingController.expectOne(
+        req => req.url === classifierMetaDataRequestUrl
+      );
+      metaDataReq.flush({
+        algorithm_id: 'TextClassifier',
+        algorithm_version: 0,
+        gcs_filename: 'classifier.pb.xz',
+      });
+      flushMicrotasks();
 
-        const classifierDataReq = httpTestingController.expectOne(
-          classifierDataRequestUrl);
-        expect(classifierDataReq.request.method).toEqual('GET');
-        classifierDataReq.flush(
-          classifierBuffer.buffer.slice(
-            classifierBuffer.byteOffset,
-            classifierBuffer.byteOffset + classifierBuffer.byteLength),
-          {status: 400, statusText: 'Failed'});
-        flushMicrotasks();
-        expect(successHandler).not.toHaveBeenCalled();
-        expect(failHandler).toHaveBeenCalled();
-      }));
+      const classifierDataReq = httpTestingController.expectOne(
+        classifierDataRequestUrl
+      );
+      expect(classifierDataReq.request.method).toEqual('GET');
+      classifierDataReq.flush(
+        classifierBuffer.buffer.slice(
+          classifierBuffer.byteOffset,
+          classifierBuffer.byteOffset + classifierBuffer.byteLength
+        ),
+        {status: 400, statusText: 'Failed'}
+      );
+      flushMicrotasks();
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    }));
   });
 
   describe('without dev mode settings', () => {
     beforeEach(() => {
       TestBed.configureTestingModule({
         imports: [HttpClientTestingModule],
-        providers: [ClassifierDataBackendApiService]
+        providers: [ClassifierDataBackendApiService],
       });
-      spyOnProperty(ClassifierDataBackendApiService, 'DEV_MODE', 'get')
-        .and.returnValue(false);
       spyOnProperty(
-        ClassifierDataBackendApiService, 'GCS_RESOURCE_BUCKET_NAME', 'get')
-        .and.returnValue('');
+        ClassifierDataBackendApiService,
+        'DEV_MODE',
+        'get'
+      ).and.returnValue(false);
+      spyOnProperty(
+        ClassifierDataBackendApiService,
+        'GCS_RESOURCE_BUCKET_NAME',
+        'get'
+      ).and.returnValue('');
     });
 
-    it('should throw an error when is not on dev mode and Google Cloud' +
-        ' Service bucket name is not set', fakeAsync(() => {
-      expect(() => {
-        TestBed.inject(ClassifierDataBackendApiService);
-      }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
-    }));
+    it(
+      'should throw an error when is not on dev mode and Google Cloud' +
+        ' Service bucket name is not set',
+      fakeAsync(() => {
+        expect(() => {
+          TestBed.inject(ClassifierDataBackendApiService);
+        }).toThrowError('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+      })
+    );
   });
 });

@@ -16,62 +16,80 @@
  * @fileoverview Acceptance Test for Blog Admin
  */
 
-import { UserFactory } from
-  '../../puppeteer-testing-utilities/user-factory';
-import testConstants from
-  '../../puppeteer-testing-utilities/test-constants';
-import { BlogAdmin } from '../../user-utilities/blog-admin-utils';
-import { SuperAdmin } from '../../user-utilities/super-admin-utils';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {BlogAdmin} from '../../user-utilities/blog-admin-utils';
+import {SuperAdmin} from '../../user-utilities/super-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
 
-describe('Blog Admin', function() {
+describe('Blog Admin', function () {
   let superAdmin: SuperAdmin;
   let blogAdmin: BlogAdmin;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     superAdmin = await UserFactory.createNewSuperAdmin('superAdm');
     blogAdmin = await UserFactory.createNewUser(
-      'blogAdm', 'blog_admin@example.com', [ROLES.BLOG_ADMIN]);
+      'blogAdm',
+      'blog_admin@example.com',
+      [ROLES.BLOG_ADMIN]
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
   /** TODO(#17162): This test should be done without the need of super admin, as
-  * blog admin must be able to revoke blog editor role of other users from the
-  * /blog-admin page. But this is not the case now, only super admin can do this
-  */
-  it('should assign roles to users and change tag properties',
-    async function() {
+   * blog admin must be able to revoke blog editor role of other users from the
+   * /blog-admin page. But this is not the case now, only super admin can do this
+   */
+  it(
+    'should assign roles to users and change tag properties',
+    async function () {
       const guestUsr1 = await UserFactory.createNewUser(
-        'guestUsr1', 'guest_user1@example.com');
+        'guestUsr1',
+        'guest_user1@example.com'
+      );
       const guestUsr2 = await UserFactory.createNewUser(
-        'guestUsr2', 'guest_user2@example.com');
+        'guestUsr2',
+        'guest_user2@example.com'
+      );
 
       await superAdmin.expectUserNotToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
-        'guestUsr1', BLOG_RIGHTS.BLOG_ADMIN);
+        'guestUsr1',
+        BLOG_RIGHTS.BLOG_ADMIN
+      );
       await superAdmin.expectUserToHaveRole('guestUsr1', ROLES.BLOG_ADMIN);
 
       await superAdmin.expectUserNotToHaveRole(
-        'guestUsr2', ROLES.BLOG_POST_EDITOR);
+        'guestUsr2',
+        ROLES.BLOG_POST_EDITOR
+      );
       await blogAdmin.assignUserToRoleFromBlogAdminPage(
-        'guestUsr2', BLOG_RIGHTS.BLOG_POST_EDITOR);
+        'guestUsr2',
+        BLOG_RIGHTS.BLOG_POST_EDITOR
+      );
       await superAdmin.expectUserToHaveRole(
-        'guestUsr2', ROLES.BLOG_POST_EDITOR);
+        'guestUsr2',
+        ROLES.BLOG_POST_EDITOR
+      );
 
       await blogAdmin.removeBlogEditorRoleFromUsername('guestUsr2');
       await superAdmin.expectUserNotToHaveRole(
-        'guestUsr2', ROLES.BLOG_POST_EDITOR);
+        'guestUsr2',
+        ROLES.BLOG_POST_EDITOR
+      );
 
       await blogAdmin.expectMaximumTagLimitNotToBe(5);
       await blogAdmin.setMaximumTagLimitTo(5);
       await blogAdmin.expectMaximumTagLimitToBe(5);
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

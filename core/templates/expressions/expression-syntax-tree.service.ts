@@ -16,10 +16,10 @@
  * @fileoverview Expression syntax tree service.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ExpressionParserService } from 'expressions/expression-parser.service';
+import {ExpressionParserService} from 'expressions/expression-parser.service';
 
 export type Expr = string | number | boolean;
 
@@ -48,33 +48,43 @@ export class ExpressionError extends Error {
 }
 
 export class ExprUndefinedVarError extends ExpressionError {
-  constructor(public varname: string, public envs: EnvDict[]) {
+  constructor(
+    public varname: string,
+    public envs: EnvDict[]
+  ) {
     super(varname + ' not found in ' + angular.toJson(envs));
   }
 }
 
 export class ExprWrongNumArgsError extends ExpressionError {
   constructor(
-      public args: (number|string)[],
-      public expectedMin: number, public expectedMax: number) {
+    public args: (number | string)[],
+    public expectedMin: number,
+    public expectedMax: number
+  ) {
     super(
-      '{' + args + '} not in range [' + expectedMin + ', ' + expectedMax + ']');
+      '{' + args + '} not in range [' + expectedMin + ', ' + expectedMax + ']'
+    );
   }
 }
 
 export class ExprWrongArgTypeError extends ExpressionError {
   constructor(
-      public arg: number|string,
-      public actualType: string, public expectedType: string) {
+    public arg: number | string,
+    public actualType: string,
+    public expectedType: string
+  ) {
     super(
-      (
-        arg !== null ?
-        (arg + ' has type ' + actualType + ' which') : ('Type ' + actualType)) +
-      ' does not match expected type ' + expectedType);
+      (arg !== null
+        ? arg + ' has type ' + actualType + ' which'
+        : 'Type ' + actualType) +
+        ' does not match expected type ' +
+        expectedType
+    );
   }
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class ExpressionSyntaxTreeService {
   constructor(private expressionParserService: ExpressionParserService) {}
 
@@ -89,8 +99,10 @@ export class ExpressionSyntaxTreeService {
   }
 
   public applyFunctionToParseTree(
-      parsed: Expr | Expr[], envs: EnvDict[],
-      func: (parsed: Expr | Expr[], envs: EnvDict[]) => Expr): Expr {
+    parsed: Expr | Expr[],
+    envs: EnvDict[],
+    func: (parsed: Expr | Expr[], envs: EnvDict[]) => Expr
+  ): Expr {
     return func(parsed, envs.concat(this.system));
   }
 
@@ -123,24 +135,29 @@ export class ExpressionSyntaxTreeService {
   // an error if not. If optional expectedMax is specified, it verifies the
   // number of args is in the inclusive range: [expectedMin, expectedMax].
   private verifyNumArgs(
-      args: string[],
-      expectedMin: number, expectedMax: number = expectedMin): void {
+    args: string[],
+    expectedMin: number,
+    expectedMax: number = expectedMin
+  ): void {
     if (args.length < expectedMin || args.length > expectedMax) {
       throw new ExprWrongNumArgsError(args, expectedMin, expectedMax);
     }
   }
 
   // Coerces the argument to a Number, and throws an error if the result is NaN.
-  private coerceToNumber(originalValue: string|number): number {
+  private coerceToNumber(originalValue: string | number): number {
     const coercedValue = +originalValue;
     if (isNaN(coercedValue)) {
       throw new ExprWrongArgTypeError(
-        originalValue, typeof originalValue, 'Number');
+        originalValue,
+        typeof originalValue,
+        'Number'
+      );
     }
     return coercedValue;
   }
 
-  private coerceAllArgsToNumber(args: (number|string)[]): number[] {
+  private coerceAllArgsToNumber(args: (number | string)[]): number[] {
     return args.map(this.coerceToNumber);
   }
 
@@ -158,20 +175,20 @@ export class ExpressionSyntaxTreeService {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
-        return numericArgs.length === 1 ?
-          numericArgs[0] :
-          numericArgs[0] + numericArgs[1];
-      }
+        return numericArgs.length === 1
+          ? numericArgs[0]
+          : numericArgs[0] + numericArgs[1];
+      },
     },
 
     '-': {
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
-        return numericArgs.length === 1 ?
-          -numericArgs[0] :
-          numericArgs[0] - numericArgs[1];
-      }
+        return numericArgs.length === 1
+          ? -numericArgs[0]
+          : numericArgs[0] - numericArgs[1];
+      },
     },
 
     '*': {
@@ -179,7 +196,7 @@ export class ExpressionSyntaxTreeService {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] * numericArgs[1];
-      }
+      },
     },
 
     '/': {
@@ -187,7 +204,7 @@ export class ExpressionSyntaxTreeService {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] / numericArgs[1];
-      }
+      },
     },
 
     '%': {
@@ -195,7 +212,7 @@ export class ExpressionSyntaxTreeService {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] % numericArgs[1];
-      }
+      },
     },
 
     '<=': {
@@ -203,7 +220,7 @@ export class ExpressionSyntaxTreeService {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] <= numericArgs[1];
-      }
+      },
     },
 
     '>=': {
@@ -211,7 +228,7 @@ export class ExpressionSyntaxTreeService {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] >= numericArgs[1];
-      }
+      },
     },
 
     '<': {
@@ -219,7 +236,7 @@ export class ExpressionSyntaxTreeService {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] < numericArgs[1];
-      }
+      },
     },
 
     '>': {
@@ -227,70 +244,74 @@ export class ExpressionSyntaxTreeService {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return numericArgs[0] > numericArgs[1];
-      }
+      },
     },
 
     '!': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 1);
         return !args[0];
-      }
+      },
     },
 
     '==': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
         return args[0] === args[1];
-      }
+      },
     },
 
     '!=': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
         return args[0] !== args[1];
-      }
+      },
     },
 
     '&&': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
         return Boolean(args[0] && args[1]);
-      }
+      },
     },
 
     '||': {
       eval: (args: string[]): boolean => {
         this.verifyNumArgs(args, 2);
         return Boolean(args[0] || args[1]);
-      }
+      },
     },
 
     // NOTE TO DEVELOPERS: Removing the quotation marks from the following keys
     // causes issues with minification when running the deployment scripts.
-    'if': { // eslint-disable-line quote-props
+    if: {
+      // eslint-disable-line quote-props
       eval: (args: string[]): string => {
         this.verifyNumArgs(args, 3);
         return args[0] ? args[1] : args[2];
-      }
+      },
     },
 
-    'floor': { // eslint-disable-line quote-props
+    floor: {
+      // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return Math.floor(numericArgs[0]);
-      }
+      },
     },
 
-    'pow': { // eslint-disable-line quote-props
+    pow: {
+      // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return Math.pow(numericArgs[0], numericArgs[1]);
-      }
+      },
     },
 
-    'log': { // eslint-disable-line quote-props
+    log: {
+      // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 2);
         const numericArgs = this.coerceAllArgsToNumber(args);
@@ -298,19 +319,23 @@ export class ExpressionSyntaxTreeService {
         // We round answers to 9 decimal places, so that we don't run into
         // issues like log(9, 3) = 2.0000000000004.
         return Math.round(preciseAns * Math.pow(10, 9)) / Math.pow(10, 9);
-      }
+      },
     },
 
-    'abs': { // eslint-disable-line quote-props
+    abs: {
+      // eslint-disable-line quote-props
       eval: (args: string[]): number => {
         this.verifyNumArgs(args, 1);
         const numericArgs = this.coerceAllArgsToNumber(args);
         return Math.abs(numericArgs[0]);
-      }
-    }
+      },
+    },
   };
 }
 
-angular.module('oppia').factory(
-  'ExpressionSyntaxTreeService',
-  downgradeInjectable(ExpressionSyntaxTreeService));
+angular
+  .module('oppia')
+  .factory(
+    'ExpressionSyntaxTreeService',
+    downgradeInjectable(ExpressionSyntaxTreeService)
+  );

@@ -18,15 +18,14 @@
 
 import {
   PlatformParameterFilter,
-  PlatformParameterFilterBackendDict
+  PlatformParameterFilterBackendDict,
 } from 'domain/platform-parameter/platform-parameter-filter.model';
-
 
 export type PlatformParameterValue = boolean | number | string;
 
 export interface PlatformParameterRuleBackendDict {
-    'filters': PlatformParameterFilterBackendDict[];
-    'value_when_matched': PlatformParameterValue;
+  filters: PlatformParameterFilterBackendDict[];
+  value_when_matched: PlatformParameterValue;
 }
 
 /**
@@ -42,21 +41,22 @@ export class PlatformParameterRule {
   valueWhenMatched: PlatformParameterValue;
 
   constructor(
-      filters: PlatformParameterFilter[],
-      valueWhenMatched: PlatformParameterValue) {
+    filters: PlatformParameterFilter[],
+    valueWhenMatched: PlatformParameterValue
+  ) {
     this.filters = filters;
     this.valueWhenMatched = valueWhenMatched;
   }
 
   static createFromBackendDict(
-      backendDict: PlatformParameterRuleBackendDict): PlatformParameterRule {
+    backendDict: PlatformParameterRuleBackendDict
+  ): PlatformParameterRule {
     return new PlatformParameterRule(
-      backendDict.filters.map(
-        filterDict => (
-          PlatformParameterFilter.createFromBackendDict(
-            filterDict)
-        )),
-      backendDict.value_when_matched);
+      backendDict.filters.map(filterDict =>
+        PlatformParameterFilter.createFromBackendDict(filterDict)
+      ),
+      backendDict.value_when_matched
+    );
   }
 
   /**
@@ -68,7 +68,7 @@ export class PlatformParameterRule {
   toBackendDict(): PlatformParameterRuleBackendDict {
     return {
       filters: this.filters.map(filter => filter.toBackendDict()),
-      value_when_matched: this.valueWhenMatched
+      value_when_matched: this.valueWhenMatched,
     };
   }
 }

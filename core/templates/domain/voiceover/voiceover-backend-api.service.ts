@@ -16,20 +16,20 @@
  * @fileoverview Service to get voiceover admin data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { VoiceoverDomainConstants } from './voiceover-domain.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {VoiceoverDomainConstants} from './voiceover-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface VoiceoverAdminDataBackendDict {
-  'language_accent_master_list': {
+  language_accent_master_list: {
     [languageCode: string]: {
       [languageAccentCode: string]: string;
     };
   };
-  'language_codes_mapping': {
+  language_codes_mapping: {
     [languageCode: string]: {
       [languageAccentCode: string]: boolean;
     };
@@ -56,7 +56,7 @@ export interface VoiceoverAdminDataResponse {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VoiceoverBackendApiService {
   constructor(
@@ -66,37 +66,50 @@ export class VoiceoverBackendApiService {
 
   async fetchVoiceoverAdminDataAsync(): Promise<VoiceoverAdminDataResponse> {
     return new Promise((resolve, reject) => {
-      this.http.get<VoiceoverAdminDataBackendDict>(
-        VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL
-      ).toPromise().then(response => {
-        resolve({
-          languageAccentMasterList: (
-            response.language_accent_master_list),
-          languageCodesMapping: response.language_codes_mapping
-        });
-      }, errorResponse => {
-        reject(errorResponse?.error);
-      });
+      this.http
+        .get<VoiceoverAdminDataBackendDict>(
+          VoiceoverDomainConstants.VOICEOVER_ADMIN_DATA_HANDLER_URL
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              languageAccentMasterList: response.language_accent_master_list,
+              languageCodesMapping: response.language_codes_mapping,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
     });
   }
 
   async updateVoiceoverLanguageCodesMappingAsync(
-      languageCodesMapping: LanguageCodesMapping): Promise<void> {
+    languageCodesMapping: LanguageCodesMapping
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<void>(
-        VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL,
-        {language_codes_mapping: languageCodesMapping}
-      ).toPromise().then(
-        response => {
-          resolve(response);
-        }, errorResopnse => {
-          reject(errorResopnse?.error);
-        }
-      );
+      this.http
+        .put<void>(
+          VoiceoverDomainConstants.VOICEOVER_LANGUAGE_CODES_MAPPING_URL,
+          {language_codes_mapping: languageCodesMapping}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResopnse => {
+            reject(errorResopnse?.error);
+          }
+        );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'VoiceoverBackendApiService',
-  downgradeInjectable(VoiceoverBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'VoiceoverBackendApiService',
+    downgradeInjectable(VoiceoverBackendApiService)
+  );
