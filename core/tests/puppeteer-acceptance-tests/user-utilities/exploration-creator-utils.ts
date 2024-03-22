@@ -33,8 +33,7 @@ const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
 const addGoal = '#explorationObjective';
-const categoryDropDawn =
-  'mat-form-field.e2e-test-exploration-category .mat-select';
+const categoryDropDawn = '.e2e-test-exploration-category-dropdown';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
 const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
@@ -181,32 +180,45 @@ export class ExplorationCreator extends BaseUser {
    * This function checks if the goal has been set in the exploration.
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(1000);
-    /**
-     * Debugging.
-     */
-    showMessage('expectedGoal->' + expectedGoal);
-    await this.page.waitForTimeout(500);
-    const goal = await this.page.$eval(
-      '#explorationObjective',
-      (input: Element) => {
-        const goalInput = input as HTMLInputElement;
-        return goalInput.value;
+    try {
+      // Wait for transitions to complete
+      await this.page.waitForTimeout(1500);
+
+      // Log debugging information
+      showMessage('expectedGoal -> ' + expectedGoal);
+
+      // Find the goal input element
+      const goalInput = await this.page.$('#explorationObjective');
+      if (!goalInput) {
+        throw new Error('Goal input element not found.');
       }
-    );
-    /**
-     * Debugging.
-     */
-    showMessage('goal->' + goal);
-    if (goal === expectedGoal) {
-      showMessage('The goal has been set for the exploration.');
-    } else {
-      throw new Error('The goal has not been set for the exploration.');
+
+      // Log the goal input element to inspect its properties
+      const goalInputInnerHTML = await this.page.evaluate(
+        input => input.innerHTML,
+        goalInput
+      );
+      showMessage('goalInputInnerHTML -> ' + goalInputInnerHTML);
+
+      // Wait for a short duration to ensure element is fully loaded
+      await this.page.waitForTimeout(1000);
+
+      // Evaluate the value of the goal input element
+      const goal = await this.page.evaluate(input => input.value, goalInput);
+
+      // Log the current goal
+      showMessage('goal -> ' + goal);
+
+      // Check if the goal matches the expected goal
+      if (goal === expectedGoal) {
+        showMessage('The goal has been set for the exploration.');
+      } else {
+        throw new Error('The goal does not match the expected goal.');
+      }
+    } catch (error) {
+      // Log any errors encountered
+      console.error('Error:', error.message);
+      throw error;
     }
   }
 
