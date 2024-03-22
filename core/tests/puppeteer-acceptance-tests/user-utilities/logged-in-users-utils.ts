@@ -733,10 +733,18 @@ export class LoggedInUser extends BaseUser {
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
   async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
-    await this.clickLinkAnchorToNewTab(
-      'create one here',
-      'https://accounts.google.com/'
+    await this.page.waitForXPath(`//a[contains(text(),"create one here")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn('create one here');
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
     );
+    const newTabPage = await newTarget.page();
+    await newTabPage?.waitForNetworkIdle();
+    expect(newTabPage?.url()).toContain(
+      'https://accounts.google.com/lifecycle/steps/signup/name'
+    );
+    await newTabPage?.close();
   }
 
   /**
@@ -796,7 +804,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn('discover more ways to get involved'),
     ]);
 
-    expect(this.page.url()).toContain(contactUrl);
+    expect(this.page.url()).toBe(contactUrl);
   }
 }
 
