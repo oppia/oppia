@@ -274,8 +274,9 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         voice_artist_id: str,
         language_code_to_accent: Dict[str, str]
     ) -> VoiceArtistMetadataModel:
-        """Creates a new VoiceArtistMetadataModel instance. This method will
-        only be used to put only a single instance of the model.
+        """Creates a new VoiceArtistMetadataModel instance.
+        Note that Beam jobs will still be able to modify this model after
+        creation because they bypass this method.
 
         Args:
             voice_artist_id: str. User ID of the voice artist.
@@ -380,8 +381,9 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
         exploration_id: str,
         content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType,
     ) -> ExplorationVoiceArtistsLinkModel:
-        """Creates a new ExplorationVoiceArtistsLinkModel instance. This method
-        will only be used to put only a single instance of the model.
+        """Creates a new ExplorationVoiceArtistsLinkModel instance.
+        Note that Beam jobs will still be able to modify this model after
+        creation because they bypass this method.
 
         Args:
             exploration_id: str. The ID of the exploration for which new model

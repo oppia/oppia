@@ -232,7 +232,7 @@ def create_voice_artist_metadata_model_instance(
     voice_artist_id: str,
     language_code_to_accent: Dict[str, str]
 ) -> voiceover_models.VoiceArtistMetadataModel:
-    """The method creates a VoiceArtistMetadataModel instance.
+    """Creates a VoiceArtistMetadataModel instance.
 
     Args:
         voice_artist_id: str. The ID of the voice artist for which new model
@@ -243,7 +243,7 @@ def create_voice_artist_metadata_model_instance(
 
     Returns:
         VoiceArtistMetadataModel. A new VoiceArtistMetadataModel instance
-        connects voiceover artists with the languages in which they have
+        that connects voiceover artists with the languages in which they have
         provided voiceovers.
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
@@ -259,20 +259,19 @@ def create_exploration_voice_artists_link_model_instance(
     content_id_to_voiceovers_mapping: (
         voiceover_models.ContentIdToVoiceoverMappingType)
 ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
-    """This method instantiates an ExplorationVoiceArtistsLinkModel,
-    establishing a link between the latest content IDs within an exploration
-    and the corresponding IDs of voice artists who provided voiceovers in the
-    specified language code. Instances of this class are keyed by the
-    exploration ID.
+    """Instantiates an ExplorationVoiceArtistsLinkModel, establishing a link
+    between the latest content IDs within an exploration and the corresponding
+    IDs of voice artists who provided voiceovers in the specified language code.
+    Instances of this class are keyed by the exploration ID.
 
     Args:
         exploration_id: str. The ID of the exploration for which new model will
             be created.
         content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. The
             dictionary contains information about voice artists and their
-            provided voiceovers in an exploration with the given exploration ID.
-            The dict maps content IDs to nested dicts. Each nested dicts maps
-            language code to voice artist and voiceover tuple.
+            provided voiceovers in the exploration with the given exploration
+            ID. The dict maps content IDs to nested dicts. Each nested dicts
+            maps language code to voice artist and voiceover tuple.
 
     Returns:
         ExplorationVoiceArtistsLinkModel. An instance of
