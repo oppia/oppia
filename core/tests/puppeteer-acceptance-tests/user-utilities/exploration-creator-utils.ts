@@ -176,51 +176,51 @@ export class ExplorationCreator extends BaseUser {
     showMessage('Goal has been filled');
   }
 
-  // /**
-  //  * This function checks if the goal has been set in the exploration.
-  //  */
-  // async expectGoalToEqual(expectedGoal: string): Promise<void> {
-  //   try {
-  //     // Wait for transitions to complete
-  //     await this.page.waitForTimeout(1500);
+  /**
+   * This function checks if the goal has been set in the exploration.
+   */
+  async expectGoalToEqual(expectedGoal: string): Promise<void> {
+    try {
+      // Wait for transitions to complete
+      await this.page.waitForTimeout(1500);
 
-  //     // Log debugging information
-  //     showMessage('expectedGoal -> ' + expectedGoal);
+      // Log debugging information
+      showMessage('expectedGoal -> ' + expectedGoal);
 
-  //     // Find the goal input element
-  //     const goalInput = await this.page.$('#explorationObjective');
-  //     if (!goalInput) {
-  //       throw new Error('Goal input element not found.');
-  //     }
+      // Find the goal input element
+      const goalInput = await this.page.$('#explorationObjective');
+      if (!goalInput) {
+        throw new Error('Goal input element not found.');
+      }
 
-  //     // Log the goal input element to inspect its properties
-  //     const goalInputInnerHTML = await this.page.evaluate(
-  //       input => input.innerHTML,
-  //       goalInput
-  //     );
-  //     showMessage('goalInputInnerHTML -> ' + goalInputInnerHTML);
+      // Log the goal input element to inspect its properties
+      const goalInputInnerHTML = await this.page.evaluate(
+        input => input.innerHTML,
+        goalInput
+      );
+      showMessage('goalInputInnerHTML -> ' + goalInputInnerHTML);
 
-  //     // Wait for a short duration to ensure element is fully loaded
-  //     await this.page.waitForTimeout(1000);
+      // Wait for a short duration to ensure element is fully loaded
+      await this.page.waitForTimeout(1000);
 
-  //     // Evaluate the value of the goal input element
-  //     const goal = await this.page.evaluate(input => input.value, goalInput);
+      // Evaluate the value of the goal input element
+      const goal = await this.page.evaluate(input => input.value, goalInput);
 
-  //     // Log the current goal
-  //     showMessage('goal -> ' + goal);
+      // Log the current goal
+      showMessage('goal -> ' + goal);
 
-  //     // Check if the goal matches the expected goal
-  //     if (goal === expectedGoal) {
-  //       showMessage('The goal has been set for the exploration.');
-  //     } else {
-  //       throw new Error('The goal does not match the expected goal.');
-  //     }
-  //   } catch (error) {
-  //     // Log any errors encountered
-  //     console.error('Error:', error.message);
-  //     throw error;
-  //   }
-  // }
+      // Check if the goal matches the expected goal
+      if (goal === expectedGoal) {
+        showMessage('The goal has been set for the exploration.');
+      } else {
+        throw new Error('The goal does not match the expected goal.');
+      }
+    } catch (error) {
+      // Log any errors encountered
+      console.error('Error:', error.message);
+      throw error;
+    }
+  }
 
   /**
    * This function helps in selecting a category from dropdawn.
