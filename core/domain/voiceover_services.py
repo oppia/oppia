@@ -238,8 +238,8 @@ def create_voice_artist_metadata_model_instance(
         voice_artist_id: str. The ID of the voice artist for which new model
             will be created.
         language_code_to_accent: dict(str, str). A dict representing the
-            language accent codes as keys and accent codes as their
-            corresponding value.
+            language codes as keys and accent codes as their corresponding
+            values.
 
     Returns:
         VoiceArtistMetadataModel. A new VoiceArtistMetadataModel instance

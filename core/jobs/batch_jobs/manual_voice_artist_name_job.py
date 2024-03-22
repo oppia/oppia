@@ -258,7 +258,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         Returns:
             tuple(ContentIdToVoiceoverMappingType, int). A 2-tuple with the
             following elements:
-            - A dictionary in which new voiceovers and voice artists are being
+            - A dictionary in which new voiceovers and voice artists have been
             added. The newly added voiceovers are filtered from the
             voiceover_mapping_2 dict using the voiceover_mapping_1 dict.
             This dict contains content IDs as keys and nested dicts as values.
