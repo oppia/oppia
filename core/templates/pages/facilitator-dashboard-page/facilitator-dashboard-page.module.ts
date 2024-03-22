@@ -40,4 +40,4 @@ import {FacilitatorDashboardPageRootComponent} from './facilitator-dashboard-pag
   declarations: [FacilitatorDashboardPageComponent],
   entryComponents: [FacilitatorDashboardPageComponent],
 })
-class FacilitatorDashboardPageModule {}
+export class FacilitatorDashboardPageModule {}
