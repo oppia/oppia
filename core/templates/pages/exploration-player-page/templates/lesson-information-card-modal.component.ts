@@ -16,25 +16,25 @@
  * @fileoverview Component for lesson information card modal.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { UrlService } from 'services/contextual/url.service';
-import { UserService } from 'services/user.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LocalStorageService } from 'services/local-storage.service';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {UrlService} from 'services/contextual/url.service';
+import {UserService} from 'services/user.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LocalStorageService} from 'services/local-storage.service';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
-import { CheckpointCelebrationUtilityService } from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -69,7 +69,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
   expInfo!: LearnerExplorationSummaryBackendDict;
   completedCheckpointsCount!: number;
   checkpointStatusArray!: string[];
-  infoCardBackgroundCss!: { 'background-color': string };
+  infoCardBackgroundCss!: {'background-color': string};
   infoCardBackgroundImageUrl!: string;
   averageRating!: number | null;
   numViews!: number;
@@ -268,7 +268,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       if (urlId === null) {
         throw new Error(
           'User should not be able to login if ' +
-          'loggedOutProgressUniqueUrlId is not null.'
+            'loggedOutProgressUniqueUrlId is not null.'
         );
       }
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
