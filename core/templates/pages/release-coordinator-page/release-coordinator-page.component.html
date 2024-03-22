@@ -73,34 +73,6 @@
         </div>
       </form>
     </div>
-
-    <div class="oppia-release-coordinator-page-card oppia-page-card oppia-long-text">
-      <form (ngSubmit)="updateVoiceoverContributionParameter()" [formGroup]="voiceoverContributionForm">
-        <div class="oppia-promo-bar-config-field">
-          <h3 *ngIf="!voiceoverContributionForm.controls.enabled.value">Enable Voiceover Contribution</h3>
-          <h3 *ngIf="voiceoverContributionForm.controls.enabled.value">Disable Voiceover Contribution</h3>
-          <mat-slide-toggle [color]="'primary'" formControlName="enabled">
-          </mat-slide-toggle>
-        </div>
-        <div>
-          <p *ngIf="voiceoverContributionForm.controls.enabled.value">
-            The field is used to disable voiceover contributions on the exploration editor page during voiceover migration.
-          </p>
-          <p *ngIf="!voiceoverContributionForm.controls.enabled.value">
-            Re-enable voiceover contributions on the exploration editor page.
-          </p>
-        </div>
-        <mat-divider></mat-divider>
-        <div class="oppia-action-buttons-container">
-          <button mat-raised-button
-                  color="primary"
-                  type="submit"
-                  [disabled]="!voiceoverContributionForm.dirty">
-            Save changes
-          </button>
-        </div>
-      </form>
-    </div>
   </div>
 </div>
 <style>

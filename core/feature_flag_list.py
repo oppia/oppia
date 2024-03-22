@@ -51,6 +51,7 @@ class FeatureNames(enum.Enum):
     NEW_LESSON_PLAYER = 'new_lesson_player'
     ADDING_VOICEOVER_WITH_ACCENT = 'adding_voiceover_with_accent'
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
+    ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -77,7 +78,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.ADDING_VOICEOVER_WITH_ACCENT,
-    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW
+    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -211,5 +213,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.DEV
         )
-    )
+    ),
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
+        (
+            'This flag is to enable the voiceover contribution in the '
+            'exploration editor page.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
 }

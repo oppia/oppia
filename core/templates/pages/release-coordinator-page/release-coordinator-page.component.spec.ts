@@ -29,7 +29,6 @@ import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service'
 import {ReleaseCoordinatorBackendApiService} from './services/release-coordinator-backend-api.service';
 import {ReleaseCoordinatorPageConstants} from './release-coordinator-page.constants';
 import {ReleaseCoordinatorPageComponent} from './release-coordinator-page.component';
-import {VoiceoverContributionBackendApiService} from '../../services/voiceover-contribution-backend-api.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {PromoBar} from 'domain/promo_bar/promo-bar.model';
 
@@ -38,7 +37,6 @@ describe('Release coordinator page', () => {
   let fixture: ComponentFixture<ReleaseCoordinatorPageComponent>;
   let pbbas: PromoBarBackendApiService;
   let rcbas: ReleaseCoordinatorBackendApiService;
-  let vbas: VoiceoverContributionBackendApiService;
 
   let testPromoBarData = new PromoBar(true, 'Hello');
   let testMemoryCacheProfile = {
@@ -65,15 +63,11 @@ describe('Release coordinator page', () => {
     component = fixture.componentInstance;
     pbbas = TestBed.inject(PromoBarBackendApiService);
     rcbas = TestBed.inject(ReleaseCoordinatorBackendApiService);
-    vbas = TestBed.inject(VoiceoverContributionBackendApiService);
   });
 
   beforeEach(() => {
     spyOn(pbbas, 'getPromoBarDataAsync').and.returnValue(
       Promise.resolve(testPromoBarData)
-    );
-    spyOn(vbas, 'getVoiceoverContributionDataAsync').and.returnValue(
-      Promise.resolve(true)
     );
     component.ngOnInit();
   });
@@ -149,40 +143,6 @@ describe('Release coordinator page', () => {
 
     expect(rcbas.flushMemoryCacheAsync).toHaveBeenCalled();
     expect(component.statusMessage).toEqual('Server error: failed to flush');
-  }));
-
-  it('should update voiceover contribution and set success status', fakeAsync(() => {
-    spyOn(vbas, 'updateVoiceoverContributionDataAsync').and.returnValue(
-      Promise.resolve()
-    );
-
-    component.updateVoiceoverContributionParameter();
-
-    expect(component.statusMessage).toEqual(
-      'Updating voiceover contribution platform parameter...'
-    );
-
-    tick();
-
-    expect(vbas.updateVoiceoverContributionDataAsync).toHaveBeenCalled();
-    expect(component.statusMessage).toEqual('Success!');
-  }));
-
-  it('should set error status when voiceover contribution update fails', fakeAsync(() => {
-    spyOn(vbas, 'updateVoiceoverContributionDataAsync').and.returnValue(
-      Promise.reject('failed to update')
-    );
-
-    component.updateVoiceoverContributionParameter();
-
-    expect(component.statusMessage).toEqual(
-      'Updating voiceover contribution platform parameter...'
-    );
-
-    tick();
-
-    expect(vbas.updateVoiceoverContributionDataAsync).toHaveBeenCalled();
-    expect(component.statusMessage).toEqual('Server error: failed to update');
   }));
 
   it('should fetch memory cache profile and set success status', fakeAsync(() => {

@@ -51,8 +51,6 @@ export const ServicesConstants = {
 
   PROMO_BAR_URL: '/promo_bar_handler',
 
-  ENABLE_VOICEOVER_CONTRIBUTION_URL: '/voiceover_contribution_handler',
-
   STORE_PLAYTHROUGH_URL: '/explorehandler/store_playthrough/<exploration_id>',
 
   // Enables recording playthroughs from learner sessions.

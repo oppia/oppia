@@ -39,6 +39,7 @@ export enum FeatureNames {
   NewLessonPlayer = 'new_lesson_player',
   ADDING_VOICEOVER_WITH_ACCENT = 'adding_voiceover_with_accent',
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
+  EnableVoiceoverContribution = 'enable_voiceover_contribution',
 }
 
 export interface FeatureStatusSummaryBackendDict {

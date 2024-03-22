@@ -914,52 +914,6 @@ class PromoBarHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class VoiceoverContributionHandlerTest(test_utils.GenericTestBase):
-    """Test for the VoiceoverContributionHandler."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(
-            self.RELEASE_COORDINATOR_EMAIL, self.RELEASE_COORDINATOR_USERNAME)
-
-        self.add_user_role(
-            self.RELEASE_COORDINATOR_USERNAME,
-            feconf.ROLE_ID_RELEASE_COORDINATOR)
-
-    def test_get_voiceover_contribution_is_enabled_data(self) -> None:
-        response = self.get_json('/voiceover_contribution_handler')
-        self.assertEqual(
-            response, {
-                'enable_voiceover_contribution': True,
-            })
-
-    def test_release_coordinator_able_to_update_voiceover_enable_config(
-        self
-    ) -> None:
-        self.login(self.RELEASE_COORDINATOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        response = self.get_json('/voiceover_contribution_handler')
-        self.assertEqual(
-            response, {
-                'enable_voiceover_contribution': True,
-            })
-
-        response = self.put_json(
-            '/voiceover_contribution_handler', {
-                'enable_voiceover_contribution': False,
-            }, csrf_token=csrf_token)
-        self.assertEqual(response, {})
-
-        response = self.get_json('/voiceover_contribution_handler')
-        self.assertEqual(
-            response, {
-                'enable_voiceover_contribution': False,
-            })
-
-        self.logout()
-
-
 class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
 
     def test_value_generated_error(self) -> None:

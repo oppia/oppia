@@ -356,13 +356,6 @@ Registry.create_platform_parameter(
 )
 
 Registry.create_platform_parameter(
-    ParamName.ENABLE_VOICEOVER_CONTRIBUTION,
-    'Whether the voiceover contribution should be enabled for all users',
-    platform_parameter_domain.DataTypes.BOOL,
-    default=True
-)
-
-Registry.create_platform_parameter(
     ParamName.PROMO_BAR_MESSAGE,
     'The message to show to all users if the promo bar is enabled',
     platform_parameter_domain.DataTypes.STRING

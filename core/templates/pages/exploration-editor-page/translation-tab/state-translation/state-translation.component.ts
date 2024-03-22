@@ -55,7 +55,7 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {TranslationLanguageService} from '../services/translation-language.service';
-import {VoiceoverContributionBackendApiService} from 'services/voiceover-contribution-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -122,11 +122,16 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     private truncatePipe: TruncatePipe,
     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
     private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
-    private voiceoverContributionBackendApiService: VoiceoverContributionBackendApiService
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   isVoiceoverModeActive(): boolean {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
+  }
+
+  isVoiceoverContributionEnabled(): boolean {
+    return this.platformFeatureService.status.EnableVoiceoverContribution
+      .isEnabled;
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
@@ -765,11 +770,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     this.initStateTranslation();
     this.initActiveIndex = this.getIndexOfActiveCard();
     this.stateEditorService.setInitActiveContentId(null);
-    this.voiceoverContributionBackendApiService
-      .getVoiceoverContributionDataAsync()
-      .then(enableVoiceoverContribution => {
-        this.voiceoverContributionIsEnabled = enableVoiceoverContribution;
-      });
   }
 
   ngOnDestroy(): void {

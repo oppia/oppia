@@ -361,12 +361,12 @@
   <div joyrideStep="translationTabReRecordingOverview" [stepContent]="TranslationTabReRecordingOverview"></div>
   <div joyrideStep="translationTabTutorialComplete" [stepContent]="TranslationTabTutorialComplete"></div>
   <div *ngIf="isVoiceoverModeActive()" id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
-    <div *ngIf="!voiceoverContributionIsEnabled">
+    <div *ngIf="!isVoiceoverContributionEnabled()">
       <p class="voiceover-disabled-text-class">
         Adding voiceover functionality is temporarily disabled due to maintenance. Try some time later.
       </p>
     </div>
-    <oppia-audio-translation-bar *ngIf="voiceoverContributionIsEnabled" [isTranslationTabBusy]="isTranslationTabBusy">
+    <oppia-audio-translation-bar *ngIf="isVoiceoverContributionEnabled()" [isTranslationTabBusy]="isTranslationTabBusy">
     </oppia-audio-translation-bar>
   </div>
   <div *ngIf="!isVoiceoverModeActive()">
