@@ -678,7 +678,7 @@ export class LoggedInUser extends BaseUser {
   async navigateToBlogPageViaFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerBlogLink,
-      'Blog  link in the About Oppia section in the footer',
+      'Blog link in the About Oppia section in the footer',
       blogUrl,
       'Blog'
     );
