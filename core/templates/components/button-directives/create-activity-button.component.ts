@@ -66,7 +66,6 @@ export class CreateActivityButtonComponent implements OnInit {
   initCreationProcess(): void {
     // Without this, the modal keeps reopening when the window is
     // resized.
-    console.log('init creation called');
     if (this.creationInProgress) {
       return;
     }
