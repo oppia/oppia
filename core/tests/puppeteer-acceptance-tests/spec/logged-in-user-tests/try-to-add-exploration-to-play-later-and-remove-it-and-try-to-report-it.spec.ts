@@ -45,7 +45,17 @@ describe('Logged-in User', function () {
 
   it(
     'should add exploration to play later then remove it and report it',
-    async function () {},
+    async function () {
+      await testLearner.navigateToCommunityLibraryPage();
+      await testLearner.findExplorationInCommunityLibrary('Test');
+      // await testLearner.expectNumberOfExplorationsInCommunityLibraryToBe(1);
+      await testLearner.addExplorationToPlayLater();
+      await testLearner.navigateToLearnerDashboardPage();
+      await testLearner.openCommunityLessonsTab();
+      // await testLearner.expectNumberOfExplorationsInPlayLater(1);
+      await testLearner.removeExplorationFromPlayLater();
+      // await testLearner.expectNumberOfExplorationsInPlayLater(0);
+    },
     DEFAULT_SPEC_TIMEOUT
   );
 

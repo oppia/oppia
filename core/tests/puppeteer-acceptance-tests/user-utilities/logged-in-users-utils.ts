@@ -21,6 +21,7 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
@@ -106,6 +107,12 @@ const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const saveContentButton = 'button.e2e-test-save-state-content';
+
+const explorationNameInput = 'input.e2e-test-search-input';
+const communityExplorationCard = '.e2e-test-exploration-dashboard-card';
+const communityLessonsTabButton = '.e2e-test-community-lessons-section';
+const playLaterExplorationCard = '.oppia-summary-tile-container';
+const confirmRemoveButton = '.e2e-test-confirm-delete-interaction';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -651,6 +658,85 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardUrl);
+  }
+
+  /**
+   * Function for navigating to the learner dashboard page.
+   */
+  async navigateToLearnerDashboardPage(): Promise<void> {
+    await this.goto(learnerDashboardUrl);
+  }
+
+  /**
+   * Function for navigating to the learner dashboard page.
+   */
+  async openCommunityLessonsTab(): Promise<void> {
+    if (this.page.url() !== learnerDashboardUrl) {
+      await this.goto(learnerDashboardUrl);
+    }
+    await this.page.click(communityLessonsTabButton);
+  }
+
+  /**
+   * Function for navigating to the creator dashboard page.
+   */
+  async navigateToCommunityLibraryPage(): Promise<void> {
+    await this.goto(communityLibraryUrl);
+  }
+
+  /**
+   * This function checks the number of the explorations in the community library.
+   */
+  async expectNumberOfExplorationsInCommunityLibraryToBe(
+    number: number
+  ): Promise<void> {
+    const allExplorations = await this.page.$$(communityExplorationCard);
+    if (allExplorations.length !== number) {
+      throw new Error(`Number of explorations is not equal to ${number}`);
+    }
+
+    showMessage(`Number of explorations is equal to ${number}`);
+  }
+
+  /**
+   * This function checks the number of the explorations in the play later.
+   */
+  async expectNumberOfExplorationsInPlayLater(number: number): Promise<void> {
+    const allExplorations = await this.page.$$(playLaterExplorationCard);
+    if (allExplorations.length !== number) {
+      throw new Error(`Number of explorations is not equal to ${number}`);
+    }
+
+    showMessage(`Number of explorations is equal to ${number}`);
+  }
+
+  /**
+   * This function to add exploration to play later.
+   */
+  async addExplorationToPlayLater(): Promise<void> {
+    await this.page.click('.oppia-learner-dashboard-icon');
+    await this.page.waitForSelector('.toast-success');
+  }
+
+  /**
+   * This function to remove exploration from play later.
+   */
+  async removeExplorationFromPlayLater(): Promise<void> {
+    await this.page.hover(playLaterExplorationCard);
+    await this.page.click('.remove-icon');
+    await this.page.waitForSelector(confirmRemoveButton);
+    await this.page.click(confirmRemoveButton);
+  }
+
+  /**
+   * Function for searching a exploration in community library page.
+   */
+  async findExplorationInCommunityLibrary(
+    explorationName: string
+  ): Promise<void> {
+    await this.type(explorationNameInput, explorationName);
+    await this.page.keyboard.press('Enter');
+    await this.page.waitForSelector(communityExplorationCard);
   }
 
   /**
