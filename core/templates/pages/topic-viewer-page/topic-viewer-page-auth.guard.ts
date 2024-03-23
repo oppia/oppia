@@ -43,7 +43,8 @@ export class TopicViewerAccessGuard implements CanActivate {
       route: ActivatedRouteSnapshot,
       state: RouterStateSnapshot
   ): Promise<boolean> {
-    let classroomUrlFragment = route.paramMap.get('classroom_url_fragment') || '';
+    let classroomUrlFragment = 
+    route.paramMap.get('classroom_url_fragment') || '';
     let topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
     return new Promise<boolean>((resolve) => {
       this.accessValidationBackendApiService

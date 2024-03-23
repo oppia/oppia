@@ -27,7 +27,8 @@ import { AccessValidationBackendApiService } from '../../pages/oppia-root/routin
 
 
 class MockAccessValidationBackendApiService {
-  validateAccessToTopicViewerPage(classroomUrlFragment: string, 
+  validateAccessToTopicViewerPage(
+  classroomUrlFragment: string,
   topicUrlFragment: string) {
     return Promise.resolve();
   }
