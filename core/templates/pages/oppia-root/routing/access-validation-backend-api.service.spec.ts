@@ -254,8 +254,8 @@ describe('Access validation backend api service', () => {
 
 
   it('should validate access to topic viewer page', fakeAsync(() => {
-    avbas.validateAccessToTopicViewerPage('sample-class', 
-    'sample-topic').then(successSpy, failSpy);
+    avbas.validateAccessToTopicViewerPage(
+      'sample-class', 'sample-topic').then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_topic_viewer_page?' +

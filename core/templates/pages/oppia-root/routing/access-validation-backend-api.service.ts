@@ -43,8 +43,7 @@ export class AccessValidationBackendApiService {
 
   TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_topic_viewer_page/' +
-    '<classroom_url_fragment>/<topic_url_fragment>' 
-  );
+    '<classroom_url_fragment>/<topic_url_fragment>');
 
   LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_create_learner_group_page'
