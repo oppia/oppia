@@ -190,27 +190,6 @@ def check_changes_in_config() -> None:
                 CONSTANTS_FILEPATH))
 
 
-def check_changes_in_gcloud_path() -> None:
-    """Checks that the gcloud path in common.py matches with the path in
-    release_constants.json.
-
-    Raises:
-        Exception. The gcloud path in common.py does not match with the path
-            in release_constants.json.
-    """
-    with utils.open_file(RELEASE_CONSTANTS_FILEPATH, 'r') as f:
-        release_constants_gcloud_path = json.loads(f.read())['GCLOUD_PATH']
-
-    if not (
-            os.path.exists(release_constants_gcloud_path) and
-            os.path.samefile(release_constants_gcloud_path, common.GCLOUD_PATH)
-    ):
-        raise Exception(
-            'The gcloud path in common.py: %s should match the path in '
-            'release_constants.json: %s. Please fix.' % (
-                common.GCLOUD_PATH, release_constants_gcloud_path))
-
-
 def run_prettier() -> None:
     """Runs prettier formatter."""
     subprocess.run('npx lint-staged', shell=True, check=True)
