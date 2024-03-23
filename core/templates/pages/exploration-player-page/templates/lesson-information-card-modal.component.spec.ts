@@ -123,6 +123,7 @@ describe('Lesson Information card modal component', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let localStorageService: LocalStorageService;
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
+  let activeModal: NgbActiveModal;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -208,6 +209,7 @@ describe('Lesson Information card modal component', () => {
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService
     );
+    activeModal = TestBed.inject(NgbActiveModal);
 
     spyOn(
       i18nLanguageCodeService,
@@ -522,5 +524,12 @@ describe('Lesson Information card modal component', () => {
     componentInstance.checkpointCount = 7;
 
     expect(componentInstance.getProgressPercentage()).toEqual('28');
+  });
+
+  it('should close the modal', () => {
+    const closeSpy = spyOn(activeModal, 'close').and.callThrough();
+    componentInstance.closeModal();
+
+    expect(closeSpy).toHaveBeenCalled();
   });
 });
