@@ -213,6 +213,7 @@ CHROME_PATHS = [
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties',
     'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'logged-in-user-tests/try-to-add-exploration-to-play-later-and-remove-it-and-try-to-report-it',
     'logged-in-user-tests/click-all-buttons-on-navbar',
     'logged-in-user-tests/click-all-buttons-in-about-page',
     'logged-in-user-tests/click-all-buttons-in-about-foundation-page',
