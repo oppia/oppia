@@ -82,7 +82,7 @@ describe('Exploration Creator', function () {
       await explorationCreator.expectTitleToHaveMaxLength(36);
 
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
-      // await explorationCreator.expectGoalToEqual('OppiaAcceptanceTestsCheck');
+      await explorationCreator.expectGoalToEqual('OppiaAcceptanceTestsCheck');
 
       await explorationCreator.selectACategory('Algebra');
       await explorationCreator.expectSelectedCategoryToBe('Algebra');
