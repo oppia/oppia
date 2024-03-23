@@ -35,46 +35,46 @@ if MYPY: # pragma: no cover
 
 class GetUsersWithInvalidBioJob(base_jobs.JobBase):
     """Validates that no user has a null bio
-    or length of bio greater than 2000.
+    or a bio with length greater than 2000.
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        user_pairs = (
+        user_ids_and_bios = (
             self.pipeline
             | 'Get all UserSettingsModels' >> (
                 ndb_io.GetModels(user_models.UserSettingsModel.get_all()))
             | 'Extract user id and bio from model' >> beam.Map(
-                lambda user_setting: (
-                    user_setting.id, user_setting.user_bio))
+                lambda user_settings: (
+                    user_settings.id, user_settings.user_bio))
         )
 
-        user_with_invalid_bio = (
-            user_pairs
-            | 'Get users with null bio or length of bio greater than 2000' >>
+        users_with_invalid_bios = (
+            user_ids_and_bios
+            | 'Get users with null bio or bio with length greater than 2000' >>
                 beam.Filter(
-                lambda user_pair:
-                    not isinstance(user_pair[1], str)
-                    or len(user_pair[1]) > 2000)
+                lambda user_id_and_bio:
+                    not isinstance(user_id_and_bio[1], str)
+                    or len(user_id_and_bio[1]) > 2000)
         )
 
         report_number_of_users_queried = (
-            user_pairs
+            user_ids_and_bios
             | 'Report count of user models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('USERS'))
+                job_result_transforms.CountObjectsToJobRunResult('CountTotalUsers'))
         )
 
         report_number_of_users_with_invalid_bio = (
-            user_with_invalid_bio
+            users_with_invalid_bios
             | 'Report count of invalid user models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('INVALID'))
+                job_result_transforms.CountObjectsToJobRunResult('CountInvalidUserBios'))
         )
 
-        report_invalid_user_ids_and_bio = (
-            user_with_invalid_bio
+        report_invalid_user_ids_and_bios = (
+            users_with_invalid_bios
             | 'Report info on each invalid user bio' >> beam.Map(
-                lambda objects: job_run_result.JobRunResult.as_stderr(
+                lambda user_id_and_bio: job_run_result.JobRunResult.as_stderr(
                     'The id of user is "%s" and its bio is "%s"'
-                    % (objects[0], objects[1])
+                    % (user_id_and_bio[0], user_id_and_bio[1])
                 ))
         )
 
@@ -82,7 +82,7 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
             (
                 report_number_of_users_queried,
                 report_number_of_users_with_invalid_bio,
-                report_invalid_user_ids_and_bio,
+                report_invalid_user_ids_and_bios,
             )
             | 'Combine reported results' >> beam.Flatten()
         )
