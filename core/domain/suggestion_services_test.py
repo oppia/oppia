@@ -7283,7 +7283,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         words are provided. We calculate the time taken to translate
         a word according to the following document.
         https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
- 
+
         Args:
             numer_of_words: int. The number of translated words.
 
@@ -7299,7 +7299,7 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         are provided. We calculate the time taken to submit
         a question according to the following document.
         https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
- 
+
         Args:
             images_included: bool. A flag that says whether the question
                 contains images.
