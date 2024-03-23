@@ -60,13 +60,15 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
         report_number_of_users_queried = (
             user_ids_and_bios
             | 'Report count of user models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('CountTotalUsers'))
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'CountTotalUsers'))
         )
 
         report_number_of_users_with_invalid_bio = (
             users_with_invalid_bios
             | 'Report count of invalid user models' >> (
-                job_result_transforms.CountObjectsToJobRunResult('CountInvalidUserBios'))
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'CountInvalidUserBios'))
         )
 
         report_invalid_user_ids_and_bios = (
