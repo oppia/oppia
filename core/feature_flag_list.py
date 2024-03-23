@@ -49,7 +49,7 @@ class FeatureNames(enum.Enum):
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     NEW_LESSON_PLAYER = 'new_lesson_player'
-    ADDING_VOICEOVER_WITH_ACCENT = 'adding_voiceover_with_accent'
+    ADD_VOICEOVER_WITH_ACCENT = 'add_voiceover_with_accent'
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
     ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
 
@@ -77,7 +77,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.ADDING_VOICEOVER_WITH_ACCENT,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION
 ]
@@ -201,9 +201,10 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV
         )
     ),
-    FeatureNames.ADDING_VOICEOVER_WITH_ACCENT.value: (
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
         (
-            'This flag is to enable the voiceover addition with an accent.',
+            'The flag allows voice artists to add voiceovers in a specific '
+            'accent for the given language.',
             feature_flag_domain.ServerMode.DEV
         )
     ),
@@ -216,8 +217,9 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     ),
     FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
         (
-            'This flag is to enable the voiceover contribution in the '
-            'exploration editor page.',
+            'The flag controls whether voiceover contributions from the '
+            'voiceover tab of the exploration editor page is enabled or '
+            'disabled during voiceover migration.',
             feature_flag_domain.ServerMode.DEV
         )
     ),
