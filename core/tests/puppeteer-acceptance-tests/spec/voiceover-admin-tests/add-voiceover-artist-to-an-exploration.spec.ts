@@ -60,8 +60,16 @@ describe('Voiceover Admin', function () {
         'voiceoverartist@example.com'
       );
       await testUser.page.reload();
+
+      const previousVoiceoverArtists = await testUser.getAllVoiceoverArtists();
       await testUser.addVoiceoverArtistToExploration('voiceoverartist');
-      await testUser.expectVoiceoverArtistToBe('voiceoverartist');
+
+      await testUser.page.reload();
+
+      await testUser.expectVoiceoverArtistsToContain([
+        'voiceoverartist',
+        ...previousVoiceoverArtists,
+      ]);
     },
     DEFAULT_SPEC_TIMEOUT
   );

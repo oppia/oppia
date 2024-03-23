@@ -52,7 +52,8 @@ const saveVoiceoverArtistEditButton =
 const errorToastMessage = 'div.e2e-test-toast-warning-message';
 const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
 
-const updatedVoiceoverArtist = 'div.e2e-test-voice-artist-voiceoverartist';
+const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
+const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -66,6 +67,7 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
+    await this.page.waitForTimeout(5000);
     await this.page.waitForSelector(explorationSettingsTab);
     await this.clickOn(explorationSettingsTab);
   }
@@ -154,22 +156,38 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to expect to see updated voiceover artist
-   * @param artistUsername - username of the artist
+   * Function to expect voiceover artists to contain
+   * @param artistUsernames - list of artist usernames
    */
-  async expectVoiceoverArtistToBe(artistUsername: string): Promise<void> {
+  async expectVoiceoverArtistsToContain(
+    artistUsernames: string[]
+  ): Promise<void> {
     await this.page.waitForSelector(updatedVoiceoverArtist);
-    const displayedArtist = await this.page.$eval(
+    const allVoiceoverArtists = await this.getAllVoiceoverArtists();
+
+    artistUsernames.forEach(artist => {
+      if (!allVoiceoverArtists.includes(artist)) {
+        throw new Error(
+          `Expected all artists to contain ${artist} but got ${allVoiceoverArtists}`
+        );
+      }
+    });
+
+    showMessage(`All artists are ${allVoiceoverArtists}`);
+  }
+
+  /**
+   * Function to get all voiceover artists
+   * @returns {Promise<string[]>} - list of voiceover artists
+   */
+  async getAllVoiceoverArtists(): Promise<string[]> {
+    await this.page.waitForSelector(allVoiceoverArtistsList);
+    const voiceoverArtists = await this.page.$$eval(
       updatedVoiceoverArtist,
-      element => (element as HTMLElement).innerText
+      (elements: Element[]) =>
+        elements.map((el: Element) => (el as HTMLElement).innerText.trim())
     );
-    if (!displayedArtist.includes(artistUsername)) {
-      throw new Error(
-        `Expected artist to be ${artistUsername} but got ${displayedArtist}`
-      );
-    } else {
-      showMessage(`Artist is ${displayedArtist}`);
-    }
+    return voiceoverArtists;
   }
 }
 
