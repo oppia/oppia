@@ -252,37 +252,16 @@ describe('Access validation backend api service', () => {
     expect(failSpy).toHaveBeenCalled();
   }));
 
-  it('should not validate access to topic viewer page with invalid ' +
-  'access', fakeAsync (() => {
-    avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
+
+  it('should validate access to topic viewer page', fakeAsync(() => {
+    avbas.validateAccessToTopicViewerPage('sample-class', 'sample-topic').then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_topic_viewer_page');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Access Denied.'
-    }, {
-      status: 401, statusText: 'Access Denied.'
-    });
-
-
-    flushMicrotasks();
-    expect(successSpy).not.toHaveBeenCalled();
-    expect(failSpy).toHaveBeenCalled();
-  })
-  );
-
-
-  it('should validate access to topic viewer page with valid ' +
-  'access', fakeAsync (() => {
-    avbas.validateAccessToTopicViewerPage().then(successSpy, failSpy);
-
-
-    const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_topic_viewer_page');
+      '/access_validation_handler/can_access_topic_viewer_page?' +
+      'classroom_url_fragment=sample-class&' + 
+      'topic_url_fragment=sample-topic');
     expect(req.request.method).toEqual('GET');
     req.flush({});
-
 
     flushMicrotasks();
     expect(successSpy).toHaveBeenCalled();

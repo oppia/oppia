@@ -42,7 +42,9 @@ export class AccessValidationBackendApiService {
   );
 
   TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR = (
-    '/access_validation_handler/can_access_topic_viewer_page');
+    '/access_validation_handler/can_access_topic_viewer_page/' +
+    '<classroom_url_fragment>/<topic_url_fragment>'  
+  );
 
   LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_create_learner_group_page'
@@ -100,9 +102,16 @@ export class AccessValidationBackendApiService {
     return this.http.get<void>(url).toPromise();
   }
 
-  validateAccessToTopicViewerPage(): Promise<void> {
-    return this.http.get<void>(
-      this.TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR).toPromise();
+  validateAccessToTopicViewerPage(
+      classroomUrlFragment: string,
+      topicUrlFragment: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.TOPIC_VIEWER_PAGE_ACCESS_VALIDATOR, {
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment
+      });
+    return this.http.get<void>(url).toPromise();
   }
 
   validateCanManageOwnAccount(): Promise<void> {

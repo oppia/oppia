@@ -16,7 +16,6 @@
  * @fileoverview Guard that redirects user to 401 error page
  * if the user is not a valid facilitator.
  */
-
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 import {
@@ -25,33 +24,41 @@ import {
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
-import { AppConstants } from 'app.constants';
-import { UserService } from 'services/user.service';
 
+import { AppConstants } from 'app.constants';
+import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TopicViewerAccessGuard implements CanActivate {
   constructor(
-    private userService: UserService,
+    private accessValidationBackendApiService:
+    AccessValidationBackendApiService,
     private router: Router,
     private location: Location
   ) {}
 
   async canActivate(
-      _route: ActivatedRouteSnapshot,
+      route: ActivatedRouteSnapshot,
       state: RouterStateSnapshot
   ): Promise<boolean> {
-    const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isCurriculumAdmin()) {
-      return true;
-    }
-    this.router.navigate(
-      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .ERROR.ROUTE}/401`]).then(() => {
-      this.location.replaceState(state.url);
+    let classroomUrlFragment = route.paramMap.get('classroom_url_fragment') || '';
+    let topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
+    return new Promise<boolean>((resolve) => {
+      this.accessValidationBackendApiService
+        .validateAccessToTopicViewerPage(classroomUrlFragment, topicUrlFragment)
+        .then(() => {
+          resolve(true);
+        })
+        .catch((err) => {
+          this.router.navigate(
+            [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            });
+        });
     });
-    return false;
   }
 }

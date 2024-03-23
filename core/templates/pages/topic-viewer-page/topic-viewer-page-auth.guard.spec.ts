@@ -15,17 +15,20 @@
 /**
  * @fileoverview Tests for TopicViewerPageAuthGuard
  */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Location } from '@angular/common';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+
 import { AppConstants } from '../../app.constants';
 import { TopicViewerAccessGuard } from './topic-viewer-page-auth.guard';
 import { AccessValidationBackendApiService } from '../../pages/oppia-root/routing/access-validation-backend-api.service';
 
 
 class MockAccessValidationBackendApiService {
-  validateAccessToTopicViewerPage() {
+  validateAccessToTopicViewerPage(classroomUrlFragment: string, 
+  topicUrlFragment: string) {
     return Promise.resolve();
   }
 }
@@ -43,7 +46,7 @@ describe('TopicViewerAccessGuard', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [
         TopicViewerAccessGuard,
         { provide: AccessValidationBackendApiService,
@@ -62,8 +65,7 @@ describe('TopicViewerAccessGuard', () => {
 
   it('should allow access if validation succeeds', fakeAsync(() => {
     const validateAccessSpy = spyOn(
-      accessValidationBackendApiService,
-      'validateAccessToTopicViewerPage')
+      accessValidationBackendApiService, 'validateAccessToTopicViewerPage')
       .and.returnValue(Promise.resolve());
     const navigateSpy = spyOn(router, 'navigate')
       .and.returnValue(Promise.resolve(true));
@@ -98,8 +100,10 @@ describe('TopicViewerAccessGuard', () => {
       });
 
     tick();
+
     expect(canActivateResult).toBeFalse();
     expect(navigateSpy).toHaveBeenCalledWith(
-      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]);
+      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]
+    );
   }));
 });
