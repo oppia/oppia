@@ -27,6 +27,7 @@
     "core/tests/puppeteer-acceptance-tests/puppeteer-testing-utilities",
     "core/tests/puppeteer-acceptance-tests/spec",
     "core/tests/puppeteer-acceptance-tests/user-utilities",
-    "core/tests/puppeteer-acceptance-tests/helpers"
+    "core/tests/puppeteer-acceptance-tests/helpers",
+    "core/tests/puppeteer-acceptance-tests/functions"
   ],
 }

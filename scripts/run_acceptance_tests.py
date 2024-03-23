@@ -67,6 +67,11 @@ _PARSER.add_argument(
     help='Run the tests in headless mode.',
     action='store_true')
 
+_PARSER.add_argument(
+    '--mobile',
+    help='Run the tests in mobile mode.',
+    action='store_true')
+
 
 def compile_test_ts_files() -> None:
     """Compiles the test typescript files into a build directory."""
@@ -138,6 +143,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         proc = stack.enter_context(servers.managed_acceptance_tests_server(
             suite_name=args.suite,
             headless=args.headless,
+            mobile=args.mobile,
             stdout=subprocess.PIPE))
 
         print('Servers have come up.\n')
