@@ -23,7 +23,7 @@ var waitFor = require('./waitFor.js');
 var DiagnosticTestPage = function() {
   var startDiagnosticTestButton = $('.e2e-test-start-diagnostic-test');
   var addNewClassroomButton = $('.e2e-test-add-new-classroom-config');
-  var newClassrooomNameInput = $('.e2e-test-new-classroom-name');
+  var newClassroomNameInput = $('.e2e-test-new-classroom-name');
   var newClassroomUrlFragmentInput = $('.e2e-test-new-classroom-url-fragment');
   var createNewClassroomButton = $('.e2e-test-create-new-classroom');
   var recommendedTopicSummaryTile = $(
@@ -56,7 +56,7 @@ var DiagnosticTestPage = function() {
 
     await action.setValue(
       'New classroom name input',
-      newClassrooomNameInput,
+      newClassroomNameInput,
       classroomName
     );
 
@@ -67,7 +67,14 @@ var DiagnosticTestPage = function() {
     );
 
     await action.click(
-      'Create new classroom config button', createNewClassroomButton);
+      'Create new classroom config button',
+      createNewClassroomButton
+    );
+
+    await waitFor.invisibilityOf(
+      newClassroomNameInput,
+      'Create classroom config modal taking too long to disappear.'
+    );
   };
 
   this.addTopicIdToClassroomConfig = async function(topicId, index) {
