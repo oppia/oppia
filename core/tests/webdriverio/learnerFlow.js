@@ -401,11 +401,18 @@ describe('Learner dashboard functionality', function () {
     await libraryPage.findCollection('Test Collection');
     await libraryPage.playCollection('Test Collection');
     await waitFor.pageToFullyLoad();
+
+    const collectionExplorationSelector = browser.isMobile
+      ? '.e2e-test-mobile-collection-exploration'
+      : '.e2e-test-collection-exploration';
+
+    await waitFor.visibilityOf(
+      $(collectionExplorationSelector),
+      'Collection exploration takes too long to appear'
+    );
     // The collection player has two sets of SVGs -- one which is
     // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile
-      ? await $$('.e2e-test-mobile-collection-exploration')[0]
-      : await $$('.e2e-test-collection-exploration')[0];
+    var firstExploration = await $$(collectionExplationSelector)[0];
     // Click first exploration in collection.
     await action.click('First exploration', firstExploration);
     await waitFor.pageToFullyLoad();
