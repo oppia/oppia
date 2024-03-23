@@ -266,7 +266,8 @@ class VoiceArtistMetadataModel(base_models.BaseModel):
         language_code_to_accent: Dict[str, str]
     ) -> VoiceArtistMetadataModel:
         """Creates a new VoiceArtistMetadataModel instance.
-        Note that Beam jobs will still be able to modify this model after
+
+        Note that Beam jobs will still be able to modify this model after its
         creation because they bypass this method.
 
         Args:
@@ -373,7 +374,8 @@ class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
         content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType,
     ) -> ExplorationVoiceArtistsLinkModel:
         """Creates a new ExplorationVoiceArtistsLinkModel instance.
-        Note that Beam jobs will still be able to modify this model after
+
+        Note that Beam jobs will still be able to modify this model after its
         creation because they bypass this method.
 
         Args:

@@ -539,29 +539,6 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
 
         self.assertEqual(len(exploration_voice_artist_link_models), 2)
 
-    def test_should_not_create_model_for_invalid_exploration(self) -> None:
-        self._create_curated_explorations()
-
-        exploration_model = exp_models.ExplorationModel.get(
-            self.CURATED_EXPLORATION_ID_1)
-
-        # Deleting recorded voiceovers field make this exploration invalid.
-        del exploration_model.states['Introduction']['recorded_voiceovers']
-        exploration_model.update_timestamps()
-        exploration_model.commit(
-            self.owner_id, 'exploration model updated', [])
-
-        job_result_template = (
-            'Generated exploration voice artist link model for '
-            'exploration %s.'
-        )
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr='')]
-        )
-
     def test_should_skip_voiceover_if_specific_snapshot_model_is_invalid(
         self
     ) -> None:
