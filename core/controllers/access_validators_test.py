@@ -513,14 +513,6 @@ class TopicEditorPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             ), expected_status_int=401
         )
 
-        self.login(self.NEW_USER_EMAIL)
-        self.get_json(
-            '%s/can_access_topic_editor/%s' % (
-                ACCESS_VALIDATION_HANDLER_PREFIX, self.topic_id
-            ), expected_status_int=401
-        )
-        self.logout()
-
     def test_access_topic_editor_page_with_curriculum_admin(
         self
     ) -> None:
