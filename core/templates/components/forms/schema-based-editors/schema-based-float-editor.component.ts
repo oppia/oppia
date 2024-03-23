@@ -247,9 +247,10 @@ export class SchemaBasedFloatEditorComponent
       this.errorStringI18nKey = null;
     } else {
       // Make sure number is in a correct format.
+      let currentDecimalSeparator = this.getCurrentDecimalSeparator();
       let error = this.numericInputValidationService.validateNumericString(
-        this.localStringValue,
-        this.getCurrentDecimalSeparator()
+        this.localStringValue.replace(/\.|,/g, currentDecimalSeparator),
+        currentDecimalSeparator
       );
       if (error !== undefined) {
         this.localValue = null;
