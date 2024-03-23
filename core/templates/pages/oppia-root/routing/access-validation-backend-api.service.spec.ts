@@ -262,7 +262,7 @@ describe('Access validation backend api service', () => {
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_edit_learner_group_page/' +
+      '/access_validation_handler/can_access_topic_viewer_page/' +
       'test_class_url/test_topic_url');
     expect(req.request.method).toEqual('GET');
     req.flush({});
