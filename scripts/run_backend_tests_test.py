@@ -110,7 +110,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.coverage_check_cmd = [
             sys.executable, '-m', 'coverage', 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
-            % common.OPPIA_TOOLS_DIR, '--show-missing']
+            % common.OPPIA_TOOLS_DIR, '--show-missing',
+            '--skip-covered']
         self.call_count = 0
 
         self.terminal_logs: List[str] = []
@@ -898,7 +899,15 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with self.swap_install_third_party_libs:
             from scripts import run_backend_tests
         data_file = '.coverage.hostname.12345.987654321'
-        coverage_report_output = 'TOTAL       283     36    112     10    86% '
+        coverage_report_output = (
+            'Name                                                       '
+            '                    Stmts   Miss Branch BrPart  Cover   Missing\n'
+            'core/constants.py                         '
+            '                         '
+            '               37      8      6      1    70%   108-112, 119-123\n'
+            'TOTAL                                                         '
+            '                 53906  17509  16917   1191    62%\n'
+        )
         process = MockProcessOutput()
         process.stdout = coverage_report_output
 
@@ -916,8 +925,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             returned_output, coverage = run_backend_tests.check_coverage(
                 False, data_file=data_file)
 
-        self.assertEqual(returned_output, coverage_report_output)
-        self.assertEqual(coverage, 86)
+        self.assertEqual(coverage_report_output, returned_output)
+        self.assertEqual(coverage, 62.0)
 
     def test_no_data_to_report_returns_full_coverage(self) -> None:
         with self.swap_install_third_party_libs:
