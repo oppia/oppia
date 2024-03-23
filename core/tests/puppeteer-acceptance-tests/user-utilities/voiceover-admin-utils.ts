@@ -67,7 +67,6 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.page.waitForSelector(explorationSettingsTab);
     await this.clickOn(explorationSettingsTab);
   }
 
@@ -84,9 +83,7 @@ export class VoiceoverAdmin extends BaseUser {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
     });
-    await this.page.waitForSelector(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
-    await this.page.waitForSelector(richTextAreaField);
     await this.type(richTextAreaField, `${explorationTitle}`);
     await this.clickOn(saveContentButton);
     await this.clickOn(addInteractionButton);
@@ -110,7 +107,6 @@ export class VoiceoverAdmin extends BaseUser {
     );
     await this.clickOn(publishExplorationButton);
     await this.clickOn(explorationConfirmPublishButton);
-    await this.page.waitForSelector(closeShareModalButton);
     await this.clickOn(closeShareModalButton);
   }
 
@@ -118,9 +114,7 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to edit voiceover artist
    */
   async addVoiceoverArtistToExploration(artistUsername: string): Promise<void> {
-    await this.page.waitForSelector(editVoiceoverArtistButton);
     await this.clickOn(editVoiceoverArtistButton);
-    await this.page.waitForSelector(voiceArtistEditSelector);
     await this.type(voiceArtistEditSelector, artistUsername);
     await this.clickOn(saveVoiceoverArtistEditButton);
   }
@@ -150,28 +144,23 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to close toast message
    */
   async closeToastMessage(): Promise<void> {
-    await this.page.waitForSelector(errorToastMessage);
     await this.clickOn(closeToastMessageButton);
   }
 
   /**
-   * Function to expect voiceover artists to contain
-   * @param artistUsernames - list of artist usernames
+   * Function to expect voiceover artists list to contain
+   * @param artistUsername - artist username
    */
-  async expectVoiceoverArtistsToContain(
-    artistUsernames: string[]
+  async expectVoiceoverArtistsListContains(
+    artistUsername: string
   ): Promise<void> {
     await this.page.waitForSelector(updatedVoiceoverArtist);
     const allVoiceoverArtists = await this.getAllVoiceoverArtists();
-
-    artistUsernames.forEach(artist => {
-      if (!allVoiceoverArtists.includes(artist)) {
-        throw new Error(
-          `Expected all artists to contain ${artist} but got ${allVoiceoverArtists}`
-        );
-      }
-    });
-
+    if (!allVoiceoverArtists.includes(artistUsername)) {
+      throw new Error(
+        `Expected all artists to contain ${artistUsername} but got ${allVoiceoverArtists}`
+      );
+    }
     showMessage(`All artists are ${allVoiceoverArtists}`);
   }
 

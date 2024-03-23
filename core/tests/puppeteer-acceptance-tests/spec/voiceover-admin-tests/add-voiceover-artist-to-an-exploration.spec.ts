@@ -36,13 +36,13 @@ describe('Voiceover Admin', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'should be able to see error while adding `xyz` voiceover artist to an exploration',
+    'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
     async function () {
       await testUser.navigateToCreatorDashboardPage();
-      await testUser.createExplorationWithTitle('Test Exploration');
+      await testUser.createExplorationWithTitle('Exploration one');
 
       await testUser.navigateToExplorationSettingsTab();
-      await testUser.addVoiceoverArtistToExploration('xyz');
+      await testUser.addVoiceoverArtistToExploration('invalidUserId');
 
       await testUser.expectToSeeErrorToastMessage(
         'Sorry, we could not find the specified user.'
@@ -59,17 +59,13 @@ describe('Voiceover Admin', function () {
         'voiceoverartist',
         'voiceoverartist@example.com'
       );
-      await testUser.page.reload();
+      await testUser.navigateToCreatorDashboardPage();
+      await testUser.createExplorationWithTitle('Exploration two');
+      await testUser.navigateToExplorationSettingsTab();
 
-      const previousVoiceoverArtists = await testUser.getAllVoiceoverArtists();
       await testUser.addVoiceoverArtistToExploration('voiceoverartist');
 
-      await testUser.page.reload();
-
-      await testUser.expectVoiceoverArtistsToContain([
-        'voiceoverartist',
-        ...previousVoiceoverArtists,
-      ]);
+      await testUser.expectVoiceoverArtistsListContains('voiceoverartist');
     },
     DEFAULT_SPEC_TIMEOUT
   );
