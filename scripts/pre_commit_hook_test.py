@@ -22,9 +22,7 @@ import builtins
 import os
 import shutil
 import subprocess
-import tempfile
 
-from core import utils
 from core.tests import test_utils
 from scripts import common
 
