@@ -110,8 +110,6 @@ jobs:
           - name: skillEditor
           - name: subscriptions
           - name: topicsAndSkillsDashboard
-            flaky_indicators: |
-              Classroom config tile selector is not visible
           - name: topicAndStoryEditor
           - name: topicAndStoryEditorFileUploadFeatures
           - name: topicAndStoryViewer
