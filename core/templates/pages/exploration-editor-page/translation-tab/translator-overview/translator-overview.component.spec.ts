@@ -41,10 +41,10 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ContextService} from 'services/context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {UserExplorationPermissionsService} from '../../services/user-exploration-permissions.service';
 import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {UserExplorationPermissionsService} from '../../services/user-exploration-permissions.service';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 
 class MockNgbModal {
@@ -74,49 +74,11 @@ describe('Translator Overview component', () => {
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
 
-  class MockUserExplorationPermissionsService {
-    getPermissionsAsync() {
-      return Promise.resolve({
-        canUnpublish: false,
-        canReleaseOwnership: false,
-        canPublish: false,
-        canVoiceover: true,
-        canDelete: false,
-        canModifyRoles: false,
-        canEdit: false,
-        canManageVoiceArtist: false,
-      } as ExplorationPermissions);
-    }
-
-    fetchPermissionsAsync() {
-      return Promise.resolve({
-        canUnpublish: false,
-        canReleaseOwnership: false,
-        canPublish: false,
-        canVoiceover: true,
-        canDelete: false,
-        canModifyRoles: false,
-        canEdit: false,
-        canManageVoiceArtist: false,
-      } as ExplorationPermissions);
-    }
-  }
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [TranslatorOverviewComponent],
       providers: [
-        ExplorationLanguageCodeService,
-        // The UserExplorationPermissionsService has been
-        // mocked here because the functions of
-        // UserExplorationPermissionsService are not able to
-        // resolve promises and throw errors i.e. ContextService should
-        // not be used outside the context of an exploration or a question.
-        {
-          provide: UserExplorationPermissionsService,
-          useClass: MockUserExplorationPermissionsService,
-        },
         {
           provide: NgbModal,
           useClass: MockNgbModal,
@@ -125,6 +87,10 @@ describe('Translator Overview component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
+
+    UserExplorationPermissionsService.permissionsPromise = Promise.resolve({
+      canVoiceover: true,
+    } as ExplorationPermissions);
   }));
 
   beforeEach(fakeAsync(() => {
