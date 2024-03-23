@@ -30,7 +30,7 @@ class MockAccessValidationBackendApiService {
   validateAccessToTopicViewerPage(
       classroomUrlFragment: string,
       topicUrlFragment: string) {
-        return Promise.resolve();
+    return Promise.resolve();
   }
 }
 
