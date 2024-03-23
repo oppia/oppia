@@ -67,7 +67,6 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    await this.page.waitForTimeout(5000);
     await this.page.waitForSelector(explorationSettingsTab);
     await this.clickOn(explorationSettingsTab);
   }
