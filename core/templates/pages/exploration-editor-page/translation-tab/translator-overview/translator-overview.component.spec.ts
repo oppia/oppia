@@ -79,6 +79,7 @@ describe('Translator Overview component', () => {
       imports: [HttpClientTestingModule],
       declarations: [TranslatorOverviewComponent],
       providers: [
+        ExplorationLanguageCodeService,
         {
           provide: NgbModal,
           useClass: MockNgbModal,
