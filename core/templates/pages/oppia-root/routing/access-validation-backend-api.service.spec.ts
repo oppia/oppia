@@ -257,7 +257,8 @@ describe('Access validation backend api service', () => {
     let classroomUrlFragment = 'test_class_url';
     let topicUrlFragment = 'test_topic_url';
 
-    avbas.validateAccessToTopicViewerPage(classroomUrlFragment, topicUrlFragment)
+    avbas.validateAccessToTopicViewerPage(
+      classroomUrlFragment, topicUrlFragment)
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
