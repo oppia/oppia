@@ -48,10 +48,7 @@ from core import utils  # isort:skip # pylint: disable=wrong-import-position
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')
 RELEASE_CONSTANTS_FILEPATH: Final = os.path.join(
-    '.', 'assets', 'release_constants_docker.json'
-) if feconf.OPPIA_IS_DOCKERIZED else os.path.join(
-    '.', 'assets', 'release_constants.json'
-)
+    '.', 'assets', 'release_constants.json')
 KEYS_UPDATED_IN_FECONF: Final = [
     b'ADMIN_EMAIL_ADDRESS',
     b'SYSTEM_EMAIL_ADDRESS', b'NOREPLY_EMAIL_ADDRESS', b'CAN_SEND_EMAILS',
