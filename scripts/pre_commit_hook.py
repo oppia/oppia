@@ -210,8 +210,6 @@ def main(args: Optional[List[str]] = None) -> None:
 
     print('Running pre-commit check for feconf and constants ...')
     check_changes_in_config()
-    print('Running pre-commit check for gcloud path changes...')
-    check_changes_in_gcloud_path()
     print('Running pre-commit check for package-lock.json ...')
     if does_diff_include_package_lock_file() and (
             does_current_folder_contain_have_package_lock_file()):
