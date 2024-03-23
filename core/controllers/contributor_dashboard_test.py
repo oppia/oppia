@@ -2172,12 +2172,13 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
         change_cmd = {
-            'cmd': 'add_translation',
+            'cmd': 'add_written_translation',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
