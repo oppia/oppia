@@ -1089,9 +1089,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       suggestion_deleted: deletedContribution,
     };
 
-    mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
-      true;
-
     beforeEach(() => {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
@@ -1099,6 +1096,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContribution
       );
+      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
+        true;
       component.ngOnInit();
     });
 
@@ -1247,9 +1246,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       true
     );
 
-    mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
-      false;
-
     beforeEach(() => {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
@@ -1258,6 +1254,8 @@ describe('Translation Suggestion Review Modal Component', function () {
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
+      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
+        false;
     });
 
     it('should call user service at initialization.', function () {
@@ -1847,9 +1845,6 @@ describe('Translation Suggestion Review Modal Component', function () {
       suggestion_deleted: deletedContribution,
     };
 
-    mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
-      false;
-
     beforeEach(() => {
       component.initialSuggestionId = 'suggestion_1';
       component.subheading = subheading;
@@ -1857,6 +1852,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.suggestionIdToContribution = angular.copy(
         suggestionIdToContribution
       );
+      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
+        false;
       component.ngOnInit();
     });
 
