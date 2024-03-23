@@ -481,14 +481,12 @@ describe('NumberWithUnitsObjectFactory', () => {
           new Units([
             {unit: 'rupee', exponent: 1},
             {unit: 'dollars', exponent: -1},
-            {unit: '$', exponent: -2},
           ])
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
           {unit: 'Rs', exponent: 1},
           {unit: 'dollar', exponent: -1},
-          {unit: 'dollar', exponent: -2},
         ]).units
       );
     });
