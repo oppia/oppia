@@ -36,6 +36,9 @@ jobs:
           make stop
       - name: Prettify code
         run: make run_tests.prettier
+      - name: Explain how to fix the issue
+        if: ${{ failure() }}
+        run: echo "Read https://github.com/oppia/oppia/wiki/Formatters to understand how to fix this issue."
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
         uses: ./.github/actions/send-webhook-notification
