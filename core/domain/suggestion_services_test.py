@@ -7276,6 +7276,45 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
             'data_format': 'set_of_normalized_string'
         }
 
+    def _calculate_translation_contribution_hours(
+        self, numer_of_words: int
+    ) -> str:
+        """Provides translatoin contribution hours when number of translated
+        words are provided. We calculate the time taken to translate
+        a word according to the following document.
+        https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
+ 
+        Args:
+            numer_of_words: int. The number of translated words.
+
+        Returns:
+            str. A string that represent the translatoin contribution hours.
+        """
+        return str(round(numer_of_words / 300, 2))
+
+    def _calculate_question_contribution_hours(
+        self, images_included: bool
+    ) -> str:
+        """Provides question contribution hours when number of questions
+        are provided. We calculate the time taken to submit
+        a question according to the following document.
+        https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
+ 
+        Args:
+            images_included: bool. A flag that says whether the question
+                contains images.
+
+        Returns:
+            str. A string that represent the question contribution hours.
+        """
+        minutes_contributed = 0
+
+        if images_included:
+            minutes_contributed += 20
+        else:
+            minutes_contributed += 12
+        return str(round(minutes_contributed / 60, 2))
+
     def test_create_translation_contributor_certificate(self) -> None:
         score_category: str = (
             suggestion_models.SCORE_TYPE_TRANSLATION +
@@ -7305,12 +7344,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # We calculate the time taken to translate
-        # a word according to the following document.
-        # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 3 words.
-        # Therefore the contribution_hours = 3 * 1 /300 = 0.01.
-        self.assertEqual(response['contribution_hours'], '0.01')
+        self.assertEqual(
+            response['contribution_hours'],
+            self._calculate_translation_contribution_hours(3)
+        )
         self.assertEqual(response['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_rule_translation(
@@ -7336,12 +7373,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # We calculate the time taken to translate
-        # a word according to the following document.
-        # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 4 words.
-        # Therefore the contribution_hours = 4 * 1 /300 = 0.01.
-        self.assertEqual(response['contribution_hours'], '0.01')
+        self.assertEqual(
+            response['contribution_hours'],
+            self._calculate_translation_contribution_hours(4)
+        )
         self.assertEqual(response['language'], 'Hindi')
 
     def test_create_translation_contributor_certificate_for_english(
@@ -7375,12 +7410,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # We calculate the time taken to translate
-        # a word according to the following document.
-        # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # The translation in this test has 3 words.
-        # Therefore the contribution_hours = 3 * 1 /300 = 0.01.
-        self.assertEqual(response['contribution_hours'], '0.01')
+        self.assertEqual(
+            response['contribution_hours'],
+            self._calculate_translation_contribution_hours(3)
+        )
         self.assertEqual(response['language'], 'English')
 
     def test_create_question_contributor_certificate(self) -> None:
@@ -7432,12 +7465,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # We calculate the time taken to create a question without images
-        # according to the following document.
-        # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # We create 1 question in this test.
-        # Therefore the contribution_hours = 1 * 1 / 5 = 0.2.
-        self.assertEqual(response['contribution_hours'], '0.2')
+        self.assertEqual(
+            response['contribution_hours'],
+            self._calculate_question_contribution_hours(False)
+        )
 
     def test_create_question_contributor_certificate_with_image_content(
         self
@@ -7491,12 +7522,10 @@ class ContributorCertificateTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(response)
-        # We calculate the time taken to create a question with images
-        # according to the following document.
-        # https://docs.google.com/spreadsheets/d/1ykSNwPLZ5qTCkuO21VLdtm_2SjJ5QJ0z0PlVjjSB4ZQ/edit#gid=0
-        # We create 1 question in this test.
-        # Therefore the contribution_hours = 1 * 1 / 3 = 0.33.
-        self.assertEqual(response['contribution_hours'], '0.33')
+        self.assertEqual(
+            response['contribution_hours'],
+            self._calculate_question_contribution_hours(True)
+        )
 
     def test_create_contributor_certificate_raises_exception_for_no_suggestions(
         self

@@ -2172,7 +2172,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
         change_cmd = {
-            'cmd': 'add_translation',
+            'cmd': 'add_written_translation',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
