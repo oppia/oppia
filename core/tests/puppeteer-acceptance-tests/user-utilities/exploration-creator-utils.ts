@@ -32,7 +32,7 @@ const endInteractionTab = '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
-const addGoal = '#explorationObjective';
+const addGoal = '.e2e-test-exploration-objective-input';
 const categoryDropDawn = '.e2e-test-exploration-category-dropdown';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
