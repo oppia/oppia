@@ -712,7 +712,11 @@ export class LoggedInUser extends BaseUser {
    * This function checks whether we have completed an exploration or not.
    */
   async expectReachedTheEndOfExploration(): Promise<void> {
-    await this.page.waitForSelector(explorationCompletionToast);
+    if (await this.page.waitForSelector(explorationCompletionToast)) {
+      showMessage('Exploration completed successfully!');
+    } else {
+      throw new Error('Failed to complete the exploration.');
+    }
   }
 
   /**
@@ -729,7 +733,13 @@ export class LoggedInUser extends BaseUser {
     await this.page.click(
       'oppia-exploration-successfully-flagged-modal button'
     );
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
     await this.page.waitForTimeout(500);
+    showMessage(`Exploration reported with message ${reportMessage}.`);
   }
 
   /**
@@ -740,6 +750,7 @@ export class LoggedInUser extends BaseUser {
     await this.type(feedbackTextArea, feedbackMessage);
     await this.page.click('.e2e-test-exploration-feedback-submit-btn');
     await this.page.waitForSelector('ngb-popover-window');
+    showMessage(`Feedback has been given with the message: ${feedbackMessage}`);
   }
 
   /**
@@ -799,6 +810,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.click('.remove-icon');
     await this.page.waitForSelector(confirmRemoveButton);
     await this.page.click(confirmRemoveButton);
+    showMessage('Removed exploration from play later');
   }
 
   /**
@@ -818,6 +830,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.click('.e2e-test-feedback-tab');
     await this.page.waitForSelector('.table');
     let feedbackFound = false;
+    let count = 0;
     const tableData = await this.page.$$eval('.table tr', rows => {
       return Array.from(rows, row => {
         const columns = row.querySelectorAll('td');
@@ -828,11 +841,16 @@ export class LoggedInUser extends BaseUser {
     tableData.forEach(row => {
       if (row[2] === username) {
         feedbackFound = true;
+        count += 1;
       }
     });
 
     if (feedbackFound) {
-      showMessage(`User feedback by ${username} is present.`);
+      if (count === 1) {
+        showMessage(`1 feedback from ${username} is present.`);
+      } else {
+        throw new Error(`${count} feedbacks from ${username} are present`);
+      }
     } else {
       throw new Error(`User feedback by ${username} is not present.`);
     }
