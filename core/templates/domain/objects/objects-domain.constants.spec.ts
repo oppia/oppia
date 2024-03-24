@@ -17,199 +17,48 @@
  */
 
 import {ObjectsDomainConstants} from './objects-domain.constants';
+import {all, create} from 'mathjs';
+
+const math = create(all);
+let currencyUnits: string[] = [];
+for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
+  if (ObjectsDomainConstants.CURRENCY_UNITS.hasOwnProperty(currency)) {
+    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+    currencyUnits.push(currency, ...currencyInfo.aliases);
+  }
+}
+
+const isValidUnit = (unit: string): boolean => {
+  return (
+    currencyUnits.includes(unit) ||
+    // This throws "TS2551". We need to
+    // suppress this error because mathjs does not have a type defined for Unit.
+    // @ts-ignore
+    math.Unit.isValuelessUnit(unit)
+  );
+};
 
 describe('ObjectsDomainConstants', () => {
-  const validUnits = [
-    'm',
-    'meter',
-    'in',
-    'inch',
-    'ft',
-    'foot',
-    'yd',
-    'yard',
-    'mi',
-    'mile',
-    'li',
-    'link',
-    'rd',
-    'rod',
-    'ch',
-    'chain',
-    'angstrom',
-    'mil',
-    'm2',
-    'sqin',
-    'sqft',
-    'sqyd',
-    'sqmi',
-    'sqrd',
-    'sqch',
-    'sqmil',
-    'acre',
-    'hectare',
-    'm3',
-    'litre',
-    'L',
-    'l',
-    'lt',
-    'cc',
-    'cuin',
-    'cuft',
-    'cuyd',
-    'teaspoon',
-    'tablespoon',
-    'radian',
-    'deg',
-    'degree',
-    'grad',
-    'gradian',
-    'cycle',
-    'arcsec',
-    'arcmin',
-    'second',
-    'seconds',
-    's',
-    'secs',
-    'minute',
-    'minutes',
-    'min',
-    'mins',
-    'hr',
-    'hrs',
-    'hour',
-    'hours',
-    'day',
-    'days',
-    'week',
-    'weeks',
-    'month',
-    'months',
-    'year',
-    'years',
-    'decade',
-    'decades',
-    'century',
-    'centuries',
-    'millennium',
-    'millennia',
-    'Hz',
-    'kg',
-    'kilogram',
-    'g',
-    'gram',
-    'tonne',
-    'ton',
-    'gr',
-    'grain',
-    'dr',
-    'dram',
-    'oz',
-    'ounce',
-    'lbm',
-    'lb',
-    'lbs',
-    'poundmass',
-    'hundredweight',
-    'stick',
-    'stone',
-    'K',
-    'kelvin',
-    'degC',
-    'celsius',
-    'degF',
-    'fahrenheit',
-    'degR',
-    'rankine',
-    'mol',
-    'mole',
-    'cd',
-    'candela',
-    'N',
-    'dyn',
-    'dyne',
-    'lbf',
-    'poundforce',
-    'kip',
-    'J',
-    'joule',
-    'erg',
-    'Wh',
-    'BTU',
-    'eV',
-    'electronvolt',
-    'W',
-    'watt',
-    'hp',
-    'horsepower',
-    'Pa',
-    'psi',
-    'atm',
-    'torr',
-    'bar',
-    'mmHg',
-    'mmH2O',
-    'cmH2O',
-    'A',
-    'ampere',
-    'V',
-    'volt',
-    'C',
-    'coulomb',
-    'ohm',
-    'F',
-    'farad',
-    'Wb',
-    'weber',
-    'T',
-    'tesla',
-    'H',
-    'henry',
-    'S',
-    'siemens',
-    'b',
-    'bit',
-    'B',
-    'byte',
-    '$',
-    'dollar',
-    'dollars',
-    'Dollar',
-    'Dollars',
-    '₹',
-    'Rs',
-    'Rupee',
-    'Rupees',
-    'rupee',
-    'rupees',
-    'Cent',
-    'Cents',
-    'cent',
-    'cents',
-    'Paisa',
-    'paise',
-    'cwt',
-    'newton',
-    'rad',
-    'USD',
-  ];
-
-  it('should have all units as keys in UNIT_TO_NORMALIZED_UNIT_MAPPING', () => {
-    const keys = Object.keys(
-      ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
-    );
-    expect(keys.sort()).toEqual(validUnits.sort());
-  });
-
   it(
     'should check that every value in UNIT_TO_' +
       'NORMALIZED_UNIT_MAPPING is a valid unit',
     () => {
-      const unitValues = Object.values(
+      Object.values(
         ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
-      );
-      unitValues.forEach(value => {
-        expect(validUnits).toContain(value);
+      ).forEach(unit => {
+        expect(isValidUnit(unit)).toBe(true);
+      });
+    }
+  );
+
+  it(
+    'should check that every key in UNIT_TO_' +
+      'NORMALIZED_UNIT_MAPPING is a valid unit',
+    () => {
+      Object.keys(
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
+      ).forEach(unit => {
+        expect(isValidUnit(unit)).toBe(true);
       });
     }
   );

@@ -222,7 +222,6 @@ export const ObjectsDomainConstants = {
     W: 'W',
     watt: 'W',
     hp: 'hp',
-    horsepower: 'hp',
 
     // Pressure.
     Pa: 'Pa',
