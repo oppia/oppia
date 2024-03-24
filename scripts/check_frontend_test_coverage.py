@@ -64,8 +64,6 @@ NOT_FULLY_COVERED_FILENAMES = [
     'rte-helper-modal.controller.ts',
     'rule-type-selector.directive.ts',
     'translation-file-hash-loader-backend-api.service.ts',
-    # TODO(#19499): Add missing tests.
-    'translation-suggestion-review-modal.component.ts',
     # Please don't try to cover `unit-test-utils.ajs.ts` file.
     'unit-test-utils.ajs.ts',
     'voiceover-recording.service.ts',
