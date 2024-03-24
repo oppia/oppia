@@ -258,7 +258,7 @@ export class SchemaBasedFloatEditorComponent
       } else {
         // Parse number if the string is in proper format.
         this.localValue = this.numberConversionService.convertToEnglishDecimal(
-          this.localStringValue
+          this.localStringValue.replace(/\.|,/g, currentDecimalSeparator)
         );
 
         // Generate errors (if any).
