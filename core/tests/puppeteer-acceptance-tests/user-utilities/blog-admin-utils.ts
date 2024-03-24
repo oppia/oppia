@@ -16,12 +16,9 @@
  * @fileoverview Blog Admin users utility file.
  */
 
-import { IBaseUser, BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const BLOG_RIGHTS = testConstants.BlogRights;
 
@@ -32,23 +29,13 @@ const blogAdminUrl = testConstants.URLs.BlogAdmin;
 
 const LABEL_FOR_SAVE_BUTTON = 'Save';
 
-export interface IBlogAdmin extends IBaseUser {
-  assignUserToRoleFromBlogAdminPage: (
-    username: string, role: keyof typeof BLOG_RIGHTS) => Promise<void>;
-  removeBlogEditorRoleFromUsername: (
-    username: string) => Promise<void>;
-  setMaximumTagLimitTo: (limit: number) => Promise<void>;
-  expectMaximumTagLimitNotToBe: (limit: number) => Promise<void>;
-  expectMaximumTagLimitToBe: (limit: number) => Promise<void>;
-}
-
-class BlogAdmin extends BaseUser implements IBlogAdmin {
+export class BlogAdmin extends BaseUser {
   /**
    * This function assigns a user with a role from the blog admin page.
    */
   async assignUserToRoleFromBlogAdminPage(
-      username: string,
-      role: keyof typeof BLOG_RIGHTS
+    username: string,
+    role: keyof typeof BLOG_RIGHTS
   ): Promise<void> {
     await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
@@ -71,7 +58,7 @@ class BlogAdmin extends BaseUser implements IBlogAdmin {
   async setMaximumTagLimitTo(limit: number): Promise<void> {
     // These steps are for deleting the existing value in the input field.
     const tagInputField = await this.page.$(maximumTagLimitInput);
-    await tagInputField?.click({ clickCount: 3 });
+    await tagInputField?.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
 
     await this.type(maximumTagLimitInput, limit.toString());
@@ -86,7 +73,8 @@ class BlogAdmin extends BaseUser implements IBlogAdmin {
   async expectMaximumTagLimitNotToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
-      element => (element as HTMLInputElement).value);
+      element => (element as HTMLInputElement).value
+    );
     if (parseInt(tagLimit) === limit) {
       throw new Error(`Maximum tag limit is already ${limit}!`);
     }
@@ -99,7 +87,8 @@ class BlogAdmin extends BaseUser implements IBlogAdmin {
   async expectMaximumTagLimitToBe(limit: number): Promise<void> {
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
-      element => (element as HTMLInputElement).value);
+      element => (element as HTMLInputElement).value
+    );
     if (parseInt(tagLimit) !== limit) {
       throw new Error(`Maximum tag limit is not ${limit}!`);
     }
@@ -107,4 +96,4 @@ class BlogAdmin extends BaseUser implements IBlogAdmin {
   }
 }
 
-export let BlogAdminFactory = (): IBlogAdmin => new BlogAdmin();
+export let BlogAdminFactory = (): BlogAdmin => new BlogAdmin();

@@ -17,12 +17,12 @@
  * is undefined.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Schema } from 'services/schema-default-value.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Schema} from 'services/schema-default-value.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SchemaUndefinedLastElementService {
   // Returns true if the input value, taken as the last element in a list,
@@ -36,6 +36,9 @@ export class SchemaUndefinedLastElementService {
   }
 }
 
-angular.module('oppia').factory(
-  'SchemaUndefinedLastElementService',
-  downgradeInjectable(SchemaUndefinedLastElementService));
+angular
+  .module('oppia')
+  .factory(
+    'SchemaUndefinedLastElementService',
+    downgradeInjectable(SchemaUndefinedLastElementService)
+  );

@@ -592,7 +592,6 @@
 	"I18N_PREFERENCES_EMAIL_RECEIVE_NEWS": "Nachrichten und Aktualisierungen über die Website erhalten",
 	"I18N_PREFERENCES_EMAIL_RECEIVE_SUBSCRIPTION_NEWS": "E-Mails erhalten, wenn ein abonnierter Ersteller eine neue Erforschung veröffentlicht.",
 	"I18N_PREFERENCES_HEADING": "Einstellungen",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Jede Änderung, die du auf dieser Seite durchführst, wird automatisch gespeichert.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Du hast noch keine Ersteller abonniert.",
 	"I18N_PREFERENCES_PAGE_BROWSER_TAB_TITLE": "Einstellungen | Oppia",
 	"I18N_PREFERENCES_PAGE_TITLE": "Deine Profileinstellungen ändern – Oppia",

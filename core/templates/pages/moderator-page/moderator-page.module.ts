@@ -16,16 +16,16 @@
  * @fileoverview Module for the moderator page.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { ToastrModule } from 'ngx-toastr';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
-import { ModeratorPageComponent } from './moderator-page.component';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { ModeratorPageRootComponent } from './moderator-page-root.component';
-import { ModeratorAuthGuard } from './moderator-auth.guard';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {ToastrModule} from 'ngx-toastr';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
+import {ModeratorPageComponent} from './moderator-page.component';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {ModeratorPageRootComponent} from './moderator-page-root.component';
+import {ModeratorAuthGuard} from './moderator-auth.guard';
 
 @NgModule({
   imports: [
@@ -37,16 +37,11 @@ import { ModeratorAuthGuard } from './moderator-auth.guard';
       {
         path: '',
         component: ModeratorPageRootComponent,
-        canActivate: [ModeratorAuthGuard]
-      }
-    ])
+        canActivate: [ModeratorAuthGuard],
+      },
+    ]),
   ],
-  declarations: [
-    ModeratorPageComponent,
-    ModeratorPageRootComponent
-  ],
-  entryComponents: [
-    ModeratorPageComponent,
-  ],
+  declarations: [ModeratorPageComponent, ModeratorPageRootComponent],
+  entryComponents: [ModeratorPageComponent],
 })
 export class ModeratorPageModule {}

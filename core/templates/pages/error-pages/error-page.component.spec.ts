@@ -15,12 +15,12 @@
 /**
  * @fileoverview Unit tests for error page.
  */
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {TestBed, ComponentFixture} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { ErrorPageComponent } from './error-page.component';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import {ErrorPageComponent} from './error-page.component';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 describe('ErrorPageComponent', () => {
   let component: ErrorPageComponent;
@@ -31,7 +31,7 @@ describe('ErrorPageComponent', () => {
       imports: [TranslateModule.forRoot()],
       declarations: [ErrorPageComponent],
       providers: [UrlInterpolationService],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ErrorPageComponent);
@@ -45,7 +45,8 @@ describe('ErrorPageComponent', () => {
   });
 
   it('should get the static image url', () => {
-    expect(component.getStaticImageUrl('/general/oops_mint.webp'))
-      .toBe('/assets/images/general/oops_mint.webp');
+    expect(component.getStaticImageUrl('/general/oops_mint.webp')).toBe(
+      '/assets/images/general/oops_mint.webp'
+    );
   });
 });

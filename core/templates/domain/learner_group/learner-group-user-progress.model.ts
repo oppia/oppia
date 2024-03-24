@@ -12,10 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { StorySummary, StorySummaryBackendDict }
-  from 'domain/story/story-summary.model';
-import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
-  from './learner-group-subtopic-summary.model';
+import {
+  StorySummary,
+  StorySummaryBackendDict,
+} from 'domain/story/story-summary.model';
+import {
+  LearnerGroupSubtopicSummary,
+  LearnerGroupSubtopicSummaryBackendDict,
+} from './learner-group-subtopic-summary.model';
 
 /**
  * @fileoverview Model for displaying instances of frontend learner group
@@ -23,7 +27,7 @@ import { LearnerGroupSubtopicSummary, LearnerGroupSubtopicSummaryBackendDict }
  */
 
 export interface LearnerGroupUserProgressBackendDict {
-  username: string ;
+  username: string;
   progress_sharing_is_turned_on: boolean;
   stories_progress: StorySummaryBackendDict[];
   subtopic_pages_progress: LearnerGroupSubtopicSummaryBackendDict[];
@@ -36,10 +40,10 @@ export class LearnerGroupUserProgress {
   _subtopicsProgress: LearnerGroupSubtopicSummary[];
 
   constructor(
-      username: string,
-      progressSharingIsTurnedOn: boolean,
-      storiesProgress: StorySummary[],
-      subtopicsProgress: LearnerGroupSubtopicSummary[],
+    username: string,
+    progressSharingIsTurnedOn: boolean,
+    storiesProgress: StorySummary[],
+    subtopicsProgress: LearnerGroupSubtopicSummary[]
   ) {
     this._username = username;
     this._progressSharingIsTurnedOn = progressSharingIsTurnedOn;
@@ -64,24 +68,23 @@ export class LearnerGroupUserProgress {
   }
 
   static createFromBackendDict(
-      progBackendDict: LearnerGroupUserProgressBackendDict
+    progBackendDict: LearnerGroupUserProgressBackendDict
   ): LearnerGroupUserProgress {
     let storiesProgress: StorySummary[] = [];
     if (progBackendDict.stories_progress.length > 0) {
       storiesProgress = progBackendDict.stories_progress.map(
-        storySummaryBackendDict => StorySummary.createFromBackendDict(
-          storySummaryBackendDict
-        )
+        storySummaryBackendDict =>
+          StorySummary.createFromBackendDict(storySummaryBackendDict)
       );
     }
 
     let subtopicsProgress: LearnerGroupSubtopicSummary[] = [];
     if (progBackendDict.subtopic_pages_progress.length > 0) {
       subtopicsProgress = progBackendDict.subtopic_pages_progress.map(
-        (subtopicProgressBackendDict) => (
+        subtopicProgressBackendDict =>
           LearnerGroupSubtopicSummary.createFromBackendDict(
-            subtopicProgressBackendDict)
-        )
+            subtopicProgressBackendDict
+          )
       );
     }
 

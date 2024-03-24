@@ -16,39 +16,43 @@
  * @fileoverview Unit tests for the training data service.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { TrainingDataService } from './training-data.service';
-import { ResponsesService } from '../services/responses.service';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Rule } from 'domain/exploration/rule.model';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { State } from 'domain/state/StateObjectFactory';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {TrainingDataService} from './training-data.service';
+import {ResponsesService} from '../services/responses.service';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Rule} from 'domain/exploration/rule.model';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {State} from 'domain/state/StateObjectFactory';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
 
 class MockResponsesService {
   AnswerGroupArray = [
-    new AnswerGroup([
-      new Rule('TextInput', null, null),
-      new Rule('TextInput', null, null)
-    ], null, ['trainingData 1'], null),
-    new AnswerGroup([
-      new Rule('TextInput', null, null),
-      new Rule('TextInput', null, null)
-    ], null, ['trainingData 1', 'trainingData 2'], null)
+    new AnswerGroup(
+      [new Rule('TextInput', null, null), new Rule('TextInput', null, null)],
+      null,
+      ['trainingData 1'],
+      null
+    ),
+    new AnswerGroup(
+      [new Rule('TextInput', null, null), new Rule('TextInput', null, null)],
+      null,
+      ['trainingData 1', 'trainingData 2'],
+      null
+    ),
   ];
 
   getAnswerGroup(index: number) {
@@ -60,22 +64,18 @@ class MockResponsesService {
   }
 
   updateAnswerGroup(
-      item1: string,
-      item2: string,
-      item3: (arg0: string) => void
+    item1: string,
+    item2: string,
+    item3: (arg0: string) => void
   ) {
     item3(null);
   }
 
-  save(
-      item1: string,
-      item2: string,
-      item3: (arg0: string) => void
-  ) {
+  save(item1: string, item2: string, item3: (arg0: string) => void) {
     item3(null);
   }
 
-  updateConfirmedUnclassifiedAnswers(item1: string) { }
+  updateConfirmedUnclassifiedAnswers(item1: string) {}
   getConfirmedUnclassifiedAnswers() {
     return ['answer1', 'answer2'];
   }
@@ -86,17 +86,11 @@ class MockResponsesService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(
-      item1: string, item2: string
-  ) { }
+  saveInteractionAnswerGroups(item1: string, item2: string) {}
 
-  saveInteractionDefaultOutcome(
-      item1: string, item2: string
-  ) { }
+  saveInteractionDefaultOutcome(item1: string, item2: string) {}
 
-  saveConfirmedUnclassifiedAnswers(
-      item1: string, item2: string
-  ) { }
+  saveConfirmedUnclassifiedAnswers(item1: string, item2: string) {}
 }
 
 class MockStateEditorService {
@@ -115,7 +109,7 @@ describe('Training Data Service', () => {
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         {
           provide: ExplorationDataService,
@@ -123,69 +117,82 @@ describe('Training Data Service', () => {
             explorationId: 0,
             autosaveChangeListAsync() {
               return;
-            }
-          }
+            },
+          },
         },
         TrainingDataService,
         {
           provide: ExplorationStatesService,
-          useClass: MockExplorationStatesService
+          useClass: MockExplorationStatesService,
         },
         {
           provide: StateEditorService,
-          useClass: MockStateEditorService
+          useClass: MockStateEditorService,
         },
         {
           provide: ResponsesService,
-          useClass: MockResponsesService
-        }
-      ]
+          useClass: MockResponsesService,
+        },
+      ],
     });
 
     responsesService = TestBed.inject(ResponsesService);
     trainingDataService = TestBed.inject(TrainingDataService);
   });
 
-  it('should be able to train answer groups and the default response',
+  it('should be able to train answer groups and the default response', () => {
+    spyOn(responsesService, 'updateAnswerGroup');
+
+    // Training the first answer of a group should add a new classifier.
+    trainingDataService.associateWithAnswerGroup(0, 'answer1');
+
+    expect(responsesService.updateAnswerGroup).toHaveBeenCalled();
+  });
+
+  it(
+    'should be able to retrain answers between answer groups and the ' +
+      'default outcome',
     () => {
-      spyOn(responsesService, 'updateAnswerGroup');
+      // Retraining an answer from the answer group to the default outcome
+      // should remove it from the first, then add it to the second.
+      trainingDataService.associateWithAnswerGroup(0, 'text answer');
+      trainingDataService.associateWithAnswerGroup(0, 'second answer');
+      trainingDataService.associateWithDefaultResponse('third answer');
 
-      // Training the first answer of a group should add a new classifier.
-      trainingDataService.associateWithAnswerGroup(0, 'answer1');
+      expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+        'trainingData 1',
+        'text answer',
+        'second answer',
+      ]);
 
-      expect(responsesService.updateAnswerGroup).toHaveBeenCalled();
+      // Try to retrain the second answer (answer group -> default response).
+      trainingDataService.associateWithDefaultResponse('second answer');
+      expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+        'trainingData 1',
+        'text answer',
+        'second answer',
+      ]);
+
+      // Try to retrain the third answer (default response -> answer group).
+      trainingDataService.associateWithAnswerGroup(0, 'third answer');
+
+      expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+        'trainingData 1',
+        'text answer',
+        'second answer',
+        'third answer',
+      ]);
     }
   );
-
-  it('should be able to retrain answers between answer groups and the ' +
-    'default outcome', () => {
-    // Retraining an answer from the answer group to the default outcome
-    // should remove it from the first, then add it to the second.
-    trainingDataService.associateWithAnswerGroup(0, 'text answer');
-    trainingDataService.associateWithAnswerGroup(0, 'second answer');
-    trainingDataService.associateWithDefaultResponse('third answer');
-
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'text answer', 'second answer']);
-
-    // Try to retrain the second answer (answer group -> default response).
-    trainingDataService.associateWithDefaultResponse('second answer');
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'text answer', 'second answer']);
-
-    // Try to retrain the third answer (default response -> answer group).
-    trainingDataService.associateWithAnswerGroup(0, 'third answer');
-
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'text answer', 'second answer', 'third answer']);
-  });
 
   it('should not be able to train duplicated answers', () => {
     trainingDataService.associateWithAnswerGroup(0, 'trainingData 2');
     trainingDataService.associateWithDefaultResponse('second answer');
 
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'trainingData 2']);
+    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+      'trainingData 1',
+      'trainingData 2',
+    ]);
 
     // Training a duplicate answer for the answer group should change nothing.
     trainingDataService.associateWithAnswerGroup(0, 'trainingData 3');
@@ -194,8 +201,11 @@ describe('Training Data Service', () => {
     // nothing.
     trainingDataService.associateWithDefaultResponse('second answer');
 
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'trainingData 2', 'trainingData 3']);
+    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+      'trainingData 1',
+      'trainingData 2',
+      'trainingData 3',
+    ]);
   });
 
   it('should get all potential outcomes of an interaction', () => {
@@ -205,79 +215,131 @@ describe('Training Data Service', () => {
     // type 'Outcome'." We need to suppress this error because of the need to
     // test validations. This throws an error because the outcome is null.
     // @ts-ignore
-    expect(trainingDataService.getAllPotentialOutcomes(
-      new State(
-        'State', 'id', 'some', null,
-        new Interaction([
-          new AnswerGroup([
-            new Rule('TextInput', null, null),
-            new Rule('TextInput', null, null)
-          ], null, ['trainingData 1'], null),
-          new AnswerGroup([
-            new Rule('TextInput', null, null),
-            new Rule('TextInput', null, null)
-          ], null, ['trainingData 1'], null)
-        ], [], null, new Outcome(
-          'Hola',
+    expect(
+      trainingDataService.getAllPotentialOutcomes(
+        new State(
+          'State',
+          'id',
+          'some',
           null,
-          new SubtitledHtml('<p> HTML string </p>', 'Id'),
-          false,
-          [],
+          new Interaction(
+            [
+              new AnswerGroup(
+                [
+                  new Rule('TextInput', null, null),
+                  new Rule('TextInput', null, null),
+                ],
+                null,
+                ['trainingData 1'],
+                null
+              ),
+              new AnswerGroup(
+                [
+                  new Rule('TextInput', null, null),
+                  new Rule('TextInput', null, null),
+                ],
+                null,
+                ['trainingData 1'],
+                null
+              ),
+            ],
+            [],
+            null,
+            new Outcome(
+              'Hola',
+              null,
+              new SubtitledHtml('<p> HTML string </p>', 'Id'),
+              false,
+              [],
+              null,
+              null
+            ),
+            [],
+            'id',
+            null
+          ),
           null,
           null,
-        ), [], 'id', null),
-        null, null, true, null)
-    )).toEqual([null, null, new Outcome(
-      'Hola',
-      null,
-      new SubtitledHtml('<p> HTML string </p>', 'Id'),
-      false,
-      [],
+          true,
+          null
+        )
+      )
+    ).toEqual([
       null,
       null,
-    )]);
+      new Outcome(
+        'Hola',
+        null,
+        new SubtitledHtml('<p> HTML string </p>', 'Id'),
+        false,
+        [],
+        null,
+        null
+      ),
+    ]);
   });
 
-  it('should remove answer from training data associated with given answer ' +
-    'group', () => {
-    trainingDataService.associateWithAnswerGroup(0, 'text answer');
-    trainingDataService.associateWithAnswerGroup(0, 'second answer');
-    trainingDataService.associateWithAnswerGroup(0, 'second answer');
+  it(
+    'should remove answer from training data associated with given answer ' +
+      'group',
+    () => {
+      trainingDataService.associateWithAnswerGroup(0, 'text answer');
+      trainingDataService.associateWithAnswerGroup(0, 'second answer');
+      trainingDataService.associateWithAnswerGroup(0, 'second answer');
 
-    trainingDataService
-      .removeAnswerFromAnswerGroupTrainingData('second answer', 0);
+      trainingDataService.removeAnswerFromAnswerGroupTrainingData(
+        'second answer',
+        0
+      );
 
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'text answer', 'second answer', 'second answer']);
-  });
+      expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+        'trainingData 1',
+        'text answer',
+        'second answer',
+        'second answer',
+      ]);
+    }
+  );
 
-  it('should correctly check whether answer is in confirmed unclassified ' +
-    'answers', fakeAsync(() => {
-    trainingDataService.associateWithAnswerGroup(0, 'text answer');
-    trainingDataService.associateWithAnswerGroup(0, 'second answer');
-    trainingDataService.associateWithDefaultResponse('second answer');
-    tick();
+  it(
+    'should correctly check whether answer is in confirmed unclassified ' +
+      'answers',
+    fakeAsync(() => {
+      trainingDataService.associateWithAnswerGroup(0, 'text answer');
+      trainingDataService.associateWithAnswerGroup(0, 'second answer');
+      trainingDataService.associateWithDefaultResponse('second answer');
+      tick();
 
-    expect(trainingDataService.isConfirmedUnclassifiedAnswer('text answer'))
-      .toBe(false);
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'text answer', 'second answer']);
-  }));
+      expect(
+        trainingDataService.isConfirmedUnclassifiedAnswer('text answer')
+      ).toBe(false);
+      expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+        'trainingData 1',
+        'text answer',
+        'second answer',
+      ]);
+    })
+  );
 
   it('should get all the training data answers', () => {
     trainingDataService.associateWithAnswerGroup(0, 'text answer');
     trainingDataService.associateWithAnswerGroup(0, 'second answer');
     trainingDataService.associateWithDefaultResponse('second answer');
 
-    expect(trainingDataService.getTrainingDataAnswers()).toEqual([{
-      answerGroupIndex: 0,
-      answers: ['trainingData 1', 'text answer', 'second answer']
-    },
-    {
-      answerGroupIndex: 1,
-      answers: ['trainingData 1', 'trainingData 2']
-    }]);
-    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual(
-      ['trainingData 1', 'text answer', 'second answer']);
+    expect(trainingDataService.getTrainingDataAnswers()).toEqual([
+      {
+        answerGroupIndex: 0,
+        answers: ['trainingData 1', 'text answer', 'second answer'],
+      },
+      {
+        answerGroupIndex: 1,
+        answers: ['trainingData 1', 'trainingData 2'],
+      },
+    ]);
+    expect(trainingDataService.getTrainingDataOfAnswerGroup(0)).toEqual([
+      'trainingData 1',
+      'text answer',
+      'second answer',
+    ]);
   });
 });

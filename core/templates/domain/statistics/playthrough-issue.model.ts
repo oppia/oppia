@@ -23,17 +23,17 @@ export enum PlaythroughIssueType {
 }
 
 export interface EarlyQuitCustomizationArgs {
-  'state_name': { value: string };
-  'time_spent_in_exp_in_msecs': { value: number };
+  state_name: {value: string};
+  time_spent_in_exp_in_msecs: {value: number};
 }
 
 export interface CyclicStateTransitionsCustomizationArgs {
-  'state_names': { value: string[] };
+  state_names: {value: string[]};
 }
 
 export interface MultipleIncorrectSubmissionsCustomizationArgs {
-  'state_name': { value: string };
-  'num_times_answered_incorrectly': { value: number };
+  state_name: {value: string};
+  num_times_answered_incorrectly: {value: number};
 }
 export type PlaythroughIssueCustomizationArgs =
   | EarlyQuitCustomizationArgs
@@ -75,8 +75,7 @@ export class PlaythroughIssue {
       }
       case PlaythroughIssueType.MultipleIncorrectSubmissions: {
         const args = this
-          .issueCustomizationArgs as
-            MultipleIncorrectSubmissionsCustomizationArgs;
+          .issueCustomizationArgs as MultipleIncorrectSubmissionsCustomizationArgs;
         return args.state_name.value;
       }
       case PlaythroughIssueType.CyclicStateTransitions: {
@@ -91,7 +90,7 @@ export class PlaythroughIssue {
   }
 
   static createFromBackendDict(
-      backendDict: PlaythroughIssueBackendDict
+    backendDict: PlaythroughIssueBackendDict
   ): PlaythroughIssue {
     switch (backendDict.issue_type) {
       case PlaythroughIssueType.EarlyQuit:
@@ -105,8 +104,7 @@ export class PlaythroughIssue {
       case PlaythroughIssueType.CyclicStateTransitions:
         return new PlaythroughIssue(
           backendDict.issue_type,
-          backendDict.issue_customization_args as
-            CyclicStateTransitionsCustomizationArgs,
+          backendDict.issue_customization_args as CyclicStateTransitionsCustomizationArgs,
           backendDict.playthrough_ids,
           backendDict.schema_version,
           backendDict.is_valid
@@ -114,8 +112,7 @@ export class PlaythroughIssue {
       case PlaythroughIssueType.MultipleIncorrectSubmissions:
         return new PlaythroughIssue(
           backendDict.issue_type,
-          backendDict.issue_customization_args as
-            MultipleIncorrectSubmissionsCustomizationArgs,
+          backendDict.issue_customization_args as MultipleIncorrectSubmissionsCustomizationArgs,
           backendDict.playthrough_ids,
           backendDict.schema_version,
           backendDict.is_valid

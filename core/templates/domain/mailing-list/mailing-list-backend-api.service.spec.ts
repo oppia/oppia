@@ -16,9 +16,12 @@
  * @fileoverview Unit tests for android updates backend API service.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-import { MailingListBackendApiService } from './mailing-list-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {MailingListBackendApiService} from './mailing-list-backend-api.service';
 
 describe('Android updates backend api service', () => {
   let aubas: MailingListBackendApiService;
@@ -28,7 +31,7 @@ describe('Android updates backend api service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
     aubas = TestBed.inject(MailingListBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -40,50 +43,57 @@ describe('Android updates backend api service', () => {
     httpTestingController.verify();
   });
 
-  it('should use the rejection handler if the backend request failed.',
-    fakeAsync(() => {
-      aubas.subscribeUserToMailingList('email@example.com', 'name', 'Web').then(
-        successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        '/mailinglistsubscriptionhandler');
-      expect(req.request.method).toEqual('PUT');
-
-      req.flush({
-        error: 'Some error in the backend.'
-      }, {
-        status: 500, statusText: 'Internal Server Error'
-      });
-      flushMicrotasks();
-
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
-    })
-  );
-
-  it('should subscribe user to android list' +
-  'when calling subscribeUserToMailingList', fakeAsync(() => {
-    let email = 'email@example.com';
-    let name = 'username';
-    let payload = {
-      email: email,
-      name: name,
-      tag: 'Android'
-    };
-    aubas.subscribeUserToMailingList(email, name, 'Android')
+  it('should use the rejection handler if the backend request failed.', fakeAsync(() => {
+    aubas
+      .subscribeUserToMailingList('email@example.com', 'name', 'Web')
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      '/mailinglistsubscriptionhandler');
+      '/mailinglistsubscriptionhandler'
+    );
     expect(req.request.method).toEqual('PUT');
-    expect(req.request.body).toEqual(payload);
 
     req.flush(
-      { status: 200, statusText: 'Success.'});
+      {
+        error: 'Some error in the backend.',
+      },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      }
+    );
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Some error in the backend.');
+  }));
+
+  it(
+    'should subscribe user to android list' +
+      'when calling subscribeUserToMailingList',
+    fakeAsync(() => {
+      let email = 'email@example.com';
+      let name = 'username';
+      let payload = {
+        email: email,
+        name: name,
+        tag: 'Android',
+      };
+      aubas
+        .subscribeUserToMailingList(email, name, 'Android')
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        '/mailinglistsubscriptionhandler'
+      );
+      expect(req.request.method).toEqual('PUT');
+      expect(req.request.body).toEqual(payload);
+
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 });

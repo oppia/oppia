@@ -16,12 +16,11 @@
  * @fileoverview Component for editing user roles.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-translation-coordinator-role-editor-modal',
@@ -49,7 +48,8 @@ export class TranslationCoordinatorRoleEditorModalComponent implements OnInit {
 
   private updatelanguageIdsForSelection(): void {
     this.languageIdsForSelection = Object.keys(this.languageIdToName).filter(
-      languageId => !this.coordinatedLanguageIds.includes(languageId));
+      languageId => !this.coordinatedLanguageIds.includes(languageId)
+    );
     this.newLanguageId = this.languageIdsForSelection[0];
   }
 
@@ -60,34 +60,45 @@ export class TranslationCoordinatorRoleEditorModalComponent implements OnInit {
     this.coordinatedLanguageIds.push(this.newLanguageId);
     this.languageIdInUpdate = this.newLanguageId;
     this.newLanguageId = null;
-    this.adminBackendApiService.assignTranslationCoordinator(
-      this.username, this.languageIdInUpdate).then(()=> {
-      this.languageIdInUpdate = null;
-      this.updatelanguageIdsForSelection();
-    }, errorMessage => {
-      if (this.languageIdInUpdate !== null) {
-        let languageIdIndex = this.coordinatedLanguageIds.indexOf(
-          this.languageIdInUpdate);
-        this.coordinatedLanguageIds.splice(languageIdIndex, 1);
-      }
-      this.alertsService.addWarning(
-        errorMessage || 'Error communicating with server.');
-    });
+    this.adminBackendApiService
+      .assignTranslationCoordinator(this.username, this.languageIdInUpdate)
+      .then(
+        () => {
+          this.languageIdInUpdate = null;
+          this.updatelanguageIdsForSelection();
+        },
+        errorMessage => {
+          if (this.languageIdInUpdate !== null) {
+            let languageIdIndex = this.coordinatedLanguageIds.indexOf(
+              this.languageIdInUpdate
+            );
+            this.coordinatedLanguageIds.splice(languageIdIndex, 1);
+          }
+          this.alertsService.addWarning(
+            errorMessage || 'Error communicating with server.'
+          );
+        }
+      );
   }
 
   removeLanguageId(languageIdToRemove: string): void {
-    let languageIdIndex = this.coordinatedLanguageIds.indexOf(
-      languageIdToRemove);
+    let languageIdIndex =
+      this.coordinatedLanguageIds.indexOf(languageIdToRemove);
     this.languageIdInUpdate = languageIdToRemove;
-    this.adminBackendApiService.deassignTranslationCoordinator(
-      this.username, languageIdToRemove).then(() => {
-      this.coordinatedLanguageIds.splice(languageIdIndex, 1);
-      this.languageIdInUpdate = null;
-      this.updatelanguageIdsForSelection();
-    }, errorMessage => {
-      this.alertsService.addWarning(
-        errorMessage || 'Error communicating with server.');
-    });
+    this.adminBackendApiService
+      .deassignTranslationCoordinator(this.username, languageIdToRemove)
+      .then(
+        () => {
+          this.coordinatedLanguageIds.splice(languageIdIndex, 1);
+          this.languageIdInUpdate = null;
+          this.updatelanguageIdsForSelection();
+        },
+        errorMessage => {
+          this.alertsService.addWarning(
+            errorMessage || 'Error communicating with server.'
+          );
+        }
+      );
   }
 
   close(): void {

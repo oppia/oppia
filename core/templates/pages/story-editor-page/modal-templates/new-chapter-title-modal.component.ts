@@ -16,22 +16,22 @@
  * @fileoverview Component for new chapter title modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
 import newChapterConstants from 'assets/constants';
-import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
-import { EditableStoryBackendApiService } from 'domain/story/editable-story-backend-api.service';
-import { StoryUpdateService } from 'domain/story/story-update.service';
-import { Story } from 'domain/story/story.model';
-import { ValidatorsService } from 'services/validators.service';
-import { StoryEditorStateService } from '../services/story-editor-state.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {CuratedExplorationValidationService} from 'domain/exploration/curated-exploration-validation.service';
+import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
+import {StoryUpdateService} from 'domain/story/story-update.service';
+import {Story} from 'domain/story/story.model';
+import {ValidatorsService} from 'services/validators.service';
+import {StoryEditorStateService} from '../services/story-editor-state.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-new-chapter-title-modal',
-  templateUrl: './new-chapter-title-modal.component.html'
+  templateUrl: './new-chapter-title-modal.component.html',
 })
 export class NewChapterTitleModalComponent implements OnInit {
   @Input() nodeTitles!: string | string[];
@@ -48,12 +48,10 @@ export class NewChapterTitleModalComponent implements OnInit {
   categoryIsDefault!: boolean;
   statesWithRestrictedInteractions!: string | string[];
   statesWithTooFewMultipleChoiceOptions!: string | string[];
-  allowedBgColors = (
-    newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter);
+  allowedBgColors = newChapterConstants.ALLOWED_THUMBNAIL_BG_COLORS.chapter;
 
   constructor(
-    private curatedExplorationValidationService:
-     CuratedExplorationValidationService,
+    private curatedExplorationValidationService: CuratedExplorationValidationService,
     private editableStoryBackendApiService: EditableStoryBackendApiService,
     private ngbActiveModal: NgbActiveModal,
     private storyEditorStateService: StoryEditorStateService,
@@ -69,15 +67,29 @@ export class NewChapterTitleModalComponent implements OnInit {
   addStoryNodeWithData(): void {
     this.storyUpdateService.addStoryNode(this.story, this.title);
     this.storyUpdateService.setStoryNodeTitle(
-      this.story, this.nodeId, this.title);
+      this.story,
+      this.nodeId,
+      this.title
+    );
     this.storyUpdateService.setStoryNodeThumbnailFilename(
-      this.story, this.nodeId, this.editableThumbnailFilename);
+      this.story,
+      this.nodeId,
+      this.editableThumbnailFilename
+    );
     this.storyUpdateService.setStoryNodeThumbnailBgColor(
-      this.story, this.nodeId, this.editableThumbnailBgColor);
-    if (this.platformFeatureService.status.
-      SerialChapterLaunchCurriculumAdminView.isEnabled) {
+      this.story,
+      this.nodeId,
+      this.editableThumbnailBgColor
+    );
+    if (
+      this.platformFeatureService.status.SerialChapterLaunchCurriculumAdminView
+        .isEnabled
+    ) {
       this.storyUpdateService.setStoryNodeStatus(
-        this.story, this.nodeId, 'Draft');
+        this.story,
+        this.nodeId,
+        'Draft'
+      );
     }
   }
 
@@ -113,13 +125,17 @@ export class NewChapterTitleModalComponent implements OnInit {
     for (var i = 0; i < nodes.length; i++) {
       if (nodes[i].getExplorationId() === this.explorationId) {
         this.invalidExpErrorStrings = [
-          'The given exploration already exists in the story.'];
+          'The given exploration already exists in the story.',
+        ];
         this.invalidExpId = true;
         return;
       }
     }
     this.storyUpdateService.setStoryNodeExplorationId(
-      this.story, this.nodeId, this.explorationId);
+      this.story,
+      this.nodeId,
+      this.explorationId
+    );
 
     this.ngbActiveModal.close();
   }
@@ -133,14 +149,20 @@ export class NewChapterTitleModalComponent implements OnInit {
 
   validateExplorationId(): boolean {
     return this.validatorsService.isValidExplorationId(
-      this.explorationId, false);
+      this.explorationId,
+      false
+    );
   }
 
   isValid(): boolean {
     return Boolean(
       this.title &&
-      this.validatorsService.isValidExplorationId(this.explorationId, false) &&
-      this.editableThumbnailFilename);
+        this.validatorsService.isValidExplorationId(
+          this.explorationId,
+          false
+        ) &&
+        this.editableThumbnailFilename
+    );
   }
 
   async saveAsync(): Promise<void> {
@@ -149,12 +171,13 @@ export class NewChapterTitleModalComponent implements OnInit {
       return;
     }
 
-    const expIsPublished = (
+    const expIsPublished =
       await this.curatedExplorationValidationService.isExpPublishedAsync(
-        this.explorationId));
+        this.explorationId
+      );
     if (!expIsPublished) {
       this.invalidExpErrorStrings = [
-        'This exploration does not exist or is not published yet.'
+        'This exploration does not exist or is not published yet.',
       ];
       this.invalidExpId = true;
       return;
@@ -162,33 +185,37 @@ export class NewChapterTitleModalComponent implements OnInit {
 
     this.invalidExpId = false;
 
-    const categoryIsDefault = (
+    const categoryIsDefault =
       await this.curatedExplorationValidationService.isDefaultCategoryAsync(
-        this.explorationId));
+        this.explorationId
+      );
     if (!categoryIsDefault) {
       this.categoryIsDefault = false;
       return;
     }
     this.categoryIsDefault = true;
 
-    this.statesWithRestrictedInteractions = (
-      await this.curatedExplorationValidationService
-        .getStatesWithRestrictedInteractions(this.explorationId));
+    this.statesWithRestrictedInteractions =
+      await this.curatedExplorationValidationService.getStatesWithRestrictedInteractions(
+        this.explorationId
+      );
     if (this.statesWithRestrictedInteractions.length > 0) {
       return;
     }
 
-    this.statesWithTooFewMultipleChoiceOptions = (
-      await this.curatedExplorationValidationService
-        .getStatesWithInvalidMultipleChoices(this.explorationId));
+    this.statesWithTooFewMultipleChoiceOptions =
+      await this.curatedExplorationValidationService.getStatesWithInvalidMultipleChoices(
+        this.explorationId
+      );
     if (this.statesWithTooFewMultipleChoiceOptions.length > 0) {
       return;
     }
 
-    const validationErrorMessages = (
+    const validationErrorMessages =
       await this.editableStoryBackendApiService.validateExplorationsAsync(
-        this.story.getId(), [this.explorationId]
-      ));
+        this.story.getId(),
+        [this.explorationId]
+      );
     if (validationErrorMessages.length > 0) {
       this.invalidExpId = true;
       this.invalidExpErrorStrings = validationErrorMessages;
@@ -201,7 +228,9 @@ export class NewChapterTitleModalComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('oppiaNewChapterTitleModal',
+angular.module('oppia').directive(
+  'oppiaNewChapterTitleModal',
   downgradeComponent({
-    component: NewChapterTitleModalComponent
-  }) as angular.IDirectiveFactory);
+    component: NewChapterTitleModalComponent,
+  }) as angular.IDirectiveFactory
+);

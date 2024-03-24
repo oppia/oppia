@@ -17,17 +17,21 @@
  */
 
 require(
-  'interactions/FractionInput/directives/' +
-  'fraction-input-rules.service.ts');
+  'interactions/FractionInput/directives/' + 'fraction-input-rules.service.ts'
+);
 require(
   'interactions/FractionInput/directives/' +
-  'fraction-input-validation.service.ts');
+    'fraction-input-validation.service.ts'
+);
 require(
   'interactions/FractionInput/directives/' +
-  'oppia-interactive-fraction-input.component.ts');
+    'oppia-interactive-fraction-input.component.ts'
+);
 require(
   'interactions/FractionInput/directives/' +
-  'oppia-response-fraction-input.component.ts');
+    'oppia-response-fraction-input.component.ts'
+);
 require(
   'interactions/FractionInput/directives/' +
-  'oppia-short-response-fraction-input.component.ts');
+    'oppia-short-response-fraction-input.component.ts'
+);

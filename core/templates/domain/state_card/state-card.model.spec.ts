@@ -16,25 +16,22 @@
  * @fileoverview Tests for state-card.model.ts.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AudioTranslationLanguageService } from
-  'pages/exploration-player-page/services/audio-translation-language.service';
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { InteractionBackendDict, InteractionObjectFactory } from
-  'domain/exploration/InteractionObjectFactory';
-import { StateCard } from
-  'domain/state_card/state-card.model';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { Voiceover } from 'domain/exploration/voiceover.model';
-import { InteractionCustomizationArgs } from 'interactions/customization-args-defs';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
-import { InteractionAnswer } from 'interactions/answer-defs';
-
+import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {
+  InteractionBackendDict,
+  InteractionObjectFactory,
+} from 'domain/exploration/InteractionObjectFactory';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
+import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
@@ -45,61 +42,66 @@ describe('State card object factory', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CamelCaseToHyphensPipe]
+      providers: [CamelCaseToHyphensPipe],
     });
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService);
+      AudioTranslationLanguageService
+    );
 
     let interactionDict: InteractionBackendDict = {
       answer_groups: [],
       confirmed_unclassified_answers: [],
       customization_args: {
         rows: {
-          value: 1
+          value: 1,
         },
         placeholder: {
           value: {
             unicode_str: 'Type your answer here.',
-            content_id: ''
-          }
+            content_id: '',
+          },
         },
         catchMisspellings: {
-          value: false
-        }
+          value: false,
+        },
       },
       default_outcome: {
         dest: '(untitled state)',
         dest_if_really_stuck: null,
         feedback: {
           content_id: 'default_outcome',
-          html: ''
+          html: '',
         },
         param_changes: [],
         labelled_as_correct: false,
         refresher_exploration_id: null,
-        missing_prerequisite_skill_id: null
+        missing_prerequisite_skill_id: null,
       },
-      hints: [{
-        hint_content: {
-          content_id: 'abc',
-          html: 'hint 1'
-        }
-      }],
+      hints: [
+        {
+          hint_content: {
+            content_id: 'abc',
+            html: 'hint 1',
+          },
+        },
+      ],
       id: 'TextInput',
       solution: {
         answer_is_exclusive: true,
         correct_answer: 'correct answer',
         explanation: {
           content_id: 'pqr',
-          html: 'solution explanation'
-        }
-      }
+          html: 'solution explanation',
+        },
+      },
     };
     _sampleCard1 = StateCard.createNewCard(
-      'State 1', '<p>Content</p>', '<interaction></interaction>',
+      'State 1',
+      '<p>Content</p>',
+      '<interaction></interaction>',
       interactionObjectFactory.createFromBackendDict(interactionDict),
       RecordedVoiceovers.createFromBackendDict({
         voiceovers_mapping: {
@@ -108,25 +110,37 @@ describe('State card object factory', () => {
               filename: 'filename1.mp3',
               file_size_bytes: 100000,
               needs_update: false,
-              duration_secs: 10.0
+              duration_secs: 10.0,
             },
             hi: {
               filename: 'filename2.mp3',
               file_size_bytes: 11000,
               needs_update: false,
-              duration_secs: 0.11
-            }
-          }
-        }
+              duration_secs: 0.11,
+            },
+          },
+        },
       }),
-      'content', audioTranslationLanguageService);
+      'content',
+      audioTranslationLanguageService
+    );
     _sampleCard2 = StateCard.createNewCard(
+      'State 2',
+      '<p>Content</p>',
+      '',
       // This throws "Type null is not assignable to type
       // 'Interaction'." We need to suppress this error
       // because of the need to test validations.
       // @ts-ignore
-      'State 2', '<p>Content</p>', '', null, null,
-      'content', audioTranslationLanguageService);
+      null,
+      // This throws "Type null is not assignable to type
+      // 'Interaction'." We need to suppress this error
+      // because of the need to test validations.
+      // @ts-ignore
+      null,
+      'content',
+      audioTranslationLanguageService
+    );
   });
 
   it('should be able to get the various fields', () => {
@@ -136,38 +150,40 @@ describe('State card object factory', () => {
     expect(_sampleCard2.getContentHtml()).toEqual('<p>Content</p>');
     expect(_sampleCard1.getInteraction().id).toEqual('TextInput');
     expect(_sampleCard1.getInteractionHtml()).toEqual(
-      '<interaction></interaction>');
+      '<interaction></interaction>'
+    );
     expect(_sampleCard1.getInputResponsePairs()).toEqual([]);
     expect(_sampleCard1.getLastInputResponsePair()).toBeNull();
     expect(_sampleCard1.getLastOppiaResponse()).toBeNull();
-    expect(_sampleCard1.getRecordedVoiceovers().getBindableVoiceovers(
-      'content')).toEqual({
+    expect(
+      _sampleCard1.getRecordedVoiceovers().getBindableVoiceovers('content')
+    ).toEqual({
       en: Voiceover.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        duration_secs: 10.0
+        duration_secs: 10.0,
       }),
       hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false,
-        duration_secs: 0.11
-      })
+        duration_secs: 0.11,
+      }),
     });
     expect(_sampleCard1.getVoiceovers()).toEqual({
       en: Voiceover.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        duration_secs: 10.0
+        duration_secs: 10.0,
       }),
       hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false,
-        duration_secs: 0.11
-      })
+        duration_secs: 0.11,
+      }),
     });
 
     expect(_sampleCard1.getInteractionId()).toEqual('TextInput');
@@ -180,7 +196,7 @@ describe('State card object factory', () => {
     expect(_sampleCard1.getInteractionCustomizationArgs()).toEqual({
       rows: {value: 1},
       placeholder: {value: new SubtitledUnicode('Type your answer here.', '')},
-      catchMisspellings: {value: false}
+      catchMisspellings: {value: false},
     });
     expect(_sampleCard2.getInteractionCustomizationArgs()).toBeNull();
     expect(_sampleCard1.getInteractionHtml()).toEqual(
@@ -190,7 +206,7 @@ describe('State card object factory', () => {
     _sampleCard1.addInputResponsePair({
       oppiaResponse: 'response',
       learnerInput: '',
-      isHint: false
+      isHint: false,
     });
 
     expect(_sampleCard1.getOppiaResponse(0)).toEqual('response');
@@ -198,7 +214,7 @@ describe('State card object factory', () => {
     expect(_sampleCard1.getLastInputResponsePair()).toEqual({
       oppiaResponse: 'response',
       learnerInput: '',
-      isHint: false
+      isHint: false,
     });
   });
 
@@ -206,7 +222,7 @@ describe('State card object factory', () => {
     const responsePair1 = {
       oppiaResponse: 'pair_1',
       learnerInput: '',
-      isHint: false
+      isHint: false,
     };
     _sampleCard1.addInputResponsePair(responsePair1);
     expect(_sampleCard1.getInputResponsePairs()).toEqual([responsePair1]);
@@ -221,19 +237,21 @@ describe('State card object factory', () => {
   it('should be able to set the various fields', () => {
     _sampleCard1.setInteractionHtml('<interaction_2></interaction_2>');
     expect(_sampleCard1.getInteractionHtml()).toEqual(
-      '<interaction_2></interaction_2>');
+      '<interaction_2></interaction_2>'
+    );
 
     _sampleCard1.addInputResponsePair({
       oppiaResponse: 'response',
       learnerInput: '',
-      isHint: false
+      isHint: false,
     });
 
     _sampleCard1.setLastOppiaResponse('response_3');
     expect(_sampleCard1.getLastOppiaResponse()).toEqual('response_3');
     _sampleCard1.addToExistingFeedback('response_4');
-    expect(_sampleCard1.getLastOppiaResponse()).
-      toEqual('response_3\nresponse_4');
+    expect(_sampleCard1.getLastOppiaResponse()).toEqual(
+      'response_3\nresponse_4'
+    );
   });
 
   it('should get the last answer or null if there is no last answer', () => {
@@ -242,7 +260,7 @@ describe('State card object factory', () => {
     _sampleCard1.addInputResponsePair({
       oppiaResponse: 'response',
       learnerInput: 'learner input',
-      isHint: false
+      isHint: false,
     });
 
     expect(_sampleCard1.getLastAnswer()).toEqual('learner input');
@@ -251,7 +269,7 @@ describe('State card object factory', () => {
   it('should get voiceovers when calling', () => {
     const expectedResults = {
       en: new Voiceover('filename1.mp3', 100000, false, 10),
-      hi: new Voiceover('filename2.mp3', 11000, false, 0.11)
+      hi: new Voiceover('filename2.mp3', 11000, false, 0.11),
     };
     expect(_sampleCard1.getVoiceovers()).toEqual(expectedResults);
     expect(_sampleCard2.getVoiceovers()).toEqual({});
@@ -264,23 +282,24 @@ describe('State card object factory', () => {
   it('should get interaction customization arguments', () => {
     const expectedResults = {
       rows: {
-        value: 1
+        value: 1,
       },
       placeholder: {
-        value: new SubtitledUnicode(
-          'Type your answer here.', '')
+        value: new SubtitledUnicode('Type your answer here.', ''),
       },
       catchMisspellings: {
-        value: false
-      }
+        value: false,
+      },
     } as InteractionCustomizationArgs;
-    expect(_sampleCard1.getInteractionCustomizationArgs())
-      .toEqual(expectedResults);
+    expect(_sampleCard1.getInteractionCustomizationArgs()).toEqual(
+      expectedResults
+    );
   });
 
   it('should check whether content audio translation is available', () => {
     spyOn(
-      audioTranslationLanguageService, 'isAutogeneratedAudioAllowed'
+      audioTranslationLanguageService,
+      'isAutogeneratedAudioAllowed'
     ).and.returnValue(false);
 
     expect(_sampleCard1.isContentAudioTranslationAvailable()).toBeTrue();
@@ -292,9 +311,9 @@ describe('State card object factory', () => {
       Hint.createFromBackendDict({
         hint_content: {
           content_id: 'abc',
-          html: 'hint 1'
-        }
-      })
+          html: 'hint 1',
+        },
+      }),
     ];
 
     expect(_sampleCard1.getHints()).toEqual(expectedResult);
@@ -306,8 +325,8 @@ describe('State card object factory', () => {
       correct_answer: 'correct answer',
       explanation: {
         content_id: 'pqr',
-        html: 'solution explanation'
-      }
+        html: 'solution explanation',
+      },
     });
 
     expect(_sampleCard1.getSolution()).toEqual(expectedResult);
@@ -347,7 +366,8 @@ describe('State card object factory', () => {
   it('should restore every property of a state card immutably', () => {
     expect(_sampleCard1.getStateName()).toEqual('State 1');
     expect(_sampleCard1.getInteractionHtml()).toEqual(
-      '<interaction></interaction>');
+      '<interaction></interaction>'
+    );
     expect(_sampleCard1.getInteractionId()).not.toBeNull();
 
     _sampleCard1.restoreImmutable(_sampleCard2);

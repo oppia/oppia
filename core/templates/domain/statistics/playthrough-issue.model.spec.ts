@@ -19,7 +19,7 @@
 import {
   PlaythroughIssue,
   PlaythroughIssueType,
-  PlaythroughIssueBackendDict
+  PlaythroughIssueBackendDict,
 } from 'domain/statistics/playthrough-issue.model';
 
 describe('Playthrough Issue Model Class', () => {
@@ -27,25 +27,30 @@ describe('Playthrough Issue Model Class', () => {
 
   it('should create a new exploration issue', () => {
     playthroughIssueObject = new PlaythroughIssue(
-      PlaythroughIssueType.EarlyQuit, {
+      PlaythroughIssueType.EarlyQuit,
+      {
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         time_spent_in_exp_in_msecs: {
-          value: 1.2
-        }
-      }, [], 1, true);
+          value: 1.2,
+        },
+      },
+      [],
+      1,
+      true
+    );
 
     expect(playthroughIssueObject.issueType).toEqual(
       PlaythroughIssueType.EarlyQuit
     );
     expect(playthroughIssueObject.issueCustomizationArgs).toEqual({
       state_name: {
-        value: 'state'
+        value: 'state',
       },
       time_spent_in_exp_in_msecs: {
-        value: 1.2
-      }
+        value: 1.2,
+      },
     });
     expect(playthroughIssueObject.playthroughIds).toEqual([]);
     expect(playthroughIssueObject.schemaVersion).toEqual(1);
@@ -57,26 +62,27 @@ describe('Playthrough Issue Model Class', () => {
       issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         time_spent_in_exp_in_msecs: {
-          value: 1.2
-        }
+          value: 1.2,
+        },
       },
       playthrough_ids: [],
       schema_version: 1,
-      is_valid: true
+      is_valid: true,
     });
 
-    expect(playthroughIssueObject.issueType)
-      .toEqual(PlaythroughIssueType.EarlyQuit);
+    expect(playthroughIssueObject.issueType).toEqual(
+      PlaythroughIssueType.EarlyQuit
+    );
     expect(playthroughIssueObject.issueCustomizationArgs).toEqual({
       state_name: {
-        value: 'state'
+        value: 'state',
       },
       time_spent_in_exp_in_msecs: {
-        value: 1.2
-      }
+        value: 1.2,
+      },
     });
     expect(playthroughIssueObject.playthroughIds).toEqual([]);
     expect(playthroughIssueObject.schemaVersion).toEqual(1);
@@ -88,18 +94,18 @@ describe('Playthrough Issue Model Class', () => {
       issue_type: PlaythroughIssueType.EarlyQuit,
       issue_customization_args: {
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         time_spent_in_exp_in_msecs: {
-          value: 1.2
-        }
+          value: 1.2,
+        },
       },
       playthrough_ids: [],
       schema_version: 1,
-      is_valid: true
+      is_valid: true,
     };
-    const playthroughIssueObject = PlaythroughIssue
-      .createFromBackendDict(playthroughDict);
+    const playthroughIssueObject =
+      PlaythroughIssue.createFromBackendDict(playthroughDict);
 
     expect(playthroughIssueObject.toBackendDict()).toEqual(playthroughDict);
   });
@@ -109,15 +115,15 @@ describe('Playthrough Issue Model Class', () => {
       issue_type: 'InvalidType',
       issue_customization_args: {
         state_name: {
-          value: 'state'
+          value: 'state',
         },
         time_spent_in_exp_in_msecs: {
-          value: 1.2
-        }
+          value: 1.2,
+        },
       },
       playthrough_ids: [],
       schema_version: 1,
-      is_valid: true
+      is_valid: true,
     };
 
     expect(() => {
@@ -129,7 +135,8 @@ describe('Playthrough Issue Model Class', () => {
       PlaythroughIssue.createFromBackendDict(playthroughDict);
     }).toThrowError(
       'Backend dict does not match any known issue type: ' +
-      JSON.stringify(playthroughDict));
+        JSON.stringify(playthroughDict)
+    );
   });
 
   it('should return the state in which the issue appears', () => {
@@ -141,18 +148,18 @@ describe('Playthrough Issue Model Class', () => {
       },
       playthrough_ids: [],
       schema_version: 1,
-      is_valid: true
+      is_valid: true,
     });
     expect(eqPlaythrough.getStateNameWithIssue()).toEqual('state');
 
     let cstPlaythrough = PlaythroughIssue.createFromBackendDict({
       issue_type: PlaythroughIssueType.CyclicStateTransitions,
       issue_customization_args: {
-        state_names: {value: ['state3', 'state1']}
+        state_names: {value: ['state3', 'state1']},
       },
       playthrough_ids: [],
       schema_version: 1,
-      is_valid: true
+      is_valid: true,
     });
     expect(cstPlaythrough.getStateNameWithIssue()).toEqual('state1');
 
@@ -164,7 +171,7 @@ describe('Playthrough Issue Model Class', () => {
       },
       playthrough_ids: [],
       schema_version: 1,
-      is_valid: true
+      is_valid: true,
     });
     expect(misPlaythrough.getStateNameWithIssue()).toEqual('state');
   });

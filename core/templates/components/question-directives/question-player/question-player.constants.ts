@@ -33,11 +33,11 @@ export const QuestionPlayerConstants = {
     // Color blue.
     PASSED_COLOR_BAR: 'rgb(32, 93, 134)',
     // Color shallow green.
-    PASSED_COLOR_OUTER: 'rgb(143, 217, 209)'
+    PASSED_COLOR_OUTER: 'rgb(143, 217, 209)',
   },
 
   QUESTION_PLAYER_MODE: {
-    PASS_FAIL_MODE: 'PASS_FAIL'
+    PASS_FAIL_MODE: 'PASS_FAIL',
   },
 
   VIEW_HINT_PENALTY: 0.1,

@@ -18,67 +18,95 @@
  */
 
 var forms = require(process.cwd() + '/core/tests/webdriverio_utils/forms.js');
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var waitFor = require(
-  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js');
+  process.cwd() + '/core/tests/webdriverio_utils/waitFor.js'
+);
 
-var customizeInteraction = async function(interactionEditor, graphDict) {
+var customizeInteraction = async function (interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.$(
-    '.e2e-test-graph-input-viz-container');
+    '.e2e-test-graph-input-viz-container'
+  );
   if (graphDict) {
     await forms.GraphEditor(graphInputContainer).clearDefaultGraph();
     await forms.GraphEditor(graphInputContainer).setValue(graphDict);
   }
 };
 
-var expectInteractionDetailsToMatch = async function(
-    interactionEditor, graphDict) {
+var expectInteractionDetailsToMatch = async function (
+  interactionEditor,
+  graphDict
+) {
   var graphInputContainer = interactionEditor.$(
-    '.e2e-test-graph-input-viz-container');
+    '.e2e-test-graph-input-viz-container'
+  );
   if (graphDict) {
-    await forms.GraphEditor(graphInputContainer)
+    await forms
+      .GraphEditor(graphInputContainer)
       .expectCurrentGraphToBe(graphDict);
   }
 };
 
-var submitAnswer = async function(conversationInput, graphDict) {
+var submitAnswer = async function (conversationInput, graphDict) {
   // Assuming graph container is empty or already has the necessary nodes to
   // draw edges on. Otherwise, should allow user to add nodes before creating
   // new nodes.
   var graphInputContainer = conversationInput.$(
-    '.e2e-test-graph-input-viz-container');
+    '.e2e-test-graph-input-viz-container'
+  );
   if (graphDict) {
     await forms.GraphEditor(graphInputContainer).setValue(graphDict);
   }
-  var submitAnswerButton = $(
-    '.e2e-test-submit-answer-button');
+  var submitAnswerButton = $('.e2e-test-submit-answer-button');
   await waitFor.elementToBeClickable(
-    submitAnswerButton, 'Submit Answer button is not clickable');
+    submitAnswerButton,
+    'Submit Answer button is not clickable'
+  );
   await action.click('Submit answer button', submitAnswerButton);
 };
 
 var answerObjectType = 'Graph';
 var initialGraph = {
-  vertices: [[-10, -50], [-39, 72], [118, 17]]
+  vertices: [
+    [-10, -50],
+    [-39, 72],
+    [118, 17],
+  ],
 };
 var responseGraphDict = {
-  edges: [[0, 1], [1, 2], [0, 2]],
-  vertices: [[-10, -50], [-39, 72], [118, 17]]
+  edges: [
+    [0, 1],
+    [1, 2],
+    [0, 2],
+  ],
+  vertices: [
+    [-10, -50],
+    [-39, 72],
+    [118, 17],
+  ],
 };
 var wrongAnswerGraph = {
-  edges: [[0, 1], [1, 2]]
+  edges: [
+    [0, 1],
+    [1, 2],
+  ],
 };
 var correctAnswerGraph = {
-  edges: [[0, 1], [1, 2], [0, 2]]
+  edges: [
+    [0, 1],
+    [1, 2],
+    [0, 2],
+  ],
 };
-var testSuite = [{
-  interactionArguments: [initialGraph],
-  ruleArguments: ['IsIsomorphicTo', responseGraphDict],
-  expectedInteractionDetails: [initialGraph],
-  wrongAnswers: [wrongAnswerGraph],
-  correctAnswers: [correctAnswerGraph]
-}];
+var testSuite = [
+  {
+    interactionArguments: [initialGraph],
+    ruleArguments: ['IsIsomorphicTo', responseGraphDict],
+    expectedInteractionDetails: [initialGraph],
+    wrongAnswers: [wrongAnswerGraph],
+    correctAnswers: [correctAnswerGraph],
+  },
+];
 
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;

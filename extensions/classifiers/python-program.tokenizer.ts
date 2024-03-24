@@ -26,19 +26,18 @@
  * https://github.com/python/cpython/blob/2.7/Lib/tokenize.py
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants';
-import { LoggerService } from 'services/contextual/logger.service';
+import {ClassifiersExtensionConstants} from 'classifiers/classifiers-extension.constants';
+import {LoggerService} from 'services/contextual/logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PythonProgramTokenizer {
-  private PythonProgramTokenType = (
-    ClassifiersExtensionConstants.PythonProgramTokenType);
+  private PythonProgramTokenType =
+    ClassifiersExtensionConstants.PythonProgramTokenType;
 
   constructor(private loggerService: LoggerService) {}
 
@@ -56,8 +55,10 @@ export class PythonProgramTokenizer {
 
   private whitespace = '[ \\f\\t]*';
   private comment = '#[^\\r\\n]*';
-  private ignore = this.whitespace + this.repeatedRegEx(
-    '\\\\\\r?\\n' + this.whitespace) + this.regExMayBePresent(this.comment);
+  private ignore =
+    this.whitespace +
+    this.repeatedRegEx('\\\\\\r?\\n' + this.whitespace) +
+    this.regExMayBePresent(this.comment);
 
   private name = '[a-zA-Z_]\\w*';
 
@@ -66,22 +67,29 @@ export class PythonProgramTokenizer {
   private binnumber = '0[bB][01]+[lL]?';
   private decnumber = '[1-9]\\d*[lL]?';
   private intnumber = this.groupOfRegEx(
-    this.hexnumber, this.binnumber, this.octnumber, this.decnumber);
+    this.hexnumber,
+    this.binnumber,
+    this.octnumber,
+    this.decnumber
+  );
 
   private exponent = '[eE][-+]?\\d+';
-  private pointfloat = this.groupOfRegEx(
-    '\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') + this.regExMayBePresent(this.exponent);
+  private pointfloat =
+    this.groupOfRegEx('\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') +
+    this.regExMayBePresent(this.exponent);
 
   private expfloat = '\\d+' + this.exponent;
   private floatnumber = this.groupOfRegEx(this.pointfloat, this.expfloat);
-  private imagnumber = this.groupOfRegEx(
-    '\\d+[jJ]', this.floatnumber + '[jJ]');
+  private imagnumber = this.groupOfRegEx('\\d+[jJ]', this.floatnumber + '[jJ]');
 
   private num = this.groupOfRegEx(
-    this.imagnumber, this.floatnumber, this.intnumber);
+    this.imagnumber,
+    this.floatnumber,
+    this.intnumber
+  );
 
   // Tail end of ' string.
-  private single = '[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'';
+  private single = "[^'\\\\]*(?:\\\\.[^'\\\\]*)*'";
   // Tail end of " string.
   private doubleQuote = '[^"\\\\]*(?:\\\\.[^"\\\\]*)*"';
   // Tail end of ''' string.
@@ -92,35 +100,59 @@ export class PythonProgramTokenizer {
   // Single-line ' or " string.
   private str = this.groupOfRegEx(
     "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'",
-    '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*"');
+    '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*"'
+  );
 
   // Because of leftmost-then-longest match semantics, be sure to put the
   // longest operators first (e.g., if = came before ==, == would get
   // recognized as two instances of =).
   private operator = this.groupOfRegEx(
-    '\\*\\*=?', '>>=?', '<<=?', '<>', '!=', '//=?', '[+\\-*/%&|^=<>]=?', '~');
+    '\\*\\*=?',
+    '>>=?',
+    '<<=?',
+    '<>',
+    '!=',
+    '//=?',
+    '[+\\-*/%&|^=<>]=?',
+    '~'
+  );
 
   private bracket = '[(){}]';
   private special = this.groupOfRegEx('\\r?\\n', '[:;.,\\`@]');
   private funny = this.groupOfRegEx(this.operator, this.bracket, this.special);
 
   private plaintoken = this.groupOfRegEx(
-    this.num, this.funny, this.str, this.name);
+    this.num,
+    this.funny,
+    this.str,
+    this.name
+  );
 
   private token = this.ignore + this.plaintoken;
 
   // First (or only) line of ' or " string.
   private contStr = this.groupOfRegEx(
     "[uUbB]?[rR]?'[^\\n'\\\\]*(?:\\\\.[^\\n'\\\\]*)*'" +
-    this.groupOfRegEx("'", '\\\\\\r?\\n'),
+      this.groupOfRegEx("'", '\\\\\\r?\\n'),
     '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*' +
-    this.groupOfRegEx('"', '\\\\\\r?\\n'));
+      this.groupOfRegEx('"', '\\\\\\r?\\n')
+  );
 
   private pseudoextras = this.groupOfRegEx(
-    '\\\\\\r?\\n|\\Z', this.comment, this.triple);
+    '\\\\\\r?\\n|\\Z',
+    this.comment,
+    this.triple
+  );
 
-  private pseudotoken = this.whitespace + this.groupOfRegEx(
-    this.pseudoextras, this.num, this.funny, this.contStr, this.name);
+  private pseudotoken =
+    this.whitespace +
+    this.groupOfRegEx(
+      this.pseudoextras,
+      this.num,
+      this.funny,
+      this.contStr,
+      this.name
+    );
 
   // Regular Expression object.
   private tokenprog = new RegExp(this.token);
@@ -129,36 +161,111 @@ export class PythonProgramTokenizer {
   private double3prog = new RegExp(this.double3);
 
   private endprogs: Record<string, RegExp | null> = {
-    "'": new RegExp(this.single), '"': new RegExp(this.doubleQuote),
-    "'''": this.single3prog, '"""': this.double3prog,
-    "r'''": this.single3prog, 'r"""': this.double3prog,
-    "u'''": this.single3prog, 'u"""': this.double3prog,
-    "ur'''": this.single3prog, 'ur"""': this.double3prog,
-    "R'''": this.single3prog, 'R"""': this.double3prog,
-    "U'''": this.single3prog, 'U"""': this.double3prog,
-    "uR'''": this.single3prog, 'uR"""': this.double3prog,
-    "Ur'''": this.single3prog, 'Ur"""': this.double3prog,
-    "UR'''": this.single3prog, 'UR"""': this.double3prog,
-    "b'''": this.single3prog, 'b"""': this.double3prog,
-    "br'''": this.single3prog, 'br"""': this.double3prog,
-    "B'''": this.single3prog, 'B"""': this.double3prog,
-    "bR'''": this.single3prog, 'bR"""': this.double3prog,
-    "Br'''": this.single3prog, 'Br"""': this.double3prog,
-    "BR'''": this.single3prog, 'BR"""': this.double3prog,
-    r: null, R: null, u: null, U: null,
-    b: null, B: null
+    "'": new RegExp(this.single),
+    '"': new RegExp(this.doubleQuote),
+    "'''": this.single3prog,
+    '"""': this.double3prog,
+    "r'''": this.single3prog,
+    'r"""': this.double3prog,
+    "u'''": this.single3prog,
+    'u"""': this.double3prog,
+    "ur'''": this.single3prog,
+    'ur"""': this.double3prog,
+    "R'''": this.single3prog,
+    'R"""': this.double3prog,
+    "U'''": this.single3prog,
+    'U"""': this.double3prog,
+    "uR'''": this.single3prog,
+    'uR"""': this.double3prog,
+    "Ur'''": this.single3prog,
+    'Ur"""': this.double3prog,
+    "UR'''": this.single3prog,
+    'UR"""': this.double3prog,
+    "b'''": this.single3prog,
+    'b"""': this.double3prog,
+    "br'''": this.single3prog,
+    'br"""': this.double3prog,
+    "B'''": this.single3prog,
+    'B"""': this.double3prog,
+    "bR'''": this.single3prog,
+    'bR"""': this.double3prog,
+    "Br'''": this.single3prog,
+    'Br"""': this.double3prog,
+    "BR'''": this.single3prog,
+    'BR"""': this.double3prog,
+    r: null,
+    R: null,
+    u: null,
+    U: null,
+    b: null,
+    B: null,
   };
 
   private tripleQuoted = [
-    "'''", '"""', "r'''", 'r"""', "R'''", 'R"""',
-    "u'''", 'u"""', "U'''", 'U"""', "ur'''", 'ur"""', "Ur'''", 'Ur"""',
-    "uR'''", 'uR"""', "UR'''", 'UR"""', "b'''", 'b"""', "B'''", 'B"""',
-    "br'''", 'br"""', "Br'''", 'Br"""', "bR'''", 'bR"""', "BR'''", 'BR"""'];
+    "'''",
+    '"""',
+    "r'''",
+    'r"""',
+    "R'''",
+    'R"""',
+    "u'''",
+    'u"""',
+    "U'''",
+    'U"""',
+    "ur'''",
+    'ur"""',
+    "Ur'''",
+    'Ur"""',
+    "uR'''",
+    'uR"""',
+    "UR'''",
+    'UR"""',
+    "b'''",
+    'b"""',
+    "B'''",
+    'B"""',
+    "br'''",
+    'br"""',
+    "Br'''",
+    'Br"""',
+    "bR'''",
+    'bR"""',
+    "BR'''",
+    'BR"""',
+  ];
 
   private singleQuoted = [
-    "'", '"', "r'", 'r"', "R'", 'R"', "u'", 'u"', "U'", 'U"', "ur'",
-    'ur"', "Ur'", 'Ur"', "uR'", 'uR"', "UR'", 'UR"', "b'", 'b"', "B'", 'B"',
-    "br'", 'br"', "Br'", 'Br"', "bR'", 'bR"', "BR'", 'BR"'];
+    "'",
+    '"',
+    "r'",
+    'r"',
+    "R'",
+    'R"',
+    "u'",
+    'u"',
+    "U'",
+    'U"',
+    "ur'",
+    'ur"',
+    "Ur'",
+    'Ur"',
+    "uR'",
+    'uR"',
+    "UR'",
+    'UR"',
+    "b'",
+    'b"',
+    "B'",
+    'B"',
+    "br'",
+    'br"',
+    "Br'",
+    'Br"',
+    "bR'",
+    'bR"',
+    "BR'",
+    'BR"',
+  ];
 
   private tabsize = 8;
 
@@ -196,16 +303,21 @@ export class PythonProgramTokenizer {
         if (endmatch && endmatch.index === 0) {
           this.token = endmatch[0];
           pos = pos + this.token.length;
-          tokenizedProgram.push(
-            [this.PythonProgramTokenType.STRING, this.token]);
+          tokenizedProgram.push([
+            this.PythonProgramTokenType.STRING,
+            this.token,
+          ]);
           contstr = '';
           needcont = 0;
           contline = null;
         } else if (
-          needcont && line.slice(-2) !== '\\\n' ||
-          line.slice(-3) !== '\\\r\n') {
-          tokenizedProgram.push(
-            [this.PythonProgramTokenType.ERRORTOKEN, contstr + line]);
+          (needcont && line.slice(-2) !== '\\\n') ||
+          line.slice(-3) !== '\\\r\n'
+        ) {
+          tokenizedProgram.push([
+            this.PythonProgramTokenType.ERRORTOKEN,
+            contstr + line,
+          ]);
           contstr = '';
           contline = null;
           continue;
@@ -240,20 +352,25 @@ export class PythonProgramTokenizer {
         }
 
         // Skip comments or blank lines.
-        if (('#\r\n').indexOf(line[pos]) !== -1) {
+        if ('#\r\n'.indexOf(line[pos]) !== -1) {
           if (line[pos] === '#') {
             const commentToken = line.slice(pos).replace('\\r\\n', '');
             const nlPos = pos + commentToken.length;
-            tokenizedProgram.push(
-              [this.PythonProgramTokenType.COMMENT, commentToken]);
-            tokenizedProgram.push(
-              [this.PythonProgramTokenType.NL, line.slice(nlPos)]);
+            tokenizedProgram.push([
+              this.PythonProgramTokenType.COMMENT,
+              commentToken,
+            ]);
+            tokenizedProgram.push([
+              this.PythonProgramTokenType.NL,
+              line.slice(nlPos),
+            ]);
           } else {
             const comment = this.PythonProgramTokenType.COMMENT;
             const nl = this.PythonProgramTokenType.NL;
             tokenizedProgram.push([
               line[pos] === '#' ? comment : nl,
-              line.slice(pos)]);
+              line.slice(pos),
+            ]);
           }
           continue;
         }
@@ -261,14 +378,17 @@ export class PythonProgramTokenizer {
         // Count indents or dedents.
         if (column > indents[-1]) {
           indents.push(column);
-          tokenizedProgram.push(
-            [this.PythonProgramTokenType.INDENT, line.slice(0, pos)]);
+          tokenizedProgram.push([
+            this.PythonProgramTokenType.INDENT,
+            line.slice(0, pos),
+          ]);
         }
 
         while (column < indents[-1]) {
           if (indents.indexOf(column) === -1) {
             this.loggerService.error(
-              'unindent does not match any outer indentation level');
+              'unindent does not match any outer indentation level'
+            );
           }
           indents = indents.slice(0, -1);
           tokenizedProgram.push([this.PythonProgramTokenType.DEDENT, '']);
@@ -297,14 +417,17 @@ export class PythonProgramTokenizer {
           // Ordinary number.
           if (
             numchars.indexOf(initial) !== -1 ||
-            (initial === '.' && token !== '.')) {
+            (initial === '.' && token !== '.')
+          ) {
             tokenizedProgram.push([this.PythonProgramTokenType.NUMBER, token]);
           } else if ('\r\n'.indexOf(initial) !== -1) {
             tokenizedProgram.push([this.PythonProgramTokenType.NL, token]);
           } else if (initial === '#') {
             if (!token.endsWith('\n')) {
-              tokenizedProgram.push(
-                [this.PythonProgramTokenType.COMMENT, token]);
+              tokenizedProgram.push([
+                this.PythonProgramTokenType.COMMENT,
+                token,
+              ]);
             }
           } else if (this.tripleQuoted.indexOf(token) !== -1) {
             let endprog = this.endprogs[token];
@@ -316,8 +439,10 @@ export class PythonProgramTokenizer {
             if (endmatch) {
               pos = pos + endmatch[0].length;
               token = line.slice(start, pos);
-              tokenizedProgram.push(
-                [this.PythonProgramTokenType.STRING, token]);
+              tokenizedProgram.push([
+                this.PythonProgramTokenType.STRING,
+                token,
+              ]);
             } else {
               // Multiple lines.
               contstr = line.slice(start);
@@ -326,20 +451,24 @@ export class PythonProgramTokenizer {
             }
           } else if (
             this.singleQuoted.indexOf(initial) !== -1 ||
-              this.singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
-              this.singleQuoted.indexOf(token.slice(0, 3)) !== -1) {
+            this.singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
+            this.singleQuoted.indexOf(token.slice(0, 3)) !== -1
+          ) {
             // Continued string.
             if (token.slice(-1) === '\n') {
-              endprog = (
-                this.endprogs[initial] || this.endprogs[token[1]] ||
-                this.endprogs[token[2]]);
+              endprog =
+                this.endprogs[initial] ||
+                this.endprogs[token[1]] ||
+                this.endprogs[token[2]];
               contstr = line.slice(start);
               needcont = 1;
               contline = line;
               break;
             } else {
-              tokenizedProgram.push(
-                [this.PythonProgramTokenType.STRING, token]);
+              tokenizedProgram.push([
+                this.PythonProgramTokenType.STRING,
+                token,
+              ]);
             }
           } else if (namechars.indexOf(initial) !== -1) {
             // Ordinary name.
@@ -356,8 +485,10 @@ export class PythonProgramTokenizer {
             tokenizedProgram.push([this.PythonProgramTokenType.OP, token]);
           }
         } else {
-          tokenizedProgram.push(
-            [this.PythonProgramTokenType.ERRORTOKEN, line[pos]]);
+          tokenizedProgram.push([
+            this.PythonProgramTokenType.ERRORTOKEN,
+            line[pos],
+          ]);
           pos += 1;
         }
       }
@@ -374,5 +505,9 @@ export class PythonProgramTokenizer {
   }
 }
 
-angular.module('oppia').factory(
-  'PythonProgramTokenizer', downgradeInjectable(PythonProgramTokenizer));
+angular
+  .module('oppia')
+  .factory(
+    'PythonProgramTokenizer',
+    downgradeInjectable(PythonProgramTokenizer)
+  );

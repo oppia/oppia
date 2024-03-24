@@ -2,15 +2,15 @@
 // present on the type of window.
 
 interface Window {
-    HTMLElement: HTMLElement;
-    __fixtures__: KarmaFixtures;
-    decodeURIComponent: (encodedURIComponent: string) => string;
-    encodeURIComponent: (decodedURIComponent: string) => string;
-    gtag: Function;
-    $: JQueryStatic;
-    Base64Binary: Base64Binary;
-    jQuery: JQueryStatic;
-    dataLayer: object[];
-    Guppy: Guppy;
-    webkitAudioContext: typeof AudioContext;
+  HTMLElement: HTMLElement;
+  __fixtures__: KarmaFixtures;
+  decodeURIComponent: (encodedURIComponent: string) => string;
+  encodeURIComponent: (decodedURIComponent: string) => string;
+  gtag: Function;
+  $: JQueryStatic;
+  Base64Binary: Base64Binary;
+  jQuery: JQueryStatic;
+  dataLayer: object[];
+  Guppy: Guppy;
+  webkitAudioContext: typeof AudioContext;
 }

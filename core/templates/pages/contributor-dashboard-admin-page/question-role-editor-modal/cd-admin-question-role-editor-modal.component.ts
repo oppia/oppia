@@ -16,12 +16,12 @@
  * @fileoverview Component for editing a user's question contribution rights.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 export interface QuestionRights {
-    isQuestionSubmitter: boolean;
-    isQuestionReviewer: boolean;
+  isQuestionSubmitter: boolean;
+  isQuestionReviewer: boolean;
 }
 
 @Component({
@@ -29,15 +29,13 @@ export interface QuestionRights {
   templateUrl: './cd-admin-question-role-editor-modal.component.html',
 })
 export class CdAdminQuestionRoleEditorModal implements OnInit {
-// These properties are initialized using Angular lifecycle hooks
-// and we need to do non-null assertion. For more information, see
-// https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+  // These properties are initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() username!: string;
   @Input() rights!: QuestionRights;
 
-  constructor(
-    private activeModal: NgbActiveModal,
-  ) {}
+  constructor(private activeModal: NgbActiveModal) {}
 
   ngOnInit(): void {}
 

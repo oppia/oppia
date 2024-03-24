@@ -17,73 +17,91 @@
  * committed to the server.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Output } from '@angular/core';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EventEmitter, Output} from '@angular/core';
+import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 
-import { AutosaveInfoModalsService } from 'pages/exploration-editor-page/services/autosave-info-modals.service';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { AlertsService } from 'services/alerts.service';
-import { LoaderService } from 'services/loader.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationChange, ExplorationChangeEditExplorationProperty } from 'domain/exploration/exploration-draft.model';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { InternetConnectivityService } from 'services/internet-connectivity.service';
-import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/ParamChangeObjectFactory';
-import { InteractionCustomizationArgs, InteractionCustomizationArgsBackendDict } from 'interactions/customization-args-defs';
-import { AnswerGroup, AnswerGroupBackendDict } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Hint, HintBackendDict } from 'domain/exploration/hint-object.model';
-import { Outcome, OutcomeBackendDict } from 'domain/exploration/OutcomeObjectFactory';
-import { RecordedVoiceOverBackendDict, RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { LostChange } from 'domain/exploration/LostChangeObjectFactory';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
-import { TranslatedContent } from 'domain/exploration/TranslatedContentObjectFactory';
+import {AutosaveInfoModalsService} from 'pages/exploration-editor-page/services/autosave-info-modals.service';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {AlertsService} from 'services/alerts.service';
+import {LoaderService} from 'services/loader.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  ExplorationChange,
+  ExplorationChangeEditExplorationProperty,
+} from 'domain/exploration/exploration-draft.model';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {InternetConnectivityService} from 'services/internet-connectivity.service';
+import {
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+} from 'domain/exploration/subtitled-html.model';
+import {
+  ParamChange,
+  ParamChangeBackendDict,
+} from 'domain/exploration/ParamChangeObjectFactory';
+import {
+  InteractionCustomizationArgs,
+  InteractionCustomizationArgsBackendDict,
+} from 'interactions/customization-args-defs';
+import {
+  AnswerGroup,
+  AnswerGroupBackendDict,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
+import {
+  Outcome,
+  OutcomeBackendDict,
+} from 'domain/exploration/OutcomeObjectFactory';
+import {
+  RecordedVoiceOverBackendDict,
+  RecordedVoiceovers,
+} from 'domain/exploration/recorded-voiceovers.model';
+import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 
-export type StatePropertyValues = (
-  AnswerGroup[] |
-  boolean |
-  Hint[] |
-  InteractionCustomizationArgs |
-  Outcome |
-  ParamChange[] |
-  RecordedVoiceovers |
-  string |
-  SubtitledHtml |
-  BaseTranslatableObject
-);
-export type StatePropertyDictValues = (
-  AnswerGroupBackendDict[] |
-  boolean |
-  HintBackendDict[] |
-  InteractionCustomizationArgsBackendDict |
-  OutcomeBackendDict |
-  ParamChangeBackendDict[] |
-  RecordedVoiceOverBackendDict |
-  string |
-  SubtitledHtmlBackendDict
-);
-export type StatePropertyNames = (
-  'answer_groups' |
-  'card_is_checkpoint' |
-  'confirmed_unclassified_answers' |
-  'content' |
-  'default_outcome' |
-  'hints' |
-  'linked_skill_id' |
-  'param_changes' |
-  'param_specs' |
-  'recorded_voiceovers' |
-  'solicit_answer_details' |
-  'solution' |
-  'state_name' |
-  'widget_customization_args' |
-  'widget_id'
-);
+export type StatePropertyValues =
+  | AnswerGroup[]
+  | boolean
+  | Hint[]
+  | InteractionCustomizationArgs
+  | Outcome
+  | ParamChange[]
+  | RecordedVoiceovers
+  | string
+  | SubtitledHtml
+  | BaseTranslatableObject;
+export type StatePropertyDictValues =
+  | AnswerGroupBackendDict[]
+  | boolean
+  | HintBackendDict[]
+  | InteractionCustomizationArgsBackendDict
+  | OutcomeBackendDict
+  | ParamChangeBackendDict[]
+  | RecordedVoiceOverBackendDict
+  | string
+  | SubtitledHtmlBackendDict;
+export type StatePropertyNames =
+  | 'answer_groups'
+  | 'card_is_checkpoint'
+  | 'confirmed_unclassified_answers'
+  | 'content'
+  | 'default_outcome'
+  | 'hints'
+  | 'linked_skill_id'
+  | 'param_changes'
+  | 'param_specs'
+  | 'recorded_voiceovers'
+  | 'solicit_answer_details'
+  | 'solution'
+  | 'state_name'
+  | 'widget_customization_args'
+  | 'widget_id';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ChangeListService {
   // Temporary buffer for changes made to the exploration.
@@ -96,8 +114,8 @@ export class ChangeListService {
   // Temporary list of the changes made to the exploration when offline.
   temporaryListOfChanges: ExplorationChange[] = [];
 
-  @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> = (
-    new EventEmitter<boolean>());
+  @Output() autosaveInProgressEventEmitter: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   ALLOWED_EXPLORATION_BACKEND_NAMES = {
     category: true,
@@ -127,7 +145,7 @@ export class ChangeListService {
     solution: true,
     state_name: true,
     widget_customization_args: true,
-    widget_id: true
+    widget_id: true,
   };
 
   // This property is initialized using private methods and we need to do
@@ -143,13 +161,13 @@ export class ChangeListService {
     private explorationDataService: ExplorationDataService,
     private loaderService: LoaderService,
     private loggerService: LoggerService,
-    private internetConnectivityService: InternetConnectivityService,
+    private internetConnectivityService: InternetConnectivityService
   ) {
     // We have added subscriptions in the constructor.
     // Since, ngOnInit does not work in angular services.
     // Ref: https://github.com/angular/angular/issues/23235.
     this.loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => this.loadingMessage = message
+      (message: string) => (this.loadingMessage = message)
     );
     this.internetConnectivityService.onInternetStateChange.subscribe(
       internetAccessible => {
@@ -159,11 +177,13 @@ export class ChangeListService {
           }
           this.temporaryListOfChanges = [];
         }
-      });
+      }
+    );
   }
 
   private autosaveChangeListOnChange(
-      explorationChangeList: ExplorationChange[] | LostChange[]) {
+    explorationChangeList: ExplorationChange[] | LostChange[]
+  ) {
     // Asynchronously send an autosave request, and check for errors in the
     // response:
     // If error is present -> Check for the type of error occurred
@@ -177,20 +197,23 @@ export class ChangeListService {
         if (!response.changes_are_mergeable) {
           if (!this.autosaveInfoModalsService.isModalOpen()) {
             this.autosaveInfoModalsService.showVersionMismatchModal(
-              explorationChangeList as LostChange[]);
+              explorationChangeList as LostChange[]
+            );
           }
         }
         this.autosaveInProgressEventEmitter.emit(false);
-        if (!response.is_version_of_draft_valid &&
-          response.changes_are_mergeable) {
+        if (
+          !response.is_version_of_draft_valid &&
+          response.changes_are_mergeable
+        ) {
           this.windowRef.nativeWindow.location.reload();
         }
       },
       () => {
         this.alertsService.clearWarnings();
         this.loggerService.error(
-          'nonStrictValidationFailure: ' +
-          JSON.stringify(explorationChangeList));
+          'nonStrictValidationFailure: ' + JSON.stringify(explorationChangeList)
+        );
         if (!this.autosaveInfoModalsService.isModalOpen()) {
           this.autosaveInfoModalsService.showNonStrictValidationFailModal();
         }
@@ -225,14 +248,15 @@ export class ChangeListService {
    * @param {string} stateName - The name of the newly-added state
    */
   addState(
-      stateName: string,
-      contentIdForContent: string,
-      contentIdForDefaultOutcome: string): void {
+    stateName: string,
+    contentIdForContent: string,
+    contentIdForDefaultOutcome: string
+  ): void {
     this.addChange({
       cmd: 'add_state',
       state_name: stateName,
       content_id_for_state_content: contentIdForContent,
-      content_id_for_default_outcome: contentIdForDefaultOutcome
+      content_id_for_default_outcome: contentIdForDefaultOutcome,
     });
   }
 
@@ -246,7 +270,7 @@ export class ChangeListService {
   deleteState(stateName: string): void {
     this.addChange({
       cmd: 'delete_state',
-      state_name: stateName
+      state_name: stateName,
     });
   }
 
@@ -267,20 +291,21 @@ export class ChangeListService {
    * @param {string} oldValue - The previous value of the property
    */
   editExplorationProperty(
-      backendName: string,
-      newValue: string,
-      oldValue: string
+    backendName: string,
+    newValue: string,
+    oldValue: string
   ): void {
     if (!this.ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning(
-        'Invalid exploration property: ' + backendName);
+        'Invalid exploration property: ' + backendName
+      );
       return;
     }
     this.addChange({
       cmd: 'edit_exploration_property',
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
-      property_name: backendName
+      property_name: backendName,
     } as ExplorationChangeEditExplorationProperty);
   }
 
@@ -295,8 +320,10 @@ export class ChangeListService {
    * @param {string} oldValue - The previous value of the property
    */
   editStateProperty(
-      stateName: string, backendName: StatePropertyNames,
-      newValue: StatePropertyDictValues, oldValue: StatePropertyDictValues
+    stateName: string,
+    backendName: StatePropertyNames,
+    newValue: StatePropertyDictValues,
+    oldValue: StatePropertyDictValues
   ): void {
     if (!this.ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
       this.alertsService.addWarning('Invalid state property: ' + backendName);
@@ -307,7 +334,7 @@ export class ChangeListService {
       new_value: angular.copy(newValue),
       old_value: angular.copy(oldValue),
       property_name: backendName,
-      state_name: stateName
+      state_name: stateName,
     });
   }
 
@@ -316,13 +343,15 @@ export class ChangeListService {
   }
 
   getTranslationChangeList(): ExplorationChange[] {
-    return angular.copy(this.explorationChangeList.filter((change) => {
-      return [
-        'edit_translation',
-        'remove_translations',
-        'mark_translations_needs_update'
-      ].includes(change.cmd);
-    }));
+    return angular.copy(
+      this.explorationChangeList.filter(change => {
+        return [
+          'edit_translation',
+          'remove_translations',
+          'mark_translations_needs_update',
+        ].includes(change.cmd);
+      })
+    );
   }
 
   isExplorationLockedForEditing(): boolean {
@@ -353,20 +382,24 @@ export class ChangeListService {
     this.addChange({
       cmd: 'rename_state',
       new_state_name: newStateName,
-      old_state_name: oldStateName
+      old_state_name: oldStateName,
     });
   }
 
   addWrittenTranslation(
-      contentId: string, dataFormat: string, languageCode: string,
-      stateName: string, translationHtml: string): void {
-  // Written translations submitted via the translation tab in the
-  // exploration editor need not pass content_html because
-  // translations submitted via this method do not undergo a review. The
-  // content_html is only required when submitting translations via
-  // the contributor dashboard because such translation suggestions
-  // undergo a manual review process where the reviewer will need to look
-  // at the corresponding original content at the time of submission.
+    contentId: string,
+    dataFormat: string,
+    languageCode: string,
+    stateName: string,
+    translationHtml: string
+  ): void {
+    // Written translations submitted via the translation tab in the
+    // exploration editor need not pass content_html because
+    // translations submitted via this method do not undergo a review. The
+    // content_html is only required when submitting translations via
+    // the contributor dashboard because such translation suggestions
+    // undergo a manual review process where the reviewer will need to look
+    // at the corresponding original content at the time of submission.
     this.addChange({
       cmd: 'add_written_translation',
       content_id: contentId,
@@ -374,7 +407,7 @@ export class ChangeListService {
       language_code: languageCode,
       state_name: stateName,
       content_html: 'N/A',
-      translation_html: translationHtml
+      translation_html: translationHtml,
     });
   }
 
@@ -387,7 +420,7 @@ export class ChangeListService {
   markTranslationsAsNeedingUpdate(contentId: string): void {
     this.addChange({
       cmd: 'mark_translations_needs_update',
-      content_id: contentId
+      content_id: contentId,
     });
   }
 
@@ -395,15 +428,15 @@ export class ChangeListService {
    * Saves a change dict that represents editing translations.
    */
   editTranslation(
-      contentId: string,
-      languageCode: string,
-      translatedContent: TranslatedContent,
+    contentId: string,
+    languageCode: string,
+    translatedContent: TranslatedContent
   ): void {
     this.addChange({
       cmd: 'edit_translation',
       language_code: languageCode,
       content_id: contentId,
-      translation: translatedContent.toBackendDict()
+      translation: translatedContent.toBackendDict(),
     });
   }
 
@@ -416,7 +449,7 @@ export class ChangeListService {
   removeTranslations(contentId: string): void {
     this.addChange({
       cmd: 'remove_translations',
-      content_id: contentId
+      content_id: contentId,
     });
   }
 
@@ -435,6 +468,6 @@ export class ChangeListService {
   }
 }
 
-angular.module('oppia').factory(
-  'ChangeListService', downgradeInjectable(
-    ChangeListService));
+angular
+  .module('oppia')
+  .factory('ChangeListService', downgradeInjectable(ChangeListService));

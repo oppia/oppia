@@ -50,7 +50,7 @@ import { TopicPlayerViewerCommonModule } from 'pages/topic-viewer-page/topic-vie
     TopicViewerPageRootComponent,
     TopicViewerNavbarBreadcrumbComponent,
     TopicViewerPageComponent,
-    PracticeSessionConfirmationModal
+    PracticeSessionConfirmationModal,
   ],
   entryComponents: [
     TopicViewerNavbarBreadcrumbComponent,

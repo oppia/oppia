@@ -16,31 +16,33 @@
  * @fileoverview Backend Api Service for the Collection Player Page
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { CollectionSummary } from '../collection-player-page.component';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {CollectionSummary} from '../collection-player-page.component';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CollectionPlayerBackendApiService {
-  constructor(
-    private http: HttpClient,
-  ) {}
+  constructor(private http: HttpClient) {}
 
   async fetchCollectionSummariesAsync(
-      collectionId: string
+    collectionId: string
   ): Promise<CollectionSummary> {
-    return this.http.get<CollectionSummary>(
-      '/collectionsummarieshandler/data', {
+    return this.http
+      .get<CollectionSummary>('/collectionsummarieshandler/data', {
         params: {
-          stringified_collection_ids: JSON.stringify([collectionId])
-        }
-      }).toPromise();
+          stringified_collection_ids: JSON.stringify([collectionId]),
+        },
+      })
+      .toPromise();
   }
 }
 
-angular.module('oppia').factory(
-  'CollectionPlayerBackendApiService',
-  downgradeInjectable(CollectionPlayerBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'CollectionPlayerBackendApiService',
+    downgradeInjectable(CollectionPlayerBackendApiService)
+  );

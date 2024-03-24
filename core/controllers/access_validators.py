@@ -78,6 +78,28 @@ class ClassroomAccessValidationHandler(
             raise self.PageNotFoundException
 
 
+class CollectionViewerPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to collection page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+       'collection_id': {
+           'schema': {
+               'type': 'basestring'
+           }
+       }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_play_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass
+
+
 class ManageOwnAccountValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):

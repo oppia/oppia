@@ -15,9 +15,12 @@
 /**
  * @fileoverview test for insert script service
  */
-import { Renderer2 } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
-import { InsertScriptService, KNOWN_SCRIPTS } from 'services/insert-script.service';
+import {Renderer2} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {
+  InsertScriptService,
+  KNOWN_SCRIPTS,
+} from 'services/insert-script.service';
 
 class MockRenderer {
   appendChild() {
@@ -29,10 +32,13 @@ describe('InsertScriptService', () => {
   let insertScriptService: InsertScriptService;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [{
-        provide: Renderer2,
-        useValue: MockRenderer,
-      }]});
+      providers: [
+        {
+          provide: Renderer2,
+          useValue: MockRenderer,
+        },
+      ],
+    });
     insertScriptService = TestBed.get(InsertScriptService);
   });
 

@@ -17,18 +17,18 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { AlertsService } from 'services/alerts.service';
-import { ChangeListService } from './change-list.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationRightsService } from './exploration-rights.service';
-import { ValidatorsService } from 'services/validators.service';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from './change-list.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ExplorationRightsService} from './exploration-rights.service';
+import {ValidatorsService} from 'services/validators.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationObjectiveService extends ExplorationPropertyService {
   propertyName: string = 'objective';
@@ -51,9 +51,14 @@ export class ExplorationObjectiveService extends ExplorationPropertyService {
   _isValid(value: string): boolean {
     return (
       this.explorationRightsService.isPrivate() ||
-      this.validatorsService.isNonempty(value, false));
+      this.validatorsService.isNonempty(value, false)
+    );
   }
 }
 
-angular.module('oppia').factory('ExplorationObjectiveService',
-  downgradeInjectable(ExplorationObjectiveService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationObjectiveService',
+    downgradeInjectable(ExplorationObjectiveService)
+  );

@@ -18,7 +18,7 @@
  */
 
 export interface RecordedVoiceOverBackendDict {
-  'voiceovers_mapping': {
+  voiceovers_mapping: {
     [propName: string]: {
       [propName: string]: VoiceoverBackendDict;
     };
@@ -33,12 +33,13 @@ export interface BindableVoiceovers {
   [propName: string]: Voiceover;
 }
 
-import { VoiceoverBackendDict, Voiceover } from
-  'domain/exploration/voiceover.model';
+import {
+  VoiceoverBackendDict,
+  Voiceover,
+} from 'domain/exploration/voiceover.model';
 export class RecordedVoiceovers {
   voiceoversMapping: VoiceoverMapping;
-  constructor(
-      voiceoversMapping: VoiceoverMapping) {
+  constructor(voiceoversMapping: VoiceoverMapping) {
     this.voiceoversMapping = voiceoversMapping;
   }
 
@@ -94,15 +95,21 @@ export class RecordedVoiceovers {
   }
 
   addVoiceover(
-      contentId: string, languageCode: string, filename: string,
-      fileSizeBytes: number, durationSecs: number): void {
+    contentId: string,
+    languageCode: string,
+    filename: string,
+    fileSizeBytes: number,
+    durationSecs: number
+  ): void {
     let languageCodeToVoiceover = this.voiceoversMapping[contentId];
     if (languageCodeToVoiceover.hasOwnProperty(languageCode)) {
       throw new Error('Trying to add duplicate language code.');
     }
-    languageCodeToVoiceover[languageCode] =
-      Voiceover.createNew(
-        filename, fileSizeBytes, durationSecs);
+    languageCodeToVoiceover[languageCode] = Voiceover.createNew(
+      filename,
+      fileSizeBytes,
+      durationSecs
+    );
   }
 
   deleteVoiceover(contentId: string, languageCode: string): void {
@@ -110,7 +117,8 @@ export class RecordedVoiceovers {
     if (!languageCodeToVoiceover.hasOwnProperty(languageCode)) {
       throw new Error(
         'Trying to remove non-existing translation for language code ' +
-        languageCode);
+          languageCode
+      );
     }
     delete languageCodeToVoiceover[languageCode];
   }
@@ -120,37 +128,38 @@ export class RecordedVoiceovers {
     languageCodeToVoiceover[languageCode].toggleNeedsUpdateAttribute();
   }
 
-
   toBackendDict(): RecordedVoiceOverBackendDict {
-    let voiceoversMappingDict:
-     Record<string, Record<string, VoiceoverBackendDict>> = {};
+    let voiceoversMappingDict: Record<
+      string,
+      Record<string, VoiceoverBackendDict>
+    > = {};
     for (let contentId in this.voiceoversMapping) {
       let languageCodeToVoiceover = this.voiceoversMapping[contentId];
-      let languageCodeToVoiceoverDict:
-       Record<string, VoiceoverBackendDict> = {};
-      Object.keys(languageCodeToVoiceover).forEach((lang) => {
-        languageCodeToVoiceoverDict[lang] = (
-          languageCodeToVoiceover[lang].toBackendDict());
+      let languageCodeToVoiceoverDict: Record<string, VoiceoverBackendDict> =
+        {};
+      Object.keys(languageCodeToVoiceover).forEach(lang => {
+        languageCodeToVoiceoverDict[lang] =
+          languageCodeToVoiceover[lang].toBackendDict();
       });
       voiceoversMappingDict[contentId] = languageCodeToVoiceoverDict;
     }
     return {
-      voiceovers_mapping: voiceoversMappingDict
+      voiceovers_mapping: voiceoversMappingDict,
     };
   }
 
   static createFromBackendDict(
-      recordedVoiceoversDict: RecordedVoiceOverBackendDict):
-      RecordedVoiceovers {
+    recordedVoiceoversDict: RecordedVoiceOverBackendDict
+  ): RecordedVoiceovers {
     let voiceoversMapping: VoiceoverMapping = {};
     let voiceoversMappingDict = recordedVoiceoversDict.voiceovers_mapping;
-    Object.keys(voiceoversMappingDict).forEach((contentId) => {
+    Object.keys(voiceoversMappingDict).forEach(contentId => {
       let languageCodeToVoiceoverDict = voiceoversMappingDict[contentId];
       let languageCodeToVoiceover: Record<string, Voiceover> = {};
-      Object.keys(languageCodeToVoiceoverDict).forEach((langCode) => {
-        languageCodeToVoiceover[langCode] = (
-          Voiceover.createFromBackendDict(
-            languageCodeToVoiceoverDict[langCode]));
+      Object.keys(languageCodeToVoiceoverDict).forEach(langCode => {
+        languageCodeToVoiceover[langCode] = Voiceover.createFromBackendDict(
+          languageCodeToVoiceoverDict[langCode]
+        );
       });
       voiceoversMapping[contentId] = languageCodeToVoiceover;
     });
