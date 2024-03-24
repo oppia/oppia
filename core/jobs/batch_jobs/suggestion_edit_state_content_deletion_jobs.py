@@ -18,7 +18,10 @@
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
+from core.domain import suggestion_registry
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -35,14 +38,17 @@ if MYPY:  # pragma: no cover
     models.Names.SUGGESTION])
 
 
-class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
-    """Job that deletes edit state content suggestion models as these are
-    deprecated.
-    """
+class DeleteDeprecatedSuggestionEditStateContentModels(beam.PTransform):  # type: ignore[misc]
+    """Transform that gets all edit state content suggestion models"""
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+    def expand(
+        self, pipeline: beam.Pipeline
+    ) -> Tuple[
+        beam.PCollection[suggestion_models.GeneralSuggestionModel],
+        beam.PCollection[job_run_result.JobRunResult]
+    ]:
         suggestion_edit_state_content_model_to_delete = (
-            self.pipeline
+            pipeline
             | 'Get all general suggestion models' >> ndb_io.GetModels(
                 suggestion_models.GeneralSuggestionModel.get_all())
             | 'Filter edit state content suggestion' >> (
@@ -62,6 +68,26 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
                     'EDIT STATE CONTENT SUGGESTION'))
         )
 
+        return (
+                suggestion_edit_state_content_model_to_delete,
+                suggestion_edit_state_content_model_to_delete_result,
+        )
+
+
+class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
+    """Job that deletes edit state content suggestion models as these are
+    deprecated.
+    """
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+
+        (suggestion_edit_state_content_model_to_delete,
+        suggestion_edit_state_content_model_to_delete_result) = (
+            self.pipeline
+            | 'Perform migration and filter migration results' >> (
+                DeleteDeprecatedSuggestionEditStateContentModels())
+        )
+
         unused_models_deletion = (
             (
                 suggestion_edit_state_content_model_to_delete
@@ -76,3 +102,23 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
             )
             | 'Merge results' >> beam.Flatten()
         )
+
+class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(base_jobs.JobBase):
+    """Job that audit edit state content suggestion."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of results from the audit of exploration
+        migration.
+
+        Returns:
+            PCollection. A PCollection of results from the exploration
+            migration.
+        """
+
+        suggestion_edit_state_content_model_to_delete, job_run_results = (
+            self.pipeline
+            | 'Perform fetching and deletion of edit state content suggestion results' >> (
+                DeleteDeprecatedSuggestionEditStateContentModels())
+        )
+
+        return job_run_results
