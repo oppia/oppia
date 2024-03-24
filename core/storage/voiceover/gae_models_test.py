@@ -177,8 +177,7 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'voiceovers_and_contents_mapping': (
-                base_models.EXPORT_POLICY.EXPORTED)
+            'language_code_to_accent': base_models.EXPORT_POLICY.EXPORTED
         }
         self.assertDictEqual(
             voiceover_models.VoiceArtistMetadataModel.get_export_policy(),
@@ -191,8 +190,8 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             voiceover_models.VoiceArtistMetadataModel.
             has_reference_to_user_id(user_id))
 
-        voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=user_id, language_code_to_accent={})
 
         self.assertTrue(
             voiceover_models.VoiceArtistMetadataModel.
@@ -200,16 +199,16 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
 
     def test_should_raise_error_if_user_id_already_exists(self) -> None:
         user_id = 'user_id'
-        voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=user_id, language_code_to_accent={})
 
         with self.assertRaisesRegex(
             Exception,
             'A voice artist metadata model with a given voice'
             'artist ID already exists'
         ):
-            voiceover_models.VoiceArtistMetadataModel.create(
-            voice_artist_id=user_id, voiceovers_and_contents_mapping={})
+            voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=user_id, language_code_to_accent={})
 
     def test_export_data_trivial(self) -> None:
         non_existent_user_id = 'non_existent_user_id'
@@ -217,50 +216,23 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             voiceover_models.VoiceArtistMetadataModel.export_data(
                 non_existent_user_id)
         )
-        test_data: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {}
+        test_data: Dict[str, Dict[str, str]] = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self) -> None:
-        voiceover1: voiceover_models.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-        voiceover2: voiceover_models.VoiceoverDict = {
-            'filename': 'filename2.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.9
-        }
-        voiceover3: voiceover_models.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0
-        }
-        voiceovers_and_contents_mapping: (
-            voiceover_models.VoiceoversAndContentsMappingType) = {
-            'en': {
-                'language_accent_code': 'en-US',
-                'exploration_id_to_content_ids': {
-                    'exp_1': ['content_1', 'content_2', 'content_3']
-                },
-                'voiceovers': [voiceover1, voiceover2, voiceover3]
-            }
+        language_code_to_accent = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
         }
         user_id = 'user_id'
-        voiceover_models.VoiceArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=user_id,
-            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping)
+            language_code_to_accent=language_code_to_accent)
         user_data = (
             voiceover_models.VoiceArtistMetadataModel.export_data(
                 user_id))
-        test_data: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {
-                'voiceovers_and_contents_mapping':
-                voiceovers_and_contents_mapping
+        test_data: Dict[str, Dict[str, str]] = {
+                'language_code_to_accent': language_code_to_accent
             }
         self.assertDictEqual(user_data, test_data)
 
@@ -276,6 +248,75 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER)
 
     def test_should_create_model_successfully(self) -> None:
+        user_id = 'user_id'
+        language_code_to_accent = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.create_model(
+                voice_artist_id=user_id,
+                language_code_to_accent=language_code_to_accent
+            )
+        )
+        retrieved_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                user_id, strict=False))
+        assert retrieved_model
+
+        self.assertEqual(
+            voice_artist_metadata_model.id, retrieved_model.id)
+        self.assertDictEqual(
+            voice_artist_metadata_model.language_code_to_accent,
+            retrieved_model.language_code_to_accent
+        )
+
+
+class ExplorationVoiceArtistsLinkModelTests(test_utils.GenericTestBase):
+    """Unit tests for ExplorationVoiceArtistsLinkModel class."""
+
+    def test_get_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'content_id_to_voiceovers_mapping': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE)
+        }
+        self.assertDictEqual(
+            voiceover_models.ExplorationVoiceArtistsLinkModel
+            .get_export_policy(),
+            expected_export_policy_dict
+        )
+
+    def test_should_raise_error_if_exp_id_already_exists(self) -> None:
+        exploration_id = 'exploration_id'
+        voiceover_models.ExplorationVoiceArtistsLinkModel.create_model(
+            exploration_id=exploration_id, content_id_to_voiceovers_mapping={})
+
+        with self.assertRaisesRegex(
+            Exception,
+            'An exploration voice artist link model with a given '
+            'exploration ID already exists'
+        ):
+            voiceover_models.ExplorationVoiceArtistsLinkModel.create_model(
+            exploration_id=exploration_id, content_id_to_voiceovers_mapping={})
+
+    def test_get_deletion_policy_is_to_keep(self) -> None:
+        self.assertEqual(
+            voiceover_models.ExplorationVoiceArtistsLinkModel.
+            get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            voiceover_models.ExplorationVoiceArtistsLinkModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_should_create_model_successfully(self) -> None:
         voiceover1: voiceover_models.VoiceoverDict = {
             'filename': 'filename1.mp3',
             'file_size_bytes': 3000,
@@ -288,38 +329,34 @@ class VoiceArtistMetadataModelTests(test_utils.GenericTestBase):
             'needs_update': False,
             'duration_secs': 5.9
         }
-        voiceover3: voiceover_models.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0
-        }
-        user_id = 'user_id'
-        voiceovers_and_contents_mapping: (
-            voiceover_models.VoiceoversAndContentsMappingType) = {
-            'en': {
-                'language_accent_code': 'en-US',
-                'exploration_id_to_content_ids': {
-                    'exp_1': ['content_1', 'content_2', 'content_3']
-                },
-                'voiceovers': [voiceover1, voiceover2, voiceover3]
+
+        exploration_id = 'exploration_id'
+
+        content_id_to_voiceovers_mapping = {
+            'content_1': {
+                'en': ('voice_artist_id_1', voiceover1)
+            },
+            'content_2': {
+                'hi': ('voice_artist_id_2', voiceover2)
             }
         }
 
-        voice_artist_metadata_model = (
-            voiceover_models.VoiceArtistMetadataModel.create(
-                voice_artist_id=user_id,
-                voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
+        exploration_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.create_model(
+                exploration_id=exploration_id,
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
             )
         )
         retrieved_model = (
-            voiceover_models.VoiceArtistMetadataModel.get(
-                user_id, strict=False))
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                exploration_id, strict=False))
         assert retrieved_model
 
         self.assertEqual(
-            voice_artist_metadata_model.id, retrieved_model.id)
+            exploration_voice_artist_link_model.id, retrieved_model.id)
         self.assertDictEqual(
-            voice_artist_metadata_model.voiceovers_and_contents_mapping,
-            retrieved_model.voiceovers_and_contents_mapping
+            exploration_voice_artist_link_model.
+            content_id_to_voiceovers_mapping,
+            retrieved_model.content_id_to_voiceovers_mapping
         )

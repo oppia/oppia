@@ -103,6 +103,7 @@ describe('CreateActivityButtonComponent', () => {
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => true,
+    isVoiceoverAdmin: () => false,
   };
 
   let userInfoForNonCollectionCreator = {
@@ -131,6 +132,7 @@ describe('CreateActivityButtonComponent', () => {
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => true,
+    isVoiceoverAdmin: () => false,
   };
 
   beforeEach(waitForAsync(() => {
