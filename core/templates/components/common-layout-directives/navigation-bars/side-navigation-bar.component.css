@@ -179,7 +179,7 @@ oppia-side-navigation-bar.oppia-community-library-section {
 }
 .oppia-sidebar-menu-open .oppia-sidebar-menu {
   box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
-  height: 110vh;
+  height: 100vh;
   overflow-y: scroll;
   -ms-transform: translate(0, 0);
   -webkit-transform: translate3d(0, 0, 0);
