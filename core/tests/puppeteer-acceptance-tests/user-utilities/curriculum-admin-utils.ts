@@ -375,19 +375,25 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(addSubtopicButton);
     await this.type(subtopicTitleField, subtopic.title);
     await this.type(subtopicUrlFragmentField, subtopic.url_fragment);
+
     await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, subtopic.description);
+
     await this.clickOn(subtopicPhotoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
+
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft();
   }
 
+  /**
+   * Function for assigning a skill to a subtopic in the topic editor page.
+   */
   async assignSkillToSubtopic() {
     await this.openTopicEditor();
     await this.clickOn(assignSkillButton);
@@ -405,6 +411,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.saveTopicDraft();
   }
 
+  /**
+   * Function for adding a skill for diagnostic tests and then publishing the topic.
+   * Adding a skill to diagnostic tests is necessary for publishing the topic.
+   */
   async addDiagnosticTestSkillAndPublishTopic(skill: Skill) {
     await this.openTopicEditor();
     await this.clickOn(addDiagnosticTestSkillButton);
@@ -416,6 +426,10 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
 
+    /**
+     * We select the skill in the dropdown with this method because the event doesn't propagate
+     * otherwise and no further changes are made to the DOM, even though the option is selected.
+     */
     await this.page.evaluate(
       (optionValue, selectElemSelector) => {
         const selectElem = document.querySelector(
@@ -447,7 +461,8 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating a story for a certain topic.
+   * Function for creating a story, executing chapter creation for
+   * the story, and then publishing the story.
    */
   async createAndPublishStoryWithChapter(
     story: Story,
@@ -509,7 +524,8 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * This function checks if the topic has been published successfully.
+   * This function checks if the topic has been published successfully,
+   * by verifying the status and the counts in the topic and skills dashboard.
    */
   async expectPublishedTopicToBePresent(): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
