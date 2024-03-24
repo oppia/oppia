@@ -111,8 +111,17 @@ const saveContentButton = 'button.e2e-test-save-state-content';
 const explorationNameInput = 'input.e2e-test-search-input';
 const communityExplorationCard = '.e2e-test-exploration-dashboard-card';
 const communityLessonsTabButton = '.e2e-test-community-lessons-section';
-const playLaterExplorationCard = '.oppia-summary-tile-container';
+const playLaterExplorationCard = '.e2e-test-exploration-dashboard-card';
 const confirmRemoveButton = '.e2e-test-confirm-delete-interaction';
+const playLaterExplorationCardTitle =
+  '.oppia-exploration-dashboard-card .activity-title';
+const explorationCompletionToast = '.e2e-test-lesson-completion-message';
+const reportExplorationButton = '.e2e-test-report-exploration-button';
+const reportOtherOptionSelector =
+  '.oppia-flag-modal-long-text:nth-child(3) input';
+const reportTextArea = '.e2e-test-report-exploration-text-area';
+const explorationFeedbackButton = '.e2e-test-exploration-feedback-popup-link';
+const feedbackTextArea = '.e2e-test-exploration-feedback-textarea';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -675,6 +684,7 @@ export class LoggedInUser extends BaseUser {
       await this.goto(learnerDashboardUrl);
     }
     await this.page.click(communityLessonsTabButton);
+    await this.page.waitForSelector('h1.lessons-title');
   }
 
   /**
@@ -685,37 +695,100 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * This function checks the number of the explorations in the community library.
+   * Function for opening an exploration from the community library page.
    */
-  async expectNumberOfExplorationsInCommunityLibraryToBe(
-    number: number
+  async searchAndOpenExplorationFromCommunityLibrary(
+    explorationName: string
   ): Promise<void> {
-    const allExplorations = await this.page.$$(communityExplorationCard);
-    if (allExplorations.length !== number) {
-      throw new Error(`Number of explorations is not equal to ${number}`);
+    if (this.page.url() !== communityLibraryUrl) {
+      await this.navigateToCommunityLibraryPage();
     }
-
-    showMessage(`Number of explorations is equal to ${number}`);
+    await this.findExplorationInCommunityLibrary(explorationName);
+    await this.page.click(communityExplorationCard);
+    await this.page.waitForNavigation();
   }
 
   /**
-   * This function checks the number of the explorations in the play later.
+   * This function checks whether we have completed an exploration or not.
    */
-  async expectNumberOfExplorationsInPlayLater(number: number): Promise<void> {
+  async expectReachedTheEndOfExploration(): Promise<void> {
+    await this.page.waitForSelector(explorationCompletionToast);
+  }
+
+  /**
+   * Function for reporting an exploration.
+   */
+  async reportTheExploration(reportMessage: string): Promise<void> {
+    await this.page.click(reportExplorationButton);
+    await this.page.waitForSelector('.modal-content');
+    await this.page.click(reportOtherOptionSelector);
+    await this.page.waitForSelector(reportTextArea);
+    await this.type(reportTextArea, reportMessage);
+    await this.page.click('.e2e-test-submit-report-button');
+    await this.page.waitForSelector('.modal-content');
+    await this.page.click(
+      'oppia-exploration-successfully-flagged-modal button'
+    );
+    await this.page.waitForTimeout(500);
+  }
+
+  /**
+   * Function for giving feedback for an exploration.
+   */
+  async giveFeedbackToExploration(feedbackMessage: string): Promise<void> {
+    await this.page.click(explorationFeedbackButton);
+    await this.type(feedbackTextArea, feedbackMessage);
+    await this.page.click('.e2e-test-exploration-feedback-submit-btn');
+    await this.page.waitForSelector('ngb-popover-window');
+  }
+
+  /**
+   * This function checks whether explorations with the given title are present in the Play Later.
+   */
+  async expectExplorationWithTitleToBePresentInPlayLater(
+    title: string,
+    shouldBePresent: boolean
+  ): Promise<void> {
     const allExplorations = await this.page.$$(playLaterExplorationCard);
-    if (allExplorations.length !== number) {
-      throw new Error(`Number of explorations is not equal to ${number}`);
+
+    if (!shouldBePresent) {
+      if (allExplorations.length > 0) {
+        throw new Error('There are some explorations present in Play Later');
+      } else {
+        showMessage(
+          `Exploration with title ${title} does not exists in Play Later`
+        );
+      }
+      return;
     }
 
-    showMessage(`Number of explorations is equal to ${number}`);
+    if (allExplorations.length === 0) {
+      throw new Error(
+        `Exploration with title ${title} does not exist in play later`
+      );
+    }
+
+    const explorationTitle = await allExplorations[0].$eval(
+      playLaterExplorationCardTitle,
+      element => (element as HTMLElement).innerText
+    );
+
+    if (explorationTitle === title) {
+      showMessage(`Exploration with title ${title} exists in Play Later`);
+    } else {
+      throw new Error(
+        `Exploration with title ${title} does not exist in play later`
+      );
+    }
   }
 
   /**
    * This function to add exploration to play later.
    */
   async addExplorationToPlayLater(): Promise<void> {
-    await this.page.click('.oppia-learner-dashboard-icon');
-    await this.page.waitForSelector('.toast-success');
+    await this.page.hover(communityExplorationCard);
+    await this.page.click('.e2e-test-add-to-playlist-btn');
+    await this.page.waitForSelector('.e2e-test-toast-message');
   }
 
   /**
@@ -738,17 +811,81 @@ export class LoggedInUser extends BaseUser {
     await this.page.keyboard.press('Enter');
     await this.page.waitForSelector(communityExplorationCard);
   }
+  /**
+   * Function for checking whether user feedback is present or not.
+   */
+  async checkUserFeedback(username: string): Promise<void> {
+    await this.page.click('.e2e-test-feedback-tab');
+    await this.page.waitForSelector('.table');
+    let feedbackFound = false;
+    const tableData = await this.page.$$eval('.table tr', rows => {
+      return Array.from(rows, row => {
+        const columns = row.querySelectorAll('td');
+        return Array.from(columns, column => column.innerText);
+      });
+    });
+
+    tableData.forEach(row => {
+      if (row[2] === username) {
+        feedbackFound = true;
+      }
+    });
+
+    if (feedbackFound) {
+      showMessage(`User feedback by ${username} is present.`);
+    } else {
+      throw new Error(`User feedback by ${username} is not present.`);
+    }
+  }
+
+  /**
+   * Function to open the exploration editor for a given exploration title.
+   */
+  async openExplorationEditor(explorationTitle: string): Promise<void> {
+    if (this.page.url() !== creatorDashboardUrl) {
+      await this.navigateToCreatorDashboardPage();
+    }
+
+    const allExplorations = await this.page.$$('.oppia-activity-summary-tile');
+    let explorationIndex = -1;
+
+    for (let i = 0; i < allExplorations.length; i++) {
+      let currentExplorationTitle = await allExplorations[i].$eval(
+        '.e2e-test-exp-summary-tile-title',
+        element => (element as HTMLElement).innerText
+      );
+
+      if (currentExplorationTitle === explorationTitle) {
+        explorationIndex = i;
+        break;
+      }
+    }
+
+    if (explorationIndex === -1) {
+      throw new Error(
+        `Exploration with title ${explorationTitle} does not exists`
+      );
+    } else {
+      await allExplorations[explorationIndex].click();
+      await this.page.waitForNavigation();
+    }
+  }
 
   /**
    * Function for creating an exploration with only EndExploration interaction.
    */
-  async createExploration(): Promise<string | null> {
+  async createEndExploration(): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
       `${dismissWelcomeModalSelector}:not([disabled])`
     );
     await this.clickOn(dismissWelcomeModalSelector);
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
     await this.page.waitForTimeout(500);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForTimeout(500);
@@ -781,6 +918,7 @@ export class LoggedInUser extends BaseUser {
       explorationIdElement,
       element => element.textContent
     );
+    await this.page.click('.e2e-test-share-publish-close');
     return explorationIdUrl;
   }
 

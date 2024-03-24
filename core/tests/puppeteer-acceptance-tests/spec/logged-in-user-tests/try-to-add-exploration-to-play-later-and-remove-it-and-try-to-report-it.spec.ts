@@ -20,7 +20,6 @@
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
-import {SuperAdmin} from '../../user-utilities/super-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
@@ -28,7 +27,6 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 describe('Logged-in User', function () {
   let testLearner: LoggedInUser;
   let explorationCreator: LoggedInUser;
-  let explorationId;
 
   beforeAll(async function () {
     testLearner = await UserFactory.createNewUser(
@@ -40,21 +38,40 @@ describe('Logged-in User', function () {
       'exploration_creator@example.com'
     );
 
-    explorationId = await explorationCreator.createExploration();
+    await explorationCreator.createEndExploration();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
     'should add exploration to play later then remove it and report it',
     async function () {
       await testLearner.navigateToCommunityLibraryPage();
-      await testLearner.findExplorationInCommunityLibrary('Test');
-      // await testLearner.expectNumberOfExplorationsInCommunityLibraryToBe(1);
+      await testLearner.findExplorationInCommunityLibrary('Test Exploration');
       await testLearner.addExplorationToPlayLater();
+
       await testLearner.navigateToLearnerDashboardPage();
       await testLearner.openCommunityLessonsTab();
-      // await testLearner.expectNumberOfExplorationsInPlayLater(1);
+      await testLearner.expectExplorationWithTitleToBePresentInPlayLater(
+        'Test Exploration',
+        true
+      );
       await testLearner.removeExplorationFromPlayLater();
-      // await testLearner.expectNumberOfExplorationsInPlayLater(0);
+      await testLearner.expectExplorationWithTitleToBePresentInPlayLater(
+        'Test Exploration',
+        false
+      );
+
+      await testLearner.searchAndOpenExplorationFromCommunityLibrary(
+        'Test Exploration'
+      );
+      await testLearner.expectReachedTheEndOfExploration();
+      await testLearner.reportTheExploration('Testing the functionality');
+
+      await testLearner.giveFeedbackToExploration(
+        'Testing Feedback functionality'
+      );
+
+      await explorationCreator.openExplorationEditor('Test Exploration');
+      await explorationCreator.checkUserFeedback('testLearner');
     },
     DEFAULT_SPEC_TIMEOUT
   );
