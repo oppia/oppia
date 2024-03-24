@@ -99,6 +99,7 @@ export const ObjectsDomainConstants = {
     chain: 'ch',
     angstrom: 'angstrom',
     mil: 'mil',
+    km: 'km',
 
     // Surface area.
     m2: 'm2',
