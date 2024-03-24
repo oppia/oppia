@@ -1101,9 +1101,7 @@ class ManagedProcessTests(test_utils.TestBase):
                     suite_name=suite_name,
                     stdout=subprocess.PIPE))
 
-    def test_managed_acceptance_test_server_mobile(
-        self
-    ) -> None:
+    def test_managed_acceptance_test_server_headless(self) -> None:
         suite_name = (
             'blog-admin-tests/assign-roles-to-users-and-change-tag-properties')
 
@@ -1113,6 +1111,17 @@ class ManagedProcessTests(test_utils.TestBase):
                 headless=True,
                 stdout=subprocess.PIPE)):
             self.assertEqual(os.getenv('HEADLESS'), 'true')
+
+    def test_managed_acceptance_test_server_mobile(self) -> None:
+        suite_name = (
+            'blog-admin-tests/assign-roles-to-users-and-change-tag-properties')
+
+        with self.exit_stack.enter_context(
+            servers.managed_acceptance_tests_server(
+                suite_name=suite_name,
+                mobile=True,
+                stdout=subprocess.PIPE)):
+            self.assertEqual(os.getenv('MOBILE'), 'true')
 
 
 class GetChromedriverVersionTests(test_utils.TestBase):
