@@ -42,7 +42,7 @@ describe('Logged-in User', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'should add exploration to play later then remove it and report it',
+    'should add exploration to play later then remove it then give feedback and report it',
     async function () {
       await testLearner.navigateToCommunityLibraryPage();
       await testLearner.findExplorationInCommunityLibrary('Test Exploration');
