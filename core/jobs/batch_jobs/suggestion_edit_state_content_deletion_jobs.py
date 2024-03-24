@@ -18,10 +18,7 @@
 
 from __future__ import annotations
 
-import logging
-
 from core import feconf
-from core.domain import suggestion_registry
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -29,6 +26,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+from typing import Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -38,8 +36,13 @@ if MYPY:  # pragma: no cover
     models.Names.SUGGESTION])
 
 
-class DeleteDeprecatedSuggestionEditStateContentModels(beam.PTransform):  # type: ignore[misc]
-    """Transform that gets all edit state content suggestion models"""
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
+class DeleteDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type: ignore[misc]
+    """Transform that gets all edit state content suggestion models."""
 
     def expand(
         self, pipeline: beam.Pipeline
@@ -81,10 +84,10 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
 
-        (suggestion_edit_state_content_model_to_delete,
-        suggestion_edit_state_content_model_to_delete_result) = (
+        (suggestion_edit_state_content_model_to_delete, (
+        suggestion_edit_state_content_model_to_delete_result)) = (
             self.pipeline
-            | 'Perform migration and filter migration results' >> (
+            | 'Get edit state content suggestion models' >> (
                 DeleteDeprecatedSuggestionEditStateContentModels())
         )
 
@@ -95,7 +98,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
             | 'Extract keys' >> beam.Map(lambda model: model.key)
             | 'Delete models' >> ndb_io.DeleteModels()
         )
-        
+
         return (
             (
                 suggestion_edit_state_content_model_to_delete_result,
@@ -103,22 +106,18 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
             | 'Merge results' >> beam.Flatten()
         )
 
-class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(base_jobs.JobBase):
+
+class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(
+    base_jobs.JobBase):
     """Job that audit edit state content suggestion."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of results from the audit of exploration
-        migration.
 
-        Returns:
-            PCollection. A PCollection of results from the exploration
-            migration.
-        """
-
-        suggestion_edit_state_content_model_to_delete, job_run_results = (
+        job_run_results = (
             self.pipeline
-            | 'Perform fetching and deletion of edit state content suggestion results' >> (
+            | 'Perform fetching and deletion of edit state content' +
+                ' suggestion results' >> (
                 DeleteDeprecatedSuggestionEditStateContentModels())
-        )
+        )[1]
 
         return job_run_results

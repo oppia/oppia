@@ -14,7 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs."""
+"""Unit tests for jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs.
+"""
 
 from __future__ import annotations
 
@@ -35,80 +36,82 @@ if MYPY: # pragma: no cover
 ])
 
 
-class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(job_test_utils.JobTestBase):
+class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
+    job_test_utils.JobTestBase):
+
+    dj = suggestion_edit_state_content_deletion_jobs
 
     JOB_CLASS: Type[
-        suggestion_edit_state_content_deletion_jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
-    ] = suggestion_edit_state_content_deletion_jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
+        dj.DeleteDeprecatedSuggestionEditStateContentModelsJob
+    ] = dj.DeleteDeprecatedSuggestionEditStateContentModelsJob
 
     def setUp(self) -> None:
         super().setUp()
 
-
         self.suggestion_1_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_1',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_1',
-            final_reviewer_id = 'reviewer_1',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_1',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_1',
+            final_reviewer_id='reviewer_1',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = None
+            language_code=None
         )
 
         self.suggestion_2_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_2',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_2',
-            final_reviewer_id = 'reviewer_2',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_2',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_2',
+            final_reviewer_id='reviewer_2',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = None
+            language_code=None
         )
 
         self.suggestion_3_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_3',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_3',
-            final_reviewer_id = 'reviewer_3',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_3',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_3',
+            final_reviewer_id='reviewer_3',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = 'hi',
-            edited_by_reviewer = False
+            language_code='hi',
+            edited_by_reviewer=False
         )
 
         self.suggestion_4_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_4',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_4',
-            final_reviewer_id = 'reviewer_4',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_4',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_4',
+            final_reviewer_id='reviewer_4',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = 'en',
-            edited_by_reviewer = False
+            language_code='en',
+            edited_by_reviewer=False
         )
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
@@ -127,90 +130,95 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(job_test_utils.Jo
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)), 2)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 2)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')
+            job_run_result.JobRunResult(
+                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')
         ])
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)), 0)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 0)
 
 
-class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(job_test_utils.JobTestBase):
+class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
+    job_test_utils.JobTestBase):
+
+    dj = suggestion_edit_state_content_deletion_jobs
 
     JOB_CLASS: Type[
-        suggestion_edit_state_content_deletion_jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
-    ] = suggestion_edit_state_content_deletion_jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
+        dj.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
+    ] = dj.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
 
     def setUp(self) -> None:
         super().setUp()
 
-
         self.suggestion_1_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_1',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_1',
-            final_reviewer_id = 'reviewer_1',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_1',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_1',
+            final_reviewer_id='reviewer_1',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = None
+            language_code=None
         )
 
         self.suggestion_2_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_2',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_2',
-            final_reviewer_id = 'reviewer_2',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_2',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_2',
+            final_reviewer_id='reviewer_2',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = None
+            language_code=None
         )
 
         self.suggestion_3_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_3',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_3',
-            final_reviewer_id = 'reviewer_3',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_3',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_3',
+            final_reviewer_id='reviewer_3',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = 'hi',
-            edited_by_reviewer = False
+            language_code='hi',
+            edited_by_reviewer=False
         )
 
         self.suggestion_4_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            suggestion_type = feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            target_type = feconf.ENTITY_TYPE_EXPLORATION,
-            target_id = 'target_4',
-            target_version_at_submission = 1,
-            status = 'accepted',
-            author_id = 'author_4',
-            final_reviewer_id = 'reviewer_4',
-            change_cmd = {},
-            score_category = (
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='target_4',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='author_4',
+            final_reviewer_id='reviewer_4',
+            change_cmd={},
+            score_category=(
                 suggestion_models.SCORE_TYPE_TRANSLATION +
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code = 'en',
-            edited_by_reviewer = False
+            language_code='en',
+            edited_by_reviewer=False
         )
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
@@ -229,11 +237,14 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(job_test_uti
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)), 2)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 2)
 
         self.assert_job_output_is([
-            job_run_result.JobRunResult(stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')
+            job_run_result.JobRunResult(
+                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')
         ])
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(queries)), 2)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 2)

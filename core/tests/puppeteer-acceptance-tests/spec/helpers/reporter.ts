@@ -18,6 +18,7 @@
 
 import util from 'util';
 import sourceMapSupport from 'source-map-support';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 sourceMapSupport.install();
 
@@ -166,6 +167,24 @@ const Reporter: jasmine.CustomReporter = {
   specDone: function (result: jasmine.SpecResult) {
     specCount++;
     const seconds = result?.duration ? result.duration / 1000 : 0;
+
+    try {
+      ConsoleReporter.reportConsoleErrors();
+    } catch (error) {
+      // Here we catch the error and add it to the failed expectations.
+      // We do not set any of the stack or actual/expected values as they
+      // are not relevant since the error message is just showing the console
+      // errors that were found during the test.
+      result.failedExpectations.push({
+        message: error,
+        stack: '',
+        actual: '',
+        expected: '',
+        matcherName: '',
+        passed: false,
+      });
+      result.status = 'failed';
+    }
 
     switch (result.status) {
       case 'pending':
