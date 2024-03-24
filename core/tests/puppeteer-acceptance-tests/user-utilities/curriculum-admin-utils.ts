@@ -35,6 +35,7 @@ const saveContentButton = 'button.e2e-test-save-state-content';
 const saveChangesButton = 'button.e2e-test-save-changes';
 const saveDraftButton = 'button.e2e-test-save-draft-button';
 const publishExplorationButton = 'button.e2e-test-publish-exploration';
+const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 
 const photoBoxButton = 'div.e2e-test-photo-button';
@@ -45,6 +46,7 @@ const storyPhotoBoxButton =
 const chapterPhotoBoxButton =
   '.e2e-test-chapter-input-thumbnail .e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
+const photoUploadModal = 'edit-thumbnail-modal';
 
 const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -59,6 +61,7 @@ const equalsRuleButtonText = 'is equal to ... ';
 const answersInGroupAreCorrectToggle =
   'input.e2e-test-editor-correctness-toggle';
 const saveResponseButton = 'button.e2e-test-add-new-response';
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
 const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
 const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
 const addHintButton = 'button.e2e-test-oppia-add-hint-button';
@@ -113,8 +116,8 @@ const confirmSkillAssignationButton =
 
 const addDiagnosticTestSkillButton =
   'button.e2e-test-add-diagnostic-test-skill';
-const diagnosticTestSkillSelector = '.e2e-test-diagnostic-test-skill-selector';
-const diagnosticSkillOption = '.e2e-test-diagnostic-test-skill-option';
+const diagnosticTestSkillSelector =
+  'select.e2e-test-diagnostic-test-skill-selector';
 
 const addStoryButton = 'button.e2e-test-create-story-button';
 const storyTitleField = 'input.e2e-test-new-story-title-field';
@@ -124,7 +127,6 @@ const createStoryButton = 'button.e2e-test-confirm-story-creation-button';
 const saveStoryButton = 'button.e2e-test-save-story-button';
 const saveStoryMessageInput = 'textarea.e2e-test-commit-message-input';
 const publishStoryButton = 'button.e2e-test-publish-story-button';
-const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
 const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
 
 const addChapterButton = 'button.e2e-test-add-chapter-button';
@@ -168,19 +170,8 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the topic and skills dashboard page.
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
+    await this.page.bringToFront();
     await this.goto(topicAndSkillsDashboardUrl);
-  }
-
-  /**
-   * Function that waits for a button to be clickable and then clicks it.
-   * Timeout is necessary due to transitions, in cases where the button has to be
-   * clicked after a modal opens or closes.
-   * The button will never be clicked and tests will fail without the timeout.
-   */
-  async clickAfterWaiting(selector: string) {
-    await this.page.waitForSelector(`${selector}:not([disabled])`);
-    await this.page.waitForTimeout(500);
-    await this.clickOn(selector);
   }
 
   /**
@@ -195,7 +186,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, skill.reviewMaterial);
-    await this.clickAfterWaiting(confirmSkillCreationButton);
+    await this.page.waitForSelector(
+      `${confirmSkillCreationButton}:not([disabled])`
+    );
+    await this.clickOn(confirmSkillCreationButton);
     await this.page.bringToFront();
 
     for (let i = 0; i < skill.questionCount; i++) {
@@ -211,13 +205,13 @@ export class CurriculumAdmin extends BaseUser {
     await this.openSkillEditor();
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, 'Add 1+2');
     await this.page.waitForSelector(`${saveContentButton}:not([disabled])`);
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(modalDiv, {visible: true});
     await this.clickOn(interactionNumberInputButton);
     await this.clickOn(saveInteractionButton);
     await this.clickOn(responseRuleDropdown);
@@ -225,20 +219,22 @@ export class CurriculumAdmin extends BaseUser {
     await this.type(floatTextField, '3');
     await this.clickOn(answersInGroupAreCorrectToggle);
     await this.clickOn(saveResponseButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
 
-    await this.page.waitForTimeout(500);
-    await this.clickOn('a.e2e-test-default-response-tab');
+    await this.clickOn(defaultFeedbackTab);
     await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, 'The answer is 3');
     await this.clickOn(saveOutcomeFeedbackButton);
 
     await this.clickOn(addHintButton);
+    await this.page.waitForSelector(modalDiv, {visible: true});
     await this.type(richTextAreaField, '3');
     await this.clickOn(saveHintButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
 
-    await this.page.waitForTimeout(500);
     await this.clickOn(addSolutionButton);
+    await this.page.waitForSelector(modalDiv, {visible: true});
     await this.page.waitForSelector(answerTypeDropdown);
     await this.page.select(answerTypeDropdown, 'The only');
     await this.page.waitForSelector(solutionFloatTextField);
@@ -248,8 +244,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.type(richTextAreaField, '1+2 is 3');
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
 
-    await this.page.waitForTimeout(500);
     await this.clickOn(saveQuestionButton);
   }
 
@@ -257,12 +253,12 @@ export class CurriculumAdmin extends BaseUser {
    * Function for navigating to the contributor dashboard page.
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
+    await this.page.bringToFront();
     await this.goto(creatorDashboardUrl);
   }
 
   /**
    * Function for creating an exploration as a curriculum admin.
-   * Timeout here is necessary for the modal dismiss transition.
    */
   async createExploration(exploration: Exploration): Promise<string | null> {
     await this.clickOn(createExplorationButton);
@@ -270,7 +266,9 @@ export class CurriculumAdmin extends BaseUser {
       `${dismissWelcomeModalSelector}:not([disabled])`
     );
     await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
     await this.clickOn(textStateEditSelector);
     await this.page.keyboard.press('Tab');
     await this.type(richTextAreaField, exploration.state);
@@ -325,11 +323,14 @@ export class CurriculumAdmin extends BaseUser {
     await this.type(topicUrlFragmentField, topic.url_fragment);
     await this.type(topicWebFragmentField, topic.web_fragment);
     await this.type(topicDescriptionField, topic.description);
+
     await this.clickOn(photoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.clickAfterWaiting(createTopicButton);
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createTopicButton);
 
     await this.openTopicEditor();
     await this.page.waitForSelector(topicMetaTagInput);
@@ -360,9 +361,10 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   async saveTopicDraft(): Promise<void> {
-    await this.clickAfterWaiting(saveTopicButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    await this.clickOn(saveTopicButton);
     await this.clickOn(closeSaveModalButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(closeSaveModalButton, {hidden: true});
   }
 
   /**
@@ -374,37 +376,72 @@ export class CurriculumAdmin extends BaseUser {
     await this.type(subtopicTitleField, subtopic.title);
     await this.type(subtopicUrlFragmentField, subtopic.url_fragment);
     await this.clickOn(subtopicDescriptionEditorToggle);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, subtopic.description);
     await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.clickAfterWaiting(createSubtopicButton);
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft();
   }
 
   async assignSkillToSubtopic() {
     await this.openTopicEditor();
     await this.clickOn(assignSkillButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector('.e2e-test-assign-subtopic', {
+      visible: true,
+    });
     await this.clickOn('Assign to Subtopic');
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(modalDiv, {visible: true});
     await this.clickOn(subtopicRadioButton);
     await this.page.waitForSelector(
       `${confirmSkillAssignationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillAssignationButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
     await this.saveTopicDraft();
   }
 
-  async addDiagnosticTestSkillAndPublishTopic() {
+  async addDiagnosticTestSkillAndPublishTopic(skill: Skill) {
     await this.openTopicEditor();
     await this.clickOn(addDiagnosticTestSkillButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(diagnosticTestSkillSelector, {
+      visible: true,
+    });
     await this.clickOn(diagnosticTestSkillSelector);
-    await this.clickOn(diagnosticSkillOption[0]);
+    await this.page.waitForSelector(diagnosticTestSkillSelector, {
+      visible: true,
+    });
+
+    await this.page.evaluate(
+      (optionValue, selectElemSelector) => {
+        const selectElem = document.querySelector(
+          selectElemSelector
+        ) as HTMLSelectElement | null;
+        if (!selectElem) {
+          console.error('Select element not found');
+          return;
+        }
+
+        const option = Array.from(selectElem.options).find(
+          opt => opt.textContent?.trim() === optionValue
+        ) as HTMLOptionElement | undefined;
+        if (!option) {
+          console.error('Option not found');
+          return;
+        }
+
+        option.selected = true;
+        const event = new Event('change', {bubbles: true});
+        selectElem.dispatchEvent(event);
+      },
+      skill.description,
+      diagnosticTestSkillSelector
+    );
+
     await this.saveTopicDraft();
     await this.clickOn(publishTopicButton);
   }
@@ -425,7 +462,8 @@ export class CurriculumAdmin extends BaseUser {
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.clickAfterWaiting(createStoryButton);
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createStoryButton);
 
     await this.page.waitForSelector(storyMetaTagInput);
     await this.page.focus(storyMetaTagInput);
@@ -433,8 +471,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.keyboard.press('Tab');
 
     await this.createChapter(explorationId);
+    await this.saveStoryDraft();
+    await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
     await this.clickOn(publishStoryButton);
-    await this.page.waitForSelector(unpublishStoryButton);
   }
 
   /**
@@ -448,26 +487,25 @@ export class CurriculumAdmin extends BaseUser {
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.clickAfterWaiting(createChapterButton);
-    await this.saveStoryDraft();
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createChapterButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
    * Function for saving a story as a curriculum admin.
-   * Timeout here is necessary for the closing modal transition.
    */
   async saveStoryDraft(): Promise<void> {
-    await this.clickAfterWaiting(saveStoryButton);
+    await this.clickOn(saveStoryButton);
     await this.clickOn(closeSaveModalButton);
-    await this.page.waitForTimeout(500);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(modalDiv, {visible: true});
     await this.type(
       saveStoryMessageInput,
       'Test saving story as curriculum admin.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
@@ -475,36 +513,31 @@ export class CurriculumAdmin extends BaseUser {
    */
   async expectPublishedTopicToBePresent(): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
-    await this.page.waitForSelector('.e2e-test-topics-table');
+    await this.page.waitForSelector('.e2e-test-topics-table', {visible: true});
 
-    let topicStatus = document.querySelector(
-      '.e2e-test-topics-table .list-item .topic-list-status-text'
+    let topicStatusText = await this.page.$eval(
+      'span.topic-list-status-text',
+      element => (element as HTMLElement).innerText
     );
-    const topicDetails = await this.page.evaluate(() => {
-      const tr = document.querySelector('.e2e-test-topics-table .list-item');
-      if (!tr) {
-        throw new Error('Cannot find topic details in dashboard!');
+
+    let topicDetails = await this.page.$eval(
+      '.e2e-test-topics-table tr.list-item',
+      element => {
+        let tds = Array.from(element.querySelectorAll('td'));
+        if (!tds) {
+          throw new Error('Cannot fetch topic details.');
+        }
+        return {
+          publishedStoryCount: tds[2].textContent?.trim().split(' ')[0] || '0',
+          subtopicCount: tds[3].textContent?.trim().split(' ')[0] || '0',
+          skillsCount: tds[4].textContent?.trim().split(' ')[0] || '0',
+        };
       }
-      const tds = tr.querySelectorAll('td');
-      return {
-        publishedStoryCount: tds[2].textContent,
-        subtopicCount: tds[3].textContent,
-        skillsCount: tds[4].textContent,
-      };
-    });
-
-    if (!topicDetails || !topicStatus) {
-      throw new Error('Cannot find topic details in dashboard!');
-    }
-
-    expect(topicStatus.textContent).toBe('Published');
-    if (topicDetails.publishedStoryCount != '1') {
-      throw new Error('Incorrect story count for topic! Expected 1 story.');
-    } else if (topicDetails.subtopicCount != '1') {
-      throw new Error('Incorrect subtopic count for topic! Expected 1 topic.');
-    } else if (topicDetails.skillsCount != '1') {
-      throw new Error('Incorrect skills count for topic! Expected 1 skill.');
-    }
+    );
+    expect(topicStatusText).toEqual('Published');
+    expect(topicDetails.subtopicCount).toEqual('1');
+    expect(topicDetails.publishedStoryCount).toEqual('1');
+    expect(topicDetails.skillsCount).toEqual('1');
     showMessage(`Topic has been published successfully!`);
   }
 }

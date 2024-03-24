@@ -79,7 +79,7 @@ describe('Curriculum Admin', function () {
       await curriculumAdmin.createTopic(topic);
       await curriculumAdmin.createSubtopic(subtopic);
       await curriculumAdmin.createSkill(skill);
-      await curriculumAdmin.addDiagnosticTestSkillAndPublishTopic();
+      await curriculumAdmin.addDiagnosticTestSkillAndPublishTopic(skill);
       await curriculumAdmin.createAndPublishStoryWithChapter(
         story,
         explorationId
