@@ -7,7 +7,6 @@
     "CRITICAL_USER_JOURNEYS_DOC": "http://docs.google.com/document/d/1s3MG2MVh_7m7B0wIlZb7sAcoyUdY0zq7a1JEFtwYBjI",
     "CUT_BRANCH_MODULE_TARGET": "scripts.release_scripts.cut_release_or_hotfix_branch",
     "DEPLOYMENT_CONFIG_PATH": "core/feconf.py",
-    "GCLOUD_PATH": "../oppia_tools/google-cloud-sdk-364.0.0/google-cloud-sdk/bin/gcloud",
     "GITHUB_RELEASE_TAB_URL": "https://github.com/oppia/oppia/releases",
     "INDEX_YAML_PATH": "index.yaml",
     "INSTALL_THIRD_PARTY_MODULE_TARGET": "scripts.install_third_party_libs",
