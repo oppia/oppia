@@ -603,7 +603,43 @@ def main(args: Optional[List[str]] = None) -> None:
     if parsed_args.generate_coverage_report:
         subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
+        print('')
+        print(
+            '+----------------------------------------------------------------+'
+            )
+        print(
+            '|-------- '
+            'SUMMARY OF THE FILES WITH INCOMPLETE COVERAGE '
+            '---------|'
+            )
+        print(
+            '+----------------------------------------------------------------+'
+            )
+        print('')
         print(report_stdout)
+        if coverage != 100:
+            print('WARNING: Backend test coverage is below 100%.')
+            print('')
+
+            print(
+                'The rightmost "Missing" column above shows lines '
+                'that are still uncovered.'
+            )
+            print(
+                'Please add tests for scenarios that exercise '
+                'those lines of code so that '
+            )
+            print('there are no uncovered lines in each file.')
+            print('')
+
+            print(
+                'For more information, please see our '
+                'backend tests wiki page:'
+            )
+            print(
+                '    https://github.com/oppia/oppia/wiki/Backend-tests'
+                '#coverage-reports'
+            )
 
         if (coverage != 100
                 and not parsed_args.ignore_coverage):
@@ -648,7 +684,8 @@ def check_coverage(
     cmd = [
         sys.executable, '-m', 'coverage', 'report',
          '--omit="%s*","third_party/*","/usr/share/*"'
-         % common.OPPIA_TOOLS_DIR, '--show-missing']
+         % common.OPPIA_TOOLS_DIR, '--show-missing',
+         '--skip-covered']
     if include:
         cmd.append('--include=%s' % ','.join(include))
 
