@@ -59,6 +59,18 @@ describe('Curriculum Admin', function () {
     description: 'This story is to test curriculum admin utility.',
   };
 
+  function getExplorationIdFromUrl(url: string | null): string {
+    if (!url) {
+      throw new Error('Exploration URL is null or empty');
+    }
+    const parts = url.split('/');
+    const explorationId = parts.length > 0 ? parts[parts.length - 1] : '';
+    if (!explorationId) {
+      throw new Error('Failed to extract exploration ID from URL');
+    }
+    return explorationId;
+  }
+
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
@@ -72,8 +84,7 @@ describe('Curriculum Admin', function () {
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       explorationUrl = await curriculumAdmin.createExploration(exploration);
-      explorationId =
-        await curriculumAdmin.getExplorationIdFromUrl(explorationUrl);
+      explorationId = getExplorationIdFromUrl(explorationUrl);
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       await curriculumAdmin.createTopic(topic);
