@@ -99,7 +99,6 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector('.customize-interaction-body-container', {
       hidden: true,
     });
-    ``;
     if (interactionToAdd !== ' End Exploration ') {
       await this.clickOn('.oppia-response-header');
     }
