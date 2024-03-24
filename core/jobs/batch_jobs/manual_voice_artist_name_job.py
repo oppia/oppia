@@ -81,8 +81,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             snapshot_model_id: str. The exploration snapshot model ID.
 
         Returns:
-            str. The committer ID for the given snapshot model ID exists, or
-            None otherwise.
+            str. The committer ID if the snapshot metadata model exists for
+            the given snapshot ID, or None otherwise.
         """
         with datastore_services.get_ndb_context():
             exp_snapshot_metadata_model = (
@@ -121,55 +121,48 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             Exception. Failed to get newly added voiceovers between the given
                 snapshot models.
         """
+        # The voiceover mapping that is present in the new snapshot model.
+        new_voiceover_mapping: Dict[str, Dict[
+            str, state_domain.VoiceoverDict]] = {}
 
-        # Note that the generic try-except block included here is designed to
-        # capture any unforeseen errors that could potentially arise from
-        # previous versions of the snapshot models.
-        try:
-            # The voiceover mapping that is present in the new snapshot model.
-            new_voiceover_mapping: Dict[str, Dict[
-                str, state_domain.VoiceoverDict]] = {}
+        # The voiceover mapping that is present in the old snapshot model.
+        old_voiceover_mapping: Dict[str, Dict[
+            str, state_domain.VoiceoverDict]] = {}
 
-            # The voiceover mapping that is present in the old snapshot model.
-            old_voiceover_mapping: Dict[str, Dict[
-                str, state_domain.VoiceoverDict]] = {}
+        for state in new_snapshot_model.content['states'].values():
+            new_voiceover_mapping.update(
+                state['recorded_voiceovers']['voiceovers_mapping'])
 
-            for state in new_snapshot_model.content['states'].values():
-                new_voiceover_mapping.update(
-                    state['recorded_voiceovers']['voiceovers_mapping'])
+        for state in old_snapshot_model.content['states'].values():
+            old_voiceover_mapping.update(
+                state['recorded_voiceovers']['voiceovers_mapping'])
 
-            for state in old_snapshot_model.content['states'].values():
-                old_voiceover_mapping.update(
-                    state['recorded_voiceovers']['voiceovers_mapping'])
+        # The voiceover mapping that has been added to this version of the
+        # exploration snapshot.
+        voiceovers_added_in_this_version: Dict[
+            str, Dict[str, state_domain.VoiceoverDict]] = (
+                collections.defaultdict(dict)
+            )
 
-            # The voiceover mapping that has been added to this version of the
-            # exploration snapshot.
-            voiceovers_added_in_this_version: Dict[
-                str, Dict[str, state_domain.VoiceoverDict]] = (
-                    collections.defaultdict(dict)
-                )
+        for content_id, lang_code_to_voiceover_dict in (
+                new_voiceover_mapping.items()):
+            for lang_code, voiceover_dict in (
+                    lang_code_to_voiceover_dict.items()):
+                if lang_code not in old_voiceover_mapping.get(
+                        content_id, {}):
+                    voiceovers_added_in_this_version[
+                        content_id][lang_code] = voiceover_dict
+                else:
+                    old_voiceover_dict = old_voiceover_mapping[
+                        content_id][lang_code]
+                    new_voiceover_dict = (
+                        lang_code_to_voiceover_dict[lang_code])
 
-            for content_id, lang_code_to_voiceover_dict in (
-                    new_voiceover_mapping.items()):
-                for lang_code, voiceover_dict in (
-                        lang_code_to_voiceover_dict.items()):
-                    if lang_code not in old_voiceover_mapping.get(
-                            content_id, {}):
+                    if old_voiceover_dict != new_voiceover_dict:
                         voiceovers_added_in_this_version[
                             content_id][lang_code] = voiceover_dict
-                    else:
-                        old_voiceover_dict = old_voiceover_mapping[
-                            content_id][lang_code]
-                        new_voiceover_dict = (
-                            lang_code_to_voiceover_dict[lang_code])
 
-                        if old_voiceover_dict != new_voiceover_dict:
-                            voiceovers_added_in_this_version[
-                                content_id][lang_code] = voiceover_dict
-
-            return voiceovers_added_in_this_version
-        except Exception as e:
-            raise Exception(e) from e
+        return voiceovers_added_in_this_version
 
     @classmethod
     def get_content_id_mapping_and_voiceovers_count(
@@ -236,7 +229,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 as keys and voiceover dicts as values.
             voiceover_mapping: dict(str, dict(str, VoiceoverDict)). The
                 dictionary contains voiceover data for some other version of
-                exploration, say M. This dict maps content IDs as keys and
+                exploration, say M < N. This dict maps content IDs as keys and
                 nested dicts as values. Each nested dict contains language
                 codes as keys and voiceover dicts as values.
             voiceover_artist_and_voiceover_mapping:
