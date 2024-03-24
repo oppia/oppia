@@ -63,7 +63,7 @@ export const ObjectsDomainConstants = {
       name: string;
       aliases: string[];
       front_units: string[];
-      base_unit: string;
+      base_unit: string | null;
     };
   },
 
