@@ -22,9 +22,7 @@ import builtins
 import os
 import shutil
 import subprocess
-import tempfile
 
-from core import utils
 from core.tests import test_utils
 from scripts import common
 
@@ -400,45 +398,3 @@ class PreCommitHookTests(test_utils.GenericTestBase):
                 pre_commit_hook.main(args=[])
         self.assertTrue(
             check_function_calls['check_changes_in_config_is_called'])
-
-    def test_check_changes_in_gcloud_path_without_mismatch(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = 'mock_release_constants.json'
-        # Here we use MyPy ignore because we are assigning value to
-        # the read-only 'name' attribute which causes MyPy to throw an error.
-        # Thus, to avoid the error, we used ignore here.
-        temp_file.name = temp_file_name  # type: ignore[misc]
-        with utils.open_file(temp_file_name, 'w') as tmp:
-            tmp.write('{"GCLOUD_PATH": "%s"}' % common.GCLOUD_PATH)
-        with self.swap(
-            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name):
-            pre_commit_hook.check_changes_in_gcloud_path()
-        temp_file.close()
-        if os.path.isfile(temp_file_name):
-            # On Windows system, occasionally this temp file is not deleted.
-            os.remove(temp_file_name)
-
-    def test_check_changes_in_gcloud_path_with_mismatch(self) -> None:
-        temp_file = tempfile.NamedTemporaryFile()
-        temp_file_name = 'mock_release_constants.json'
-        # Here we use MyPy ignore because we are assigning value to
-        # the read-only 'name' attribute which causes MyPy to throw an error.
-        # Thus, to avoid the error, we used ignore here.
-        temp_file.name = temp_file_name  # type: ignore[misc]
-        incorrect_gcloud_path = (
-            '../oppia_tools/google-cloud-sdk-314.0.0/google-cloud-sdk/'
-            'bin/gcloud')
-        with utils.open_file(temp_file_name, 'w') as tmp:
-            tmp.write('{"GCLOUD_PATH": "%s"}' % incorrect_gcloud_path)
-        constants_file_swap = self.swap(
-            pre_commit_hook, 'RELEASE_CONSTANTS_FILEPATH', temp_file_name)
-        with constants_file_swap, self.assertRaisesRegex(
-            Exception, (
-                'The gcloud path in common.py: %s should match the path in '
-                'release_constants.json: %s. Please fix.' % (
-                    common.GCLOUD_PATH, incorrect_gcloud_path))):
-            pre_commit_hook.check_changes_in_gcloud_path()
-        temp_file.close()
-        if os.path.isfile(temp_file_name):
-            # On Windows system, occasionally this temp file is not deleted.
-            os.remove(temp_file_name)
