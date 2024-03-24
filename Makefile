@@ -122,6 +122,12 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
+run_tests.prettier: ## Formats the code using prettier.
+	docker compose run --no-deps --entrypoint "npx prettier --check ." dev-server
+
+run_tests.third_party_size_check: ## Runs the third party size check
+	docker compose run --no-deps --entrypoint "python -m scripts.third_party_size_check" dev-server
+
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
 
@@ -147,7 +153,7 @@ run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks $(PYTHON_ARGS)" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.run_typescript_checks $(PYTHON_ARGS)" dev-server || $(MAKE) stop
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || $(MAKE) stop
@@ -174,7 +180,11 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting acceptance test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite) || $(MAKE) stop
+	@if [ -d ./core/tests/puppeteer-acceptance-tests/build ]; then \
+		rm -rf ./core/tests/puppeteer-acceptance-tests/build; \
+	fi
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
+	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/spec/$(suite).spec.js
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'
