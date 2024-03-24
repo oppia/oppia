@@ -234,13 +234,13 @@ class CreateLearnerGroupPageAccessValidationHandler(
         """Retrieves information about a learner group.
 
         Raises:
-            PageNotFoundException. The learner groups are not enabled.
+            NotFoundException. The learner groups are not enabled.
         """
         assert self.user_id is not None
         if not learner_group_services.is_learner_group_feature_enabled(
             self.user_id
         ):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
 
 class EditLearnerGroupPageAccessValidationHandler(
