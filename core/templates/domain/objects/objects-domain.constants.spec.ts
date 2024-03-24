@@ -22,10 +22,8 @@ import {all, create} from 'mathjs';
 const math = create(all);
 let currencyUnits: string[] = [];
 for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
-  if (ObjectsDomainConstants.CURRENCY_UNITS.hasOwnProperty(currency)) {
-    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
-    currencyUnits.push(currency, ...currencyInfo.aliases);
-  }
+  const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+  currencyUnits.push(currency, ...currencyInfo.aliases);
 }
 
 const isValidUnit = (unit: string): boolean => {
