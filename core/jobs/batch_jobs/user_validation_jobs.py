@@ -39,26 +39,26 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        user_ids_and_bios = (
+        user_usernames_and_bios = (
             self.pipeline
             | 'Get all UserSettingsModels' >> (
                 ndb_io.GetModels(user_models.UserSettingsModel.get_all()))
-            | 'Extract user id and bio from model' >> beam.Map(
+            | 'Extract username and bio from model' >> beam.Map(
                 lambda user_settings: (
-                    user_settings.id, user_settings.user_bio))
+                    user_settings.username, user_settings.user_bio))
         )
 
         users_with_invalid_bios = (
-            user_ids_and_bios
+            user_usernames_and_bios
             | 'Get users with null bio or bio with length greater than 2000' >>
                 beam.Filter(
-                lambda user_id_and_bio:
-                    not isinstance(user_id_and_bio[1], str)
-                    or len(user_id_and_bio[1]) > 2000)
+                lambda user_username_and_bio:
+                    not isinstance(user_username_and_bio[1], str)
+                    or len(user_username_and_bio[1]) > 2000)
         )
 
         number_of_users_queried_report = (
-            user_ids_and_bios
+            user_usernames_and_bios
             | 'Report count of user models' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'CountTotalUsers'))
@@ -71,12 +71,12 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
                     'CountInvalidUserBios'))
         )
 
-        invalid_user_ids_and_bios_report = (
+        invalid_user_usernames_and_bios_report = (
             users_with_invalid_bios
             | 'Report info on each invalid user bio' >> beam.Map(
-                lambda user_id_and_bio: job_run_result.JobRunResult.as_stderr(
-                    'The id of user is "%s" and their bio is "%s"'
-                    % (user_id_and_bio[0], user_id_and_bio[1])
+                lambda user_username_and_bio: job_run_result.JobRunResult.as_stderr(
+                    'The username of user is "%s" and their bio is "%s"'
+                    % (user_username_and_bio[0], user_username_and_bio[1])
                 ))
         )
 
@@ -84,7 +84,7 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
             (
                 number_of_users_queried_report,
                 number_of_users_with_invalid_bio_report,
-                invalid_user_ids_and_bios_report,
+                invalid_user_usernames_and_bios_report,
             )
             | 'Combine reported results' >> beam.Flatten()
         )
