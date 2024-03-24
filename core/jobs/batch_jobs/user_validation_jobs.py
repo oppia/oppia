@@ -74,7 +74,8 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
         invalid_user_usernames_and_bios_report = (
             users_with_invalid_bios
             | 'Report info on each invalid user bio' >> beam.Map(
-                lambda user_username_and_bio: job_run_result.JobRunResult.as_stderr(
+                lambda user_username_and_bio:
+                    job_run_result.JobRunResult.as_stderr(
                     'The username of user is "%s" and their bio is "%s"'
                     % (user_username_and_bio[0], user_username_and_bio[1])
                 ))

@@ -56,7 +56,8 @@ class GetUsersWithInvalidBioJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr='The username of user is "user_1" and their bio is "None"'),
+                stderr='The username of user is "user_1"' +
+                ' and their bio is "None"'),
             job_run_result.JobRunResult(
                 stdout='CountInvalidUserBios SUCCESS: 1'),
             job_run_result.JobRunResult(
