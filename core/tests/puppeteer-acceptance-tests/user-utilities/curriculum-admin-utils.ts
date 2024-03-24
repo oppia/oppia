@@ -395,7 +395,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for assigning a skill to a subtopic in the topic editor page.
    */
-  async assignSkillToSubtopic() {
+  async assignSkillToSubtopic(): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(assignSkillButton);
     await this.page.waitForSelector('.e2e-test-assign-subtopic', {
@@ -416,7 +416,7 @@ export class CurriculumAdmin extends BaseUser {
    * Function for adding a skill for diagnostic tests and then publishing the topic.
    * Adding a skill to diagnostic tests is necessary for publishing the topic.
    */
-  async addDiagnosticTestSkillAndPublishTopic(skill: Skill) {
+  async addDiagnosticTestSkillAndPublishTopic(skill: Skill): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addDiagnosticTestSkillButton);
     await this.page.waitForSelector(diagnosticTestSkillSelector, {
@@ -556,7 +556,7 @@ export class CurriculumAdmin extends BaseUser {
     expect(topicDetails.subtopicCount).toEqual('1');
     expect(topicDetails.publishedStoryCount).toEqual('1');
     expect(topicDetails.skillsCount).toEqual('1');
-    showMessage(`Topic has been published successfully!`);
+    showMessage('Topic has been published successfully!');
   }
 }
 

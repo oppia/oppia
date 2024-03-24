@@ -59,7 +59,7 @@ describe('Curriculum Admin', function () {
     description: 'This story is to test curriculum admin utility.',
   };
 
-  function getExplorationIdFromUrl(url: string | null): string {
+  const getExplorationIdFromUrl = (url: string | null): string => {
     if (!url) {
       throw new Error('Exploration URL is null or empty');
     }
@@ -69,7 +69,7 @@ describe('Curriculum Admin', function () {
       throw new Error('Failed to extract exploration ID from URL');
     }
     return explorationId;
-  }
+  };
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
