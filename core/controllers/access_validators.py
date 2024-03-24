@@ -78,6 +78,28 @@ class ClassroomAccessValidationHandler(
             raise self.NotFoundException
 
 
+class CollectionViewerPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to collection page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS = {
+       'collection_id': {
+           'schema': {
+               'type': 'basestring'
+           }
+       }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_play_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass
+
+
 class ManageOwnAccountValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -194,6 +216,31 @@ class ViewLearnerGroupPageAccessValidationHandler(
 
         if not is_valid_request:
             raise self.NotFoundException
+
+
+class CreateLearnerGroupPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to create learner group page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.can_access_learner_groups
+    def get(self) -> None:
+        """Retrieves information about a learner group.
+
+        Raises:
+            PageNotFoundException. The learner groups are not enabled.
+        """
+        assert self.user_id is not None
+        if not learner_group_services.is_learner_group_feature_enabled(
+            self.user_id
+        ):
+            raise self.PageNotFoundException
 
 
 class EditLearnerGroupPageAccessValidationHandler(

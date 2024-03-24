@@ -16,16 +16,16 @@
  * @fileoverview Unit Test for create new topic modal.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TopicEditorStateService } from 'pages/topic-editor-page/services/topic-editor-state.service';
-import { ContextService } from 'services/context.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { CreateNewTopicModalComponent } from './create-new-topic-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
+import {ContextService} from 'services/context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
 
 describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
@@ -38,30 +38,25 @@ describe('Create new topic modal', () => {
   class MockWindowRef {
     nativeWindow = {
       location: {
-        hostname: ''
-      }
+        hostname: '',
+      },
     };
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        FormsModule
-      ],
-      declarations: [
-        CreateNewTopicModalComponent,
-      ],
+      imports: [HttpClientTestingModule, FormsModule],
+      declarations: [CreateNewTopicModalComponent],
       providers: [
         NgbActiveModal,
         ImageLocalStorageService,
         TopicEditorStateService,
         {
           provide: WindowRef,
-          useClass: MockWindowRef
-        }
+          useClass: MockWindowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -81,8 +76,9 @@ describe('Create new topic modal', () => {
   it('should intialize', () => {
     spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
     componentInstance.ngOnInit();
-    expect(contextService.setImageSaveDestinationToLocalStorage)
-      .toHaveBeenCalled();
+    expect(
+      contextService.setImageSaveDestinationToLocalStorage
+    ).toHaveBeenCalled();
   });
 
   it('should save new topic', () => {
@@ -99,78 +95,92 @@ describe('Create new topic modal', () => {
 
   it('should validate newly created topic', () => {
     spyOn(componentInstance.newlyCreatedTopic, 'isValid').and.returnValue(true);
-    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([{
-      filename: '',
-      imageBlob: null
-    }]);
+    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([
+      {
+        filename: '',
+        imageBlob: null,
+      },
+    ]);
     expect(componentInstance.isValid()).toBeTrue();
   });
 
   it('should update topic url framgent', () => {
     componentInstance.newlyCreatedTopic.urlFragment = 'not-empty';
-    spyOn(topicEditorStateService, 'updateExistenceOfTopicUrlFragment')
-      .and.callFake((urlFragment: string, callb: () => void) => {
-        callb();
-      });
-    spyOn(topicEditorStateService, 'getTopicWithUrlFragmentExists')
-      .and.returnValue(true);
+    spyOn(
+      topicEditorStateService,
+      'updateExistenceOfTopicUrlFragment'
+    ).and.callFake((urlFragment: string, callb: () => void) => {
+      callb();
+    });
+    spyOn(
+      topicEditorStateService,
+      'getTopicWithUrlFragmentExists'
+    ).and.returnValue(true);
     componentInstance.onTopicUrlFragmentChange();
-    expect(topicEditorStateService.updateExistenceOfTopicUrlFragment)
-      .toHaveBeenCalled();
-    expect(topicEditorStateService.getTopicWithUrlFragmentExists)
-      .toHaveBeenCalled();
+    expect(
+      topicEditorStateService.updateExistenceOfTopicUrlFragment
+    ).toHaveBeenCalled();
+    expect(
+      topicEditorStateService.getTopicWithUrlFragmentExists
+    ).toHaveBeenCalled();
   });
 
   it('should not update topic url with wrong framgent', () => {
     componentInstance.newlyCreatedTopic.urlFragment = 'not empty';
-    spyOn(topicEditorStateService, 'updateExistenceOfTopicUrlFragment')
-      .and.callFake((urlFragment, successCallback, errorCallback) => {
-        errorCallback();
-      });
+    spyOn(
+      topicEditorStateService,
+      'updateExistenceOfTopicUrlFragment'
+    ).and.callFake((urlFragment, successCallback, errorCallback) => {
+      errorCallback();
+    });
     spyOn(topicEditorStateService, 'getTopicWithUrlFragmentExists');
     componentInstance.onTopicUrlFragmentChange();
-    expect(topicEditorStateService.updateExistenceOfTopicUrlFragment)
-      .toHaveBeenCalled();
-    expect(topicEditorStateService.getTopicWithUrlFragmentExists)
-      .not.toHaveBeenCalled();
+    expect(
+      topicEditorStateService.updateExistenceOfTopicUrlFragment
+    ).toHaveBeenCalled();
+    expect(
+      topicEditorStateService.getTopicWithUrlFragmentExists
+    ).not.toHaveBeenCalled();
   });
 
   it('should update topic name', () => {
     componentInstance.newlyCreatedTopic.name = 'not-empty';
-    spyOn(topicEditorStateService, 'updateExistenceOfTopicName')
-      .and.callFake((topicName: string, callb: () => void) => {
+    spyOn(topicEditorStateService, 'updateExistenceOfTopicName').and.callFake(
+      (topicName: string, callb: () => void) => {
         callb();
-      });
-    spyOn(topicEditorStateService, 'getTopicWithNameExists')
-      .and.returnValue(true);
+      }
+    );
+    spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
+      true
+    );
     componentInstance.onTopicNameChange();
-    expect(topicEditorStateService.updateExistenceOfTopicName)
-      .toHaveBeenCalled();
+    expect(
+      topicEditorStateService.updateExistenceOfTopicName
+    ).toHaveBeenCalled();
     expect(topicEditorStateService.getTopicWithNameExists).toHaveBeenCalled();
   });
 
-  it('should not update existence of topic name if not provided by user',
-    () => {
-      componentInstance.newlyCreatedTopic.name = '';
-      spyOn(topicEditorStateService, 'updateExistenceOfTopicName');
-      componentInstance.onTopicNameChange();
-      expect(topicEditorStateService.updateExistenceOfTopicName)
-        .not.toHaveBeenCalled();
-    });
+  it('should not update existence of topic name if not provided by user', () => {
+    componentInstance.newlyCreatedTopic.name = '';
+    spyOn(topicEditorStateService, 'updateExistenceOfTopicName');
+    componentInstance.onTopicNameChange();
+    expect(
+      topicEditorStateService.updateExistenceOfTopicName
+    ).not.toHaveBeenCalled();
+  });
 
-  it('should remove unnecessary spaces from topic name',
-    () => {
-      componentInstance.newlyCreatedTopic.name = ' extra  spaces ';
-      componentInstance.onTopicNameChange();
-      expect(componentInstance.newlyCreatedTopic.name).toBe('extra spaces');
-    });
+  it('should remove unnecessary spaces from topic name', () => {
+    componentInstance.newlyCreatedTopic.name = ' extra  spaces ';
+    componentInstance.onTopicNameChange();
+    expect(componentInstance.newlyCreatedTopic.name).toBe('extra spaces');
+  });
 
-  it('should not update topic url fragment if not provided by user',
-    () => {
-      componentInstance.newlyCreatedTopic.urlFragment = '';
-      spyOn(topicEditorStateService, 'updateExistenceOfTopicUrlFragment');
-      componentInstance.onTopicUrlFragmentChange();
-      expect(topicEditorStateService.updateExistenceOfTopicUrlFragment)
-        .not.toHaveBeenCalled();
-    });
+  it('should not update topic url fragment if not provided by user', () => {
+    componentInstance.newlyCreatedTopic.urlFragment = '';
+    spyOn(topicEditorStateService, 'updateExistenceOfTopicUrlFragment');
+    componentInstance.onTopicUrlFragmentChange();
+    expect(
+      topicEditorStateService.updateExistenceOfTopicUrlFragment
+    ).not.toHaveBeenCalled();
+  });
 });

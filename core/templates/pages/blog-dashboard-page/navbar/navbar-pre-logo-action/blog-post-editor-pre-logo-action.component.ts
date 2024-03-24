@@ -17,34 +17,31 @@
  *  of the blog dashboard.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
 
 @Component({
   selector: 'oppia-blog-post-editor-pre-logo-action',
-  templateUrl: './blog-post-editor-pre-logo-action.component.html'
+  templateUrl: './blog-post-editor-pre-logo-action.component.html',
 })
 export class BlogPostEditorNavbarPreLogoActionComponent
-implements OnInit, OnDestroy {
+  implements OnInit, OnDestroy
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   activeTab!: string;
   directiveSubscriptions = new Subscription();
-  constructor(
-    private blogDashboardPageService: BlogDashboardPageService,
-  ) {}
+  constructor(private blogDashboardPageService: BlogDashboardPageService) {}
 
   ngOnInit(): void {
     this.activeTab = this.blogDashboardPageService.activeTab;
     this.directiveSubscriptions.add(
-      this.blogDashboardPageService.updateViewEventEmitter.subscribe(
-        () => {
-          this.activeTab = this.blogDashboardPageService.activeTab;
-        }
-      )
+      this.blogDashboardPageService.updateViewEventEmitter.subscribe(() => {
+        this.activeTab = this.blogDashboardPageService.activeTab;
+      })
     );
   }
 
@@ -52,5 +49,9 @@ implements OnInit, OnDestroy {
     return this.directiveSubscriptions.unsubscribe();
   }
 }
-angular.module('oppia').directive('oppiaBlogPostEditorPreLogoAction',
-  downgradeComponent({component: BlogPostEditorNavbarPreLogoActionComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaBlogPostEditorPreLogoAction',
+    downgradeComponent({component: BlogPostEditorNavbarPreLogoActionComponent})
+  );

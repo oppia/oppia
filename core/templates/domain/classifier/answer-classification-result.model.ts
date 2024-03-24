@@ -17,7 +17,7 @@
  *     Classification Result domain objects.
  */
 
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
 export class AnswerClassificationResult {
   outcome: Outcome;
@@ -28,8 +28,11 @@ export class AnswerClassificationResult {
   classificationCategorization: string;
 
   constructor(
-      outcome: Outcome, answerGroupIndex: number, ruleIndex: number | null,
-      classificationCategorization: string) {
+    outcome: Outcome,
+    answerGroupIndex: number,
+    ruleIndex: number | null,
+    classificationCategorization: string
+  ) {
     this.outcome = outcome;
     this.answerGroupIndex = answerGroupIndex;
     this.ruleIndex = ruleIndex;

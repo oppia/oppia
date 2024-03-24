@@ -22,7 +22,8 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import config_domain
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -94,23 +95,17 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.topic_id],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_config_services.get_new_classroom_id(),
+            name='math',
+            url_fragment='math',
+            course_details='',
+            topic_list_intro='',
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: []
             }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
+        )
+        classroom_config_services.update_or_create_classroom_model(classroom)
         self.logout()
 
 

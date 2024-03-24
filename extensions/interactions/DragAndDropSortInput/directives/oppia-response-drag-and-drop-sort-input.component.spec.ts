@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the DragAndDropSortInput response.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ResponseDragAndDropSortInputComponent } from './oppia-response-drag-and-drop-sort-input.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ResponseDragAndDropSortInputComponent} from './oppia-response-drag-and-drop-sort-input.component';
 
 describe('Drag and drop sort input response component', () => {
   let component: ResponseDragAndDropSortInputComponent;
@@ -37,64 +37,67 @@ describe('Drag and drop sort input response component', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: MockHtmlEscaperService
-        }
+          useClass: MockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = (
-      TestBed.createComponent(ResponseDragAndDropSortInputComponent));
+    fixture = TestBed.createComponent(ResponseDragAndDropSortInputComponent);
     component = fixture.componentInstance;
-    component.answer = '[' +
+    component.answer =
       '[' +
-        '"ca_choices_1"' +
+      '[' +
+      '"ca_choices_1"' +
       '],' +
       '[' +
-        '"ca_choices_2"' +
+      '"ca_choices_2"' +
       '],' +
       '[' +
-        '"ca_choices_3"' +
+      '"ca_choices_3"' +
       ']' +
-    ']';
-    component.choices = '[{' +
+      ']';
+    component.choices =
+      '[{' +
       '"_html": "Choice 1",' +
       '"_contentId": "ca_choices_1"' +
-    '}, {' +
+      '}, {' +
       '"_html": "Choice 2",' +
       '"_contentId": "ca_choices_2"' +
-    '}, {' +
+      '}, {' +
       '"_html": "Choice 3",' +
       '"_contentId": "ca_choices_3"' +
-    '}]';
+      '}]';
   });
 
   it('should initialise component when user submits answer', () => {
     component.ngOnInit();
 
     expect(component.responseList).toEqual([
-      [
-        'Choice 1'
-      ],
-      [
-        'Choice 2'
-      ],
-      [
-        'Choice 3'
-      ]
+      ['Choice 1'],
+      ['Choice 2'],
+      ['Choice 3'],
     ]);
     expect(component.isAnswerLengthGreaterThanZero).toBe(true);
   });
 
-  it('should display item below another item when user drags item to' +
-  ' new position', () => {
-    expect(component.chooseItemType(0)).toBe('drag-and-drop-response-item');
-  });
+  it(
+    'should display item below another item when user drags item to' +
+      ' new position',
+    () => {
+      expect(component.chooseItemType(0)).toBe('drag-and-drop-response-item');
+    }
+  );
 
-  it('should display item right below another item when user puts' +
-  ' 2 or more items in the same position', () => {
-    expect(component.chooseItemType(1)).toBe('drag-and-drop-response-subitem');
-  });
+  it(
+    'should display item right below another item when user puts' +
+      ' 2 or more items in the same position',
+    () => {
+      expect(component.chooseItemType(1)).toBe(
+        'drag-and-drop-response-subitem'
+      );
+    }
+  );
 });

@@ -19,8 +19,8 @@
  * in the diagnostic test.
  */
 
-import { DiagnosticTestQuestionsModel } from 'domain/question/diagnostic-test-questions.model';
-import { Question } from 'domain/question/QuestionObjectFactory';
+import {DiagnosticTestQuestionsModel} from 'domain/question/diagnostic-test-questions.model';
+import {Question} from 'domain/question/QuestionObjectFactory';
 
 export interface SkillIdToQuestionsDict {
   [skillId: string]: DiagnosticTestQuestionsModel;

@@ -268,6 +268,12 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_create_learner_group_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CreateLearnerGroupPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_edit_learner_group_page/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.EditLearnerGroupPageAccessValidationHandler
@@ -277,6 +283,11 @@ URLS = [
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_collection_player_page/<collection_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CollectionViewerPageAccessValidationHandler),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -313,6 +324,9 @@ URLS = [
     get_redirect_route(
         r'/translationcontributionstatshandler',
         contributor_dashboard_admin.TranslationContributionStatsHandler),
+    get_redirect_route(
+        r'%s' % feconf.CONTRIBUTOR_DASHBOARD_URL,
+        contributor_dashboard.ContributorDashboardPage),
     get_redirect_route(
         r'%s/<contribution_type>/<contribution_subtype>/<username>' % (
             feconf.CONTRIBUTOR_STATS_SUMMARIES_URL),
@@ -857,9 +871,6 @@ URLS = [
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
-        collection_viewer.CollectionPage),
-    get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler),
 
@@ -1096,9 +1107,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
         learner_group.FacilitatorDashboardPage),
-    get_redirect_route(
-        r'%s' % feconf.CREATE_LEARNER_GROUP_PAGE_URL,
-        learner_group.CreateLearnerGroupPage),
     get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),

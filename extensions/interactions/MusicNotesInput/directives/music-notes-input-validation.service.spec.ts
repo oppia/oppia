@@ -16,13 +16,17 @@
  * @fileoverview Unit tests for music notes input validation service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AnswerGroup, AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-import { Outcome, OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
+import {
+  Outcome,
+  OutcomeObjectFactory,
+} from 'domain/exploration/OutcomeObjectFactory';
 
 describe('MusicNotesInputValidationService', () => {
   let validatorService: MusicNotesInputValidationService;
@@ -33,7 +37,7 @@ describe('MusicNotesInputValidationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MusicNotesInputValidationService]
+      providers: [MusicNotesInputValidationService],
     });
 
     validatorService = TestBed.get(MusicNotesInputValidationService);
@@ -47,26 +51,30 @@ describe('MusicNotesInputValidationService', () => {
       dest_if_really_stuck: null,
       feedback: {
         html: '',
-        content_id: ''
+        content_id: '',
       },
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      missing_prerequisite_skill_id: null
+      missing_prerequisite_skill_id: null,
     });
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], '')];
   });
 
   it('should be able to perform basic validation', () => {
     var warnings = validatorService.getAllWarnings(
-      currentState, {
+      currentState,
+      {
         sequenceToGuess: {
-          value: []
+          value: [],
         },
         initialSequence: {
-          value: []
-        }
-      }, goodAnswerGroups, goodDefaultOutcome);
+          value: [],
+        },
+      },
+      goodAnswerGroups,
+      goodDefaultOutcome
+    );
     expect(warnings).toEqual([]);
   });
 });

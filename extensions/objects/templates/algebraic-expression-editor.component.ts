@@ -20,16 +20,16 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { GuppyConfigurationService } from 'services/guppy-configuration.service';
-import { GuppyInitializationService } from 'services/guppy-initialization.service';
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { TranslateService } from '@ngx-translate/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {GuppyConfigurationService} from 'services/guppy-configuration.service';
+import {GuppyInitializationService} from 'services/guppy-initialization.service';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {TranslateService} from '@ngx-translate/core';
 
 interface FocusObj {
   focused: boolean;
@@ -37,7 +37,7 @@ interface FocusObj {
 
 @Component({
   selector: 'algebraic-expression-editor',
-  templateUrl: './algebraic-expression-editor.component.html'
+  templateUrl: './algebraic-expression-editor.component.html',
 })
 export class AlgebraicExpressionEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -71,13 +71,17 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     this.currentValue = this.value;
     this.guppyConfigurationService.init();
     let translatedPlaceholder = this.translateService.instant(
-      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput);
+      AppConstants.MATH_INTERACTION_PLACEHOLDERS.AlgebraicExpressionInput
+    );
     this.guppyInitializationService.init(
-      'guppy-div-creator', translatedPlaceholder, this.value);
+      'guppy-div-creator',
+      translatedPlaceholder,
+      this.value
+    );
 
     Guppy.event('change', (focusObj: FocusObj) => {
-      const activeGuppyObject = (
-        this.guppyInitializationService.findActiveGuppyObject());
+      const activeGuppyObject =
+        this.guppyInitializationService.findActiveGuppyObject();
       if (activeGuppyObject !== undefined) {
         this.hasBeenTouched = true;
         this.currentValue = activeGuppyObject.guppyInstance.asciimath();
@@ -98,11 +102,13 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
     // Replacing abs symbol, '|x|', with text, 'abs(x)' since the symbol
     // is not compatible with nerdamer or with the backend validations.
     this.currentValue = this.mathInteractionsService.replaceAbsSymbolWithText(
-      this.currentValue);
-    const answerIsValid = (
+      this.currentValue
+    );
+    const answerIsValid =
       this.mathInteractionsService.validateAlgebraicExpression(
         this.currentValue,
-        this.guppyInitializationService.getAllowedVariables()));
+        this.guppyInitializationService.getAllowedVariables()
+      );
     if (this.guppyInitializationService.findActiveGuppyObject() === undefined) {
       // The warnings should only be displayed when the editor is inactive
       // focus, i.e., the user is done typing.
@@ -111,17 +117,22 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
       this.warningText = '';
     }
     if (answerIsValid) {
-      this.currentValue = (
+      this.currentValue =
         this.mathInteractionsService.insertMultiplicationSigns(
-          this.currentValue));
+          this.currentValue
+        );
       this.value = this.currentValue;
       this.valueChanged.emit(this.value);
     }
     if (!this.hasBeenTouched) {
       this.warningText = '';
     }
-    this.eventBusGroup.emit(new ObjectFormValidityChangeEvent(
-      {value: !answerIsValid, modalId: this.modalId}));
+    this.eventBusGroup.emit(
+      new ObjectFormValidityChangeEvent({
+        value: !answerIsValid,
+        modalId: this.modalId,
+      })
+    );
     return answerIsValid;
   }
 
@@ -132,6 +143,8 @@ export class AlgebraicExpressionEditorComponent implements OnInit {
 }
 
 angular.module('oppia').directive(
-  'algebraicExpressionEditor', downgradeComponent({
-    component: AlgebraicExpressionEditorComponent
-  }) as angular.IDirectiveFactory);
+  'algebraicExpressionEditor',
+  downgradeComponent({
+    component: AlgebraicExpressionEditorComponent,
+  }) as angular.IDirectiveFactory
+);

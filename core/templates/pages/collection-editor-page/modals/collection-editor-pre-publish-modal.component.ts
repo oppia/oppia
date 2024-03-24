@@ -16,21 +16,20 @@
  * @fileoverview Component for collection editor pre publish modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { CollectionUpdateService } from 'domain/collection/collection-update.service';
-import { Collection } from 'domain/collection/collection.model';
-import { AlertsService } from 'services/alerts.service';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {CollectionUpdateService} from 'domain/collection/collection-update.service';
+import {Collection} from 'domain/collection/collection.model';
+import {AlertsService} from 'services/alerts.service';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 
 @Component({
   selector: 'oppia-collection-editor-pre-publish-modal',
-  templateUrl: './collection-editor-pre-publish-modal.component.html'
+  templateUrl: './collection-editor-pre-publish-modal.component.html',
 })
-export class CollectionEditorPrePublishModalComponent
-  extends ConfirmOrCancelModal {
+export class CollectionEditorPrePublishModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -87,17 +86,23 @@ export class CollectionEditorPrePublishModalComponent
     if (this.newTitle !== this._collection.getTitle()) {
       metadataList.push('title');
       this.collectionUpdateService.setCollectionTitle(
-        this._collection, this.newTitle);
+        this._collection,
+        this.newTitle
+      );
     }
     if (this.newObjective !== this._collection.getObjective()) {
       metadataList.push('objective');
       this.collectionUpdateService.setCollectionObjective(
-        this._collection, this.newObjective);
+        this._collection,
+        this.newObjective
+      );
     }
     if (this.newCategory !== this._collection.getCategory()) {
       metadataList.push('category');
       this.collectionUpdateService.setCollectionCategory(
-        this._collection, this.newCategory);
+        this._collection,
+        this.newCategory
+      );
     }
 
     this.ngbActiveModal.close(metadataList);

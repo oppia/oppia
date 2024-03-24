@@ -18,7 +18,6 @@
 
 export const CollectionSummaryTileConstants = {
   COLLECTION_VIEWER_URL: '/collection/<collection_id>',
-  COLLECTION_EDITOR_URL:
-    '/collection_editor/create/<collection_id>',
-  DEFAULT_EMPTY_TITLE: 'Untitled'
+  COLLECTION_EDITOR_URL: '/collection_editor/create/<collection_id>',
+  DEFAULT_EMPTY_TITLE: 'Untitled',
 } as const;

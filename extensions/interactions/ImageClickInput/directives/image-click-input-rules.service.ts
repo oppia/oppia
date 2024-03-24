@@ -16,22 +16,24 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { ImageClickAnswer } from 'interactions/answer-defs';
-import { ImageClickRuleInputs } from 'interactions/rule-input-defs';
+import {ImageClickAnswer} from 'interactions/answer-defs';
+import {ImageClickRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ImageClickInputRulesService {
-  IsInRegion(
-      answer: ImageClickAnswer, inputs: ImageClickRuleInputs): boolean {
+  IsInRegion(answer: ImageClickAnswer, inputs: ImageClickRuleInputs): boolean {
     return answer.clickedRegions.indexOf(inputs.x) !== -1;
   }
 }
 
-angular.module('oppia').factory(
-  'ImageClickInputRulesService',
-  downgradeInjectable(ImageClickInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'ImageClickInputRulesService',
+    downgradeInjectable(ImageClickInputRulesService)
+  );

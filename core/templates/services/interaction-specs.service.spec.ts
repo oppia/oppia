@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for the interaction specs service.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { InteractionSpecsService } from 'services/interaction-specs.service';
+import {InteractionSpecsService} from 'services/interaction-specs.service';
 
 describe('InteractionSpecsService', () => {
   let interactionSpecsService: InteractionSpecsService;
@@ -29,8 +29,9 @@ describe('InteractionSpecsService', () => {
 
   describe('checking whether an interaction can be trained with ML', () => {
     it('should throw an error when interaction does not exist.', () => {
-      expect(() => interactionSpecsService.isInteractionTrainable('Fake'))
-        .toThrowError('Fake is not a valid interaction id');
+      expect(() =>
+        interactionSpecsService.isInteractionTrainable('Fake')
+      ).toThrowError('Fake is not a valid interaction id');
     });
 
     it('should return false for ImageClickInput', () => {
@@ -53,26 +54,26 @@ describe('InteractionSpecsService', () => {
 
     it('should return false for DragAndDropSortInput', () => {
       expect(
-        interactionSpecsService.isInteractionTrainable(
-          'DragAndDropSortInput')
+        interactionSpecsService.isInteractionTrainable('DragAndDropSortInput')
       ).toBeFalse();
     });
 
     it('should return false for ItemSelectionInput', () => {
       expect(
-        interactionSpecsService.isInteractionTrainable(
-          'ItemSelectionInput')
+        interactionSpecsService.isInteractionTrainable('ItemSelectionInput')
       ).toBeFalse();
     });
 
     it('should return false for Continue', () => {
-      expect(interactionSpecsService.isInteractionTrainable('Continue'))
-        .toBeFalse();
+      expect(
+        interactionSpecsService.isInteractionTrainable('Continue')
+      ).toBeFalse();
     });
 
     it('should return false for GraphInput', () => {
-      expect(interactionSpecsService.isInteractionTrainable('GraphInput'))
-        .toBeFalse();
+      expect(
+        interactionSpecsService.isInteractionTrainable('GraphInput')
+      ).toBeFalse();
     });
 
     it('should return false for EndExploration', () => {
@@ -82,19 +83,20 @@ describe('InteractionSpecsService', () => {
     });
 
     it('should return false for SetInput', () => {
-      expect(interactionSpecsService.isInteractionTrainable('SetInput'))
-        .toBeFalse();
+      expect(
+        interactionSpecsService.isInteractionTrainable('SetInput')
+      ).toBeFalse();
     });
 
     it('should return true for CodeRepl', () => {
-      expect(interactionSpecsService.isInteractionTrainable('CodeRepl'))
-        .toBeTrue();
+      expect(
+        interactionSpecsService.isInteractionTrainable('CodeRepl')
+      ).toBeTrue();
     });
 
     it('should return false for MultipleChoiceInput', () => {
       expect(
-        interactionSpecsService.isInteractionTrainable(
-          'MultipleChoiceInput')
+        interactionSpecsService.isInteractionTrainable('MultipleChoiceInput')
       ).toBeFalse();
     });
 
@@ -105,8 +107,9 @@ describe('InteractionSpecsService', () => {
     });
 
     it('should return true for TextInput', () => {
-      expect(interactionSpecsService.isInteractionTrainable('TextInput'))
-        .toBeTrue();
+      expect(
+        interactionSpecsService.isInteractionTrainable('TextInput')
+      ).toBeTrue();
     });
 
     it('should return false for InteractiveMap', () => {

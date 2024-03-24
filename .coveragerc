@@ -8,6 +8,7 @@ omit =
     *core/tests/*
     *scripts/linters/test_files/*
     *__init__.py
+    */vm_deps/*
 
 # The 'exclude_lines' is used to skip a particular clause in coverage.
 # We exclude any line with a comment of “pragma: no cover” as this is the default option

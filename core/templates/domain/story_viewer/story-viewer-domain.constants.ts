@@ -17,11 +17,11 @@
  */
 
 export const StoryViewerDomainConstants = {
-  STORY_DATA_URL_TEMPLATE: (
+  STORY_DATA_URL_TEMPLATE:
     '/story_data_handler/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/<story_url_fragment>'),
+    '<topic_url_fragment>/<story_url_fragment>',
 
-  STORY_PROGRESS_URL_TEMPLATE: (
+  STORY_PROGRESS_URL_TEMPLATE:
     '/story_progress_handler/<classroom_url_fragment>/' +
-    '<topic_url_fragment>/<story_url_fragment>/<node_id>')
+    '<topic_url_fragment>/<story_url_fragment>/<node_id>',
 } as const;

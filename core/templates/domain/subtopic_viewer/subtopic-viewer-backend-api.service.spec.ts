@@ -16,12 +16,13 @@
  * @fileoverview Unit tests for SubtopicViewerBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { SubtopicViewerBackendApiService } from
-  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
+import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 
 describe('Subtopic viewer backend API service', () => {
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
@@ -32,7 +33,7 @@ describe('Subtopic viewer backend API service', () => {
     page_contents: {
       subtitled_html: {
         html: 'test content',
-        content_id: 'content'
+        content_id: 'content',
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -40,21 +41,22 @@ describe('Subtopic viewer backend API service', () => {
             en: {
               filename: 'test.mp3',
               file_size_bytes: 100,
-              needs_update: false
-            }
-          }
-        }
-      }
-    }
+              needs_update: false,
+            },
+          },
+        },
+      },
+    },
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     subtopicViewerBackendApiService = TestBed.get(
-      SubtopicViewerBackendApiService);
+      SubtopicViewerBackendApiService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -62,43 +64,44 @@ describe('Subtopic viewer backend API service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing subtopic from the backend',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch an existing subtopic from the backend', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      subtopicViewerBackendApiService.fetchSubtopicDataAsync(
-        'topic', 'staging', '0').then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/subtopic_data_handler/staging/topic/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush(sampleDataResults);
+    subtopicViewerBackendApiService
+      .fetchSubtopicDataAsync('topic', 'staging', '0')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/subtopic_data_handler/staging/topic/0'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should use the rejection handler if the backend request failed',
-    fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the backend request failed', fakeAsync(() => {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      subtopicViewerBackendApiService.fetchSubtopicDataAsync(
-        'topic', 'staging', '0').then(successHandler, failHandler);
-      let req = httpTestingController.expectOne(
-        '/subtopic_data_handler/staging/topic/0');
-      expect(req.request.method).toEqual('GET');
-      req.flush('Error loading subtopic.', {
-        status: 500, statusText: 'Invalid Request'
-      });
+    subtopicViewerBackendApiService
+      .fetchSubtopicDataAsync('topic', 'staging', '0')
+      .then(successHandler, failHandler);
+    let req = httpTestingController.expectOne(
+      '/subtopic_data_handler/staging/topic/0'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush('Error loading subtopic.', {
+      status: 500,
+      statusText: 'Invalid Request',
+    });
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

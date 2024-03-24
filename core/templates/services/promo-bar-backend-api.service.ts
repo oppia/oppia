@@ -16,15 +16,15 @@
  * @fileoverview The backend API service to fetch promo bar data.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { PromoBar, PromoBarBackendDict } from 'domain/promo_bar/promo-bar.model';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {PromoBar, PromoBarBackendDict} from 'domain/promo_bar/promo-bar.model';
 
-import { ServicesConstants } from 'services/services.constants';
+import {ServicesConstants} from 'services/services.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PromoBarBackendApiService {
   constructor(private http: HttpClient) {}
@@ -37,34 +37,46 @@ export class PromoBarBackendApiService {
     }
 
     return new Promise((resolve, reject) => {
-      this.http.get<PromoBarBackendDict>(
-        ServicesConstants.PROMO_BAR_URL, {}
-      ).toPromise().then((response: PromoBarBackendDict) => {
-        resolve(PromoBar.createFromBackendDict(response));
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+      this.http
+        .get<PromoBarBackendDict>(ServicesConstants.PROMO_BAR_URL, {})
+        .toPromise()
+        .then(
+          (response: PromoBarBackendDict) => {
+            resolve(PromoBar.createFromBackendDict(response));
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 
   async updatePromoBarDataAsync(
-      promoBarEnabled: boolean, promoBarMessage: string): Promise<void> {
+    promoBarEnabled: boolean,
+    promoBarMessage: string
+  ): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.put<PromoBarBackendDict>(
-        ServicesConstants.PROMO_BAR_URL, {
+      this.http
+        .put<PromoBarBackendDict>(ServicesConstants.PROMO_BAR_URL, {
           promo_bar_enabled: promoBarEnabled,
-          promo_bar_message: promoBarMessage
-        }
-      ).toPromise().then(() => {
-        resolve();
-      }, errorResponse => {
-        reject(errorResponse.error.error);
-      });
+          promo_bar_message: promoBarMessage,
+        })
+        .toPromise()
+        .then(
+          () => {
+            resolve();
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 }
 
-angular.module('oppia').factory(
-  'PromoBarBackendApiService',
-  downgradeInjectable(PromoBarBackendApiService)
-);
+angular
+  .module('oppia')
+  .factory(
+    'PromoBarBackendApiService',
+    downgradeInjectable(PromoBarBackendApiService)
+  );

@@ -16,18 +16,17 @@
  * @fileoverview Unit tests for attribution guide component.
  */
 
-import { TestBed, async, ComponentFixture } from
-  '@angular/core/testing';
+import {TestBed, async, ComponentFixture} from '@angular/core/testing';
 
-import { AttributionGuideComponent } from './attribution-guide.component';
-import { ContextService } from 'services/context.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { UrlService } from 'services/contextual/url.service';
-import { AttributionService } from 'services/attribution.service';
-import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {AttributionGuideComponent} from './attribution-guide.component';
+import {ContextService} from 'services/context.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {UrlService} from 'services/contextual/url.service';
+import {AttributionService} from 'services/attribution.service';
+import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 class MockAttributionService {
   init() {
@@ -71,7 +70,7 @@ class MockUrlService {
   }
 
   getCurrentLocation() {
-    return { href: 'localhost:8181/explore/0' };
+    return {href: 'localhost:8181/explore/0'};
   }
 }
 
@@ -81,7 +80,7 @@ class MockContextService {
   }
 }
 
-describe('Attribution Guide Component', function() {
+describe('Attribution Guide Component', function () {
   let component: AttributionGuideComponent;
   let fixture: ComponentFixture<AttributionGuideComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -89,18 +88,15 @@ describe('Attribution Guide Component', function() {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        AttributionGuideComponent,
-        MockTranslatePipe
-      ],
+      declarations: [AttributionGuideComponent, MockTranslatePipe],
       providers: [
-        { provide: AttributionService, useClass: MockAttributionService },
-        { provide: BrowserCheckerService, useClass: MockBrowserCheckerService },
-        { provide: UrlService, useClass: MockUrlService },
-        { provide: ContextService, useClass: MockContextService },
-        WindowDimensionsService
+        {provide: AttributionService, useClass: MockAttributionService},
+        {provide: BrowserCheckerService, useClass: MockBrowserCheckerService},
+        {provide: UrlService, useClass: MockUrlService},
+        {provide: ContextService, useClass: MockContextService},
+        WindowDimensionsService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -111,26 +107,31 @@ describe('Attribution Guide Component', function() {
 
     component = fixture.componentInstance;
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
-  it('should switch to mobile view if the window size is less than or equal' +
-    'to 1024px',
-  function() {
-    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
-    widthSpy.and.returnValue(400);
+  it(
+    'should switch to mobile view if the window size is less than or equal' +
+      'to 1024px',
+    function () {
+      let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+      widthSpy.and.returnValue(400);
 
-    expect(component.checkMobileView()).toBe(true);
-  });
+      expect(component.checkMobileView()).toBe(true);
+    }
+  );
 
-  it('should not switch to mobile view if the window size is less than or' +
-    ' equal to 1024px',
-  function() {
-    let widthSpy = spyOn(windowDimensionsService, 'getWidth');
-    widthSpy.and.returnValue(1025);
+  it(
+    'should not switch to mobile view if the window size is less than or' +
+      ' equal to 1024px',
+    function () {
+      let widthSpy = spyOn(windowDimensionsService, 'getWidth');
+      widthSpy.and.returnValue(1025);
 
-    expect(component.checkMobileView()).toBe(false);
-  });
+      expect(component.checkMobileView()).toBe(false);
+    }
+  );
 
   it('should initialize component properties correctly', () => {
     expect(component.deviceUsedIsMobile).toBeFalse();
@@ -182,9 +183,9 @@ describe('Attribution Guide Component', function() {
     dummyDivElement.appendChild(dummyTextNode);
     let dummyDocumentFragment = document.createDocumentFragment();
     dummyDocumentFragment.appendChild(dummyDivElement);
-    spyOn(
-      document, 'getElementsByClassName'
-    ).withArgs('class-name').and.returnValue(dummyDocumentFragment.children);
+    spyOn(document, 'getElementsByClassName')
+      .withArgs('class-name')
+      .and.returnValue(dummyDocumentFragment.children);
     spyOn(document, 'execCommand').withArgs('copy');
     spyOn($.fn, 'tooltip');
     component.copyAttribution('class-name');
