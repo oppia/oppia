@@ -58,6 +58,13 @@ export const ObjectsDomainConstants = {
       front_units: [],
       base_unit: '0.01 rupee',
     },
+  } as {
+    [key: string]: {
+      name: string;
+      aliases: string[];
+      front_units: string[];
+      base_unit: string;
+    };
   },
 
   RATIO_PARSING_ERROR_I18N_KEYS: {
