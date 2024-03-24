@@ -57,34 +57,34 @@ class GetUsersWithInvalidBioJob(base_jobs.JobBase):
                     or len(user_id_and_bio[1]) > 2000)
         )
 
-        report_number_of_users_queried = (
+        number_of_users_queried_report = (
             user_ids_and_bios
             | 'Report count of user models' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'CountTotalUsers'))
         )
 
-        report_number_of_users_with_invalid_bio = (
+        number_of_users_with_invalid_bio_report = (
             users_with_invalid_bios
             | 'Report count of invalid user models' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'CountInvalidUserBios'))
         )
 
-        report_invalid_user_ids_and_bios = (
+        invalid_user_ids_and_bios_report = (
             users_with_invalid_bios
             | 'Report info on each invalid user bio' >> beam.Map(
                 lambda user_id_and_bio: job_run_result.JobRunResult.as_stderr(
-                    'The id of user is "%s" and its bio is "%s"'
+                    'The id of user is "%s" and their bio is "%s"'
                     % (user_id_and_bio[0], user_id_and_bio[1])
                 ))
         )
 
         return (
             (
-                report_number_of_users_queried,
-                report_number_of_users_with_invalid_bio,
-                report_invalid_user_ids_and_bios,
+                number_of_users_queried_report,
+                number_of_users_with_invalid_bio_report,
+                invalid_user_ids_and_bios_report,
             )
             | 'Combine reported results' >> beam.Flatten()
         )
