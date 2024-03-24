@@ -176,7 +176,8 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for creating a skill in the topics and skills dashboard.
-   * Handles creating questions for the relevant skills.
+   * We need to generate at least 3 questions for the skill as a
+   * pre-requisite for publishing the topic later.
    */
   async createSkill(skill: Skill): Promise<void> {
     await this.openTopicEditor();
@@ -422,9 +423,6 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(diagnosticTestSkillSelector);
-    await this.page.waitForSelector(diagnosticTestSkillSelector, {
-      visible: true,
-    });
 
     /**
      * We select the skill in the dropdown with this method because the event doesn't propagate
@@ -473,10 +471,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.type(storyTitleField, story.title);
     await this.type(storyUrlFragmentField, story.url_fragment);
     await this.type(storyDescriptionField, story.description);
+
     await this.clickOn(storyPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
+
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createStoryButton);
 
@@ -498,10 +498,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(addChapterButton);
     await this.type(chapterTitleField, 'Test Chapter 1');
     await this.type(chapterExplorationIdField, explorationId);
+
     await this.clickOn(chapterPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
+
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createChapterButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
