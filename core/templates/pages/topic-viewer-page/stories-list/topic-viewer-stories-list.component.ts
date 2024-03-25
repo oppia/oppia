@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {StorySummary} from 'domain/story/story-summary.model';
 import {
@@ -84,9 +83,3 @@ export class StoriesListComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 768;
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'storiesList',
-    downgradeComponent({component: StoriesListComponent})
-  );

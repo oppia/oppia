@@ -17,14 +17,11 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
-
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
-
 import './subtopics-list.component.css';
 
 @Component({
@@ -61,10 +58,3 @@ export class SubtopicsListComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'subtopicsList',
-    downgradeComponent({component: SubtopicsListComponent})
-  );
