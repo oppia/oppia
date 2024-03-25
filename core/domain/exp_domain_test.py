@@ -18568,11 +18568,8 @@ class UserExplorationDataTests(
         'next_content_id_index': self.exploration.next_content_id_index,
         'is_version_of_draft_valid': False
       }
-      user_exploration_data_object = exp_domain.UserExplorationData(
-        self.exploration, self.states, self.exploration_rights
-      )
       
       self.assertEqual(
           user_exploration_data_dict,
-          user_exploration_data_object.to_dict()
+          self.user_exploration_data.to_dict()
       )
