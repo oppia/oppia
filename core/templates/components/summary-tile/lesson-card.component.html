@@ -1,11 +1,11 @@
 <div class="lesson-card_container mr-4">
-  <div class="align-items-center d-flex justify-content-center lesson-card_img relative w-100" [ngStyle]="{'background-color': imgColor}">
+  <div class="align-items-center d-flex justify-content-center lesson-card_img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
     <img alt="" class="h-100" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card_tags w-100">
-     <!--go back 2 - If tag length (learner groups && goal) === 0-->
+     <!--if tag length (learner groups && goal) === 0-->
     </div>
   </div>
-  <div class="d-flex flex-column lesson-card_info justify-content-between">
+  <div class="bg-white d-flex flex-column lesson-card_info justify-content-between">
     <div class="d-flex flex-column flex-grow"> 
       <!--nextIncompleteNodeTitle (story-summary), explorationTitle (exploration-summary), rename to chapter-->
       <!--go back 3 - Find a way so the text are always aligned regardless of title length/line clamp-->
@@ -13,7 +13,7 @@
         <p class="lesson-card_title mb-0"> {{ title }} </p>
       </div>
       <!--topicName (story-summary)-->
-      <p class="lesson-card_topic mb-0"> {{ topic !== 'undefined' ? topic : 'Community Lessons' }} </p>
+      <p class="lesson-card_topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
       <!--storyTitle (story-summary), expTitleTranlationKey (exploration-summary), rename to story-->
       <p class="lesson-card_desc mb-0"> {{ desc }} </p>
     </div>
@@ -25,9 +25,9 @@
           {{ progress }}% 
         </div>
       </div>
-      <!--go back 1 - i1qn, adjust for exploration lessons  = 0 -->
+      <!--need to handle when starting explorations (no way to calculate progress, currently defaults to start)-->
       <a class="align-items-center d-inline-flex justify-content-center lesson-card_button text-decoration-none" [href]="lessonUrl" target="_self">
-        {{ progress ===  100 ? 'Redo' : (progress === 0 ? 'Start' : 'Resume') }}
+        {{'I18N_LEARNER_DASHBOARD_CARD_BUTTON' | translate: {progressText: (progress ===  100 ? 'Redo' : (progress === 0 ? 'Start' : 'Resume'))} }}
       </a>
     </div>
   </div>
