@@ -102,7 +102,7 @@ export default {
 
     "ACTION_ACCEPT_SUGGESTION": "accept",
     "ACTION_REJECT_SUGGESTION": "reject",
- 
+
     "SKILL_STATUS_OPTIONS": {
       "ALL": "All",
       "ASSIGNED": "Assigned",
@@ -123,7 +123,7 @@ export default {
       "DecreasingUpcomingLaunches": "Most Upcoming Launches",
       "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
     },
- 
+
     // Sorting categories for contributor admin dashboard.
     "CD_ADMIN_STATS_SORT_OPTIONS": {
       "IncreasingLastActivity": "Most Recently Active",
@@ -5110,7 +5110,7 @@ export default {
       "Sport": "#893327",
       "Welcome": "#992a2b"
     },
- 
+
     "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
       "tabs", "math", "collapsible", "skillreview"
     ],
@@ -6266,7 +6266,7 @@ export default {
       "solicit_answer_details": false,
       "card_is_checkpoint": false
     },
-  
+
     // Data required for Firebase authentication.
     //
     // NOTE TO RELEASE COORDINATORS: Please change these to the production values,
@@ -7406,4 +7406,3 @@ export default {
     "BRANCH_NAME": "",
     "SHORT_COMMIT_HASH": ""
   } as const;
-  
