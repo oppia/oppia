@@ -454,18 +454,19 @@ def create_voice_artist_metadata_model_instance(
     voice_artist_id: str,
     language_code_to_accent: Dict[str, str]
 ) -> voiceover_models.VoiceArtistMetadataModel:
-    """The method creates a VoiceArtistMetadataModel instance.
+    """Creates a VoiceArtistMetadataModel instance.
 
     Args:
         voice_artist_id: str. The ID of the voice artist for which new model
             will be created.
         language_code_to_accent: dict(str, str). A dict representing the
-            language accent codes as keys and accent codes as their
-            corresponding value.
+            language codes as keys and accent codes as their corresponding
+            values.
 
     Returns:
-        VoiceArtistMetadataModel. A newly created VoiceArtistMetadataModel
-        instance.
+        VoiceArtistMetadataModel. A new VoiceArtistMetadataModel instance
+        that connects voiceover artists with the languages in which they have
+        provided voiceovers.
     """
     voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
         id=voice_artist_id,
@@ -478,22 +479,27 @@ def create_voice_artist_metadata_model_instance(
 def create_exploration_voice_artists_link_model_instance(
     exploration_id: str,
     content_id_to_voiceovers_mapping: (
-        voiceover_models.ContentIdToVoiceoverMappingType)
+        voiceover_domain.ContentIdToVoiceoverMappingType)
 ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
-    """The method creates a ExplorationVoiceArtistsLinkModel instance.
+    """Instantiates an ExplorationVoiceArtistsLinkModel, establishing a link
+    between the latest content IDs within an exploration and the corresponding
+    IDs of voice artists who provided voiceovers in the specified language code.
+    Instances of this class are keyed by the exploration ID.
 
     Args:
         exploration_id: str. The ID of the exploration for which new model will
             be created.
-        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. A
-            dictionary with content IDs as keys and nested dicts as values. Each
-            nested dict contains language codes as keys and a 2-tuple as values.
-            The 2-tuple contains voice artist ID as the first element and
-            VoiceoverDict as the second element.
+        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. The
+            dictionary contains information about voice artists and their
+            provided voiceovers in the exploration with the given exploration
+            ID. The dict maps content IDs to nested dicts. Each nested dicts
+            maps language code to voice artist and voiceover tuple.
 
     Returns:
-        ExplorationVoiceArtistsLinkModel. A newly created
-        ExplorationVoiceArtistsLinkModel instance.
+        ExplorationVoiceArtistsLinkModel. An instance of
+        ExplorationVoiceArtistsLinkModel, establishing a link between the latest
+        content IDs within an exploration and the corresponding IDs of
+        voice artists who provided voiceovers.
     """
     exploration_voice_artists_link_model = (
         voiceover_models.ExplorationVoiceArtistsLinkModel(

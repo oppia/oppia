@@ -368,13 +368,13 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.voiceover1: voiceover_models.VoiceoverDict = {
+        self.voiceover1: state_domain.VoiceoverDict = {
             'filename': 'filename1.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
             'duration_secs': 6.1
         }
-        self.voiceover2: voiceover_models.VoiceoverDict = {
+        self.voiceover2: state_domain.VoiceoverDict = {
             'filename': 'filename2.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
