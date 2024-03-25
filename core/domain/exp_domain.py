@@ -5814,7 +5814,7 @@ class UserExplorationDataDict(TypedDict):
     show_state_translation_tutorial_on_load: bool
     is_version_of_draft_valid: Optional[bool]
     draft_changes: Optional[Dict[str, str]]
-    email_preferences: Optional[user_domain.UserExplorationPrefsDict]
+    email_preferences: user_domain.UserExplorationPrefsDict
     next_content_id_index: int
     exploration_metadata: ExplorationMetadataDict
 
@@ -5858,10 +5858,10 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         self.rights = rights
         self.is_valid_draft_version = is_valid_draft_version
         if exploration_email_preferences is None:
-            self.exploration_email_preferences = (
-                user_domain.UserExplorationPrefs(
-                    False, False
-            )).to_dict()
+            self.exploration_email_preferences: user_domain.UserExplorationPrefsDict = {
+                'mute_feedback_notifications': False,
+                'mute_suggestion_notifications': False
+            }
         else:
             self.exploration_email_preferences = exploration_email_preferences
 

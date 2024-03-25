@@ -18499,3 +18499,80 @@ class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
         ).to_dict()
 
         self.assertEqual(actual_dict, expected_dict)
+
+
+class UserExplorationDataTests(
+    exp_services_test.ExplorationServicesUnitTests,
+    test_utils.EmailTestBase):
+    """Testing UserExplorationData domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.exploration = self.save_new_valid_exploration(
+            self.EXP_0_ID, self.owner_id, end_state_name='End')
+        rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
+        self.exploration_rights = (
+          rights_manager.get_exploration_rights(
+            self.EXP_0_ID).to_dict()
+          )
+        self.states = {}
+        for state_name in self.exploration.states:
+          state_dict = self.exploration.states[state_name].to_dict()
+          self.states[state_name] = state_dict
+        self.user_exploration_data = exp_domain.UserExplorationData(
+          self.exploration, self.states, self.exploration_rights
+        )
+
+    def test_initialization(self) -> None:
+        """Testing init method."""
+
+        self.assertEqual(self.user_exploration_data.exploration, self.exploration)
+        self.assertFalse(self.user_exploration_data.is_valid_draft_version)
+        self.assertFalse(self.user_exploration_data.show_state_editor_tutorial_on_load)
+        self.assertFalse(self.user_exploration_data.show_state_translation_tutorial_on_load)
+        self.assertEqual(self.user_exploration_data.draft_change_list_id, 0)
+        self.assertEqual(self.user_exploration_data.draft_changes, None)
+        self.assertEqual(self.user_exploration_data.rights, self.exploration_rights)
+        self.assertEqual(self.user_exploration_data.exploration_email_preferences, {
+            'mute_feedback_notifications': False,
+            'mute_suggestion_notifications': False
+        })
+        self.assertEqual(self.user_exploration_data.states, self.states)
+        self.assertEqual(self.user_exploration_data.exploration, self.exploration)
+
+    def test_to_dict(self) -> None:
+      user_exploration_data_dict = {
+        'exploration_id': self.exploration.id,
+        'title': self.exploration.title,
+        'category': self.exploration.category,
+        'objective': self.exploration.objective,
+        'language_code': self.exploration.language_code,
+        'tags': self.exploration.tags,
+        'init_state_name': self.exploration.init_state_name,
+        'states': self.states,
+        'param_changes': self.exploration.param_change_dicts,
+        'param_specs': self.exploration.param_specs_dict,
+        'version': self.exploration.version,
+        'auto_tts_enabled': self.exploration.auto_tts_enabled,
+        'edits_allowed': self.exploration.edits_allowed,
+        'draft_change_list_id': 0,
+        'rights': self.exploration_rights,
+        'show_state_editor_tutorial_on_load': False,
+        'show_state_translation_tutorial_on_load': False,
+        'draft_changes': None,
+        'exploration_metadata': self.exploration.get_metadata().to_dict(),
+        'email_preferences': {
+            'mute_feedback_notifications': False,
+            'mute_suggestion_notifications': False
+        },
+        'next_content_id_index': self.exploration.next_content_id_index,
+        'is_version_of_draft_valid': False
+      }
+      user_exploration_data_object = exp_domain.UserExplorationData(
+        self.exploration, self.states, self.exploration_rights
+      )
+      
+      self.assertEqual(
+          user_exploration_data_dict,
+          user_exploration_data_object.to_dict()
+      )
