@@ -125,6 +125,12 @@ restart.%: ## Restarts the given docker service. Example: make restart.datastore
 run_tests.prettier: ## Formats the code using prettier.
 	docker compose run --no-deps --entrypoint "npx prettier --check ." dev-server
 
+<<<<<<< HEAD
+=======
+run_tests.third_party_size_check: ## Runs the third party size check
+	docker compose run --no-deps --entrypoint "python -m scripts.third_party_size_check" dev-server
+
+>>>>>>> 9a4370d9126b358b39ed1a155da807a6cd4c0fbb
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server
 

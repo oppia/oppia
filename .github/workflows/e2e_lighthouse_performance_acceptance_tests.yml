@@ -60,8 +60,6 @@ jobs:
           - name: skillEditor
           - name: subscriptions
           - name: topicsAndSkillsDashboard
-            flaky_indicators: |
-              Classroom config tile selector is not visible
           - name: topicAndStoryEditor
           - name: topicAndStoryEditorFileUploadFeatures
           - name: topicAndStoryViewer
@@ -195,6 +193,8 @@ jobs:
             sudo docker cp oppia-angular-build:/app/oppia/node_modules .
         - name: Run Acceptance Test ${{ matrix.suite }}
           run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite }}
+        - name: Run Mobile Acceptance Test ${{ matrix.suite }}
+          run: xvfb-run -a --server-args="-screen 0, 1285x1000x24" make run_tests.acceptance suite=${{ matrix.suite }} MOBILE=true
         - name: Report failure if failed on oppia/oppia develop branch
           if: ${{
             failure() &&
