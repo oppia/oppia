@@ -111,7 +111,6 @@ const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
 
 const assignSkillButton = 'i.e2e-test-skill-item-edit-btn';
-const subtopicRadioButton = '.mat-radio-button';
 const confirmSkillAssignationButton =
   'button.e2e-test-skill-assign-subtopic-confirm';
 
