@@ -380,37 +380,37 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             'needs_update': False,
             'duration_secs': 5.9
         }
-        self.voiceover3: voiceover_models.VoiceoverDict = {
+        self.voiceover3: state_domain.VoiceoverDict = {
             'filename': 'filename3.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
             'duration_secs': 5.0
         }
-        self.voiceover4: voiceover_models.VoiceoverDict = {
+        self.voiceover4: state_domain.VoiceoverDict = {
             'filename': 'filename4.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
             'duration_secs': 3.0
         }
-        self.voiceover5: voiceover_models.VoiceoverDict = {
+        self.voiceover5: state_domain.VoiceoverDict = {
             'filename': 'filename5.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
             'duration_secs': 7.0
         }
-        self.voiceover6: voiceover_models.VoiceoverDict = {
+        self.voiceover6: state_domain.VoiceoverDict = {
             'filename': 'filename6.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
             'duration_secs': 5.0
         }
-        self.voiceover7: voiceover_models.VoiceoverDict = {
+        self.voiceover7: state_domain.VoiceoverDict = {
             'filename': 'filename7.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
             'duration_secs': 5.0
         }
-        self.voiceover8: voiceover_models.VoiceoverDict = {
+        self.voiceover8: state_domain.VoiceoverDict = {
             'filename': 'filename8.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,

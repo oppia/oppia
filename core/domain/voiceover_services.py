@@ -325,8 +325,7 @@ def get_voiceover_filenames(
 
     exploration_id_to_filenames: Dict[str, List[str]] = {}
     filename_to_exp_id: Dict[str, str] = {}
-    contributed_voiceovers: List[
-        voiceover_models.VoiceoverDict] = []
+    contributed_voiceovers: List[state_domain.VoiceoverDict] = []
 
     exp_voice_artist_link_models: Sequence[
         voiceover_models.ExplorationVoiceArtistsLinkModel] = (

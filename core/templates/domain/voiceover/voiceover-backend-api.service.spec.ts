@@ -179,7 +179,7 @@ describe('Voiceover backend API service', function () {
     let failHandler = jasmine.createSpy('fail');
 
     voiceoverBackendApiService
-      .fetchVoiceArtistMetadtaAsync()
+      .fetchVoiceArtistMetadataAsync()
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
       VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL
@@ -214,7 +214,7 @@ describe('Voiceover backend API service', function () {
     let failHandler = jasmine.createSpy('fail');
 
     voiceoverBackendApiService
-      .fetchVoiceArtistMetadtaAsync()
+      .fetchVoiceArtistMetadataAsync()
       .then(successHandler, failHandler);
     let req = httpTestingController.expectOne(
       VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL
