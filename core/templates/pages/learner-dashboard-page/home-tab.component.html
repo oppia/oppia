@@ -96,7 +96,7 @@
         }}
       </p>
       <!--go back 3 - title should stay in place when scrolling for small screens -->
-      <div [ngStyle]="{'min-width': 'fit-content'}">
+      <div class="w-100" [ngStyle]="{'min-width': 'fit-content'}">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles">
           <p class="oppia-learner-dash-section_heading mb-0">
             {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
@@ -146,3 +146,11 @@
   </div>
   <!------------>
 </div>
+
+<style>
+  .subsection-container {
+    display: flex;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+</style>
