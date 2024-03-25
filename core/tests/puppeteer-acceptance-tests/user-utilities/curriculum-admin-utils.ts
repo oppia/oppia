@@ -100,6 +100,7 @@ const subtopicUrlFragmentField =
   'input.e2e-test-new-subtopic-url-fragment-field';
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
+const subtopicNameSelector = '.e2e-test-subtopic-name';
 
 const skillsTab = 'a.e2e-test-skills-tab';
 const skill = 'a.e2e-test-open-skill-editor';
@@ -128,6 +129,7 @@ const saveStoryButton = 'button.e2e-test-save-story-button';
 const saveStoryMessageInput = 'textarea.e2e-test-commit-message-input';
 const publishStoryButton = 'button.e2e-test-publish-story-button';
 const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
+const unpublishStoryButton = 'button.e2e-test-unpublish-story-button';
 
 const addChapterButton = 'button.e2e-test-add-chapter-button';
 const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
@@ -215,6 +217,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(modalDiv, {visible: true});
     await this.clickOn(interactionNumberInputButton);
     await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
+      visible: true,
+    });
     await this.clickOn(responseRuleDropdown);
     await this.clickOn(equalsRuleButtonText);
     await this.type(floatTextField, '3');
@@ -276,6 +281,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
+    await this.page.waitForSelector('oppia-customize-interaction', {
+      visible: true,
+    });
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
     await this.clickOn(saveChangesButton);
@@ -290,10 +298,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
-    await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`
-    );
-    await this.clickOn(publishExplorationButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
@@ -301,18 +305,6 @@ export class CurriculumAdmin extends BaseUser {
       element => element.textContent
     );
     return explorationIdUrl;
-  }
-
-  async getExplorationIdFromUrl(url: string | null): Promise<string> {
-    if (!url) {
-      throw new Error('Exploration URL is null or empty');
-    }
-    const parts = url.split('/');
-    const explorationId = parts.length > 0 ? parts[parts.length - 1] : '';
-    if (!explorationId) {
-      throw new Error('Failed to extract exploration ID from URL');
-    }
-    return explorationId;
   }
 
   /**
@@ -402,8 +394,8 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn('Assign to Subtopic');
-    await this.page.waitForSelector(modalDiv, {visible: true});
-    await this.clickOn(subtopicRadioButton);
+    await this.page.waitForSelector(subtopicNameSelector, {visible: true});
+    await this.clickOn(subtopicNameSelector);
     await this.page.waitForSelector(
       `${confirmSkillAssignationButton}:not([disabled])`
     );
@@ -489,6 +481,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.saveStoryDraft();
     await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
     await this.clickOn(publishStoryButton);
+    await this.page.waitForSelector(unpublishStoryButton, {visible: true});
   }
 
   /**
@@ -514,8 +507,6 @@ export class CurriculumAdmin extends BaseUser {
    */
   async saveStoryDraft(): Promise<void> {
     await this.clickOn(saveStoryButton);
-    await this.clickOn(closeSaveModalButton);
-    await this.page.waitForSelector(modalDiv, {visible: true});
     await this.type(
       saveStoryMessageInput,
       'Test saving story as curriculum admin.'
@@ -530,19 +521,24 @@ export class CurriculumAdmin extends BaseUser {
    * by verifying the status and the counts in the topic and skills dashboard.
    */
   async expectPublishedTopicToBePresent(): Promise<void> {
-    await this.navigateToTopicAndSkillsDashboardPage();
-    await this.page.waitForSelector('.e2e-test-topics-table', {visible: true});
+    const newPage = await this.browserObject.newPage();
+    await newPage.setViewport({width: 1920, height: 1080});
+    await newPage.bringToFront();
+    await newPage.goto(topicAndSkillsDashboardUrl);
 
-    let topicStatusText = await this.page.$eval(
+    await newPage.waitForSelector('.e2e-test-topics-table', {visible: true});
+    await newPage.waitForSelector('span.topic-list-status-text');
+    let topicStatusText = await newPage.$eval(
       'span.topic-list-status-text',
       element => (element as HTMLElement).innerText
     );
 
-    let topicDetails = await this.page.$eval(
+    await newPage.waitForSelector('.e2e-test-topics-table tr.list-item');
+    let topicDetails = await newPage.$eval(
       '.e2e-test-topics-table tr.list-item',
       element => {
         let tds = Array.from(element.querySelectorAll('td'));
-        if (!tds) {
+        if (!tds || tds.length < 5) {
           throw new Error('Cannot fetch topic details.');
         }
         return {
