@@ -18501,9 +18501,7 @@ class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(actual_dict, expected_dict)
 
 
-class UserExplorationDataTests(
-    exp_services_test.ExplorationServicesUnitTests,
-    test_utils.EmailTestBase):
+class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
     """Testing UserExplorationData domain object."""
 
     def setUp(self) -> None:
