@@ -5858,7 +5858,8 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         self.rights = rights
         self.is_valid_draft_version = is_valid_draft_version
         if exploration_email_preferences is None:
-            self.exploration_email_preferences: user_domain.UserExplorationPrefsDict = {
+            self.exploration_email_preferences: \
+                user_domain.UserExplorationPrefsDict = {
                 'mute_feedback_notifications': False,
                 'mute_suggestion_notifications': False
             }

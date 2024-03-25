@@ -18524,8 +18524,8 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
     def test_initialization(self) -> None:
         """Testing init method."""
 
-        self.assertEqual(self.user_exploration_data.exploration,
-                         self.exploration)
+        self.assertEqual(
+            self.user_exploration_data.exploration, self.exploration)
         self.assertFalse(
             self.user_exploration_data.is_valid_draft_version)
         self.assertFalse(
@@ -18534,7 +18534,8 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
             self.user_exploration_data.show_state_translation_tutorial_on_load)
         self.assertEqual(self.user_exploration_data.draft_change_list_id, 0)
         self.assertEqual(self.user_exploration_data.draft_changes, None)
-        self.assertEqual(self.user_exploration_data.rights, self.exploration_rights)
+        self.assertEqual(
+            self.user_exploration_data.rights, self.exploration_rights)
         self.assertEqual(
             self.user_exploration_data.exploration_email_preferences, {
             'mute_feedback_notifications': False,
