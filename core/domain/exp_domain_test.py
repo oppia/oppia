@@ -18542,7 +18542,8 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
             'mute_suggestion_notifications': False
         })
         self.assertEqual(self.user_exploration_data.states, self.states)
-        self.assertEqual(self.user_exploration_data.exploration, self.exploration)
+        self.assertEqual(
+          self.user_exploration_data.exploration, self.exploration)
 
     def test_to_dict(self) -> None:
         user_exploration_data_dict = {
