@@ -21,14 +21,14 @@ export default {
     // The term 'staging' is used instead of the classroom url fragment field
     // in the URL for topics that are not yet attached to a classroom.
     "CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS": "staging",
-  
+
     // Acceptable URL schemes for links.
     "ACCEPTABLE_SCHEMES": ["https", ""],
-  
+
     // The default classroom URL fragment to use when the provided classroom URL
     // fragment in the controller is invalid.
     "DEFAULT_CLASSROOM_URL_FRAGMENT": "math",
-  
+
     "FEATURED_TRANSLATION_LANGUAGES": [
       {
         "language_code": "pt",
@@ -67,12 +67,12 @@ export default {
         "language_code": "yo",
         "explanation": "For learners in Nigeria."
       }],
-  
+
     "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
       "News", "International", "Educators", "Learners", "Community",
       "Partnerships", "Volunteer", "Stories", "Languages", "New features",
       "New lessons", "Software development", "Content"],
-  
+
     "ALL_CATEGORIES": ["Algebra", "Algorithms", "Architecture", "Arithmetic",
       "Art", "Astronomy", "Biology", "Business", "Calculus", "Chemistry",
       "Combinatorics", "Computing", "Economics", "Education", "Engineering",
@@ -99,10 +99,10 @@ export default {
     "DEFAULT_COLOR": "#a33f40",
     "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
     "DEFAULT_CATEGORY_ICON": "Lightbulb",
-  
+
     "ACTION_ACCEPT_SUGGESTION": "accept",
     "ACTION_REJECT_SUGGESTION": "reject",
-  
+ 
     "SKILL_STATUS_OPTIONS": {
       "ALL": "All",
       "ASSIGNED": "Assigned",
@@ -123,7 +123,7 @@ export default {
       "DecreasingUpcomingLaunches": "Most Upcoming Launches",
       "DecreasingOverdueLaunches": "Most Launches Behind Schedule"
     },
-  
+ 
     // Sorting categories for contributor admin dashboard.
     "CD_ADMIN_STATS_SORT_OPTIONS": {
       "IncreasingLastActivity": "Most Recently Active",
@@ -147,16 +147,16 @@ export default {
       "Biology", "Business", "Chemistry", "Economics", "English", "Geography",
       "History", "Mathematics", "Medicine", "Music", "Physics", "Programming",
       "Reading", "Statistics"],
-  
+
     // These classrooms are shown in the add learner group syllabus filters.
     "SEARCH_DROPDOWN_CLASSROOMS": ["math"],
-  
+
     // These types are shown in the add learner group syllabus filters.
     "SEARCH_DROPDOWN_TYPES": ["Skill", "Story"],
-  
+
     // The default language code for an exploration.
     "DEFAULT_LANGUAGE_CODE": "en",
-  
+
     // Hacky translation keys for classroom, topic, skill, exploration
     // and subtopic names and descriptions. Needs to be updated whenever
     // any new class, topic, skill, exploration or subtopic is added or a
@@ -413,14 +413,14 @@ export default {
       "I18N_SUBTOPIC_F4vMtwKMS6jR_relating-to-actual-values_TITLE",
       "I18N_SUBTOPIC_F4vMtwKMS6jR_solving-problems_TITLE"
     ],
-  
+
     "ALLOWED_THUMBNAIL_BG_COLORS": {
       "chapter": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"],
       "topic": ["#C6DCDA"],
       "subtopic": ["#FFFFFF"],
       "story": ["#F8BF74", "#D68F78", "#8EBBB6", "#B3D8F1"]
     },
-  
+
     "ALLOWED_STORY_NODE_STATUS": ["Draft", "Ready To Publish", "Published"],
     "ALLOWED_STORY_NODE_UNPUBLISHING_REASONS": ["BAD_CONTENT",
       "CHAPTER_NEEDS_SPLITTING"],
@@ -428,53 +428,53 @@ export default {
     "STORY_NODE_STATUS_READY_TO_PUBLISH": "Ready To Publish",
     "STORY_NODE_STATUS_DRAFT": "Draft",
     "CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS": 14,
-  
+
     "ALLOWED_IMAGE_FORMATS": ["svg", "png", "jpeg", "jpg", "gif"],
     "MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG": 1024,
-  
+
     "TASK_TYPE_HIGH_BOUNCE_RATE": "high_bounce_rate",
     "TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP": "ineffective_feedback_loop",
     "TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS": "successive_incorrect_answers",
     "TASK_TYPE_NEEDS_GUIDING_RESPONSES": "needs_guiding_responses",
-  
+
     "TASK_STATUS_OPEN": "open",
     "TASK_STATUS_OBSOLETE": "obsolete",
     "TASK_STATUS_RESOLVED": "resolved",
-  
+
     "TASK_ENTITY_TYPE_EXPLORATION": "exploration",
-  
+
     "TASK_TARGET_TYPE_STATE": "state",
-  
+
     // Filters for adding new syllabus items to learner groups.
     "DEFAULT_ADD_SYLLABUS_FILTER": "All",
     "LEARNER_GROUP_ADD_STORY_FILTER": "Story",
     "LEARNER_GROUP_ADD_SKILL_FILTER": "Skill",
-  
+
     // Roles in exploration.
     "ROLE_OWNER": "owner",
     "ROLE_EDITOR": "editor",
     "ROLE_VOICE_ARTIST": "voice artist",
     "ROLE_VIEWER": "viewer",
-  
+
     // The supported tags for the mailing list subscriptions.
     "MAILING_LIST_ANDROID_TAG": "Android",
     "MAILING_LIST_WEB_TAG": "Web",
-  
+
     // The error message to be displayed when the user tries to subscribe to the
     // mailing list but fails.
     // eslint-disable-next-line max-len
     "MAILING_LIST_UNEXPECTED_ERROR_MESSAGE": "Sorry, an unexpected error occurred. Please email admin@oppia.org to be added to the mailing list.",
-  
+
     // Regex to validate the format of Math rich-text component SVGs. If this is
     // changed in the future, the existing filenames on the server should be
     // handled as well.
     // eslint-disable-next-line max-len
     "MATH_SVG_FILENAME_REGEX": "mathImg_[a-z0-9_]+_height_[0-9d]+_width_[0-9d]+_vertical_[0-9d]+.(svg)$",
-  
+
     // This regex validates whether a given string is in the format of YYYY-MM-DD
     // format.
     "DATE_REGEX": "^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}$",
-  
+
     // The SVG tag-specific attribute allowlist is based on the list of tags and
     // and attributes specified in this project:
     // https://github.com/cure53/DOMPurify
@@ -5056,7 +5056,7 @@ export default {
         "u2"
       ]
     },
-  
+
     // List of supported default categories. For now, each category has a specific
     // color associated with it. Each category also has a thumbnail icon whose
     // filename is '{{CategoryName}}.svg'.
@@ -5072,11 +5072,11 @@ export default {
       "Statistics": "#cc4b00",
       "Geometry": "#be5637",
       "Trigonometry": "#be5637",
-  
+
       "Algorithms": "#9d6901",
       "Computing": "#927117",
       "Programming": "#886628",
-  
+
       "Astronomy": "#58613a",
       "Biology": "#657030",
       "Chemistry": "#6c7c36",
@@ -5084,47 +5084,47 @@ export default {
       "Environment": "#747142",
       "Medicine": "#657030",
       "Physics": "#58613a",
-  
+
       "Architecture": "#6e3466",
       "Art": "#895a83",
       "Music": "#6a3862",
       "Philosophy": "#613968",
       "Poetry": "#7f507f",
-  
+
       "English": "#193a69",
       "Languages": "#1b4174",
       "Latin": "#3d5a89",
       "Reading": "#193a69",
       "Spanish": "#405185",
       "Gaulish": "#1b4174",
-  
+
       "Business": "#387163",
       "Economics": "#2f836d",
       "Geography": "#3c6d62",
       "Government": "#507c6b",
       "History": "#3d6b52",
       "Law": "#507c6b",
-  
+
       "Education": "#942e20",
       "Puzzles": "#a8554a",
       "Sport": "#893327",
       "Welcome": "#992a2b"
     },
-  
+ 
     "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
       "tabs", "math", "collapsible", "skillreview"
     ],
-  
+
     // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
     "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
-  
+
     // This is linked to SUPPORTED_LANGUAGES in android_validation_constants.
     "SUPPORTED_CONTENT_LANGUAGES_FOR_ANDROID": [{
       "code": "en",
       "description": "English",
       "decimal_separator": "."
     }],
-  
+
     // List of supported content languages in which we can create explorations or
     // other entities. Each description has a parenthetical part that may be
     // stripped out to give a shorter description.
@@ -5460,7 +5460,7 @@ export default {
       "decimal_separator": ".",
       "ariaLabelInEnglish": "Yoruba"
     }],
-  
+
     // NOTE TO DEVELOPERS: While adding another language, please ensure that the
     // languages are roughly in order of how much support we have for them in
     // terms of lesson content translations.
@@ -5569,7 +5569,7 @@ export default {
       "decimal_separator": ".",
       "ariaLabelInEnglish": "Traditional Chinese"
     }],
-  
+
     // List of supported audio languages in which we have audio and translations
     // for explorations or other entities.
     // Related languages are used to prioritize an exploration's language when
@@ -5880,7 +5880,7 @@ export default {
       "relatedLanguages": ["yo"],
       "direction": "ltr"
     }],
-  
+
     "AUTOGENERATED_AUDIO_LANGUAGES": [{
       "id": "en-auto",
       "description": "English (auto)",
@@ -5888,7 +5888,7 @@ export default {
       "speechSynthesisCode": "en-US",
       "speechSynthesisCodeMobile": "en_US"
     }],
-  
+
     "TRANSLATION_TIPS": {
       // Arabic.
       "ar": [
@@ -5978,15 +5978,15 @@ export default {
         "When translating a currency, replace \"Dollar\" for \"Real\"."
       ]
     },
-  
+
     // Types of view in creator dashboard page.
     "ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS": {
       "CARD": "card",
       "LIST": "list"
     },
-  
+
     "EMAIL_REGEX": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+",
-  
+
     "ALLOWED_QUESTION_INTERACTION_CATEGORIES": [{
       "name": "Commonly Used",
       "interaction_ids": [
@@ -6005,7 +6005,7 @@ export default {
         "NumericInput"
       ]
     }],
-  
+
     // These are linked to the VALID_INTERACTION_IDS constant in
     // android_validation_constants.py.
     "ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES": [{
@@ -6031,7 +6031,7 @@ export default {
         "RatioExpressionInput"
       ]
     }],
-  
+
     // These categories and interactions are displayed in the order in which they
     // appear in the interaction selector.
     "ALLOWED_INTERACTION_CATEGORIES": [{
@@ -6076,10 +6076,10 @@ export default {
         "InteractiveMap"
       ]
     }],
-  
+
     "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP": 4,
     "MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_REGULAR_EXP": 2,
-  
+
     "CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION": "translation",
     "CD_USER_RIGHTS_CATEGORY_REVIEW_VOICEOVER": "voiceover",
     "CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION": "question",
@@ -6090,30 +6090,30 @@ export default {
       "voiceover",
       "submit_question"
     ],
-  
+
     "SUGGESTIONS_SORT_KEY_DATE": "Date",
-  
+
     "ACTION_REMOVE_ALL_REVIEW_RIGHTS": "all",
     "ACTION_REMOVE_SPECIFIC_CONTRIBUTION_RIGHTS": "specific",
     "USER_FILTER_CRITERION_USERNAME": "username",
     "USER_FILTER_CRITERION_ROLE": "role",
-  
+
     // Interaction IDs for which answer details cannot be solicited.
     "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
-  
+
     "ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
-  
+
     "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
-  
+
     "MAX_CURRENT_GOALS_COUNT": 5,
-  
+
     "ACTIVITY_STATUS_PRIVATE": "private",
     "ACTIVITY_STATUS_PUBLIC": "public",
-  
+
     "SITE_FEEDBACK_FORM_URL": "",
-  
+
     "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
-  
+
     // A string containing the disallowed characters in state or exploration
     // names. The underscore is needed because spaces in names must be converted
     // to underscores when displayed as part of a URL or key. The other
@@ -6127,64 +6127,64 @@ export default {
       "\\u0014", "\\u0015", "\\u0016", "\\u0017", "\\u0018", "\\u0019", "\\u001a",
       "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
     ],
-  
+
     "DEFAULT_SKILL_DIFFICULTY": 0.6,
-  
+
     "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
-  
+
     // If new difficulties are added or the names changed, only the constants
     // below need to be edited.
     "SKILL_DIFFICULTY_EASY": "Easy",
     "SKILL_DIFFICULTY_MEDIUM": "Medium",
     "SKILL_DIFFICULTY_HARD": "Hard",
-  
+
     "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
-  
+
     "SKILL_DIFFICULTY_LABEL_TO_FLOAT": {
       "Easy": 0.3,
       "Medium": 0.6,
       "Hard": 0.9
     },
-  
+
     "ENABLE_PREREQUISITE_SKILLS": false,
-  
+
     "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
-  
+
     "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
-  
+
     "MAX_SKILLS_PER_QUESTION": 3,
-  
+
     "MAX_QUESTIONS_PER_SKILL": 10,
-  
+
     "NUM_EXPLORATIONS_PER_REVIEW_TEST": 3,
-  
+
     "NUM_QUESTIONS_PER_PAGE": 10,
-  
+
     "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 3,
-  
+
     "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
-  
+
     // The default number of opportunities to show on the contributor dashboard
     // page.
     "OPPORTUNITIES_PAGE_SIZE": 10,
-  
+
     // The breakpoint for mobile view for contributor dashboard in px.
     // This value must be the same as the one specified in
     // opportunities-list-item.component.html.
     "OPPORTUNITIES_LIST_ITEM_MOBILE_BREAKPOINT": 700,
-  
+
     // Represents the string value indicating "All topics" in the Contributor
     // Dashboard topic selector.
     "TOPIC_SENTINEL_NAME_ALL": "All",
-  
+
     // Review message to display for an obsolete translation suggestion with no
     // exploration content.
     // eslint-disable-next-line max-len
     "OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG": "The original content was deleted and no longer needs translation. Sorry about that!",
-  
+
     // The following character limit constraints follow from
     // android_validation_constants.py. Both have to be kept in sync.
-  
+
     // This represents the maximum number of characters in the URL fragment for
     // classroom in the classroom page URL. E.g. in /learn/math/...,
     // 'math' is the 'classroom URL fragment'.
@@ -6231,7 +6231,7 @@ export default {
     // questions and another topic is tested for more accurate results. For all
     // other cases, 15 questions is the upper limit.
     "MAX_ALLOWED_QUESTIONS_IN_THE_DIAGNOSTIC_TEST": 15,
-  
+
     "NEW_STATE_TEMPLATE": {
       "classifier_model_id": null,
       "linked_skill_id": null,
@@ -6278,46 +6278,46 @@ export default {
     "FIREBASE_CONFIG_MESSAGING_SENDER_ID": "",
     "FIREBASE_CONFIG_APP_ID": "",
     "FIREBASE_CONFIG_GOOGLE_CLIENT_ID": "",
-  
+
     // The name of the cookie Oppia will place the session cookie into. The name
     // is arbitrary. If it is changed later on, then the cookie will live on in
     // the users' browsers as garbage (although it'd expire eventually).
     "FIREBASE_AUTH_SESSION_COOKIE_NAME": "session",
-  
+
     "ALLOW_YAML_FILE_UPLOAD": false,
-  
+
     // A regular expression for tags.
     "TAG_REGEX": "^[a-z ]+$",
-  
+
     // A regular expression for allowed character in tags for blog post.
     "BLOG_POST_TAG_REGEX": "^[a-zA-Z0-9 ]+$",
-  
+
     // A regular expression for allowed characters in URL fragment fields.
     "VALID_URL_FRAGMENT_REGEX": "^[a-z]+(-[a-z]+)*$",
-  
+
     // A regular expression for allowed characters for thumbnail filename.
     "VALID_THUMBNAIL_FILENAME_REGEX": "^[^.](?!.*/)(?!.*\\.\\.).*.svg$",
-  
+
     // A regular expression for allowed entity id's.
     "ENTITY_ID_REGEX": "^[a-zA-Z0-9-_]{1,12}$",
-  
+
     // A regular expression for allowed learner group IDs.
     "LEARNER_GROUP_ID_REGEX": "^[a-zA-Z]{1,12}$",
-  
+
     // A regular expression for allowed characters in Title field for Blog Post.
     // eslint-disable-next-line max-len
     "VALID_BLOG_POST_TITLE_REGEX": "^[a-zA-Z0-9(&!,'/)][a-zA-Z0-9(&!,'/) ]+([-:][ a-zA-Z0-9(&!,'/)]+)*$",
-  
+
     // A regular expression for allowed characters in URL fragment for Blog Post.
     "VALID_URL_BLOG_FRAGMENT_REGEX": "^[a-z0-9]+(-[a-z0-9]+)*$",
-  
+
     // A regular expression for allowed characters in URL fragment for Blog Post.
     // eslint-disable-next-line max-len
     "VALID_THREAD_ID_REGEX": "(exploration|collection|skill).[a-zA-Z0-9]+.[a-zA-Z0-9=]+",
-  
+
     // A regular expression for valid skill misconception id.
     "VALID_SKILL_MISCONCEPTION_ID_REGEX": "[A-Za-z0-9]{12}-[0-9]+",
-  
+
     // A regular expression for allowed characters in author name field for Author
     // details Model.
     "VALID_AUTHOR_NAME_REGEX": "^[a-zA-Z0-9][a-zA-Z0-9 ]+(-[a-zA-Z0-9]+)*$",
@@ -6326,7 +6326,7 @@ export default {
       "answer", "choices", "abs", "all", "and", "any", "else",
       "floor", "if", "log", "or", "pow", "round", "then"
     ],
-  
+
     // Greek letters allowed in math interactions.
     "GREEK_LETTER_NAMES_TO_SYMBOLS": {
       "alpha": "α",
@@ -6363,7 +6363,7 @@ export default {
       "Psi": "Ψ",
       "Omega": "Ω"
     },
-  
+
     // The greek letters in the list should be in sync with the
     // GREEK_LETTER_NAMES_TO_SYMBOLS object's keys.
     "VALID_ALGEBRAIC_IDENTIFIERS": [
@@ -6375,7 +6375,7 @@ export default {
       "iota", "kappa", "lambda", "mu", "nu", "xi", "pi", "rho", "sigma", "tau",
       "upsilon", "phi", "chi", "psi", "omega", "Gamma", "Delta", "Theta",
       "Lambda", "Xi", "Pi", "Sigma", "Phi", "Psi", "Omega"],
-  
+
     // Valid allowed letters for math lessons.
     "VALID_ALLOWED_VARIABLES": [
       "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
@@ -6385,27 +6385,27 @@ export default {
       "α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π",
       "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω", "Γ", "Δ", "Θ", "Λ", "Ξ", "Π", "Σ",
       "Φ", "Ψ", "Ω"],
-  
+
     // Number of custom letters allowed in the on-screen keyboard for math
     // interactions.
     "MAX_CUSTOM_LETTERS_FOR_OSK": 10,
-  
+
     // Functions allowed in math interactions.
     "MATH_FUNCTION_NAMES": [
       "log", "ln", "sqrt", "abs", "sin", "cos", "tan", "sec", "csc", "cot",
       "arcsin", "arccos", "arctan", "sinh", "cosh", "tanh"
     ],
-  
+
     // Supported functions for math interactions.
     "SUPPORTED_FUNCTION_NAMES": ["sqrt", "abs"],
-  
+
     "OSK_MAIN_TAB": "mainTab",
     "OSK_FUNCTIONS_TAB": "functionsTab",
     "OSK_LETTERS_TAB": "lettersTab",
-  
+
     "CUSTOM_LETTERS_LATIN_TAB": "latinTab",
     "CUSTOM_LETTERS_GREEK_TAB": "greekTab",
-  
+
     // Name to human readable form mapping of the position of terms object.
     "POSITION_OF_TERMS_MAPPING": [{
       "name": "lhs",
@@ -6420,7 +6420,7 @@ export default {
       "name": "irrelevant",
       "humanReadableName": "with reordering allowed around ="
     }],
-  
+
     // Placeholder texts for the math interactions.
     "MATH_INTERACTION_PLACEHOLDERS": {
       "AlgebraicExpressionInput": "I18N_INTERACTIONS_ALGEBRAIC_EXPR_INSTRUCTION",
@@ -6428,47 +6428,47 @@ export default {
       // The following is user editable and hence, is not translated.
       "NumericExpressionInput": "Type an expression here, using only numbers."
     },
-  
+
     // Unfinished features.
     "SHOW_TRAINABLE_UNRESOLVED_ANSWERS": false,
-  
+
     // eslint-disable-next-line max-len
     "DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR": "Check out this interactive lesson on Oppia - a free platform for teaching and learning!",
-  
+
     // eslint-disable-next-line max-len
     "DEFUALT_BLOG_POST_SHARE_TWITTER_TEXT": "Check out this new blog post on Oppia!",
-  
+
     "OPPORTUNITY_TYPE_SKILL": "skill",
     "OPPORTUNITY_TYPE_TRANSLATION": "translation",
-  
+
     // The bucket name is set to app_default_bucket which is used to store files
     // in GCS when local development server is running. This should be changed
     // in prod appropriately.
     "GCS_RESOURCE_BUCKET_NAME": "app_default_bucket",
-  
+
     "ENABLE_EXP_FEEDBACK_FOR_LOGGED_OUT_USERS": true,
-  
+
     // Maximum allowed length of a username.
     "MAX_USERNAME_LENGTH": 30,
-  
+
     // Minimum allowed length of a blog post author's name.
     "MIN_AUTHOR_NAME_LENGTH": 2,
-  
+
     // Maximum allowed length of a blog post author's name.
     "MAX_AUTHOR_NAME_LENGTH": 35,
-  
+
     // Minimum allowed characters in a blog post author's bio.
     "MIN_CHARS_IN_AUTHOR_BIO": 5,
-  
+
     // Maximum allowed characters in a blog post author's bio.
     "MAX_CHARS_IN_AUTHOR_BIO": 250,
-  
+
     // Maximum allowed length of a state name.
     "MAX_STATE_NAME_LENGTH": 50,
-  
+
     // Maximum allowed length of unique progress url ID.
     "MAX_PROGRESS_URL_ID_LENGTH": 6,
-  
+
     "PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES": ["Web", "Android", "Backend"],
     // The ordering of in ALLOWED_APP_VERSION_FLAVORS implies the ordering
     // of corresponding flavors, which is used in app_version_flavor filter for
@@ -6479,13 +6479,13 @@ export default {
       "^(\\d+(?:\\.\\d+){2})$",
     "PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP":
       "^(\\d+(?:\\.\\d+){2})(?:-[a-z0-9]+(?:-(.+))?)?$",
-  
+
     // Maximum allowed commit message length. 375 characters because indexed
     // fields must be at most 1500 bytes, and UTF-8 encoded characters can be
     // up to 4 bytes long.
     "MAX_COMMIT_MESSAGE_LENGTH": 375,
     "MAX_REVIEW_MESSAGE_LENGTH": 10000,
-  
+
     "EMAIL_DASHBOARD_PREDICATE_DEFINITION": [
       {
         "backend_id": "user_inactivity",
@@ -6578,10 +6578,10 @@ export default {
         "default_value": false
       }
     ],
-  
+
     // When the site cookie policy was last updated in UNIX time milliseconds.
     "COOKIE_POLICY_LAST_UPDATED_MSECS": 1624909164000,
-  
+
     // Pages registered with angular router.
     "PAGES_REGISTERED_WITH_FRONTEND": {
       "ADMIN": {
@@ -7328,13 +7328,13 @@ export default {
         ]
       }
     },
-  
+
     "STEWARDS_LANDING_PAGE": {
       "ROUTES": ["parents", "partners", "nonprofits", "teachers", "volunteers"],
       "TITLE": "Getting Started with Oppia",
       "META": []
     },
-  
+
     // A dict representing available landing pages, having subject as a key
     // and list of topics as the value.
     // Note: This dict needs to be keep in sync with frontend
@@ -7344,7 +7344,7 @@ export default {
     "AVAILABLE_LANDING_PAGES": {
       "math": ["fractions", "negative-numbers", "ratios"]
     },
-  
+
     "SCHEMA_FOR_TOPIC_URL_FRAGMENTS": {
       "schema": {
         "type": "basestring",
@@ -7357,7 +7357,7 @@ export default {
         }]
       }
     },
-  
+
     "SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS": {
       "schema": {
         "type": "basestring",
@@ -7370,7 +7370,7 @@ export default {
         }]
       }
     },
-  
+
     "SCHEMA_FOR_STORY_URL_FRAGMENTS": {
       "schema": {
         "type": "basestring",
@@ -7383,15 +7383,15 @@ export default {
         }]
       }
     },
-  
+
     "DEV_MODE": true,
     "EMULATOR_MODE": true,
     "ASSET_TYPE_AUDIO": "audio",
     "ASSET_TYPE_IMAGE": "image",
     "ASSET_TYPE_THUMBNAIL": "thumbnail",
-  
+
     "FAVICON_ALERT_PATH": "/assets/images/favicon_alert/favicon_alert.ico",
-  
+
     "METADATA_PROPERTIES": [
       "title", "category", "objective", "language_code", "tags", "blurb",
       "author_notes", "states_schema_version", "init_state_name", "param_specs",
