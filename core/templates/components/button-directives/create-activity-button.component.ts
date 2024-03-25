@@ -16,7 +16,7 @@
  * @fileoverview Component for the Create Exploration/Collection button.
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
@@ -30,6 +30,7 @@ import {AppConstants} from 'app.constants';
 @Component({
   selector: 'oppia-create-activity-button',
   templateUrl: './create-activity-button.component.html',
+  encapsulation: ViewEncapsulation.None,
 })
 export class CreateActivityButtonComponent implements OnInit {
   creationInProgress: boolean = false;

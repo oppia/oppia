@@ -26,12 +26,10 @@
   </div>
   <div *ngIf="noCommunityLessonActivity">
     <h2 [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_NO_ACTIVITY_IN_EXPLORATION' | translate" class="empty-section"></h2>
-    <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
-       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-       href="/community-library"
-       [routerLink]="communityLibraryUrl"
-       [oppiaFocusOn]="'ourLessonsBtn'">
-    </a>
+    <oppia-primary-button [customClasses]="'btn oppia-dashboard-intro-button'"
+                          [buttonHref]="communityLibraryUrl"
+                          [buttonText]="'I18N_ACTION_BROWSE_LESSONS' | translate">
+    </oppia-primary-button>
   </div>
   <div class="incomplete-section e2e-test-incomplete-community-lessons-section" *ngIf="!windowIsNarrow">
     <div *ngIf="totalIncompleteLessonsList.length !== 0">
@@ -255,11 +253,10 @@
   </h1>
   <div *ngIf="noPlaylistActivity">
     <h2 [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_EXPLORATION_PLAYLIST' | translate" class="empty-section"></h2>
-    <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-nonexistent-exploration"
-       [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
-       href="/community-library"
-       [routerLink]="communityLibraryUrl">
-    </a>
+    <oppia-primary-button [customClasses]="'btn oppia-dashboard-intro-button'"
+                          [buttonHref]="communityLibraryUrl"
+                          [buttonText]="'I18N_ACTION_BROWSE_LESSONS' | translate">
+    </oppia-primary-button>
   </div>
   <div *ngIf="windowIsNarrow && displayLessonsInPlaylist.length !== 0">
     <div class="pagination">

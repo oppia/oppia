@@ -1,20 +1,19 @@
 <div class="btn-group"
      [ngClass]="checkTabletView() ? 'oppia-button-display' : 'float-right'">
   <!-- User must complete the registration process. -->
-  <button type="button"
-          class="oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus"
-          (click)="onRedirectToLogin('/creator-dashboard?mode=create')"
+  <oppia-primary-button
+          [customClasses]="'oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus'"
+          (onClickPrimaryButton)="onRedirectToLogin('/creator-dashboard?mode=create')"
+          [buttonText]="'+ ' + ('I18N_CREATE_EXPLORATION' | translate)"
           *ngIf="userIsLoggedIn === false">
           <!-- "userIsLoggedIn === false" is needed because we want to show the button when we know that user is not logged in
                 when userIsLoggedIn is undefined or null we don't want to show the button thus we can't use ""userIsLoggedIn"!-->
-          + {{'I18N_CREATE_EXPLORATION' | translate}}
-  </button>
-  <button type="button"
-          class="oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus"
-          (click)="initCreationProcess()"
-          *ngIf="userIsLoggedIn">
-          + {{'I18N_CREATE_EXPLORATION' | translate}}
-  </button>
+  </oppia-primary-button>
+  <oppia-primary-button [customClasses]="'oppia-creator-dashboard-intro-button oppia-transition-200 e2e-test-create-activity e2e-test-create-new-exploration-button oppia-autofocus'"
+                        (onClickPrimaryButton)="initCreationProcess()"
+                        *ngIf="'userIsLoggedIn'"
+                        [buttonText]="'+ ' + ('I18N_CREATE_EXPLORATION' | translate)">
+  </oppia-primary-button>
   <button class="btn nav-link oppia-navbar-button oppia-navbar-hide-on-small-width oppia-transition-200"
           (click)="showUploadExplorationModal()"
           [disabled]="creationInProgress"

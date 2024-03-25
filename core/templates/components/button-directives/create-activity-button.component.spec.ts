@@ -30,6 +30,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {CreateActivityButtonComponent} from './create-activity-button.component';
+import {PrimaryButtonComponent} from './primary-button.component';
 
 /**
  * @fileoverview Unit tests for CreateActivityButtonComponent.
@@ -137,7 +138,11 @@ describe('CreateActivityButtonComponent', () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [CreateActivityButtonComponent, MockTranslatePipe],
+      declarations: [
+        CreateActivityButtonComponent,
+        PrimaryButtonComponent,
+        MockTranslatePipe,
+      ],
       providers: [
         UserService,
         {
