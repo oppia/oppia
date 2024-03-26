@@ -20,6 +20,13 @@ import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
 import {SuperAdmin} from '../../user-utilities/super-admin-utils';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
+
+// TODO(#18372): KeyError: <state name> when the version history handler is hit
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Failed to load resource: the server responded with a status of 500/,
+  /Failed to load resource: the server responded with a status of 400/,
+]);
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
@@ -42,17 +49,18 @@ describe('Exploration Creator', function () {
       'guestUsr1',
       'guest_user1@example.com'
     );
+    await guestUser1.closeBrowser();
+
     const guestUser2 = await UserFactory.createNewUser(
       'guestUsr2',
       'guest_user2@example.com'
     );
+    await guestUser2.closeBrowser();
+
     const guestUser3 = await UserFactory.createNewUser(
       'guestUsr3',
       'guest_user3@example.com'
     );
-
-    await guestUser1.closeBrowser();
-    await guestUser2.closeBrowser();
     await guestUser3.closeBrowser();
 
     await superAdmin.assignRoleToUser('explorationAdm', 'voiceover admin');
@@ -87,8 +95,8 @@ describe('Exploration Creator', function () {
       await explorationCreator.selectACategory('Algebra');
       await explorationCreator.expectSelectedCategoryToBe('Algebra');
 
-      await explorationCreator.selectALanguage('English');
-      await explorationCreator.expectSelectedLanguageToBe('English');
+      await explorationCreator.selectALanguage('Arabic');
+      await explorationCreator.expectSelectedLanguageToBe('Arabic');
 
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
       await explorationCreator.expectTagsToBeAdded(['TagA', 'TagB', 'TagC']);

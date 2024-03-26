@@ -27,7 +27,7 @@ const addCardName = '.e2e-test-state-name-text';
 const introSubmitButton = '.e2e-test-state-name-submit';
 const forButtonToBeEnabled = '.e2e-test-state-name-submit:not([disabled])';
 const introTitleSubmitButton = '.e2e-test-save-state-content';
-const interactionAddbutton = '.oppia-add-interaction-button';
+const interactionAddbutton = 'button.e2e-test-open-add-interaction-modal';
 const endInteractionTab = '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
@@ -41,21 +41,20 @@ const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label[for="text-speech-switch"]';
 const feedbackToggleOff = 'label[for="feedback-switch"]';
 
-const editbutton = '.oppia-edit-roles-btn';
+const editbutton = '.e2e-test-edit-roles';
 const addUserName = '#newMemberUsername';
-const addRoleBar = '#mat-select-value-11';
+const addRoleBar = '.e2e-test-role-select';
 const collaborator = 'Collaborator (can make changes)';
 const playtester = 'Playtester (can give feedback)';
 const saveRole = '.e2e-test-save-role';
-const deleteExplorationButton = '.oppia-delete-button';
-const saveDraftButton = '.oppia-save-draft-button';
-const publishButton = '.oppia-editor-publish-button';
+const deleteExplorationButton = '.e2e-test-delete-exploration-button';
+const saveDraftButton = '.e2e-test-save-changes';
+const publishButton = '.e2e-test-publish-exploration';
 const discardDraftButton = 'a.e2e-test-discard-changes';
 const discardConfirmButton = '.e2e-test-confirm-discard-changes';
 const deleteConfirmButton = '.e2e-test-really-delete-exploration-button';
 const voiceArtistEditButton = '.e2e-test-edit-voice-artist-roles';
 const voiceArtistSaveButton = '.e2e-test-add-voice-artist-role-button';
-const saveChangesButton = '.e2e-test-confirm-pre-publication';
 const publishConfirmButton = '.e2e-test-confirm-publish';
 const commitMessage = '.e2e-test-commit-message-input';
 const closePublishedPopUp = '.e2e-test-share-publish-close';
@@ -110,6 +109,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding interaction.
    */
   async addEndInteraction(): Promise<void> {
+    await this.page.waitForSelector(interactionAddbutton, {visible: true});
     await this.clickOn(interactionAddbutton);
     /** Giving explicit timeout because we need to wait for small
      * transition to complete. We cannot wait for the next element to click
@@ -171,9 +171,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding a goal.
    */
   async updateGoal(goal: string): Promise<void> {
-    await this.page.waitForTimeout(1000);
     await this.clickOn(addGoal);
-    await this.page.waitForTimeout(1000);
     await this.type(addGoal, goal);
     showMessage('Goal has been filled');
   }
@@ -183,9 +181,6 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
     try {
-      // Wait for transitions to complete
-      await this.page.waitForTimeout(1500);
-
       // Log debugging information
       showMessage('expectedGoal -> ' + expectedGoal);
 
@@ -201,9 +196,6 @@ export class ExplorationCreator extends BaseUser {
         goalInput
       );
       showMessage('goalInputInnerHTML -> ' + goalInputInnerHTML);
-
-      // Wait for a short duration to ensure element is fully loaded
-      await this.page.waitForTimeout(1000);
 
       // Evaluate the value of the goal input element
       const goal = await this.page.evaluate(input => input.value, goalInput);
@@ -228,7 +220,6 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in selecting a category from dropdawn.
    */
   async selectACategory(category: string): Promise<void> {
-    await this.page.waitForTimeout(1000);
     await this.clickOn(categoryDropDawn);
     /**
      * Debugging.
@@ -299,9 +290,25 @@ export class ExplorationCreator extends BaseUser {
      */
     showMessage('expectedLanguage->' + expectedLanguage);
     const selectedLanguage = await this.page.evaluate(() => {
-      return (
-        document.querySelector('.mat-option.mat-selected') as HTMLElement
-      ).innerText.trim();
+      const matOption = document.querySelector(
+        '.mat-option.mat-selected'
+      ) as HTMLElement;
+      if (!matOption) {
+        throw new Error('Selected language option not found.');
+      }
+      const selectedLanguageText = matOption.innerText.trim();
+
+      /**
+       * Extract words within parentheses using regex العربية (Arabic) -> Arabic
+       */
+      const matches = selectedLanguageText.match(/\(([^)]+)\)/);
+      if (matches && matches.length >= 2) {
+        return matches[1].trim();
+      } else {
+        // If no parentheses found, assume the whole text is the language.
+        //For eg : English.
+        return selectedLanguageText.trim();
+      }
     });
     /**
      * Debugging.
@@ -314,6 +321,7 @@ export class ExplorationCreator extends BaseUser {
     } else {
       throw new Error('Language is not correct.');
     }
+    await this.page.keyboard.press('Enter');
   }
 
   /**
@@ -327,7 +335,7 @@ export class ExplorationCreator extends BaseUser {
        * Debugging.
        */
       showMessage('tagsArray->' + addTags);
-      await this.clickOn('.secondary-info-text');
+      await this.page.keyboard.press('Tab');
     }
   }
 
@@ -461,6 +469,9 @@ export class ExplorationCreator extends BaseUser {
    */
   async assignUserToPlaytesterRole(username: string): Promise<void> {
     await this.clickOn(editbutton);
+    await this.page.waitForSelector('.e2e-test-editor-role-names', {
+      visible: true,
+    });
     await this.clickOn(addUserName);
     await this.type(addUserName, username);
     await this.clickOn(addRoleBar);
@@ -491,9 +502,11 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding voice artist.
    */
   async addVoiceArtists(voiceArtists: string[]): Promise<void> {
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       await this.clickOn(voiceArtistEditButton);
       await this.clickOn(addVoiceArtistUserName);
+      await this.page.click(addVoiceArtistUserName, {clickCount: 3});
+      await this.page.keyboard.press('Backspace');
       await this.type(addVoiceArtistUserName, voiceArtists[i]);
       await this.clickOn(voiceArtistSaveButton);
       /**
@@ -561,6 +574,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in drafting the exploration.
    */
   async saveDraftExploration(): Promise<void> {
+    await this.page.keyboard.press('Tab');
     await this.clickOn(saveDraftButton);
     /**
      * Debugging.
@@ -603,7 +617,6 @@ export class ExplorationCreator extends BaseUser {
       '.oppia-editor-publish-button:not([disabled])'
     );
     await this.clickOn(publishButton);
-    await this.clickOn(saveChangesButton);
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
     await this.clickOn(closePublishedPopUp);
@@ -657,9 +670,9 @@ export class ExplorationCreator extends BaseUser {
     );
 
     if (titleBeforeChanges === titleAfterChanges) {
-      showMessage('Changes have been discarded successfully.');
+      showMessage('Changes have been updated successfully.');
     } else {
-      throw new Error('Failed to discard changes.');
+      throw new Error('Failed to update changes.');
     }
   }
 }

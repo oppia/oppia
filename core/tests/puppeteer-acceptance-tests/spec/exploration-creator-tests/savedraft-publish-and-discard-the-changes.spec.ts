@@ -19,6 +19,12 @@
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
+
+// TODO(#18372): KeyError: <state name> when the version history handler is hit
+ConsoleReporter.setConsoleErrorsToIgnore([
+  /Failed to load resource: the server responded with a status of 500/,
+]);
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
@@ -52,7 +58,7 @@ describe('Exploration Publisher, Saver and Drafter', function () {
       await explorationCreator.addTitle('Old Title');
       await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
       await explorationCreator.selectACategory('Algebra');
-      await explorationCreator.selectALanguage('English');
+      await explorationCreator.selectALanguage('Arabic');
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
       await explorationCreator.updateSettingsSuccessfully();
 
