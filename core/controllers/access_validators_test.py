@@ -23,8 +23,8 @@ from core import feconf
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
 from core.domain import learner_group_fetchers
-from core.domain import rights_manager
 from core.domain import learner_group_services
+from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import topic_fetchers
 from core.domain import user_services
