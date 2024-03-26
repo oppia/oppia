@@ -182,6 +182,9 @@ export class CurriculumAdmin extends BaseUser {
    */
   async createSkill(skill: Skill): Promise<void> {
     await this.openTopicEditor();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.subtopic-reassign-header');
+    }
     await this.clickOn(addSkillButton);
     await this.type(skillDescriptionField, skill.description);
     await this.page.waitForSelector(skillReviewMaterialHeader);
@@ -251,6 +254,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
+    await this.page.waitForTimeout(5000000);
     await this.clickOn(saveQuestionButton);
   }
 
@@ -285,13 +289,26 @@ export class CurriculumAdmin extends BaseUser {
     });
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
-    await this.clickOn(saveChangesButton);
-    await this.clickOn(saveDraftButton);
 
-    await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`
-    );
-    await this.clickOn(publishExplorationButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-options');
+      await this.clickOn('.e2e-test-save-changes-for-small-screens');
+      await this.clickOn(saveDraftButton);
+      await this.clickOn('.e2e-test-toast-message');
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        hidden: true,
+      });
+      await this.clickOn('.e2e-test-mobile-changes-dropdown');
+      await this.clickOn('.e2e-test-mobile-publish-button');
+    } else {
+      await this.clickOn(saveChangesButton);
+      await this.clickOn(saveDraftButton);
+      await this.page.waitForSelector(
+        `${publishExplorationButton}:not([disabled])`
+      );
+      await this.clickOn(publishExplorationButton);
+    }
+
     await this.type(explorationTitleInput, exploration.title);
     await this.type(explorationGoalInput, exploration.goal);
     await this.clickOn(explorationCategoryDropdown);
@@ -336,10 +353,13 @@ export class CurriculumAdmin extends BaseUser {
    * Function that opens the topic editor page for the topic created.
    */
   async openTopicEditor(): Promise<void> {
-    await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(topicsTab);
-    await this.clickOn(topic);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-topic-name');
+    } else {
+      await this.clickOn(topic);
+    }
   }
 
   /**
@@ -349,14 +369,35 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(skillsTab);
-    await this.clickOn(skill);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-skills-tab');
+    } else {
+      await this.clickOn(skill);
+    }
   }
 
   async saveTopicDraft(): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
-    await this.clickOn(saveTopicButton);
-    await this.clickOn(closeSaveModalButton);
-    await this.page.waitForSelector(closeSaveModalButton, {hidden: true});
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-options-base');
+      await this.page.evaluate(() => {
+        const button = document.querySelector(
+          '.e2e-test-mobile-save-topic-button'
+        ) as HTMLElement;
+        if (button) {
+          button.click();
+        }
+      });
+      await this.clickOn(closeSaveModalButton);
+      await this.clickOn('.e2e-test-toast-message');
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        hidden: true,
+      });
+    } else {
+      await this.clickOn(saveTopicButton);
+      await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector(closeSaveModalButton, {hidden: true});
+    }
   }
 
   /**
@@ -364,6 +405,9 @@ export class CurriculumAdmin extends BaseUser {
    */
   async createSubtopic(subtopic: Subtopic): Promise<void> {
     await this.openTopicEditor();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.subtopic-reassign-header');
+    }
     await this.clickOn(addSubtopicButton);
     await this.type(subtopicTitleField, subtopic.title);
     await this.type(subtopicUrlFragmentField, subtopic.url_fragment);
@@ -446,7 +490,12 @@ export class CurriculumAdmin extends BaseUser {
     );
 
     await this.saveTopicDraft();
-    await this.clickOn(publishTopicButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-save-topic-dropdown');
+      await this.clickOn('.e2e-test-mobile-publish-topic-button');
+    } else {
+      await this.clickOn(publishTopicButton);
+    }
   }
 
   /**
@@ -521,7 +570,24 @@ export class CurriculumAdmin extends BaseUser {
    */
   async expectPublishedTopicToBePresent(): Promise<void> {
     const newPage = await this.browserObject.newPage();
-    await newPage.setViewport({width: 1920, height: 1080});
+    if (this.isViewportAtMobileWidth()) {
+      // This is the default viewport and user agent settings for iPhone 6.
+      await newPage.setViewport({
+        width: 375,
+        height: 667,
+        deviceScaleFactor: 2,
+        isMobile: true,
+        hasTouch: true,
+        isLandscape: false,
+      });
+      await newPage.setUserAgent(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+          'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+          'Mobile/15A372 Safari/604.1'
+      );
+    } else {
+      await newPage.setViewport({width: 1920, height: 1080});
+    }
     await newPage.bringToFront();
     await newPage.goto(topicAndSkillsDashboardUrl);
 
