@@ -248,8 +248,13 @@ export class SchemaBasedFloatEditorComponent
     } else {
       // Make sure number is in a correct format.
       let currentDecimalSeparator = this.getCurrentDecimalSeparator();
+      let formattedDtringValue = this.localStringValue.replace(
+        /\.|,/g,
+        currentDecimalSeparator
+      );
+
       let error = this.numericInputValidationService.validateNumericString(
-        this.localStringValue.replace(/\.|,/g, currentDecimalSeparator),
+        formattedDtringValue,
         currentDecimalSeparator
       );
       if (error !== undefined) {
@@ -257,9 +262,10 @@ export class SchemaBasedFloatEditorComponent
         this.errorStringI18nKey = error || null;
       } else {
         // Parse number if the string is in proper format.
-        this.localValue = this.numberConversionService.convertToEnglishDecimal(
-          this.localStringValue.replace(/\.|,/g, currentDecimalSeparator)
-        );
+        this.localValue =
+          this.numberConversionService.convertToEnglishDecimal(
+            formattedDtringValue
+          );
 
         // Generate errors (if any).
         this.generateErrors();
