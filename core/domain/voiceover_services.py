@@ -205,9 +205,9 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
 
 
 def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
-    """The method returns a dict with voice artist IDs as keys and nested dicts
-    as values. Each nested dict contains language codes as keys and language
-    accent codes as values.
+    """The method returns a dict with all voice artist IDs as keys and nested
+    dicts as values. Each nested dict contains language codes as keys and
+    language accent codes as values.
 
     Returns:
         dict(str, dict(str, str)). A dict representing voice artist IDs to
@@ -273,7 +273,7 @@ def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
         dict(str, str). A dict with all the voice artist IDs as keys and their
         respective usernames as values.
     """
-    voice_artist_id_to_voice_artist_name = {}
+    voice_artist_id_to_voice_artist_name: Dict[str, str] = {}
 
     exploration_voice_artist_link_models: Sequence[
         voiceover_models.ExplorationVoiceArtistsLinkModel] = (
