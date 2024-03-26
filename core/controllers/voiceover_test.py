@@ -17,15 +17,13 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import state_domain
 from core.domain import user_services
+from core.domain import voiceover_domain
 from core.domain import voiceover_services
 from core.tests import test_utils
 
 from typing import Dict
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import voiceover_models
 
 
 class VoiceoverAdminPageHandlerTests(test_utils.GenericTestBase):
@@ -132,19 +130,19 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         user_services.set_username(
             self.voice_artist_id, self.voice_artist_username)
 
-        self.voiceover1: voiceover_models.VoiceoverDict = {
+        self.voiceover1: state_domain.VoiceoverDict = {
             'filename': 'filename1.mp3',
             'file_size_bytes': 3000,
             'needs_update': False,
             'duration_secs': 6.1
         }
-        self.voiceover2: voiceover_models.VoiceoverDict = {
+        self.voiceover2: state_domain.VoiceoverDict = {
             'filename': 'filename2.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
             'duration_secs': 5.9
         }
-        self.voiceover3: voiceover_models.VoiceoverDict = {
+        self.voiceover3: state_domain.VoiceoverDict = {
             'filename': 'filename3.mp3',
             'file_size_bytes': 3500,
             'needs_update': False,
@@ -157,7 +155,7 @@ class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
         }
 
         self.content_id_to_voiceovers_mapping: (
-            voiceover_models.ContentIdToVoiceoverMappingType) = {
+            voiceover_domain.ContentIdToVoiceoverMappingType) = {
                 'content_1': {
                     'en': (self.voice_artist_id, self.voiceover1)
                 },

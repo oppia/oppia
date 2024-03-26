@@ -141,7 +141,7 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async fetchVoiceArtistMetadtaAsync(): Promise<VoiceArtistMetadataResponse> {
+  async fetchVoiceArtistMetadataAsync(): Promise<VoiceArtistMetadataResponse> {
     return new Promise((resolve, reject) => {
       this.http
         .get<VoiceArtistMetaDataBackendDict>(

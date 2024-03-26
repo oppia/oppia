@@ -114,7 +114,7 @@ describe('Voiceover Admin Page component ', () => {
     ).and.returnValue(Promise.resolve(voiceoverAdminDataResponse));
     spyOn(
       voiceoverBackendApiService,
-      'fetchVoiceArtistMetadtaAsync'
+      'fetchVoiceArtistMetadataAsync'
     ).and.returnValue(Promise.resolve(voiceArtistMetadataInfo));
 
     expect(
@@ -129,7 +129,7 @@ describe('Voiceover Admin Page component ', () => {
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
     ).toHaveBeenCalled();
     expect(
-      voiceoverBackendApiService.fetchVoiceArtistMetadtaAsync
+      voiceoverBackendApiService.fetchVoiceArtistMetadataAsync
     ).toHaveBeenCalled();
     expect(component.availableLanguageAccentCodesToDescriptions).toEqual({
       'hi-IN': 'Hindi (India)',

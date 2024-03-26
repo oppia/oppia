@@ -84,7 +84,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.pageIsInitialized = true;
       });
     this.voiceoverBackendApiService
-      .fetchVoiceArtistMetadtaAsync()
+      .fetchVoiceArtistMetadataAsync()
       .then(response => {
         this.voiceArtistIdToLanguageMapping =
           response.voiceArtistIdToLanguageMapping;
