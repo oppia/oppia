@@ -22,7 +22,7 @@ import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils
 import {SuperAdmin} from '../../user-utilities/super-admin-utils';
 import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
-// TODO(#18372): KeyError: <state name> when the version history handler is hit
+// TODO(#18372): KeyError: <state name> when the version history handler is hit.
 ConsoleReporter.setConsoleErrorsToIgnore([
   /Failed to load resource: the server responded with a status of 500/,
   /Failed to load resource: the server responded with a status of 400/,

@@ -181,36 +181,29 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
     try {
-      // Log debugging information
+      // Log debugging information.
       showMessage('expectedGoal -> ' + expectedGoal);
 
-      // Find the goal input element
+      // Find the goal input element.
       const goalInput = await this.page.$('#explorationObjective');
       if (!goalInput) {
         throw new Error('Goal input element not found.');
       }
 
-      // Log the goal input element to inspect its properties
-      const goalInputInnerHTML = await this.page.evaluate(
-        input => input.innerHTML,
-        goalInput
-      );
-      showMessage('goalInputInnerHTML -> ' + goalInputInnerHTML);
-
-      // Evaluate the value of the goal input element
+      // Evaluate the value of the goal input element.
       const goal = await this.page.evaluate(input => input.value, goalInput);
 
       // Log the current goal
       showMessage('goal -> ' + goal);
 
-      // Check if the goal matches the expected goal
+      // Check if the goal matches the expected goal.
       if (goal === expectedGoal) {
         showMessage('The goal has been set for the exploration.');
       } else {
         throw new Error('The goal does not match the expected goal.');
       }
     } catch (error) {
-      // Log any errors encountered
+      // Log any errors encountered.
       console.error('Error:', error.message);
       throw error;
     }
@@ -306,7 +299,7 @@ export class ExplorationCreator extends BaseUser {
         return matches[1].trim();
       } else {
         // If no parentheses found, assume the whole text is the language.
-        //For eg : English.
+        // For eg : English.
         return selectedLanguageText.trim();
       }
     });
