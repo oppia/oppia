@@ -556,7 +556,8 @@ def update_exploration_voice_artist_link_model(
         return
 
     exp_voice_artist_link_model = (
-        voiceover_models.ExplorationVoiceArtistsLinkModel.get(exploration_id))
+        voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+            exploration_id, strict=False))
     content_id_to_voiceovers_mapping = collections.defaultdict(dict)
 
     if exp_voice_artist_link_model is not None:

@@ -24,6 +24,7 @@ import os
 from core import feconf
 from core import schema_utils
 from core import utils
+from core.domain import exp_domain
 from core.domain import state_domain
 from core.domain import user_services
 from core.domain import voiceover_services
@@ -596,3 +597,106 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             total_files += len(filnames)
 
         self.assertEqual(total_files, 1)
+
+    def test_auto_update_exploration_voice_artist_link_model(self) -> None:
+        content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_1', self.voiceover1),
+            },
+            'content_1': {
+                'ar': ('voice_artist_2', self.voiceover3),
+                'en': ('voice_artist_1', self.voiceover4)
+            },
+            'content_2': {
+                'en': ('voice_artist_1', self.voiceover6),
+            },
+            'content_3': {
+                'en': ('voice_artist_1', self.voiceover5)
+            }
+        }
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_3', self.voiceover8],
+            },
+            'content_1': {
+                'ar': ['voice_artist_2', self.voiceover3],
+                'en': ['voice_artist_1', self.voiceover4]
+            },
+            'content_2': {
+                'en': ['voice_artist_1', self.voiceover6],
+            },
+            'content_3': {
+                'en': ['voice_artist_1', self.voiceover5]
+            }
+        }
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'State name',
+            'new_value': {}
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'State name',
+            'new_value': {
+                'content_0': {
+                    'en': self.voiceover7
+                }
+            },
+            'old_value': {
+                'content_0': {}
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'State name',
+            'new_value': {
+                'content_0': {}
+            },
+            'old_value': {
+                'content_0': {
+                    'en': self.voiceover7
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'State name',
+            'new_value': {
+                'content_0': {
+                    'en': self.voiceover8
+                }
+            },
+            'old_value': {}
+        })]
+
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_1',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+        exploration_voice_artists_link_model.put()
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'exploration_id_1', 'voice_artist_3', change_list
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id_1'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
