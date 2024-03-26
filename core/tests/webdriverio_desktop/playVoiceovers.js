@@ -72,6 +72,10 @@ describe('Voiceover player', function () {
     );
     await explorationEditorPage.saveChanges('Done.');
     await workflow.publishExploration();
+
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
   });
 
   it('should play voiceovers for multiple languages', async function () {
