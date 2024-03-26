@@ -193,7 +193,7 @@ export class ExplorationCreator extends BaseUser {
       // Evaluate the value of the goal input element.
       const goal = await this.page.evaluate(input => input.value, goalInput);
 
-      // Log the current goal
+      // Log the current goal.
       showMessage('goal -> ' + goal);
 
       // Check if the goal matches the expected goal.
