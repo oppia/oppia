@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -69,9 +68,3 @@ export class TopicViewerNavbarBreadcrumbComponent implements OnInit {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'topicViewerNavbarBreadcrumb',
-    downgradeComponent({component: TopicViewerNavbarBreadcrumbComponent})
-  );

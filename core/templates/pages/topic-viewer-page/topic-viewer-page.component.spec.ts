@@ -24,14 +24,14 @@ import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 
-import {TopicViewerPageComponent} from 'pages/topic-viewer-page/topic-viewer-page.component';
-import {AlertsService} from 'services/alerts.service';
-import {UrlService} from 'services/contextual/url.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {PageTitleService} from 'services/page-title.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {TopicViewerPageComponent} from '../../pages/topic-viewer-page/topic-viewer-page.component';
+import {AlertsService} from '../../services/alerts.service';
+import {UrlService} from '../../services/contextual/url.service';
+import {WindowDimensionsService} from '../../services/contextual/window-dimensions.service';
+import {WindowRef} from '../../services/contextual/window-ref.service';
+import {PageTitleService} from '../../services/page-title.service';
+import {MockTranslatePipe} from '../../tests/unit-test-utils';
+import {I18nLanguageCodeService} from '../../services/i18n-language-code.service';
 
 class MockWindowRef {
   _window = {
