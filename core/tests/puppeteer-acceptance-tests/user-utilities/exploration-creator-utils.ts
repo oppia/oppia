@@ -19,8 +19,10 @@
 import {error} from 'console';
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
 
-const creatorDashboardUrl = 'http://localhost:8181/creator-dashboard';
+const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+
 const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
 const takeMeToEditorButton = '.e2e-test-dismiss-welcome-modal';
 const addCardName = '.e2e-test-state-name-text';
@@ -92,12 +94,6 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in updating exploration intro text.
    */
   async updateExplorationIntroText(Introtext: string): Promise<void> {
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(500);
     await this.clickOn('div.e2e-test-state-edit-content');
     await this.clickOn('div.e2e-test-rte');
     await this.type('div.e2e-test-rte', Introtext);
@@ -109,14 +105,8 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding interaction.
    */
   async addEndInteraction(): Promise<void> {
-    await this.page.waitForSelector(interactionAddbutton, {visible: true});
+    await this.page.waitForNavigation({waitUntil: 'networkidle2'});
     await this.clickOn(interactionAddbutton);
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(350);
     await this.clickOn(endInteractionTab);
     await this.clickOn(saveInteractionButton);
     showMessage('End Exploration has been added successfully.');
@@ -636,12 +626,7 @@ export class ExplorationCreator extends BaseUser {
   async discardCurrentChanges(): Promise<void> {
     await this.clickOn('.e2e-test-settings-container');
     await this.clickOn('button.e2e-test-save-discard-toggle');
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(400);
+    await this.page.waitForSelector(discardDraftButton, {visible: true});
     await this.clickOn(discardDraftButton);
     await this.page.waitForSelector('.e2e-test-confirm-discard-changes', {
       visible: true,

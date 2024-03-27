@@ -91,7 +91,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          await this.page.setViewport({width: 1920, height: 1080});
+          await this.page.setViewport({width: 0, height: 0});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
