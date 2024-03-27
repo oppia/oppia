@@ -331,8 +331,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       ) {
         if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
           this.routerService.navigateToFeedbackTab();
-        } else {
-          this.routerService.navigateToMainTab(null);
         }
       }
 
