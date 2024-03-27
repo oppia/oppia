@@ -606,27 +606,16 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             'content_1': {
                 'ar': ('voice_artist_2', self.voiceover3),
                 'en': ('voice_artist_1', self.voiceover4)
-            },
-            'content_2': {
-                'en': ('voice_artist_1', self.voiceover6),
-            },
-            'content_3': {
-                'en': ('voice_artist_1', self.voiceover5)
             }
         }
         expected_content_id_to_voiceovers_mapping = {
             'content_0': {
                 'en': ['voice_artist_3', self.voiceover8],
+                'hi': ['voice_artist_3', self.voiceover7]
             },
             'content_1': {
                 'ar': ['voice_artist_2', self.voiceover3],
                 'en': ['voice_artist_1', self.voiceover4]
-            },
-            'content_2': {
-                'en': ['voice_artist_1', self.voiceover6],
-            },
-            'content_3': {
-                'en': ['voice_artist_1', self.voiceover5]
             }
         }
 
@@ -642,24 +631,15 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
             'state_name': 'State name',
             'new_value': {
-                'content_0': {
-                    'en': self.voiceover7
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover6,
+                    }
                 }
             },
             'old_value': {
-                'content_0': {}
-            }
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': 'State name',
-            'new_value': {
-                'content_0': {}
-            },
-            'old_value': {
-                'content_0': {
-                    'en': self.voiceover7
+                'voiceovers_mapping': {
+                    'content_0': {}
                 }
             }
         }), exp_domain.ExplorationChange({
@@ -668,11 +648,40 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
             'state_name': 'State name',
             'new_value': {
-                'content_0': {
-                    'en': self.voiceover8
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'hi': self.voiceover7
+                    }
                 }
             },
-            'old_value': {}
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover6
+                    }
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'State name',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover8,
+                        'hi': self.voiceover7
+                    }
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover6,
+                        'hi': self.voiceover7
+                    }
+                }
+            }
         })]
 
         exploration_voice_artists_link_model = (
@@ -684,6 +693,149 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             )
         )
         exploration_voice_artists_link_model.put()
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'exploration_id_1', 'voice_artist_3', change_list
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id_1'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_not_update_exp_link_model_for_empty_change_list(
+        self
+    ) -> None:
+        content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_1', self.voiceover1),
+            },
+            'content_1': {
+                'ar': ('voice_artist_2', self.voiceover3),
+                'en': ('voice_artist_1', self.voiceover4)
+            }
+        }
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_1', self.voiceover1],
+            },
+            'content_1': {
+                'ar': ['voice_artist_2', self.voiceover3],
+                'en': ['voice_artist_1', self.voiceover4]
+            }
+        }
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'State name',
+            'new_value': {}
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'State name',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover6,
+                    }
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            }
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'State name',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover6
+                    }
+                }
+            }
+        })]
+
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_1',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+        exploration_voice_artists_link_model.put()
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'exploration_id_1', 'voice_artist_3', change_list
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id_1'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_create_exp_link_model(self) -> None:
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_3', self.voiceover7],
+            }
+        }
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'State name',
+            'new_value': {}
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'State name',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover7
+                    }
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            }
+        })]
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id_1', strict=False))
+        self.assertIsNone(exp_voice_artist_link_model)
 
         voiceover_services.update_exploration_voice_artist_link_model(
             'exploration_id_1', 'voice_artist_3', change_list

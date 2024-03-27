@@ -30,7 +30,7 @@ from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -516,7 +516,7 @@ def create_exploration_voice_artists_link_model_instance(
 def update_exploration_voice_artist_link_model(
     exploration_id: str,
     committer_id: str,
-    change_list: List[exp_domain.ExplorationChange]
+    change_list: Sequence[exp_domain.ExplorationChange]
 ) -> None:
     """Create or update a voice artist link model following modifications to
     the recorded voiceover property in an exploration's state.
@@ -532,18 +532,28 @@ def update_exploration_voice_artist_link_model(
         str, state_domain.VoiceoverDict]] = {}
 
     for change in voiceover_change_list:
-        voiceover_mapping = change.new_value
+        # Here we use cast because this condition forces change to have type
+        # EditExpStatePropertyRecordedVoiceoversCmd.
+        recorded_voiceovers = cast(
+            exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
+            change
+        )
+        voiceover_mapping = recorded_voiceovers.new_value['voiceovers_mapping']
 
         for content_id, lang_code_to_voiceover in voiceover_mapping.items():
-            updated_voiceover_mapping[content_id] = {}
+            if content_id not in updated_voiceover_mapping:
+                updated_voiceover_mapping[content_id] = {}
 
             for lang_code, voiceover_dict in lang_code_to_voiceover.items():
                 updated_voiceover_mapping[content_id][lang_code] = (
                     voiceover_dict)
 
+            updated_language_codes = list(
+                updated_voiceover_mapping[content_id].keys())
+
             # Remove the language codes that were initially added to the change
             # list but subsequently removed.
-            for lang_code in updated_voiceover_mapping[content_id]:
+            for lang_code in updated_language_codes:
                 if lang_code not in lang_code_to_voiceover:
                     del updated_voiceover_mapping[content_id][lang_code]
 
@@ -558,7 +568,9 @@ def update_exploration_voice_artist_link_model(
     exp_voice_artist_link_model = (
         voiceover_models.ExplorationVoiceArtistsLinkModel.get(
             exploration_id, strict=False))
-    content_id_to_voiceovers_mapping = collections.defaultdict(dict)
+    content_id_to_voiceovers_mapping: (
+        voiceover_domain.ContentIdToVoiceoverMappingType) = (
+            collections.defaultdict(dict))
 
     if exp_voice_artist_link_model is not None:
         content_id_to_voiceovers_mapping.update(
