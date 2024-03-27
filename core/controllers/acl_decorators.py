@@ -3784,7 +3784,7 @@ def can_access_classroom_admin_page(
 def can_access_voiceover_admin_page(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Decorator to check whether user can access vocieover admin page.
+    """Decorator to check whether user can access voiceover admin page.
 
     Args:
         handler: function. The function to be decorated.

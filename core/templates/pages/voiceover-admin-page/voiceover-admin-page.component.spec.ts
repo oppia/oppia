@@ -32,6 +32,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {MatTableModule} from '@angular/material/table';
 
 class MockNgbModal {
   open() {
@@ -56,6 +57,7 @@ describe('Voiceover Admin Page component ', () => {
         FormsModule,
         MatAutocompleteModule,
         ReactiveFormsModule,
+        MatTableModule,
       ],
       declarations: [VoiceoverAdminPageComponent, MockTranslatePipe],
       providers: [
@@ -92,10 +94,28 @@ describe('Voiceover Admin Page component ', () => {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
     };
+    let voiceArtistMetadataInfo = {
+      voiceArtistIdToLanguageMapping: {
+        voiceArtist1: {
+          en: 'en-US',
+        },
+        voiceArtist2: {
+          hi: 'hi-IN',
+        },
+      },
+      voiceArtistIdToVoiceArtistName: {
+        voiceArtist1: 'Voice Artist 1',
+        voiceArtist2: 'Voice Artist 2',
+      },
+    };
     spyOn(
       voiceoverBackendApiService,
       'fetchVoiceoverAdminDataAsync'
     ).and.returnValue(Promise.resolve(voiceoverAdminDataResponse));
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceArtistMetadataAsync'
+    ).and.returnValue(Promise.resolve(voiceArtistMetadataInfo));
 
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
@@ -107,7 +127,10 @@ describe('Voiceover Admin Page component ', () => {
 
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
-    ).not.toHaveBeenCalledWith(voiceoverAdminDataResponse);
+    ).toHaveBeenCalled();
+    expect(
+      voiceoverBackendApiService.fetchVoiceArtistMetadataAsync
+    ).toHaveBeenCalled();
     expect(component.availableLanguageAccentCodesToDescriptions).toEqual({
       'hi-IN': 'Hindi (India)',
     });
@@ -234,4 +257,66 @@ describe('Voiceover Admin Page component ', () => {
 
     expect(component.languageAccentDropdownIsShown).toBeFalse();
   });
+
+  it('should be able to add accent for voiceovers', fakeAsync(() => {
+    component.languageAccentMasterList = {
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+      en: {
+        'en-US': 'English (United States)',
+      },
+    };
+    component.voiceArtistIdToVoiceArtistName = {
+      voiceArtistId: 'Voice Artist',
+    };
+    component.voiceArtistIdToLanguageMapping = {
+      voiceArtistId: {
+        en: '',
+      },
+    };
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.resolve('en-US'),
+    } as NgbModalRef);
+
+    component.addLanguageAccentForVoiceArtist('voiceArtistId', 'en');
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.voiceArtistIdToLanguageMapping.voiceArtistId.en).toEqual(
+      'en-US'
+    );
+  }));
+
+  it('should not add accent for voiceovers when confirm modal is cancelled', fakeAsync(() => {
+    component.languageAccentMasterList = {
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+      en: {
+        'en-US': 'English (United States)',
+      },
+    };
+    component.voiceArtistIdToVoiceArtistName = {
+      voiceArtistId: 'Voice Artist',
+    };
+    component.voiceArtistIdToLanguageMapping = {
+      voiceArtistId: {
+        en: '',
+      },
+    };
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.addLanguageAccentForVoiceArtist('voiceArtistId', 'en');
+    tick();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.voiceArtistIdToLanguageMapping.voiceArtistId.en).toEqual(
+      ''
+    );
+  }));
 });

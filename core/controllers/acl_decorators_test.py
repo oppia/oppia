@@ -7870,7 +7870,7 @@ class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
 
         self.add_user_role(
-            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_CURRICULUM_ADMIN)
+            self.VOICEOVER_ADMIN_USERNAME, feconf.ROLE_ID_VOICEOVER_ADMIN)
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/voiceover-admin', self.MockHandler)],

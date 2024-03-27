@@ -36,6 +36,16 @@ interface VoiceoverAdminDataBackendDict {
   };
 }
 
+interface ExplorationIdToFilenamesBackendDict {
+  exploration_id_to_filenames: {
+    [explorationId: string]: string[];
+  };
+}
+
+export interface ExplorationIdToFilenames {
+  [explorationId: string]: string[];
+}
+
 export interface LanguageAccentToDescription {
   [languageAccentCode: string]: string;
 }
@@ -53,6 +63,31 @@ export interface LanguageCodesMapping {
 export interface VoiceoverAdminDataResponse {
   languageAccentMasterList: LanguageAccentMasterList;
   languageCodesMapping: LanguageCodesMapping;
+}
+
+export interface VoiceArtistIdToLanguageMapping {
+  [voiceArtistId: string]: {
+    [languageCode: string]: string;
+  };
+}
+
+export interface VoiceArtistIdToVoiceArtistName {
+  [voiceArtistId: string]: string;
+}
+
+interface VoiceArtistMetaDataBackendDict {
+  voice_artist_id_to_language_mapping: {
+    [voiceArtistId: string]: {
+      [languageCode: string]: string;
+    };
+  };
+  voice_artist_id_to_voice_artist_name: {
+    [voiceArtistId: string]: string;
+  };
+}
+export interface VoiceArtistMetadataResponse {
+  voiceArtistIdToLanguageMapping: VoiceArtistIdToLanguageMapping;
+  voiceArtistIdToVoiceArtistName: VoiceArtistIdToVoiceArtistName;
 }
 
 @Injectable({
@@ -101,6 +136,80 @@ export class VoiceoverBackendApiService {
           },
           errorResopnse => {
             reject(errorResopnse?.error);
+          }
+        );
+    });
+  }
+
+  async fetchVoiceArtistMetadataAsync(): Promise<VoiceArtistMetadataResponse> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<VoiceArtistMetaDataBackendDict>(
+          VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve({
+              voiceArtistIdToLanguageMapping:
+                response.voice_artist_id_to_language_mapping,
+              voiceArtistIdToVoiceArtistName:
+                response.voice_artist_id_to_voice_artist_name,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async updateVoiceArtistToLanguageAccentAsync(
+    voiceArtistId: string,
+    languageCode: string,
+    languageAccentCode: string
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .put<void>(VoiceoverDomainConstants.VOICE_ARTIST_METADATA_HANDLER_URL, {
+          voice_artist_id: voiceArtistId,
+          language_code: languageCode,
+          language_accent_code: languageAccentCode,
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async fetchFilenamesForVoiceArtistAsync(
+    voiceArtistId: string,
+    languageCode: string
+  ): Promise<ExplorationIdToFilenames> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<ExplorationIdToFilenamesBackendDict>(
+          this.urlInterpolationService.interpolateUrl(
+            VoiceoverDomainConstants.GET_VOICEOVERS_FOR_VOICE_ARTIST_URL_TEMPLATE,
+            {
+              voice_artist_id: voiceArtistId,
+              language_code: languageCode,
+            }
+          )
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response.exploration_id_to_filenames);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
           }
         );
     });
