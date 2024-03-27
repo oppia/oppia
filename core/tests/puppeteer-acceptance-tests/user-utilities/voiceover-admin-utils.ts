@@ -41,6 +41,7 @@ const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
+const explorationIdElement = 'span.oppia-unique-progress-id';
 const closeShareModalButton = 'button.e2e-test-share-publish-close';
 
 const explorationSettingsTab = '.e2e-test-settings-tab';
@@ -67,6 +68,14 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      visible: true,
+    });
+    await this.clickOn(dismissWelcomeModalSelector);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
+    await this.page.waitForFunction('document.readyState === "complete"');
     await this.clickOn(explorationSettingsTab);
   }
 
@@ -76,23 +85,44 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async createExplorationWithTitle(explorationTitle: string): Promise<void> {
     await this.clickOn(createExplorationButton);
-    await this.page.waitForSelector(
-      `${dismissWelcomeModalSelector}:not([disabled])`
-    );
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      visible: true,
+    });
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
     });
+    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.page.waitForSelector(textStateEditSelector, {
+      visible: true,
+    });
     await this.clickOn(textStateEditSelector);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, `${explorationTitle}`);
     await this.clickOn(saveContentButton);
+
     await this.clickOn(addInteractionButton);
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector('.customize-interaction-body-container', {
+      hidden: true,
+    });
+
     await this.page.waitForSelector(`${saveChangesButton}:not([disabled])`);
     await this.clickOn(saveChangesButton);
+    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.page.waitForSelector(saveDraftButton, {visible: true});
     await this.clickOn(saveDraftButton);
+    await this.page.waitForSelector(saveDraftButton, {hidden: true});
+    await this.page.waitForFunction('document.readyState === "complete"');
+  }
 
+  /**
+   * Function to publish exploration
+   */
+  async publishExplorationWithTitle(
+    explorationTitle: string
+  ): Promise<string | null> {
     await this.page.waitForSelector(
       `${publishExplorationButton}:not([disabled])`
     );
@@ -102,16 +132,49 @@ export class VoiceoverAdmin extends BaseUser {
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
-    await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`
-    );
-    await this.clickOn(publishExplorationButton);
     await this.clickOn(explorationConfirmPublishButton);
+    await this.page.waitForSelector(explorationIdElement);
+    const explorationId = await this.page.$eval(
+      explorationIdElement,
+      element => (element as HTMLElement).innerText
+    );
     await this.clickOn(closeShareModalButton);
+    return explorationId;
   }
 
   /**
-   * Function to edit voiceover artist
+   * Function to navigate to exploration editor
+   * @param explorationUrl - url of the exploration
+   */
+  async navigateToExplorationEditor(
+    explorationUrl: string | null
+  ): Promise<void> {
+    if (!explorationUrl) {
+      throw new Error('Cannot navigate to editor: explorationUrl is null');
+    }
+
+    const editorUrl = explorationUrl.replace('/explore/', '/create/');
+    await this.page.goto(editorUrl);
+  }
+
+  /**
+   * Asserts that a voiceover artist does not exist in the list.
+   * @param artistUsername - The username of the voiceover artist to check for
+   */
+  async expectVoiceoverArtistNotExists(artistUsername: string): Promise<void> {
+    const allVoiceoverArtists = await this.getAllVoiceoverArtists();
+    if (allVoiceoverArtists.includes(artistUsername)) {
+      throw new Error('Voiceover artist already exists in the list.');
+    } else {
+      showMessage(
+        `Voiceover artist '${artistUsername}' does not exist and can be added.`
+      );
+    }
+  }
+
+  /**
+   * Adds a voiceover artist to an exploration.
+   * @param artistUsername - The username of the voiceover artist to add
    */
   async addVoiceoverArtistToExploration(artistUsername: string): Promise<void> {
     await this.clickOn(editVoiceoverArtistButton);

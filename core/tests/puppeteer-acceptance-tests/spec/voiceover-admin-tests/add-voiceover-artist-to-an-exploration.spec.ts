@@ -25,29 +25,41 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
 
 describe('Voiceover Admin', function () {
-  let testUser: VoiceoverAdmin;
+  let voiceoverAdm: VoiceoverAdmin;
+  let explorationEditor: VoiceoverAdmin;
+  let explorationUrl: string | null;
 
   beforeAll(async function () {
-    testUser = await UserFactory.createNewUser(
-      'testuser',
-      'testuser@example.com',
+    voiceoverAdm = await UserFactory.createNewUser(
+      'voiceoverAdm',
+      'voiceover_admin@example.com',
       [ROLES.VOICEOVER_ADMIN]
+    );
+
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_creator@example.com'
     );
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
     'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
     async function () {
-      await testUser.navigateToCreatorDashboardPage();
-      await testUser.createExplorationWithTitle('Exploration one');
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.createExplorationWithTitle('Exploration one');
+      explorationUrl =
+        await explorationEditor.publishExplorationWithTitle('Exploration one');
 
-      await testUser.navigateToExplorationSettingsTab();
-      await testUser.addVoiceoverArtistToExploration('invalidUserId');
+      await voiceoverAdm.navigateToExplorationEditor(explorationUrl);
+      await voiceoverAdm.navigateToExplorationSettingsTab();
 
-      await testUser.expectToSeeErrorToastMessage(
+      await voiceoverAdm.expectVoiceoverArtistNotExists('invalidUserId');
+      await voiceoverAdm.addVoiceoverArtistToExploration('invalidUserId');
+
+      await voiceoverAdm.expectToSeeErrorToastMessage(
         'Sorry, we could not find the specified user.'
       );
-      await testUser.closeToastMessage();
+      await voiceoverAdm.closeToastMessage();
     },
     DEFAULT_SPEC_TIMEOUT
   );
@@ -59,13 +71,18 @@ describe('Voiceover Admin', function () {
         'voiceoverartist',
         'voiceoverartist@example.com'
       );
-      await testUser.navigateToCreatorDashboardPage();
-      await testUser.createExplorationWithTitle('Exploration two');
-      await testUser.navigateToExplorationSettingsTab();
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.createExplorationWithTitle('Exploration two');
+      explorationUrl =
+        await explorationEditor.publishExplorationWithTitle('Exploration two');
 
-      await testUser.addVoiceoverArtistToExploration('voiceoverartist');
+      await voiceoverAdm.navigateToExplorationEditor(explorationUrl);
+      await voiceoverAdm.navigateToExplorationSettingsTab();
 
-      await testUser.expectVoiceoverArtistsListContains('voiceoverartist');
+      await voiceoverAdm.expectVoiceoverArtistNotExists('voiceoverartist');
+      await voiceoverAdm.addVoiceoverArtistToExploration('voiceoverartist');
+
+      await voiceoverAdm.expectVoiceoverArtistsListContains('voiceoverartist');
     },
     DEFAULT_SPEC_TIMEOUT
   );

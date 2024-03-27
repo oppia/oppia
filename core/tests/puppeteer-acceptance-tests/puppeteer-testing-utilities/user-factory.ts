@@ -29,7 +29,10 @@ import {
 import {BlogAdminFactory, BlogAdmin} from '../user-utilities/blog-admin-utils';
 import {QuestionAdminFactory} from '../user-utilities/question-admin-utils';
 import {BlogPostEditorFactory} from '../user-utilities/blog-post-editor-utils';
-import {VoiceoverAdminFactory} from '../user-utilities/voiceover-admin-utils';
+import {
+  VoiceoverAdminFactory,
+  VoiceoverAdmin,
+} from '../user-utilities/voiceover-admin-utils';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -140,10 +143,13 @@ export class UserFactory {
     username: string,
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
-  ): Promise<LoggedInUser & MultipleRoleIntersection<TRoles>> {
-    let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
-      LoggedInUserFactory(),
-    ]);
+  ): Promise<LoggedInUser & VoiceoverAdmin & MultipleRoleIntersection<TRoles>> {
+    let user = UserFactory.composeUserWithRoles(
+      UserFactory.composeUserWithRoles(BaseUserFactory(), [
+        LoggedInUserFactory(),
+      ]),
+      [VoiceoverAdminFactory()]
+    );
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
