@@ -1958,7 +1958,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       target_type: 'target_type',
     };
-    const suggestion3Obsolete = {
+    const obsoleteSuggestion = {
       suggestion_id: 'suggestion_3',
       target_id: '3',
       suggestion_type: 'translate_content',
@@ -1997,7 +1997,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       },
     };
     const contribution3 = {
-      suggestion: suggestion3Obsolete,
+      suggestion: obsoleteSuggestion,
       details: {
         topic_name: 'topic_3',
         story_title: 'story_3',
@@ -2111,7 +2111,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(component.activeSuggestionId).toBe('suggestion_3');
-      expect(component.activeSuggestion).toEqual(suggestion3Obsolete);
+      expect(component.activeSuggestion).toEqual(obsoleteSuggestion);
       expect(component.reviewable).toBe(reviewable);
       expect(component.subheading).toBe('topic_3 / story_3 / chapter_3');
       // Suggestion 3's exploration_content_html does not match its
@@ -2168,7 +2168,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       status: 'status',
       target_type: 'target_type',
     };
-    const suggestion3Obsolete = {
+    const obsoleteSuggestion = {
       suggestion_id: 'suggestion_3',
       target_id: '3',
       suggestion_type: 'translate_content',
@@ -2207,7 +2207,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       },
     };
     const contribution3 = {
-      suggestion: suggestion3Obsolete,
+      suggestion: obsoleteSuggestion,
       details: {
         topic_name: 'topic_3',
         story_title: 'story_3',
@@ -2321,7 +2321,7 @@ describe('Translation Suggestion Review Modal Component', function () {
       tick();
 
       expect(component.activeSuggestionId).toBe('suggestion_3');
-      expect(component.activeSuggestion).toEqual(suggestion3Obsolete);
+      expect(component.activeSuggestion).toEqual(obsoleteSuggestion);
       expect(component.reviewable).toBe(reviewable);
       expect(component.subheading).toBe('topic_3 / story_3 / chapter_3');
       // Suggestion 3's exploration_content_html does not match its
