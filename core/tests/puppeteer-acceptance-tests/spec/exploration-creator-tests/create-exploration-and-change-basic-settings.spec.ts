@@ -25,7 +25,7 @@ import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporte
 // TODO(#18372): KeyError: <state name> when the version history handler is hit.
 ConsoleReporter.setConsoleErrorsToIgnore([
   /Failed to load resource: the server responded with a status of 500/,
-  /Failed to load resource: the server responded with a status of 400/,
+  /Failed to load resource: the server responded with a status of 404/,
 ]);
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;

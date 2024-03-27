@@ -35,7 +35,7 @@ const saveInteractionButton = '.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
 const addGoal = '.e2e-test-exploration-objective-input';
-const categoryDropDawn = '.e2e-test-exploration-category-dropdown';
+const categoryDropDown = '.e2e-test-exploration-category-dropdown';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
 const addTags = '.e2e-test-chip-list-tags';
 const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
@@ -61,6 +61,26 @@ const publishConfirmButton = '.e2e-test-confirm-publish';
 const commitMessage = '.e2e-test-commit-message-input';
 const closePublishedPopUp = '.e2e-test-share-publish-close';
 const addVoiceArtistUserName = '#newVoicAartistUsername';
+
+/**
+ * For mobile.
+ */
+const navBarOpener = '.e2e-test-mobile-options';
+const optionsDropDown = '.e2e-test-mobile-options-dropdown';
+const mobileSettingsBar = '.e2e-test-mobile-settings-button';
+const basicSettingsDropDown = '.e2e-test-settings-container';
+const feedbackSettingsDropdown = '.e2e-test-feedback-settings-container';
+const permissionSettingsDropDown = '.e2e-test-permission-settings-container';
+const voiceArtistSettingsDropDown =
+  '.e2e-test-voice-artists-settings-container';
+const rolesSettingsDropDown = '.e2e-test-roles-settings-container';
+const advanceSettingsDropDown = '.e2e-test-advanced-settings-container';
+const explorationControlsSettingsDropDown =
+  '.e2e-test-controls-bar-settings-container';
+const mobileSaveDraftButton = 'button.e2e-test-save-changes-for-small-screens';
+const mobilePublishButton = '.e2e-test-mobile-publish-button';
+const publishButtonDropDown = '#discardButtonPopup';
+const mobileDiscardButton = '.e2e-test-mobile-exploration-discard-tab';
 
 let explorationUrlAfterPublished = '';
 export class ExplorationCreator extends BaseUser {
@@ -120,7 +140,23 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in reaching setting tab successfully.
    */
   async goToSettingsTab(): Promise<void> {
-    await this.clickOn(settingsTab);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(navBarOpener);
+      await this.clickOn(optionsDropDown);
+      await this.clickOn(mobileSettingsBar);
+      /**
+       * Open all dropdowns.
+       */
+      await this.clickOn(basicSettingsDropDown);
+      await this.clickOn(advanceSettingsDropDown);
+      await this.clickOn(rolesSettingsDropDown);
+      await this.clickOn(voiceArtistSettingsDropDown);
+      await this.clickOn(permissionSettingsDropDown);
+      await this.clickOn(feedbackSettingsDropdown);
+      await this.clickOn(explorationControlsSettingsDropDown);
+    } else {
+      await this.clickOn(settingsTab);
+    }
   }
 
   /**
@@ -200,14 +236,14 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function helps in selecting a category from dropdawn.
+   * This function helps in selecting a category from dropdown.
    */
   async selectACategory(category: string): Promise<void> {
-    await this.clickOn(categoryDropDawn);
+    await this.clickOn(categoryDropDown);
     /**
      * Debugging.
      */
-    showMessage('category dropdawn is visible.');
+    showMessage('category dropdown is visible.');
     await this.clickOn(category);
   }
 
@@ -239,7 +275,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function helps in selecting language from dropdawn.
+   * This function helps in selecting language from dropdown.
    */
   async selectALanguage(language: string): Promise<void> {
     await this.page.evaluate(() => {
@@ -558,7 +594,11 @@ export class ExplorationCreator extends BaseUser {
    */
   async saveDraftExploration(): Promise<void> {
     await this.page.keyboard.press('Tab');
-    await this.clickOn(saveDraftButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileSaveDraftButton);
+    } else {
+      await this.clickOn(saveDraftButton);
+    }
     /**
      * Debugging.
      */
@@ -596,14 +636,24 @@ export class ExplorationCreator extends BaseUser {
    */
   async publishExploration(): Promise<void> {
     await this.saveDraftExploration();
-    await this.page.waitForSelector(
-      '.oppia-editor-publish-button:not([disabled])'
-    );
-    await this.clickOn(publishButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(publishButtonDropDown);
+      await this.page.waitForSelector(`${mobilePublishButton}:not([disabled])`);
+      await this.clickOn(mobilePublishButton);
+    } else {
+      await this.page.waitForSelector(
+        '.oppia-editor-publish-button:not([disabled])'
+      );
+      await this.clickOn(publishButton);
+    }
+
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
     await this.clickOn(closePublishedPopUp);
-
+    /**
+     * Debug
+     */
+    showMessage('PublishExploration is working fine.');
     explorationUrlAfterPublished = await this.page.url();
   }
 
@@ -624,22 +674,31 @@ export class ExplorationCreator extends BaseUser {
    * This function is discarding the current changes.
    */
   async discardCurrentChanges(): Promise<void> {
-    await this.clickOn('.e2e-test-settings-container');
-    await this.clickOn('button.e2e-test-save-discard-toggle');
-    await this.page.waitForSelector(discardDraftButton, {visible: true});
-    await this.clickOn(discardDraftButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(publishButtonDropDown);
+      await this.clickOn(mobileDiscardButton);
+    } else {
+      await this.clickOn(basicSettingsDropDown);
+      await this.clickOn('button.e2e-test-save-discard-toggle');
+      await this.page.waitForSelector(discardDraftButton, {visible: true});
+      await this.clickOn(discardDraftButton);
+    }
     await this.page.waitForSelector('.e2e-test-confirm-discard-changes', {
       visible: true,
     });
     await this.clickOn(discardConfirmButton);
 
     await this.page.waitForNavigation({waitUntil: 'networkidle2'});
+    await this.clickOn(navBarOpener);
   }
 
   /**
    *This function checks whether changes has discarded successfully or not.
    */
   async expectTitleToBe(titleBeforeChanges: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(basicSettingsDropDown);
+    }
     await this.page.waitForSelector('.e2e-test-exploration-title-input');
     const titleInput = await this.page.$('.e2e-test-exploration-title-input');
     const titleAfterChanges = await this.page.evaluate(
