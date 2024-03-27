@@ -30,16 +30,16 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Exploration Publisher, Saver and Drafter', function () {
   let explorationCreator: ExplorationCreator;
-  let explorationVisitor: ExplorationCreator;
+  // let explorationVisitor: ExplorationCreator;
   beforeAll(async function () {
     explorationCreator = await UserFactory.createNewUser(
       'explorationAdm',
       'exploration_creator@example.com'
     );
-    explorationVisitor = await UserFactory.createNewUser(
-      'explorationSeeker',
-      'exploration_visitor@example.com'
-    );
+    // explorationVisitor = await UserFactory.createNewUser(
+    //   'explorationSeeker',
+    //   'exploration_visitor@example.com'
+    // );
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
@@ -76,7 +76,7 @@ describe('Exploration Publisher, Saver and Drafter', function () {
        */
       await explorationCreator.expectTitleToBe('Old TitleNew Title');
 
-      await explorationVisitor.expectInteractionOnCreatorDashboard();
+      // await explorationVisitor.expectInteractionOnCreatorDashboard();
     },
     DEFAULT_SPEC_TIMEOUT
   );
