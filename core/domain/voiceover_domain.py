@@ -22,10 +22,9 @@ import re
 
 from core import feconf
 from core import utils
-
 from core.domain import state_domain
 
-from typing import Dict, TypedDict
+from typing import Dict, Tuple, TypedDict
 
 
 class EntityVoiceoversDict(TypedDict):
@@ -36,6 +35,11 @@ class EntityVoiceoversDict(TypedDict):
     entity_version: int
     language_accent_code: str
     voiceovers: Dict[str, Dict[str, state_domain.VoiceoverDict]]
+
+
+ContentIdToVoiceoverMappingType = Dict[
+    str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
+]
 
 
 class EntityVoiceovers:
