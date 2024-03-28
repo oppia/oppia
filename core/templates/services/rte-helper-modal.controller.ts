@@ -393,9 +393,11 @@ export class RteHelperModalComponent {
             customizationArgsDict as {
               [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
             }
-          )[caName] =
-            this.tmpCustomizationArgs[i].value ||
-            this.tmpCustomizationArgs[i - 1].value;
+          )[caName] = this.hasPrintableCharacters(
+            this.tmpCustomizationArgs[i].value.toString()
+          )
+            ? this.tmpCustomizationArgs[i].value
+            : this.tmpCustomizationArgs[i - 1].value;
         } else {
           (
             customizationArgsDict as {
@@ -413,5 +415,22 @@ export class RteHelperModalComponent {
     return videoUrl[2] !== undefined
       ? videoUrl[2].split(/[^0-9a-z_\-]/i)[0]
       : videoUrl[0];
+  }
+
+  hasPrintableCharacters(input: string): boolean {
+    // Returns false if empty.
+    if (!input) {
+      return false;
+    }
+
+    // Returns true if any printable character between the specified ASCII range is found.
+    for (let i = 0; i < input.length; i++) {
+      const charCode = input.charCodeAt(i);
+      if (charCode > 32 && charCode <= 126) {
+        return true;
+      }
+    }
+    // Returns false otherwise.
+    return false;
   }
 }
