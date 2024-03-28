@@ -18,17 +18,19 @@
 
 from __future__ import annotations
 
+import collections
 import json
 import os
 
 from core import feconf
 from core import utils
+from core.domain import exp_domain
 from core.domain import state_domain
 from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -509,3 +511,91 @@ def create_exploration_voice_artists_link_model_instance(
     exploration_voice_artists_link_model.update_timestamps()
 
     return exploration_voice_artists_link_model
+
+
+def update_exploration_voice_artist_link_model(
+    exploration_id: str,
+    committer_id: str,
+    change_list: Sequence[exp_domain.ExplorationChange]
+) -> None:
+    """Create or update a voice artist link model following modifications to
+    the recorded voiceover property in an exploration's state.
+    """
+
+    voiceover_change_list: List[exp_domain.ExplorationChange] = []
+    for change in change_list:
+        if (
+            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            change.property_name == (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS)
+        ):
+            voiceover_change_list.append(change)
+
+    updated_voiceover_mapping: Dict[str, Dict[
+        str, state_domain.VoiceoverDict]] = {}
+
+    for change in voiceover_change_list:
+        # Here we use cast because this condition forces change to have type
+        # EditExpStatePropertyRecordedVoiceoversCmd.
+        recorded_voiceovers = cast(
+            exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
+            change
+        )
+        voiceover_mapping = recorded_voiceovers.new_value['voiceovers_mapping']
+
+        for content_id, lang_code_to_voiceover in voiceover_mapping.items():
+            if content_id not in updated_voiceover_mapping:
+                updated_voiceover_mapping[content_id] = {}
+
+            for lang_code, voiceover_dict in lang_code_to_voiceover.items():
+                updated_voiceover_mapping[content_id][lang_code] = (
+                    voiceover_dict)
+
+            updated_language_codes = list(
+                updated_voiceover_mapping[content_id].keys())
+
+            # Remove the language codes that were initially added to the change
+            # list but subsequently removed.
+            for lang_code in updated_language_codes:
+                if lang_code not in lang_code_to_voiceover:
+                    del updated_voiceover_mapping[content_id][lang_code]
+
+            if not bool(updated_voiceover_mapping[content_id]):
+                del updated_voiceover_mapping[content_id]
+
+    # If no voiceover-related changes were made during the commit, then there is
+    # no need to update the exploration voice artist link model.
+    if not bool(updated_voiceover_mapping):
+        return
+
+    exp_voice_artist_link_model = (
+        voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+            exploration_id, strict=False))
+    content_id_to_voiceovers_mapping: (
+        voiceover_domain.ContentIdToVoiceoverMappingType) = (
+            collections.defaultdict(dict))
+
+    if exp_voice_artist_link_model is not None:
+        content_id_to_voiceovers_mapping.update(
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping)
+
+    for content_id, lang_code_to_voiceovers in (
+            updated_voiceover_mapping.items()):
+        for lang_code, voiceover_dict in lang_code_to_voiceovers.items():
+            content_id_to_voiceovers_mapping[content_id][lang_code] = (
+                committer_id, voiceover_dict)
+
+    if exp_voice_artist_link_model is None:
+        exp_voice_artist_link_model = (
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id=exploration_id,
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+    else:
+        exp_voice_artist_link_model.content_id_to_voiceovers_mapping = (
+            content_id_to_voiceovers_mapping)
+
+    exp_voice_artist_link_model.update_timestamps()
+    exp_voice_artist_link_model.put()
