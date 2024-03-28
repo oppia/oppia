@@ -165,6 +165,7 @@ import {OppiaVisualizationEnumeratedFrequencyTableComponent} from 'visualization
 import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
 import {CopierComponent} from 'value_generators/templates/copier.component';
 import {PrimaryButtonComponent} from './button-directives/primary-button.component';
+import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -358,6 +359,7 @@ import {DirectivesModule} from 'directives/directives.module';
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
     PrimaryButtonComponent,
+    UndoSnackbarComponent,
   ],
 
   entryComponents: [
@@ -490,6 +492,7 @@ import {DirectivesModule} from 'directives/directives.module';
     RandomSelectorComponent,
     RteHelperModalComponent,
     PrimaryButtonComponent,
+    UndoSnackbarComponent,
   ],
 
   exports: [
@@ -631,6 +634,7 @@ import {DirectivesModule} from 'directives/directives.module';
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
     PrimaryButtonComponent,
+    UndoSnackbarComponent,
   ],
 })
 export class SharedComponentsModule {}

@@ -47,7 +47,7 @@ import {of, Subject} from 'rxjs';
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
-import {UndoSnackbarComponent} from '../custom-snackbar/undo-snackbar.component';
+import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockChangeDetectorRef {

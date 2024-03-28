@@ -52,7 +52,6 @@ import {QuestionOpportunitiesComponent} from './question-opportunities/question-
 import {ContributorDashboardPageComponent} from './contributor-dashboard-page.component';
 import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
 
 @NgModule({
   imports: [
@@ -90,7 +89,6 @@ import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent,
     ContributorBadgesComponent,
-    UndoSnackbarComponent,
   ],
   entryComponents: [
     CertificateDownloadModalComponent,
@@ -110,7 +108,6 @@ import {UndoSnackbarComponent} from './custom-snackbar/undo-snackbar.component';
     ContributionsAndReview,
     QuestionOpportunitiesComponent,
     ContributorDashboardPageComponent,
-    UndoSnackbarComponent,
   ],
   providers: [
     {
