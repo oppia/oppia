@@ -78,7 +78,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForFunction('document.readyState === "complete"');
   }
 
-  async updateCardContents(content: string) {
+  async updateCardContents(content: string): Promise<void> {
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOn(stateEditSelector);
 
@@ -102,13 +102,13 @@ export class ExplorationEditor extends BaseUser {
     });
   }
 
-  async navigateToOppiaResponses() {
+  async navigateToOppiaResponses(): Promise<void> {
     await this.clickOn('.oppia-response-header');
   }
 
-  async oppiaDirectlearnersTo() {}
+  async oppiaDirectlearnersTo(): Promise<void> {}
 
-  async nameTheNewCard() {}
+  async nameTheNewCard(): Promise<void> {}
 
   /**
    * Function to save an exploration draft.
