@@ -486,6 +486,9 @@ URLS = [
         feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
         voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler
     ),
+    get_redirect_route(
+        r'/entity_voiceovers_handler', voiceover.EntityVoiceoversHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
