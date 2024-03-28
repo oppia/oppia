@@ -169,17 +169,38 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_compute_summary(self) -> None:
         topic_summary = topic_services.compute_summary_of_topic(self.topic)
 
-        self.assertEqual(topic_summary.id, self.TOPIC_ID)
-        self.assertEqual(topic_summary.name, 'Name')
-        self.assertEqual(topic_summary.description, 'Description')
+        self.assertEqual(topic_summary.id, self.topic.id)
+        self.assertEqual(topic_summary.name, self.topic.name)
+        self.assertEqual(
+            topic_summary.canonical_name,
+            self.topic.canonical_name
+        )
+        self.assertEqual(topic_summary.url_fragment, self.topic.url_fragment)
+        self.assertEqual(topic_summary.description, self.topic.description)
+        self.assertEqual(topic_summary.language_code, self.topic.language_code)
+        self.assertEqual(topic_summary.version, self.topic.version)
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
         self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.total_published_node_count, 0)
-        self.assertEqual(topic_summary.thumbnail_filename, 'topic.svg')
-        self.assertEqual(topic_summary.thumbnail_bg_color, '#C6DCDA')
+        self.assertEqual(
+            topic_summary.thumbnail_filename,
+            self.topic.thumbnail_filename
+        )
+        self.assertEqual(
+            topic_summary.thumbnail_bg_color,
+            self.topic.thumbnail_bg_color
+        )
+        self.assertEqual(
+            topic_summary.topic_model_created_on,
+            self.topic.created_on
+        )
+        self.assertEqual(
+            topic_summary.topic_model_last_updated,
+            self.topic.last_updated
+        )
 
     def test_compute_summary_when_serial_chapter_launch_disabled(
         self
