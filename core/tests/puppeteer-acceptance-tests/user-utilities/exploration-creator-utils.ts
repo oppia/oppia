@@ -689,7 +689,9 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(discardConfirmButton);
 
     await this.page.waitForNavigation({waitUntil: 'networkidle2'});
-    await this.clickOn(navBarOpener);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(navBarOpener);
+    }
   }
 
   /**
