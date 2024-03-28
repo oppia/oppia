@@ -16,48 +16,13 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
 from core import feconf
-from core.domain import platform_parameter_registry
 from core.domain import question_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import translation_domain
 from core.domain import user_services
 from core.tests import test_utils
-
-
-class DiagnosticTestLandingPageTest(test_utils.GenericTestBase):
-    """Test class for the diagnostic test player page."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.original_parameter_registry = (
-            platform_parameter_registry.Registry.parameter_registry.copy())
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        platform_parameter_registry.Registry.parameter_registry = (
-            self.original_parameter_registry)
-
-    def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
-        self) -> None:
-        self.get_html_response(
-            feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-            expected_status_int=404
-        )
-
-    @test_utils.enable_feature_flags(
-        [feature_flag_list.FeatureNames.DIAGNOSTIC_TEST])
-    def test_should_access_diagnostic_test_page_when_feature_is_enabled(
-        self
-    ) -> None:
-        self.get_html_response(
-            feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-            expected_status_int=200
-        )
 
 
 class DiagnosticTestQuestionsHandlerTest(test_utils.GenericTestBase):
