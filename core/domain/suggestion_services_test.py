@@ -4459,22 +4459,22 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestions[0].status, suggestion_models.STATUS_REJECTED)
 
-    def test_remove_exp_from_story_rejects_translation_suggestion(self) -> None:
+    def test_swap_exp_from_story_rejects_translation_suggestion(self) -> None:
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id)
         self.assert_created_suggestion_is_valid(self.EXP_ID, self.author_id)
 
-        # Removes the exploration from the story.
+        # Swaps the exploration from the story.
         story_services.update_story(
             self.owner_id, self.STORY_ID, [story_domain.StoryChange({
                 'cmd': 'update_story_node_property',
                 'property_name': 'exploration_id',
                 'node_id': 'node_1',
                 'old_value': self.EXP_ID,
-                'new_value': None
-            })], 'Removed exploration.')
+                'new_value': 'another_exp_id'
+            })], 'Changed exploration.')
 
-        # Suggestion should be rejected after exploration is removed from the
+        # Suggestion should be rejected after exploration is swapped in the
         # story.
         suggestions = suggestion_services.query_suggestions(
             [('author_id', self.author_id), ('target_id', self.EXP_ID)])

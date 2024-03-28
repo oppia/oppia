@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the contributor dashboard page."""
+"""Controllers for the contributor dashboard admin page."""
 
 from __future__ import annotations
 import datetime
