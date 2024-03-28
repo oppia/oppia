@@ -58,6 +58,13 @@ export const ObjectsDomainConstants = {
       front_units: [],
       base_unit: '0.01 rupee',
     },
+  } as {
+    [key: string]: {
+      name: string;
+      aliases: string[];
+      front_units: string[];
+      base_unit: string | null;
+    };
   },
 
   RATIO_PARSING_ERROR_I18N_KEYS: {
@@ -68,4 +75,215 @@ export const ObjectsDomainConstants = {
     INCLUDES_ZERO: 'I18N_INTERACTIONS_RATIO_INCLUDES_ZERO',
     EMPTY_STRING: 'I18N_INTERACTIONS_RATIO_EMPTY_STRING',
   },
+
+  // Used for converting units to their canonical forms.
+  // Keys represent unit name, and values are their canonical forms.
+  // Example: 'm' and 'meter' both map to 'm' (meters)
+  UNIT_TO_NORMALIZED_UNIT_MAPPING: {
+    // Length.
+    m: 'm',
+    meter: 'm',
+    in: 'in',
+    inch: 'in',
+    ft: 'ft',
+    foot: 'ft',
+    yd: 'yd',
+    yard: 'yd',
+    mi: 'mi',
+    mile: 'mi',
+    li: 'link',
+    link: 'li',
+    rd: 'rd',
+    rod: 'rd',
+    ch: 'ch',
+    chain: 'ch',
+    angstrom: 'angstrom',
+    mil: 'mil',
+    km: 'km',
+
+    // Surface area.
+    m2: 'm2',
+    sqin: 'sqin',
+    sqft: 'sqft',
+    sqyd: 'sqyd',
+    sqmi: 'sqmi',
+    sqrd: 'sqrd',
+    sqch: 'sqch',
+    sqmil: 'sqmil',
+    acre: 'acre',
+    hectare: 'hectare',
+
+    // Volume.
+    m3: 'm3',
+    litre: 'l',
+    L: 'l',
+    l: 'l',
+    lt: 'l',
+    cc: 'cc',
+    cuin: 'cuin',
+    cuft: 'cuft',
+    cuyd: 'cuyd',
+    teaspoon: 'teaspoon',
+    tablespoon: 'tablespoon',
+
+    // Angles.
+    rad: 'rad',
+    radian: 'rad',
+    deg: 'deg',
+    degree: 'deg',
+    grad: 'grad',
+    gradian: 'grad',
+    cycle: 'cycle',
+    arcsec: 'arcsec',
+    arcmin: 'arcmin',
+
+    // Time.
+    second: 's',
+    seconds: 's',
+    s: 's',
+    secs: 's',
+    minute: 'min',
+    minutes: 'min',
+    min: 'min',
+    mins: 'min',
+    hr: 'hr',
+    hrs: 'hr',
+    hour: 'hr',
+    hours: 'hr',
+    day: 'day',
+    days: 'day',
+    week: 'week',
+    weeks: 'week',
+    month: 'month',
+    months: 'month',
+    year: 'year',
+    years: 'year',
+    decade: 'decade',
+    decades: 'decade',
+    century: 'century',
+    centuries: 'century',
+    millennium: 'millennium',
+    millennia: 'millennium',
+
+    // Frequency.
+    Hz: 'Hz',
+
+    // Mass.
+    kg: 'kg',
+    kilogram: 'kg',
+    g: 'g',
+    gram: 'g',
+    tonne: 'tonne',
+    ton: 'ton',
+    gr: 'gr',
+    grain: 'gr',
+    dr: 'dr',
+    dram: 'dr',
+    oz: 'oz',
+    ounce: 'oz',
+    lbm: 'lb',
+    lb: 'lb',
+    lbs: 'lb',
+    poundmass: 'lb',
+    cwt: 'cwt',
+    hundredweight: 'cwt',
+    stick: 'stick',
+    stone: 'stone',
+
+    // Temperature.
+    K: 'K',
+    kelvin: 'K',
+    degC: 'degC',
+    celsius: 'degC',
+    degF: 'degF',
+    fahrenheit: 'degF',
+    degR: 'degR',
+    rankine: 'degR',
+
+    // Amount of substance.
+    mol: 'mol',
+    mole: 'mol',
+
+    // Luminous intensity.
+    cd: 'cd',
+    candela: 'cd',
+
+    // Force.
+    N: 'N',
+    newton: 'N',
+    dyn: 'dyn',
+    dyne: 'dyn',
+    lbf: 'lbf',
+    poundforce: 'lbf',
+    kip: 'kip',
+
+    // Energy.
+    J: 'J',
+    joule: 'J',
+    erg: 'erg',
+    Wh: 'Wh',
+    BTU: 'BTU',
+    eV: 'eV',
+    electronvolt: 'eV',
+
+    // Power.
+    W: 'W',
+    watt: 'W',
+    hp: 'hp',
+
+    // Pressure.
+    Pa: 'Pa',
+    psi: 'psi',
+    atm: 'atm',
+    torr: 'torr',
+    bar: 'bar',
+    mmHg: 'mmHg',
+    mmH2O: 'mmH2O',
+    cmH2O: 'cmH2O',
+
+    // Electricity and magnetism.
+    A: 'A',
+    ampere: 'A',
+    V: 'V',
+    volt: 'V',
+    C: 'C',
+    coulomb: 'C',
+    ohm: 'ohm',
+    F: 'F',
+    farad: 'farad',
+    Wb: 'Wb',
+    weber: 'Wb',
+    T: 'T',
+    tesla: 'T',
+    H: 'H',
+    henry: 'H',
+    S: 'S',
+    siemens: 'S',
+
+    // Binary.
+    b: 'b',
+    bit: 'bit',
+    B: 'B',
+    byte: 'B',
+
+    // Currency.
+    $: 'dollar',
+    USD: 'dollar',
+    dollar: 'dollar',
+    dollars: 'dollar',
+    Dollar: 'dollar',
+    Dollars: 'dollar',
+    '₹': 'Rs',
+    Rs: 'Rs',
+    Rupee: 'Rs',
+    Rupees: 'Rs',
+    rupee: 'Rs',
+    rupees: 'Rs',
+    Cent: 'Cent',
+    Cents: 'Cent',
+    cent: 'Cent',
+    cents: 'Cent',
+    Paisa: 'Paisa',
+    paise: 'Paisa',
+  } as {[key: string]: string},
 } as const;
