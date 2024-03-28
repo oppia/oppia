@@ -17,10 +17,7 @@
         </div>
       </div>
     </form>
-    <div *ngIf="disableSaveButtonForLinkRte()" class="link-error-message">
-      It seems like clicking on this link will lead the user to a different URL
-      than the text specifies. Please change the text.
-    </div>
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
   </div>
 
   <div class="modal-footer">
@@ -37,29 +34,13 @@
             Cancel
     </button>
 
-    <button *ngIf="!currentRteIsMathExpressionEditor && !currentRteIsLinkEditor"
-            type="button"
+    <button type="button"
             class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
             (click)="save()"
-            [disabled]="!customizationArgsForm.valid">
+            [disabled]="!customizationArgsForm.valid || isErrorMessageNonempty()">
             Done
     </button>
 
-    <button *ngIf="currentRteIsLinkEditor"
-            type="button"
-            class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-            (click)="save()"
-            [disabled]="!customizationArgsForm.valid || disableSaveButtonForLinkRte()">
-            Done
-    </button>
-
-    <button *ngIf="currentRteIsMathExpressionEditor"
-            type="button"
-            class="btn btn-success e2e-test-close-rich-text-component-editor oppia-save-btn"
-            (click)="save()"
-            [disabled]="!customizationArgsForm.valid || disableSaveButtonForMathRte()">
-            Done
-    </button>
   </div>
 </div>
 <style>
@@ -71,7 +52,7 @@
     .oppia-customization-arg-editor-inner {
     margin-top: 15px;
   }
-  .oppia-customization-arg-form-container .link-error-message {
+  .oppia-customization-arg-form-container .error-message {
     color: #f00;
     display: block;
     font-size: 0.8em;
