@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2021 The Oppia Authors. All Rights Reserved.
+# Copyright 2024 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ if MYPY:  # pragma: no cover
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
 # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
 # ignore here.
-class DeleteDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type: ignore[misc]
+class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type: ignore[misc]
     """Transform that gets all edit state content suggestion models."""
 
     def expand(
@@ -64,7 +64,7 @@ class DeleteDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type:
                 ))
         )
 
-        suggestion_edit_state_content_model_to_delete_result = (
+        suggestion_edit_state_content_model_to_delete_count = (
             suggestion_edit_state_content_model_to_delete
             | 'Count edit state content suggestion to be deleted' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
@@ -73,7 +73,7 @@ class DeleteDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type:
 
         return (
                 suggestion_edit_state_content_model_to_delete,
-                suggestion_edit_state_content_model_to_delete_result,
+                suggestion_edit_state_content_model_to_delete_count,
         )
 
 
@@ -88,7 +88,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
         suggestion_edit_state_content_model_to_delete_result)) = (
             self.pipeline
             | 'Get edit state content suggestion models' >> (
-                DeleteDeprecatedSuggestionEditStateContentModels())
+                GetDeprecatedSuggestionEditStateContentModels())
         )
 
         unused_models_deletion = (
@@ -113,11 +113,11 @@ class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
 
-        job_run_results = (
+        job_run_result = (
             self.pipeline
             | 'Perform fetching and deletion of edit state content' +
                 ' suggestion results' >> (
-                DeleteDeprecatedSuggestionEditStateContentModels())
+                GetDeprecatedSuggestionEditStateContentModels())
         )[1]
 
-        return job_run_results
+        return job_run_result
