@@ -2919,6 +2919,43 @@ class DisallowedImportsChecker(checkers.BaseChecker):  # type: ignore[misc]
                 self.add_message('disallowed-text-import', node=node)
 
 
+# TODO(#16567): Here we use MyPy ignore because of the incomplete typing of
+# pylint library and absences of stubs in pylint, forces MyPy to
+# assume that BaseChecker class has attributes of type Any.
+# Thus to avoid MyPy's error
+# (Class cannot subclass 'BaseChecker' (has type 'Any')),
+# we added an ignore here.
+class PreventStringConcatenationChecker(checkers.BaseChecker): # type: ignore[misc]
+    """Checks for string concactenation and encourage string interpolation."""
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'prefer-string-interpolation'
+    priority = -1
+    msgs = {
+        'C0042': (
+            'Please use string interpolation over string concatenation',
+            'prefer-string-interpolation',
+            'Used when string concatenation is detected.',
+        ),
+    }
+
+    def visit_binop(self, node: astroid.BinOp) -> None:
+        """Visits a binary operation node in the AST
+        then checks if it's a string concatenation operation.
+
+        Args: node: astroid.BinOp The binary operation node to check.
+        """
+
+        if isinstance(node, astroid.BinOp) and node.op == '+':
+            left_inferred = next(node.left.infer())
+            right_inferred = next(node.right.infer())
+
+            if (isinstance(left_inferred.value, str) and
+                isinstance(right_inferred.value, str)):
+                self.add_message('prefer-string-interpolation', node=node)
+
+
 def register(linter: lint.PyLinter) -> None:
     """Registers the checker with pylint.
 
@@ -2943,3 +2980,4 @@ def register(linter: lint.PyLinter) -> None:
     linter.register_checker(DisallowedFunctionsChecker(linter))
     linter.register_checker(DisallowHandlerWithoutSchema(linter))
     linter.register_checker(DisallowedImportsChecker(linter))
+    linter.register_checker(PreventStringConcatenationChecker(linter))
