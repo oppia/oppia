@@ -113,11 +113,11 @@ class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
 
-        job_run_result = (
+        job_run_results = (
             self.pipeline
             | 'Perform fetching and deletion of edit state content' +
                 ' suggestion results' >> (
                 GetDeprecatedSuggestionEditStateContentModels())
         )[1]
 
-        return job_run_result
+        return job_run_results

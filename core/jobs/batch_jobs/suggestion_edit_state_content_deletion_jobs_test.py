@@ -39,11 +39,11 @@ if MYPY: # pragma: no cover
 class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     job_test_utils.JobTestBase):
 
-    deletion_jobs = suggestion_edit_state_content_deletion_jobs
+    jobs = suggestion_edit_state_content_deletion_jobs
 
     JOB_CLASS: Type[
-        deletion_jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
-    ] = deletion_jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
+        jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
+    ] = jobs.DeleteDeprecatedSuggestionEditStateContentModelsJob
 
     def create_suggestion(
             self,
@@ -52,9 +52,26 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             target_id: str,
             author_id: str,
             final_reviewer_id: str,
-            language_code: str
+            language_code: None | str
             ) -> suggestion_models.GeneralSuggestionModel:
-            
+        """creates new suggestion.
+
+        Args:
+            suggestion_type: str. Type of the suggestion that is being
+                created.
+            target_type: str. Type of traget entity for which the suggestion
+                is being created.
+            target_id: str. The ID of the target entity.
+            author_id: str. The ID of user who creates the suggestion.
+            final_reviewer_id: str. The user ID of the reviewer.
+            language_code: None | str. Code of the language in which the
+                suggestion is created.
+
+        Returns:
+            GeneralSuggestionModel. Returns newly created
+            GeneralSuggestionModel.
+        """
+
         return self.create_model(
             suggestion_models.GeneralSuggestionModel,
             suggestion_type=suggestion_type,
@@ -70,46 +87,49 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
             language_code=language_code
         )
-        
 
     def setUp(self) -> None:
         super().setUp()
 
-        self.suggestion_1_model = self.create_suggestion(
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'target_1',
-            'author_1',
-            'reviewer_1',
-            None
-        )
+        self.suggestion_1_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_1',
+                'author_1',
+                'reviewer_1',
+                None
+            ))
 
-        self.suggestion_2_model = self.create_suggestion(
-            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'target_2',
-            'author_2',
-            'reviewer_2',
-            None
-        )
+        self.suggestion_2_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_2',
+                'author_2',
+                'reviewer_2',
+                None
+            ))
 
-        self.suggestion_3_model = self.create_suggestion(
-            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'target_3',
-            'author_3',
-            'reviewer_3',
-            'hi'
-        )
+        self.suggestion_3_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_3',
+                'author_3',
+                'reviewer_3',
+                'hi'
+            ))
 
-        self.suggestion_4_model = self.create_suggestion(
-            feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            feconf.ENTITY_TYPE_EXPLORATION,
-            'target_4',
-            'author_4',
-            'reviewer_4',
-            'en'
-        )
+        self.suggestion_4_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_4',
+                'author_4',
+                'reviewer_4',
+                'en'
+            ))
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
         self.suggestion_1_model.update_timestamps()
@@ -143,80 +163,97 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
 class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     job_test_utils.JobTestBase):
 
-    deletion_jobs = suggestion_edit_state_content_deletion_jobs
+    jobs = suggestion_edit_state_content_deletion_jobs
 
     JOB_CLASS: Type[
-        deletion_jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
-    ] = deletion_jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
+        jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
+    ] = jobs.AuditDeprecatedSuggestionEditStateContentModelsDeletionJob
+
+    def create_suggestion(
+            self,
+            suggestion_type: str,
+            target_type: str,
+            target_id: str,
+            author_id: str,
+            final_reviewer_id: str,
+            language_code: None | str
+            ) -> suggestion_models.GeneralSuggestionModel:
+        """creates new suggestion.
+
+        Args:
+            suggestion_type: str. Type of the suggestion that is being
+                created.
+            target_type: str. Type of traget entity for which the suggestion
+                is being created.
+            target_id: str. The ID of the target entity.
+            author_id: str. The ID of user who creates the suggestion.
+            final_reviewer_id: str. The user ID of the reviewer.
+            language_code: None | str. Code of the language in which the
+                suggestion is created.
+
+        Returns:
+            GeneralSuggestionModel. Returns newly created
+            GeneralSuggestionModel.
+            """
+
+        return self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=suggestion_type,
+            target_type=target_type,
+            target_id=target_id,
+            target_version_at_submission=1,
+            status='accepted',
+            author_id=author_id,
+            final_reviewer_id=final_reviewer_id,
+            change_cmd={},
+            score_category=(
+                suggestion_models.SCORE_TYPE_TRANSLATION +
+                suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
+            language_code=language_code
+        )
 
     def setUp(self) -> None:
         super().setUp()
 
-        self.suggestion_1_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id='target_1',
-            target_version_at_submission=1,
-            status='accepted',
-            author_id='author_1',
-            final_reviewer_id='reviewer_1',
-            change_cmd={},
-            score_category=(
-                suggestion_models.SCORE_TYPE_TRANSLATION +
-                suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code=None
-        )
+        self.suggestion_1_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_1',
+                'author_1',
+                'reviewer_1',
+                None
+            ))
 
-        self.suggestion_2_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id='target_2',
-            target_version_at_submission=1,
-            status='accepted',
-            author_id='author_2',
-            final_reviewer_id='reviewer_2',
-            change_cmd={},
-            score_category=(
-                suggestion_models.SCORE_TYPE_TRANSLATION +
-                suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code=None
-        )
+        self.suggestion_2_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_2',
+                'author_2',
+                'reviewer_2',
+                None
+            ))
 
-        self.suggestion_3_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id='target_3',
-            target_version_at_submission=1,
-            status='accepted',
-            author_id='author_3',
-            final_reviewer_id='reviewer_3',
-            change_cmd={},
-            score_category=(
-                suggestion_models.SCORE_TYPE_TRANSLATION +
-                suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code='hi',
-            edited_by_reviewer=False
-        )
+        self.suggestion_3_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_3',
+                'author_3',
+                'reviewer_3',
+                'hi'
+            ))
 
-        self.suggestion_4_model = self.create_model(
-            suggestion_models.GeneralSuggestionModel,
-            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id='target_4',
-            target_version_at_submission=1,
-            status='accepted',
-            author_id='author_4',
-            final_reviewer_id='reviewer_4',
-            change_cmd={},
-            score_category=(
-                suggestion_models.SCORE_TYPE_TRANSLATION +
-                suggestion_models.SCORE_CATEGORY_DELIMITER + 'English'),
-            language_code='en',
-            edited_by_reviewer=False
-        )
+        self.suggestion_4_model: suggestion_models.GeneralSuggestionModel = (
+            self.create_suggestion(
+                feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                'target_4',
+                'author_4',
+                'reviewer_4',
+                'en'
+            ))
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
         self.suggestion_1_model.update_timestamps()
