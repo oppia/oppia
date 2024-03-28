@@ -524,8 +524,11 @@ def update_exploration_voice_artist_link_model(
 
     voiceover_change_list: List[exp_domain.ExplorationChange] = []
     for change in change_list:
-        if (change.property_name ==
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+        if (
+            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            change.property_name == (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS)
+        ):
             voiceover_change_list.append(change)
 
     updated_voiceover_mapping: Dict[str, Dict[
