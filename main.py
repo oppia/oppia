@@ -470,16 +470,21 @@ URLS = [
         classroom.ClassroomIdHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.VOICEOVER_ADMIN_PAGE_URL,
-        voiceover.VoiceoverAdminPage
-    ),
-    get_redirect_route(
         r'%s' % feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL,
         voiceover.VoiceoverAdminDataHandler
     ),
     get_redirect_route(
         r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
         voiceover.VoiceoverLanguageCodesMappingHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
+        voiceover.VoiceArtistMetadataHandler
+    ),
+    get_redirect_route(
+        r'%s/<voice_artist_id>/<language_code>' %
+        feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
+        voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler
     ),
 
     get_redirect_route(

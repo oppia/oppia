@@ -582,7 +582,6 @@
 /scripts/release_scripts/ @oppia/release-workflow-reviewers
 /assets/release_constants.json @oppia/release-workflow-reviewers
 
-
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts @oppia/lace-frontend-reviewers
