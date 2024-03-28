@@ -168,24 +168,6 @@ const Reporter: jasmine.CustomReporter = {
     specCount++;
     const seconds = result?.duration ? result.duration / 1000 : 0;
 
-    try {
-      ConsoleReporter.reportConsoleErrors();
-    } catch (error) {
-      // Here we catch the error and add it to the failed expectations.
-      // We do not set any of the stack or actual/expected values as they
-      // are not relevant since the error message is just showing the console
-      // errors that were found during the test.
-      result.failedExpectations.push({
-        message: error,
-        stack: '',
-        actual: '',
-        expected: '',
-        matcherName: '',
-        passed: false,
-      });
-      result.status = 'failed';
-    }
-
     switch (result.status) {
       case 'pending':
         pendingSpecs.push(result);
@@ -283,3 +265,7 @@ const Reporter: jasmine.CustomReporter = {
 
 jasmine.getEnv().clearReporters();
 jasmine.getEnv().addReporter(Reporter);
+// Here we report console errors after each test suite.
+afterEach(() => {
+  ConsoleReporter.reportConsoleErrors();
+});
