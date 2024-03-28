@@ -75,6 +75,7 @@ describe('Voiceover upload features', function () {
 
   it('should upload an audio file', async function () {
     await explorationEditorTranslationTab.openUploadAudioModal();
+    await browser.pause(10000);
     await explorationEditorTranslationTab.uploadAudio('../data/cafe.mp3');
 
     var playClick =
@@ -97,6 +98,7 @@ describe('Voiceover upload features', function () {
 
   it('should not let upload a five minutes longer audio', async function () {
     await explorationEditorTranslationTab.openUploadAudioModal();
+    await browser.pause(10000);
     await explorationEditorTranslationTab.expectAudioOverFiveMinutes(
       '../data/cafe-over-five-minutes.mp3'
     );
