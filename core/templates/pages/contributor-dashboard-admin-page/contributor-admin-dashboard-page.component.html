@@ -20,8 +20,8 @@
             {{ translationReviewersCount ? translationReviewersCount : 0 }}
           </h2>
         </div>
-        <div class="question-reviewer stats-card" [attr.aria-label]="'Question Reviewer '" tabindex="0" *ngIf="isQuestionCoordinator">
-          <p class="stat-description">Question Reviewers</p>
+        <div class="question-reviewer stats-card" [attr.aria-label]="'Practice Question Reviewer '" tabindex="0" *ngIf="isQuestionCoordinator">
+          <p class="stat-description">Practice Question Reviewers</p>
           <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
             {{questionReviewersCount}}
           </h2>

@@ -167,12 +167,17 @@ export class ContributorDashboardAdminStatsBackendApiService {
           PageConstants.COMMUNITY_CONTRIBUTION_STATS_URL
         )
         .toPromise()
-        .then(response => {
-          resolve({
-            translation_reviewers_count: response.translation_reviewers_count,
-            question_reviewers_count: response.question_reviewers_count,
-          });
-        });
+        .then(
+          response => {
+            resolve({
+              translation_reviewers_count: response.translation_reviewers_count,
+              question_reviewers_count: response.question_reviewers_count,
+            });
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
     });
   }
 

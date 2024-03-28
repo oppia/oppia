@@ -265,7 +265,7 @@ describe('Contributor dashboard admin backend api service', () => {
         language_code: languageCode,
       };
       cdabas
-        .removeContributionReviewerAsync(username, category, languageCode)
+        .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
       const query = new URLSearchParams(payload);
@@ -293,7 +293,7 @@ describe('Contributor dashboard admin backend api service', () => {
         language_code: languageCode,
       };
       cdabas
-        .removeContributionReviewerAsync(username, category, languageCode)
+        .removeContributionReviewerAsync(category, username, languageCode)
         .then(successHandler, failHandler);
 
       const query = new URLSearchParams(payload);
@@ -330,7 +330,7 @@ describe('Contributor dashboard admin backend api service', () => {
         username: username,
       };
       cdabas
-        .removeContributionReviewerAsync(username, category, null)
+        .removeContributionReviewerAsync(category, username, null)
         .then(successHandler, failHandler);
 
       const query = new URLSearchParams(payload);
@@ -413,6 +413,123 @@ describe('Contributor dashboard admin backend api service', () => {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(errorMessage);
+    })
+  );
+
+  it(
+    'should add question reviewer rights given the username ' +
+      'when calling updateQuestionRightsAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+      cdabas
+        .updateQuestionRightsAsync(username, true, true, true, false)
+        .then(successHandler, failHandler);
+
+      const url = '/contributionrightshandler/' + 'question';
+      const req = httpTestingController.expectOne(url);
+      expect(req.request.method).toEqual('POST');
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should remove question reviewer rights given the username ' +
+      'when calling updateQuestionRightsAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+      let payload = {
+        username: username,
+      };
+      cdabas
+        .updateQuestionRightsAsync(username, true, false, true, true)
+        .then(successHandler, failHandler);
+      const query = new URLSearchParams(payload);
+      const url =
+        '/contributionrightshandler/' + 'question' + '?' + query.toString();
+      const req = httpTestingController.expectOne(url);
+      expect(req.request.method).toEqual('DELETE');
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should add question submitter rights given the username ' +
+      'when calling updateQuestionRightsAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+      cdabas
+        .updateQuestionRightsAsync(username, true, true, false, true)
+        .then(successHandler, failHandler);
+
+      const url = '/contributionrightshandler/' + 'submit_question';
+      const req = httpTestingController.expectOne(url);
+      expect(req.request.method).toEqual('POST');
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should remove question submitter rights given the username ' +
+      'when calling updateQuestionRightsAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+      let payload = {
+        username: username,
+      };
+      cdabas
+        .updateQuestionRightsAsync(username, false, true, true, true)
+        .then(successHandler, failHandler);
+      const query = new URLSearchParams(payload);
+      const url =
+        '/contributionrightshandler/' +
+        'submit_question' +
+        '?' +
+        query.toString();
+      const req = httpTestingController.expectOne(url);
+      expect(req.request.method).toEqual('DELETE');
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should add question submitter and reviewer rights given the username ' +
+      'when calling updateQuestionRightsAsync',
+    fakeAsync(() => {
+      let username = 'validUser';
+      cdabas
+        .updateQuestionRightsAsync(username, true, true, false, false)
+        .then(successHandler, failHandler);
+
+      const url = '/contributionrightshandler/' + 'submit_question';
+      const req = httpTestingController.expectOne(url);
+      expect(req.request.method).toEqual('POST');
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+      const urlTwo = '/contributionrightshandler/' + 'question';
+      const reqTwo = httpTestingController.expectOne(urlTwo);
+      expect(reqTwo.request.method).toEqual('POST');
+      reqTwo.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+      httpTestingController.verify();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
     })
   );
 });

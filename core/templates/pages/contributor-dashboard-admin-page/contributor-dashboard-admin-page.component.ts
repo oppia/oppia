@@ -366,8 +366,8 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
 
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        formResponse.username,
         formResponse.category,
+        formResponse.username,
         formResponse.languageCode
       )
       .then(

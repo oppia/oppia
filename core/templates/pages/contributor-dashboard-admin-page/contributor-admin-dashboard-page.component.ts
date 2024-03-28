@@ -41,6 +41,7 @@ import {UsernameInputModal} from './username-input-modal/username-input-modal.co
 import {CdAdminQuestionRoleEditorModal} from './question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from './translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import isEqual from 'lodash/isEqual';
+import {AlertsService} from 'services/alerts.service';
 
 export interface LanguageChoice {
   id: string;
@@ -113,7 +114,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     private contributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
     private userService: UserService,
     private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private alertsService: AlertsService
   ) {}
 
   ngOnInit(): void {
@@ -121,80 +123,87 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.activeTab = this.TAB_NAME_TRANSLATION_SUBMITTER;
     this.contributorDashboardAdminStatsBackendApiService
       .fetchCommunityStats()
-      .then(response => {
-        this.translationReviewersCountByLanguage =
-          response.translation_reviewers_count;
-        this.questionReviewersCount = response.question_reviewers_count;
+      .then(
+        response => {
+          this.translationReviewersCountByLanguage =
+            response.translation_reviewers_count;
+          this.questionReviewersCount = response.question_reviewers_count;
 
-        this.languageChoices = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
-          languageItem => {
-            return {
-              id: languageItem.id,
-              language: this.putEnglishLanguageNameAtFront(
-                languageItem.description
-              ),
-            };
-          }
-        );
+          this.languageChoices = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
+            languageItem => {
+              return {
+                id: languageItem.id,
+                language: this.putEnglishLanguageNameAtFront(
+                  languageItem.description
+                ),
+              };
+            }
+          );
 
-        this.selectedLastActivity = 0;
+          this.selectedLastActivity = 0;
 
-        this.userService.getUserInfoAsync().then(userInfo => {
-          const username = userInfo.getUsername();
+          this.userService.getUserInfoAsync().then(userInfo => {
+            const username = userInfo.getUsername();
 
-          if (username === null) {
-            return;
-          }
-          this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
-          this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+            if (username === null) {
+              return;
+            }
+            this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+            this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
 
-          if (this.isTranslationCoordinator) {
-            this.CONTRIBUTION_TYPES.push(
-              this.TAB_NAME_TRANSLATION_SUBMITTER,
-              this.TAB_NAME_TRANSLATION_REVIEWER
-            );
+            if (this.isTranslationCoordinator) {
+              this.CONTRIBUTION_TYPES.push(
+                this.TAB_NAME_TRANSLATION_SUBMITTER,
+                this.TAB_NAME_TRANSLATION_REVIEWER
+              );
+
+              this.contributorDashboardAdminStatsBackendApiService
+                .fetchAssignedLanguageIds(username)
+                .then(response => {
+                  this.languageChoices = this.languageChoices.filter(
+                    languageItem => response.includes(languageItem.id)
+                  );
+                  this.selectedLanguage = this.languageChoices[0];
+                  if (!this.selectedLanguage) {
+                    throw new Error('No languages are assigned to user.');
+                  }
+                  this.translationReviewersCount =
+                    this.translationReviewersCountByLanguage[
+                      this.selectedLanguage.id
+                    ];
+                });
+            }
+            if (this.isQuestionCoordinator) {
+              this.CONTRIBUTION_TYPES.push(
+                this.TAB_NAME_QUESTION_SUBMITTER,
+                this.TAB_NAME_QUESTION_REVIEWER
+              );
+            }
+
+            this.createFilter();
+
+            this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
+
+            this.loadingMessage = '';
+            this.changeDetectorRef.detectChanges();
+            this.lastActivity = [0, 7, 30, 90];
 
             this.contributorDashboardAdminStatsBackendApiService
-              .fetchAssignedLanguageIds(username)
+              .fetchTopicChoices()
               .then(response => {
-                this.languageChoices = this.languageChoices.filter(
-                  languageItem => response.includes(languageItem.id)
-                );
-                this.selectedLanguage = this.languageChoices[0];
-                if (!this.selectedLanguage) {
-                  throw new Error('No languages are assigned to user.');
-                }
-                this.translationReviewersCount =
-                  this.translationReviewersCountByLanguage[
-                    this.selectedLanguage.id
-                  ];
+                this.topics = this.filterTopicChoices(response.flat());
+                this.allTopicNames = this.topics.map(topic => topic.topic);
+                this.applyTopicFilter();
+                this.topicsAreFetched = 'true';
               });
-          }
-          if (this.isQuestionCoordinator) {
-            this.CONTRIBUTION_TYPES.push(
-              this.TAB_NAME_QUESTION_SUBMITTER,
-              this.TAB_NAME_QUESTION_REVIEWER
-            );
-          }
-
-          this.createFilter();
-
-          this.updateSelectedContributionType(this.CONTRIBUTION_TYPES[0]);
-
-          this.loadingMessage = '';
-          this.changeDetectorRef.detectChanges();
-          this.lastActivity = [0, 7, 30, 90];
-
-          this.contributorDashboardAdminStatsBackendApiService
-            .fetchTopicChoices()
-            .then(response => {
-              this.topics = this.filterTopicChoices(response.flat());
-              this.allTopicNames = this.topics.map(topic => topic.topic);
-              this.applyTopicFilter();
-              this.topicsAreFetched = 'true';
-            });
-        });
-      });
+          });
+        },
+        errorMessage => {
+          this.alertsService.addWarning(
+            errorMessage || 'Failed to fetch contributor stats.'
+          );
+        }
+      );
   }
 
   filterTopicChoices(topic: TopicChoice[]): TopicChoice[] {
@@ -318,36 +327,13 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
         };
         modelRef.result.then(
           results => {
-            if (results.isQuestionSubmitter !== response.can_submit_questions) {
-              if (results.isQuestionSubmitter) {
-                this.contributorDashboardAdminBackendApiService.addContributionReviewerAsync(
-                  AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-                  username,
-                  null
-                );
-              } else {
-                this.contributorDashboardAdminBackendApiService.removeContributionReviewerAsync(
-                  username,
-                  AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-                  null
-                );
-              }
-            }
-            if (results.isQuestionReviewer !== response.can_review_questions) {
-              if (results.isQuestionReviewer) {
-                this.contributorDashboardAdminBackendApiService.addContributionReviewerAsync(
-                  AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                  username,
-                  null
-                );
-              } else {
-                this.contributorDashboardAdminBackendApiService.removeContributionReviewerAsync(
-                  username,
-                  AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                  null
-                );
-              }
-            }
+            this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
+              username,
+              results.isQuestionSubmitter,
+              results.isQuestionReviewer,
+              response.can_submit_questions,
+              response.can_review_questions
+            );
           },
           () => {
             // Note to developers:
