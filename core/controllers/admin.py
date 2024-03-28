@@ -2294,9 +2294,9 @@ class InteractionsByExplorationIdHandler(
             raise self.InvalidInputException('Exploration does not exist.')
 
         interaction_ids = [
-            {'id': state.interaction.id}
+            state.interaction.id
             for state in exploration.states.values()
             if state.interaction.id is not None
         ]
 
-        self.render_json({'interactions': list(interaction_ids)})
+        self.render_json({'interaction_ids': interaction_ids})
