@@ -118,6 +118,24 @@ var ReleaseCoordinatorPage = function () {
     return null;
   };
 
+  // Remove this method after the enable_voiceover_contribution feature flag
+  // is deprecated.
+  this.getVoiceoverContributionFeatureElement = async function () {
+    var featureFlagElements = await featureFlagElementsSelector();
+    var count = featureFlagElements.length;
+    for (let i = 0; i < count; i++) {
+      var elem = featureFlagElements[i];
+      if (
+        (await elem.$(featureNameLocator).getText()) ===
+        'enable_voiceover_contribution'
+      ) {
+        return elem;
+      }
+    }
+
+    return null;
+  };
+
   // TODO(#18881): Remove this method after the cd_admin_dashboard_new_ui
   // feature flag is deprecated.
   this.getCdAdminDashboardNewUiFeatureElement = async function () {
