@@ -32,6 +32,7 @@ export default {
     Contact: 'http://localhost:8181/contact',
     ContributorDashboardAdmin:
       'http://localhost:8181/contributor-admin-dashboard',
+    LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     CreatorDashboardCreateMode:
       'http://localhost:8181/creator-dashboard?mode=create',
