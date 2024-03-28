@@ -3967,6 +3967,8 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.FIRST_CONTRIBUTION_DATE).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
         }
@@ -4055,6 +4057,8 @@ class TranslationReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.FIRST_CONTRIBUTION_DATE).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
         }
@@ -4142,6 +4146,8 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.FIRST_CONTRIBUTION_DATE).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
         }
@@ -4221,6 +4227,8 @@ class QuestionReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.FIRST_CONTRIBUTION_DATE).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
         }

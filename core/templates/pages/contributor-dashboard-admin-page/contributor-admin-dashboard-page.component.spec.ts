@@ -327,14 +327,6 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.languageDropdownShown).toBeTrue();
     });
 
-    it('should open last activity dropdown', fakeAsync(() => {
-      expect(component.activityDropdownShown).toBeFalse();
-
-      component.toggleActivityDropdown();
-
-      expect(component.activityDropdownShown).toBeTrue();
-    }));
-
     it('should select language from dropdown', fakeAsync(() => {
       component.ngOnInit();
       tick();
@@ -350,18 +342,151 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.selectedLanguage.id).toBe(nonDefaultLanguage.id);
     }));
 
-    it('should select last activity from dropdown', fakeAsync(() => {
+    it('should set default first activity at 0 days', fakeAsync(() => {
       component.ngOnInit();
       tick();
       fixture.detectChanges();
 
-      let lastActivityDays = 7;
-      component.selectLastActivity(lastActivityDays);
-      expect(component.selectedLastActivity).toEqual(lastActivityDays);
-      lastActivityDays = 0;
-      component.selectLastActivity(lastActivityDays);
-      expect(component.selectedLastActivity).toEqual(lastActivityDays);
+      expect(component.selectedFirstActivityInDays).toEqual(0);
     }));
+
+    it(
+      'should update first activity in days via dateChange' + 'event',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        const newDate: Date = new Date(
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 7
+        );
+        component.changeFirstActivity(newDate);
+        expect(component.selectedFirstActivityInDays).toEqual(7);
+      })
+    );
+
+    it(
+      'should update first activity in days when selected first' +
+        'date is valid',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        component.selectedFirstActivity = new Date(
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 7
+        );
+        component.selectFirstActivity();
+        expect(component.selectedFirstActivityInDays).toEqual(7);
+      })
+    );
+
+    it(
+      'should not update first activity in days when selected first' +
+        ' date is more than today',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        component.selectedFirstActivity = new Date(
+          new Date().getTime() + 24 * 60 * 60 * 1000
+        );
+        component.selectFirstActivity();
+        expect(component.selectedFirstActivityInDays).toEqual(0);
+      })
+    );
+
+    it(
+      'should not update first activity in days when selected first' +
+        ' date is less than selected last date',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        component.selectedFirstActivity = new Date(
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 91
+        );
+        component.selectFirstActivity();
+        expect(component.selectedFirstActivityInDays).toEqual(0);
+      })
+    );
+
+    it('should set default last activity at 90 days', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
+
+      expect(component.selectedLastActivityInDays).toEqual(90);
+    }));
+
+    it(
+      'should update last activity in days via dateChange' + ' event',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        const newDate: Date = new Date(
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 7
+        );
+        component.changeLastActivity(newDate);
+        expect(component.selectedLastActivityInDays).toEqual(7);
+      })
+    );
+
+    it(
+      'should update last activity in days when selected last' +
+        ' date is valid',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        component.selectedLastActivity = new Date(
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 30
+        );
+        component.selectLastActivity();
+        expect(component.selectedLastActivityInDays).toEqual(30);
+      })
+    );
+
+    it(
+      'should not update last activity in days when selected last' +
+        ' date is more than today',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        component.selectedLastActivity = new Date(
+          new Date().getTime() + 24 * 60 * 60 * 1000
+        );
+        component.selectLastActivity();
+        expect(component.selectedLastActivityInDays).toEqual(90);
+      })
+    );
+
+    it(
+      'should not update last activity in days when selected last' +
+        ' date is more than selected first date',
+      fakeAsync(() => {
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
+
+        component.selectedFirstActivity = new Date(
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 30
+        );
+        component.selectFirstActivity();
+        component.selectedLastActivity = new Date(
+          new Date().getTime() - 24 * 60 * 60 * 1000 * 29
+        );
+        component.selectLastActivity();
+        expect(component.selectedLastActivityInDays).toEqual(90);
+      })
+    );
 
     it(
       'should remove duplicates from available topics when component' +
@@ -497,7 +622,7 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.isTranslationCoordinator).toBeTrue();
     }));
 
-    it('should open the language dropdown when clicked away', fakeAsync(() => {
+    it('should close the language dropdown when clicked away', fakeAsync(() => {
       spyOn(component, 'checkMobileView').and.returnValue(false);
       const fakeClickAwayEvent = new MouseEvent('click');
       Object.defineProperty(fakeClickAwayEvent, 'target', {
@@ -513,37 +638,25 @@ describe('Contributor dashboard Admin page', () => {
       expect(component.languageDropdownShown).toBe(false);
     }));
 
-    it('should hide opened activity dropdown when clicking away', fakeAsync(() => {
-      spyOn(component, 'checkMobileView').and.returnValue(false);
-      const fakeClickAwayEvent = new MouseEvent('click');
-      Object.defineProperty(fakeClickAwayEvent, 'target', {
-        value: document.createElement('div'),
-      });
+    it(
+      'should not close the language dropdown when clicked away' +
+        ' in mobile view',
+      fakeAsync(() => {
+        spyOn(component, 'checkMobileView').and.returnValue(true);
+        const fakeClickAwayEvent = new MouseEvent('click');
+        Object.defineProperty(fakeClickAwayEvent, 'target', {
+          value: document.createElement('div'),
+        });
 
-      component.toggleActivityDropdown();
-      component.ngOnInit();
-      tick();
-      component.onDocumentClick(fakeClickAwayEvent);
-      fixture.detectChanges();
+        component.toggleLanguageDropdown();
+        component.ngOnInit();
+        tick();
+        component.onDocumentClick(fakeClickAwayEvent);
+        fixture.detectChanges();
 
-      expect(component.activityDropdownShown).toBe(false);
-    }));
-
-    it('should not hide opened activity dropdown when clicking away on mobile', fakeAsync(() => {
-      spyOn(component, 'checkMobileView').and.returnValue(true);
-      const fakeClickAwayEvent = new MouseEvent('click');
-      Object.defineProperty(fakeClickAwayEvent, 'target', {
-        value: document.createElement('div'),
-      });
-
-      component.toggleActivityDropdown();
-      component.ngOnInit();
-      tick();
-      component.onDocumentClick(fakeClickAwayEvent);
-      fixture.detectChanges();
-
-      expect(component.activityDropdownShown).toBe(true);
-    }));
+        expect(component.languageDropdownShown).toBe(true);
+      })
+    );
 
     it(
       'should open question role editor modal when on question' +

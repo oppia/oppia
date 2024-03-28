@@ -2061,6 +2061,7 @@ class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
     rejected_translations_count: int
     rejected_translation_word_count: int
     first_contribution_date: str
+    first_contributed_in_days: int
     last_contributed_in_days: int
 
 
@@ -2139,6 +2140,8 @@ class TranslationSubmitterTotalContributionStats:
                 self.rejected_translation_word_count),
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.first_contribution_date).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
@@ -2158,6 +2161,7 @@ class TranslationReviewerTotalContributionStatsFrontendDict(TypedDict):
     accepted_translation_word_count: int
     rejected_translations_count: int
     first_contribution_date: str
+    first_contributed_in_days: int
     last_contributed_in_days: int
 
 
@@ -2220,6 +2224,8 @@ class TranslationReviewerTotalContributionStats:
             'rejected_translations_count': self.rejected_translations_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.first_contribution_date).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
@@ -2239,6 +2245,7 @@ class QuestionSubmitterTotalContributionStatsFrontendDict(TypedDict):
     accepted_questions_without_reviewer_edits_count: int
     rejected_questions_count: int
     first_contribution_date: str
+    first_contributed_in_days: int
     last_contributed_in_days: int
 
 
@@ -2302,6 +2309,8 @@ class QuestionSubmitterTotalContributionStats:
             'rejected_questions_count': self.rejected_questions_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.first_contribution_date).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
@@ -2319,6 +2328,7 @@ class QuestionReviewerTotalContributionStatsFrontendDict(TypedDict):
     accepted_questions_with_reviewer_edits_count: int
     rejected_questions_count: int
     first_contribution_date: str
+    first_contributed_in_days: int
     last_contributed_in_days: int
 
 
@@ -2374,6 +2384,8 @@ class QuestionReviewerTotalContributionStats:
             'rejected_questions_count': self.rejected_questions_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
+            'first_contributed_in_days': int(
+                (datetime.date.today() - self.first_contribution_date).days),
             'last_contributed_in_days': int(
                 (datetime.date.today() - self.last_contribution_date).days)
         }
