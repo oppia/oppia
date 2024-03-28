@@ -64,11 +64,17 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             bool. A boolean value indicating if the exploration is curated
             or not.
         """
-        with datastore_services.get_ndb_context():
-            return (
-                opportunity_services.
-                is_exploration_available_for_contribution(exploration_id)
-            )
+        try:
+            with datastore_services.get_ndb_context():
+                return (
+                    opportunity_services.
+                    is_exploration_available_for_contribution(exploration_id)
+                )
+        except Exception:
+            logging.exception(
+                'Not able to check whether exploration is curated or not'
+                ' for exploration ID %s.' % exploration_id)
+            return False
 
     @classmethod
     def get_committer_id_for_given_snapshot_model_id(
@@ -84,15 +90,20 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             str. The committer ID if the snapshot metadata model exists for
             the given snapshot ID, or None otherwise.
         """
-        with datastore_services.get_ndb_context():
-            exp_snapshot_metadata_model = (
-                exp_models.ExplorationSnapshotMetadataModel.get(
-                    snapshot_model_id, strict=False))
-        if exp_snapshot_metadata_model:
-            assert isinstance(exp_snapshot_metadata_model.committer_id, str)
-            return exp_snapshot_metadata_model.committer_id
-        else:
-            return None
+        try:
+            with datastore_services.get_ndb_context():
+                exp_snapshot_metadata_model = (
+                    exp_models.ExplorationSnapshotMetadataModel.get(
+                        snapshot_model_id, strict=False))
+            if exp_snapshot_metadata_model is not None:
+                assert isinstance(exp_snapshot_metadata_model.committer_id, str)
+                return exp_snapshot_metadata_model.committer_id
+        except Exception:
+            logging.exception(
+                'Not able to get committer ID for snapshot model ID %s.'
+                % snapshot_model_id
+            )
+        return None
 
     @classmethod
     def extract_added_voiceovers_between_successive_snapshots(
@@ -315,7 +326,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         cls,
         exploration_model: exp_models.ExplorationModel,
         snapshot_models: List[exp_models.ExplorationSnapshotContentModel]
-    ) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
+    ) -> Optional[voiceover_models.ExplorationVoiceArtistsLinkModel]:
         """Creates an exploration voice artist link model using the
         exploration snapshot models for a given exploration model.
 
@@ -357,13 +368,20 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 collections.defaultdict(dict)
             )
 
-        (
-            latest_content_id_to_voiceover_mapping,
-            total_number_of_voiceovers_to_identify
-        ) = (
-            cls.get_content_id_mapping_and_voiceovers_count(
-                exploration_model)
-        )
+        try:
+            (
+                latest_content_id_to_voiceover_mapping,
+                total_number_of_voiceovers_to_identify
+            ) = (
+                cls.get_content_id_mapping_and_voiceovers_count(
+                    exploration_model)
+            )
+        except Exception as e:
+            logging.exception(
+                'Failed to get latest voiceover mapping for exploration %s, '
+                'with error message: %s.' % (exploration_model.id, e)
+            )
+            return None
 
         # Note that, in this code, we don't need to explicitly handle the case
         # where explorations were reverted to previous versions. This is
@@ -381,7 +399,11 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                     cls.extract_added_voiceovers_between_successive_snapshots(
                         new_snapshot_model, old_snapshot_model))
             except Exception as e:
-                logging.exception(e)
+                logging.exception(
+                    'Failed to get newly added voiceover between snapshot '
+                    'versions %s and %s, with error: %s' % (
+                        old_snapshot_model.id, new_snapshot_model.id, e)
+                )
                 # If the method does not successfully retrieve newly added
                 # voiceovers in these versions of snapshot models, we should
                 # bypass the iteration, as it indicates potential corruption or
@@ -398,22 +420,31 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                     new_snapshot_model.id)
             )
 
-            # If voice_artist_id is None, this means the exploration
-            # snapshot metadata model for the given commit does not exist.
-            if voice_artist_id is None:
+            # If voice_artist_id is None or empty, this means the exploration
+            # snapshot metadata model for the given commit does not exist or
+            # committer ID field in snapshot metadata model contains empty data.
+            if voice_artist_id is None or voice_artist_id == '':
                 continue
 
-            (
-                voiceover_artist_and_voiceover_mapping,
-                number_of_voiceovers_identified
-            ) = (
-                cls.update_content_id_to_voiceovers_mapping(
-                    latest_content_id_to_voiceover_mapping,
-                    newly_added_voiceover_mapping,
+            try:
+                (
                     voiceover_artist_and_voiceover_mapping,
-                    voice_artist_id
+                    number_of_voiceovers_identified
+                ) = (
+                    cls.update_content_id_to_voiceovers_mapping(
+                        latest_content_id_to_voiceover_mapping,
+                        newly_added_voiceover_mapping,
+                        voiceover_artist_and_voiceover_mapping,
+                        voice_artist_id
+                    )
                 )
-            )
+            except Exception as e:
+                logging.exception(
+                    'Failed to update newly added voiceover between snapshot '
+                    'versions %s and %s, with error: %s' % (
+                        old_snapshot_model.id, new_snapshot_model.id, e)
+                )
+                continue
 
             total_number_of_voiceovers_identified += (
                 number_of_voiceovers_identified)
@@ -504,10 +535,14 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         exploration_voice_artist_link_models = (
             grouped_models
-            | 'Get curated exploration models' >> beam.Filter(
-                lambda element: self.is_exploration_curated(
-                    exploration_id=element[0])
+            | 'Get curated and valid exploration models' >> beam.Filter(
+                lambda element: (
+                    element[0] != '' and
+                    self.is_exploration_curated(exploration_id=element[0]) and
+                    len(element[1]['exploration_models']) > 0 and
+                    len(element[1]['snapshot_models']) > 0
                 )
+            )
             | 'Get exploration voice artist link models' >> beam.Map(
                 lambda element: (
                     CreateExplorationVoiceArtistLinkModelsJob.
@@ -516,6 +551,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                         snapshot_models=element[1]['snapshot_models']
                     )
                 )
+            )
+            | 'Filter None objects' >> beam.Filter(
+                lambda model: model is not None
             )
         )
 
