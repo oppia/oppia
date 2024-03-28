@@ -173,10 +173,6 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectTitleToHaveMaxLength(maxLength: number): Promise<void> {
     const titleInput = await this.page.$('.e2e-test-exploration-title-input');
-    /**
-     * Debugging.
-     */
-    showMessage('titleInput->' + titleInput);
     const title = await this.page.evaluate(input => input.value, titleInput);
     const titleLength = title.length;
 
@@ -207,29 +203,19 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectGoalToEqual(expectedGoal: string): Promise<void> {
     try {
-      // Log debugging information.
-      showMessage('expectedGoal -> ' + expectedGoal);
-
-      // Find the goal input element.
       const goalInput = await this.page.$('#explorationObjective');
       if (!goalInput) {
         throw new Error('Goal input element not found.');
       }
 
-      // Evaluate the value of the goal input element.
       const goal = await this.page.evaluate(input => input.value, goalInput);
 
-      // Log the current goal.
-      showMessage('goal -> ' + goal);
-
-      // Check if the goal matches the expected goal.
       if (goal === expectedGoal) {
         showMessage('The goal has been set for the exploration.');
       } else {
         throw new Error('The goal does not match the expected goal.');
       }
     } catch (error) {
-      // Log any errors encountered.
       console.error('Error:', error.message);
       throw error;
     }
@@ -240,10 +226,6 @@ export class ExplorationCreator extends BaseUser {
    */
   async selectACategory(category: string): Promise<void> {
     await this.clickOn(categoryDropDown);
-    /**
-     * Debugging.
-     */
-    showMessage('category dropdown is visible.');
     await this.clickOn(category);
   }
 
@@ -252,19 +234,11 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
     await this.page.waitForSelector('.mat-select-value');
-    /**
-     * Debugging.
-     */
-    showMessage('expectedCategory->' + expectedCategory);
     const selectedCategory = await this.page.evaluate(() => {
       return (
         document.querySelector('.mat-select-value') as HTMLElement
       ).innerText.trim();
     });
-    /**
-     * Debugging.
-     */
-    showMessage('selectedCategory->' + selectedCategory);
     if (selectedCategory === expectedCategory) {
       showMessage(
         `The category ${selectedCategory}` + ' is same as expectedCategory.'
@@ -283,15 +257,7 @@ export class ExplorationCreator extends BaseUser {
     });
 
     await this.clickOn(languageUpdateBar);
-    /**
-     * Debugging.
-     */
-    showMessage('language update bar is visible');
     await this.clickOn(language);
-    /**
-     * Debugging.
-     */
-    showMessage('language is visible and clicked.');
   }
 
   /**
@@ -304,10 +270,7 @@ export class ExplorationCreator extends BaseUser {
       throw new Error('Category dropdown not found.');
     }
     await languageDropdown.click();
-    /**
-     * Debugging.
-     */
-    showMessage('expectedLanguage->' + expectedLanguage);
+
     const selectedLanguage = await this.page.evaluate(() => {
       const matOption = document.querySelector(
         '.mat-option.mat-selected'
@@ -329,10 +292,7 @@ export class ExplorationCreator extends BaseUser {
         return selectedLanguageText.trim();
       }
     });
-    /**
-     * Debugging.
-     */
-    showMessage('selectedLanguage->' + selectedLanguage);
+
     if (selectedLanguage === expectedLanguage) {
       showMessage(
         `The language ${selectedLanguage}` + ' is same as expectedLanguage.'
@@ -350,10 +310,6 @@ export class ExplorationCreator extends BaseUser {
     for (let i = 0; i < 3; i++) {
       await this.clickOn(addTags);
       await this.type(addTags, TagNames[i].toLowerCase());
-      /**
-       * Debugging.
-       */
-      showMessage('tagsArray->' + addTags);
       await this.page.keyboard.press('Tab');
     }
   }
@@ -368,10 +324,6 @@ export class ExplorationCreator extends BaseUser {
   async expectTagsToBeAdded(expectedTags: string[]): Promise<void> {
     const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
     await this.page.waitForSelector('mat-chip-list');
-    /**
-     * Debugging.
-     */
-    showMessage('expectedTags->' + expectedTags);
 
     const addedTags = await this.page.evaluate(() => {
       const tagElements = Array.from(document.querySelectorAll('mat-chip'));
@@ -383,10 +335,7 @@ export class ExplorationCreator extends BaseUser {
         })
         .filter(Boolean);
     });
-    /**
-     * Debugging.
-     */
-    showMessage('addedTags->' + addedTags);
+
     for (const expectedTag of lowercaseExpectedTags) {
       if (!addedTags.includes(expectedTag)) {
         throw new Error(`Tag "${expectedTag}" was not added.`);
@@ -404,15 +353,7 @@ export class ExplorationCreator extends BaseUser {
       '.e2e-test-open-preview-summary-modal:not([disabled])'
     );
     await this.clickOn(previewSummaryButton);
-    /**
-     * Debugging.
-     */
-    showMessage('previewSummary button is visible.');
     await this.clickOn(dismissPreviewButton);
-    /**
-     * Debugging.
-     */
-    showMessage('Summary has been discarded.');
     await this.expectPreviewSummaryToBeVisible();
   }
 
@@ -424,10 +365,7 @@ export class ExplorationCreator extends BaseUser {
     const previewSummary = await this.page.$(
       '.e2e-test-open-preview-summary-modal'
     );
-    /**
-     * Debugging.
-     */
-    showMessage('previewSummary->' + previewSummary);
+
     if (previewSummary) {
       showMessage('Preview summary is visible.');
     } else {
@@ -467,16 +405,8 @@ export class ExplorationCreator extends BaseUser {
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
     await this.clickOn(editbutton);
-    /**
-     * Debugging.
-     */
-    showMessage('edit button is visible.');
     await this.clickOn(addUserName);
     await this.type(addUserName, username);
-    /**
-     * Debugging.
-     */
-    showMessage(username + 'has been added.');
     await this.clickOn(addRoleBar);
     await this.clickOn(collaborator);
     await this.clickOn(saveRole);
@@ -528,9 +458,7 @@ export class ExplorationCreator extends BaseUser {
       await this.page.keyboard.press('Backspace');
       await this.type(addVoiceArtistUserName, voiceArtists[i]);
       await this.clickOn(voiceArtistSaveButton);
-      /**
-       * Debugging.
-       */
+
       showMessage(voiceArtists[i] + 'has been added successfully.');
     }
   }
@@ -549,10 +477,6 @@ export class ExplorationCreator extends BaseUser {
   async expectEmailNotificationToBeActivated(): Promise<void> {
     await this.page.waitForSelector('input[id="feedback-switch"]');
     const input = await this.page.$('input[id="feedback-switch"]');
-    /**
-     * Debugging.
-     */
-    showMessage(input + '-> it is the email toggle which needs to be enabled.');
 
     if (!input) {
       throw new Error('Feedback switch input element not found.');
@@ -599,10 +523,7 @@ export class ExplorationCreator extends BaseUser {
     } else {
       await this.clickOn(saveDraftButton);
     }
-    /**
-     * Debugging.
-     */
-    showMessage(saveDraftButton + 'is visible.');
+
     await this.clickOn(commitMessage);
     await this.type(commitMessage, 'Testing Testing');
     await this.clickOn('.e2e-test-save-draft-button');
@@ -650,10 +571,7 @@ export class ExplorationCreator extends BaseUser {
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
     await this.clickOn(closePublishedPopUp);
-    /**
-     * Debug
-     */
-    showMessage('PublishExploration is working fine.');
+
     explorationUrlAfterPublished = await this.page.url();
   }
 
