@@ -750,6 +750,7 @@
 	"I18N_LEARNER_DASHBOARD_ALL": "Section in the learner dashboard that displays both completed and incomplete explorations.\n\n{{Identical|All}}",
 	"I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION": "Text for the edit goals section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_BRONZE_BADGE": "Text for the bronze badge in the learner dashboard.",
+	"I18N_LEARNER_DASHBOARD_CLASSROOM_TITLE": "Text for the Learn Something New section in the learner dashboard. - This text is the title of a classroom.",
 	"I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION": "Text for the community lessons section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION": "Text for the completed goals section in the learner dashboard.",
 	"I18N_LEARNER_DASHBOARD_COMPLETED_SECTION": "Text for the completed section in the learner dashboard.",
