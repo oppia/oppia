@@ -432,22 +432,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         # well. So, due to this conflict in types MyPy throws an `Incompatible
         # types in assignment` error. Thus to avoid the error, we used ignore.
         self.language_code = language_code  # type: ignore[assignment]
-        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
-        # last_updated is defined with only datetime type but here
-        # last_updated is of Optional[datetime] type because while creating
-        # 'SuggestionEditStateContent' through create_suggestion() method, we
-        # are not providing 'last_updated' and just using None default value.
-        # So, once this suggestion_services.create_suggestion() method is
-        # fixed, we can remove both todo and MyPy ignore from here.
-        self.last_updated = last_updated  # type: ignore[assignment]
-        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
-        # created_on is defined with only datetime type but here
-        # created_on is of Optional[datetime] type because while creating
-        # 'SuggestionEditStateContent' through create_suggestion() method, we
-        # are not providing 'created_on' and just using None default value.
-        # So, once this suggestion_services.create_suggestion() method is
-        # fixed, we can remove both todo and MyPy ignore from here.
-        self.created_on = created_on  # type: ignore[assignment]
+        self.last_updated = last_updated
+        self.created_on = created_on
         self.edited_by_reviewer = edited_by_reviewer
         # Here we use MyPy ignore because in BaseSuggestion, image_context
         # is defined as string type attribute but currently, we don't
@@ -663,22 +649,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
-        # last_updated is defined with only datetime type but here
-        # last_updated is of Optional[datetime] type because while creating
-        # 'SuggestionTranslateContent' through create_suggestion() method, we
-        # are not providing 'last_updated' and just using None default value.
-        # So, once this suggestion_services.create_suggestion() method is
-        # fixed, we can remove both todo and MyPy ignore from here.
-        self.last_updated = last_updated  # type: ignore[assignment]
-        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
-        # created_on is defined with only datetime type but here
-        # created_on is of Optional[datetime] type because while creating
-        # 'SuggestionTranslateContent' through create_suggestion() method, we
-        # are not providing 'created_on' and just using None default value.
-        # So, once this suggestion_services.create_suggestion() method is
-        # fixed, we can remove both todo and MyPy ignore from here.
-        self.created_on = created_on  # type: ignore[assignment]
+        self.last_updated = last_updated
+        self.created_on = created_on
         self.edited_by_reviewer = edited_by_reviewer
         self.image_context = feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
 
@@ -915,22 +887,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         )
         self.score_category = score_category
         self.language_code = language_code
-        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
-        # last_updated is defined with only datetime type but here
-        # last_updated is of Optional[datetime] type because while creating
-        # 'SuggestionAddQuestion' through create_suggestion() method, we
-        # are not providing 'last_updated' and just using None default value.
-        # So, once this suggestion_services.create_suggestion() method is
-        # fixed, we can remove both todo and MyPy ignore from here.
-        self.last_updated = last_updated  # type: ignore[assignment]
-        # TODO(#16048): Here we use MyPy ignore because in BaseSuggestion,
-        # created_on is defined with only datetime type but here
-        # created_on is of Optional[datetime] type because while creating
-        # 'SuggestionAddQuestion' through create_suggestion() method, we
-        # are not providing 'created_on' and just using None default value.
-        # So, once this suggestion_services.create_suggestion() method is
-        # fixed, we can remove both todo and MyPy ignore from here.
-        self.created_on = created_on  # type: ignore[assignment]
+        self.last_updated = last_updated
+        self.created_on = created_on
         self.image_context = feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS
         self._update_change_to_latest_state_schema_version()
         self.edited_by_reviewer = edited_by_reviewer
