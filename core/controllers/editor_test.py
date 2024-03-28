@@ -375,6 +375,21 @@ class EditorTests(BaseEditorControllerTests):
             'This exploration cannot be edited. Please contact the admin.')
         self.logout()
 
+    def test_logged_out_user_can_get_exploration_editor_data(self) -> None:
+        exp_id = '0'
+        response = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+
+        self.assertFalse(response['show_state_editor_tutorial_on_load'])
+        self.assertFalse(response['show_state_translation_tutorial_on_load'])
+        self.assertFalse(response['is_version_of_draft_valid'])
+        self.assertEqual(response['draft_change_list_id'], 0)
+        self.assertEqual(response['draft_changes'], None)
+        self.assertEqual(response['email_preferences'], {
+            'mute_feedback_notifications': False,
+            'mute_suggestion_notifications': False
+        })
+
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
