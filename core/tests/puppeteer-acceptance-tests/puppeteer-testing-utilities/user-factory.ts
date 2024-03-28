@@ -30,6 +30,7 @@ import {BlogAdminFactory, BlogAdmin} from '../user-utilities/blog-admin-utils';
 import {QuestionAdminFactory} from '../user-utilities/question-admin-utils';
 import {BlogPostEditorFactory} from '../user-utilities/blog-post-editor-utils';
 import testConstants from './test-constants';
+import {CurriculumAdminFactory} from '../user-utilities/curriculum-admin-utils';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -42,6 +43,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
+  [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
 } as const;
 
 /**

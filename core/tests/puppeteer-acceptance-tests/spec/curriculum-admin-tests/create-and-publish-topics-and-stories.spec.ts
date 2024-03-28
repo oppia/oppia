@@ -1,0 +1,107 @@
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance Test for topic management by curriculum admin
+ */
+
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {CurriculumAdmin} from '../../user-utilities/curriculum-admin-utils';
+
+const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
+
+describe('Curriculum Admin', function () {
+  let curriculumAdmin: CurriculumAdmin;
+  let explorationUrl: string | null;
+  let explorationId: string;
+
+  let exploration = {
+    state: 'Test Exploration',
+    title: 'Test Exploration Title 1',
+    goal: 'Test Exploration Goal 1',
+  };
+
+  let skill = {
+    description: 'Test Skill 1',
+    reviewMaterial: 'This is a test skill for curriculum admin.',
+    questionCount: 3,
+  };
+
+  let topic = {
+    name: 'Test Topic 1',
+    url_fragment: 'test-topic-one',
+    web_fragment: 'Test Topic 1',
+    description: 'This topic is to test curriculum admin utility.',
+  };
+
+  let subtopic = {
+    title: 'Test Subtopic 1',
+    url_fragment: 'test-subtopic-one',
+    description: 'This subtopic is to test curriculum admin utility.',
+  };
+
+  let story = {
+    title: 'Test Story 1',
+    url_fragment: 'test-story-one',
+    description: 'This story is to test curriculum admin utility.',
+  };
+
+  const getExplorationIdFromUrl = (url: string | null): string => {
+    if (!url) {
+      throw new Error('Exploration URL is null or empty');
+    }
+    const parts = url.split('/');
+    const explorationId = parts.length > 0 ? parts[parts.length - 1] : '';
+    if (!explorationId) {
+      throw new Error('Failed to extract exploration ID from URL');
+    }
+    return explorationId;
+  };
+
+  beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+  }, DEFAULT_SPEC_TIMEOUT);
+
+  it(
+    'should create and publish topics, subtopics, skills, stories and chapters.',
+    async function () {
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      explorationUrl = await curriculumAdmin.createExploration(exploration);
+      explorationId = getExplorationIdFromUrl(explorationUrl);
+
+      await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+      await curriculumAdmin.createTopic(topic);
+      await curriculumAdmin.createSubtopic(subtopic);
+      await curriculumAdmin.createSkill(skill);
+      await curriculumAdmin.addDiagnosticTestSkillAndPublishTopic(skill);
+      await curriculumAdmin.createAndPublishStoryWithChapter(
+        story,
+        explorationId
+      );
+
+      await curriculumAdmin.expectPublishedTopicToBePresent();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
+});

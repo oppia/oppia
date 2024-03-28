@@ -51,6 +51,8 @@ export default {
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
     Partnerships: 'http://localhost:8181/partnerships',
+    TopicAndSkillsDashboard:
+      'http://localhost:8181/topics-and-skills-dashboard',
     Volunteer: 'http://localhost:8181/volunteer',
   },
   Dashboard: {
@@ -64,6 +66,7 @@ export default {
     TRANSLATION_ADMIN: 'translation admin',
     BLOG_ADMIN: 'blog admin',
     BLOG_POST_EDITOR: 'blog post editor',
+    CURRICULUM_ADMIN: 'curriculum admin',
     QUESTION_ADMIN: 'question admin',
   } as const,
   BlogRights: {
@@ -77,6 +80,10 @@ export default {
     blogPostThumbnailImage: path.resolve(
       __dirname,
       '../images/blog-post-thumbnail.svg'
+    ),
+    curriculumAdminThumbnailImage: path.resolve(
+      __dirname,
+      '../images/curriculum-admin-thumbnail.svg'
     ),
   },
   DEFAULT_SPEC_TIMEOUT: 300000,
