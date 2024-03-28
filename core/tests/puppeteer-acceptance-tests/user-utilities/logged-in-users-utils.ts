@@ -146,6 +146,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Get Started page.
+   */
+  async navigateToGetStartedPage(): Promise<void> {
+    await this.goto(getStartedUrl);
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    */
   async clickButtonToNavigateToNewPage(
