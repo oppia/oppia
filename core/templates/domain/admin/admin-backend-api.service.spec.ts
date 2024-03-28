@@ -1601,7 +1601,7 @@ describe('Admin backend api service', () => {
     it('should get interaction IDs if exploration exists', fakeAsync(() => {
       let expId = '123';
       let result = {
-        interactions: [{id: 'EndExploration'}],
+        interaction_ids: ['EndExploration'],
       };
 
       abas
@@ -1612,7 +1612,7 @@ describe('Admin backend api service', () => {
       expect(req.request.method).toEqual('GET');
 
       req.flush(
-        {interactions: [{id: 'EndExploration'}]},
+        {interaction_ids: ['EndExploration']},
         {status: 200, statusText: 'Success.'}
       );
       flushMicrotasks();
