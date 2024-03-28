@@ -160,7 +160,7 @@
                         </mat-chip-list>
                       </div>
 
-                      <div *ngIf="classroomEditorMode">
+                      <div *ngIf="classroomEditorMode" class="classroom-editor">
                         <mat-form-field class="topics-form-field"
                                         appearance="fill">
                           <mat-label>Prerequisites</mat-label>
@@ -190,9 +190,7 @@
                             </mat-option>
                           </mat-autocomplete>
                         </mat-form-field>
-                      </div>
 
-                      <div *ngIf="classroomEditorMode">
                         <button (click)="deleteTopic(topicName)"
                                 mat-button matSuffix mat-icon-button
                                 aria-label="Clear">
@@ -278,6 +276,10 @@
 </mat-card>
 
 <style>
+  .classroom-editor {
+    display: flex;
+    width: 90%;
+  }
   .new-topic-input-container {
     margin-top: 10px;
   }
