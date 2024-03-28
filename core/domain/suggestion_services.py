@@ -223,8 +223,7 @@ def create_suggestion(
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id, target_id, target_version_at_submission, status,
             author_id, None, change_cmd, score_category, language_code, False, 
-            datetime.datetime.utcnow(), datetime.datetime.utcnow()
-        )
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +

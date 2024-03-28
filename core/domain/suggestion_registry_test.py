@@ -2710,7 +2710,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['target_version_at_submission'],
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change_cmd'], suggestion_dict['score_category'],
-            suggestion_dict['language_code'], False, self.fake_date, self.fake_date)
+            suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date)
         suggestion.convert_html_in_suggestion_change(
             html_validation_service.add_math_content_to_math_rte_components)
         # Ruling out the possibility of any other type for mypy type checking.
@@ -2777,7 +2778,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['target_version_at_submission'],
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change_cmd'], suggestion_dict['score_category'],
-            suggestion_dict['language_code'], False, self.fake_date, self.fake_date)
+            suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date)
         suggestion.accept('commit_message')
 
     def test_accept_suggestion_with_image_region_interactions(self) -> None:
@@ -2926,7 +2928,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_dict['target_version_at_submission'],
             suggestion_dict['status'], self.author_id, self.reviewer_id,
             suggestion_dict['change_cmd'], suggestion_dict['score_category'],
-            suggestion_dict['language_code'], False, self.fake_date, self.fake_date)
+            suggestion_dict['language_code'], False, self.fake_date,
+            self.fake_date)
 
         suggestion.accept('commit_message')
 
