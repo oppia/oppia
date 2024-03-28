@@ -38,10 +38,10 @@
         <div class="history-table-index" [attr.aria-label]="'Version number: '+ metadata.versionNumber" tabindex="0">
           {{ metadata.versionNumber }}.
         </div>
-        <div class="history-table-message" [attr.aria-label]="'Notes: '+ metadata.commitMessage" tabindex="0">
+        <div class="history-table-message e2e-test-history-table-message" [attr.aria-label]="'Notes: '+ metadata.commitMessage" tabindex="0">
           {{ metadata.commitMessage }}
         </div>
-        <div class="history-table-profile e2e-test-history-table-profile">
+        <div class="history-table-profile">
           <strong><profile-link-text [attr.aria-label]="'Username: '+ metadata.committerId" [username]="metadata.committerId"></profile-link-text></strong>
         </div>
         <div class="history-table-version" title="{{ metadata.tooltipText }}" [attr.aria-label]="'Date: '+ metadata.createdOnMsecsStr" tabindex="0">

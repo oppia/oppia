@@ -21,6 +21,12 @@ import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT: number = testConstants.DEFAULT_SPEC_TIMEOUT;
 
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = ' Continue Button ',
+  NUMERIC_INPUT = ' Number Input ',
+  END_EXPLORATION = ' End Exploration ',
+}
+
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
@@ -35,27 +41,31 @@ describe('Exploration Editor', function () {
     'should be able to load, complete and restart an exploration preview',
     async function () {
       await explorationEditor.navigateToCreatorDashboard();
-      await explorationEditor.createExploration('Exploration begins');
-      await explorationEditor.addAnInteractionToTheExploration(
-        ' Continue Button '
+      await explorationEditor.createExploration();
+      await explorationEditor.updateCardContent(
+        'Test exploration to question negative numbers'
       );
+      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
       // The following block of code adds a new card to the exploration that contains a question.
-      await explorationEditor.addANewCardToTheExploration('Question Card');
-      await explorationEditor.goToTheCard('Question Card ');
-      await explorationEditor.addContentToTheCard(
+      await explorationEditor.navigateToOppiaResponses();
+      await explorationEditor.oppiaDirectlearnersTo();
+      await explorationEditor.nameTheNewCard();
+      await explorationEditor.navigateToCard('Question Card ');
+      await explorationEditor.updateCardContent(
         'mention a negative number greater than -100.'
       );
-      await explorationEditor.addAnInteractionToTheCard(' Number Input ');
-      await explorationEditor.addResponsesToTheInteraction('-45');
+      await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+      await explorationEditor.addResponseToTheInteraction('-45');
 
       // The following block adds the final card with an ‘End’ interaction to conclude the exploration.
-      await explorationEditor.addANewCardToTheExploration('Last Card');
-      await explorationEditor.goToTheCard('Last Card ');
-      await explorationEditor.addContentToTheCard('Exploration ends here');
-      await explorationEditor.addAnInteractionToTheCard(' End Exploration ');
+      await explorationEditor.oppiaDirectlearnersTo();
+      await explorationEditor.nameTheNewCard();
+      await explorationEditor.navigateToCard('Last Card ');
+      await explorationEditor.updateCardContent('');
+      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
-      await explorationEditor.goToTheIntroductionCard(0);
+      await explorationEditor.navigateToCard('');
       await explorationEditor.saveExplorationDraft();
 
       await explorationEditor.navigateToPreviewTab();
@@ -65,7 +75,7 @@ describe('Exploration Editor', function () {
 
       await explorationEditor.completeTheExplorationInPreviewTab();
       await explorationEditor.expectTheExplorationToComplete();
-      await explorationEditor.restartTheExploration();
+      await explorationEditor.restartExploration();
       await explorationEditor.expectTheExplorationToRestart(
         'Exploration begins'
       );

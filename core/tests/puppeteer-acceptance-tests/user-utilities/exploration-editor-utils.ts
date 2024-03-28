@@ -66,7 +66,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to create an exploration in the Exploration Editor.
    * @param {string} content - The content in the Exploration.
    */
-  async createExploration(content: string): Promise<void> {
+  async createExploration(): Promise<void> {
     await this.page.click(createExplorationButtonSelector);
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       visible: true,
@@ -76,6 +76,9 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     await this.page.waitForFunction('document.readyState === "complete"');
+  }
+
+  async updateCardContents(content: string) {
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOn(stateEditSelector);
 
@@ -88,9 +91,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    */
-  async addAnInteractionToTheExploration(
-    interactionToAdd: string
-  ): Promise<void> {
+  async addInteraction(interactionToAdd: string): Promise<void> {
     await this.page.waitForSelector(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(endInteractionSelector, {visible: true});
@@ -99,10 +100,15 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector('.customize-interaction-body-container', {
       hidden: true,
     });
-    if (interactionToAdd !== ' End Exploration ') {
-      await this.clickOn('.oppia-response-header');
-    }
   }
+
+  async navigateToOppiaResponses() {
+    await this.clickOn('.oppia-response-header');
+  }
+
+  async oppiaDirectlearnersTo() {}
+
+  async nameTheNewCard() {}
 
   /**
    * Function to save an exploration draft.
@@ -133,7 +139,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    */
-  async goToTheCard(cardName: string): Promise<void> {
+  async navigateToCard(cardName: string): Promise<void> {
     await this.clickOn(cardName);
     await this.page.waitForNetworkIdle({idleTime: 700});
   }
@@ -159,7 +165,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to add content to a card.
    * @param {string} questionText - The content to be added to the card.
    */
-  async addContentToTheCard(questionText: string): Promise<void> {
+  async updateCardContent(questionText: string): Promise<void> {
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOn(stateEditSelector);
     await this.page.waitForSelector(explorationContentInput, {visible: true});
@@ -184,7 +190,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to add responses to the interactions.
    * @param {string} response - response to be added.
    */
-  async addResponsesToTheInteraction(response: string): Promise<void> {
+  async addResponseToTheInteraction(response: string): Promise<void> {
     await this.page.waitForSelector(floatFormInput);
     await this.type(floatFormInput, response);
     await this.page.waitForSelector(oppiaResponseSelector);
@@ -262,7 +268,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to restart the exploration after it has been completed.
    */
-  async restartTheExploration(): Promise<void> {
+  async restartExploration(): Promise<void> {
     await this.page.waitForSelector(explorationCompletedMessage, {
       hidden: true,
     });
