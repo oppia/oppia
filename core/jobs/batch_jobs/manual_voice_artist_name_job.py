@@ -54,7 +54,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
     DATASTORE_UPDATES_ALLOWED = True
 
     @staticmethod
-    def is_exploration_curated(exploration_id: str) -> bool:
+    def is_exploration_curated(exploration_id: str) -> Optional[bool]:
         """Checks whether the provided exploration ID is curated or not.
 
         Args:
@@ -423,28 +423,20 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             # If voice_artist_id is None or empty, this means the exploration
             # snapshot metadata model for the given commit does not exist or
             # committer ID field in snapshot metadata model contains empty data.
-            if voice_artist_id is None or voice_artist_id == '':
+            if voice_artist_id is None:
                 continue
 
-            try:
-                (
+            (
+                voiceover_artist_and_voiceover_mapping,
+                number_of_voiceovers_identified
+            ) = (
+                cls.update_content_id_to_voiceovers_mapping(
+                    latest_content_id_to_voiceover_mapping,
+                    newly_added_voiceover_mapping,
                     voiceover_artist_and_voiceover_mapping,
-                    number_of_voiceovers_identified
-                ) = (
-                    cls.update_content_id_to_voiceovers_mapping(
-                        latest_content_id_to_voiceover_mapping,
-                        newly_added_voiceover_mapping,
-                        voiceover_artist_and_voiceover_mapping,
-                        voice_artist_id
-                    )
+                    voice_artist_id
                 )
-            except Exception as e:
-                logging.exception(
-                    'Failed to update newly added voiceover between snapshot '
-                    'versions %s and %s, with error: %s' % (
-                        old_snapshot_model.id, new_snapshot_model.id, e)
-                )
-                continue
+            )
 
             total_number_of_voiceovers_identified += (
                 number_of_voiceovers_identified)

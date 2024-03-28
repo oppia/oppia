@@ -607,6 +607,33 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                 expected_content_id_voiceovers_mapping
             )
 
+    def test_should_skip_exploration_for_invalid_exploration(
+        self
+    ) -> None:
+        self._create_curated_explorations()
+        self._create_non_curated_exploration()
+
+        job_result_template = (
+            'Generated exploration voice artist link model for '
+            'exploration %s.'
+        )
+
+        exploration_id: str = 'exploration_id_1'
+        exploration_model: exp_models.ExplorationModel = (
+            exp_models.ExplorationModel.get_by_id(exploration_id))
+        # Deleting recorded voiceovers field to make this exploration invalid.
+        del exploration_model.states[
+            'Introduction']['recorded_voiceovers']
+        exploration_model.update_timestamps()
+        exploration_model.commit(
+            'committer_id', 'commit message', [])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                stderr='')
+        ])
+
 
 class AuditVoiceArtistMetadataModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
@@ -869,3 +896,39 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             exp_link_model.content_id_to_voiceovers_mapping,
             expected_content_id_to_voiceovers_mapping
         )
+
+    def test_check_is_exploration_curated_for_invalid_id(self) -> None:
+        is_exploration_curated = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            is_exploration_curated(exploration_id='')
+        )
+        self.assertFalse(is_exploration_curated)
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        is_exploration_curated = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            is_exploration_curated(exploration_id=None) # type: ignore[arg-type]
+        )
+        self.assertFalse(is_exploration_curated)
+
+    def test_check_committer_id_for_invalid_id(self) -> None:
+        committer_id = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_committer_id_for_given_snapshot_model_id(snapshot_model_id='')
+        )
+        self.assertIsNone(committer_id)
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type the
+        # codebase we plan to get rid of the tests that intentionally test wrong
+        # inputs that we can normally catch by typing.
+        committer_id = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_committer_id_for_given_snapshot_model_id(snapshot_model_id=None) # type: ignore[arg-type]
+        )
+        self.assertIsNone(committer_id)
