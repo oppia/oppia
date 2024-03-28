@@ -123,7 +123,7 @@
   padding-right: 4vw;
 }
 .oppia-about-page-section-one .oppia-about-study-image img {
-  height: 60vh;
+  height: 90vh;
 }
 .oppia-about-page-section-two .oppia-section-two-content {
   align-items: center;
@@ -221,6 +221,7 @@
   }
   .oppia-about-page-section-one .oppia-about-content {
     padding-right: 0;
+    padding-top: 9px;
   }
   .oppia-about-page-section-two .oppia-about-section-two-top {
     display: flex;
@@ -280,6 +281,15 @@
   .oppia-about-page-section-one .oppia-about-page-section-one-right {
     height: 50vh;
   }
+  .about-page .oppia-about-button {
+    padding: 6px;
+  }
+}
+@media (orientation: landscape) and (max-width: 868px) {
+  .oppia-about-page-section-one .oppia-about-title {
+    font-size: 25px;
+    padding-top: 5vh;
+  }
 }
 @media (orientation: landscape) and (max-width: 862px) {
   .oppia-about-page-section-one,
@@ -313,7 +323,7 @@
     padding-bottom: 5vh;
   }
   .oppia-about-page-section-one .oppia-about-title {
-    padding-top: 10vh;
+    padding-top: 5vh;
   }
   .oppia-about-page-section-six .oppia-about-book-image img {
     max-height: 50vh;
@@ -324,11 +334,12 @@
     width: 100%;
   }
 }
-@media (orientation: landscape) and (max-width: 740px) {
-  .oppia-about-page-section-one,
-  .oppia-about-page-section-one .oppia-about-study-image img {
-    height: 90vh;
+@media (orientation: landscape) and (max-width: 815px) {
+  .about-page .oppia-about-button {
+    padding: 3px;
   }
+}
+@media (orientation: landscape) and (max-width: 740px) {
   .oppia-about-page-section-two .oppia-section-two-content {
     padding-left: 4vw;
   }
@@ -431,7 +442,7 @@
   }
   .oppia-about-page-section-one .oppia-about-button-container {
     margin: 0;
-    padding-bottom: 5vh;
+    padding: 0;
   }
   .oppia-about-page-section-one .oppia-about-content {
     font-size: 18px;
@@ -524,6 +535,15 @@
   }
   .oppia-about-page-section-seven .oppia-about-button {
     margin: 0;
+  }
+}
+@media (max-width: 730px) {
+  .about-page .oppia-about-button {
+    padding: 3px;
+  }
+  .oppia-about-page-section-one .oppia-about-title {
+    font-size: 23px;
+    padding-top: 2vh;
   }
 }
 @media (orientation: landscape) and (max-width: 640px) {
