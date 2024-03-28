@@ -203,7 +203,6 @@
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/dev-workflow-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/dev-workflow-reviewers
-/scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
 /scripts/linters/ @oppia/dev-workflow-reviewers
 /scripts/linters/codeowner_linter*.py @oppia/dev-workflow-reviewers
@@ -582,7 +581,6 @@
 /core/templates/pages/release-coordinator-page/ @oppia/release-workflow-reviewers
 /scripts/release_scripts/ @oppia/release-workflow-reviewers
 /assets/release_constants.json @oppia/release-workflow-reviewers
-
 
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/lace-frontend-reviewers

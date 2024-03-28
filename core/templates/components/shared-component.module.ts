@@ -164,7 +164,6 @@ import {OppiaVisualizationFrequencyTableComponent} from 'visualizations/oppia-vi
 import {OppiaVisualizationEnumeratedFrequencyTableComponent} from 'visualizations/oppia-visualization-enumerated-frequency-table.directive';
 import {RandomSelectorComponent} from 'value_generators/templates/random-selector.component';
 import {CopierComponent} from 'value_generators/templates/copier.component';
-import {PrimaryButtonComponent} from './button-directives/primary-button.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -357,7 +356,6 @@ import {DirectivesModule} from 'directives/directives.module';
     ComponentOverviewComponent,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
-    PrimaryButtonComponent,
   ],
 
   entryComponents: [
@@ -489,7 +487,6 @@ import {DirectivesModule} from 'directives/directives.module';
     CopierComponent,
     RandomSelectorComponent,
     RteHelperModalComponent,
-    PrimaryButtonComponent,
   ],
 
   exports: [
@@ -630,7 +627,6 @@ import {DirectivesModule} from 'directives/directives.module';
     TranslateModule,
     VisualizationSortedTilesComponent,
     RteHelperModalComponent,
-    PrimaryButtonComponent,
   ],
 })
 export class SharedComponentsModule {}
