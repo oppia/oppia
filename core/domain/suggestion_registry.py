@@ -407,8 +407,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         score_category: str,
         language_code: Optional[str],
         edited_by_reviewer: bool,
-        last_updated: Optional[datetime.datetime] = None,
-        created_on: Optional[datetime.datetime] = None
+        last_updated: datetime.datetime,
+        created_on: datetime.datetime
     ) -> None:
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
@@ -643,8 +643,8 @@ class SuggestionTranslateContent(BaseSuggestion):
         score_category: str,
         language_code: str,
         edited_by_reviewer: bool,
-        last_updated: Optional[datetime.datetime] = None,
-        created_on: Optional[datetime.datetime] = None
+        last_updated: datetime.datetime,
+        created_on: datetime.datetime
     ) -> None:
         """Initializes an object of type SuggestionTranslateContent
         corresponding to the SUGGESTION_TYPE_TRANSLATE_CONTENT choice.
@@ -895,8 +895,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         score_category: str,
         language_code: str,
         edited_by_reviewer: bool,
-        last_updated: Optional[datetime.datetime] = None,
-        created_on: Optional[datetime.datetime] = None
+        last_updated: datetime.datetime,
+        created_on: datetime.datetime
     ) -> None:
         """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
