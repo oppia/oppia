@@ -159,7 +159,7 @@ class ExplorationEmbedPage(
             self.iframed = True
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         self.iframed = True
         self.render_template(
@@ -259,7 +259,7 @@ class ExplorationPage(
             collection_id = self.normalized_request.get('collection_id')
 
         if not _does_exploration_exist(exploration_id, version, collection_id):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         self.render_template('oppia-root.mainpage.html')
 
@@ -332,7 +332,7 @@ class ExplorationHandler(
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False, version=version)
         if exploration is None:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -2172,7 +2172,7 @@ class TransientCheckpointUrlPage(
             exp_fetchers.get_logged_out_user_progress(unique_progress_url_id))
 
         if logged_out_user_data is None:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
 
         redirect_url = '%s/%s?pid=%s' % (
             feconf.EXPLORATION_URL_PREFIX,
@@ -2368,7 +2368,7 @@ class LearnerAnswerDetailsSubmissionHandler(
         """
         assert self.normalized_payload is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         interaction_id = self.normalized_payload['interaction_id']
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -2625,7 +2625,7 @@ class StateVersionHistoryHandler(
         )
 
         if version_history is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         state_version_history = (
             version_history.state_version_history[state_name]
@@ -2703,7 +2703,7 @@ class MetadataVersionHistoryHandler(
         )
 
         if version_history is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         metadata_version_history = version_history.metadata_version_history
         metadata_in_previous_version = None

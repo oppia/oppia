@@ -252,12 +252,12 @@ class BlogPostDataHandler(
             blog_post_url: str. The URL of the blog post.
 
         Raises:
-            PageNotFoundException. The blog post page with the given url
+            NotFoundException. The blog post page with the given url
                 doesn't exist.
         """
         blog_post = blog_services.get_blog_post_by_url_fragment(blog_post_url)
         if not blog_post:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception(
                     'The blog post page with the given url doesn\'t exist.'))
         user_settings = user_services.get_user_settings(

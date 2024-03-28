@@ -1330,7 +1330,7 @@ class AdminRoleHandler(
                 is 'role'.
             Exception. The username must be provided when the filter
                 criterion is 'username'.
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.user_id is not None
         # Here we use cast because we are narrowing down the type of
@@ -1379,7 +1379,7 @@ class AdminRoleHandler(
                 self.user_id, feconf.ROLE_ACTION_VIEW_BY_USERNAME,
                 username=username)
             if user_id is None:
-                raise self.InvalidInputException(
+                raise self.NotFoundException(
                     'User with given username does not exist.')
 
             user_settings = user_services.get_user_settings(user_id)
@@ -1408,7 +1408,7 @@ class AdminRoleHandler(
         """Adds a role to a user.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
             InvalidInputException. Unsupported role for this handler.
         """
         assert self.normalized_payload is not None
@@ -1417,7 +1417,7 @@ class AdminRoleHandler(
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
@@ -1435,7 +1435,7 @@ class AdminRoleHandler(
         """Removes a role from a user.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         # Here we use cast because we are narrowing down the type of
         # 'normalized_request' from Union of request TypedDicts to a
@@ -1450,7 +1450,7 @@ class AdminRoleHandler(
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
 
         if role == feconf.ROLE_ID_TOPIC_MANAGER:
@@ -1511,7 +1511,7 @@ class TopicManagerRoleHandler(
         of a specific topic.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
@@ -1521,7 +1521,7 @@ class TopicManagerRoleHandler(
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
 
         user_id = user_settings.user_id
@@ -1601,14 +1601,14 @@ class BannedUsersHandler(
         """Marks a user as banned.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
         topic_services.deassign_user_from_all_topics(self.user, user_id)
         user_services.mark_user_banned(user_id)
@@ -1620,14 +1620,14 @@ class BannedUsersHandler(
         """Removes the banned status of the user.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.normalized_request is not None
         username = self.normalized_request['username']
         user_id = user_services.get_user_id_from_username(username)
 
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
         user_services.unmark_user_banned(user_id)
 
@@ -1685,7 +1685,7 @@ class AdminSuperAdminPrivilegesHandler(
         Raises:
             UnauthorizedUserException. Only the default system admin can
                 manage super admins.
-            InvalidInputException. No such user exists.
+            NotFoundException. No such user exists.
         """
         assert self.normalized_payload is not None
         if self.email != feconf.ADMIN_EMAIL_ADDRESS:
@@ -1695,7 +1695,7 @@ class AdminSuperAdminPrivilegesHandler(
 
         user_id = user_services.get_user_id_from_username(username)
         if user_id is None:
-            raise self.InvalidInputException('No such user exists')
+            raise self.NotFoundException('No such user exists')
 
         auth_services.grant_super_admin_privileges(user_id)
         self.render_json(self.values)
@@ -1707,7 +1707,7 @@ class AdminSuperAdminPrivilegesHandler(
         Raises:
             UnauthorizedUserException. Only the default system admin can
                 manage super admins.
-            InvalidInputException. No such user exists.
+            NotFoundException. No such user exists.
             InvalidInputException. Cannot revoke privileges from the default
                 super admin account.
         """
@@ -1719,7 +1719,7 @@ class AdminSuperAdminPrivilegesHandler(
 
         user_settings = user_services.get_user_settings_from_username(username)
         if user_settings is None:
-            raise self.InvalidInputException('No such user exists')
+            raise self.NotFoundException('No such user exists')
 
         if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
             raise self.InvalidInputException(
@@ -1804,7 +1804,7 @@ class DataExtractionQueryHandler(
         state within an exploration.
 
         Raises:
-            InvalidInputException. Entity not found.
+            NotFoundException. Entity not found.
             InvalidInputException. Exploration does not have such state.
             Exception. No state answer exists.
         """
@@ -1815,9 +1815,9 @@ class DataExtractionQueryHandler(
         exploration = exp_fetchers.get_exploration_by_id(
             exp_id, strict=False, version=exp_version)
         if exploration is None:
-            raise self.InvalidInputException(
-                'Entity for exploration with id %s and version %s not found.'
-                % (exp_id, exp_version))
+            raise self.NotFoundException(
+                'Entity for exploration with id %s and version '
+                '%s not found.' % (exp_id, exp_version))
 
         state_name = self.normalized_request['state_name']
         num_answers = self.normalized_request['num_answers']
@@ -1913,10 +1913,10 @@ class UpdateUsernameHandler(
         """Updates the username for a user.
 
         Raises:
-            InvalidInputException. Invalid username.
-            InvalidInputException. The user does not have a profile picture
+            NotFoundException. Invalid username.
+            NotFoundException. The user does not have a profile picture
                 with png extension.
-            InvalidInputException. The user does not have a profile picture
+            NotFoundException. The user does not have a profile picture
                 with webp extension.
         """
         assert self.user_id is not None
@@ -1926,7 +1926,7 @@ class UpdateUsernameHandler(
 
         user_id = user_services.get_user_id_from_username(old_username)
         if user_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'Invalid username: %s' % old_username)
 
         if user_services.is_username_taken(new_username):
@@ -1939,16 +1939,14 @@ class UpdateUsernameHandler(
             feconf.ENTITY_TYPE_USER, new_username)
 
         if not old_fs.isfile('profile_picture.png'):
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'The user with username %s does not have a '
-                'profile picture with png extension.' % old_username
-            )
+                'profile picture with png extension.' % old_username)
 
         if not old_fs.isfile('profile_picture.webp'):
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'The user with username %s does not have a '
-                'profile picture with webp extension.' % old_username
-            )
+                'profile picture with webp extension.' % old_username)
 
         image_png = old_fs.get('profile_picture.png')
         old_fs.delete('profile_picture.png')
@@ -2064,7 +2062,7 @@ class DeleteUserHandler(
         """Initiates the pre-deletion process for a user.
 
         Raises:
-            InvalidInputException. The username doesn't belong to any user.
+            NotFoundException. The username doesn't belong to any user.
             InvalidInputException. The user ID retrieved from the username
                 and the user ID provided by admin differ.
         """
@@ -2075,9 +2073,9 @@ class DeleteUserHandler(
         user_id_from_username = (
             user_services.get_user_id_from_username(username))
         if user_id_from_username is None:
-            raise self.InvalidInputException(
-                'The username doesn\'t belong to any user'
-            )
+            raise self.NotFoundException(
+                'The username doesn\'t belong to any user')
+
         if user_id_from_username != user_id:
             raise self.InvalidInputException(
                 'The user ID retrieved from the username and '
@@ -2135,10 +2133,10 @@ class UpdateBlogPostHandler(
         """Updates the author and published date of a blog post.
 
         Raises:
-            InvalidInputException. Invalid username.
-            InvalidInputException. User does not have enough rights to be
+            NotFoundException. Invalid username.
+            UnauthorizedUserException. User does not have enough rights to be
                 blog post author.
-            PageNotFoundException. The blog post with the given id or url
+            NotFoundException. The blog post with the given id or url
                 doesn't exist.
         """
         assert self.normalized_payload is not None
@@ -2148,20 +2146,19 @@ class UpdateBlogPostHandler(
 
         author_id = user_services.get_user_id_from_username(author_username)
         if author_id is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'Invalid username: %s' % author_username)
 
         user_actions = user_services.get_user_actions_info(author_id).actions
         if role_services.ACTION_ACCESS_BLOG_DASHBOARD not in user_actions:
-            raise self.InvalidInputException(
+            raise self.UnauthorizedUserException(
                 'User does not have enough rights to be blog post author.')
 
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
-            raise self.PageNotFoundException(
-                Exception(
-                    'The blog post with the given id or url doesn\'t exist.'))
+            raise self.NotFoundException(
+                'The blog post with the given id or url doesn\'t exist.')
 
         blog_services.update_blog_models_author_and_published_on_date(
             blog_post_id, author_id, published_on)
@@ -2215,7 +2212,7 @@ class TranslationCoordinatorRoleHandler(
         context of a specific language.
 
         Raises:
-            InvalidInputException. User with given username does not exist.
+            NotFoundException. User with given username does not exist.
         """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
@@ -2225,7 +2222,7 @@ class TranslationCoordinatorRoleHandler(
         user_settings = user_services.get_user_settings_from_username(username)
 
         if user_settings is None:
-            raise self.InvalidInputException(
+            raise self.NotFoundException(
                 'User with given username does not exist.')
 
         user_id = user_settings.user_id
@@ -2291,7 +2288,7 @@ class InteractionsByExplorationIdHandler(
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, strict=False)
         if exploration is None:
-            raise self.InvalidInputException('Exploration does not exist.')
+            raise self.NotFoundException('Exploration does not exist.')
 
         interaction_ids = [
             state.interaction.id

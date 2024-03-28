@@ -175,7 +175,7 @@ class TrainedClassifierHandler(
             ) from e
 
         if interaction_id not in feconf.INTERACTION_CLASSIFIER_MAPPING:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'No classifier algorithm found for %s interaction' % (
                     interaction_id))
 
@@ -201,7 +201,7 @@ class TrainedClassifierHandler(
             # Once jobs are migrated and trained they can be sent to the client
             # upon further requests. This exception should be gracefully
             # handled in the client code and shouldn't break UX.
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'No valid classifier exists for the given exploration state')
 
         training_job = classifier_services.get_classifier_training_job_by_id(
@@ -209,7 +209,7 @@ class TrainedClassifierHandler(
 
         if training_job is None or (
                 training_job.status != feconf.TRAINING_JOB_STATUS_COMPLETE):
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'No valid classifier exists for the given exploration state')
 
         if training_job.algorithm_version != algorithm_version:
@@ -220,7 +220,7 @@ class TrainedClassifierHandler(
             # Once jobs are migrated and trained they can be sent to the client
             # upon further requests. This exception should be gracefully
             # handled in the client code and shouldn't break UX.
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'No valid classifier exists for the given exploration state')
 
         return self.render_json({

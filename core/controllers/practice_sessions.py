@@ -119,7 +119,7 @@ class PracticeSessionsPageDataHandler(
             topic_name: str. The topic name.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
         """
         assert self.normalized_request is not None
         # Topic cannot be None as an exception will be thrown from its decorator
@@ -139,7 +139,7 @@ class PracticeSessionsPageDataHandler(
         try:
             skills = skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
         skill_ids_to_descriptions_map = {}
         for skill in skills:
             skill_ids_to_descriptions_map[skill.id] = skill.description
