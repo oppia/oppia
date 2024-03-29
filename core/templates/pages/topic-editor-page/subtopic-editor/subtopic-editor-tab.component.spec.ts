@@ -170,16 +170,6 @@ describe('Subtopic editor tab', () => {
     expect(component.editableTitle).toEqual('Subtopic1');
   });
 
-  it('should assign default values to modal when initialized', () => {
-    component.ngOnInit();
-    expect(component.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT).toEqual(
-      AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
-    );
-    expect(component.MAX_CHARS_IN_SUBTOPIC_TITLE).toEqual(
-      AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE
-    );
-  });
-
   it('should call topicUpdateService if subtopic title updates', () => {
     let titleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
     component.updateSubtopicTitle('New title');

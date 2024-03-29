@@ -67,9 +67,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   skillsListIsShown: boolean;
   subtopicEditorCardIsShown: boolean;
   selectedSkillEditOptionsIndex: number;
+  maxCharsInSubtopicTitle!: number;
+  maxCharsInSubtopicUrlFragment!: number;
   SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
-  MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
-  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
 
   constructor(
     private questionBackendApiService: QuestionBackendApiService,
@@ -340,8 +340,8 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     if (this.topicEditorStateService.hasLoadedTopic()) {
       this.initEditor();
     }
-    this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
-    this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
+    this.maxCharsInSubtopicTitle = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
+    this.maxCharsInSubtopicUrlFragment =
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
   }
 

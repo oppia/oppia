@@ -250,22 +250,22 @@ describe('Topic editor tab directive', () => {
     expect(component.SUBTOPIC_LIST).toEqual('subtopic');
     expect(component.SKILL_LIST).toEqual('skill');
     expect(component.STORY_LIST).toEqual('story');
-    expect(component.MAX_CHARS_IN_TOPIC_NAME).toEqual(
+    expect(component.maxCharsInTopicName).toEqual(
       AppConstants.MAX_CHARS_IN_TOPIC_NAME
     );
-    expect(component.MAX_CHARS_IN_TOPIC_URL_FRAGMENT).toEqual(
+    expect(component.maxCharsInTopicUrlFragment).toEqual(
       AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
     );
-    expect(component.MAX_CHARS_IN_TOPIC_DESCRIPTION).toEqual(
+    expect(component.maxCharsInTopicDescription).toEqual(
       AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION
     );
-    expect(component.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB).toEqual(
+    expect(component.maxCharsInPageTitleFragmentForWeb).toEqual(
       AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
     );
-    expect(component.MAX_CHARS_IN_META_TAG_CONTENT).toEqual(
+    expect(component.maxCharsInMetaTagContent).toEqual(
       AppConstants.MAX_CHARS_IN_META_TAG_CONTENT
     );
-    expect(component.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB).toEqual(
+    expect(component.minCharsInPageTitleFragmentForWeb).toEqual(
       AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
     );
   });
