@@ -218,7 +218,9 @@ export class RteHelperModalComponent {
       this.ngbActiveModal.dismiss(true);
     } else {
       this.ngbActiveModal.dismiss(false);
-      this.customizationArgsFormSubscription.unsubscribe();
+      if (this.customizationArgsFormSubscription) {
+        this.customizationArgsFormSubscription.unsubscribe();
+      }
     }
   }
 
