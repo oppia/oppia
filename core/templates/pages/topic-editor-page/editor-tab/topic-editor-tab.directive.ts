@@ -92,6 +92,12 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   uncategorizedEditOptionsIndex: number;
   subtopicEditOptionsAreShown: number;
   skillOptionDialogueBox: boolean = true;
+  MAX_CHARS_IN_TOPIC_NAME!: number;
+  MAX_CHARS_IN_TOPIC_URL_FRAGMENT!: number;
+  MAX_CHARS_IN_TOPIC_DESCRIPTION!: number;
+  MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB!: number;
+  MAX_CHARS_IN_META_TAG_CONTENT!: number;
+  MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB!: number;
 
   constructor(
     private contextService: ContextService,
@@ -651,6 +657,17 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     );
     this.initEditor();
     this._initStorySummaries();
+    this.MAX_CHARS_IN_TOPIC_NAME = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
+    this.MAX_CHARS_IN_TOPIC_URL_FRAGMENT =
+      AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
+    this.MAX_CHARS_IN_TOPIC_DESCRIPTION =
+      AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION;
+    this.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB =
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+    this.MAX_CHARS_IN_META_TAG_CONTENT =
+      AppConstants.MAX_CHARS_IN_META_TAG_CONTENT;
+    this.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB =
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   }
 
   ngOnDestroy(): void {

@@ -29,6 +29,7 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {StoryReference} from 'domain/topic/story-reference-object.model';
 import {Topic} from 'domain/topic/topic-object.model';
+import {AppConstants} from 'app.constants';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
@@ -249,6 +250,24 @@ describe('Topic editor tab directive', () => {
     expect(component.SUBTOPIC_LIST).toEqual('subtopic');
     expect(component.SKILL_LIST).toEqual('skill');
     expect(component.STORY_LIST).toEqual('story');
+    expect(component.MAX_CHARS_IN_TOPIC_NAME).toEqual(
+      AppConstants.MAX_CHARS_IN_TOPIC_NAME
+    );
+    expect(component.MAX_CHARS_IN_TOPIC_URL_FRAGMENT).toEqual(
+      AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+    );
+    expect(component.MAX_CHARS_IN_TOPIC_DESCRIPTION).toEqual(
+      AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION
+    );
+    expect(component.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB).toEqual(
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+    );
+    expect(component.MAX_CHARS_IN_META_TAG_CONTENT).toEqual(
+      AppConstants.MAX_CHARS_IN_META_TAG_CONTENT
+    );
+    expect(component.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB).toEqual(
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+    );
   });
 
   it('should call EntityCreationService to create skill', () => {

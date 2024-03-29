@@ -68,6 +68,8 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicEditorCardIsShown: boolean;
   selectedSkillEditOptionsIndex: number;
   SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
+  MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
+  MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
 
   constructor(
     private questionBackendApiService: QuestionBackendApiService,
@@ -338,6 +340,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     if (this.topicEditorStateService.hasLoadedTopic()) {
       this.initEditor();
     }
+    this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
+    this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
+      AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
   }
 
   ngOnDestroy(): void {
