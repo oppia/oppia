@@ -50,6 +50,7 @@ describe('User info model', () => {
     expect(userInfo.getUsername()).toBe('tester');
     expect(userInfo.getEmail()).toBe('tester@example.org');
     expect(userInfo.isLoggedIn()).toBe(true);
+    expect(userInfo.isVoiceoverAdmin()).toBe(false);
   });
 
   it('should create correct default UserInfo object', () => {
@@ -65,5 +66,6 @@ describe('User info model', () => {
     expect(userInfo.getUsername()).toBeNull();
     expect(userInfo.getEmail()).toBeNull();
     expect(userInfo.isLoggedIn()).toBe(false);
+    expect(userInfo.isVoiceoverAdmin()).toBe(false);
   });
 });
