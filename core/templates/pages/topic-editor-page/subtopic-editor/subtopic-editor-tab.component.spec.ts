@@ -20,7 +20,6 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
-import {AppConstants} from 'app.constants';
 import {SubtopicEditorTabComponent} from './subtopic-editor-tab.component';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
