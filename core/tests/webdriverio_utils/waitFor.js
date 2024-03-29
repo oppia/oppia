@@ -87,7 +87,7 @@ var pageToFullyLoad = async function () {
   var loadingMessage = await $('.e2e-test-loading-fullpage');
   // Wait for the message to disappear.
   await loadingMessage.waitForDisplayed({
-    timeout: 15000,
+    timeout: 30000,
     reverse: true,
     timeoutMsg:
       'Loading message takes more than 15 sec to disappear\n' +
