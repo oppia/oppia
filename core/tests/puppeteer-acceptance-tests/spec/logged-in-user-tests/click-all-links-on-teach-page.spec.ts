@@ -34,77 +34,53 @@ describe('Logged-in Users', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'should be able to navigate to the Get Started page using the footer',
+    'should be able to navigate to the Creator Guidelines page using the footer',
     async function () {
       await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToGetStartedPageViaFooter();
+      await testUser.navigateToCreatorGuidelinesPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   describe('on the Get Started page', function () {
     beforeEach(async function () {
-      await testUser.navigateToGetStartedPage();
+      await testUser.navigateToCreatorGuidelinesPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
     it(
-      'should be able to use the "create one here" link',
+      'should be able to use the "forum" link',
       async function () {
-        await testUser.clickCreateOneHereLinkOnGetStartedPage();
+        await testUser.clickForumLinkOnCreatorGuidelinesPage();
       },
       DEFAULT_SPEC_TIMEOUT
     );
 
     it(
-      'should be able to use the "Welcome to Oppia" link',
+      'should be able to use the "Design Tips" link',
       async function () {
-        await testUser.clickWelcomeToOppiaLinkOnGetStartedPage();
+        await testUser.clickDesignTipsLinkOnCreatorGuidelinesPage();
       },
       DEFAULT_SPEC_TIMEOUT
     );
 
     it(
-      'should be able to use the "Get Electrified!" link',
+      'should be able to use the "Create an Exploration" link',
       async function () {
-        await testUser.clickGetElectrifiedLinkOnGetStartedPage();
+        await testUser.clickCreateAnExplorationLinkOnCreatorGuidelinesPage();
       },
       DEFAULT_SPEC_TIMEOUT
     );
 
     it(
-      'should be able to use the "Programming with Carla" link',
+      'should be able to use the "Browse our Expectations" link',
       async function () {
-        await testUser.clickProgrammingWithCarlaLinkOnGetStartedPage();
+        await testUser.clickBrowseOurExpectationsLinkOnCreatorGuidelinesPage();
       },
       DEFAULT_SPEC_TIMEOUT
     );
+  });
 
-    it(
-      'should be able to use "in our user documentation" link',
-      async function () {
-        await testUser.clickInOurUserDocumentationLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to use the "embed it in your own web page" link',
-      async function () {
-        await testUser.clickEmbedItInYourOwnWebPageLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to use the "discover more ways to get involved" link',
-      async function () {
-        await testUser.clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    afterAll(async function () {
-      await UserFactory.closeAllBrowsers();
-    });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

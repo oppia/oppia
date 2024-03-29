@@ -36,6 +36,7 @@ export default {
     CreatorDashboardCreateMode:
       'http://localhost:8181/creator-dashboard?mode=create',
     CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
+    CreatorGuidelines: 'http://localhost:8181/creator-guidelines',
     Donate: 'http://localhost:8181/donate',
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
     EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
@@ -56,6 +57,7 @@ export default {
       'https://m.facebook.com/oppiaorg/videos/189487953721583/',
     Partnerships: 'http://localhost:8181/partnerships',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
+    Teach: 'http://localhost:8181/teach',
     Volunteer: 'http://localhost:8181/volunteer',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
   },

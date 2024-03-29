@@ -47,6 +47,7 @@ const electromagnetismUrl = testConstants.URLs.Electromagnetism;
 const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
+const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -68,7 +69,9 @@ const footerAboutLink = 'a.e2e-test-footer-about-link';
 const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
-const footerGetStartedLink = 'a.e2e-test-get-started-link';
+const footerGetStartedLink = 'a.e2e-test-footer-get-started-link';
+const footerCreatorGuidelinesLink = 'a.e2e-test-creator-guidelines-link';
+const footerTeachLink = 'a.e2e-test-teach-link';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -150,6 +153,13 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToGetStartedPage(): Promise<void> {
     await this.goto(getStartedUrl);
+  }
+
+  /**
+   * Function to navigate to the Creator Guidelines page.
+   */
+  async navigateToCreatorGuidelinesPage(): Promise<void> {
+    await this.goto(creatorGuidelinesUrl);
   }
 
   /**
@@ -796,6 +806,32 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the GetStarted page using the oppia website footer.
+   */
+  async navigateToCreatorGuidelinesPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerCreatorGuidelinesLink,
+      'Creator Guidelines in the About Menu on navbar',
+      creatorGuidelinesUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Navigates to the GetStarted page using the oppia website footer.
+   */
+  async navigateToTeachPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerTeachLink,
+      'Creator Guidelines in the About Menu on navbar',
+      teach,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
    * Function to click an anchor tag and check if it opens the expected destination
    * in a new tab. Closes the tab afterwards.
    */
@@ -818,7 +854,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the link with the text "create on here" on the Get Stated page.
    */
-  async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
+  async clickCreateOneHereLinkOnGetStartedPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"create one here")]');
     const pageTarget = this.page.target();
     await this.clickOn('create one here');
@@ -836,21 +872,21 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the link with the text "Welcome to Oppia" on the Get Stated page.
    */
-  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<void> {
+  async clickWelcomeToOppiaLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab('Welcome to Oppia', welcomeToOppiaUrl);
   }
 
   /**
    * Clicks the link with the text "Get Electrified!" on the Get Stated page.
    */
-  async clickGetElectrifiedLinkInGetStartedPage(): Promise<void> {
+  async clickGetElectrifiedLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab('Get Electrified!', electromagnetismUrl);
   }
 
   /**
    * Clicks the link with the text "Programming with Carla" on the Get Stated page.
    */
-  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<void> {
+  async clickProgrammingWithCarlaLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab(
       'Programming with Carla',
       programmingWithCarlaUrl
@@ -860,7 +896,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the link with the text "in our user documentation" on the Get Stated page.
    */
-  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<void> {
+  async clickInOurUserDocumentationLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab(
       'in our user documentation',
       creatingAnExplorationUrl
@@ -870,7 +906,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the link with the text "embed it in your own web page" on the Get Stated page.
    */
-  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<void> {
+  async clickEmbedItInYourOwnWebPageLinkOnGetStartedPage(): Promise<void> {
     await this.clickLinkAnchorToNewTab(
       'embed it in your own web page',
       embeddingAnExplorationUrl
@@ -880,7 +916,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the link with the text "discover more ways to get involved" on the Get Stated page.
    */
-  async clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage(): Promise<void> {
+  async clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage(): Promise<void> {
     await this.page.waitForXPath(
       '//a[contains(text(),"discover more ways to get involved")]'
     );
@@ -891,6 +927,66 @@ export class LoggedInUser extends BaseUser {
     ]);
 
     expect(this.page.url()).toBe(contactUrl);
+  }
+
+  /**
+   * Clicks the link with the text "forum" on the Creator Guidelines page.
+   */
+  async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"forum")]');
+    const pageTarget = this.page.target();
+    await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
+
+    await this.page.waitForNetworkIdle();
+    expect(this.page.url()).toBe('https://groups.google.com/g/oppia');
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickDesignTipsLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"Design Tips")]');
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Design Tips'),
+    ]);
+
+    expect(this.page.url()).toBe('http://oppia.github.io/#/DesignTips');
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickCreateAnExplorationLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"Create an Exploration")]'
+    );
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Create an Exploration'),
+    ]);
+
+    expect(this.page.url()).toBe(
+      'http://localhost:8181/creator-dashboard?mode=create'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickBrowseOurExpectationsLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"Browse our Explorations")]'
+    );
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Browse our Explorations'),
+    ]);
+
+    expect(this.page.url()).toBe('http://localhost:8181/community-library');
   }
 }
 
