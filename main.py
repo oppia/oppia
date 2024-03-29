@@ -413,10 +413,6 @@ URLS = [
         r'/<story_url_fragment>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
         review_tests.ReviewTestsPageDataHandler),
     get_redirect_route(
-        r'%s/review-test/<story_url_fragment>'
-        % feconf.TOPIC_VIEWER_URL_PREFIX,
-        review_tests.ReviewTestsPage),
-    get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
         r'/<story_url_fragment>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
