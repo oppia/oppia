@@ -149,7 +149,6 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
         error_msg = (
             'Could not find the resource http://localhost'
-            'Could not find the resource http://localhost'
             '/mock_secret_page/%s.' % self.secret
         )
         self.assertEqual(response['error'], error_msg)
