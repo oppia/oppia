@@ -94,7 +94,7 @@ export class ConversationSkinService {
       previousSupplementalCardIsNonempty &&
       !nextSupplementalCardIsNonempty
     ) {
-      component.animateToOneCard(() => {
+      component?.animateToOneCard(() => {
         this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
       });
     } else {
