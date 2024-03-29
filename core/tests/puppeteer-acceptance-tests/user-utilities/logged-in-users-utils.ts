@@ -825,7 +825,7 @@ export class LoggedInUser extends BaseUser {
    * Function for giving feedback for an exploration.
    */
   async giveFeedbackToExploration(feedbackMessage: string): Promise<void> {
-    await this.page.click(explorationFeedbackButton);
+    await this.clickOn(explorationFeedbackButton);
     await this.type(feedbackTextArea, feedbackMessage);
     await this.page.click('.e2e-test-exploration-feedback-submit-btn');
     await this.page.waitForSelector('ngb-popover-window');
@@ -833,24 +833,12 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * This function checks whether explorations with the given title are present in the Play Later.
+   * This function checks whether explorations with the given title is present in the Play Later.
    */
   async expectExplorationWithTitleToBePresentInPlayLater(
-    title: string,
-    shouldBePresent: boolean
+    title: string
   ): Promise<void> {
     const allExplorations = await this.page.$$(playLaterExplorationCard);
-
-    if (!shouldBePresent) {
-      if (allExplorations.length > 0) {
-        throw new Error('There are some explorations present in Play Later');
-      } else {
-        showMessage(
-          `Exploration with title ${title} does not exists in Play Later`
-        );
-      }
-      return;
-    }
 
     if (allExplorations.length === 0) {
       throw new Error(
@@ -873,6 +861,23 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * This function checks whether explorations with the given title is absent in the Play Later.
+   */
+  async expectExplorationWithTitleToBeAbsentInPlayLater(
+    title: string
+  ): Promise<void> {
+    const allExplorations = await this.page.$$(playLaterExplorationCard);
+
+    if (allExplorations.length > 0) {
+      throw new Error('There are some explorations present in Play Later');
+    } else {
+      showMessage(
+        `Exploration with title ${title} does not exist in Play Later`
+      );
+    }
+  }
+
+  /**
    * This function to add exploration to play later.
    */
   async addExplorationToPlayLater(): Promise<void> {
@@ -887,8 +892,7 @@ export class LoggedInUser extends BaseUser {
   async removeExplorationFromPlayLater(): Promise<void> {
     await this.page.hover(playLaterExplorationCard);
     await this.page.click('.remove-icon');
-    await this.page.waitForSelector(confirmRemoveButton);
-    await this.page.click(confirmRemoveButton);
+    await this.clickOn(confirmRemoveButton);
     showMessage('Removed exploration from play later');
   }
 

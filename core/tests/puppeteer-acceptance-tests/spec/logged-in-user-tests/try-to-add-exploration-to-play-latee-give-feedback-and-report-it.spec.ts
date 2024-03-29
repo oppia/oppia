@@ -51,13 +51,11 @@ describe('Logged-in User', function () {
       await testLearner.navigateToLearnerDashboardPage();
       await testLearner.openCommunityLessonsTab();
       await testLearner.expectExplorationWithTitleToBePresentInPlayLater(
-        'Test Exploration',
-        true
+        'Test Exploration'
       );
       await testLearner.removeExplorationFromPlayLater();
-      await testLearner.expectExplorationWithTitleToBePresentInPlayLater(
-        'Test Exploration',
-        false
+      await testLearner.expectExplorationWithTitleToBeAbsentInPlayLater(
+        'Test Exploration'
       );
 
       await testLearner.searchAndOpenExplorationFromCommunityLibrary(
