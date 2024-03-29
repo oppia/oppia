@@ -812,12 +812,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.click(
       'oppia-exploration-successfully-flagged-modal button'
     );
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(explorationFeedbackButton);
     showMessage(`Exploration reported with message ${reportMessage}.`);
   }
 
