@@ -105,7 +105,7 @@ describe('RteHelperModalComponent', () => {
       },
     ];
 
-   beforeEach(() => {
+    beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
       component.componentId = 'video';
