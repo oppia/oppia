@@ -48,6 +48,7 @@ const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
 const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
 const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
+const teachUrl = testConstants.URLs.Teach;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -160,6 +161,13 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToCreatorGuidelinesPage(): Promise<void> {
     await this.goto(creatorGuidelinesUrl);
+  }
+
+  /**
+   * Function to navigate to the Teach page.
+   */
+  async navigateToTeachPage(): Promise<void> {
+    await this.goto(teachUrl);
   }
 
   /**
@@ -826,7 +834,7 @@ export class LoggedInUser extends BaseUser {
     await this.clickButtonToNavigateToNewPage(
       footerTeachLink,
       'Creator Guidelines in the About Menu on navbar',
-      teach,
+      teachUrl,
       'Creator Guidelines'
     );
   }
@@ -977,6 +985,22 @@ export class LoggedInUser extends BaseUser {
    * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
    */
   async clickBrowseOurExpectationsLinkOnCreatorGuidelinesPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"Browse our Explorations")]'
+    );
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('Browse our Explorations'),
+    ]);
+
+    expect(this.page.url()).toBe('http://localhost:8181/community-library');
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickBrowseOurLessonsOnTeachPage(): Promise<void> {
     await this.page.waitForXPath(
       '//a[contains(text(),"Browse our Explorations")]'
     );

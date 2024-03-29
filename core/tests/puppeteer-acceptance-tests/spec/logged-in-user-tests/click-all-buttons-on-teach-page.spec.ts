@@ -37,14 +37,14 @@ describe('Logged-in Users', function () {
     'should be able to navigate to the Creator Guidelines page using the footer',
     async function () {
       await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToCreatorGuidelinesPageViaFooter();
+      await testUser.navigateToTeachPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
   describe('on the Get Started page', function () {
     beforeEach(async function () {
-      await testUser.navigateToCreatorGuidelinesPage();
+      await testUser.navigateToTeachPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
     it(
