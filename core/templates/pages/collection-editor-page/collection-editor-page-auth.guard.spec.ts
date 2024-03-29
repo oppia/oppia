@@ -21,12 +21,11 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/ro
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { AppConstants } from 'app.constants';
-import { EditLearnerGroupPageAuthGuard } from './edit-learner-group-page-auth.guard';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-
+import { CollectionEditorPageAuthGuard } from './collection-editor-page-auth.guard';
+import { AccessValidationBackendApiService } from '../oppia-root/routing/access-validation-backend-api.service';
 
 class MockAccessValidationBackendApiService {
-  validateAccessToLearnerGroupEditorPage(learnerGroupId: string) {
+    validateAccessCollectionEditorPage(collectionId: string) {
     return Promise.resolve();
   }
 }
@@ -37,8 +36,8 @@ class MockRouter {
   }
 }
 
-fdescribe('EditLearnerGroupPageAuthGuard', () => {
-  let guard: EditLearnerGroupPageAuthGuard;
+fdescribe('CollectionEditorPageAuthGuard', () => {
+  let guard: CollectionEditorPageAuthGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;
 
@@ -46,7 +45,7 @@ fdescribe('EditLearnerGroupPageAuthGuard', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       providers: [
-        EditLearnerGroupPageAuthGuard,
+        CollectionEditorPageAuthGuard,
         { provide: AccessValidationBackendApiService,
           useClass: MockAccessValidationBackendApiService },
         { provide: Router, useClass: MockRouter },
@@ -54,7 +53,7 @@ fdescribe('EditLearnerGroupPageAuthGuard', () => {
       ],
     });
 
-    guard = TestBed.inject(EditLearnerGroupPageAuthGuard);
+    guard = TestBed.inject(CollectionEditorPageAuthGuard);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService
     );
@@ -64,7 +63,7 @@ fdescribe('EditLearnerGroupPageAuthGuard', () => {
   it('should allow access if validation succeeds', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
-      'validateAccessToLearnerGroupEditorPage')
+      'validateAccessCollectionEditorPage')
       .and.returnValue(Promise.resolve());
     const navigateSpy = spyOn(router, 'navigate')
       .and.returnValue(Promise.resolve(true));
@@ -86,7 +85,7 @@ fdescribe('EditLearnerGroupPageAuthGuard', () => {
   it('should redirect to 401 page if validation fails', fakeAsync(() => {
     spyOn(
       accessValidationBackendApiService,
-      'validateAccessToLearnerGroupEditorPage')
+      'validateAccessCollectionEditorPage')
       .and.returnValue(Promise.reject());
     const navigateSpy = spyOn(router, 'navigate')
       .and.returnValue(Promise.resolve(true));

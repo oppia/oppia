@@ -60,9 +60,6 @@ module.exports = {
     }
   },
   entry: {
-    collection_editor:
-      commonPrefix + '/pages/collection-editor-page/' +
-      'collection-editor-page.import.ts',
     collection_player:
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.import.ts',
@@ -154,21 +151,6 @@ module.exports = {
       template:
         commonPrefix + '/pages/diagnostic-test-player-page/' +
         'diagnostic-test-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['collection_editor'],
-      filename: 'collection-editor-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description: 'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.'
-      },
-      template:
-        commonPrefix + '/pages/collection-editor-page/' +
-        'collection-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

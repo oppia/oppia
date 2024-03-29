@@ -27,6 +27,14 @@ from core.domain import learner_group_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
+from core.domain import user_services
+from core.domain import collection_services
+from core.domain import rights_manager
+from core.domain import rights_domain
+
+
+
+
 
 from typing import Final
 
@@ -466,6 +474,74 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.get_json(
             '%s/can_access_blog_author_profile_page/invalid_username' % (
             ACCESS_VALIDATION_HANDLER_PREFIX
+            ), expected_status_int=404
+        )
+        self.logout()
+
+class CollectionEditorPageAccessValidationHandler(test_utils.GenericTestBase):
+
+    COLLECTION_ID: Final = '0'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.collection_editor_username = 'collectionEditor'
+        self.guest_username = 'guest'
+        self.user_email = 'collectionEditor@example.com'
+        self.guest_email = 'guest@example.com'
+
+        system_user = user_services.get_system_user()
+        collection_services.load_demo(self.COLLECTION_ID)
+        rights_manager.release_ownership_of_collection(
+            system_user, self.COLLECTION_ID)
+
+        self.signup(self.user_email, self.collection_editor_username)
+        self.signup(self.guest_email, self.guest_username)
+        self.add_user_role(
+            self.collection_editor_username, feconf.ROLE_ID_COLLECTION_EDITOR)
+
+    def test_collection_editor_page_access_with_logging_in(self) -> None:
+        self.login(self.user_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_collection_editor_page_access_after_logging_in(self) -> None:
+        self.login(self.user_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_collection_editor_page_access_as_collection_editor(self) -> None:
+        self.login(self.user_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_validation_returns_false_if_given_user_is_not_collection_editor(
+        self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
+            ), expected_status_int=200
+        )
+        self.logout()
+
+    def test_validation_returns_false_if_given_collection_id_non_existent(
+        self) -> None:
+        self.login(self.guest_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/invalid_collectionId' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX,
             ), expected_status_int=404
         )
         self.logout()
