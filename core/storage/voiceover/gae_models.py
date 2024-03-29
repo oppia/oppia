@@ -87,7 +87,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         })
 
     @staticmethod
-    def _generate_id(
+    def generate_id(
         entity_type: str,
         entity_id: str,
         entity_version: int,
@@ -135,7 +135,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             corresponding to the given inputs, if such a voiceover
             exists, or None if no voiceover is found.
         """
-        model_id = cls._generate_id(
+        model_id = cls.generate_id(
             entity_type, entity_id, entity_version, language_accent_code)
         return cls.get_by_id(model_id)
 
@@ -164,7 +164,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             EntityVoiceoversModel. Returns a new EntityVoiceoversModel.
         """
         return cls(
-            id=cls._generate_id(
+            id=cls.generate_id(
                 entity_type, entity_id, entity_version, language_accent_code),
             entity_type=entity_type,
             entity_id=entity_id,
@@ -172,6 +172,18 @@ class EntityVoiceoversModel(base_models.BaseModel):
             language_accent_code=language_accent_code,
             voiceovers=voiceovers
         )
+
+    @classmethod
+    def get_entity_voiceovers_for_given_exploration(
+        cls, entity_id, entity_type, entity_version
+    ):
+        return cls.query(
+            cls.entity_type == entity_type,
+            cls.entity_id == entity_id,
+            cls.entity_version == entity_version
+        ).fetch()
+
+
 
 
 class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):

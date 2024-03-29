@@ -106,48 +106,24 @@ def get_voiceovers_for_given_language_accent_code(
         language_accent_code=language_accent_code)
 
 
-def _apply_changes(
-    entity_voiceovers: translation_domain.EntityTranslation,
-    voiceover_changes: List[exp_domain.ExplorationChange]
-) -> None:
-    """Applies the changes to the entity_translation object.
+def get_entity_voiceovers_for_given_exploration(
+    entity_id, entity_type, entity_version
+):
+    entity_voiceovers_objects = []
+    entity_voiceover_models = (
+        voiceover_models.get_entity_voiceovers_for_given_exploration(
+            entity_id, entity_type, entity_version))
 
-    Args:
-        entity_translation: EntityTranslation. The entity translation object.
-        translation_changes: list(ExplorationChange). The list of changes to be
-            applied.
-
-    Raises:
-        Exception. Invalid translation change cmd.
-    """
-    for change in voiceover_changes:
-        if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
-            # Here we use cast because we are narrowing down the type of
-            # 'change' from exp_domain.ExplorationChange to specific type of
-            # change EditTranslationsChangesCmd.
-            change = cast(
-                exp_domain.VoiceoversChangesCmd,
-                change
-            )
-
-
-        elif change.cmd == exp_domain.CMD_REMOVE_TRANSLATIONS:
-            entity_translation.remove_translations([change.content_id])
-        elif change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
-            entity_translation.mark_translations_needs_update(
-                [change.content_id])
-        else:
-            raise Exception(
-                'Invalid translation change cmd: %s' % change.cmd)
-
-    entity_translation.validate()
+    for model_instance in entity_voiceover_models:
+        entity_voiceovers_objects.append(
+            _get_entity_voiceovers_from_model(model_instance))
 
 
 def compute_voiceover_related_change(
     updated_exploration: exp_domain.Exploration,
     voiceover_changes: List[exp_domain.ExplorationChange]
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
-    """Cretase new EntityVoiceovers models corresponding to translation related
+    """Cretase new EntityVoiceovers models corresponding to voiceover related
     changes.
 
     Args:
@@ -156,56 +132,57 @@ def compute_voiceover_related_change(
             applied.
 
     Returns:
-        Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
-        list of new EntityTranslationsModel and a dict with count of translated
-        contents as value and the languages as key.
+        list(EntityVoiceoversModel). A list of EntityVoiceoversModel's with
+        respect to updated exploration version.
     """
-    language_code_to_entity_translation = {
-        entity_translation.language_code: entity_translation
-        for entity_translation in (
-            translation_fetchers.get_all_entity_translations_for_entity(
-                feconf.TranslatableEntityType.EXPLORATION,
-                updated_exploration.id,
-                updated_exploration.version - 1
+    new_voiceovers_models = []
+    entity_voiceover_id_to_entity_voiceovers = {}
+    generate_id = voiceover_models.EntityVoiceoversModel.generate_id
+
+    entity_id = updated_exploration.id
+    entity_version = updated_exploration.version - 1
+    entity_type = 'exploration'
+
+    entity_voiceovers_objects = get_entity_voiceovers_for_given_exploration(
+        entity_id, entity_type, entity_version)
+
+    for entity_voiceovers in entity_voiceovers_objects:
+        entity_voiceover_id_to_entity_voiceovers[entity_voiceovers.id] = (
+            entity_voiceovers)
+
+    for change in voiceover_changes:
+        language_accent_code = change.language_accent_code
+        content_id = change.content_id
+        voiceovers = change.voiceovers
+
+        entity_voiceover_id = generate_id(
+            entity_type, entity_id, entity_version, language_accent_code)
+
+        if entity_voiceover_id in entity_voiceover_id_to_entity_voiceovers:
+            entity_voiceovers = (
+                entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id])
+        else:
+            entity_voiceovers = voiceover_domain.EntityVoiceovers.create_empty(
+                entity_id, entity_type, entity_version, language_accent_code)
+
+        entity_voiceovers.voiceovers[content_id] = voiceovers
+        entity_voiceovers.validate()
+
+        entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
+            entity_voiceovers)
+
+    for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():
+        new_voiceovers_models.append(
+            voiceover_models.EntityVoiceoversModel.create_new(
+                entity_voiceovers.entity_type,
+                entity_voiceovers.entity_id,
+                entity_voiceovers.entity_version + 1,
+                entity_voiceovers.language_accent_code,
+                entity_voiceovers.voiceovers
             )
         )
-    }
 
-    # Create EntityTranslation object for new languages.
-    for change in translation_changes:
-        if change.cmd != exp_domain.CMD_EDIT_TRANSLATION:
-            continue
-        if change.language_code in language_code_to_entity_translation:
-            continue
-
-        language_code_to_entity_translation[change.language_code] = (
-            translation_domain.EntityTranslation.create_empty(
-                feconf.TranslatableEntityType.EXPLORATION,
-                updated_exploration.id,
-                change.language_code,
-                updated_exploration.version - 1
-            )
-        )
-
-    # Create entity_translation models for all languages.
-    new_translation_models = []
-    translation_counts = {}
-    for entity_translation in language_code_to_entity_translation.values():
-        _apply_changes(entity_translation, translation_changes)
-
-        translation_counts[entity_translation.language_code] = (
-            updated_exploration.get_translation_count(entity_translation))
-
-        new_translation_models.append(
-            translation_models.EntityTranslationsModel.create_new(
-                entity_translation.entity_type,
-                entity_translation.entity_id,
-                entity_translation.entity_version + 1,
-                entity_translation.language_code,
-                entity_translation.to_dict()['translations']
-            )
-        )
-    return new_translation_models, translation_counts
+    return new_voiceovers_models
 
 
 # NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
