@@ -549,7 +549,7 @@ def main(args: Optional[List[str]] = None) -> None:
                     'scripts.script_import_test',
                     'scripts.build_test',
                     'scripts.run_acceptance_tests_test'
-                    ]
+                ]
                 all_test_targets = [
                     test for test in all_test_targets
                     if test not in docker_exclude_tests]
