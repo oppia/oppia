@@ -58,6 +58,8 @@ var ContributorDashboardAdminPage = function () {
   var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
   var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
   var languageSelector = $('.e2e-test-language-selector');
+  const lastDatePicker = $('e2e-test-last-date-picker');
+  const firstDatePicker = $('e2e-test-firt-date-picker');
   var noDataMessage = $('.e2e-test-no-data-message');
   var loadingMessage = $('.e2e-test-loading-message');
   var languageDropdown = $('.e2e-test-language-selector-dropdown');
@@ -233,6 +235,14 @@ var ContributorDashboardAdminPage = function () {
     );
     await action.click(`${language} option selector`, selectorOption);
     await action.click('Language Selector', languageSelector);
+  };
+
+  this.setLastDatePickerValue = async function (value) {
+    document.getElementById(lastDatePicker).value = value;
+  };
+
+  this.setFirstDatePickerValue = async function (value) {
+    document.getElementById(firstDatePicker).value = value;
   };
 
   this.expectUserToBeTranslationReviewer = async function (

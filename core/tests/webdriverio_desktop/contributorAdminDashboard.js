@@ -350,4 +350,93 @@ describe('Contributor Admin Dashboard', function () {
     await contributorDashboardAdminPage.expectNoStatsElement();
     await users.logout();
   });
+
+  fit(
+    'should be able to filter translation submissions using time range' +
+      ' filter',
+    async function () {
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+
+      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setFirstDatePickerValue(
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement();
+
+      await users.logout();
+    }
+  );
+
+  fit(
+    'should be able to filter translation reviewers using time range' +
+      ' filter',
+    async function () {
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+
+      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setFirstDatePickerValue(
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement();
+
+      await users.logout();
+    }
+  );
+
+  fit(
+    'should be able to filter question submissions using time range' +
+      ' filter',
+    async function () {
+      await users.login(QUESTION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToQuestionSubmitterTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setFirstDatePickerValue(
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement();
+
+      await users.logout();
+    }
+  );
+
+  fit(
+    'should be able to filter question reviewers using time range' + ' filter',
+    async function () {
+      await users.login(QUESTION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setFirstDatePickerValue(
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement();
+
+      await users.logout();
+    }
+  );
 });
