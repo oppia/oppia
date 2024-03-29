@@ -105,13 +105,13 @@ describe('RteHelperModalComponent', () => {
       },
     ];
 
-    beforeEach(() => {
+   beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      (component.componentId = 'video'),
-        (component.attrsCustomizationArgsDict = {
-          heading: 'This value is not default.',
-        });
+      component.componentId = 'video';
+      component.attrsCustomizationArgsDict = {
+        heading: 'This value is not default.',
+      };
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
