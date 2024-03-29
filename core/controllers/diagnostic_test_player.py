@@ -48,7 +48,7 @@ class DiagnosticTestPlayerPage(
         ):
             self.render_template('diagnostic-test-player-page.mainpage.html')
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
 
 def normalize_comma_separated_ids(comma_separated_ids: str) -> List[str]:
@@ -131,7 +131,7 @@ class DiagnosticTestQuestionsHandler(
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'No corresponding topic exists for the given topic ID.')
 
         diagnostic_test_skill_ids = topic.skill_ids_for_diagnostic_test

@@ -62,7 +62,7 @@ class ProfileHandler(
 
         user_settings = user_services.get_user_settings_from_username(username)
         if not user_settings:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         created_exp_summary_dicts = []
         edited_exp_summary_dicts = []

@@ -101,7 +101,7 @@ class SkillMasteryDataHandler(
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e) from e
+            raise self.NotFoundException(e) from e
 
         degrees_of_mastery = skill_services.get_multi_user_skill_mastery(
             self.user_id, skill_ids)
@@ -150,7 +150,7 @@ class SkillMasteryDataHandler(
         try:
             skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e) from e
+            raise self.NotFoundException(e) from e
 
         skill_services.create_multi_user_skill_mastery(
             self.user_id, new_degrees_of_mastery)
