@@ -245,7 +245,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             ),
             expected_status_int=404
         )
-        self.assertIn('Could not find the page', response['error'])
+        self.assertIn('Could not find the resource', response['error'])
 
     def test_cannot_get_with_invalid_topic_name(self) -> None:
         response = self.get_json(
@@ -267,7 +267,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             ),
             expected_status_int=404
         )
-        self.assertIn('Could not find the page', response['error'])
+        self.assertIn('Could not find the resource', response['error'])
 
     def test_cannot_get_with_deleted_subtopic_page(self) -> None:
         subtopic_page_services.delete_subtopic_page(
@@ -278,4 +278,4 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
             ),
             expected_status_int=404
         )
-        self.assertIn('Could not find the page', response['error'])
+        self.assertIn('Could not find the resource', response['error'])
