@@ -55,6 +55,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             language_code: None | str
             ) -> suggestion_models.GeneralSuggestionModel:
         """creates new suggestion.
+
         Args:
             suggestion_type: str. Type of the suggestion that is being
                 created.
@@ -65,6 +66,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             final_reviewer_id: str. The user ID of the reviewer.
             language_code: None | str. Code of the language in which the
                 suggestion is created.
+
         Returns:
             GeneralSuggestionModel. Returns newly created
             GeneralSuggestionModel.
@@ -177,6 +179,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             language_code: None | str
             ) -> suggestion_models.GeneralSuggestionModel:
         """creates new suggestion.
+
         Args:
             suggestion_type: str. Type of the suggestion that is being
                 created.
@@ -187,6 +190,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             final_reviewer_id: str. The user ID of the reviewer.
             language_code: None | str. Code of the language in which the
                 suggestion is created.
+
         Returns:
             GeneralSuggestionModel. Returns newly created
             GeneralSuggestionModel.
