@@ -978,21 +978,20 @@ export class LoggedInUser extends BaseUser {
       `${dismissWelcomeModalSelector}:not([disabled])`
     );
     await this.clickOn(dismissWelcomeModalSelector);
-    /** Giving explicit timeout because we need to wait for small
-     * transition to complete. We cannot wait for the next element to click
-     * using its selector as it is instantly loaded in the DOM but cannot
-     * be clicked until the transition is completed.
-     */
-    await this.page.waitForTimeout(500);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
     await this.clickOn(textStateEditSelector);
-    await this.page.waitForTimeout(500);
+    await this.page.keyboard.press('Tab');
     await this.type(richTextAreaField, 'Test Exploration');
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
+    await this.page.waitForSelector('oppia-customize-interaction', {
+      visible: true,
+    });
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector(`${saveChangesButton}:not([disabled])`);
     await this.clickOn(saveChangesButton);
     await this.clickOn(saveDraftButton);
 
@@ -1005,17 +1004,13 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
-    await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`
-    );
-    await this.clickOn(publishExplorationButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
+    await this.page.click('.e2e-test-share-publish-close');
     const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
       element => element.textContent
     );
-    await this.page.click('.e2e-test-share-publish-close');
     return explorationIdUrl;
   }
 
