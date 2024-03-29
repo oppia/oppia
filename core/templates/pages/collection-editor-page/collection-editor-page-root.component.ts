@@ -25,7 +25,9 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
   templateUrl: './collection-editor-page-root.component.html',
 })
 export class CollectionEditorPageRootComponent extends BaseRootComponent {
-  title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.TITLE;
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.TITLE;
+
   meta: MetaTagData[] =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.META as
     unknown as Readonly<MetaTagData>[];

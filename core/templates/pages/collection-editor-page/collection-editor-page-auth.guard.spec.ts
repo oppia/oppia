@@ -25,7 +25,7 @@ import { CollectionEditorPageAuthGuard } from './collection-editor-page-auth.gua
 import { AccessValidationBackendApiService } from '../oppia-root/routing/access-validation-backend-api.service';
 
 class MockAccessValidationBackendApiService {
-    validateAccessCollectionEditorPage(collectionId: string) {
+  validateAccessCollectionEditorPage(collectionId: string) {
     return Promise.resolve();
   }
 }
@@ -36,7 +36,7 @@ class MockRouter {
   }
 }
 
-fdescribe('CollectionEditorPageAuthGuard', () => {
+describe('CollectionEditorPageAuthGuard', () => {
   let guard: CollectionEditorPageAuthGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;
