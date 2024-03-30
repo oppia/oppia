@@ -261,7 +261,7 @@ describe('Schema based float editor component', function () {
     expect(component.errorStringI18nKey).toEqual('Error');
   });
 
-  it('should not show error to diffrent decimal points', () => {
+  it('should not show error for different decimal points', () => {
     component.localStringValue = '12.5';
     component.parseInput();
     expect(component.localValue).toEqual(12.5);
