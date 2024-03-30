@@ -148,7 +148,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
                 )
 
         error_msg = (
-            'Could not find the page http://localhost'
+            'Could not find the resource http://localhost'
             '/mock_secret_page/%s.' % self.secret
         )
         self.assertEqual(response['error'], error_msg)
@@ -166,7 +166,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
             )
 
         error_msg = (
-            'Could not find the page http://localhost'
+            'Could not find the resource http://localhost'
             '/mock_secret_page/%s.' % self.invalid_secret
         )
         self.assertEqual(response['error'], error_msg)
@@ -242,7 +242,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_skills/%s' % json.dumps(skill_ids),
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/mock_view_skills/'
+            'Could not find the resource http://localhost/mock_view_skills/'
             '%5B%22invalid_id12%22,%20%22invalid_id13%22%5D.'
         )
         self.assertEqual(response['error'], error_msg)
@@ -301,7 +301,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 expected_status_int=404
             )
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 feconf.DISABLED_EXPLORATION_IDS[0]
             )
@@ -320,7 +320,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_download_exploration/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 self.private_exp_id
             )
@@ -350,7 +350,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_download_exploration/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 self.private_exp_id
             )
@@ -370,7 +370,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
                 '/mock_download_exploration/%s' % self.published_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_download_exploration/%s.' % (
                 self.published_exp_id
             )
@@ -432,7 +432,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 expected_status_int=404
             )
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 feconf.DISABLED_EXPLORATION_IDS[0]
             )
@@ -451,7 +451,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_exploration_stats/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 self.private_exp_id
             )
@@ -481,7 +481,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_exploration_stats/%s' % self.private_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 self.private_exp_id
             )
@@ -501,7 +501,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_exploration_stats/%s' % self.published_exp_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_view_exploration_stats/%s.' % (
                 self.published_exp_id
             )
@@ -2176,7 +2176,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_delete_blog_post/%s.' % self.blog_post_id
         )
         self.assertEqual(response['error'], error_msg)
@@ -2276,7 +2276,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page '
+            'Could not find the resource '
             'http://localhost/mock_edit_blog_post/%s.' % self.blog_post_id
         )
         self.assertEqual(response['error'], error_msg)
@@ -2810,7 +2810,8 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock/%s' % invalid_id, expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/mock/%s.' % invalid_id)
+            'Could not find the resource http://localhost/mock/%s.'
+            % invalid_id)
         self.assertEqual(response['error'], error_msg)
         self.logout()
 
@@ -3952,7 +3953,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
                     self.TARGET_TYPE, 'invalid'),
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/'
+            'Could not find the resource http://localhost/'
             'mock_review_suggestion/%s/%s.' % (self.TARGET_TYPE, 'invalid')
         )
         self.assertEqual(response['error'], error_msg)
@@ -4773,8 +4774,8 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/mock_edit_story/%s.' % (
-                self.story_id)
+            'Could not find the resource http://localhost/mock_edit_story/%s.' 
+            % (self.story_id)
         )
         self.assertEqual(response['error'], error_msg)
         self.logout()
@@ -6533,7 +6534,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
                 '/mock_view_question_editor/%s' % invalid_id,
                 expected_status_int=404)
         error_msg = (
-            'Could not find the page http://localhost/'
+            'Could not find the resource http://localhost/'
             'mock_view_question_editor/%s.' % invalid_id
         )
         self.assertEqual(response['error'], error_msg)
