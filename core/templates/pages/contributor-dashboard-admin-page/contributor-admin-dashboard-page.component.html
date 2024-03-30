@@ -88,15 +88,15 @@
             <div class="date-selector-inner-container">
               <b class="filter-label">Filter:</b>
               <mat-form-field>
-                <input matInput class="e2e-test-last-date-picker" [matDatepicker]="lastDatepicker" (dateChange)="changeLastActivity($event.value)" [(ngModel)]="selectedLastActivity" [max]="selectedFirstActivity">
-                <mat-datepicker-toggle matSuffix [for]="lastDatepicker"></mat-datepicker-toggle>
-                <mat-datepicker #lastDatepicker></mat-datepicker>
+                <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatepicker" (dateChange)="changeLastActivity($event.value)" [(ngModel)]="selectedLastActivity" [max]="selectedFirstActivity">
+                <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatepicker"></mat-datepicker-toggle>
+                <mat-datepicker #lastDatepicker class="e2e-test-last-date-picker"></mat-datepicker>
               </mat-form-field>
               <b class="filter-label double-sided-arrow">To</b>
               <mat-form-field>
-                <input matInput class="e2e-test-firt-date-picker" [matDatepicker]="firstDatepicker" (dateChange)="changeFirstActivity($event.value)" [(ngModel)]="selectedFirstActivity" [max]="today" [min]="selectedLastActivity">
-                <mat-datepicker-toggle matSuffix [for]="firstDatepicker"></mat-datepicker-toggle>
-                <mat-datepicker #firstDatepicker></mat-datepicker>
+                <input matInput class="e2e-test-first-date-picker-input" [matDatepicker]="firstDatepicker" (dateChange)="changeFirstActivity($event.value)" [(ngModel)]="selectedFirstActivity" [max]="today" [min]="selectedLastActivity">
+                <mat-datepicker-toggle matSuffix class="e2e-test-first-date-picker-toggle" [for]="firstDatepicker"></mat-datepicker-toggle>
+                <mat-datepicker #firstDatepicker class="e2e-test-first-date-picker"></mat-datepicker>
               </mat-form-field>
             </div>
           </div>
