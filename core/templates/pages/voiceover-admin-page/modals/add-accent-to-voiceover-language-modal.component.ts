@@ -58,11 +58,21 @@ export class AddAccentToVoiceoverLanguageModalComponent extends ConfirmOrCancelM
         this.explorationIdsToFilenames = explorationIdToFilenames;
         this.pageIsInitialized = true;
       });
+    setInterval(() => {
+      if (!this.audioPlayerService.isPlaying()) {
+        this.currentFilename = '';
+      }
+    }, 1000);
   }
 
   update(): void {
     this.pauseAudio();
     this.ngbActiveModal.close(this.languageAccentCode);
+  }
+
+  removeSelectedAccent(): void {
+    this.languageAccentCode = '';
+    this.updateButtonIsDisabled = false;
   }
 
   cancel(): void {

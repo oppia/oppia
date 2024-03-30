@@ -131,11 +131,11 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             Exception. Failed to get newly added voiceovers between the given
                 snapshot models.
         """
-        # The voiceover filenames that is present in the new snapshot model.
+        # The voiceover filenames that are present in the new snapshot model.
         new_lang_code_to_filenames: Dict[str, List[str]] = (
             collections.defaultdict(list))
 
-        # The voiceover filenames that is present in the old snapshot model.
+        # The voiceover filenames that are present in the old snapshot model.
         old_lang_code_to_filenames: Dict[str, List[str]] = (
             collections.defaultdict(list))
 
@@ -237,7 +237,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 nested dicts as values. Each nested dict contains language codes
                 as keys and voiceover dicts as values.
             lang_code_to_filenames: dict(str, dict(str)). The dictionary
-                contains voiceover filanames data for some other version of
+                contains voiceover filenames data for some other version of
                 exploration, say M < N. This dict maps content IDs as keys and
                 nested dicts as values. Each nested dict contains language
                 codes as keys and voiceover dicts as values.
@@ -283,7 +283,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
             for lang_code, voiceover_dict in lang_code_to_voiceovers.items():
 
-                # If a language code is not present lang_code_to_filenames
+                # If a language code is not present in lang_code_to_filenames
                 # dict, then we should skip the iteration for that
                 # language code.
                 if lang_code not in lang_code_to_filenames:
@@ -291,7 +291,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
                 referred_filename = voiceover_dict['filename']
 
-                # If a voiceover filename does not present in
+                # If a voiceover filename is not present in
                 # lang_code_to_filenames, then we should skip the iteration for
                 # the language code.
                 # This equality check is dependable for confirming whether the
