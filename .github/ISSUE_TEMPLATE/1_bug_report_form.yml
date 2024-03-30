@@ -30,8 +30,8 @@ body:
         Steps to reproduce the behavior. **Example:** "1. Go to the library page. 2. Click on the 'Sign in' button. 3. See error."
 
         **Notes:**
-        - Please list the full step-by-step instructions. Do not require the reader to infer the steps from watching a video.
-        - (For devs) If any feature flags need to be turned on to reproduce the issue, specify them here as well.
+          - Please list the full step-by-step instructions. Do not require the reader to infer the steps from watching a video.
+          - (For devs) If any feature flags need to be turned on to reproduce the issue, specify them here as well.
     validations:
       required: true
   - type: textarea
