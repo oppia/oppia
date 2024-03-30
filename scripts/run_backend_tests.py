@@ -54,7 +54,6 @@ import json
 import multiprocessing
 import os
 import re
-import string
 import subprocess
 import sys
 import threading
@@ -313,7 +312,7 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
-) -> Tuple[int, int, int, int]:
+) -> Tuple[int, int, int]:
     """Run tests and parse coverage reports."""
     # Check we ran all tests as expected.
     total_count = 0
