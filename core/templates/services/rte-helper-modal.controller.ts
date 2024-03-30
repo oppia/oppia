@@ -416,7 +416,14 @@ export class RteHelperModalComponent {
             this.tmpCustomizationArgs[i].value.toString()
           );
         }
+        (
+          customizationArgsDict as {
+            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+          }
+        )[caName] = this.tmpCustomizationArgs[i].value;
       }
+      this.ngbActiveModal.close(customizationArgsDict);
+      this.customizationArgsFormSubscription.unsubscribe();
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
@@ -430,19 +437,27 @@ export class RteHelperModalComponent {
             this.tmpCustomizationArgs[i].value ||
             this.tmpCustomizationArgs[i - 1].value;
         }
+        (
+          customizationArgsDict as {
+            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+          }
+        )[caName] = this.tmpCustomizationArgs[i].value;
       }
-    }
+      this.ngbActiveModal.close(customizationArgsDict);
+      this.customizationArgsFormSubscription.unsubscribe();
+    } else {
+      for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
+        const caName = this.tmpCustomizationArgs[i].name;
+        (
+          customizationArgsDict as {
+            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+          }
+        )[caName] = this.tmpCustomizationArgs[i].value;
+      }
 
-    for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
-      const caName = this.tmpCustomizationArgs[i].name;
-      (
-        customizationArgsDict as {
-          [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-        }
-      )[caName] = this.tmpCustomizationArgs[i].value;
+      this.ngbActiveModal.close(customizationArgsDict);
+      this.customizationArgsFormSubscription.unsubscribe();
     }
-    this.ngbActiveModal.close(customizationArgsDict);
-    this.customizationArgsFormSubscription.unsubscribe();
   }
 
   extractVideoIdFromVideoUrl(url: string): string {
