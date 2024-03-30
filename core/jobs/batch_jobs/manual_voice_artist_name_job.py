@@ -110,7 +110,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         cls,
         new_snapshot_model: exp_models.ExplorationSnapshotContentModel,
         old_snapshot_model: exp_models.ExplorationSnapshotContentModel
-    ) -> Dict[str, Dict[str, state_domain.VoiceoverDict]]:
+    ) -> Dict[str, List[str]]:
         """Compares two successive versions of snapshot models and
         extracts voiceovers that have been added in the later version of the
         exploration snapshot.
@@ -122,9 +122,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 exploration snapshot model, let's say version n-1.
 
         Returns:
-            dict(str, dict(str, VoiceoverDict)). A dict with content IDs as keys
-            and nested dicts as values. Each nested dict contains language codes
-            as keys and voiceover dicts as values. Only voiceovers that exist in
+            dict(str, list(str)). A dict with language codes as keys and list
+            of filenames as values. Only voiceover filenames that exist in
             the new snapshot model but are absent in the old snapshot model are
             included in this dictionary.
 
@@ -132,48 +131,48 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             Exception. Failed to get newly added voiceovers between the given
                 snapshot models.
         """
-        # The voiceover mapping that is present in the new snapshot model.
-        new_voiceover_mapping: Dict[str, Dict[
-            str, state_domain.VoiceoverDict]] = {}
+        # The voiceover filenames that is present in the new snapshot model.
+        new_lang_code_to_filenames: Dict[str, List[str]] = (
+            collections.defaultdict(list))
 
-        # The voiceover mapping that is present in the old snapshot model.
-        old_voiceover_mapping: Dict[str, Dict[
-            str, state_domain.VoiceoverDict]] = {}
+        # The voiceover filenames that is present in the old snapshot model.
+        old_lang_code_to_filenames: Dict[str, List[str]] = (
+            collections.defaultdict(list))
+
+        # The voiceover filenames that has been added to this version of the
+        # exploration snapshot.
+        lang_code_to_filenames_in_this_version: Dict[str, List[str]] = (
+            collections.defaultdict(list))
 
         for state in new_snapshot_model.content['states'].values():
-            new_voiceover_mapping.update(
+            voiceovers_mapping = (
                 state['recorded_voiceovers']['voiceovers_mapping'])
+            for lang_code_to_voiceover_dict in voiceovers_mapping.values():
+                for lang_code, voiceover_dict in (
+                        lang_code_to_voiceover_dict.items()):
+                    new_lang_code_to_filenames[lang_code].append(
+                        voiceover_dict['filename'])
 
         for state in old_snapshot_model.content['states'].values():
-            old_voiceover_mapping.update(
+            voiceovers_mapping = (
                 state['recorded_voiceovers']['voiceovers_mapping'])
+            for lang_code_to_voiceover_dict in voiceovers_mapping.values():
+                for lang_code, voiceover_dict in (
+                        lang_code_to_voiceover_dict.items()):
+                    old_lang_code_to_filenames[lang_code].append(
+                        voiceover_dict['filename'])
 
-        # The voiceover mapping that has been added to this version of the
-        # exploration snapshot.
-        voiceovers_added_in_this_version: Dict[
-            str, Dict[str, state_domain.VoiceoverDict]] = (
-                collections.defaultdict(dict)
-            )
+        for lang_code, filenames in new_lang_code_to_filenames.items():
+            if lang_code not in old_lang_code_to_filenames:
+                lang_code_to_filenames_in_this_version[lang_code].extend(
+                    filenames)
+                continue
+            for filename in filenames:
+                if filename not in old_lang_code_to_filenames[lang_code]:
+                    lang_code_to_filenames_in_this_version[lang_code].append(
+                        filename)
 
-        for content_id, lang_code_to_voiceover_dict in (
-                new_voiceover_mapping.items()):
-            for lang_code, voiceover_dict in (
-                    lang_code_to_voiceover_dict.items()):
-                if lang_code not in old_voiceover_mapping.get(
-                        content_id, {}):
-                    voiceovers_added_in_this_version[
-                        content_id][lang_code] = voiceover_dict
-                else:
-                    old_voiceover_dict = old_voiceover_mapping[
-                        content_id][lang_code]
-                    new_voiceover_dict = (
-                        lang_code_to_voiceover_dict[lang_code])
-
-                    if old_voiceover_dict != new_voiceover_dict:
-                        voiceovers_added_in_this_version[
-                            content_id][lang_code] = voiceover_dict
-
-        return voiceovers_added_in_this_version
+        return lang_code_to_filenames_in_this_version
 
     @classmethod
     def get_content_id_mapping_and_voiceovers_count(
@@ -220,8 +219,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         cls,
         reference_voiceover_mapping: Dict[
             str, Dict[str, state_domain.VoiceoverDict]],
-        voiceover_mapping: Dict[
-            str, Dict[str, state_domain.VoiceoverDict]],
+        lang_code_to_filenames: Dict[str, List[str]],
         voiceover_artist_and_voiceover_mapping: (
             voiceover_domain.ContentIdToVoiceoverMappingType),
         voice_artist_id: str
@@ -238,8 +236,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 exploration, say N. This dict maps content IDs as keys and
                 nested dicts as values. Each nested dict contains language codes
                 as keys and voiceover dicts as values.
-            voiceover_mapping: dict(str, dict(str, VoiceoverDict)). The
-                dictionary contains voiceover data for some other version of
+            lang_code_to_filenames: dict(str, dict(str)). The dictionary
+                contains voiceover filanames data for some other version of
                 exploration, say M < N. This dict maps content IDs as keys and
                 nested dicts as values. Each nested dict contains language
                 codes as keys and voiceover dicts as values.
@@ -280,26 +278,21 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         updated_voiceover_artist_and_voiceover_mapping.update(
             voiceover_artist_and_voiceover_mapping)
 
-        for content_id, lang_code_to_voiceovers in voiceover_mapping.items():
-
-            # If a content ID is not present in the reference_voiceover_mapping
-            # dict, we should skip the iteration for that content.
-            if content_id not in reference_voiceover_mapping:
-                continue
+        for content_id, lang_code_to_voiceovers in (
+                reference_voiceover_mapping.items()):
 
             for lang_code, voiceover_dict in lang_code_to_voiceovers.items():
 
-                # If a language code is not present for the given content ID in
-                # the reference_voiceover_mapping dict, then we should skip the
-                # iteration for that language code.
-                if lang_code not in reference_voiceover_mapping[content_id]:
+                # If a language code is not present lang_code_to_filenames
+                # dict, then we should skip the iteration for that
+                # language code.
+                if lang_code not in lang_code_to_filenames:
                     continue
 
-                referred_voiceover_dict = (
-                    reference_voiceover_mapping[content_id][lang_code])
+                referred_filename = voiceover_dict['filename']
 
-                # If a voiceover dictionary does not match the referenced
-                # voiceover dictionary, then we should skip the iteration for
+                # If a voiceover filename does not present in
+                # lang_code_to_filenames, then we should skip the iteration for
                 # the language code.
                 # This equality check is dependable for confirming whether the
                 # two voiceovers are identical or distinct. Two distinct
@@ -308,13 +301,11 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 # content_id, language_code, and a random hash. Because of the
                 # random hash, two distinct voiceovers can never share the
                 # same filename.
-                if voiceover_dict != referred_voiceover_dict:
-                    continue
+                if referred_filename in lang_code_to_filenames[lang_code]:
+                    updated_voiceover_artist_and_voiceover_mapping[content_id][
+                        lang_code] = (voice_artist_id, voiceover_dict)
 
-                updated_voiceover_artist_and_voiceover_mapping[content_id][
-                    lang_code] = (voice_artist_id, voiceover_dict)
-
-                number_of_voiceovers_identified += 1
+                    number_of_voiceovers_identified += 1
 
         return (
             updated_voiceover_artist_and_voiceover_mapping,
@@ -395,7 +386,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             old_snapshot_model = snapshot_models[index + 1]
 
             try:
-                newly_added_voiceover_mapping = (
+                lang_code_to_filenames_in_this_version = (
                     cls.extract_added_voiceovers_between_successive_snapshots(
                         new_snapshot_model, old_snapshot_model))
             except Exception as e:
@@ -412,7 +403,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
             # If no voiceover-related changes were made during the commit,
             # then the rest of the for loop body can be skipped.
-            if not bool(newly_added_voiceover_mapping):
+            if not bool(lang_code_to_filenames_in_this_version):
                 continue
 
             voice_artist_id = (
@@ -432,7 +423,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             ) = (
                 cls.update_content_id_to_voiceovers_mapping(
                     latest_content_id_to_voiceover_mapping,
-                    newly_added_voiceover_mapping,
+                    lang_code_to_filenames_in_this_version,
                     voiceover_artist_and_voiceover_mapping,
                     voice_artist_id
                 )

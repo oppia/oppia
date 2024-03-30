@@ -205,6 +205,17 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             self.editor_id_2, self.CURATED_EXPLORATION_ID_1,
             change_list, 'Translation commits2')
 
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+            'new_value': 'TextInput'
+        })]
+
+        exp_services.update_exploration(
+            self.owner_id, self.CURATED_EXPLORATION_ID_1,
+            change_list, 'Added new interaction')
+
         new_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content_0': {
@@ -550,7 +561,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'exploration %s.'
         )
 
-        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model_id: str = 'exploration_id_1-4'
         snapshot_model: exp_models.ExplorationSnapshotContentModel = (
             exp_models.ExplorationSnapshotContentModel.get_by_id(
                 snapshot_model_id))
@@ -572,7 +583,8 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         expected_exp_id_to_content_id_to_voiceovers_mapping = {
             self.CURATED_EXPLORATION_ID_1: {
                 'content_0': {
-                    'en': [self.editor_id_1, self.voiceover_dict_1]
+                    'en': [self.editor_id_1, self.voiceover_dict_1],
+                    'hi': [self.editor_id_2, self.voiceover_dict_2]
                 }
             },
             self.CURATED_EXPLORATION_ID_2: {
@@ -705,21 +717,17 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
     """Test class to validate helper methods."""
 
     def test_should_update_content_id_to_voiceovers_mapping(self) -> None:
-        voiceover_mapping = {
-            'content_0': {
-                'en': self.voiceover_dict_1,
-                'hi': self.voiceover_dict_2
-            },
-            'content_1': {
-                'en': self.voiceover_dict_3
-            },
-            'content_2': {
-                'en': self.voiceover_dict_4,
-                'hi': self.voiceover_dict_6
-            },
-            'content_3': {
-                'en': self.voiceover_dict_5
-            }
+        lang_code_to_filenames = {
+            'en': [
+                'filename1.mp3',
+                'filename3.mp3',
+                'filename4.mp3',
+                'filename5.mp3'
+            ],
+            'hi': [
+                'filename2.mp3',
+                'filename6.mp3'
+            ]
         }
         latest_content_id_to_voiceover_mapping = {
             'content_0': {
@@ -761,7 +769,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             CreateExplorationVoiceArtistLinkModelsJob.
             update_content_id_to_voiceovers_mapping(
                 latest_content_id_to_voiceover_mapping,
-                voiceover_mapping,
+                lang_code_to_filenames,
                 content_id_to_voiceovers_mapping,
                 voice_artist_id
             )
