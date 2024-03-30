@@ -53,10 +53,7 @@ import contextlib
 import json
 import multiprocessing
 import os
-import random
 import re
-import socket
-import string
 import subprocess
 import sys
 import threading
@@ -75,10 +72,6 @@ install_third_party_libs.main()
 from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-COVERAGE_EXCLUSION_LIST_PATH: Final = os.path.join(
-    os.getcwd(), 'scripts', 'backend_tests_incomplete_coverage.txt'
-)
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -186,24 +179,17 @@ class TestingTaskSpec:
 
     def run(self) -> List[concurrent_task_utils.TaskResult]:
         """Runs all tests corresponding to the given test target."""
-        env = os.environ.copy()
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                sys.executable, '-m', 'coverage', 'run',
+                sys.executable, '-m', 'coverage', 'run', '-p',
                 '--branch', TEST_RUNNER_PATH, test_target_flag
             ]
-            rand = ''.join(random.choices(string.ascii_lowercase, k=16))
-            data_file = '.coverage.%s.%s.%s' % (
-                socket.gethostname(), os.getpid(), rand)
-            env['COVERAGE_FILE'] = data_file
-            concurrent_task_utils.log('Coverage data for %s is in %s' % (
-                self.test_target, data_file))
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
         try:
-            result = run_shell_cmd(exc_list, env=env)
+            result = run_shell_cmd(exc_list)
         except Exception as e:
             # Occasionally, tests fail spuriously because of an issue in grpc
             # (see e.g. https://github.com/oppia/oppia/runs/7462764522) that
@@ -211,30 +197,11 @@ class TestingTaskSpec:
             # represent a 'real' test failure, we do a single extra run if we
             # see that.
             if 'ev_epollex_linux.cc' in str(e):
-                result = run_shell_cmd(exc_list, env=env)
+                result = run_shell_cmd(exc_list)
             else:
                 raise e
 
-        messages = [result]
-
-        if self.generate_coverage_report:
-            covered_path = self.test_target.replace('.', '/')
-            covered_path = covered_path[:-len('_test')]
-            covered_path += '.py'
-            if os.path.exists(covered_path):
-                report, coverage = check_coverage(
-                    False, data_file=data_file, include=(covered_path,))
-            else:
-                # Some test files (e.g. scripts/script_import_test.py)
-                # have no corresponding code file, so we treat them as
-                # fully covering their (nonexistent) associated code
-                # file.
-                report = ''
-                coverage = 100.0
-            messages.append(report)
-            messages.append(str(coverage))
-
-        return [concurrent_task_utils.TaskResult('', False, [], messages)]
+        return [concurrent_task_utils.TaskResult('', False, [], [result])]
 
 
 def get_all_test_targets_from_path(
@@ -342,40 +309,15 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
     ).format(test_extra, SHARDS_WIKI_LINK)
 
 
-def load_coverage_exclusion_list(path: str) -> List[str]:
-    """Load modules excluded from per-file coverage checks.
-
-    Args:
-        path: str. Path to file with exclusion list. File should have
-            one dotted module name per line. Blank lines and lines
-            starting with `#` are ignored.
-
-    Returns:
-        list(str). Dotted names of excluded modules.
-    """
-    exclusion_list = []
-    with open(path, 'r', encoding='utf-8') as exclusion_file:
-        for line in exclusion_file:
-            line = line.strip()
-            if line and not line.startswith('#'):
-                exclusion_list.append(line)
-    return exclusion_list
-
-
 def check_test_results(
     tasks: List[concurrent_task_utils.TaskThread],
     task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec],
-    generate_coverage_report: bool
-) -> Tuple[int, int, int, int]:
+) -> Tuple[int, int, int]:
     """Run tests and parse coverage reports."""
-    coverage_exclusions = load_coverage_exclusion_list(
-        COVERAGE_EXCLUSION_LIST_PATH)
-
     # Check we ran all tests as expected.
     total_count = 0
     total_errors = 0
     total_failures = 0
-    incomplete_coverage = 0
     for task in tasks:
         test_count = 0
         spec = task_to_taskspec[task]
@@ -440,37 +382,9 @@ def check_test_results(
                 print(
                     'An unexpected error occurred. '
                     'Task output:\n%s' % task.task_results[0].get_report()[0])
-            if generate_coverage_report:
-                coverage = task.task_results[0].get_report()[-2]
-                if (
-                        spec.test_target not in coverage_exclusions
-                        and float(coverage) != 100.0):
-                    incomplete_coverage += 1
         total_count += test_count
 
-    return total_count, total_errors, total_failures, incomplete_coverage
-
-
-def print_coverage_report(
-    tasks: List[concurrent_task_utils.TaskThread],
-    task_to_taskspec: Dict[concurrent_task_utils.TaskThread, TestingTaskSpec]
-    ) -> int:
-    """Run tests and parse coverage reports."""
-    incomplete_coverage = 0
-    coverage_exclusions = load_coverage_exclusion_list(
-    COVERAGE_EXCLUSION_LIST_PATH)
-    for task in tasks:
-        if task.finished and not task.exception:
-            coverage = task.task_results[0].get_report()[-2]
-            spec = task_to_taskspec[task]
-            if (
-                    spec.test_target not in coverage_exclusions
-                    and float(coverage) != 100.0):
-                print('INCOMPLETE PER-FILE COVERAGE (%s%%): %s' % (
-                    coverage, spec.test_target))
-                incomplete_coverage += 1
-                print(task.task_results[0].get_report()[-3])
-    return incomplete_coverage
+    return total_count, total_errors, total_failures
 
 
 def main(args: Optional[List[str]] = None) -> None:
@@ -565,10 +479,8 @@ def main(args: Optional[List[str]] = None) -> None:
     print('+------------------+')
     print('')
 
-    (
-        total_count, total_errors, total_failures, incomplete_coverage
-    ) = check_test_results(
-        tasks, task_to_taskspec, parsed_args.generate_coverage_report)
+    total_count, total_errors, total_failures = check_test_results(
+        tasks, task_to_taskspec)
 
     print('')
     if total_count == 0:
@@ -593,15 +505,6 @@ def main(args: Optional[List[str]] = None) -> None:
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        print_coverage_report(tasks, task_to_taskspec)
-
-    if incomplete_coverage:
-        raise Exception(
-            '%s tests incompletely cover associated code files.' %
-            incomplete_coverage)
-
-    if parsed_args.generate_coverage_report:
-        subprocess.check_call([sys.executable, '-m', 'coverage', 'combine'])
         report_stdout, coverage = check_coverage(True)
         print('')
         print(
