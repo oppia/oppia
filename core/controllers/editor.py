@@ -185,7 +185,7 @@ class ExplorationHandler(
             exploration_id: str. The exploration ID.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
         """
         # 'apply_draft' and 'v'(version) are optional parameters because the
         # exploration history tab also uses this handler, and these parameters
@@ -221,7 +221,7 @@ class ExplorationHandler(
                 exp_services.get_story_id_linked_to_exploration(
                     exploration_id) is not None)
         except Exception as e:
-            raise self.PageNotFoundException from e
+            raise self.NotFoundException from e
 
         self.values.update(exploration_data)
         self.render_json(self.values)
@@ -1083,7 +1083,7 @@ class StateInteractionStatsHandler(
             state_name: str. The state name.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
         """
         current_exploration = exp_fetchers.get_exploration_by_id(
             exploration_id)
@@ -1092,7 +1092,7 @@ class StateInteractionStatsHandler(
             logging.exception('Could not find state: %s' % state_name)
             logging.exception('Available states: %s' % (
                 list(current_exploration.states.keys())))
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         # TODO(#11475): Return visualizations info based on Apache Beam job.
         self.render_json({'visualizations_info': []})
@@ -1136,7 +1136,7 @@ class FetchIssuesHandler(
             exp_id: str. The exploration ID.
 
         Raises:
-            PageNotFoundException. Invalid version for exploration ID.
+            NotFoundException. Invalid version for exploration ID.
         """
         assert self.normalized_request is not None
         exp_version = self.normalized_request['exp_version']
@@ -1144,7 +1144,7 @@ class FetchIssuesHandler(
             exp_id, exp_version, strict=False
         )
         if exp_issues is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Invalid version %s for exploration ID %s'
                 % (exp_version, exp_id))
         unresolved_issues = []
@@ -1183,11 +1183,11 @@ class FetchPlaythroughHandler(
             playthrough_id: str. The playthrough ID.
 
         Raises:
-            PageNotFoundException. Invalid playthrough ID.
+            NotFoundException. Invalid playthrough ID.
         """
         playthrough = stats_services.get_playthrough_by_id(playthrough_id)
         if playthrough is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Invalid playthrough ID %s' % (playthrough_id))
         self.render_json(playthrough.to_dict())
 
@@ -1242,8 +1242,8 @@ class ResolveIssueHandler(
             exp_id: str. The exploration ID.
 
         Raises:
-            PageNotFoundException. Invalid exploration ID.
-            PageNotFoundException. Exploration issue does not exist in the
+            NotFoundException. Invalid exploration ID.
+            NotFoundException. Exploration issue does not exist in the
                 list of issues for the exploration.
         """
         assert self.normalized_payload is not None
@@ -1254,7 +1254,7 @@ class ResolveIssueHandler(
             exp_id, exp_version, strict=False
         )
         if exp_issues is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Invalid exploration ID %s' % (exp_id))
 
         # Check that the passed in issue actually exists in the exploration
@@ -1266,7 +1266,7 @@ class ResolveIssueHandler(
                 break
 
         if not issue_to_remove:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'Exploration issue does not exist in the list of issues for '
                 'the exploration with ID %s' % exp_id)
 
@@ -1664,10 +1664,10 @@ class LearnerAnswerInfoHandler(
             entity_id: str. The ID of the entity.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
         """
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         learner_answer_info_data = []
         learner_answer_info_data_dict = {}
@@ -1728,12 +1728,12 @@ class LearnerAnswerInfoHandler(
             entity_id: str. The ID of the entity.
 
         Raises:
-            PageNotFoundException. The page cannot be found.
+            NotFoundException. The page cannot be found.
             InvalidInputException. Invalid input.
         """
         assert self.normalized_request is not None
         if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             state_name = self.normalized_request.get('state_name')
