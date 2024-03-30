@@ -1,7 +1,7 @@
 name: CI Flake report
 description: Create a report to help us improve
 title: "[Flake]: "
-labels: [triage needed, bug]
+labels: [triage needed, bug, CI breakage]
 body:
   - type: dropdown
     id: ci-test-type
@@ -31,7 +31,10 @@ body:
     id: additional-information
     attributes:
       label: Additional Information
-      description: Add any other context about the flake here.
+      description: |
+        Add any other context about the flake here, e.g. the link to the GitHub Actions logs page.
+
+        For e2e flakes, include screenshots/videos of the failure here, since these may get wiped from GitHub Actions after a few days/weeks. (Click on "Summary" at the top-left of the test log page, scroll to the bottom, downlaod the appropriate webdriverio-screenshots/webdriverio-video artifacts, and upload them here.)
     validations:
       required: false
   - type: textarea

@@ -17,6 +17,8 @@ Add error logs here.
 
 **Where did the error occur?** Add the page the error occurred on.
 
+**Which release did the error occur in?** Add the Oppia release version associated with the error.
+
 **Frequency of occurrence** Add details about how many times the error occurred within a given time period (e.g. the last week, the last 30 days, etc.). This helps issue triagers establish severity.
 
 **Additional context** Add any other context that would be useful. Make sure to anonymize user data like user IDs, exploration IDs, state names, user names, etc. Replace any personal data with appropriate placeholders.
