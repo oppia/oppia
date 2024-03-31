@@ -2656,7 +2656,7 @@ class UserGroupModelTests(test_utils.GenericTestBase):
     def test_export_data_trivial(self) -> None:
         user_data = user_models.UserGroupModel.export_data(
             self.NONEXISTENT_USER_ID)
-        test_data = {}
+        test_data: Dict[str, Dict[str, str]] = {}
         self.assertEqual(user_data, test_data)
 
     def test_export_data_nontrivial(self) -> None:

@@ -31,6 +31,10 @@ from core.tests import test_utils
 
 from typing import Tuple
 
+MYPY = False
+if MYPY: # pragma: no cover
+    from mypy_imports import user_models
+
 (user_models, ) = models.Registry.import_models([models.Names.USER])
 
 

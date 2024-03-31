@@ -2440,15 +2440,8 @@ class UserGroupModel(base_models.BaseModel):
         cls.update_timestamps_multi(user_group_models)
         cls.put_multi(user_group_models)
 
-        user_group_models: List[UserGroupModel] = list(cls.query(
-            cls.users == user_id
-        ).fetch())
-
-        for user_group_model in user_group_models:
-            user_group_model.users.remove(user_id)
-
     @classmethod
-    def export_data(cls, user_id: str) -> Dict[str, Dict[str, float]]:
+    def export_data(cls, user_id: str) -> Dict[str, Dict[str, str]]:
         """Exports the data from UserGroupModel into dict format for Takeout.
 
         Args:

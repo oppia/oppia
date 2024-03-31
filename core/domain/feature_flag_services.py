@@ -241,10 +241,11 @@ def is_feature_flag_enabled(
         return True
 
     if user_id is not None:
-        user_group_models = [user_group_model.id for user_group_model in list(
-            user_models.UserGroupModel.query(
-                user_models.UserGroupModel.users == user_id
-            ).fetch())]
+        user_group_models: List[user_models.UserGroupModel] = [
+            user_group_model.id for user_group_model in list(
+                user_models.UserGroupModel.query(
+                    user_models.UserGroupModel.users == user_id
+                ).fetch())]
         for user_group_id in feature_flag.feature_flag_config.user_group_ids:
             if user_group_id in user_group_models:
                 return True
