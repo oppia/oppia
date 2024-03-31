@@ -54,7 +54,7 @@ export class TopicViewerAccessGuard implements CanActivate {
         .catch(err => {
           this.router
             .navigate([
-              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
             ])
             .then(() => {
               this.location.replaceState(state.url);
