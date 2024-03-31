@@ -2457,15 +2457,16 @@ class UserGroupModel(base_models.BaseModel):
         Returns:
             dict. Dictionary of the data from UserGroupModel.
         """
-
-        user_group_ids = []
+        user_data = {}
         user_group_models: List[UserGroupModel] = list(cls.query(
             cls.users == user_id
         ).fetch())
         for user_group_model in user_group_models:
-            user_group_ids.append(user_group_model.id)
+            user_data[user_group_model.id] = {
+                'users': user_id
+            }
 
-        return {'user_group_ids': user_group_ids}
+        return user_data
 
 
 class UserSkillMasteryModel(base_models.BaseModel):
