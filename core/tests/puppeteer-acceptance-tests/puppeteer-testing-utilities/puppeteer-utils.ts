@@ -193,8 +193,6 @@ export class BaseUser implements IBaseUser {
               'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
               'Mobile/15A372 Safari/604.1'
           );
-        } else {
-          await this.page.setViewport({width: 1920, height: 1080});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
