@@ -27,6 +27,5 @@ core/tests/data/dummy_constants.js
 extensions/rich_text_components/webdriverio.js
 core/tests/wdio.conf.js
 core/tests/data/dummy_ci_tests/dummy_webdriverio.conf.js
-# formatting the directories below reduces test coverage. TODO(#19499): Fix it.
 scripts/linters/test_files
 core/tests/services_sources

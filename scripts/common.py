@@ -218,9 +218,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/click-all-buttons-in-about-foundation-page',
     'logged-in-user-tests/click-all-buttons-in-thanks-for-donating-page',
     'practice-question-admin-tests/add-and-remove-contribution-rights',
-    'practice-question-submitter-tests' +
-    '/suggest-medium-drag-and-drop-sort-question',
-    'practice-question-submitter-tests/suggest-hard-fraction-input-question',
     'translation-admin-tests/add-translation-rights',
     'translation-admin-tests/remove-translation-rights'
 ]

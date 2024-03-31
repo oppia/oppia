@@ -16,8 +16,12 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser} from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
+import isElementClickable from '../functions/is-element-clickable';
+import {ConsoleReporter} from './console-reporter';
+
+const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -72,7 +76,6 @@ export type ModalUserInteractions = (
 ) => Promise<void>;
 
 interface DebugTools {
-  capturePageConsoleLogs: () => void;
   setupClickLogger: () => Promise<void>;
   logClickEventsFrom: (selector: string) => Promise<void>;
 }
@@ -85,20 +88,6 @@ export class BaseUser implements IBaseUser {
   username: string = '';
   debug: DebugTools = {
     startTime: -1,
-
-    /**
-     * This function prints all of the page's console logs to the
-     * terminal.
-     *
-     * Any time this.page object is replaced, this function must be called
-     * again to continue printing console logs.
-     */
-    capturePageConsoleLogs(): void {
-      // eslint-disable-next-line no-console
-      this.page.on('console', message =>
-        console.log('PAGE: ' + message.text())
-      );
-    },
 
     /**
      * This function sets up a click logger that logs click events to the
@@ -164,6 +153,7 @@ export class BaseUser implements IBaseUser {
     ];
 
     const headless = process.env.HEADLESS === 'true';
+    const mobile = process.env.MOBILE === 'true';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -186,7 +176,26 @@ export class BaseUser implements IBaseUser {
         this.debug.startTime = Date.now();
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({width: 1920, height: 1080});
+        ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+
+        if (mobile) {
+          // This is the default viewport and user agent settings for iPhone 6.
+          await this.page.setViewport({
+            width: 375,
+            height: 667,
+            deviceScaleFactor: 2,
+            isMobile: true,
+            hasTouch: true,
+            isLandscape: false,
+          });
+          await this.page.setUserAgent(
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+              'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+              'Mobile/15A372 Safari/604.1'
+          );
+        } else {
+          await this.page.setViewport({width: 1920, height: 1080});
+        }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -195,8 +204,9 @@ export class BaseUser implements IBaseUser {
             throw new Error(`Unexpected alert: ${alertText}`);
           }
         });
-        this._setupDebugTools();
+        this.setupDebugTools();
       });
+
     return this.page;
   }
 
@@ -204,9 +214,8 @@ export class BaseUser implements IBaseUser {
    * Function to setup debug methods for the current page of any acceptance
    * test.
    */
-  async _setupDebugTools(): Promise<void> {
+  private async setupDebugTools(): Promise<void> {
     this.debug.page = this.page;
-    this.debug.capturePageConsoleLogs();
     await this.debug.setupClickLogger();
   }
 
@@ -260,7 +269,7 @@ export class BaseUser implements IBaseUser {
       )
     ).page();
     this.page = newPage;
-    this._setupDebugTools();
+    this.setupDebugTools();
   }
 
   /**
@@ -282,22 +291,40 @@ export class BaseUser implements IBaseUser {
   }
 
   /**
-   * The function clicks the element using the text on the button.
+   * This function waits for an element to be clickable either by its CSS selector or
+   * by the ElementHandle.
    */
-  async clickOn(
-    selector: string,
-    waitForSelectorOptions: WaitForSelectorOptions = {}
+  async waitForElementToBeClickable(
+    selector: string | ElementHandle<Element>
   ): Promise<void> {
     try {
-      /** Normalize-space is used to remove the extra spaces in the text.
-       * Check the documentation for the normalize-space function here :
-       * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-      const [button] = await this.page.$x(
-        `\/\/*[contains(text(), normalize-space('${selector}'))]`
-      );
-      await button.click();
+      const element =
+        typeof selector === 'string'
+          ? await this.page.waitForSelector(selector)
+          : selector;
+      await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
-      await this.page.waitForSelector(selector, waitForSelectorOptions);
+      throw new Error(`Element ${selector} took too long to be clickable.`);
+    }
+  }
+
+  /**
+   * The function clicks the element using the text on the button.
+   */
+  async clickOn(selector: string): Promise<void> {
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
+      await button.click();
+    } else {
+      await this.waitForElementToBeClickable(selector);
       await this.page.click(selector);
     }
   }
@@ -305,24 +332,16 @@ export class BaseUser implements IBaseUser {
   /**
    * This function types the text in the input field using its CSS selector.
    */
-  async type(
-    selector: string,
-    text: string,
-    waitForSelectorOptions: WaitForSelectorOptions = {}
-  ): Promise<void> {
-    await this.page.waitForSelector(selector, waitForSelectorOptions);
+  async type(selector: string, text: string): Promise<void> {
+    await this.page.waitForSelector(selector);
     await this.page.type(selector, text);
   }
 
   /**
    * This selects a value in a dropdown.
    */
-  async select(
-    selector: string,
-    option: string,
-    waitForSelectorOptions: WaitForSelectorOptions
-  ): Promise<void> {
-    await this.page.waitForSelector(selector, waitForSelectorOptions);
+  async select(selector: string, option: string): Promise<void> {
+    await this.page.waitForSelector(selector);
     await this.page.select(selector, option);
   }
 
@@ -346,6 +365,28 @@ export class BaseUser implements IBaseUser {
   }
 
   /**
+   * This function validates whether an anchor tag is correctly linked
+   * to external PDFs or not. Use this particularly when interacting with
+   * buttons associated with external PDF links, because Puppeteer,
+   * in headless-mode, does not natively support the opening of external PDFs.
+   */
+  async openExternalPdfLink(
+    selector: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.waitForSelector(selector);
+    const href = await this.page.$eval(selector, element =>
+      element.getAttribute('href')
+    );
+    if (href === null) {
+      throw new Error(`The ${selector} does not have a href attribute!`);
+    }
+    if (href !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
+    }
+  }
+
+  /**
    * This function logs out the current user.
    */
   async logout(): Promise<void> {
@@ -358,6 +399,31 @@ export class BaseUser implements IBaseUser {
    */
   async closeBrowser(): Promise<void> {
     await this.browserObject.close();
+  }
+
+  /**
+   * This function returns the current viewport of the page.
+   */
+  get viewport(): Viewport {
+    const viewport = this.page.viewport();
+    if (viewport === null) {
+      throw new Error('Viewport is not defined.');
+    }
+    return viewport;
+  }
+
+  /**
+   * This function checks if the viewport is at mobile width.
+   */
+  isViewportAtMobileWidth(): boolean {
+    return this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX;
+  }
+
+  /**
+   * This function gets the current URL of the page without parameters.
+   */
+  getCurrentUrlWithoutParameters(): string {
+    return this.page.url().split('?')[0];
   }
 }
 
