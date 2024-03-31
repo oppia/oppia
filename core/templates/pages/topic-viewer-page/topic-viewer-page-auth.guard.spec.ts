@@ -94,7 +94,7 @@ describe('TopicViewerAccessGuard', () => {
     expect(navigateSpy).not.toHaveBeenCalled();
   }));
 
-  it('should redirect to 401 page if validation fails', fakeAsync(() => {
+  it('should redirect to 404 page if validation fails', fakeAsync(() => {
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToTopicViewerPage'
@@ -115,7 +115,7 @@ describe('TopicViewerAccessGuard', () => {
 
     expect(canActivateResult).toBeFalse();
     expect(navigateSpy).toHaveBeenCalledWith([
-      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
     ]);
   }));
 });
