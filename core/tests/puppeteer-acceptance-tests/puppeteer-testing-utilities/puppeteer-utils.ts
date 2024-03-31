@@ -33,10 +33,10 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?',
 ];
 
-type ClickDetails = {
+interface ClickDetails {
   position: {x: number; y: number};
   time: number;
-};
+}
 
 declare global {
   interface Window {
