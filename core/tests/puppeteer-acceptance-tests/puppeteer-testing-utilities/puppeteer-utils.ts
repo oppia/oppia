@@ -33,113 +33,29 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?',
 ];
 
-interface IUserProperties {
-  page: Page;
-  browserObject: Browser;
-  userHasAcceptedCookies: boolean;
-  username: string;
-  email: string;
-  debug: DebugTools;
-}
+type ClickDetails = {
+  position: {x: number; y: number};
+  time: number;
+};
 
-export interface IBaseUser extends IUserProperties {
-  openBrowser: () => Promise<Page>;
-  signInWithEmail: (email: string) => Promise<void>;
-  signUpNewUser: (userName: string, signInEmail: string) => Promise<void>;
-  reloadPage: () => Promise<void>;
-  switchToPageOpenedByElementInteraction: () => Promise<void>;
-  withinModal: ({
-    selector,
-    beforeOpened,
-    whenOpened,
-    afterClosing,
-  }: ModalCoordination) => Promise<void>;
-  clickOn: (selector: string) => Promise<void>;
-  type: (selector: string, text: string) => Promise<void>;
-  select: (selector: string, option: string) => Promise<void>;
-  goto: (url: string) => Promise<void>;
-  uploadFile: (filePath: string) => Promise<void>;
-  logout: () => Promise<void>;
-  closeBrowser: () => Promise<void>;
-}
-
-export interface ModalCoordination {
-  selector: string;
-  beforeOpened?: ModalUserInteractions;
-  whenOpened: ModalUserInteractions;
-  afterClosing?: ModalUserInteractions;
+declare global {
+  interface Window {
+    logClick: (clickDetails: ClickDetails) => void;
+  }
 }
 
 export type ModalUserInteractions = (
-  _this: IBaseUser,
+  _this: BaseUser,
   container: string
 ) => Promise<void>;
 
-interface DebugTools {
-  setupClickLogger: () => Promise<void>;
-  logClickEventsFrom: (selector: string) => Promise<void>;
-}
-
-export class BaseUser implements IBaseUser {
+export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
   email: string = '';
   username: string = '';
-  debug: DebugTools = {
-    startTime: -1,
-
-    /**
-     * This function sets up a click logger that logs click events to the
-     * terminal.
-     *
-     * Any time this.page object is replaced, this function must be called
-     * again before it start logging clicks again.
-     */
-    async setupClickLogger(): Promise<void> {
-      await this.page.exposeFunction('logClick', ({position: {x, y}, time}) => {
-        // eslint-disable-next-line no-console
-        console.log(
-          `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
-            'of the viewport'
-        );
-        // eslint-disable-next-line no-console
-        console.log(
-          `- Click occurred ${time - this.startTime} ms into the test`
-        );
-      });
-    },
-
-    /**
-     * This function logs click events from all enabled elements selected by
-     * a given selector.
-     *
-     * The selector must be present in the document when called.
-     *
-     * this.setupClickLogger() must be called once before it can log click
-     * events from the elements.
-     */
-    async logClickEventsFrom(selector: string): Promise<void> {
-      await this.page.$$eval(
-        selector,
-        (elements, selector) => {
-          for (const element of elements) {
-            element.addEventListener('click', e => {
-              // eslint-disable-next-line no-console
-              console.log(
-                `DEBUG-ACCEPTANCE-TEST: User clicked on ${selector}:`
-              );
-              window.logClick({
-                position: {x: e.clientX, y: e.clientY},
-                time: Date.now(),
-              });
-            });
-          }
-        },
-        selector
-      );
-    },
-  };
+  startTime: number = -1;
 
   constructor() {}
 
@@ -173,7 +89,7 @@ export class BaseUser implements IBaseUser {
         defaultViewport: null,
       })
       .then(async browser => {
-        this.debug.startTime = Date.now();
+        this.startTime = Date.now();
         this.browserObject = browser;
         this.page = await browser.newPage();
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
@@ -213,8 +129,61 @@ export class BaseUser implements IBaseUser {
    * test.
    */
   private async setupDebugTools(): Promise<void> {
-    this.debug.page = this.page;
-    await this.debug.setupClickLogger();
+    await this.setupClickLogger();
+  }
+
+  /**
+   * This function sets up a click logger that logs click events to the
+   * terminal.
+   *
+   * Any time this.page object is replaced, this function must be called
+   * again before it start logging clicks again.
+   */
+  private async setupClickLogger(): Promise<void> {
+    await this.page.exposeFunction(
+      'logClick',
+      ({position: {x, y}, time}: ClickDetails) => {
+        // eslint-disable-next-line no-console
+        console.log(
+          `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
+            'of the viewport'
+        );
+        // eslint-disable-next-line no-console
+        console.log(
+          `- Click occurred ${time - this.startTime} ms into the test`
+        );
+      }
+    );
+  }
+
+  /**
+   * This function logs click events from all enabled elements selected by
+   * a given selector.
+   *
+   * The selector must be present in the document when called.
+   *
+   * this.setupClickLogger() must be called once before it can log click
+   * events from the elements.
+   */
+  async logClickEventsFrom(selector: string): Promise<void> {
+    await this.page.$$eval(
+      selector,
+      (elements: Element[], ...args: unknown[]) => {
+        const selector = args[0] as string;
+        for (const element of elements) {
+          element.addEventListener('click', (event: Event) => {
+            const mouseEvent = event as MouseEvent;
+            // eslint-disable-next-line no-console
+            console.log(`DEBUG: User clicked on ${selector}:`);
+            window.logClick({
+              position: {x: mouseEvent.clientX, y: mouseEvent.clientY},
+              time: Date.now(),
+            });
+          });
+        }
+      },
+      selector
+    );
   }
 
   /**
@@ -261,11 +230,12 @@ export class BaseUser implements IBaseUser {
    * interacting with an element on the current page.
    */
   async switchToPageOpenedByElementInteraction(): Promise<void> {
-    const newPage: Page = await (
-      await this.browserObject.waitForTarget(
-        target => target.opener() === this.page.target()
-      )
-    ).page();
+    const newPage: Page =
+      (await (
+        await this.browserObject.waitForTarget(
+          target => target.opener() === this.page.target()
+        )
+      ).page()) ?? (await this.browserObject.newPage());
     this.page = newPage;
     this.setupDebugTools();
   }
@@ -282,7 +252,12 @@ export class BaseUser implements IBaseUser {
     afterClosing = async (_this, container) => {
       await _this.page.waitForSelector(container, {hidden: true});
     },
-  }: ModalCoordination): Promise<void> {
+  }: {
+    selector: string;
+    beforeOpened?: ModalUserInteractions;
+    whenOpened: ModalUserInteractions;
+    afterClosing?: ModalUserInteractions;
+  }): Promise<void> {
     await beforeOpened(this, selector);
     await whenOpened(this, selector);
     await afterClosing(this, selector);
