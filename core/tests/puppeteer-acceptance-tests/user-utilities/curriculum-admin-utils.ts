@@ -254,7 +254,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(submitSolutionButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
-    await this.page.waitForTimeout(5000000);
     await this.clickOn(saveQuestionButton);
   }
 
@@ -389,6 +388,9 @@ export class CurriculumAdmin extends BaseUser {
         }
       });
       await this.clickOn(closeSaveModalButton);
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        visible: true,
+      });
       await this.clickOn('.e2e-test-toast-message');
       await this.page.waitForSelector('.e2e-test-toast-message', {
         hidden: true,
@@ -432,6 +434,9 @@ export class CurriculumAdmin extends BaseUser {
    */
   async assignSkillToSubtopic(): Promise<void> {
     await this.openTopicEditor();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.subtopic-reassign-header');
+    }
     await this.clickOn(assignSkillButton);
     await this.page.waitForSelector('.e2e-test-assign-subtopic', {
       visible: true,
@@ -489,9 +494,14 @@ export class CurriculumAdmin extends BaseUser {
       diagnosticTestSkillSelector
     );
 
+    await this.page.waitForTimeout(5000);
     await this.saveTopicDraft();
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('.e2e-test-mobile-save-topic-dropdown');
+      await this.clickOn('.e2e-test-mobile-changes-dropdown');
+
+      await this.page.waitForTimeout(2000);
+
+      await this.page.waitForSelector('.e2e-test-mobile-publish-topic-button');
       await this.clickOn('.e2e-test-mobile-publish-topic-button');
     } else {
       await this.clickOn(publishTopicButton);
@@ -507,6 +517,9 @@ export class CurriculumAdmin extends BaseUser {
     explorationId: string
   ): Promise<void> {
     await this.openTopicEditor();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-story-dropdown');
+    }
     await this.clickOn(addStoryButton);
     await this.type(storyTitleField, story.title);
     await this.type(storyUrlFragmentField, story.url_fragment);
