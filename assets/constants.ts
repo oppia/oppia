@@ -6602,6 +6602,15 @@ export default {
         }
       ]
     },
+    "COLLECTION_PLAYER": {
+      "ROUTE": "collection/:collection_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
     "EMAIL_DASHBOARD": {
       "ROUTE": "emaildashboard",
       "TITLE": "Email Dashboard - Oppia",
@@ -7239,6 +7248,24 @@ export default {
     "BLOG_ADMIN": {
       "ROUTE": "blog-admin",
       "TITLE": "Oppia Blog Admin Panel",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "VOICEOVER_ADMIN": {
+      "ROUTE": "voiceover-admin",
+      "TITLE": "Voiceover Admin Panel",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
