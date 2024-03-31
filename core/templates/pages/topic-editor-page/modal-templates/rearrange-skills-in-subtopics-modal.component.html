@@ -73,7 +73,7 @@
             </div>
           </div>
           <div *ngIf="subtopic.getId() === selectedSubtopicId">
-            <input type="text" [(ngModel)]="editableName">
+            <input type="text" [(ngModel)]="editableName" maxlength="{{maxCharsInSubtopicTitle}}">
             <button class="btn btn-secondary"
                     (click)="editNameOfSubtopicWithId(null)">
               Cancel

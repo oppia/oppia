@@ -38,11 +38,11 @@
                      [(ngModel)]="editableName"
                      (blur)="updateTopicName(editableName)"
                      placeholder="Enter a name for the topic."
-                     [maxlength]="MAX_CHARS_IN_TOPIC_NAME"
+                     [maxlength]="maxCharsInTopicName"
                      [ngClass]="{'is-invalid': topicNameExists}">
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Topic name should be at most {{ MAX_CHARS_IN_TOPIC_NAME }} characters.
+                  Topic name should be at most {{ maxCharsInTopicName }} characters.
                 </em>
               </span>
               <div *ngIf="topicNameExists" class="oppia-input-box-subtitle text-danger">
@@ -62,12 +62,12 @@
                      [disabled]="!topicRights.canEditTopic()"
                      [(ngModel)]="editableTopicUrlFragment"
                      (blur)="updateTopicUrlFragment(editableTopicUrlFragment)"
-                     [maxlength]="MAX_CHARS_IN_TOPIC_URL_FRAGMENT"
+                     [maxlength]="maxCharsInTopicUrlFragment"
                      [ngClass]="{'is-invalid': topicUrlFragmentExists}"
                      trim>
               <span class="oppia-input-box-subtitle">
                 <em>
-                  The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ MAX_CHARS_IN_TOPIC_URL_FRAGMENT }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
+                  The topic URL fragment is used to uniquely access the topic viewer page. It should consist of one or more hyphen-separated words, all in lowercase, with at most {{ maxCharsInTopicUrlFragment }} characters in total. Please use meaningful keywords, and avoid using words like "and", "of", or "the".
                   This topic can be accessed at the following URL:<br>
                   {{ hostname }}/learn/{{ getClassroomUrlFragment() }}/{{ editableTopicUrlFragment }}
                 </em>
@@ -86,7 +86,7 @@
               <textarea type="text"
                         class="form-control topic-description e2e-test-topic-description-field"
                         [(ngModel)]="editableDescription"
-                        [maxlength]="MAX_CHARS_IN_TOPIC_DESCRIPTION"
+                        [maxlength]="maxCharsInTopicDescription"
                         (change)="updateTopicDescriptionStatus(editableDescription)"
                         (blur)="updateTopicDescription(editableDescription)"
                         [disabled]="!topicRights.canEditTopic()"
@@ -95,7 +95,7 @@
               </textarea>
               <span class="oppia-input-box-subtitle">
                 <em>
-                  Topic description should be at most {{ MAX_CHARS_IN_TOPIC_DESCRIPTION }} characters.
+                  Topic description should be at most {{ maxCharsInTopicDescription }} characters.
                 </em>
               </span>
               <span *ngIf="editableDescriptionIsEmpty && topicDescriptionChanged" class="form-text">
@@ -112,7 +112,7 @@
               <textarea type="text"
                         class="form-control topic-description e2e-test-topic-page-title-fragment-field"
                         [(ngModel)]="editablePageTitleFragmentForWeb"
-                        [maxlength]="MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB"
+                        [maxlength]="maxCharsInPageTitleFragmentForWeb"
                         (blur)="updateTopicPageTitleFragmentForWeb(editablePageTitleFragmentForWeb)"
                         [disabled]="!topicRights.canEditTopic()"
                         aria-label="Page Title Fragment"
@@ -121,7 +121,7 @@
               <span class="oppia-input-box-subtitle">
                 <em>
                   Enter the middle component of the page title. For example, if you enter "Add, Subtract, Multiply and Divide" it will show up in the browser tab as "Learn {{ editableName }} | Add, Subtract, Multiply and Divide | Oppia".
-                  It should be at least {{ MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB }} and at most {{ MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB }} characters.
+                  It should be at least {{ minCharsInPageTitleFragmentForWeb }} and at most {{ maxCharsInPageTitleFragmentForWeb }} characters.
                 </em>
               </span>
             </div>
@@ -134,7 +134,7 @@
               <textarea type="text"
                         class="form-control topic-description e2e-test-topic-meta-tag-content-field"
                         [(ngModel)]="editableMetaTagContent"
-                        [maxlength]="MAX_CHARS_IN_META_TAG_CONTENT"
+                        [maxlength]="maxCharsInMetaTagContent"
                         (blur)="updateTopicMetaTagContent(editableMetaTagContent)"
                         [disabled]="!topicRights.canEditTopic()"
                         placeholder="Enter the meta tag content for the topic"
@@ -143,7 +143,7 @@
               <span class="oppia-input-box-subtitle">
                 <em>
                   Meta tags provide information about the webpage. This information will not displayed on the page but it can be read by search engines and web crawlers. This text will be shown to users in seach engine results.
-                  Topic meta tag content should be at most {{ MAX_CHARS_IN_META_TAG_CONTENT }} characters.
+                  Topic meta tag content should be at most {{ maxCharsInMetaTagContent }} characters.
                 </em>
               </span>
             </div>
