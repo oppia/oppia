@@ -34,7 +34,7 @@ const routes: Route[] = [
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE,
-    loadChildren: () => import('pages/collection-editor-page/collection-editor-page.module')
+    loadChildren: () => import('pages/collection-editor-page/collection-editor-page.module') // eslint-disable-line max-len
       .then(m => m.CollectionEditorPageModule),
     canActivate: [IsLoggedInGuard]
   },

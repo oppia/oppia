@@ -37,7 +37,7 @@ class MockRouter {
   }
 }
 
-fdescribe('EditLearnerGroupPageAuthGuard', () => {
+describe('EditLearnerGroupPageAuthGuard', () => {
   let guard: EditLearnerGroupPageAuthGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;

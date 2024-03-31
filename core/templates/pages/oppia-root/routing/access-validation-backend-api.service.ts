@@ -57,8 +57,8 @@ export class AccessValidationBackendApiService {
   BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR = (
     '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'); // eslint-disable-line max-len
 
-  COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR =(
-    '/access_validation_handler/can_access_collection_editor_page/<collection_id>');
+  COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR = (
+    '/access_validation_handler/can_access_collection_editor_page/<collection_id>'); // eslint-disable-line max-len
 
   constructor(
     private http: HttpClient,

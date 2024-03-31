@@ -552,12 +552,10 @@ def can_edit_collection(
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
         if collection_rights is None:
-            print("heyaaaaaaaaaaaaaaaaaaaaaaaaaaa")
             raise base.UserFacingExceptions.PageNotFoundException
 
         if rights_manager.check_can_edit_activity(
                 self.user, collection_rights):
-            print("pritammmmmmmmmmmmmmmmmmmmmmmmmmmmm")
             return handler(self, collection_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(

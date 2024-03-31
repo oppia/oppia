@@ -22,19 +22,14 @@ from core import feature_flag_list
 from core import feconf
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import collection_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
+from core.domain import rights_manager
+from core.domain import user_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
 from core.tests import test_utils
-from core.domain import user_services
-from core.domain import collection_services
-from core.domain import rights_manager
-from core.domain import rights_domain
-
-
-
-
 
 from typing import Final
 
@@ -478,7 +473,9 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         )
         self.logout()
 
+
 class CollectionEditorPageAccessValidationHandler(test_utils.GenericTestBase):
+    """Checks the access to the collection editor page and its rendering."""
 
     COLLECTION_ID: Final = '0'
 

@@ -259,7 +259,8 @@ describe('Access validation backend api service', () => {
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_collection_editor_page/collection_id');
+      '/access_validation_handler/can_access_collection_editor_page/collection_id' // eslint-disable-line max-len
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({});
 
