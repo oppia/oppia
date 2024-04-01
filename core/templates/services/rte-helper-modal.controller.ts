@@ -434,9 +434,9 @@ export class RteHelperModalComponent {
           }
         )[caName] = this.tmpCustomizationArgs[i].value;
 
-        this.ngbActiveModal.close(customizationArgsDict);
-        this.customizationArgsFormSubscription.unsubscribe();
       }
+      this.ngbActiveModal.close(customizationArgsDict);
+      this.customizationArgsFormSubscription.unsubscribe();
     }
   }
 
