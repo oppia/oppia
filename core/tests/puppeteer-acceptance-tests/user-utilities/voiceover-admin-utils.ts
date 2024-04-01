@@ -69,6 +69,21 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.clickOn(explorationSettingsTab);
+  }
+
+  /**
+   * Function to navigate to exploration editor
+   */
+  async navigateToExplorationEditorPage(): Promise<void> {
+    await this.clickOn(createExplorationButton);
+  }
+
+  /**
+   * Function to dismiss welcome modal
+   */
+  async dismissWelcomeModal(): Promise<void> {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       visible: true,
     });
@@ -76,8 +91,6 @@ export class VoiceoverAdmin extends BaseUser {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
     });
-    await this.page.waitForFunction('document.readyState === "complete"');
-    await this.clickOn(explorationSettingsTab);
   }
 
   /**
@@ -85,14 +98,6 @@ export class VoiceoverAdmin extends BaseUser {
    * @param explorationTitle - title of the exploration
    */
   async createExplorationWithTitle(explorationTitle: string): Promise<void> {
-    await this.clickOn(createExplorationButton);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
     await this.page.waitForFunction('document.readyState === "complete"');
     await this.page.waitForSelector(textStateEditSelector, {
       visible: true,

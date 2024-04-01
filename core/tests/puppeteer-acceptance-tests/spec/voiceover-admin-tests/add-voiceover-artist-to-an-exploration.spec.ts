@@ -46,11 +46,16 @@ describe('Voiceover Admin', function () {
     'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.dismissWelcomeModal();
+
       await explorationEditor.createExplorationWithTitle('Exploration one');
       explorationId =
         await explorationEditor.publishExplorationWithTitle('Exploration one');
 
       await voiceoverAdm.navigateToExplorationEditor(explorationId);
+      await voiceoverAdm.dismissWelcomeModal();
+
       await voiceoverAdm.navigateToExplorationSettingsTab();
 
       await voiceoverAdm.expectVoiceoverArtistNotExists('invalidUserId');
@@ -72,6 +77,8 @@ describe('Voiceover Admin', function () {
         'voiceoverartist@example.com'
       );
       await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorPage();
+
       await explorationEditor.createExplorationWithTitle('Exploration two');
       explorationId =
         await explorationEditor.publishExplorationWithTitle('Exploration two');
