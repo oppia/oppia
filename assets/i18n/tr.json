@@ -555,7 +555,6 @@
 	"I18N_PREFERENCES_EXPORT_ACCOUNT": "Hesabı dışa aktar",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT": "Bu Oppia hesap verinizi JSON biçimli metin dosyası olarak indirecektir.",
 	"I18N_PREFERENCES_HEADING": "Tercihler",
-	"I18N_PREFERENCES_HEADING_SUBTEXT": "Bu sayfa üzerinde yaptığın herhangi bir değişiklik otomatik olarak kaydedilecek.",
 	"I18N_PREFERENCES_NO_SUBSCRIPTIONS": "Henüz hiçbir içerik oluşturucuya abone olmadınız. Yazar profil sayfasındaki 'abone ol' düğmesine tıklayarak favori yazara abone olmaktan çekinmeyin. Bir yazara abone olarak, yazar yeni bir ders yayımladığında e-posta ile bilgilendirileceksiniz.",
 	"I18N_PREFERENCES_OPPIA_IMPACT_SECTION_HEADING": "Etki",
 	"I18N_PREFERENCES_PAGE_TITLE": "Profil tercihlerini değiştir - Oppia",
