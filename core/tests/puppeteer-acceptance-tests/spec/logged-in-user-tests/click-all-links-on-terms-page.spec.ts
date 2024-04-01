@@ -34,55 +34,31 @@ describe('Logged-in Users', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'should be able to navigate to the Teach page using the footer',
+    'should be able to navigate to the Creator Guidelines page using the footer',
     async function () {
       await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToTeachPageViaFooter();
+      await testUser.navigateToTermsPageViaFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
 
-  describe('on the Teach page', function () {
+  describe('on the Get Started page', function () {
     beforeEach(async function () {
-      await testUser.navigateToTeachPage();
+      await testUser.navigateToTermsPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
     it(
-      'should be able to use the "Browse our Lessons" button',
+      'should be able to use the "forum" link',
       async function () {
-        await testUser.clickBrowseOurLessonsOnTeachPage();
+        await testUser.clickLinkToLicenseOnTermsPage();
       },
       DEFAULT_SPEC_TIMEOUT
     );
 
     it(
-      'should be able to use the "Accesss the Android app" button',
+      'should be able to use the "Design Tips" link',
       async function () {
-        await testUser.clickAccessTheAndroidAppOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to use the "VISIT CLASSROOM" button',
-      async function () {
-        await testUser.clickVisitClassroomOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to use the "BROWSE LIBRARY" button',
-      async function () {
-        await testUser.clickBrowseLibraryOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to use the "EXPLORE LESSONS" button',
-      async function () {
-        await testUser.clickExploreLessonsOnTeachPage();
+        await testUser.clickLinkToGoogleGroupOnTermsPage();
       },
       DEFAULT_SPEC_TIMEOUT
     );

@@ -58,6 +58,7 @@ export default {
     Partnerships: 'http://localhost:8181/partnerships',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Teach: 'http://localhost:8181/teach',
+    Terms: 'http://localhost:8181/terms',
     Volunteer: 'http://localhost:8181/volunteer',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
   },

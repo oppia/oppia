@@ -49,6 +49,7 @@ const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
 const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
 const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
 const teachUrl = testConstants.URLs.Teach;
+const termsUrl = testConstants.URLs.Terms;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -73,6 +74,7 @@ const footerForumlink = 'a.e2e-test-footer-forum-link';
 const footerGetStartedLink = 'a.e2e-test-footer-get-started-link';
 const footerCreatorGuidelinesLink = 'a.e2e-test-creator-guidelines-link';
 const footerTeachLink = 'a.e2e-test-teach-link';
+const footerTermsLink = 'a.e2e-test-terms-link';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -117,6 +119,10 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
+
+const teachPageBrowseOurLessonsButton = '.oppia-teach-browse-button';
+const teachPAgeAccessOurAndroidApp = '.oppia-';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -168,6 +174,13 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToTeachPage(): Promise<void> {
     await this.goto(teachUrl);
+  }
+
+  /**
+   * Function to navigate to the Terms page.
+   */
+  async navigateToTermsPage(): Promise<void> {
+    await this.goto(termsUrl);
   }
 
   /**
@@ -827,7 +840,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the GetStarted page using the oppia website footer.
+   * Navigates to the Teach page using the oppia website footer.
    */
   async navigateToTeachPageViaFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
@@ -835,6 +848,19 @@ export class LoggedInUser extends BaseUser {
       footerTeachLink,
       'Creator Guidelines in the About Menu on navbar',
       teachUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async navigateToTermsPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerTermsLink,
+      'Creator Guidelines in the About Menu on navbar',
+      termsUrl,
       'Creator Guidelines'
     );
   }
@@ -1001,14 +1027,86 @@ export class LoggedInUser extends BaseUser {
    * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
    */
   async clickBrowseOurLessonsOnTeachPage(): Promise<void> {
-    await this.page.waitForXPath(
-      '//a[contains(text(),"Browse our Explorations")]'
+    await this.clickButtonToNavigateToNewPage(
+      'Browse our Lessons',
+      'Creator Guidelines in the About Menu on navbar',
+      mathClassroomUrl,
+      'Creator Guidelines'
     );
+  }
 
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn('Browse our Explorations'),
-    ]);
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickAccessTheAndroidAppOnTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'Access the Android app',
+      'Creator Guidelines in the About Menu on navbar',
+      androidUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickVisitClassroomOnTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'VISIT CLASSROOM',
+      'Creator Guidelines in the About Menu on navbar',
+      mathClassroomUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickBrowseLibraryOnTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'BROWSE LIBRARY',
+      'Creator Guidelines in the About Menu on navbar',
+      communityLibraryUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickExploreLessonsOnTeachPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'Explore lessons',
+      'Creator Guidelines in the About Menu on navbar',
+      mathClassroomUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickLinkToLicenseOnTermsPage(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"here")])[1]');
+
+    const [link] = await this.page.$x('(//a[contains(text(),"here")])[1]');
+
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(
+      'https://creativecommons.org/licenses/by-sa/4.0/legalcode'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickLinkToGoogleGroupOnTermsPage(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"here")])[2]');
+
+    const [link] = await this.page.$x('(//a[contains(text(),"here")])[2]');
+
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe('http://localhost:8181/community-library');
   }
