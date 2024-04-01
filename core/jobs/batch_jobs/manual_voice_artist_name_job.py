@@ -95,10 +95,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 exp_snapshot_metadata_model = (
                     exp_models.ExplorationSnapshotMetadataModel.get(
-                        snapshot_model_id, strict=False))
-            if exp_snapshot_metadata_model is not None:
-                assert isinstance(exp_snapshot_metadata_model.committer_id, str)
-                return exp_snapshot_metadata_model.committer_id
+                        snapshot_model_id))
+            assert isinstance(exp_snapshot_metadata_model.committer_id, str)
+            return exp_snapshot_metadata_model.committer_id
         except Exception:
             logging.exception(
                 'Not able to get committer ID for snapshot model ID %s.'
@@ -125,14 +124,13 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 exp_snapshot_metadata_model = (
                     exp_models.ExplorationSnapshotMetadataModel.get(
-                        snapshot_model_id, strict=False))
-            if exp_snapshot_metadata_model is not None:
-                for change in exp_snapshot_metadata_model.commit_cmds:
-                    if (
-                        change['cmd'] == 'edit_state_property' and
-                        change['property_name'] == 'recorded_voiceovers'
-                    ):
-                        return True
+                        snapshot_model_id))
+            for change in exp_snapshot_metadata_model.commit_cmds:
+                if (
+                    change['cmd'] == 'edit_state_property' and
+                    change['property_name'] == 'recorded_voiceovers'
+                ):
+                    return True
         except Exception:
             logging.exception(
                 'Not able to check voiceover changes for snapshot model ID %s.'
@@ -464,7 +462,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                     'Not Found for user ID: %s.' % voice_artist_id)
 
             debug_logs.append('-------------------------------')
-            debug_logs.append('Voiceo Artist: %s' % voice_artist_username)
+            debug_logs.append('Voice Artist: %s' % voice_artist_username)
             debug_logs.append('Snapshot ID: %s' % new_snapshot_model.id)
             debug_logs.append(
                 'Newly added filenames: %s' % filenames_in_this_version)

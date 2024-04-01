@@ -500,7 +500,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
 
         debug_logs_1 = str([
             '-------------------------------',
-            'Voiceo Artist: editor1',
+            'Voice Artist: editor1',
             'Snapshot ID: exploration_id_1-5',
             'Newly added filenames: [\'filename3.mp3\']',
             'Referred filename: filename1.mp3, is not present in filenames.',
@@ -508,7 +508,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Referred filename: filename3.mp3, is present in filenames.',
             '-------------------------------',
             '-------------------------------',
-            'Voiceo Artist: editor2',
+            'Voice Artist: editor2',
             'Snapshot ID: exploration_id_1-3',
             'Newly added filenames: [\'filename2.mp3\']',
             'Referred filename: filename1.mp3, is not present in filenames.',
@@ -516,7 +516,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Referred filename: filename3.mp3, is not present in filenames.',
             '-------------------------------',
             '-------------------------------',
-            'Voiceo Artist: editor1',
+            'Voice Artist: editor1',
             'Snapshot ID: exploration_id_1-2',
             'Newly added filenames: [\'filename1.mp3\']',
             'Referred filename: filename1.mp3, is present in filenames.',
@@ -526,7 +526,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         ])
         debug_logs_2 = str([
             '-------------------------------',
-            'Voiceo Artist: editor1',
+            'Voice Artist: editor1',
             'Snapshot ID: exploration_id_2-5',
             'Newly added filenames: [\'filename7.mp3\']',
             'Referred filename: filename6.mp3, is not present in filenames.',
@@ -534,7 +534,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Referred filename: filename7.mp3, is present in filenames.',
             '-------------------------------',
             '-------------------------------',
-            'Voiceo Artist: editor4',
+            'Voice Artist: editor4',
             'Snapshot ID: exploration_id_2-4',
             'Newly added filenames: [\'filename6.mp3\']',
             'Referred filename: filename6.mp3, is present in filenames.',
@@ -542,7 +542,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Referred filename: filename7.mp3, is not present in filenames.',
             '-------------------------------',
             '-------------------------------',
-            'Voiceo Artist: editor3',
+            'Voice Artist: editor3',
             'Snapshot ID: exploration_id_2-3',
             'Newly added filenames: [\'filename5.mp3\']',
             'Referred filename: filename6.mp3, is not present in filenames.',
@@ -550,7 +550,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Referred filename: filename7.mp3, is not present in filenames.',
             '-------------------------------',
             '-------------------------------',
-            'Voiceo Artist: editor1',
+            'Voice Artist: editor1',
             'Snapshot ID: exploration_id_2-2',
             'Newly added filenames: [\'filename4.mp3\']',
             'Referred filename: filename6.mp3, is not present in filenames.',
@@ -634,13 +634,68 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
+        debug_logs_1 = str([
+            '-------------------------------',
+            'Voice Artist: editor2',
+            'Snapshot ID: exploration_id_1-3',
+            'Newly added filenames: [\'filename2.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_1-2',
+            'Newly added filenames: [\'filename1.mp3\']',
+            'Referred filename: filename1.mp3, is present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+        debug_logs_2 = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-5',
+            'Newly added filenames: [\'filename7.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor4',
+            'Snapshot ID: exploration_id_2-4',
+            'Newly added filenames: [\'filename6.mp3\']',
+            'Referred filename: filename6.mp3, is present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor3',
+            'Snapshot ID: exploration_id_2-3',
+            'Newly added filenames: [\'filename5.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-2',
+            'Newly added filenames: [\'filename4.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
                 stderr=''),
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr='')
+                stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
         expected_exp_id_to_content_id_to_voiceovers_mapping = {
@@ -692,6 +747,40 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Generated exploration voice artist link model for '
             'exploration %s.'
         )
+        debug_logs = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-5',
+            'Newly added filenames: [\'filename7.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor4',
+            'Snapshot ID: exploration_id_2-4',
+            'Newly added filenames: [\'filename6.mp3\']',
+            'Referred filename: filename6.mp3, is present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor3',
+            'Snapshot ID: exploration_id_2-3',
+            'Newly added filenames: [\'filename5.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-2',
+            'Newly added filenames: [\'filename4.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
 
         exploration_id: str = 'exploration_id_1'
         exploration_model: exp_models.ExplorationModel = (
@@ -706,7 +795,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr='')
+                stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs, stderr=''),
+
         ])
 
 
@@ -730,13 +821,75 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'Generated exploration voice artist link model for '
             'exploration %s.'
         )
+        debug_logs_1 = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_1-5',
+            'Newly added filenames: [\'filename3.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor2',
+            'Snapshot ID: exploration_id_1-3',
+            'Newly added filenames: [\'filename2.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_1-2',
+            'Newly added filenames: [\'filename1.mp3\']',
+            'Referred filename: filename1.mp3, is present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+        debug_logs_2 = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-5',
+            'Newly added filenames: [\'filename7.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor4',
+            'Snapshot ID: exploration_id_2-4',
+            'Newly added filenames: [\'filename6.mp3\']',
+            'Referred filename: filename6.mp3, is present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor3',
+            'Snapshot ID: exploration_id_2-3',
+            'Newly added filenames: [\'filename5.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-2',
+            'Newly added filenames: [\'filename4.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
                 stderr=''),
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr='')
+                stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
         total_exploration_voice_artist_link_models = len(
@@ -764,13 +917,158 @@ class AuditVoiceArtistMetadataModelsJobTests(
                 snapshot_model_id))
         snapshot_model.delete()
 
+        debug_logs_1 = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_1-5',
+            'Newly added filenames: [\'filename3.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_1-2',
+            'Newly added filenames: [\'filename1.mp3\']',
+            'Referred filename: filename1.mp3, is present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+        debug_logs_2 = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-5',
+            'Newly added filenames: [\'filename7.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor4',
+            'Snapshot ID: exploration_id_2-4',
+            'Newly added filenames: [\'filename6.mp3\']',
+            'Referred filename: filename6.mp3, is present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor3',
+            'Snapshot ID: exploration_id_2-3',
+            'Newly added filenames: [\'filename5.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-2',
+            'Newly added filenames: [\'filename4.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
                 stderr=''),
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr='')
+                stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
+        ])
+
+    def test_shoould_raise_error_for_non_existent_user(self) -> None:
+        self._create_curated_explorations()
+
+        # Updating committer ID.
+        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                snapshot_model_id))
+        snapshot_model.committer_id = 'non_existent_user'
+        snapshot_model.update_timestamps()
+        snapshot_model.put()
+
+        job_result_template = (
+            'Generated exploration voice artist link model for '
+            'exploration %s.'
+        )
+
+        debug_logs_1 = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_1-5',
+            'Newly added filenames: [\'filename3.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: Not Found for user ID: non_existent_user.',
+            'Snapshot ID: exploration_id_1-3',
+            'Newly added filenames: [\'filename2.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_1-2',
+            'Newly added filenames: [\'filename1.mp3\']',
+            'Referred filename: filename1.mp3, is present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+
+        debug_logs_2 = str([
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-5',
+            'Newly added filenames: [\'filename7.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor4',
+            'Snapshot ID: exploration_id_2-4',
+            'Newly added filenames: [\'filename6.mp3\']',
+            'Referred filename: filename6.mp3, is present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor3',
+            'Snapshot ID: exploration_id_2-3',
+            'Newly added filenames: [\'filename5.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voice Artist: editor1',
+            'Snapshot ID: exploration_id_2-2',
+            'Newly added filenames: [\'filename4.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
 
