@@ -812,7 +812,6 @@ export class LoggedInUser extends BaseUser {
     await this.page.click(
       'oppia-exploration-successfully-flagged-modal button'
     );
-    await this.page.waitForSelector(explorationFeedbackButton);
     showMessage(`Exploration reported with message ${reportMessage}.`);
   }
 
