@@ -51,7 +51,7 @@ class ReviewTestsPageDataHandler(
         ) if self.user_id else []
 
         if len(latest_completed_node_ids) == 0:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         try:
             skills = skill_fetchers.get_multi_skills(
@@ -59,7 +59,7 @@ class ReviewTestsPageDataHandler(
                     latest_completed_node_ids
                 ))
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
         skill_descriptions = {}
         for skill in skills:
             skill_descriptions[skill.id] = skill.description
