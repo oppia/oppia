@@ -218,10 +218,8 @@ export class RteHelperModalComponent {
       this.ngbActiveModal.dismiss(true);
     } else {
       this.ngbActiveModal.dismiss(false);
-      if (this.customizationArgsFormSubscription) {
-        this.customizationArgsFormSubscription.unsubscribe();
-      }
     }
+    this.customizationArgsFormSubscription.unsubscribe();
   }
 
   delete(): void {
@@ -408,55 +406,37 @@ export class RteHelperModalComponent {
             this.ngbActiveModal.dismiss('cancel');
           }
         );
-    } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
-        const caName = this.tmpCustomizationArgs[i].name;
-        if (caName === 'video_id') {
-          this.tmpCustomizationArgs[i].value = this.extractVideoIdFromVideoUrl(
-            this.tmpCustomizationArgs[i].value.toString()
-          );
-        }
-        (
-          customizationArgsDict as {
-            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-          }
-        )[caName] = this.tmpCustomizationArgs[i].value;
-      }
-      this.ngbActiveModal.close(customizationArgsDict);
-      this.customizationArgsFormSubscription.unsubscribe();
-    } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
-        const caName = this.tmpCustomizationArgs[i].name;
-        if (caName === 'text') {
-          // Set the link `text` to the link `url` if the `text` is empty.
-          (
-            customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-            }
-          )[caName] =
-            this.tmpCustomizationArgs[i].value ||
-            this.tmpCustomizationArgs[i - 1].value;
-        }
-        (
-          customizationArgsDict as {
-            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-          }
-        )[caName] = this.tmpCustomizationArgs[i].value;
-      }
-      this.ngbActiveModal.close(customizationArgsDict);
-      this.customizationArgsFormSubscription.unsubscribe();
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
+        if (this.componentId === this.COMPONENT_ID_VIDEO) {
+          if (caName === 'video_id') {
+            this.tmpCustomizationArgs[i].value =
+              this.extractVideoIdFromVideoUrl(
+                this.tmpCustomizationArgs[i].value.toString()
+              );
+          }
+        } else if (this.componentId === this.COMPONENT_ID_LINK) {
+          if (caName === 'text') {
+            // Set the link `text` to the link `url` if the `text` is empty.
+            (
+              customizationArgsDict as {
+                [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+              }
+            )[caName] =
+              this.tmpCustomizationArgs[i].value ||
+              this.tmpCustomizationArgs[i - 1].value;
+          }
+        }
         (
           customizationArgsDict as {
             [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
           }
         )[caName] = this.tmpCustomizationArgs[i].value;
-      }
 
-      this.ngbActiveModal.close(customizationArgsDict);
-      this.customizationArgsFormSubscription.unsubscribe();
+        this.ngbActiveModal.close(customizationArgsDict);
+        this.customizationArgsFormSubscription.unsubscribe();
+      }
     }
   }
 
