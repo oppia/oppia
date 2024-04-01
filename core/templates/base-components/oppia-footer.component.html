@@ -36,22 +36,26 @@
         <ul>
           <li>
             <a href="/about"
+               class="e2e-test-footer-about-link"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.ABOUT.ROUTE">
                {{ 'I18N_FOOTER_ABOUT' | translate }}
             </a>
           </li>
           <li>
-            <a href="/about-foundation">
+            <a href="/about-foundation"
+               class="e2e-test-footer-about-foundation-link">
               {{ 'I18N_FOOTER_OPPIA_FOUNDATION' | translate }}
             </a>
           </li>
           <li>
-            <a [href]="getOppiaBlogUrl()">
+            <a [href]="getOppiaBlogUrl()"
+               class="e2e-test-footer-blog-link">
               {{ 'I18N_TOPNAV_BLOG' | translate }}
             </a>
           </li>
           <li>
-            <a href="https://groups.google.com/forum/?place=forum/oppia#!forum/oppia">
+            <a href="https://groups.google.com/g/oppia"
+               class="e2e-test-footer-forum-link">
               {{ 'I18N_FOOTER_FORUM' | translate }}
             </a>
           </li>
@@ -69,24 +73,28 @@
           </li>
           <li>
             <a href="/creator-guidelines"
+               class="e2e-test-creator-guidelines-link"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PLAYBOOK.ROUTE">
                {{ 'I18N_PLAYBOOK_HEADING' | translate }}
             </a>
           </li>
           <li>
             <a href="/teach"
+               class="e2e-test-teach-link"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.TEACH.ROUTE">
                {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
             </a>
           </li>
           <li>
             <a href="/community-library"
+               class="e2e-test-community-library-link"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
                {{ 'I18N_FOOTER_BROWSE_LIBRARY' | translate }}
             </a>
           </li>
           <li>
             <a href="/contact"
+               class="e2e-test-contact-link"
                [smartRouterLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE">
                {{ 'I18N_FOOTER_CONTACT_US' | translate }}
             </a>
