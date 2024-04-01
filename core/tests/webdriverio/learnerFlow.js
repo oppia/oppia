@@ -26,6 +26,7 @@ var workflow = require('../webdriverio_utils/workflow.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 var CollectionEditorPage = require('../webdriverio_utils/CollectionEditorPage.js');
+var CollectionPlayerPage = require('../webdriverio_utils/CollectionPlayerPage.js');
 var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage = require('../webdriverio_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage = require('../webdriverio_utils/LearnerDashboardPage.js');
@@ -35,6 +36,7 @@ describe('Learner dashboard functionality', function () {
   var adminPage = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
+  var collectionPlayerPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
@@ -113,6 +115,7 @@ describe('Learner dashboard functionality', function () {
     // The editor and player page objects are only required for desktop testing.
     if (!browser.isMobile) {
       collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+      collectionPlayerPage = new CollectionPlayerPage.CollectionPlayerPage();
       creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
       explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
       explorationEditorMainTab = explorationEditorPage.getMainTab();
@@ -401,14 +404,8 @@ describe('Learner dashboard functionality', function () {
     await libraryPage.findCollection('Test Collection');
     await libraryPage.playCollection('Test Collection');
     await waitFor.pageToFullyLoad();
-    // The collection player has two sets of SVGs -- one which is
-    // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile
-      ? await $$('.e2e-test-mobile-collection-exploration')[0]
-      : await $$('.e2e-test-collection-exploration')[0];
-    // Click first exploration in collection.
-    await action.click('First exploration', firstExploration);
-    await waitFor.pageToFullyLoad();
+    await collectionPlayerPage.openFirstExplorationInCollection();
+
     // Leave this collection incomplete.
     if (browser.isMobile) {
       // In mobile, 'Play Exploration' button also needs to be clicked
@@ -435,14 +432,8 @@ describe('Learner dashboard functionality', function () {
     await libraryPage.findCollection('Test Collection');
     await libraryPage.playCollection('Test Collection');
     await waitFor.pageToFullyLoad();
-    // The collection player has two sets of SVGs -- one which is
-    // rendered for desktop and the other which is rendered for mobile.
-    var firstExploration = browser.isMobile
-      ? await $$('.e2e-test-mobile-collection-exploration')[0]
-      : await $$('.e2e-test-collection-exploration')[0];
-    // Click first exploration in collection.
-    await action.click('First exploration', firstExploration);
-    await waitFor.pageToFullyLoad();
+    await collectionPlayerPage.openFirstExplorationInCollection();
+
     if (browser.isMobile) {
       var playExploration = $('.e2e-test-play-exploration-button');
       await action.click('Play exploration', playExploration);
