@@ -50,6 +50,9 @@ const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
 const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
+const GoogleGroupsOppiaUrl = testConstants.URLs.GoogleGroups.Oppia;
+const GoogleGroupsOppiaAnnouceUrl =
+  testConstants.URLs.GoogleGroups.OppiaAnnounce;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -810,7 +813,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(footerForumlink),
     ]);
 
-    expect(this.page.url()).toBe('https://groups.google.com/g/oppia');
+    expect(this.page.url()).toBe(GoogleGroupsOppiaUrl);
   }
 
   /**
@@ -972,7 +975,7 @@ export class LoggedInUser extends BaseUser {
     await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
 
     await this.page.waitForNetworkIdle();
-    expect(this.page.url()).toBe('https://groups.google.com/g/oppia');
+    expect(this.page.url()).toBe(GoogleGroupsOppiaUrl);
   }
 
   /**
@@ -1108,7 +1111,7 @@ export class LoggedInUser extends BaseUser {
 
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
-    expect(this.page.url()).toBe('http://localhost:8181/community-library');
+    expect(this.page.url()).toBe(GoogleGroupsOppiaAnnouceUrl);
   }
 }
 

@@ -61,6 +61,10 @@ export default {
     Terms: 'http://localhost:8181/terms',
     Volunteer: 'http://localhost:8181/volunteer',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
+    GoogleGroups: {
+      Oppia: 'https://groups.google.com/g/oppia',
+      OppiaAnnounce: 'https://groups.google.com/g/oppia-announce',
+    },
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
