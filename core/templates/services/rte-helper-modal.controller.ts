@@ -433,7 +433,6 @@ export class RteHelperModalComponent {
             [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
           }
         )[caName] = this.tmpCustomizationArgs[i].value;
-
       }
       this.ngbActiveModal.close(customizationArgsDict);
       this.customizationArgsFormSubscription.unsubscribe();
