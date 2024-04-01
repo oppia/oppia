@@ -24,6 +24,7 @@ import logging
 
 from core.domain import opportunity_services
 from core.domain import state_domain
+from core.domain import user_services
 from core.domain import voiceover_domain
 from core.domain import voiceover_services
 from core.jobs import base_jobs
@@ -106,11 +107,45 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         return None
 
     @classmethod
+    def is_voiceover_changes_made(
+        cls, snapshot_model_id: str
+    ) -> bool:
+        """Checks whether the given snapshot model contains voiceover-related
+        changes.
+
+        Args:
+            snapshot_model_id: str. The exploration snapshot model ID.
+
+        Returns:
+            bool. Whether the given snapshot model contains voiceover-related
+            changes.
+        """
+
+        try:
+            with datastore_services.get_ndb_context():
+                exp_snapshot_metadata_model = (
+                    exp_models.ExplorationSnapshotMetadataModel.get(
+                        snapshot_model_id, strict=False))
+            if exp_snapshot_metadata_model is not None:
+                for change in exp_snapshot_metadata_model.commit_cmds:
+                    if (
+                        change['cmd'] == 'edit_state_property' and
+                        change['property_name'] == 'recorded_voiceovers'
+                    ):
+                        return True
+        except Exception:
+            logging.exception(
+                'Not able to check voiceover changes for snapshot model ID %s.'
+                % snapshot_model_id
+            )
+        return False
+
+    @classmethod
     def extract_added_voiceovers_between_successive_snapshots(
         cls,
         new_snapshot_model: exp_models.ExplorationSnapshotContentModel,
         old_snapshot_model: exp_models.ExplorationSnapshotContentModel
-    ) -> Dict[str, List[str]]:
+    ) -> List[str]:
         """Compares two successive versions of snapshot models and
         extracts voiceovers that have been added in the later version of the
         exploration snapshot.
@@ -122,57 +157,43 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 exploration snapshot model, let's say version n-1.
 
         Returns:
-            dict(str, list(str)). A dict with language codes as keys and list
-            of filenames as values. Only voiceover filenames that exist in
-            the new snapshot model but are absent in the old snapshot model are
-            included in this dictionary.
+            list(str). A list of filenames as values. Only voiceover
+            filenames that exist in the new snapshot model but are absent in
+            the old snapshot model are included in this dictionary.
 
         Raises:
             Exception. Failed to get newly added voiceovers between the given
                 snapshot models.
         """
         # The voiceover filenames that are present in the new snapshot model.
-        new_lang_code_to_filenames: Dict[str, List[str]] = (
-            collections.defaultdict(list))
+        new_filenames: List[str] = []
 
         # The voiceover filenames that are present in the old snapshot model.
-        old_lang_code_to_filenames: Dict[str, List[str]] = (
-            collections.defaultdict(list))
+        old_filenames: List[str] = []
 
         # The voiceover filenames that has been added to this version of the
         # exploration snapshot.
-        lang_code_to_filenames_in_this_version: Dict[str, List[str]] = (
-            collections.defaultdict(list))
+        filenames_in_this_version: List[str] = []
 
         for state in new_snapshot_model.content['states'].values():
             voiceovers_mapping = (
                 state['recorded_voiceovers']['voiceovers_mapping'])
             for lang_code_to_voiceover_dict in voiceovers_mapping.values():
-                for lang_code, voiceover_dict in (
-                        lang_code_to_voiceover_dict.items()):
-                    new_lang_code_to_filenames[lang_code].append(
-                        voiceover_dict['filename'])
+                for voiceover_dict in lang_code_to_voiceover_dict.values():
+                    new_filenames.append(voiceover_dict['filename'])
 
         for state in old_snapshot_model.content['states'].values():
             voiceovers_mapping = (
                 state['recorded_voiceovers']['voiceovers_mapping'])
             for lang_code_to_voiceover_dict in voiceovers_mapping.values():
-                for lang_code, voiceover_dict in (
-                        lang_code_to_voiceover_dict.items()):
-                    old_lang_code_to_filenames[lang_code].append(
-                        voiceover_dict['filename'])
+                for voiceover_dict in lang_code_to_voiceover_dict.values():
+                    old_filenames.append(voiceover_dict['filename'])
 
-        for lang_code, filenames in new_lang_code_to_filenames.items():
-            if lang_code not in old_lang_code_to_filenames:
-                lang_code_to_filenames_in_this_version[lang_code].extend(
-                    filenames)
-                continue
-            for filename in filenames:
-                if filename not in old_lang_code_to_filenames[lang_code]:
-                    lang_code_to_filenames_in_this_version[lang_code].append(
-                        filename)
+        for filename in new_filenames:
+            if filename not in old_filenames:
+                filenames_in_this_version.append(filename)
 
-        return lang_code_to_filenames_in_this_version
+        return filenames_in_this_version
 
     @classmethod
     def get_content_id_mapping_and_voiceovers_count(
@@ -219,11 +240,12 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         cls,
         reference_voiceover_mapping: Dict[
             str, Dict[str, state_domain.VoiceoverDict]],
-        lang_code_to_filenames: Dict[str, List[str]],
+        filenames: List[str],
         voiceover_artist_and_voiceover_mapping: (
             voiceover_domain.ContentIdToVoiceoverMappingType),
         voice_artist_id: str
-    ) -> Tuple[voiceover_domain.ContentIdToVoiceoverMappingType, int]:
+    ) -> Tuple[
+        voiceover_domain.ContentIdToVoiceoverMappingType, int, List[str]]:
         """Adds new voiceover entries to the
         `voiceover_artist_and_voiceover_mapping` dictionary with their
         respective voice artists. Only include voiceovers that are present in
@@ -236,11 +258,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 exploration, say N. This dict maps content IDs as keys and
                 nested dicts as values. Each nested dict contains language codes
                 as keys and voiceover dicts as values.
-            lang_code_to_filenames: dict(str, dict(str)). The dictionary
-                contains voiceover filenames data for some other version of
-                exploration, say M < N. This dict maps content IDs as keys and
-                nested dicts as values. Each nested dict contains language
-                codes as keys and voiceover dicts as values.
+            filenames: list(str). A list of filenames data for some other
+                version of exploration, say M < N.
             voiceover_artist_and_voiceover_mapping:
                 ContentIdToVoiceoverMappingType. The dictionary contains
                 voiceovers and voice artists information about an exploration.
@@ -254,7 +273,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 voiceover_mapping.
 
         Returns:
-            tuple(ContentIdToVoiceoverMappingType, int). A 2-tuple with the
+            tuple(ContentIdToVoiceoverMappingType, int). A 3-tuple with the
             following elements:
             - A dictionary in which new voiceovers and voice artists have been
             added. The newly added voiceovers are filtered from the
@@ -266,6 +285,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             - The number of voiceovers that are identified after iterating
             through the voiceover mapping input. Identifying a voiceover means
             finding the voice artist who contributed to that voiceover.
+            - A list of debug logs.
         """
 
         # Identifying a voiceover means finding the voice artist who contributed
@@ -278,16 +298,13 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         updated_voiceover_artist_and_voiceover_mapping.update(
             voiceover_artist_and_voiceover_mapping)
 
+        # Collects all the debug logs.
+        debug_logs: List[str] = []
+
         for content_id, lang_code_to_voiceovers in (
                 reference_voiceover_mapping.items()):
 
             for lang_code, voiceover_dict in lang_code_to_voiceovers.items():
-
-                # If a language code is not present in lang_code_to_filenames
-                # dict, then we should skip the iteration for that
-                # language code.
-                if lang_code not in lang_code_to_filenames:
-                    continue
 
                 referred_filename = voiceover_dict['filename']
 
@@ -301,15 +318,25 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 # content_id, language_code, and a random hash. Because of the
                 # random hash, two distinct voiceovers can never share the
                 # same filename.
-                if referred_filename in lang_code_to_filenames[lang_code]:
+                if referred_filename in filenames:
+                    debug_logs.append(
+                        'Referred filename: %s, is present in filenames.'
+                        % referred_filename
+                    )
                     updated_voiceover_artist_and_voiceover_mapping[content_id][
                         lang_code] = (voice_artist_id, voiceover_dict)
 
                     number_of_voiceovers_identified += 1
+                else:
+                    debug_logs.append(
+                        'Referred filename: %s, is not present in filenames.'
+                        % referred_filename
+                    )
 
         return (
             updated_voiceover_artist_and_voiceover_mapping,
-            number_of_voiceovers_identified
+            number_of_voiceovers_identified,
+            debug_logs
         )
 
     @classmethod
@@ -317,7 +344,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         cls,
         exploration_model: exp_models.ExplorationModel,
         snapshot_models: List[exp_models.ExplorationSnapshotContentModel]
-    ) -> Optional[voiceover_models.ExplorationVoiceArtistsLinkModel]:
+    ) -> Tuple[
+        Optional[voiceover_models.ExplorationVoiceArtistsLinkModel], List[str]]:
         """Creates an exploration voice artist link model using the
         exploration snapshot models for a given exploration model.
 
@@ -329,8 +357,10 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 curated exploration.
 
         Returns:
-            ExplorationVoiceArtistsLinkModel. An object containing voice artist
-            IDs and their provided voiceovers for the given exploration.
+            A 2-tuple with the following elements:
+            - ExplorationVoiceArtistsLinkModel. An object containing voice
+            artist IDs and their provided voiceovers for the given exploration.
+            - A list of debug logs.
         """
 
         # The key for sorting is defined separately because of a mypy bug.
@@ -350,6 +380,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # exploration.
         latest_content_id_to_voiceover_mapping: Dict[str, Dict[
             str, state_domain.VoiceoverDict]] = {}
+
+        # Collects all the debug logs.
+        debug_logs: List[str] = []
 
         # The dictionary contains information about voice artists and their
         # provided voiceovers in the given exploration. This dict is built
@@ -372,7 +405,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 'Failed to get latest voiceover mapping for exploration %s, '
                 'with error message: %s.' % (exploration_model.id, e)
             )
-            return None
+            return None, debug_logs
 
         # Note that, in this code, we don't need to explicitly handle the case
         # where explorations were reverted to previous versions. This is
@@ -385,8 +418,13 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         for index, new_snapshot_model in enumerate(snapshot_models[:-1]):
             old_snapshot_model = snapshot_models[index + 1]
 
+            # If the commit does not contain voiceover changes, then we should
+            # skip the snapshot model.
+            if not cls.is_voiceover_changes_made(new_snapshot_model.id):
+                continue
+
             try:
-                lang_code_to_filenames_in_this_version = (
+                filenames_in_this_version = (
                     cls.extract_added_voiceovers_between_successive_snapshots(
                         new_snapshot_model, old_snapshot_model))
             except Exception as e:
@@ -403,7 +441,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
             # If no voiceover-related changes were made during the commit,
             # then the rest of the for loop body can be skipped.
-            if not bool(lang_code_to_filenames_in_this_version):
+            if len(filenames_in_this_version) == 0:
                 continue
 
             voice_artist_id = (
@@ -417,13 +455,28 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             if voice_artist_id is None:
                 continue
 
+            try:
+                with datastore_services.get_ndb_context():
+                    voice_artist_username = (
+                        user_services.get_username(voice_artist_id))
+            except Exception:
+                voice_artist_username = (
+                    'Not Found for user ID: %s.' % voice_artist_id)
+
+            debug_logs.append('-------------------------------')
+            debug_logs.append('Voiceo Artist: %s' % voice_artist_username)
+            debug_logs.append('Snapshot ID: %s' % new_snapshot_model.id)
+            debug_logs.append(
+                'Newly added filenames: %s' % filenames_in_this_version)
+
             (
                 voiceover_artist_and_voiceover_mapping,
-                number_of_voiceovers_identified
+                number_of_voiceovers_identified,
+                logs
             ) = (
                 cls.update_content_id_to_voiceovers_mapping(
                     latest_content_id_to_voiceover_mapping,
-                    lang_code_to_filenames_in_this_version,
+                    filenames_in_this_version,
                     voiceover_artist_and_voiceover_mapping,
                     voice_artist_id
                 )
@@ -431,6 +484,9 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
             total_number_of_voiceovers_identified += (
                 number_of_voiceovers_identified)
+
+            debug_logs.extend(logs)
+            debug_logs.append('-------------------------------')
 
             # Once all voice artists for the latest exploration version are
             # identified, further iteration over the remaining unexplored
@@ -450,7 +506,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 )
             )
 
-        return exploration_voice_artists_link_model
+        return exploration_voice_artists_link_model, debug_logs
 
     def extract_exploration_id_from_snapshot_id(
         self,
@@ -516,7 +572,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             'snapshot_models': paired_snapshot_models
         } | 'Group by Exploration ID' >> beam.CoGroupByKey()
 
-        exploration_voice_artist_link_models = (
+        voice_artist_link_models_and_logs = (
             grouped_models
             | 'Get curated and valid exploration models' >> beam.Filter(
                 lambda element: (
@@ -536,12 +592,26 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 )
             )
             | 'Filter None objects' >> beam.Filter(
-                lambda model: model is not None
+                lambda model: model[0] is not None
+            )
+        )
+
+        voice_artist_link_models = (
+            voice_artist_link_models_and_logs
+            | 'Unpack models' >> beam.Map(lambda element: element[0])
+        )
+
+        debug_logs = (
+            voice_artist_link_models_and_logs
+            | 'Unpack and get debug logs result' >> beam.Map(
+                lambda element: (
+                    job_run_result.JobRunResult.as_stdout(element[1])
+                )
             )
         )
 
         exploration_voice_artist_link_result = (
-            exploration_voice_artist_link_models
+            voice_artist_link_models
             | 'Get the exploration IDs for generated models' >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
                     'Generated exploration voice artist link model for '
@@ -552,10 +622,15 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
-                exploration_voice_artist_link_models
+                voice_artist_link_models
                 | 'Put models into datastore' >> ndb_io.PutModels()
             )
-        return exploration_voice_artist_link_result
+        return (
+            (
+                exploration_voice_artist_link_result,
+                debug_logs
+            ) | 'Flatten job run results' >> beam.Flatten()
+        )
 
 
 class AuditExplorationVoiceArtistLinkModelsJob(

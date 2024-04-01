@@ -497,13 +497,76 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'Generated exploration voice artist link model for '
             'exploration %s.'
         )
+
+        debug_logs_1 = str([
+            '-------------------------------',
+            'Voiceo Artist: editor1',
+            'Snapshot ID: exploration_id_1-5',
+            'Newly added filenames: [\'filename3.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voiceo Artist: editor2',
+            'Snapshot ID: exploration_id_1-3',
+            'Newly added filenames: [\'filename2.mp3\']',
+            'Referred filename: filename1.mp3, is not present in filenames.',
+            'Referred filename: filename2.mp3, is present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voiceo Artist: editor1',
+            'Snapshot ID: exploration_id_1-2',
+            'Newly added filenames: [\'filename1.mp3\']',
+            'Referred filename: filename1.mp3, is present in filenames.',
+            'Referred filename: filename2.mp3, is not present in filenames.',
+            'Referred filename: filename3.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
+        debug_logs_2 = str([
+            '-------------------------------',
+            'Voiceo Artist: editor1',
+            'Snapshot ID: exploration_id_2-5',
+            'Newly added filenames: [\'filename7.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voiceo Artist: editor4',
+            'Snapshot ID: exploration_id_2-4',
+            'Newly added filenames: [\'filename6.mp3\']',
+            'Referred filename: filename6.mp3, is present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voiceo Artist: editor3',
+            'Snapshot ID: exploration_id_2-3',
+            'Newly added filenames: [\'filename5.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is not present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+            '-------------------------------',
+            'Voiceo Artist: editor1',
+            'Snapshot ID: exploration_id_2-2',
+            'Newly added filenames: [\'filename4.mp3\']',
+            'Referred filename: filename6.mp3, is not present in filenames.',
+            'Referred filename: filename4.mp3, is present in filenames.',
+            'Referred filename: filename7.mp3, is not present in filenames.',
+            '-------------------------------',
+        ])
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
                 stderr=''),
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr='')
+                stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
         ])
 
         expected_exp_id_to_content_id_to_voiceovers_mapping = {
@@ -717,18 +780,14 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
     """Test class to validate helper methods."""
 
     def test_should_update_content_id_to_voiceovers_mapping(self) -> None:
-        lang_code_to_filenames = {
-            'en': [
-                'filename1.mp3',
-                'filename3.mp3',
-                'filename4.mp3',
-                'filename5.mp3'
-            ],
-            'hi': [
-                'filename2.mp3',
-                'filename6.mp3'
-            ]
-        }
+        filenames = [
+            'filename1.mp3',
+            'filename3.mp3',
+            'filename4.mp3',
+            'filename5.mp3',
+            'filename2.mp3',
+            'filename6.mp3',
+        ]
         latest_content_id_to_voiceover_mapping = {
             'content_0': {
                 'en': self.voiceover_dict_1,
@@ -763,13 +822,14 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
 
         (
             updated_content_id_to_voiceovers_mapping,
-            number_of_voiceovers_identified
+            number_of_voiceovers_identified,
+            _
         ) = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             update_content_id_to_voiceovers_mapping(
                 latest_content_id_to_voiceover_mapping,
-                lang_code_to_filenames,
+                filenames,
                 content_id_to_voiceovers_mapping,
                 voice_artist_id
             )
@@ -815,7 +875,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             exp_models.ExplorationSnapshotContentModel] = list(
                 exp_models.ExplorationSnapshotContentModel.get_all().fetch())
 
-        exp_link_model = (
+        exp_link_model, _ = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             get_exploration_voice_artists_link_model(
@@ -892,7 +952,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             }
         }
 
-        exp_link_model = (
+        exp_link_model, _ = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             get_exploration_voice_artists_link_model(
