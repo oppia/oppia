@@ -58,6 +58,9 @@ export class AccessValidationBackendApiService {
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
+  REVIEW_TESTS_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_review_tests_page/<classroom_url_fragment>/<topic_url_fragment>/<story_url_fragment>'; // eslint-disable-line max-len
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -150,6 +153,23 @@ export class AccessValidationBackendApiService {
     return this.http
       .get<void>(this.LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR)
       .toPromise();
+  }
+
+  validateAccessToReviewTestPage(
+    classroom_url_fragment: string,
+    topic_url_fragment: string,
+    story_url_fragment: string
+  ): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.REVIEW_TESTS_PAGE_ACCESS_VALIDATOR,
+      {
+        classroom_url_fragment: classroom_url_fragment,
+        topic_url_fragment: topic_url_fragment,
+        story_url_fragment: story_url_fragment,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
   }
 
   doesLearnerGroupExist(learnerGroupId: string): Promise<void> {

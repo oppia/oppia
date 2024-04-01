@@ -112,6 +112,7 @@ import { PretestQuestionBackendApiService } from 'domain/question/pretest-questi
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
 import { ExplorationRecommendationsBackendApiService } from 'domain/recommendations/exploration-recommendations-backend-api.service';
 import { ReviewTestBackendApiService } from 'domain/review_test/review-test-backend-api.service';
+import { ReviewTestAuthGuard } from 'pages/review-test-page/review-test-auth.guard';
 import { PracticeSessionsBackendApiService } from 'pages/practice-session-page/practice-session-backend-api.service';
 import { MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
@@ -780,6 +781,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReleaseCoordinatorBackendApiService', ReleaseCoordinatorBackendApiService],
   ['RequestInterceptor', RequestInterceptor],
   ['ReviewTestBackendApiService', ReviewTestBackendApiService],
+  ['ReviewTestAuthGuard', ReviewTestAuthGuard],
   ['ReviewTestEngineService', ReviewTestEngineService],
   ['ResponsesService', ResponsesService],
   ['SVMPredictionService', SVMPredictionService],
