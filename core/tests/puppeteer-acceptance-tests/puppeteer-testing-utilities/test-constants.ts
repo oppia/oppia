@@ -36,21 +36,29 @@ export default {
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
     CreatorDashboardCreateMode:
       'http://localhost:8181/creator-dashboard?mode=create',
+    CreatingAnExploration: 'https://oppia.github.io/#/CreatingAnExploration',
     Donate: 'http://localhost:8181/donate',
     DonateWithThanksModal: 'http://localhost:8181/donate?thanks=',
+    EmbeddingAnExploration: 'https://oppia.github.io/#/EmbeddingAnExploration',
     ExternalLink61MillionChildren:
       'https://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education',
     ExternalLinkEvenThoseWhoAreInSchool:
       'https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf',
     ExternalLinkSourceUnesco:
       'https://uis.unesco.org/en/news/new-report-how-measure-equity-education',
-    ExternalLinkWatchAVideo:
+    DesktopExternalLinkWatchAVideo:
       'https://www.facebook.com/oppiaorg/videos/189487953721583/',
+    Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
+    GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
+    MobileExternalLinkWatchAVideo:
+      'https://m.facebook.com/oppiaorg/videos/189487953721583/',
     Partnerships: 'http://localhost:8181/partnerships',
+    ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
+    WelcomeToOppia: 'https://www.oppia.org/explore/0',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -70,6 +78,9 @@ export default {
     BLOG_ADMIN: 'BLOG_ADMIN',
     BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
   } as const,
+  ViewportWidthBreakpoints: {
+    MOBILE_PX: 768,
+  },
   images: {
     blogPostThumbnailImage: path.resolve(
       __dirname,

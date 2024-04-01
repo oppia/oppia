@@ -26,7 +26,12 @@ body:
   - type: textarea
     attributes:
       label: Steps To Reproduce
-      description: Steps to reproduce the behavior. **Example:** "1. Go to the library page. 2. Click on the 'Sign in' button. 3. See error."
+      description: |
+        Steps to reproduce the behavior. **Example:** "1. Go to the library page. 2. Click on the 'Sign in' button. 3. See error."
+
+        **Notes:**
+          - Please list the full step-by-step instructions. Do not require the reader to infer the steps from watching a video.
+          - (For devs) If any feature flags need to be turned on to reproduce the issue, specify them here as well.
     validations:
       required: true
   - type: textarea
@@ -105,6 +110,8 @@ body:
       value: |
         Before addressing the bug, please identify which PR caused the issue (you can follow the steps [here](https://github.com/oppia/oppia/wiki/How-to-find-the-commit-which-introduced-a-bug)). If you identify the PR, comment on the issue with a link to it. If not, mention the commit hash of the oldest commit you saw the bug on (and the month and year it was made in).
 
-        Also, if this is your first issue, please make sure to follow https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#choosing-a-good-first-issue and https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up before claiming it. Thanks!
+        Then, please leave a comment with details of the approach that you plan to take to fix the issue (see [example](https://github.com/oppia/oppia/issues/19157#issuecomment-1858788463)).
+
+        **Note:** If this is your first Oppia issue, please make sure to follow our guidelines for [choosing an issue](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#choosing-a-good-first-issue) and [setting things up](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up). You will also need to show a demo of the fix working correctly on your local machine. Thanks!
     validations:
       required: true

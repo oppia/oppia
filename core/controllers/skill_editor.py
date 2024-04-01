@@ -89,7 +89,7 @@ class SkillEditorPage(
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
         self.render_template('skill-editor-page.mainpage.html')
@@ -222,7 +222,7 @@ class EditableSkillDataHandler(
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
         topics = topic_fetchers.get_all_topics()
@@ -267,7 +267,7 @@ class EditableSkillDataHandler(
             skill_id: str. The skill ID.
 
         Raises:
-            PageNotFoundException. The skill with the given id doesn't exist.
+            NotFoundException. The skill with the given id doesn't exist.
             InvalidInputException. Commit messages must be at most 375
                 characters long.
             InvalidInputException. The input provided is not valid.
@@ -276,7 +276,7 @@ class EditableSkillDataHandler(
         assert self.normalized_payload is not None
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
         if skill is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
         version = self.normalized_payload['version']
@@ -358,7 +358,7 @@ class SkillDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         try:
             skills = skill_fetchers.get_multi_skills(skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
