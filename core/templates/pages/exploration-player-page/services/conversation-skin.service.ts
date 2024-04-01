@@ -19,7 +19,7 @@
  */
 
 import {StateCard} from 'domain/state_card/state-card.model';
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
@@ -36,11 +36,62 @@ import {QuestionPlayerStateService} from 'components/question-directives/questio
 import {InteractionRulesService} from '../services/answer-classification.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {AppConstants} from 'app.constants';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {ConceptCard} from 'domain/skill/concept-card.model';
+
+// Note: This file should be assumed to be in an IIFE, and the constants below
+// should only be used within this file.
+const TIME_FADEIN_MSEC = 100;
+const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConversationSkinService {
+  // The minimum width, in pixels, needed to be able to show two cards
+  // side-by-side.
+  TIME_PADDING_MSEC = 250;
+  TIME_SCROLL_MSEC = 600;
+  MIN_CARD_LOADING_DELAY_MSEC = 950;
+
+  displayedCard: StateCard;
+  nextCard: StateCard | null;
+  nextCardIfStuck: StateCard | null;
+  conceptCard: ConceptCard;
+
+  isAnimatingToTwoCards: boolean;
+  isAnimatingToOneCard: boolean;
+  pendingCardWasSeenBefore: boolean;
+
+  // 'completedChaptersCount' is fetched via a HTTP request.
+  // Until the response is received, it remains undefined.
+  completedChaptersCount: number | undefined;
+  _editorPreviewMode: boolean;
+  _nextFocusLabel: string | null;
+  upcomingInlineInteractionHtml: string | null;
+
+  moveToExploration: boolean;
+  explorationActuallyStarted: boolean;
+  questionSessionCompleted: boolean;
+  answerIsBeingProcessed: boolean = false;
+  answerIsCorrect: boolean = false;
+
+  onGiveFeedbackAndStayOnCurrentCard = new EventEmitter<{
+    feedbackHtml: string | null;
+    missingPrerequisiteSkillId: string | null;
+    refreshInteraction: boolean;
+    refresherExplorationId: string | null;
+  }>();
+
+  onMoveToNewCard = new EventEmitter<{
+    feedbackHtml: string | null;
+    isFinalQuestion: boolean;
+    nextCard: StateCard;
+  }>();
+
+  onShowUpcomingCard = new EventEmitter<void>();
+  onShowPendingCard = new EventEmitter<void>();
+
   constructor(
     private audioPlayerService: AudioPlayerService,
     private conceptCardBackendApiService: ConceptCardBackendApiService,
@@ -53,10 +104,11 @@ export class ConversationSkinService {
     private playerTranscriptService: PlayerTranscriptService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private questionPlayerStateService: QuestionPlayerStateService,
-    private statsReportingService: StatsReportingService
+    private statsReportingService: StatsReportingService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
-  handleNewCardAddition(newCard: StateCard, component: any) {
+  handleNewCardAddition(newCard: StateCard) {
     this.playerTranscriptService.addNewCard(newCard);
     const explorationLanguageCode =
       this.explorationPlayerStateService.getLanguageCode();
@@ -72,29 +124,29 @@ export class ConversationSkinService {
 
     let previousSupplementalCardIsNonempty =
       totalNumCards > 1 &&
-      component.isSupplementalCardNonempty(
+      this.isSupplementalCardNonempty(
         this.playerTranscriptService.getCard(totalNumCards - 2)
       );
 
-    let nextSupplementalCardIsNonempty = component.isSupplementalCardNonempty(
+    let nextSupplementalCardIsNonempty = this.isSupplementalCardNonempty(
       this.playerTranscriptService.getLastCard()
     );
 
     if (
       totalNumCards > 1 &&
-      component.canWindowShowTwoCards() &&
+      this.canWindowShowTwoCards() &&
       !previousSupplementalCardIsNonempty &&
       nextSupplementalCardIsNonempty
     ) {
       this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-      component?.animateToTwoCards(function () {});
+      this.animateToTwoCards(function () {});
     } else if (
       totalNumCards > 1 &&
-      component.canWindowShowTwoCards() &&
+      this.canWindowShowTwoCards() &&
       previousSupplementalCardIsNonempty &&
       !nextSupplementalCardIsNonempty
     ) {
-      component?.animateToOneCard(() => {
+      this.animateToOneCard(() => {
         this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
       });
     } else {
@@ -107,14 +159,13 @@ export class ConversationSkinService {
 
   submitAnswerNavigation(
     answer: string,
-    interactionRulesService: InteractionRulesService,
-    component: any
+    interactionRulesService: InteractionRulesService
   ) {
     let timeAtServerCall = new Date().getTime();
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
       this.explorationPlayerStateService.getCurrentEngineService();
-    component.answerIsCorrect = currentEngineService.submitAnswer(
+    this.answerIsCorrect = currentEngineService.submitAnswer(
       answer,
       interactionRulesService,
       (
@@ -132,10 +183,10 @@ export class ConversationSkinService {
         nextCardIfReallyStuck,
         focusLabel
       ) => {
-        component.nextCard = nextCard;
-        component.nextCardIfStuck = nextCardIfReallyStuck;
+        this.nextCard = nextCard;
+        this.nextCardIfStuck = nextCardIfReallyStuck;
         if (
-          !component._editorPreviewMode &&
+          !this._editorPreviewMode &&
           !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
         ) {
           let oldStateName = this.playerPositionService.getCurrentStateName();
@@ -147,8 +198,7 @@ export class ConversationSkinService {
               this.learnerParamsService.getAllParams(),
               isFirstHit,
               String(
-                component.completedChaptersCount &&
-                  component.completedChaptersCount + 1
+                this.completedChaptersCount && this.completedChaptersCount + 1
               ),
               String(this.playerTranscriptService.getNumCards()),
               currentEngineService.getLanguageCode()
@@ -161,11 +211,11 @@ export class ConversationSkinService {
               nextCard.getStateName()
             );
           }
-          if (wasOldStateInitial && !component.explorationActuallyStarted) {
+          if (wasOldStateInitial && !this.explorationActuallyStarted) {
             this.statsReportingService.recordExplorationActuallyStarted(
               oldStateName
             );
-            component.explorationActuallyStarted = true;
+            this.explorationActuallyStarted = true;
           }
         }
 
@@ -186,7 +236,7 @@ export class ConversationSkinService {
         }
 
         let millisecsLeftToWait: number;
-        if (!component.displayedCard.isInteractionInline()) {
+        if (!this.displayedCard.isInteractionInline()) {
           // Do not wait if the interaction is supplemental -- there's
           // already a delay bringing in the help card.
           millisecsLeftToWait = 1.0;
@@ -199,7 +249,7 @@ export class ConversationSkinService {
           millisecsLeftToWait = 1.0;
         } else {
           millisecsLeftToWait = Math.max(
-            component.MIN_CARD_LOADING_DELAY_MSEC -
+            this.MIN_CARD_LOADING_DELAY_MSEC -
               (new Date().getTime() - timeAtServerCall),
             1.0
           );
@@ -215,16 +265,20 @@ export class ConversationSkinService {
           });
 
           if (remainOnCurrentCard) {
-            component.giveFeedbackAndStayOnCurrentCard(
+            this.onGiveFeedbackAndStayOnCurrentCard.emit({
               feedbackHtml,
               missingPrerequisiteSkillId,
               refreshInteraction,
-              refresherExplorationId
-            );
+              refresherExplorationId,
+            });
           } else {
-            component.moveToNewCard(feedbackHtml, isFinalQuestion, nextCard);
+            this.onMoveToNewCard.emit({
+              feedbackHtml,
+              isFinalQuestion,
+              nextCard,
+            });
           }
-          component.answerIsBeingProcessed = false;
+          this.answerIsBeingProcessed = false;
         }, millisecsLeftToWait);
       }
     );
@@ -232,12 +286,11 @@ export class ConversationSkinService {
 
   processFeedbackAndPrerequisiteSkills(
     feedbackHtml: string | null,
-    missingPrerequisiteSkillId: string | null,
-    component: any
+    missingPrerequisiteSkillId: string | null
   ) {
     this.playerTranscriptService.addNewResponse(feedbackHtml);
     let helpCardAvailable = false;
-    if (feedbackHtml && !component.displayedCard.isInteractionInline()) {
+    if (feedbackHtml && !this.displayedCard.isInteractionInline()) {
       helpCardAvailable = true;
     }
 
@@ -248,11 +301,11 @@ export class ConversationSkinService {
       });
     }
     if (missingPrerequisiteSkillId) {
-      component.displayedCard.markAsCompleted();
+      this.displayedCard.markAsCompleted();
       this.conceptCardBackendApiService
         .loadConceptCardsAsync([missingPrerequisiteSkillId])
         .then(conceptCardObject => {
-          component.conceptCard = conceptCardObject[0];
+          this.conceptCard = conceptCardObject[0];
           if (helpCardAvailable) {
             this.playerPositionService.onHelpCardAvailable.emit({
               helpCardHtml: feedbackHtml,
@@ -265,40 +318,35 @@ export class ConversationSkinService {
 
   handleFinalQuestionNavigation(
     feedbackHtml: string | null,
-    isFinalQuestion: boolean,
-    component: any
+    isFinalQuestion: boolean
   ) {
-    component.displayedCard.markAsCompleted();
+    this.displayedCard.markAsCompleted();
     if (isFinalQuestion) {
       if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
         // We will redirect to the results page here.
-        component.questionSessionCompleted = true;
+        this.questionSessionCompleted = true;
       }
-      component.moveToExploration = true;
+      this.moveToExploration = true;
       if (feedbackHtml) {
         this.playerTranscriptService.addNewResponse(feedbackHtml);
-        if (!component.displayedCard.isInteractionInline()) {
+        if (!this.displayedCard.isInteractionInline()) {
           this.playerPositionService.onHelpCardAvailable.emit({
             helpCardHtml: feedbackHtml,
             hasContinueButton: true,
           });
         }
       } else {
-        component.showUpcomingCard();
+        this.onShowUpcomingCard.emit();
       }
-      component.answerIsBeingProcessed = false;
+      this.answerIsBeingProcessed = false;
       return;
     }
   }
 
-  handleFeedbackNavigation(
-    feedbackHtml: string | null,
-    nextCard: StateCard,
-    component: any
-  ) {
-    let _isNextInteractionInline = component.nextCard.isInteractionInline();
-    component.upcomingInlineInteractionHtml = _isNextInteractionInline
-      ? component.nextCard.getInteractionHtml()
+  handleFeedbackNavigation(feedbackHtml: string | null, nextCard: StateCard) {
+    let _isNextInteractionInline = this.nextCard.isInteractionInline();
+    this.upcomingInlineInteractionHtml = _isNextInteractionInline
+      ? this.nextCard.getInteractionHtml()
       : '';
 
     if (feedbackHtml) {
@@ -307,28 +355,86 @@ export class ConversationSkinService {
           nextCard.getStateName()
         )
       ) {
-        component.pendingCardWasSeenBefore = true;
+        this.pendingCardWasSeenBefore = true;
       }
       this.playerTranscriptService.addNewResponse(feedbackHtml);
-      if (!component.displayedCard.isInteractionInline()) {
+      if (!this.displayedCard.isInteractionInline()) {
         this.playerPositionService.onHelpCardAvailable.emit({
           helpCardHtml: feedbackHtml,
           hasContinueButton: true,
         });
       }
       this.playerPositionService.onNewCardAvailable.emit();
-      component._nextFocusLabel =
+      this._nextFocusLabel =
         ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
-      this.focusManagerService.setFocusIfOnDesktop(component._nextFocusLabel);
-      component?.scrollToBottom();
+      this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
+      this.scrollToBottom();
     } else {
       this.playerTranscriptService.addNewResponse(feedbackHtml);
       // If there is no feedback, it immediately moves on
       // to next card. Therefore this.answerIsCorrect needs
       // to be set to false before it proceeds to next card.
-      component.answerIsCorrect = false;
-      component.showPendingCard();
+      this.answerIsCorrect = false;
+      this.onShowPendingCard.emit();
     }
+  }
+
+  // Returns whether the screen is wide enough to fit two
+  // cards (e.g., the tutor and supplemental cards) side-by-side.
+  canWindowShowTwoCards(): boolean {
+    return (
+      this.windowDimensionsService.getWidth() >
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
+    );
+  }
+
+  animateToTwoCards(doneCallback: () => void): void {
+    this.isAnimatingToTwoCards = true;
+    setTimeout(
+      () => {
+        this.isAnimatingToTwoCards = false;
+        if (doneCallback) {
+          doneCallback();
+        }
+      },
+      TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + this.TIME_PADDING_MSEC
+    );
+  }
+
+  animateToOneCard(doneCallback: () => void): void {
+    this.isAnimatingToOneCard = true;
+    setTimeout(() => {
+      this.isAnimatingToOneCard = false;
+      if (doneCallback) {
+        doneCallback();
+      }
+    }, TIME_NUM_CARDS_CHANGE_MSEC);
+  }
+
+  isSupplementalCardNonempty(card: StateCard): boolean {
+    return !card.isInteractionInline();
+  }
+
+  scrollToBottom(): void {
+    setTimeout(() => {
+      let tutorCard = $('.conversation-skin-main-tutor-card');
+
+      if (tutorCard && tutorCard.length === 0) {
+        return;
+      }
+      let tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight();
+      if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
+        $('html, body').animate(
+          {
+            scrollTop: tutorCardBottom - $(window).height() + 12,
+          },
+          {
+            duration: this.TIME_SCROLL_MSEC,
+            easing: 'easeOutQuad',
+          }
+        );
+      }
+    }, 100);
   }
 }
 
