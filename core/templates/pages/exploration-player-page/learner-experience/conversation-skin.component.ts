@@ -768,15 +768,6 @@ export class ConversationSkinComponent {
     );
   }
 
-  isCurrentSupplementalCardNonempty(): boolean {
-    return (
-      this.conversationSkinService.displayedCard &&
-      this.conversationSkinService.isSupplementalCardNonempty(
-        this.conversationSkinService.displayedCard
-      )
-    );
-  }
-
   isSupplementalNavShown(): boolean {
     if (
       this.conversationSkinService.displayedCard.getStateName() === null &&
@@ -789,7 +780,7 @@ export class ConversationSkinComponent {
     return (
       Boolean(interaction.id) &&
       INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
-      this.isCurrentCardAtEndOfTranscript()
+      this.conversationSkinService.isCurrentCardAtEndOfTranscript()
     );
   }
 
@@ -932,12 +923,6 @@ export class ConversationSkinComponent {
     this.playerTranscriptService.addPreviousCard();
     let numCards = this.playerTranscriptService.getNumCards();
     this.playerPositionService.setDisplayedCardIndex(numCards - 1);
-  }
-
-  isCurrentCardAtEndOfTranscript(): boolean {
-    return this.playerTranscriptService.isLastCard(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
   }
 
   private _addNewCard(newCard): void {
@@ -1224,15 +1209,7 @@ export class ConversationSkinComponent {
     interactionRulesService: InteractionRulesService
   ): void {
     this.conversationSkinService.displayedCard.updateCurrentAnswer(null);
-
-    // Safety check to prevent double submissions from occurring.
-    if (
-      this.conversationSkinService.answerIsBeingProcessed ||
-      !this.isCurrentCardAtEndOfTranscript() ||
-      this.conversationSkinService.displayedCard.isCompleted()
-    ) {
-      return;
-    }
+    this.conversationSkinService.submitAnswerSafetyCheck();
 
     if (!this.isInPreviewMode) {
       this.fatigueDetectionService.recordSubmissionTimestamp();
@@ -1490,11 +1467,6 @@ export class ConversationSkinComponent {
     this.siteAnalyticsService.registerVisitOppiaFromIframeEvent(
       this.explorationId
     );
-  }
-
-  submitAnswerFromProgressNav(): void {
-    this.conversationSkinService.displayedCard.toggleSubmitClicked(true);
-    this.currentInteractionService.submitAnswer();
   }
 
   getRecommendedExpTitleTranslationKey(explorationId: string): string {

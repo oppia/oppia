@@ -38,6 +38,7 @@ import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {AppConstants} from 'app.constants';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
+import {CurrentInteractionService} from './current-interaction.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -105,7 +106,8 @@ export class ConversationSkinService {
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private questionPlayerStateService: QuestionPlayerStateService,
     private statsReportingService: StatsReportingService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
+    private currentInteractionService: CurrentInteractionService
   ) {}
 
   handleNewCardAddition(newCard: StateCard) {
@@ -155,6 +157,17 @@ export class ConversationSkinService {
     this.playerPositionService.changeCurrentQuestion(
       this.playerPositionService.getDisplayedCardIndex()
     );
+  }
+
+  submitAnswerSafetyCheck() {
+    // Safety check to prevent double submissions from occurring.
+    if (
+      this.answerIsBeingProcessed ||
+      !this.isCurrentCardAtEndOfTranscript() ||
+      this.displayedCard.isCompleted()
+    ) {
+      return;
+    }
   }
 
   submitAnswerNavigation(
@@ -379,6 +392,11 @@ export class ConversationSkinService {
     }
   }
 
+  submitAnswerFromProgressNav(): void {
+    this.displayedCard.toggleSubmitClicked(true);
+    this.currentInteractionService.submitAnswer();
+  }
+
   // Returns whether the screen is wide enough to fit two
   // cards (e.g., the tutor and supplemental cards) side-by-side.
   canWindowShowTwoCards(): boolean {
@@ -413,6 +431,18 @@ export class ConversationSkinService {
 
   isSupplementalCardNonempty(card: StateCard): boolean {
     return !card.isInteractionInline();
+  }
+
+  isCurrentSupplementalCardNonempty(): boolean {
+    return (
+      this.displayedCard && this.isSupplementalCardNonempty(this.displayedCard)
+    );
+  }
+
+  isCurrentCardAtEndOfTranscript(): boolean {
+    return this.playerTranscriptService.isLastCard(
+      this.playerPositionService.getDisplayedCardIndex()
+    );
   }
 
   scrollToBottom(): void {

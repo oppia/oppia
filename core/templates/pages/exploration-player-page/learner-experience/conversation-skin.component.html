@@ -4,9 +4,9 @@
 
     <div class="conversation-skin-tutor-card-container"
          [ngClass]="{'conversation-skin-animate-tutor-card-on-narrow':
-                      !conversationSkinService.canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
+                      !conversationSkinService.canWindowShowTwoCards() && conversationSkinService.isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
-                      !conversationSkinService.canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
+                      !conversationSkinService.canWindowShowTwoCards() && !conversationSkinService.isCurrentSupplementalCardNonempty()}">
       <oppia-tutor-card [displayedCard]="conversationSkinService.displayedCard"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
@@ -28,7 +28,7 @@
                         [inputOutputHistoryIsShown]="inputOutputHistoryIsShown"
                         [checkpointCelebrationModalIsEnabled]="checkpointCelebrationModalIsEnabled">
       </oppia-tutor-card>
-      <div *ngIf="isCurrentSupplementalCardNonempty() && !conversationSkinService.canWindowShowTwoCards()">
+      <div *ngIf="conversationSkinService.isCurrentSupplementalCardNonempty() && !conversationSkinService.canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
                                  [displayedCard]="conversationSkinService.displayedCard"
                                  [isLearnAgainButton]="isLearnAgainButton()">
@@ -39,7 +39,7 @@
         </oppia-learner-answer-info-card>
       </div>
       <div *ngIf="!getCanAskLearnerForAnswerInfo()">
-        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
+        <oppia-progress-nav (submit)="conversationSkinService.submitAnswerFromProgressNav()"
                             [isLearnAgainButton]="isLearnAgainButton()"
                             [displayedCard]="conversationSkinService.displayedCard"
                             [submitButtonIsShown]="!conversationSkinService.answerIsBeingProcessed && !continueToReviseStateButtonIsVisible"
@@ -52,7 +52,7 @@
                             (skipQuestion)="skipCurrentQuestion()">
         </oppia-progress-nav>
       </div>
-      <div *ngIf="isOnTerminalCard() && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
+      <div *ngIf="isOnTerminalCard() && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && ((!isEndChapterCelebrationFeatureEnabled() && inStoryMode) || (collectionSummary && isOnTerminalCard() && conversationSkinService.isCurrentCardAtEndOfTranscript()))"
            class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lesson-text-container">
           <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
@@ -73,7 +73,7 @@
       </div>
     </div>
 
-    <div *ngIf="isCurrentSupplementalCardNonempty() && conversationSkinService.canWindowShowTwoCards()"
+    <div *ngIf="conversationSkinService.isCurrentSupplementalCardNonempty() && conversationSkinService.canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <div class="supplemental-card-parent-container">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
