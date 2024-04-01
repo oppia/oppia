@@ -421,4 +421,3 @@ class ReviewTestsPageAccessValidationHandler(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
-

@@ -44,16 +44,15 @@ export class ReviewTestAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>(resolve => {
-      const classroom_url_fragment = route.paramMap.get(
-        'classroom_url_fragment'
-      );
-      const topic_url_fragment = route.paramMap.get('topic_url_fragment');
-      const story_url_fragment = route.paramMap.get('story_url_fragment');
+      const classroomUrlFragment =
+        route.paramMap.get('classroom_url_fragment') || '';
+      const topicUrlFragment = route.paramMap.get('topic_url_fragment') || '';
+      const storyUrlFragment = route.paramMap.get('story_url_fragment') || '';
       this.accessValidationBackendApiService
         .validateAccessToReviewTestPage(
-          classroom_url_fragment,
-          topic_url_fragment,
-          story_url_fragment
+          classroomUrlFragment,
+          topicUrlFragment,
+          storyUrlFragment
         )
         .then(() => {
           resolve(true);

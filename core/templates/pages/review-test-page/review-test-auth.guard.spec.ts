@@ -31,9 +31,9 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 
 class MockAccessValidationBackendApiService {
   validateAccessToReviewTestPage(
-    classroom_url_fragment: string,
-    topic_url_fragment: string,
-    story_url_fragment: string
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    storyUrlFragment: string
   ) {
     return Promise.resolve();
   }

@@ -156,16 +156,16 @@ export class AccessValidationBackendApiService {
   }
 
   validateAccessToReviewTestPage(
-    classroom_url_fragment: string,
-    topic_url_fragment: string,
-    story_url_fragment: string
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    storyUrlFragment: string
   ): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.REVIEW_TESTS_PAGE_ACCESS_VALIDATOR,
       {
-        classroom_url_fragment: classroom_url_fragment,
-        topic_url_fragment: topic_url_fragment,
-        story_url_fragment: story_url_fragment,
+        classroom_url_fragment: classroomUrlFragment,
+        topic_url_fragment: topicUrlFragment,
+        story_url_fragment: storyUrlFragment,
       }
     );
 
