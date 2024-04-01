@@ -124,6 +124,8 @@ describe('RteHelperModalComponent', () => {
     }));
 
     it('should close modal when clicking on cancel button', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
       component.cancel();
       expect(activeModal.dismiss).toHaveBeenCalledWith(false);
     }));
