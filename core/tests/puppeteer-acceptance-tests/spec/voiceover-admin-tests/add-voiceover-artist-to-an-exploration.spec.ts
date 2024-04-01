@@ -27,7 +27,7 @@ const ROLES = testConstants.Roles;
 describe('Voiceover Admin', function () {
   let voiceoverAdm: VoiceoverAdmin;
   let explorationEditor: VoiceoverAdmin;
-  let explorationUrl: string | null;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     voiceoverAdm = await UserFactory.createNewUser(
@@ -47,10 +47,10 @@ describe('Voiceover Admin', function () {
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.createExplorationWithTitle('Exploration one');
-      explorationUrl =
+      explorationId =
         await explorationEditor.publishExplorationWithTitle('Exploration one');
 
-      await voiceoverAdm.navigateToExplorationEditor(explorationUrl);
+      await voiceoverAdm.navigateToExplorationEditor(explorationId);
       await voiceoverAdm.navigateToExplorationSettingsTab();
 
       await voiceoverAdm.expectVoiceoverArtistNotExists('invalidUserId');
@@ -73,10 +73,10 @@ describe('Voiceover Admin', function () {
       );
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.createExplorationWithTitle('Exploration two');
-      explorationUrl =
+      explorationId =
         await explorationEditor.publishExplorationWithTitle('Exploration two');
 
-      await voiceoverAdm.navigateToExplorationEditor(explorationUrl);
+      await voiceoverAdm.navigateToExplorationEditor(explorationId);
       await voiceoverAdm.navigateToExplorationSettingsTab();
 
       await voiceoverAdm.expectVoiceoverArtistNotExists('voiceoverartist');

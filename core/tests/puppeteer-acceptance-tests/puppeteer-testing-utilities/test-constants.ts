@@ -20,6 +20,7 @@ import path from 'path';
 
 export default {
   URLs: {
+    BaseURL: 'http://localhost:8181',
     About: 'http://localhost:8181/about',
     AboutFoundation: 'http://localhost:8181/about-foundation',
     AdminPage: 'http://localhost:8181/admin',

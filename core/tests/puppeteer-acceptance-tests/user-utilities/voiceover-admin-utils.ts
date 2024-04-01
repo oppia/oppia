@@ -21,6 +21,7 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
+const baseURL = testConstants.URLs.BaseURL;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -134,10 +135,12 @@ export class VoiceoverAdmin extends BaseUser {
     await this.clickOn(saveExplorationChangesButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
-    const explorationId = await this.page.$eval(
+    const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
       element => (element as HTMLElement).innerText
     );
+    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+
     await this.clickOn(closeShareModalButton);
     return explorationId;
   }
@@ -147,13 +150,12 @@ export class VoiceoverAdmin extends BaseUser {
    * @param explorationUrl - url of the exploration
    */
   async navigateToExplorationEditor(
-    explorationUrl: string | null
+    explorationId: string | null
   ): Promise<void> {
-    if (!explorationUrl) {
-      throw new Error('Cannot navigate to editor: explorationUrl is null');
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
     }
-
-    const editorUrl = explorationUrl.replace('/explore/', '/create/');
+    const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.page.goto(editorUrl);
   }
 
@@ -164,7 +166,9 @@ export class VoiceoverAdmin extends BaseUser {
   async expectVoiceoverArtistNotExists(artistUsername: string): Promise<void> {
     const allVoiceoverArtists = await this.getAllVoiceoverArtists();
     if (allVoiceoverArtists.includes(artistUsername)) {
-      throw new Error('Voiceover artist already exists in the list.');
+      throw new Error(
+        `Error: User '${artistUsername}' is already assigned as a voiceover artist for this exploration.`
+      );
     } else {
       showMessage(
         `Voiceover artist '${artistUsername}' does not exist and can be added.`
@@ -199,7 +203,7 @@ export class VoiceoverAdmin extends BaseUser {
         `Expected error message to be ${expectedErrorMessage} but got ${errorMessage}`
       );
     } else {
-      showMessage(`Error message is ${errorMessage}`);
+      showMessage(`Toast Error Message: ${errorMessage}`);
     }
   }
 
@@ -224,7 +228,9 @@ export class VoiceoverAdmin extends BaseUser {
         `Expected all artists to contain ${artistUsername} but got ${allVoiceoverArtists}`
       );
     }
-    showMessage(`All artists are ${allVoiceoverArtists}`);
+    showMessage(
+      `${artistUsername} added as voiceover artist! Current voice artists for this exploration are: ${allVoiceoverArtists}`
+    );
   }
 
   /**
