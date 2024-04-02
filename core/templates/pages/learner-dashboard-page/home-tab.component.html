@@ -88,7 +88,7 @@
     <p class="oppia-learner-dash-greeting mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
     <div class="oppia-learner-dash-section" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
       <p class="oppia-learner-dash-section-heading">
-        {{(continueWhereYouLeftOffList.length !== 0 ?
+        {{ (continueWhereYouLeftOffList.length !== 0 ?
             'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION'
           :
             'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_HEADING'
@@ -98,7 +98,7 @@
       <div [ngStyle]="{'min-width': 'fit-content'}">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles">
           <p class="oppia-learner-dash-section-heading mb-0">
-            {{'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate}}
+            {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
           </p>
           <a id="setting-a-goal-link" class="d-inline-block mb-0" (click)="changeActiveSection()">
             {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION_SET_A_GOAL' | translate }}
