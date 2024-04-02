@@ -83,11 +83,10 @@
     </div>
   </ng-container>
 
-  <!--REDESIGN-->
   <div *ngIf="featureFlag">
-    <p class="oppia-learner-dash_greeting mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
+    <p class="oppia-learner-dash-greeting mt-4"> {{ getTimeOfDay() | translate }}, {{ username }}! </p>
     <div class="oppia-learner-dash-section" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">
-      <p class="oppia-learner-dash-section_heading">
+      <p class="oppia-learner-dash-section-heading">
         {{(continueWhereYouLeftOffList.length !== 0 ?
             'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION'
           :
@@ -97,7 +96,7 @@
       </p>
       <div [ngStyle]="{'min-width': 'fit-content'}">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles">
-          <p class="oppia-learner-dash-section_heading mb-0">
+          <p class="oppia-learner-dash-section-heading mb-0">
             {{'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate}}
           </p>
           <a id="setting-a-goal-link" class="d-inline-block mb-0" (click)="changeActiveSection()">
@@ -116,9 +115,9 @@
       </div>
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
-      <p class="oppia-learner-dash-section_heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+      <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
-        <p *ngIf="item.value.length !== 0" class="oppia-learner-dash-section_subheading"> {{ 'I18N_LEARNER_DASHBOARD_CLASSROOM_TITLE' | translate: {classroomName: item.key} }} </p>
+        <p *ngIf="item.value.length !== 0" class="oppia-learner-dash-section-subheading"> {{ 'I18N_LEARNER_DASHBOARD_CLASSROOM_TITLE' | translate: {classroomName: item.key} }} </p>
         <hr width="100%" color="#00645c" class="mt-2" size="2">
         <div class="oppia-learner-dash-classes d-flex gap-4 mt-4 overflow-hidden w-100">
           <ng-container *ngFor="let topicSummaryTile of item.value.slice(0,3)">
@@ -127,7 +126,7 @@
           </ng-container>
         </div>
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-           class="align-items-center d-inline-flex justify-content-center mt-4 oppia-learner-dash-home_button text-center">
+           class="align-items-center d-inline-flex justify-content-center mt-4 oppia-learner-dash-home-button text-center">
           <span class="fa fa-arrow-right mr-2"></span>
           {{ 'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key} }}
         </a>
@@ -135,11 +134,10 @@
     </div>
     <div class="oppia-learner-dash-section px-3 py-4 w-100"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
-      <p class="oppia-learner-dash-section_heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
+      <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <div class="empty-suggested-for-you-section">
         <p> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate }} </p>
       </div>
     </div>
   </div>
-  <!------------>
 </div>
