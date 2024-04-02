@@ -21,7 +21,7 @@
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-details questionSuggestionDiv" tabindex="0">
+    <div class="oppia-question-details" tabindex="0">
       <div class="oppia-question-suggestion">
         <strong class="oppia-difficulty-title">
           Selected Difficulty: {{skillDifficultyLabel}}
@@ -41,7 +41,7 @@
     </div>
     <div *ngIf="showQuestion">
       <oppia-question-editor [questionId]="questionId"
-                            [isSticky]="isSticky"
+                            [stateContentShouldStayVisibleOnScroll]="stateContentShouldStayVisibleOnScroll"
                             [misconceptionsBySkill]="misconceptionsBySkill"
                             [questionStateData]="questionStateData"
                             [question]="question"

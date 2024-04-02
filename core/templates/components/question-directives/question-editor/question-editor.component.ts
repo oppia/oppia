@@ -60,7 +60,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   @Input() question!: Question;
   @Input() questionId!: string;
   @Input() questionStateData!: State;
-  @Input() isSticky: boolean = false;
+  @Input() stateContentShouldStayVisibleOnScroll!: boolean;
   interactionIsShown!: boolean;
   oppiaBlackImgUrl!: string;
   stateEditorIsInitialized!: boolean;
