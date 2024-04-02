@@ -50,9 +50,21 @@ const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
 const creatorGuidelinesUrl = testConstants.URLs.CreatorGuidelines;
 const teachUrl = testConstants.URLs.Teach;
 const termsUrl = testConstants.URLs.Terms;
-const GoogleGroupsOppiaUrl = testConstants.URLs.GoogleGroups.Oppia;
-const GoogleGroupsOppiaAnnouceUrl =
+const privacyPolicyUrl = testConstants.URLs.PrivacyPolicy;
+const googleGroupsOppiaUrl = testConstants.URLs.GoogleGroups.Oppia;
+const googleGroupsOppiaAnnouceUrl =
   testConstants.URLs.GoogleGroups.OppiaAnnounce;
+const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
+const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
+const googleAnalyticsPartnerPoliciesUrl =
+  testConstants.URLs.GoogleAnalytics.PartnerPolicies;
+const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
+const oppiaYouTubeUrl = testConstants.URLs.OppiaSocial.YouTube;
+const oppiaFacebookUrl = testConstants.URLs.OppiaSocial.FaceBook;
+const oppiaInstagramUrl = testConstants.URLs.OppiaSocial.Instagram;
+const oppiaTwitterUrl = testConstants.URLs.OppiaSocial.Twitter;
+const oppiaGithubUrl = testConstants.URLs.OppiaSocial.Github;
+const oppiaLinkedInUrl = testConstants.URLs.OppiaSocial.LinkedIn;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -78,6 +90,13 @@ const footerGetStartedLink = 'a.e2e-test-footer-get-started-link';
 const footerCreatorGuidelinesLink = 'a.e2e-test-creator-guidelines-link';
 const footerTeachLink = 'a.e2e-test-teach-link';
 const footerTermsLink = 'a.e2e-test-terms-link';
+const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
+const oppiaYouTubeLinkIcon = '.oppia-youtube-follow';
+const oppiaFacebookLinkIcon = '.oppia-facebook-follow';
+const oppiaInstagramLinkIcon = '.oppia-instagram-follow';
+const oppiaTwitterLinkIcon = '.oppia-twitter-follow';
+const oppiaGithubLinkIcon = '.oppia-github-follow';
+const oppiaLinkedInLinkIcon = '.oppia-linkedin-follow';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -184,6 +203,13 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToTermsPage(): Promise<void> {
     await this.goto(termsUrl);
+  }
+
+  /**
+   * Function to navigate to the Privacy Policy page.
+   */
+  async navigateToPrivacyPolicyPage(): Promise<void> {
+    await this.goto(privacyPolicyUrl);
   }
 
   /**
@@ -813,7 +839,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(footerForumlink),
     ]);
 
-    expect(this.page.url()).toBe(GoogleGroupsOppiaUrl);
+    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
 
   /**
@@ -864,6 +890,19 @@ export class LoggedInUser extends BaseUser {
       footerTermsLink,
       'Creator Guidelines in the About Menu on navbar',
       termsUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async navigateToPrivacyPolicyPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerPrivacyPolicyLink,
+      'Creator Guidelines in the About Menu on navbar',
+      privacyPolicyUrl,
       'Creator Guidelines'
     );
   }
@@ -971,11 +1010,10 @@ export class LoggedInUser extends BaseUser {
    */
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
-    const pageTarget = this.page.target();
     await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
 
     await this.page.waitForNetworkIdle();
-    expect(this.page.url()).toBe(GoogleGroupsOppiaUrl);
+    expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
 
   /**
@@ -1111,7 +1149,121 @@ export class LoggedInUser extends BaseUser {
 
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
-    expect(this.page.url()).toBe(GoogleGroupsOppiaAnnouceUrl);
+    expect(this.page.url()).toBe(googleGroupsOppiaAnnouceUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickLinkToHomePageOnPrivacyPolicyPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"https://www.oppia.org")]'
+    );
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOn('https://www.oppia.org'),
+    ]);
+
+    //  Wait for redirect.
+    await this.page.waitForNetworkIdle();
+    expect(this.page.url()).toBe(learnerDashboardUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'http://www.allaboutcookies.org/manage-cookies/index.html',
+      'Creator Guidelines in the About Menu on navbar',
+      allAboutCookiesUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      'https://www.google.com/policies/privacy/partners/',
+      'Creator Guidelines in the About Menu on navbar',
+      googleAnalyticsPartnerPoliciesUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Clicks the link with the text "Design Tips" on the Creator Guidelines page.
+   */
+  async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      googleAnalyticsOptOutUrl,
+      'Creator Guidelines in the About Menu on navbar',
+      googleAnalyticsOptOutUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  private async clickSocialIconToNewTab(
+    socialIconSelector: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForSelector(socialIconSelector);
+    const pageTarget = this.page.target();
+    await this.clickOn(socialIconSelector);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Clicks the YouTube social icon in the footer.
+   */
+  async navigateToOppiaYouTubeViaFooter(): Promise<void> {
+    await this.clickSocialIconToNewTab(oppiaYouTubeLinkIcon, oppiaYouTubeUrl);
+  }
+
+  /**
+   * Clicks the Facebooksocial icon in the footer.
+   */
+  async navigateToOppiaFacebookViaFooter(): Promise<void> {
+    await this.clickSocialIconToNewTab(oppiaFacebookLinkIcon, oppiaFacebookUrl);
+  }
+
+  /**
+   * Clicks the Instagram social icon in the footer.
+   */
+  async navigateToOppiaInstagramViaFooter(): Promise<void> {
+    await this.clickSocialIconToNewTab(
+      oppiaInstagramLinkIcon,
+      oppiaInstagramUrl
+    );
+  }
+
+  /**
+   * Clicks the YouTube social icon in the footer.
+   */
+  async navigateToOppiaTwitterViaFooter(): Promise<void> {
+    await this.clickSocialIconToNewTab(oppiaTwitterLinkIcon, oppiaTwitterUrl);
+  }
+
+  /**
+   * Clicks the YouTube social icon in the footer.
+   */
+  async navigateToOppiaGithubViaFooter(): Promise<void> {
+    await this.clickSocialIconToNewTab(oppiaGithubLinkIcon, oppiaGithubUrl);
+  }
+
+  /**
+   * Clicks the LinkedIn social icon in the footer.
+   */
+  async navigateToOppiaLinkedInViaFooter(): Promise<void> {
+    await this.clickSocialIconToNewTab(oppiaLinkedInLinkIcon, oppiaLinkedInUrl);
   }
 }
 

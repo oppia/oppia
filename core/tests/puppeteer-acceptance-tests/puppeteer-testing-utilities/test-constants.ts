@@ -51,11 +51,13 @@ export default {
     Electromagnetism: 'https://www.oppia.org/collection/wqCTKpKA0LBe',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
+    LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Logout: 'http://localhost:8181/logout',
     MathClassroom: 'http://localhost:8181/learn/math',
     MobileExternalLinkWatchAVideo:
       'https://m.facebook.com/oppiaorg/videos/189487953721583/',
     Partnerships: 'http://localhost:8181/partnerships',
+    PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Teach: 'http://localhost:8181/teach',
     Terms: 'http://localhost:8181/terms',
@@ -64,6 +66,21 @@ export default {
     GoogleGroups: {
       Oppia: 'https://groups.google.com/g/oppia',
       OppiaAnnounce: 'https://groups.google.com/g/oppia-announce',
+    },
+    GoogleAnalytics: {
+      PartnerPolicies: 'https://policies.google.com/technologies/partner-sites',
+      OptOut: 'https://tools.google.com/dlpage/gaoptout',
+    },
+    ExternalLink: {
+      AboutCookies: 'https://allaboutcookies.org/how-to-manage-cookies',
+    },
+    OppiaSocial: {
+      YouTube: 'https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw',
+      FaceBook: 'https://www.facebook.com/oppiaorg',
+      Instagram: 'https://www.instagram.com/oppia.global/',
+      Twitter: 'https://twitter.com/oppiaorg',
+      Github: 'https://github.com/oppia',
+      LinkedIn: 'https://www.linkedin.com/company/oppia-org',
     },
   },
   Dashboard: {
