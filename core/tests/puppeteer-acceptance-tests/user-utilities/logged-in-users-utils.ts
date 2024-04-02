@@ -142,9 +142,6 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
 
-const teachPageBrowseOurLessonsButton = '.oppia-teach-browse-button';
-const teachPAgeAccessOurAndroidApp = '.oppia-';
-
 export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the home page.
