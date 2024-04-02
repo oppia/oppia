@@ -61,7 +61,6 @@
         </div>
       </div>
     </div>
-    <!--[smartRouterLink]="communityLibraryUrl" removed, causes bug-->
     <div tabindex="0" class="empty-suggested-for-you"
         *ngIf="isGoalLimitReached()">
       <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></p>
@@ -69,7 +68,9 @@
       <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
          [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
          href="/community-library"
-         [oppiaFocusOn]="'ourLessonsBtn'">
+         [oppiaFocusOn]="'ourLessonsBtn'"
+         [routerLink]="communityLibraryUrl" 
+         >
       </a>
     </div>
     <div tabindex="0" class="empty-suggested-for-you learn-something-new-section"
