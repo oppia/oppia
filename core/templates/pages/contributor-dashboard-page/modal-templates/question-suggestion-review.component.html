@@ -41,13 +41,13 @@
     </div>
     <div *ngIf="showQuestion">
       <oppia-question-editor [questionId]="questionId"
-                            [stateContentShouldStayVisibleOnScroll]="stateContentShouldStayVisibleOnScroll"
-                            [misconceptionsBySkill]="misconceptionsBySkill"
-                            [questionStateData]="questionStateData"
-                            [question]="question"
-                            [userCanEditQuestion]="canEditQuestion"
-                            (questionChange)="questionChanged()"
-                            tabindex="0">
+                             [stateContentShouldStayVisibleOnScroll]="stateContentShouldStayVisibleOnScroll"
+                             [misconceptionsBySkill]="misconceptionsBySkill"
+                             [questionStateData]="questionStateData"
+                             [question]="question"
+                             [userCanEditQuestion]="canEditQuestion"
+                             (questionChange)="questionChanged()"
+                             tabindex="0">
       </oppia-question-editor>
     </div>
   </section>
