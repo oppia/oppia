@@ -247,18 +247,25 @@ export class SchemaBasedFloatEditorComponent
       this.errorStringI18nKey = null;
     } else {
       // Make sure number is in a correct format.
+      let currentDecimalSeparator = this.getCurrentDecimalSeparator();
+      let formattedStringValue = this.localStringValue.replace(
+        /\.|,/g,
+        currentDecimalSeparator
+      );
+
       let error = this.numericInputValidationService.validateNumericString(
-        this.localStringValue,
-        this.getCurrentDecimalSeparator()
+        formattedStringValue,
+        currentDecimalSeparator
       );
       if (error !== undefined) {
         this.localValue = null;
         this.errorStringI18nKey = error || null;
       } else {
         // Parse number if the string is in proper format.
-        this.localValue = this.numberConversionService.convertToEnglishDecimal(
-          this.localStringValue
-        );
+        this.localValue =
+          this.numberConversionService.convertToEnglishDecimal(
+            formattedStringValue
+          );
 
         // Generate errors (if any).
         this.generateErrors();
