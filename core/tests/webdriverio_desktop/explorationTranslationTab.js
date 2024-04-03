@@ -57,6 +57,7 @@ describe('Exploration translation and voiceover tab', function () {
     var voiceoverContributionFlag =
       await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
     await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
+    await users.logout();
 
     await users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
