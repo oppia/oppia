@@ -20,9 +20,17 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {VoiceoverAdmin} from '../../user-utilities/voiceover-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
+const invalidIdErrorToastMessage =
+  'Sorry, we could not find the specified user.';
+
+ConsoleReporter.setConsoleErrorsToIgnore([
+  'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400',
+  'Sorry, we could not find the specified user.',
+]);
 
 describe('Voiceover Admin', function () {
   let voiceoverAdm: VoiceoverAdmin;
@@ -62,7 +70,7 @@ describe('Voiceover Admin', function () {
       await voiceoverAdm.addVoiceoverArtistToExploration('invalidUserId');
 
       await voiceoverAdm.expectToSeeErrorToastMessage(
-        'Sorry, we could not find the specified user.'
+        invalidIdErrorToastMessage
       );
       await voiceoverAdm.closeToastMessage();
     },
