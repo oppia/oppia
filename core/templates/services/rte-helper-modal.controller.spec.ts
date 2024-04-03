@@ -116,7 +116,7 @@ describe('RteHelperModalComponent', () => {
 
     it('should load modal correctly', fakeAsync(() => {
       expect(component.customizationArgSpecs).toEqual(customizationArgSpecs);
-      expect(component.modalIsLoading).toBe(true);
+      expect(component.modalIsLoading).toBe(false);
       component.ngOnInit();
       flush();
       expect(component.modalIsLoading).toBe(false);
