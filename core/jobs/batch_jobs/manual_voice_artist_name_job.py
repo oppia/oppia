@@ -450,7 +450,7 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             # If voice_artist_id is None or empty, this means the exploration
             # snapshot metadata model for the given commit does not exist or
             # committer ID field in snapshot metadata model contains empty data.
-            if voice_artist_id is None:
+            if voice_artist_id is None or voice_artist_id == '':
                 continue
 
             try:

@@ -630,7 +630,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                 snapshot_model_id))
         # Deleting recorded voiceovers field to make this snapshot invalid.
         del snapshot_model.content['states'][
-            'Introduction']['recorded_voiceovers']
+            'Introduction']['recorded_voiceovers']['voiceovers_mapping']
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
@@ -1298,3 +1298,181 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             get_committer_id_for_given_snapshot_model_id(snapshot_model_id=None) # type: ignore[arg-type]
         )
         self.assertIsNone(committer_id)
+
+    def test_should_get_empty_filenames_successfully(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            self.CURATED_EXPLORATION_ID_1,
+            self.owner_id,
+            title='title1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.CURATED_EXPLORATION_ID_1,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': '<p>A content to translate.</p>'
+                }
+            })],
+            'Changes content.'
+        )
+
+        new_voiceovers_dict_1: Dict[str, Dict[str, Dict[
+            str, state_domain.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover_dict_1
+                    },
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        old_voiceover_dict_1: Dict[str, Dict[str, Dict[
+            str, state_domain.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+
+        new_voiceovers_dict_2: Dict[str, Dict[str, Dict[
+            str, state_domain.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        old_voiceover_dict_2: Dict[str, Dict[str, Dict[
+            str, state_domain.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover_dict_1
+                    },
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict_1,
+            'old_value': old_voiceover_dict_1
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict_2,
+            'old_value': old_voiceover_dict_2
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
+            change_list, 'Translation commits')
+
+        exploration_models: List[exp_models.ExplorationModel] = list(
+            exp_models.ExplorationModel.get_all().fetch())
+
+        snapshot_models: List[
+            exp_models.ExplorationSnapshotContentModel] = list(
+                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+
+        exp_link_model, _ = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_exploration_voice_artists_link_model(
+                exploration_models[0], snapshot_models
+            ))
+        assert exp_link_model is not None
+        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
+        self.assertEqual(exp_link_model.content_id_to_voiceovers_mapping, {})
+
+    def test_should_skip_checking_if_voice_artist_id_is_none(self) -> None:
+        exploration = self.save_new_valid_exploration(
+            self.CURATED_EXPLORATION_ID_1,
+            self.owner_id,
+            title='title1',
+            category=constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        exp_services.update_exploration(
+            self.owner_id, self.CURATED_EXPLORATION_ID_1,
+            [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'Introduction',
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': '<p>A content to translate.</p>'
+                }
+            })],
+            'Changes content.'
+        )
+
+        new_voiceovers_dict_1: Dict[str, Dict[str, Dict[
+            str, state_domain.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover_dict_1
+                    },
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+        old_voiceover_dict_1: Dict[str, Dict[str, Dict[
+            str, state_domain.VoiceoverDict]]] = {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'ca_placeholder_2': {},
+                    'default_outcome_1': {}
+                }
+            }
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+            'new_value': new_voiceovers_dict_1,
+            'old_value': old_voiceover_dict_1
+        })]
+        exp_services.update_exploration(
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
+            change_list, 'Translation commits')
+
+        # Deleting an exploration commit log entry model.
+        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                snapshot_model_id))
+        snapshot_model.committer_id = ''
+        snapshot_model.update_timestamps()
+        snapshot_model.put()
+
+        exploration_models: List[exp_models.ExplorationModel] = list(
+            exp_models.ExplorationModel.get_all().fetch())
+
+        snapshot_models: List[
+            exp_models.ExplorationSnapshotContentModel] = list(
+                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+
+        exp_link_model, _ = (
+            manual_voice_artist_name_job.
+            CreateExplorationVoiceArtistLinkModelsJob.
+            get_exploration_voice_artists_link_model(
+                exploration_models[0], snapshot_models
+            ))
+        assert exp_link_model is not None
+        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
+        self.assertEqual(exp_link_model.content_id_to_voiceovers_mapping, {})
