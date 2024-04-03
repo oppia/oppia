@@ -91,6 +91,9 @@ const footerCreatorGuidelinesLink = 'a.e2e-test-creator-guidelines-link';
 const footerTeachLink = 'a.e2e-test-teach-link';
 const footerTermsLink = 'a.e2e-test-terms-link';
 const footerPrivacyPolicyLink = 'a.e2e-test-privacy-policy-link';
+const footerCommunityLibraryLink = 'a.e2e-test-community-library-link';
+const footerContactUsLink = 'a.e2e-test-contact-link';
+
 const oppiaYouTubeLinkIcon = '.oppia-youtube-follow';
 const oppiaFacebookLinkIcon = '.oppia-facebook-follow';
 const oppiaInstagramLinkIcon = '.oppia-instagram-follow';
@@ -902,6 +905,65 @@ export class LoggedInUser extends BaseUser {
       privacyPolicyUrl,
       'Creator Guidelines'
     );
+  }
+
+  async navigateToCommunityLibraryPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerCommunityLibraryLink,
+      'Creator Guidelines in the About Menu on navbar',
+      communityLibraryUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  async navigateToContactPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerContactUsLink,
+      'Creator Guidelines in the About Menu on navbar',
+      contactUrl,
+      'Creator Guidelines'
+    );
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async navigateToDonatePageViaFooter(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"Donate")])');
+
+    const [link] = await this.page.$x('(//a[contains(text(),"Donate")])');
+
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(donateUrl);
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async navigateToVolunteerPageViaFooter(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"volunteer")])');
+
+    const [link] = await this.page.$x('(//a[contains(text(),"volunteer")])');
+
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(volunteerUrl);
+  }
+
+  /**
+   * Navigates to the Terms page using the oppia website footer.
+   */
+  async navigateToVolunteerPageViaFooter(): Promise<void> {
+    await this.page.waitForXPath('(//a[contains(text(),"volunteer")])');
+
+    const [link] = await this.page.$x('(//a[contains(text(),"volunteer")])');
+
+    await Promise.all([this.page.waitForNavigation(), await link.click()]);
+
+    expect(this.page.url()).toBe(volunteerUrl);
   }
 
   /**
