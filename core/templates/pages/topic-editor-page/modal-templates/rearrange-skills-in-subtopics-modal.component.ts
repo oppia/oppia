@@ -32,6 +32,7 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-rearrange-skills-in-subtopics-modal',
@@ -49,6 +50,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
   errorMsg: string;
   editableName: string;
   selectedSubtopicId: number;
+  maxCharsInSubtopicTitle: number = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
 
   SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
   directiveSubscriptions = new Subscription();
