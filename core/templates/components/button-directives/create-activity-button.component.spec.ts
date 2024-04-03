@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
-import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
-import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
-import { UrlParamsType, UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { CreateActivityButtonComponent } from './create-activity-button.component';
+import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
+import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import {UrlParamsType, UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {CreateActivityButtonComponent} from './create-activity-button.component';
+import {PrimaryButtonComponent} from './primary-button.component';
 
 /**
  * @fileoverview Unit tests for CreateActivityButtonComponent.
@@ -39,9 +46,9 @@ class MockWindowRef {
       set href(val) {
         this._href = val;
       },
-      replace: (val: string) => {}
+      replace: (val: string) => {},
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -56,7 +63,7 @@ class MockUrlService {
 
   getUrlParams(): UrlParamsType {
     return {
-      mode: 'create'
+      mode: 'create',
     };
   }
 }
@@ -93,10 +100,11 @@ describe('CreateActivityButtonComponent', () => {
     isQuestionCoordinator: () => false,
     isTranslationCoordinator: () => false,
     canCreateCollections: () => true,
-    getPreferredSiteLanguageCode: () =>'en',
+    getPreferredSiteLanguageCode: () => 'en',
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
+    isLoggedIn: () => true,
+    isVoiceoverAdmin: () => false,
   };
 
   let userInfoForNonCollectionCreator = {
@@ -121,10 +129,11 @@ describe('CreateActivityButtonComponent', () => {
     isBlogAdmin: () => false,
     isBlogPostEditor: () => false,
     canCreateCollections: () => false,
-    getPreferredSiteLanguageCode: () =>'en',
+    getPreferredSiteLanguageCode: () => 'en',
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
-    isLoggedIn: () => true
+    isLoggedIn: () => true,
+    isVoiceoverAdmin: () => false,
   };
 
   beforeEach(waitForAsync(() => {
@@ -133,21 +142,22 @@ describe('CreateActivityButtonComponent', () => {
       imports: [HttpClientTestingModule],
       declarations: [
         CreateActivityButtonComponent,
-        MockTranslatePipe
+        PrimaryButtonComponent,
+        MockTranslatePipe,
       ],
       providers: [
         UserService,
         {
           provide: UrlService,
-          useClass: MockUrlService
+          useClass: MockUrlService,
         },
         {
           provide: WindowRef,
-          useValue: windowRef
+          useValue: windowRef,
         },
         ExplorationCreationService,
-        SiteAnalyticsService
-      ]
+        SiteAnalyticsService,
+      ],
     }).compileComponents();
   }));
 
@@ -162,200 +172,243 @@ describe('CreateActivityButtonComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should successfully instantiate the component from beforeEach block',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component from beforeEach block', () => {
+    expect(component).toBeDefined();
+  });
 
   describe('when user can create collections', () => {
-    it('should begin activity creation process if the' +
-      ' url parameter \'mode\' is set as \'create\'', fakeAsync(() => {
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue(Promise.resolve(userInfoForCollectionCreator));
-      spyOn(urlService, 'getUrlParams').and.returnValue({
-        mode: 'create'
-      });
-      spyOn(component, 'initCreationProcess');
+    it(
+      'should begin activity creation process if the' +
+        " url parameter 'mode' is set as 'create'",
+      fakeAsync(() => {
+        spyOn(userService, 'getUserInfoAsync').and.returnValue(
+          Promise.resolve(userInfoForCollectionCreator)
+        );
+        spyOn(urlService, 'getUrlParams').and.returnValue({
+          mode: 'create',
+        });
+        spyOn(component, 'initCreationProcess');
 
-      expect(component.userIsLoggedIn).toBe(false);
-      expect(component.canCreateCollections).toBe(false);
+        expect(component.userIsLoggedIn).toBe(false);
+        expect(component.canCreateCollections).toBe(false);
 
-      component.ngOnInit();
-      tick();
-      fixture.detectChanges();
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
 
-      expect(component.userIsLoggedIn).toBe(true);
-      expect(component.canCreateCollections).toBe(true);
-      expect(urlService.getUrlParams).toHaveBeenCalled();
-      expect(component.initCreationProcess).toHaveBeenCalled();
-    }));
+        expect(component.userIsLoggedIn).toBe(true);
+        expect(component.canCreateCollections).toBe(true);
+        expect(urlService.getUrlParams).toHaveBeenCalled();
+        expect(component.initCreationProcess).toHaveBeenCalled();
+      })
+    );
 
-    it('should redirect user to creator dashboard page when the user' +
-      ' clicks on the create button', () => {
-      component.creationInProgress = false;
-      component.canCreateCollections = true;
-      spyOn(urlService, 'getPathname').and.returnValue('not/creator-dashboard');
-      spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-        location: {
-          _href: '',
-          href: '',
-          replace: (val: string) => {},
-        },
-        gtag: () => '',
-      });
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          result: Promise.resolve('success')
-        } as NgbModalRef);
-      });
-      const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
+    it(
+      'should redirect user to creator dashboard page when the user' +
+        ' clicks on the create button',
+      () => {
+        component.creationInProgress = false;
+        component.canCreateCollections = true;
+        spyOn(urlService, 'getPathname').and.returnValue(
+          'not/creator-dashboard'
+        );
+        spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
+          location: {
+            _href: '',
+            href: '',
+            replace: (val: string) => {},
+          },
+          gtag: () => '',
+        });
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return {
+            result: Promise.resolve('success'),
+          } as NgbModalRef;
+        });
+        const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
-      component.initCreationProcess();
+        component.initCreationProcess();
 
-      expect(replaceSpy).toHaveBeenCalledWith('/creator-dashboard?mode=create');
-      expect(modalSpy).not.toHaveBeenCalled();
-    });
+        expect(replaceSpy).toHaveBeenCalledWith(
+          '/creator-dashboard?mode=create'
+        );
+        expect(modalSpy).not.toHaveBeenCalled();
+      }
+    );
 
-    it('should not redirect user but open a create activity modal if user' +
-      ' is on the creator dashboard page', () => {
-      component.creationInProgress = false;
-      component.canCreateCollections = true;
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/creator-dashboard');
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          result: Promise.resolve('success')
-        } as NgbModalRef);
-      });
-      const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
+    it(
+      'should not redirect user but open a create activity modal if user' +
+        ' is on the creator dashboard page',
+      () => {
+        component.creationInProgress = false;
+        component.canCreateCollections = true;
+        spyOn(urlService, 'getPathname').and.returnValue('/creator-dashboard');
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return {
+            result: Promise.resolve('success'),
+          } as NgbModalRef;
+        });
+        const replaceSpy = spyOn(windowRef.nativeWindow.location, 'replace');
 
-      component.initCreationProcess();
+        component.initCreationProcess();
 
-      expect(replaceSpy).not.toHaveBeenCalled();
-      expect(modalSpy).toHaveBeenCalled();
-    });
+        expect(replaceSpy).not.toHaveBeenCalled();
+        expect(modalSpy).toHaveBeenCalled();
+      }
+    );
 
-    it('should stop the creation process when there is an error with' +
-    ' the create activity modal opening', fakeAsync(() => {
-      component.creationInProgress = false;
-      component.canCreateCollections = true;
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/creator-dashboard');
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          result: Promise.reject('cancel')
-        } as NgbModalRef);
-      });
+    it(
+      'should stop the creation process when there is an error with' +
+        ' the create activity modal opening',
+      fakeAsync(() => {
+        component.creationInProgress = false;
+        component.canCreateCollections = true;
+        spyOn(urlService, 'getPathname').and.returnValue('/creator-dashboard');
+        const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+          return {
+            result: Promise.reject('cancel'),
+          } as NgbModalRef;
+        });
 
-      component.initCreationProcess();
-      tick();
+        component.initCreationProcess();
+        tick();
 
-      expect(modalSpy).toHaveBeenCalledWith(
-        CreateActivityModalComponent,
-        {
-          backdrop: true
-        }
-      );
-      expect(component.creationInProgress).toBe(false);
-    }));
+        expect(modalSpy).toHaveBeenCalledWith(CreateActivityModalComponent, {
+          backdrop: true,
+        });
+        expect(component.creationInProgress).toBe(false);
+      })
+    );
 
-    it('should create new exploration when clicked on CREATE' +
-    ' EXPLORATION button', () => {
-      spyOn(
-        explorationCreationService, 'createNewExploration');
-      component.createNewExploration();
-      expect(
-        explorationCreationService.createNewExploration).toHaveBeenCalled();
-    });
+    it(
+      'should create new exploration when clicked on CREATE' +
+        ' EXPLORATION button',
+      () => {
+        spyOn(explorationCreationService, 'createNewExploration');
+        component.createNewExploration();
+        expect(
+          explorationCreationService.createNewExploration
+        ).toHaveBeenCalled();
+      }
+    );
   });
 
   describe('when user cannot create collection', () => {
-    it('should create a new exploration automatically if' +
-      ' url parameter \'mode\' is set as \'create\'', fakeAsync(() => {
-      spyOn(userService, 'getUserInfoAsync')
-        .and.returnValue(Promise.resolve(userInfoForNonCollectionCreator));
-      const explorationCreationServiceSpy = spyOn(
-        explorationCreationService, 'createNewExploration');
-      spyOn(urlService, 'getUrlParams').and.returnValue({
-        mode: 'create'
-      });
+    it(
+      'should create a new exploration automatically if' +
+        " url parameter 'mode' is set as 'create'",
+      fakeAsync(() => {
+        spyOn(userService, 'getUserInfoAsync').and.returnValue(
+          Promise.resolve(userInfoForNonCollectionCreator)
+        );
+        const explorationCreationServiceSpy = spyOn(
+          explorationCreationService,
+          'createNewExploration'
+        );
+        spyOn(urlService, 'getUrlParams').and.returnValue({
+          mode: 'create',
+        });
 
-      expect(component.userIsLoggedIn).toBe(false);
-      expect(component.canCreateCollections).toBe(false);
+        expect(component.userIsLoggedIn).toBe(false);
+        expect(component.canCreateCollections).toBe(false);
 
-      component.ngOnInit();
-      tick();
-      fixture.detectChanges();
+        component.ngOnInit();
+        tick();
+        fixture.detectChanges();
 
-      expect(component.userIsLoggedIn).toBe(true);
-      expect(component.canCreateCollections).toBe(false);
-      expect(urlService.getUrlParams).toHaveBeenCalled();
-      expect(explorationCreationServiceSpy).toHaveBeenCalled();
-    }));
+        expect(component.userIsLoggedIn).toBe(true);
+        expect(component.canCreateCollections).toBe(false);
+        expect(urlService.getUrlParams).toHaveBeenCalled();
+        expect(explorationCreationServiceSpy).toHaveBeenCalled();
+      })
+    );
 
-    it('should create new exploration when the user clicks' +
-      ' on the create button', () => {
-      component.creationInProgress = false;
+    it(
+      'should create new exploration when the user clicks' +
+        ' on the create button',
+      () => {
+        component.creationInProgress = false;
+        component.canCreateCollections = false;
+        const explorationCreationServiceSpy = spyOn(
+          explorationCreationService,
+          'createNewExploration'
+        );
+
+        component.initCreationProcess();
+
+        expect(explorationCreationServiceSpy).toHaveBeenCalled();
+      }
+    );
+  });
+
+  it(
+    'should not start a new creation process if another' +
+      ' creation is in progress',
+    () => {
       component.canCreateCollections = false;
+      component.creationInProgress = false;
+
       const explorationCreationServiceSpy = spyOn(
-        explorationCreationService, 'createNewExploration');
+        explorationCreationService,
+        'createNewExploration'
+      );
 
       component.initCreationProcess();
+      expect(component.creationInProgress).toBe(true);
+      expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
 
-      expect(explorationCreationServiceSpy).toHaveBeenCalled();
-    });
-  });
-
-  it('should not start a new creation process if another' +
-    ' creation is in progress', () => {
-    component.canCreateCollections = false;
-    component.creationInProgress = false;
-
-    const explorationCreationServiceSpy = spyOn(
-      explorationCreationService, 'createNewExploration');
-
-    component.initCreationProcess();
-    expect(component.creationInProgress).toBe(true);
-    expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
-
-    component.initCreationProcess();
-    expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
-  });
+      component.initCreationProcess();
+      expect(explorationCreationServiceSpy).toHaveBeenCalledTimes(1);
+    }
+  );
 
   it('should show upload exploration modal', () => {
     const showUploadExplorationModalSpy = spyOn(
-      explorationCreationService, 'showUploadExplorationModal');
+      explorationCreationService,
+      'showUploadExplorationModal'
+    );
 
     component.showUploadExplorationModal();
 
     expect(showUploadExplorationModalSpy).toHaveBeenCalled();
   });
 
-  it('should redirect to login page when user creates exploration' +
-    ' and is not logged in', fakeAsync(() => {
-    windowRef.nativeWindow.location.href = '';
-    const siteAnalyticsServiceSpy = spyOn(
-      siteAnalyticsService, 'registerStartLoginEvent');
+  it(
+    'should redirect to login page when user creates exploration' +
+      ' and is not logged in',
+    fakeAsync(() => {
+      windowRef.nativeWindow.location.href = '';
+      const siteAnalyticsServiceSpy = spyOn(
+        siteAnalyticsService,
+        'registerStartLoginEvent'
+      );
 
-    component.onRedirectToLogin('login-url');
-    tick(150);
-    fixture.detectChanges();
+      component.onRedirectToLogin('login-url');
+      tick(150);
+      fixture.detectChanges();
 
-    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
-      'createActivityButton');
-    expect(windowRef.nativeWindow.location.href).toBe('login-url');
-  }));
+      expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+        'createActivityButton'
+      );
+      expect(windowRef.nativeWindow.location.href).toBe('login-url');
+    })
+  );
 
-  it('should call the site analytics service on redirect' +
-    ' to login', fakeAsync(() => {
-    const siteAnalyticsServiceSpy = spyOn(
-      siteAnalyticsService, 'registerStartLoginEvent');
+  it(
+    'should call the site analytics service on redirect' + ' to login',
+    fakeAsync(() => {
+      const siteAnalyticsServiceSpy = spyOn(
+        siteAnalyticsService,
+        'registerStartLoginEvent'
+      );
 
-    component.onRedirectToLogin('login-url');
-    tick(150);
-    fixture.detectChanges();
+      component.onRedirectToLogin('login-url');
+      tick(150);
+      fixture.detectChanges();
 
-    expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
-      'createActivityButton');
-  }));
+      expect(siteAnalyticsServiceSpy).toHaveBeenCalledWith(
+        'createActivityButton'
+      );
+    })
+  );
 });

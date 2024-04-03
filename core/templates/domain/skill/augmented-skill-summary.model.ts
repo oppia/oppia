@@ -17,16 +17,16 @@
  */
 
 export interface AugmentedSkillSummaryBackendDict {
-  'id': string;
-  'description': string;
-  'language_code': string;
-  'version': number;
-  'misconception_count': number;
-  'worked_examples_count': number;
-  'skill_model_created_on': number;
-  'skill_model_last_updated': number;
-  'topic_names': string[];
-  'classroom_names': string[];
+  id: string;
+  description: string;
+  language_code: string;
+  version: number;
+  misconception_count: number;
+  worked_examples_count: number;
+  skill_model_created_on: number;
+  skill_model_last_updated: number;
+  topic_names: string[];
+  classroom_names: string[];
 }
 
 export class AugmentedSkillSummary {
@@ -40,10 +40,12 @@ export class AugmentedSkillSummary {
     public skillModelCreatedOn: number,
     public skillModelLastUpdated: number,
     public topicNames: string[],
-    public classroomNames: string[]) { }
+    public classroomNames: string[]
+  ) {}
 
   static createFromBackendDict(
-      summaryDict: AugmentedSkillSummaryBackendDict): AugmentedSkillSummary {
+    summaryDict: AugmentedSkillSummaryBackendDict
+  ): AugmentedSkillSummary {
     return new AugmentedSkillSummary(
       summaryDict.id,
       summaryDict.description,
@@ -54,6 +56,7 @@ export class AugmentedSkillSummary {
       summaryDict.skill_model_created_on,
       summaryDict.skill_model_last_updated,
       summaryDict.topic_names,
-      summaryDict.classroom_names);
+      summaryDict.classroom_names
+    );
   }
 }

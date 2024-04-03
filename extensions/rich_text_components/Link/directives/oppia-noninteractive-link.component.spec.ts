@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for the Link rich-text component.
  */
 
-import { SimpleChanges } from '@angular/core';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ContextService } from 'services/context.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NoninteractiveLink } from './oppia-noninteractive-link.component';
+import {SimpleChanges} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ContextService} from 'services/context.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NoninteractiveLink} from './oppia-noninteractive-link.component';
 
 describe('NoninteractiveLink', () => {
   let component: NoninteractiveLink;
@@ -32,19 +32,20 @@ describe('NoninteractiveLink', () => {
   let mockHtmlEscaperService = {
     escapedJsonToObj: (answer: string) => {
       return answer;
-    }
+    },
   };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [NoninteractiveLink],
-      providers: [HtmlEscaperService,
+      providers: [
+        HtmlEscaperService,
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }
+          useValue: mockHtmlEscaperService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -67,7 +68,7 @@ describe('NoninteractiveLink', () => {
     expect(component.tabIndexVal).toBe(-1);
   });
 
-  it('should add \'https://\' when user does not add it', () => {
+  it("should add 'https://' when user does not add it", () => {
     component.urlWithValue = 'www.oppia.org/';
 
     component.ngOnInit();
@@ -76,8 +77,10 @@ describe('NoninteractiveLink', () => {
   });
 
   it('should display url instead of text in old explorations', () => {
-    spyOn(htmlEscaperService, 'escapedJsonToObj')
-      .and.returnValues('https://www.oppia.org/', '');
+    spyOn(htmlEscaperService, 'escapedJsonToObj').and.returnValues(
+      'https://www.oppia.org/',
+      ''
+    );
 
     component.ngOnInit();
 
@@ -101,14 +104,14 @@ describe('NoninteractiveLink', () => {
         currentValue: 'www.new_url.com',
         previousValue: 'https://www.oppia.org/',
         firstChange: false,
-        isFirstChange: () => false
+        isFirstChange: () => false,
       },
       textWithValue: {
         currentValue: 'new text',
         previousValue: 'text',
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.urlWithValue = 'www.new_url.com';
     component.textWithValue = 'new text';

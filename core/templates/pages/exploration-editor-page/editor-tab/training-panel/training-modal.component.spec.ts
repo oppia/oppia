@@ -16,23 +16,25 @@
  * @fileoverview Unit tests for TrainingModalController.
  */
 
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TrainingModalComponent } from './training-modal.component';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { ResponsesService } from '../services/responses.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { TrainingDataService } from './training-data.service';
-import { AnswerGroup, AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { AnswerClassificationService } from 'pages/exploration-player-page/services/answer-classification.service';
-import { GraphDataService } from 'pages/exploration-editor-page/services/graph-data.service';
-import { ExplorationWarningsService } from 'pages/exploration-editor-page/services/exploration-warnings.service';
-
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TrainingModalComponent} from './training-modal.component';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ResponsesService} from '../services/responses.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {TrainingDataService} from './training-data.service';
+import {
+  AnswerGroup,
+  AnswerGroupObjectFactory,
+} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
+import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
+import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
 
 class MockActiveModal {
   close(): void {
@@ -49,15 +51,13 @@ class MockStateInteractionIdService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1, item2) {
-  }
+  saveInteractionAnswerGroups(item1, item2) {}
 
-  saveInteractionDefaultOutcome(item1, item2) {
-  }
+  saveInteractionDefaultOutcome(item1, item2) {}
 
   getState() {
     return {
-      interaction: 'TextInput'
+      interaction: 'TextInput',
     };
   }
 }
@@ -72,7 +72,7 @@ class MockAnswerClassificationService {
   getMatchingClassificationResult() {
     return {
       answerGroupIndex: 2,
-      outcome: null
+      outcome: null,
     };
   }
 }
@@ -89,12 +89,8 @@ describe('Training Modal Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-      ],
-      declarations: [
-        TrainingModalComponent
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [TrainingModalComponent],
       providers: [
         {
           provide: ExplorationDataService,
@@ -102,36 +98,36 @@ describe('Training Modal Component', () => {
             explorationId: 0,
             autosaveChangeListAsync() {
               return;
-            }
-          }
+            },
+          },
         },
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
         {
           provide: StateInteractionIdService,
-          useClass: MockStateInteractionIdService
+          useClass: MockStateInteractionIdService,
         },
         {
           provide: StateEditorService,
-          useClass: MockStateEditorService
+          useClass: MockStateEditorService,
         },
         {
           provide: ExplorationStatesService,
-          useClass: MockExplorationStatesService
+          useClass: MockExplorationStatesService,
         },
         {
           provide: AnswerClassificationService,
-          useClass: MockAnswerClassificationService
+          useClass: MockAnswerClassificationService,
         },
         AnswerGroupObjectFactory,
         TrainingDataService,
         ResponsesService,
         ExplorationWarningsService,
-        GraphDataService
+        GraphDataService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     });
   });
 
@@ -157,73 +153,69 @@ describe('Training Modal Component', () => {
     expect(ngbActiveModal.close).toHaveBeenCalled();
   });
 
-  it('should click on confirm button when ' +
-    'answerGroupIndex is greater than Response', () => {
-    component.classification = {
-      answerGroupIndex: 2,
-      newOutcome: new Outcome(
-        'dest', null, null, true,
-        [],
-        null, null
-      )
-    };
-    component.unhandledAnswer = 'string';
+  it(
+    'should click on confirm button when ' +
+      'answerGroupIndex is greater than Response',
+    () => {
+      component.classification = {
+        answerGroupIndex: 2,
+        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+      };
+      component.unhandledAnswer = 'string';
 
-    spyOn(answerGroupObjectFactory, 'createNew').and.returnValue(null);
-    spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
-    spyOn(responsesService, 'getAnswerGroupCount')
-      .and.returnValue(1);
-    spyOn(responsesService, 'getAnswerGroups')
-      .and.returnValue([{}] as AnswerGroup[]);
-    spyOn(responsesService, 'save')
-      .and.callFake((answerGroups, getDefaultOutcome, save) => {
-        save(null, null);
-      });
+      spyOn(answerGroupObjectFactory, 'createNew').and.returnValue(null);
+      spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
+      spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(1);
+      spyOn(responsesService, 'getAnswerGroups').and.returnValue([
+        {},
+      ] as AnswerGroup[]);
+      spyOn(responsesService, 'save').and.callFake(
+        (answerGroups, getDefaultOutcome, save) => {
+          save(null, null);
+        }
+      );
 
-    component.ngOnInit();
-    component.onConfirm();
+      component.ngOnInit();
+      component.onConfirm();
 
-    expect(responsesService.save).toHaveBeenCalled();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
+      expect(responsesService.save).toHaveBeenCalled();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    }
+  );
 
-  it('should click on confirm button when ' +
-    'answerGroupIndex is greater than Response', () => {
-    component.classification = {
-      answerGroupIndex: 1,
-      newOutcome: new Outcome(
-        'dest', null, null, true,
-        [],
-        null, null
-      )
-    };
-    component.unhandledAnswer = 'string';
+  it(
+    'should click on confirm button when ' +
+      'answerGroupIndex is greater than Response',
+    () => {
+      component.classification = {
+        answerGroupIndex: 1,
+        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+      };
+      component.unhandledAnswer = 'string';
 
-    spyOn(trainingDataService, 'associateWithDefaultResponse').and.stub();
-    spyOn(responsesService, 'getAnswerGroupCount')
-      .and.returnValue(1);
+      spyOn(trainingDataService, 'associateWithDefaultResponse').and.stub();
+      spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(1);
 
-    component.onConfirm();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
+      component.onConfirm();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    }
+  );
 
-  it('should click on confirm button when ' +
-    'answerGroupIndex is less than Response', () => {
-    component.classification = {
-      answerGroupIndex: 1,
-      newOutcome: new Outcome(
-        'dest', null, null, true,
-        [],
-        null, null
-      )
-    };
-    component.unhandledAnswer = 'string';
+  it(
+    'should click on confirm button when ' +
+      'answerGroupIndex is less than Response',
+    () => {
+      component.classification = {
+        answerGroupIndex: 1,
+        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+      };
+      component.unhandledAnswer = 'string';
 
-    spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
-    spyOn(responsesService, 'getAnswerGroupCount')
-      .and.returnValue(3);
+      spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
+      spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(3);
 
-    component.onConfirm();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
-  });
+      component.onConfirm();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    }
+  );
 });

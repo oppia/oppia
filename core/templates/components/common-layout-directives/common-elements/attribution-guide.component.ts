@@ -16,24 +16,22 @@
  * @fileoverview Component for the attribution guide.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { BrowserCheckerService } from
-  'domain/utilities/browser-checker.service';
-import { AttributionService } from 'services/attribution.service';
-import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {BrowserCheckerService} from 'domain/utilities/browser-checker.service';
+import {AttributionService} from 'services/attribution.service';
+import {ContextService} from 'services/context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 import './attribution-guide.component.css';
-
 
 @Component({
   selector: 'attribution-guide',
   templateUrl: './attribution-guide.component.html',
-  styleUrls: ['./attribution-guide.component.css']
+  styleUrls: ['./attribution-guide.component.css'],
 })
 export class AttributionGuideComponent implements OnInit {
   deviceUsedIsMobile: boolean = false;
@@ -53,21 +51,21 @@ export class AttributionGuideComponent implements OnInit {
   ngOnInit(): void {
     this.deviceUsedIsMobile = this.browserCheckerService.isMobileDevice();
     this.iframed = this.urlService.isIframed();
-    this.printAttributionLink = (
-      '<a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" ' +
-      'rel=\"noopener\" target=\"_blank\"><span ' +
-      'class=\"oppia-attribution-licence-link\">CC BY SA 4.0 license</span>' +
-      '<span class=\"fas fa-external-link-alt oppia-open-new-tab-icon\">' +
-      '</span></a>');
-    this.generateAttibutionIsAllowed = (
-      this.attributionService.isGenerateAttributionAllowed());
+    this.printAttributionLink =
+      '<a href="https://creativecommons.org/licenses/by-sa/4.0/" ' +
+      'rel="noopener" target="_blank"><span ' +
+      'class="oppia-attribution-licence-link">CC BY SA 4.0 license</span>' +
+      '<span class="fas fa-external-link-alt oppia-open-new-tab-icon">' +
+      '</span></a>';
+    this.generateAttibutionIsAllowed =
+      this.attributionService.isGenerateAttributionAllowed();
     if (this.generateAttibutionIsAllowed) {
       this.attributionService.init();
     }
   }
 
   checkMobileView(): boolean {
-    return (this.windowDimensionsService.getWidth() <= 1024);
+    return this.windowDimensionsService.getWidth() <= 1024;
   }
 
   getAttributionModalStatus(): boolean {
@@ -117,6 +115,9 @@ export class AttributionGuideComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive(
-  'attributionGuide', downgradeComponent(
-    {component: AttributionGuideComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'attributionGuide',
+    downgradeComponent({component: AttributionGuideComponent})
+  );

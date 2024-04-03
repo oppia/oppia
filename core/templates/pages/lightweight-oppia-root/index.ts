@@ -17,21 +17,21 @@
  */
 
 import 'pages/common-imports';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { enableProdMode } from '@angular/core';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {enableProdMode} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { LighweightAppModule } from './app.module';
-import { LoggerService } from 'services/contextual/logger.service';
+import {AppConstants} from 'app.constants';
+import {LighweightAppModule} from './app.module';
+import {LoggerService} from 'services/contextual/logger.service';
 
 if (!AppConstants.DEV_MODE) {
   enableProdMode();
 }
 
 const loggerService = new LoggerService();
-platformBrowserDynamic().bootstrapModule(LighweightAppModule).catch(
-  (err) => loggerService.error(err)
-);
+platformBrowserDynamic()
+  .bootstrapModule(LighweightAppModule)
+  .catch(err => loggerService.error(err));
 
 // This prevents angular pages to cause side effects to hybrid pages.
 // TODO(#13080): Remove window.name statement from import.ts files

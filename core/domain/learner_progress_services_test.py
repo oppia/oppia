@@ -21,9 +21,10 @@ from __future__ import annotations
 import datetime
 
 from core.constants import constants
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import config_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_goals_services
@@ -1597,26 +1598,18 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_all_and_untracked_topic_ids(self) -> None:
         # Add topics to config_domain.
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.TOPIC_ID_0, self.TOPIC_ID_1],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_config_services.get_new_classroom_id(),
+            name='math',
+            url_fragment='math-one',
+            course_details='',
+            topic_list_intro='',
+            topic_id_to_prerequisite_topic_ids={
+                self.TOPIC_ID_0: [],
+                self.TOPIC_ID_1: []
             }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-        self.logout()
+        )
+        classroom_config_services.update_or_create_classroom_model(classroom)
 
         self.login(self.USER_EMAIL)
         partially_learnt_topic_ids = (
@@ -2121,26 +2114,17 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
     def test_get_all_activity_progress(self) -> None:
         # Add topics to config_domain.
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'url_fragment': 'math',
-            'topic_ids': [self.TOPIC_ID_3],
-            'course_details': '',
-            'topic_list_intro': ''
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_config_services.get_new_classroom_id(),
+            name='math',
+            url_fragment='math-one',
+            course_details='',
+            topic_list_intro='',
+            topic_id_to_prerequisite_topic_ids={
+                self.TOPIC_ID_3: []
             }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
-        self.logout()
+        )
+        classroom_config_services.update_or_create_classroom_model(classroom)
 
         # Add activities to the completed section.
         learner_progress_services.mark_exploration_as_completed(

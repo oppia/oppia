@@ -18,18 +18,18 @@
  */
 
 export interface FeedbackThreadSummaryBackendDict {
-  'status': string;
-  'original_author_id': string;
-  'last_updated_msecs': number;
-  'last_message_text': string;
-  'total_message_count': number;
-  'last_message_is_read': boolean;
-  'second_last_message_is_read': boolean;
-  'author_last_message': string;
-  'author_second_last_message': string;
-  'exploration_title': string;
-  'exploration_id': string;
-  'thread_id': string;
+  status: string;
+  original_author_id: string;
+  last_updated_msecs: number;
+  last_message_text: string;
+  total_message_count: number;
+  last_message_is_read: boolean;
+  second_last_message_is_read: boolean;
+  author_last_message: string;
+  author_second_last_message: string;
+  exploration_title: string;
+  exploration_id: string;
+  thread_id: string;
 }
 
 export class FeedbackThreadSummary {
@@ -47,11 +47,19 @@ export class FeedbackThreadSummary {
   threadId: string;
 
   constructor(
-      status: string, originalAuthorId: string, lastUpdatedMsecs: number,
-      lastMessageText: string, totalMessageCount: number,
-      lastMessageIsRead: boolean, secondLastMessageIsRead: boolean,
-      authorLastMessage: string, authorSecondLastMessage: string,
-      explorationTitle: string, explorationId: string, threadId: string) {
+    status: string,
+    originalAuthorId: string,
+    lastUpdatedMsecs: number,
+    lastMessageText: string,
+    totalMessageCount: number,
+    lastMessageIsRead: boolean,
+    secondLastMessageIsRead: boolean,
+    authorLastMessage: string,
+    authorSecondLastMessage: string,
+    explorationTitle: string,
+    explorationId: string,
+    threadId: string
+  ) {
     this.status = status;
     this.originalAuthorId = originalAuthorId;
     this.lastUpdatedMsecs = lastUpdatedMsecs;
@@ -84,8 +92,8 @@ export class FeedbackThreadSummary {
   }
 
   static createFromBackendDict(
-      feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict):
-      FeedbackThreadSummary {
+    feedbackThreadSummaryBackendDict: FeedbackThreadSummaryBackendDict
+  ): FeedbackThreadSummary {
     return new FeedbackThreadSummary(
       feedbackThreadSummaryBackendDict.status,
       feedbackThreadSummaryBackendDict.original_author_id,

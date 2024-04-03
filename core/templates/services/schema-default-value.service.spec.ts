@@ -16,12 +16,15 @@
  * @fileoverview Unit tests for SchemaDefaultValueService.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { LoggerService } from 'services/contextual/logger.service';
-import { Schema, SchemaDefaultValueService } from 'services/schema-default-value.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { SubtitledUnicode } from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  Schema,
+  SchemaDefaultValueService,
+} from 'services/schema-default-value.service';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('Schema Default Value Service', () => {
   let sdvs: SchemaDefaultValueService;
@@ -34,26 +37,26 @@ describe('Schema Default Value Service', () => {
 
   it('should get default value if schema has choices', () => {
     const schema = {
-      choices: ['Choice 1']
+      choices: ['Choice 1'],
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe('Choice 1');
   });
 
   it('should get default value if schema type is bool', () => {
     const schema = {
-      type: 'bool'
+      type: 'bool',
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBeFalse();
   });
 
   it('should get default value if schema type is unicode or html', () => {
     let schema = {
-      type: 'unicode'
+      type: 'unicode',
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe('');
 
     schema = {
-      type: 'html'
+      type: 'html',
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe('');
   });
@@ -61,17 +64,20 @@ describe('Schema Default Value Service', () => {
   it('should get default value if schema type is list', () => {
     let schema = {
       type: 'list',
-      items: [{
-        type: 'bool'
-      }, {
-        type: 'int'
-      }]
+      items: [
+        {
+          type: 'bool',
+        },
+        {
+          type: 'int',
+        },
+      ],
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toEqual([false, 0]);
 
     let schema2 = {
       type: 'list',
-      items: ''
+      items: '',
     } as Schema;
     expect(sdvs.getDefaultValue(schema2)).toEqual([]);
   });
@@ -79,38 +85,42 @@ describe('Schema Default Value Service', () => {
   it('should get default value if schema type is dict', () => {
     const schema = {
       type: 'dict',
-      properties: [{
-        name: 'property_1',
-        schema: {
-          type: 'bool'
-        }
-      }, {
-        name: 'property_2',
-        schema: {
-          type: 'unicode'
-        }
-      }, {
-        name: 'property_3',
-        schema: {
-          type: 'int'
-        }
-      }]
+      properties: [
+        {
+          name: 'property_1',
+          schema: {
+            type: 'bool',
+          },
+        },
+        {
+          name: 'property_2',
+          schema: {
+            type: 'unicode',
+          },
+        },
+        {
+          name: 'property_3',
+          schema: {
+            type: 'int',
+          },
+        },
+      ],
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toEqual({
       property_1: false,
       property_2: '',
-      property_3: 0
+      property_3: 0,
     });
   });
 
   it('should get default value if schema type is int or float', () => {
     let schema = {
-      type: 'int'
+      type: 'int',
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe(0);
 
     schema = {
-      type: 'float'
+      type: 'float',
     } as Schema;
     expect(sdvs.getDefaultValue(schema)).toBe(0);
   });
@@ -118,21 +128,19 @@ describe('Schema Default Value Service', () => {
   it('should get default value if schema type SubtitledHtml', () => {
     let schema = {
       type: 'custom',
-      obj_type: 'SubtitledHtml'
+      obj_type: 'SubtitledHtml',
     } as Schema;
-    expect(
-      sdvs.getDefaultValue(schema)
-    ).toEqual(new SubtitledHtml('', null));
+    expect(sdvs.getDefaultValue(schema)).toEqual(new SubtitledHtml('', null));
   });
 
   it('should get default value if schema type is SubtitledUnicode', () => {
     let schema = {
       type: 'custom',
-      obj_type: 'SubtitledUnicode'
+      obj_type: 'SubtitledUnicode',
     } as Schema;
-    expect(
-      sdvs.getDefaultValue(schema)
-    ).toEqual(new SubtitledUnicode('', null));
+    expect(sdvs.getDefaultValue(schema)).toEqual(
+      new SubtitledUnicode('', null)
+    );
   });
 
   it('should not get default value if schema type is invalid', () => {
@@ -143,11 +151,12 @@ describe('Schema Default Value Service', () => {
     // value in order to test validations.
     // @ts-expect-error
     const schema = {
-      type: 'invalid'
+      type: 'invalid',
     } as Schema;
 
     expect(() => sdvs.getDefaultValue(schema)).toThrowError('Invalid Schema');
     expect(loggerErrorSpy).toHaveBeenCalledWith(
-      'Invalid schema: ' + JSON.stringify(schema));
+      'Invalid schema: ' + JSON.stringify(schema)
+    );
   });
 });

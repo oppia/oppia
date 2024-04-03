@@ -16,13 +16,13 @@
  * @fileoverview Service for retrieving issues and playthroughs.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { PlaythroughIssuesBackendApiService } from 'services/playthrough-issues-backend-api.service';
-import { PlaythroughIssue } from 'domain/statistics/playthrough-issue.model';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {PlaythroughIssuesBackendApiService} from 'services/playthrough-issues-backend-api.service';
+import {PlaythroughIssue} from 'domain/statistics/playthrough-issue.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PlaythroughIssuesService {
   // These properties are initialized using init method and we need to do
@@ -32,29 +32,33 @@ export class PlaythroughIssuesService {
   explorationVersion!: number;
 
   constructor(
-    private playthroughIssuesBackendApiService:
-      PlaythroughIssuesBackendApiService
-  ) { }
+    private playthroughIssuesBackendApiService: PlaythroughIssuesBackendApiService
+  ) {}
 
   /** Prepares the PlaythroughIssuesService for subsequent calls to other
-  * functions.
-  *
-  * @param {string} newExplorationId - the exploration id the service will
-  *    be targeting.
-  * @param {number} newExplorationVersion - the version of the exploration
-  *    the service will be targeting.
-  */
-  initSession(
-      newExplorationId: string, newExplorationVersion: number): void {
+   * functions.
+   *
+   * @param {string} newExplorationId - the exploration id the service will
+   *    be targeting.
+   * @param {number} newExplorationVersion - the version of the exploration
+   *    the service will be targeting.
+   */
+  initSession(newExplorationId: string, newExplorationVersion: number): void {
     this.explorationId = newExplorationId;
     this.explorationVersion = newExplorationVersion;
   }
 
   getIssues(): Promise<PlaythroughIssue[]> {
     return this.playthroughIssuesBackendApiService.fetchIssuesAsync(
-      this.explorationId, this.explorationVersion);
+      this.explorationId,
+      this.explorationVersion
+    );
   }
 }
 
-angular.module('oppia').factory('PlaythroughIssuesService',
-  downgradeInjectable(PlaythroughIssuesService));
+angular
+  .module('oppia')
+  .factory(
+    'PlaythroughIssuesService',
+    downgradeInjectable(PlaythroughIssuesService)
+  );

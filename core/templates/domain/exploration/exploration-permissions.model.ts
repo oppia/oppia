@@ -17,14 +17,14 @@
  */
 
 export interface ExplorationPermissionsBackendDict {
-  'can_unpublish': boolean;
-  'can_release_ownership': boolean;
-  'can_publish': boolean;
-  'can_voiceover': boolean;
-  'can_delete': boolean;
-  'can_modify_roles': boolean;
-  'can_edit': boolean;
-  'can_manage_voice_artist': boolean;
+  can_unpublish: boolean;
+  can_release_ownership: boolean;
+  can_publish: boolean;
+  can_voiceover: boolean;
+  can_delete: boolean;
+  can_modify_roles: boolean;
+  can_edit: boolean;
+  can_manage_voice_artist: boolean;
 }
 
 export class ExplorationPermissions {
@@ -38,9 +38,15 @@ export class ExplorationPermissions {
   canManageVoiceArtist: boolean;
 
   constructor(
-      canUnpublish: boolean, canReleaseOwnership: boolean, canPublish: boolean,
-      canVoiceover: boolean, canDelete: boolean, canModifyRoles: boolean,
-      canEdit: boolean, canManageVoiceArtist: boolean) {
+    canUnpublish: boolean,
+    canReleaseOwnership: boolean,
+    canPublish: boolean,
+    canVoiceover: boolean,
+    canDelete: boolean,
+    canModifyRoles: boolean,
+    canEdit: boolean,
+    canManageVoiceArtist: boolean
+  ) {
     this.canUnpublish = canUnpublish;
     this.canReleaseOwnership = canReleaseOwnership;
     this.canPublish = canPublish;
@@ -52,11 +58,17 @@ export class ExplorationPermissions {
   }
 
   static createFromBackendDict(
-      backendDict: ExplorationPermissionsBackendDict): ExplorationPermissions {
+    backendDict: ExplorationPermissionsBackendDict
+  ): ExplorationPermissions {
     return new ExplorationPermissions(
-      backendDict.can_unpublish, backendDict.can_release_ownership,
-      backendDict.can_publish, backendDict.can_voiceover,
-      backendDict.can_delete, backendDict.can_modify_roles,
-      backendDict.can_edit, backendDict.can_manage_voice_artist);
+      backendDict.can_unpublish,
+      backendDict.can_release_ownership,
+      backendDict.can_publish,
+      backendDict.can_voiceover,
+      backendDict.can_delete,
+      backendDict.can_modify_roles,
+      backendDict.can_edit,
+      backendDict.can_manage_voice_artist
+    );
   }
 }

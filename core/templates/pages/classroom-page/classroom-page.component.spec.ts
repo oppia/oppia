@@ -16,25 +16,31 @@
  * @fileoverview Unit tests for classroom page component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { ClassroomBackendApiService } from 'domain/classroom/classroom-backend-api.service';
-import { ClassroomData } from 'domain/classroom/classroom-data.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { CapitalizePipe } from 'filters/string-utility-filters/capitalize.pipe';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-import { UrlService } from 'services/contextual/url.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ClassroomPageComponent } from './classroom-page.component';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {ClassroomData} from 'domain/classroom/classroom-data.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ClassroomPageComponent} from './classroom-page.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockCapitalizePipe {
   transform(input: string): string {
@@ -52,8 +58,8 @@ class MockTranslateService {
 class MockPlatformFeatureService {
   status = {
     DiagnosticTest: {
-      isEnabled: false
-    }
+      isEnabled: false,
+    },
   };
 }
 
@@ -74,26 +80,21 @@ describe('Classroom Page Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
-      declarations: [
-        ClassroomPageComponent,
-        MockTranslatePipe
-      ],
+      imports: [HttpClientTestingModule],
+      declarations: [ClassroomPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
         {
           provide: CapitalizePipe,
-          useClass: MockCapitalizePipe
+          useClass: MockCapitalizePipe,
         },
         {
           provide: TranslateService,
-          useClass: MockTranslateService
+          useClass: MockTranslateService,
         },
         {
           provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService
+          useValue: mockPlatformFeatureService,
         },
         ClassroomBackendApiService,
         LoaderService,
@@ -102,7 +103,7 @@ describe('Classroom Page Component', () => {
         UrlInterpolationService,
         UrlService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -118,11 +119,13 @@ describe('Classroom Page Component', () => {
     alertsService = TestBed.inject(AlertsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     accessValidationBackendApiService = TestBed.inject(
-      AccessValidationBackendApiService);
+      AccessValidationBackendApiService
+    );
     translateService = TestBed.inject(TranslateService);
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
 
   it('should create', () => {
@@ -131,117 +134,148 @@ describe('Classroom Page Component', () => {
 
   it('should provide static image url', () => {
     let imageUrl = 'image_url';
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue(imageUrl);
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      imageUrl
+    );
     expect(component.getStaticImageUrl('test')).toEqual(imageUrl);
   });
 
   it('should initialize', fakeAsync(() => {
     let classroomUrlFragment = 'math';
     let bannerImageUrl = 'banner_image_url';
-    spyOn(urlService, 'getClassroomUrlFragmentFromUrl')
-      .and.returnValue(classroomUrlFragment);
-    spyOn(urlInterpolationService, 'getStaticImageUrl')
-      .and.returnValue(bannerImageUrl);
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      classroomUrlFragment
+    );
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      bannerImageUrl
+    );
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(component, 'setPageTitle');
     spyOn(component, 'subscribeToOnLangChange');
     spyOn(loaderService, 'hideLoadingScreen');
     spyOn(classroomBackendApiService.onInitializeTranslation, 'emit');
     spyOn(siteAnalyticsService, 'registerClassroomPageViewed');
-    let topicSummaryDicts = [{
-      id: 'topic1',
-      name: 'Topic name',
-      description: 'Topic description',
-      canonical_story_count: 4,
-      subtopic_count: 5,
-      total_skill_count: 20,
-      uncategorized_skill_count: 5,
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      language_code: 'en',
-      version: 1,
-      additional_story_count: 0,
-      total_published_node_count: 4,
-      topic_model_created_on: 20160101,
-      topic_model_last_updated: 20160110,
-      can_edit_topic: true,
-      is_published: true,
-      url_fragment: 'some-url-fragment',
-      classroom: 'math',
-      total_upcoming_chapters_count: 1,
-      total_overdue_chapters_count: 1,
-      total_chapter_counts_for_each_story: [5, 4],
-      published_chapter_counts_for_each_story: [3, 4]
-    }];
+    let topicSummaryDicts = [
+      {
+        id: 'topic1',
+        name: 'Topic name',
+        description: 'Topic description',
+        canonical_story_count: 4,
+        subtopic_count: 5,
+        total_skill_count: 20,
+        uncategorized_skill_count: 5,
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        language_code: 'en',
+        version: 1,
+        additional_story_count: 0,
+        total_published_node_count: 4,
+        topic_model_created_on: 20160101,
+        topic_model_last_updated: 20160110,
+        can_edit_topic: true,
+        is_published: true,
+        url_fragment: 'some-url-fragment',
+        classroom: 'math',
+        total_upcoming_chapters_count: 1,
+        total_overdue_chapters_count: 1,
+        total_chapter_counts_for_each_story: [5, 4],
+        published_chapter_counts_for_each_story: [3, 4],
+      },
+    ];
 
     let classroomData = ClassroomData.createFromBackendData(
-      'Math', topicSummaryDicts, 'Course details', 'Topics covered');
-    spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-      .and.returnValue(Promise.resolve());
-    spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
-      .and.returnValue(Promise.resolve(classroomData));
-    spyOn(i18nLanguageCodeService, 'getClassroomTranslationKey')
-      .and.returnValue('I18N_CLASSROOM_MATH_TITLE');
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValue(true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
+      'Math',
+      topicSummaryDicts,
+      'Course details',
+      'Topics covered'
+    );
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.resolve(classroomData));
+    spyOn(
+      i18nLanguageCodeService,
+      'getClassroomTranslationKey'
+    ).and.returnValue('I18N_CLASSROOM_MATH_TITLE');
+    spyOn(
+      i18nLanguageCodeService,
+      'isHackyTranslationAvailable'
+    ).and.returnValue(true);
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish').and.returnValue(
+      false
+    );
     component.ngOnInit();
     tick();
     tick();
     expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
     expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
     expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-    expect(classroomBackendApiService.fetchClassroomDataAsync)
-      .toHaveBeenCalled();
+    expect(
+      classroomBackendApiService.fetchClassroomDataAsync
+    ).toHaveBeenCalled();
     expect(component.classroomData).toEqual(classroomData);
     expect(component.classroomDisplayName).toEqual(classroomData.getName());
     expect(component.classroomNameTranslationKey).toBe(
-      'I18N_CLASSROOM_MATH_TITLE');
+      'I18N_CLASSROOM_MATH_TITLE'
+    );
     expect(component.isHackyClassroomTranslationDisplayed()).toBe(true);
     expect(component.setPageTitle).toHaveBeenCalled();
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    expect(classroomBackendApiService.onInitializeTranslation.emit)
-      .toHaveBeenCalled();
+    expect(
+      classroomBackendApiService.onInitializeTranslation.emit
+    ).toHaveBeenCalled();
     expect(siteAnalyticsService.registerClassroomPageViewed).toHaveBeenCalled();
   }));
 
-  it('should display alert when unable to fetch classroom data',
-    fakeAsync(() => {
-      let classroomUrlFragment = 'test_fragment';
-      let bannerImageUrl = 'banner_image_url';
-      spyOn(urlService, 'getClassroomUrlFragmentFromUrl')
-        .and.returnValue(classroomUrlFragment);
-      spyOn(urlInterpolationService, 'getStaticImageUrl')
-        .and.returnValue(bannerImageUrl);
-      spyOn(loaderService, 'showLoadingScreen');
-      spyOn(accessValidationBackendApiService, 'validateAccessToClassroomPage')
-        .and.returnValue(Promise.resolve());
-      spyOn(classroomBackendApiService, 'fetchClassroomDataAsync')
-        .and.returnValue(Promise.reject({ status: 500 }));
-      spyOn(alertsService, 'addWarning');
-      component.ngOnInit();
-      tick();
-      expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
-      expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
-      expect(loaderService.showLoadingScreen).toHaveBeenCalled();
-      expect(classroomBackendApiService.fetchClassroomDataAsync)
-        .toHaveBeenCalled();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(
-        'Failed to get dashboard data');
-    }));
+  it('should display alert when unable to fetch classroom data', fakeAsync(() => {
+    let classroomUrlFragment = 'test_fragment';
+    let bannerImageUrl = 'banner_image_url';
+    spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+      classroomUrlFragment
+    );
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      bannerImageUrl
+    );
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToClassroomPage'
+    ).and.returnValue(Promise.resolve());
+    spyOn(
+      classroomBackendApiService,
+      'fetchClassroomDataAsync'
+    ).and.returnValue(Promise.reject({status: 500}));
+    spyOn(alertsService, 'addWarning');
+    component.ngOnInit();
+    tick();
+    expect(component.classroomUrlFragment).toEqual(classroomUrlFragment);
+    expect(component.bannerImageFileUrl).toEqual(bannerImageUrl);
+    expect(loaderService.showLoadingScreen).toHaveBeenCalled();
+    expect(
+      classroomBackendApiService.fetchClassroomDataAsync
+    ).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to get dashboard data'
+    );
+  }));
 
-  it('should obtain translated page title whenever the selected' +
-  'language changes', () => {
-    component.subscribeToOnLangChange();
-    spyOn(component, 'setPageTitle');
-    translateService.onLangChange.emit();
+  it(
+    'should obtain translated page title whenever the selected' +
+      'language changes',
+    () => {
+      component.subscribeToOnLangChange();
+      spyOn(component, 'setPageTitle');
+      translateService.onLangChange.emit();
 
-    expect(component.directiveSubscriptions.closed).toBe(false);
-    expect(component.setPageTitle).toHaveBeenCalled();
-  });
+      expect(component.directiveSubscriptions.closed).toBe(false);
+      expect(component.setPageTitle).toHaveBeenCalled();
+    }
+  );
 
   it('should set new page title', () => {
     spyOn(translateService, 'instant').and.callThrough();
@@ -250,11 +284,14 @@ describe('Classroom Page Component', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_PAGE_TITLE', {
-        classroomName: 'dummy_name'
-      });
+      'I18N_CLASSROOM_PAGE_TITLE',
+      {
+        classroomName: 'dummy_name',
+      }
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_CLASSROOM_PAGE_TITLE');
+      'I18N_CLASSROOM_PAGE_TITLE'
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

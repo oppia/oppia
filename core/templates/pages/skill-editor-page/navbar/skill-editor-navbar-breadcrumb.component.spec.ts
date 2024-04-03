@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for the navbar breadcrumb of the skill editor.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Skill, SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from '../services/skill-editor-state.service';
-import { SkillEditorNavbarBreadcrumbComponent } from './skill-editor-navbar-breadcrumb.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from '../services/skill-editor-state.service';
+import {SkillEditorNavbarBreadcrumbComponent} from './skill-editor-navbar-breadcrumb.component';
 
 describe('SkillEditorNavbarBreadcrumbComponent', () => {
   let component: SkillEditorNavbarBreadcrumbComponent;
@@ -29,11 +29,10 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
   let skillObject: Skill;
   let skillEditorStateService: SkillEditorStateService;
 
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [SkillEditorNavbarBreadcrumbComponent]
+      declarations: [SkillEditorNavbarBreadcrumbComponent],
     }).compileComponents();
   }));
 
@@ -47,12 +46,12 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
-      must_be_addressed: true
+      must_be_addressed: true,
     };
 
     let rubricDict = {
       difficulty: 'Easy',
-      explanations: ['explanation']
+      explanations: ['explanation'],
     };
 
     let skillContentsDict = {
@@ -62,8 +61,8 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
       },
       worked_examples: [],
       recorded_voiceovers: {
-        voiceovers_mapping: {}
-      }
+        voiceovers_mapping: {},
+      },
     };
 
     skillObject = skillObjectFactory.createFromBackendDict({
@@ -77,22 +76,22 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
       next_misconception_id: 3,
       prerequisite_skill_ids: ['skill_1'],
       superseding_skill_id: 'skill0',
-      all_questions_merged: true
+      all_questions_merged: true,
     });
   });
 
-  it('should not truncate skill descirption when skill editor navbar loads',
-    () => {
-      spyOn(skillEditorStateService, 'getSkill').and.returnValue(skillObject);
+  it('should not truncate skill descirption when skill editor navbar loads', () => {
+    spyOn(skillEditorStateService, 'getSkill').and.returnValue(skillObject);
 
-      expect(component.getTruncatedDescription()).toBe('test description 1');
-    });
+    expect(component.getTruncatedDescription()).toBe('test description 1');
+  });
 
   it('should truncate skill descirption when skill editor navbar loads', () => {
     skillObject.setDescription(Array(40).join('a'));
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(skillObject);
 
     expect(component.getTruncatedDescription()).toBe(
-      Array(36).join('a') + '...');
+      Array(36).join('a') + '...'
+    );
   });
 });

@@ -16,10 +16,12 @@
  * @fileoverview Tests that server connection service is working as expected.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
-import { ServerConnectionBackendApiService } from 'services/server-connection-backend-api.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {ServerConnectionBackendApiService} from 'services/server-connection-backend-api.service';
 
 describe('Server Connection Backend Api Service', () => {
   let serverConnectionBackendApiService: ServerConnectionBackendApiService;
@@ -32,7 +34,8 @@ describe('Server Connection Backend Api Service', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     serverConnectionBackendApiService = TestBed.inject(
-      ServerConnectionBackendApiService);
+      ServerConnectionBackendApiService
+    );
   });
 
   afterEach(() => {

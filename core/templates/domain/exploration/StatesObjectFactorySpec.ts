@@ -16,15 +16,13 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { CamelCaseToHyphensPipe } from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
-import { Voiceover } from './voiceover.model';
+import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {Voiceover} from './voiceover.model';
 
 describe('States Object Factory', () => {
   let sof: StateObjectFactory = null;
@@ -38,7 +36,7 @@ describe('States Object Factory', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [CamelCaseToHyphensPipe]
+      providers: [CamelCaseToHyphensPipe],
     });
     ssof = TestBed.get(StatesObjectFactory);
     sof = TestBed.get(StateObjectFactory);
@@ -46,127 +44,127 @@ describe('States Object Factory', () => {
       classifier_model_id: null,
       content: {
         content_id: 'content',
-        html: ''
+        html: '',
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
           content: {},
-          default_outcome: {}
-        }
+          default_outcome: {},
+        },
       },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
           rows: {
-            value: 1
+            value: 1,
           },
           placeholder: {
-            value: new SubtitledUnicode('Type your answer here.', '')
+            value: new SubtitledUnicode('Type your answer here.', ''),
           },
           catchMisspellings: {
-            value: false
-          }
+            value: false,
+          },
         },
         default_outcome: {
           dest: '(untitled state)',
           dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
           },
           param_changes: [],
           labelled_as_correct: false,
           refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
+          missing_prerequisite_skill_id: null,
         },
         hints: [],
         solution: null,
-        id: 'TextInput'
+        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],
-      solicit_answer_details: false
+      solicit_answer_details: false,
     });
 
     newState = {
       classifier_model_id: null,
       content: {
         content_id: 'content_7',
-        html: ''
+        html: '',
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
           content_7: {},
-          default_outcome_8: {}
-        }
+          default_outcome_8: {},
+        },
       },
       interaction: {
         id: 'EndExploration',
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
-          recommendedExplorationIds: { value: [] }
+          recommendedExplorationIds: {value: []},
         },
         default_outcome: {
           dest: 'new state',
           dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome_8',
-            html: ''
+            html: '',
           },
           param_changes: [],
           labelled_as_correct: false,
           refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
+          missing_prerequisite_skill_id: null,
         },
         hints: [],
       },
       linked_skill_id: null,
       param_changes: [],
-      solicit_answer_details: false
+      solicit_answer_details: false,
     };
 
     newState2 = {
       classifier_model_id: null,
       content: {
         content_id: 'content_5',
-        html: ''
+        html: '',
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
           content_5: {},
-          default_outcome_6: {}
-        }
+          default_outcome_6: {},
+        },
       },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
         customization_args: {
           rows: {
-            value: 1
+            value: 1,
           },
           placeholder: {
-            value: new SubtitledUnicode('Type your answer here.', '')
+            value: new SubtitledUnicode('Type your answer here.', ''),
           },
           catchMisspellings: {
-            value: false
-          }
+            value: false,
+          },
         },
         default_outcome: {
           dest: 'new state',
           dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome_6',
-            html: ''
+            html: '',
           },
           param_changes: [],
           labelled_as_correct: false,
           refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null
+          missing_prerequisite_skill_id: null,
         },
         hints: [],
-        id: 'TextInput'
+        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],
@@ -176,7 +174,7 @@ describe('States Object Factory', () => {
     secondState = {
       content: {
         content_id: 'content',
-        html: 'more content'
+        html: 'more content',
       },
       recorded_voiceovers: {
         voiceovers_mapping: {
@@ -185,8 +183,8 @@ describe('States Object Factory', () => {
               filename: 'myfile2.mp3',
               file_size_bytes: 0.8,
               needs_update: false,
-              duration_secs: 0.8
-            }
+              duration_secs: 0.8,
+            },
           },
           default_outcome: {},
           solution: {
@@ -194,10 +192,10 @@ describe('States Object Factory', () => {
               filename: 'myfile9.mp3',
               file_size_bytes: 0.5,
               needs_update: false,
-              duration_secs: 0.5
-            }
-          }
-        }
+              duration_secs: 0.5,
+            },
+          },
+        },
       },
       interaction: {
         answer_groups: [],
@@ -206,23 +204,23 @@ describe('States Object Factory', () => {
           placeholder: {
             value: {
               content_id: 'ca_placeholder_0',
-              unicode_str: ''
-            }
+              unicode_str: '',
+            },
           },
-          rows: { value: 1 },
+          rows: {value: 1},
           catchMisspellings: {
-            value: false
-          }
+            value: false,
+          },
         },
         default_outcome: {
           dest: 'new state',
           dest_if_really_stuck: null,
           feedback: {
             content_id: 'default_outcome',
-            html: ''
+            html: '',
           },
           labelled_as_correct: false,
-          param_changes: []
+          param_changes: [],
         },
         hints: [],
         solution: {
@@ -230,122 +228,130 @@ describe('States Object Factory', () => {
           correct_answer: 'answer',
           explanation: {
             content_id: 'solution',
-            html: '<p>This is an explanation.</p>'
-          }
+            html: '<p>This is an explanation.</p>',
+          },
         },
-        id: 'TextInput'
+        id: 'TextInput',
       },
       linked_skill_id: null,
       param_changes: [],
-      solicit_answer_details: false
+      solicit_answer_details: false,
     };
 
     statesDict = {
-      'first state': newState2
+      'first state': newState2,
     };
 
     statesWithCyclicOutcomeDict = {
       'first state': {
         content: {
           content_id: 'content',
-          html: 'content'
+          html: 'content',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
             default_outcome: {},
-            feedback_1: {}
-          }
+            feedback_1: {},
+          },
         },
         interaction: {
           id: 'MultipleChoiceInput',
           customization_args: {
             choices: {value: []},
-            showChoicesInShuffledOrder: {value: false}
+            showChoicesInShuffledOrder: {value: false},
           },
-          answer_groups: [{
-            outcome: {
-              dest: 'second state',
-              dest_if_really_stuck: 'second state',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'second state',
+                dest_if_really_stuck: 'second state',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 10},
+                },
+              ],
             },
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: {x: 10}
-            }],
-          }],
+          ],
           default_outcome: {
             dest: 'second state',
             dest_if_really_stuck: 'second state',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
             },
             labelled_as_correct: false,
-            param_changes: []
+            param_changes: [],
           },
           hints: [],
-          solution: null
+          solution: null,
         },
         param_changes: [],
-        solicit_answer_details: false
+        solicit_answer_details: false,
       },
       'second state': {
         content: {
           content_id: 'content',
-          html: 'content'
+          html: 'content',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
             content: {},
             default_outcome: {},
-            feedback_1: {}
-          }
+            feedback_1: {},
+          },
         },
         interaction: {
           id: 'MultipleChoiceInput',
           customization_args: {
             choices: {value: []},
-            showChoicesInShuffledOrder: {value: false}
+            showChoicesInShuffledOrder: {value: false},
           },
-          answer_groups: [{
-            outcome: {
-              dest: 'first state',
-              dest_if_really_stuck: 'first state',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'first state',
+                dest_if_really_stuck: 'first state',
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 10},
+                },
+              ],
             },
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: {x: 10}
-            }],
-          }],
+          ],
           default_outcome: {
             dest: 'first state',
             dest_if_really_stuck: 'first state',
             feedback: {
               content_id: 'default_outcome',
-              html: ''
+              html: '',
             },
             labelled_as_correct: false,
-            param_changes: []
+            param_changes: [],
           },
           hints: [],
-          solution: null
+          solution: null,
         },
         param_changes: [],
-        solicit_answer_details: false
+        solicit_answer_details: false,
       },
     };
 
@@ -353,7 +359,7 @@ describe('States Object Factory', () => {
       'first state': {
         content: {
           content_id: 'content',
-          html: 'content'
+          html: 'content',
         },
         recorded_voiceovers: {
           voiceovers_mapping: {
@@ -362,143 +368,157 @@ describe('States Object Factory', () => {
                 filename: 'myfile1.mp3',
                 file_size_bytes: 0.5,
                 needs_update: false,
-                duration_secs: 0.5
+                duration_secs: 0.5,
               },
               'hi-en': {
                 filename: 'myfile3.mp3',
                 file_size_bytes: 0.8,
                 needs_update: false,
-                duration_secs: 0.8
-              }
+                duration_secs: 0.8,
+              },
             },
             default_outcome: {
               he: {
                 filename: 'myfile10.mp3',
                 file_size_bytes: 0.5,
                 needs_update: false,
-                duration_secs: 0.5
-              }
+                duration_secs: 0.5,
+              },
             },
             feedback_1: {
               zh: {
                 filename: 'myfile4.mp3',
                 file_size_bytes: 1.1,
                 needs_update: false,
-                duration_secs: 1.1
-              }
+                duration_secs: 1.1,
+              },
             },
             hint_1: {
               es: {
                 filename: 'myfile5.mp3',
                 file_size_bytes: 0.7,
                 needs_update: false,
-                duration_secs: 0.7
+                duration_secs: 0.7,
               },
               zh: {
                 filename: 'myfile6.mp3',
                 file_size_bytes: 0.9,
                 needs_update: false,
-                duration_secs: 0.9
+                duration_secs: 0.9,
               },
               'hi-en': {
                 filename: 'myfile8.mp3',
                 file_size_bytes: 1.2,
                 needs_update: false,
-                duration_secs: 1.2
-              }
+                duration_secs: 1.2,
+              },
             },
             hint_2: {
               cs: {
                 filename: 'myfile7.mp3',
                 file_size_bytes: 0.2,
                 needs_update: false,
-                duration_secs: 0.2
-              }
-            }
-          }
+                duration_secs: 0.2,
+              },
+            },
+          },
         },
         interaction: {
-          answer_groups: [{
-            outcome: {
-              dest: 'second state',
-              dest_if_really_stuck: null,
-              feedback: {
-                content_id: 'feedback_1',
-                html: '<p>Good.</p>'
+          answer_groups: [
+            {
+              outcome: {
+                dest: 'second state',
+                dest_if_really_stuck: null,
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: '<p>Good.</p>',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null,
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
+              rule_specs: [
+                {
+                  rule_type: 'Equals',
+                  inputs: {x: 20},
+                },
+              ],
             },
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: {x: 20}
-            }],
-          }],
+          ],
           confirmed_unclassified_answers: [],
           customization_args: {
             placeholder: {
               value: {
                 content_id: 'ca_placeholder_3',
-                unicode_str: ''
-              }
+                unicode_str: '',
+              },
             },
-            rows: { value: 1 },
+            rows: {value: 1},
             catchMisspellings: {
-              value: false
-            }
+              value: false,
+            },
           },
           default_outcome: {
             dest: 'new state',
             dest_if_really_stuck: null,
             feedback: {
               content_id: 'default_outcome',
-              html: '<p>Feedback</p>'
+              html: '<p>Feedback</p>',
             },
             labelled_as_correct: false,
-            param_changes: []
+            param_changes: [],
           },
-          hints: [{
-            hint_content: {
-              content_id: 'hint_1',
-              html: '<p>Here is a hint.</p>'
-            }
-          }, {
-            hint_content: {
-              content_id: 'hint_2',
-              html: '<p>Here is another hint.</p>'
-            }
-          }],
-          id: 'TextInput'
+          hints: [
+            {
+              hint_content: {
+                content_id: 'hint_1',
+                html: '<p>Here is a hint.</p>',
+              },
+            },
+            {
+              hint_content: {
+                content_id: 'hint_2',
+                html: '<p>Here is another hint.</p>',
+              },
+            },
+          ],
+          id: 'TextInput',
         },
         linked_skill_id: null,
         param_changes: [],
-        solicit_answer_details: false
+        solicit_answer_details: false,
       },
-      'second state': secondState
+      'second state': secondState,
     };
   });
 
+  it(
+    'should create a new state given a state name and set ' +
+      'that state to a terminal state',
+    () => {
+      let newStates = ssof.createFromBackendDict(statesDict);
+      newStates.addState('new state', 'content_5', 'default_outcome_6');
+      expect(newStates.hasState('new state')).toBe(true);
+      expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
+      expect(Object.keys(newStates.getStateObjects()).length).toBe(2);
 
-  it('should create a new state given a state name and set ' +
-    'that state to a terminal state', () => {
-    let newStates = ssof.createFromBackendDict(statesDict);
-    newStates.addState('new state', 'content_5', 'default_outcome_6');
-    expect(newStates.hasState('new state')).toBe(true);
-    expect(newStates.getStateNames()).toEqual(['first state', 'new state']);
-    expect((Object.keys(newStates.getStateObjects())).length).toBe(2);
-
-    newStates.setState(
-      'new state', sof.createFromBackendDict('new state', newState));
-    expect(newStates.getState('new state')).toEqual(
-      sof.createFromBackendDict('new state', newState));
-  });
+      newStates.setState(
+        'new state',
+        sof.createFromBackendDict('new state', newState)
+      );
+      expect(newStates.getState('new state')).toEqual(
+        sof.createFromBackendDict('new state', newState)
+      );
+    }
+  );
 
   it('should correctly retrieve the terminal states', () => {
     let newStates = ssof.createFromBackendDict(statesDict);
 
     newStates.setState(
-      'first state', sof.createFromBackendDict('first state', newState));
+      'first state',
+      sof.createFromBackendDict('first state', newState)
+    );
     expect(newStates.getFinalStateNames()).toEqual['new state'];
   });
 
@@ -507,97 +527,118 @@ describe('States Object Factory', () => {
     states.deleteState('first state');
     expect(states).toEqual(
       ssof.createFromBackendDict({
-        'second state': secondState
-      }));
+        'second state': secondState,
+      })
+    );
   });
 
-  it('should correctly set any states\' interaction.defaultOutcomes that ' +
-     'point to a deleted or renamed state name', () => {
-    let states = ssof.createFromBackendDict(statesWithCyclicOutcomeDict);
-    states.renameState('first state', 'third state');
-    states.deleteState('second state');
-    expect(states).toEqual(ssof.createFromBackendDict({
-      'third state': {
-        content: {
-          content_id: 'content',
-          html: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
-          }
-        },
-        interaction: {
-          id: 'MultipleChoiceInput',
-          customization_args: {
-            choices: {value: []},
-            showChoicesInShuffledOrder: {value: false}
-          },
-          answer_groups: [{
-            outcome: {
-              dest: 'third state',
-              dest_if_really_stuck: 'third state',
-              feedback: {
-                content_id: 'feedback_1',
-                html: ''
+  it(
+    "should correctly set any states' interaction.defaultOutcomes that " +
+      'point to a deleted or renamed state name',
+    () => {
+      let states = ssof.createFromBackendDict(statesWithCyclicOutcomeDict);
+      states.renameState('first state', 'third state');
+      states.deleteState('second state');
+      expect(states).toEqual(
+        ssof.createFromBackendDict({
+          'third state': {
+            content: {
+              content_id: 'content',
+              html: 'content',
+            },
+            recorded_voiceovers: {
+              voiceovers_mapping: {
+                content: {},
+                default_outcome: {},
+                feedback_1: {},
               },
-              labelled_as_correct: false,
-              param_changes: [],
-              refresher_exploration_id: null
             },
-            rule_specs: [{
-              rule_type: 'Equals',
-              inputs: {x: 10}
-            }],
-          }],
-          default_outcome: {
-            dest: 'third state',
-            dest_if_really_stuck: 'third state',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
+            interaction: {
+              id: 'MultipleChoiceInput',
+              customization_args: {
+                choices: {value: []},
+                showChoicesInShuffledOrder: {value: false},
+              },
+              answer_groups: [
+                {
+                  outcome: {
+                    dest: 'third state',
+                    dest_if_really_stuck: 'third state',
+                    feedback: {
+                      content_id: 'feedback_1',
+                      html: '',
+                    },
+                    labelled_as_correct: false,
+                    param_changes: [],
+                    refresher_exploration_id: null,
+                  },
+                  rule_specs: [
+                    {
+                      rule_type: 'Equals',
+                      inputs: {x: 10},
+                    },
+                  ],
+                },
+              ],
+              default_outcome: {
+                dest: 'third state',
+                dest_if_really_stuck: 'third state',
+                feedback: {
+                  content_id: 'default_outcome',
+                  html: '',
+                },
+                labelled_as_correct: false,
+                param_changes: [],
+              },
+              hints: [],
+              solution: null,
             },
-            labelled_as_correct: false,
-            param_changes: []
+            param_changes: [],
+            solicit_answer_details: false,
           },
-          hints: [],
-          solution: null
-        },
-        param_changes: [],
-        solicit_answer_details: false
-      },
-    }));
-  });
+        })
+      );
+    }
+  );
 
   it('should correctly get all audio language codes in states', () => {
     const states = ssof.createFromBackendDict(statesWithVoiceoverDict);
-    expect(states.getAllVoiceoverLanguageCodes())
-      .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
+    expect(states.getAllVoiceoverLanguageCodes()).toEqual([
+      'en',
+      'hi-en',
+      'he',
+      'zh',
+      'es',
+      'cs',
+      'de',
+    ]);
   });
 
   it('should correctly get all audio translations in states', () => {
     const states = ssof.createFromBackendDict(statesWithVoiceoverDict);
-    expect(states.getAllVoiceovers('hi-en'))
-      .toEqual({
-        'first state': [Voiceover.createFromBackendDict({
+    expect(states.getAllVoiceovers('hi-en')).toEqual({
+      'first state': [
+        Voiceover.createFromBackendDict({
           filename: 'myfile3.mp3',
           file_size_bytes: 0.8,
           needs_update: false,
-          duration_secs: 0.8
-        }), Voiceover.createFromBackendDict({
+          duration_secs: 0.8,
+        }),
+        Voiceover.createFromBackendDict({
           filename: 'myfile8.mp3',
           file_size_bytes: 1.2,
           needs_update: false,
-          duration_secs: 1.2
-        })],
-        'second state': [Voiceover.createFromBackendDict({
+          duration_secs: 1.2,
+        }),
+      ],
+      'second state': [
+        Voiceover.createFromBackendDict({
           filename: 'myfile2.mp3',
           file_size_bytes: 0.8,
           needs_update: false,
-          duration_secs: 0.8
-        })]
-      });
+          duration_secs: 0.8,
+        }),
+      ],
+    });
   });
 });

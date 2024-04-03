@@ -16,25 +16,25 @@
  * @fileoverview Unit tests for the TopicEditorSendMailComponent.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { TopicEditorSendMailComponent } from './topic-editor-send-mail-modal.component';
+import {TopicEditorSendMailComponent} from './topic-editor-send-mail-modal.component';
 
-describe('Topic Editor Send Mail Modal Component', function() {
+describe('Topic Editor Send Mail Modal Component', function () {
   let component: TopicEditorSendMailComponent;
   let fixture: ComponentFixture<TopicEditorSendMailComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TopicEditorSendMailComponent
+      declarations: [TopicEditorSendMailComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for confirm discard changes modal.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmDiscardChangesModalComponent } from './confirm-discard-changes-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmDiscardChangesModalComponent} from './confirm-discard-changes-modal.component';
 
 describe('Collection editor save modal component', () => {
   let fixture: ComponentFixture<ConfirmDiscardChangesModalComponent>;
@@ -27,13 +27,9 @@ describe('Collection editor save modal component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        ConfirmDiscardChangesModalComponent
-      ],
-      providers: [
-        NgbActiveModal
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [ConfirmDiscardChangesModalComponent],
+      providers: [NgbActiveModal],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 

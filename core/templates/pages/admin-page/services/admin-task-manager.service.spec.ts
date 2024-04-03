@@ -16,8 +16,7 @@
  * @fileoverview Tests for AdminTaskManagerService.
  */
 
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
+import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
 
 describe('Admin task manager service', () => {
   let adminTaskManagerService: AdminTaskManagerService;

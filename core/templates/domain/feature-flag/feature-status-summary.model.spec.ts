@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for FeatureStatusSummary.
  */
 
-import { FeatureStatusSummary, FeatureNames } from
-  'domain/feature-flag/feature-status-summary.model';
+import {
+  FeatureStatusSummary,
+  FeatureNames,
+} from 'domain/feature-flag/feature-status-summary.model';
 
 describe('Feature Status Summary Model', () => {
   it('should create an instance from a backend dict.', () => {
@@ -39,7 +41,7 @@ describe('Feature Status Summary Model', () => {
   describe('.isFeatureEnabled', () => {
     it('should return the value of the parameter', () => {
       const summary = FeatureStatusSummary.createFromBackendDict({
-        [FeatureNames.DummyFeatureFlagForE2ETests]: true
+        [FeatureNames.DummyFeatureFlagForE2ETests]: true,
       });
       const checker = summary.toStatusChecker();
 
@@ -50,11 +52,9 @@ describe('Feature Status Summary Model', () => {
       const summary = FeatureStatusSummary.createFromBackendDict({});
       const checker = summary.toStatusChecker();
 
-      expect(
-        () => checker.DummyFeatureFlagForE2ETests.isEnabled
-      ).toThrowError(
-        `Feature \'${
-          FeatureNames.DummyFeatureFlagForE2ETests}\' does not exist.`);
+      expect(() => checker.DummyFeatureFlagForE2ETests.isEnabled).toThrowError(
+        `Feature \'${FeatureNames.DummyFeatureFlagForE2ETests}\' does not exist.`
+      );
     });
   });
 });

@@ -18,40 +18,38 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-import { Observable } from 'rxjs';
+import {Observable} from 'rxjs';
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { SubtitledHtml } from
-  'domain/exploration/subtitled-html.model';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
   DragAndDropSortInputCustomizationArgs,
   ImageClickInputCustomizationArgs,
   InteractionCustomizationArgs,
   ItemSelectionInputCustomizationArgs,
-  MultipleChoiceInputCustomizationArgs
+  MultipleChoiceInputCustomizationArgs,
 } from 'extensions/interactions/customization-args-defs';
-import { Interaction } from 'domain/exploration/InteractionObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { State } from 'domain/state/StateObjectFactory';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import {State} from 'domain/state/StateObjectFactory';
 
 export interface AnswerChoice {
   val: string | number | SubtitledHtml;
   label: string;
 }
 
-type CustomizationArgs = (
-  ItemSelectionInputCustomizationArgs | DragAndDropSortInputCustomizationArgs);
+type CustomizationArgs =
+  | ItemSelectionInputCustomizationArgs
+  | DragAndDropSortInputCustomizationArgs;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class StateEditorService {
   constructor(private solutionValidityService: SolutionValidityService) {}
@@ -63,13 +61,13 @@ export class StateEditorService {
   private _interactionEditorInitializedEventEmitter = new EventEmitter<void>();
   private _showTranslationTabBusyModalEventEmitter = new EventEmitter<void>();
   private _refreshStateTranslationEventEmitter = new EventEmitter<void>();
-  private _updateAnswerChoicesEventEmitter =
-    new EventEmitter<AnswerChoice[]>();
+  private _updateAnswerChoicesEventEmitter = new EventEmitter<AnswerChoice[]>();
 
   private _saveOutcomeDestDetailsEventEmitter = new EventEmitter<void>();
   private _saveOutcomeDestIfStuckDetailsEventEmitter = new EventEmitter<void>();
-  private _handleCustomArgsUpdateEventEmitter =
-    new EventEmitter<AnswerChoice[]>();
+  private _handleCustomArgsUpdateEventEmitter = new EventEmitter<
+    AnswerChoice[]
+  >();
 
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
@@ -140,7 +138,8 @@ export class StateEditorService {
     return (
       this.stateInteractionEditorInitialised &&
       this.stateResponsesInitialised &&
-      this.stateEditorDirectiveInitialised);
+      this.stateEditorDirectiveInitialised
+    );
   }
 
   getActiveStateName(): string | null {
@@ -191,8 +190,7 @@ export class StateEditorService {
     this.interaction.setDefaultOutcome(newOutcome);
   }
 
-  setInteractionCustomizationArgs(
-      newArgs: InteractionCustomizationArgs): void {
+  setInteractionCustomizationArgs(newArgs: InteractionCustomizationArgs): void {
     this.interaction.setCustomizationArgs(newArgs);
   }
 
@@ -212,8 +210,8 @@ export class StateEditorService {
   // equivalent to 'MultipleChoiceInput', 'ItemSelectionInput',
   // 'DragAndDropSortInput'.
   getAnswerChoices(
-      interactionId: string,
-      customizationArgs: InteractionCustomizationArgs
+    interactionId: string,
+    customizationArgs: InteractionCustomizationArgs
   ): AnswerChoice[] | null {
     if (!interactionId) {
       return null;
@@ -222,19 +220,19 @@ export class StateEditorService {
     if (interactionId === 'MultipleChoiceInput') {
       return (
         customizationArgs as MultipleChoiceInputCustomizationArgs
-      ).choices.value.map((val, ind) => (
-        { val: ind, label: val.html }
-      )) as AnswerChoice[];
+      ).choices.value.map((val, ind) => ({
+        val: ind,
+        label: val.html,
+      })) as AnswerChoice[];
     } else if (interactionId === 'ImageClickInput') {
       var _answerChoices = [];
       var imageWithRegions = (
-        customizationArgs as ImageClickInputCustomizationArgs)
-        .imageAndRegions.value;
-      for (
-        var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
+        customizationArgs as ImageClickInputCustomizationArgs
+      ).imageAndRegions.value;
+      for (var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
         _answerChoices.push({
           val: imageWithRegions.labeledRegions[j].label,
-          label: imageWithRegions.labeledRegions[j].label
+          label: imageWithRegions.labeledRegions[j].label,
         });
       }
       return _answerChoices;
@@ -242,12 +240,11 @@ export class StateEditorService {
       interactionId === 'ItemSelectionInput' ||
       interactionId === 'DragAndDropSortInput'
     ) {
-      return (
-        customizationArgs as CustomizationArgs
-      ).choices.value.map(
+      return (customizationArgs as CustomizationArgs).choices.value.map(
         val => ({
-          val: val.contentId, label: val.html}
-        )
+          val: val.contentId,
+          label: val.html,
+        })
       ) as AnswerChoice[];
     } else {
       return null;
@@ -288,9 +285,10 @@ export class StateEditorService {
   }
 
   setInapplicableSkillMisconceptionIds(
-      newInapplicableSkillMisconceptionIds: string[]): void {
-    this.inapplicableSkillMisconceptionIds = (
-      newInapplicableSkillMisconceptionIds);
+    newInapplicableSkillMisconceptionIds: string[]
+  ): void {
+    this.inapplicableSkillMisconceptionIds =
+      newInapplicableSkillMisconceptionIds;
   }
 
   getInapplicableSkillMisconceptionIds(): string[] {
@@ -360,5 +358,6 @@ export class StateEditorService {
   }
 }
 
-angular.module('oppia').factory(
-  'StateEditorService', downgradeInjectable(StateEditorService));
+angular
+  .module('oppia')
+  .factory('StateEditorService', downgradeInjectable(StateEditorService));

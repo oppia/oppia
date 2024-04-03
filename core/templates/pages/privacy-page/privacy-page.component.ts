@@ -16,14 +16,18 @@
  * @fileoverview Component for the Oppia privacy page.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-privacy-page',
-  templateUrl: './privacy-page.component.html'
+  templateUrl: './privacy-page.component.html',
 })
 export class PrivacyPageComponent {}
 
-angular.module('oppia').directive('oppiaPrivacyPage',
-  downgradeComponent({ component: PrivacyPageComponent }));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaPrivacyPage',
+    downgradeComponent({component: PrivacyPageComponent})
+  );

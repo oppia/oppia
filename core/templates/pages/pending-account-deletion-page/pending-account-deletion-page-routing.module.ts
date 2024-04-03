@@ -16,25 +16,19 @@
  * @fileoverview Routing module for pending account deletion page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { PendingAccountDeletionPageRootComponent } from './pending-account-deletion-page-root.component';
-
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {PendingAccountDeletionPageRootComponent} from './pending-account-deletion-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: PendingAccountDeletionPageRootComponent
-  }
+    component: PendingAccountDeletionPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class PendingAccountDeletionPageRoutingModule {}

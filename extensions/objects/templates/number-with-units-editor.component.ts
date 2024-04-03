@@ -16,17 +16,17 @@
  * @fileoverview Component for number with units editor.
  */
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ObjectFormValidityChangeEvent } from 'app-events/app-events';
-import { EventBusGroup, EventBusService } from 'app-events/event-bus.service';
-import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { NumberWithUnitsAnswer } from 'interactions/answer-defs';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
+import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
+import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 
 @Component({
   selector: 'number-with-units-editor',
   templateUrl: './number-with-units-editor.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class NumberWithUnitsEditorComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -42,7 +42,8 @@ export class NumberWithUnitsEditorComponent implements OnInit {
 
   constructor(
     private eventBusService: EventBusService,
-    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory) {
+    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory
+  ) {
     this.eventBusGroup = new EventBusGroup(this.eventBusService);
   }
 
@@ -50,9 +51,9 @@ export class NumberWithUnitsEditorComponent implements OnInit {
     if (this.value === null || this.value === undefined) {
       return;
     } else {
-      const defaultNumberWithUnits =
-        this.numberWithUnitsObjectFactory.fromDict(
-          this.value);
+      const defaultNumberWithUnits = this.numberWithUnitsObjectFactory.fromDict(
+        this.value
+      );
       this.numberWithUnitsString = defaultNumberWithUnits.toString();
       this.valueChanged.emit(this.value);
     }
@@ -64,20 +65,24 @@ export class NumberWithUnitsEditorComponent implements OnInit {
         this.numberWithUnitsObjectFactory.fromRawInputString(newValue);
       this.value = numberWithUnits;
       this.valueChanged.emit(this.value);
-      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-        value: false,
-        modalId: this.modalId
-      }));
+      this.eventBusGroup.emit(
+        new ObjectFormValidityChangeEvent({
+          value: false,
+          modalId: this.modalId,
+        })
+      );
       this.errorMessageI18nKey = '';
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
+      // We use unknown type because we are unsure of the type of error
+      // that was thrown. Since the catch block cannot identify the
+      // specific type of error, we are unable to further optimise the
+      // code by introducing more types of errors.
     } catch (parsingError: unknown) {
-      this.eventBusGroup.emit(new ObjectFormValidityChangeEvent({
-        value: true,
-        modalId: this.modalId
-      }));
+      this.eventBusGroup.emit(
+        new ObjectFormValidityChangeEvent({
+          value: true,
+          modalId: this.modalId,
+        })
+      );
       if (parsingError instanceof Error) {
         this.errorMessageI18nKey = parsingError.message;
       }
@@ -85,6 +90,9 @@ export class NumberWithUnitsEditorComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('numberWithUnitsEditor', downgradeComponent({
-  component: NumberWithUnitsEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'numberWithUnitsEditor',
+  downgradeComponent({
+    component: NumberWithUnitsEditorComponent,
+  }) as angular.IDirectiveFactory
+);

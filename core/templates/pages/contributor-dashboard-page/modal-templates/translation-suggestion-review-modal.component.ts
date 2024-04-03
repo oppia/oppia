@@ -12,85 +12,103 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for translation suggestion review modal.
  */
 
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AlertsService } from 'services/alerts.service';
-import { ContextService } from 'services/context.service';
-import { ContributionAndReviewService } from '../services/contribution-and-review.service';
-import { ContributionOpportunitiesService } from '../services/contribution-opportunities.service';
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { ThreadDataBackendApiService } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import { UserService } from 'services/user.service';
-import { ValidatorsService } from 'services/validators.service';
-import { ThreadMessage } from 'domain/feedback_message/ThreadMessage.model';
-import { AppConstants } from 'app.constants';
-import { ListSchema, UnicodeSchema } from 'services/schema-default-value.service';
-import { UserContributionRightsDataBackendDict } from 'services/user-backend-api.service';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  ViewChild,
+  ElementRef,
+  Input,
+} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AlertsService} from 'services/alerts.service';
+import {ContextService} from 'services/context.service';
+import {ContributionAndReviewService} from '../services/contribution-and-review.service';
+import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
+import {UserService} from 'services/user.service';
+import {ValidatorsService} from 'services/validators.service';
+import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
+import {AppConstants} from 'app.constants';
+import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
+import {UserContributionRightsDataBackendDict} from 'services/user-backend-api.service';
 // This throws "TS2307". We need to
 // suppress this error because rte-output-display is not strictly typed yet.
 // @ts-ignore
-import { RteOutputDisplayComponent } from 'rich_text_components/rte-output-display.component';
+import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
+import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
+import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface HTMLSchema {
-  'type': string;
+  type: string;
 }
 
 interface EditedContentDict {
-  'html': string;
+  html: string;
 }
 
 interface ActiveContributionDetailsDict {
-  'chapter_title': string;
-  'story_title': string;
-  'topic_name': string;
+  chapter_title: string;
+  story_title: string;
+  topic_name: string;
 }
 
 interface SuggestionChangeDict {
-  'cmd': string;
-  'content_html': string | string[];
-  'content_id': string;
-  'data_format': string;
-  'language_code': string;
-  'state_name': string;
-  'translation_html': string;
+  cmd: string;
+  content_html: string | string[];
+  content_id: string;
+  data_format: string;
+  language_code: string;
+  state_name: string;
+  translation_html: string;
 }
 
 interface ActiveSuggestionDict {
-  'author_name': string;
-  'change_cmd': SuggestionChangeDict;
-  'exploration_content_html': string | string[] | null;
-  'language_code': string;
-  'last_updated_msecs': number;
-  'status': string;
-  'suggestion_id': string;
-  'suggestion_type': string;
-  'target_id': string;
-  'target_type': string;
+  author_name: string;
+  change_cmd: SuggestionChangeDict;
+  exploration_content_html: string | string[] | null;
+  language_code: string;
+  last_updated_msecs: number;
+  status: string;
+  suggestion_id: string;
+  suggestion_type: string;
+  target_id: string;
+  target_type: string;
 }
 
 // Details are null if suggestion's corresponding opportunity is deleted.
 // See issue #14234.
 export interface ActiveContributionDict {
-  'details': ActiveContributionDetailsDict | null;
-  'suggestion': ActiveSuggestionDict;
+  details: ActiveContributionDetailsDict | null;
+  suggestion: ActiveSuggestionDict;
+}
+
+interface PendingSuggestionDict {
+  target_id: string;
+  suggestion_id: string;
+  action_status: string;
+  reviewer_message: string;
+  commit_message?: string;
 }
 
 enum ExpansionTabType {
   CONTENT,
-  TRANSLATION
+  TRANSLATION,
 }
+
+const COMMIT_TIMEOUT_DURATION = 30000; // 30 seconds in milliseconds.
 
 @Component({
   selector: 'oppia-translation-suggestion-review-modal',
   templateUrl: './translation-suggestion-review-modal.component.html',
 })
-
 export class TranslationSuggestionReviewModalComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -139,35 +157,41 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   isTranslationOverflowing: boolean = false;
   explorationImagesString: string = '';
   suggestionImagesString: string = '';
+  queuedSuggestion?: PendingSuggestionDict;
+  commitTimeout?: NodeJS.Timeout;
+  removedSuggestion?: ActiveContributionDict;
+  hasQueuedSuggestion: boolean = false;
+  currentSnackbarRef?: MatSnackBarRef<UndoSnackbarComponent>;
+  isUndoFeatureEnabled: boolean = false;
   @Input() altTextIsDisplayed: boolean = false;
 
   @ViewChild('contentPanel')
-    contentPanel!: RteOutputDisplayComponent;
+  contentPanel!: RteOutputDisplayComponent;
 
   @ViewChild('translationPanel')
-    translationPanel!: RteOutputDisplayComponent;
+  translationPanel!: RteOutputDisplayComponent;
 
   @ViewChild('contentContainer')
-    contentContainer!: ElementRef;
+  contentContainer!: ElementRef;
 
   @ViewChild('translationContainer')
-    translationContainer!: ElementRef;
+  translationContainer!: ElementRef;
 
   @ViewChild('contentPanelWithAltText')
-    contentPanelWithAltText!: RteOutputDisplayComponent;
+  contentPanelWithAltText!: RteOutputDisplayComponent;
 
-  HTML_SCHEMA: HTMLSchema = { type: 'html' };
+  HTML_SCHEMA: HTMLSchema = {type: 'html'};
   MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
   SET_OF_STRINGS_SCHEMA: ListSchema = {
     type: 'list',
     items: {
-      type: 'unicode'
-    }
+      type: 'unicode',
+    },
   };
 
   startedEditing: boolean = false;
   translationUpdated: boolean = false;
-  UNICODE_SCHEMA: UnicodeSchema = { type: 'unicode' };
+  UNICODE_SCHEMA: UnicodeSchema = {type: 'unicode'};
 
   constructor(
     private readonly changeDetectorRef: ChangeDetectorRef,
@@ -181,36 +205,46 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     private threadDataBackendApiService: ThreadDataBackendApiService,
     private userService: UserService,
     private validatorsService: ValidatorsService,
+    private snackBar: MatSnackBar,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
+    this.isUndoFeatureEnabled =
+      this.platformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled;
     this.activeSuggestionId = this.initialSuggestionId;
-    this.activeContribution = this.suggestionIdToContribution[
-      this.activeSuggestionId];
+    this.activeContribution =
+      this.suggestionIdToContribution[this.activeSuggestionId];
     this.activeSuggestion = this.activeContribution.suggestion;
     this.authorName = this.activeSuggestion.author_name;
-    this.languageDescription = (
+    this.languageDescription =
       this.languageUtilService.getAudioLanguageDescription(
-        this.activeSuggestion.language_code));
+        this.activeSuggestion.language_code
+      );
     this.status = this.activeSuggestion.status;
     if (this.reviewable) {
-      this.siteAnalyticsService
-        .registerContributorDashboardViewSuggestionForReview('Translation');
+      this.siteAnalyticsService.registerContributorDashboardViewSuggestionForReview(
+        'Translation'
+      );
       this.heading = 'Review Translation Contributions';
     }
     const suggestionIds = Object.keys(this.suggestionIdToContribution);
     const clickedSuggestionIndex = suggestionIds.indexOf(
-      this.activeSuggestionId);
-    this.skippedContributionIds = (
-      suggestionIds.slice(0, clickedSuggestionIndex));
+      this.activeSuggestionId
+    );
+    this.skippedContributionIds = suggestionIds.slice(
+      0,
+      clickedSuggestionIndex
+    );
     delete this.suggestionIdToContribution[this.initialSuggestionId];
     this.remainingContributionIds = suggestionIds.slice(
-      clickedSuggestionIndex + 1, suggestionIds.length);
+      clickedSuggestionIndex + 1,
+      suggestionIds.length
+    );
     this.remainingContributionIds.reverse();
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.allContributions = this.suggestionIdToContribution;
-    this.allContributions[this.activeSuggestionId] = (
-      this.activeContribution);
+    this.allContributions[this.activeSuggestionId] = this.activeContribution;
 
     this.refreshActiveContributionState();
     // The 'html' value is passed as an object as it is required for
@@ -218,13 +252,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     // the translation is not received from the editor when the translation
     // is edited by the reviewer.
     this.editedContent = {
-      html: this.translationHtml
+      html: this.translationHtml,
     };
   }
 
   refreshActiveContributionState(): void {
-    this.activeContribution = this.allContributions[
-      this.activeSuggestionId];
+    this.activeContribution = this.allContributions[this.activeSuggestionId];
 
     // Close modal instance if the suggestion's corresponding opportunity
     // is deleted. See issue #14234.
@@ -235,18 +268,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.activeSuggestion = this.activeContribution.suggestion;
     this.contextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
-      this.activeSuggestion.target_id);
-    this.subheading = (
-      `${this.activeContribution.details.topic_name} / ` +
-        `${this.activeContribution.details.story_title} / ` +
-        `${this.activeContribution.details.chapter_title}`
+      this.activeSuggestion.target_id
     );
+    this.subheading =
+      `${this.activeContribution.details.topic_name} / ` +
+      `${this.activeContribution.details.story_title} / ` +
+      `${this.activeContribution.details.chapter_title}`;
 
     this.isLastItem = this.remainingContributionIds.length === 0;
     this.isFirstItem = this.skippedContributionIds.length === 0;
     this.userCanReviewTranslationSuggestionsInLanguages = [];
-    this.languageCode = this.activeSuggestion.change_cmd.
-      language_code;
+    this.languageCode = this.activeSuggestion.change_cmd.language_code;
     this.userService.getUserInfoAsync().then(userInfo => {
       const username = userInfo.getUsername();
 
@@ -256,18 +288,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.username = username;
       this.userIsCurriculumAdmin = userInfo.isCurriculumAdmin();
     });
-    this.userService.getUserContributionRightsDataAsync().then(
-      (userContributionRights) => {
-        let userContributionRightsData = (
-          userContributionRights as UserContributionRightsDataBackendDict);
-        this.userCanReviewTranslationSuggestionsInLanguages = (
-          userContributionRightsData
-            .can_review_translation_for_language_codes);
-        this.canEditTranslation = (
+    this.userService
+      .getUserContributionRightsDataAsync()
+      .then(userContributionRights => {
+        let userContributionRightsData =
+          userContributionRights as UserContributionRightsDataBackendDict;
+        this.userCanReviewTranslationSuggestionsInLanguages =
+          userContributionRightsData.can_review_translation_for_language_codes;
+        this.canEditTranslation =
           this.userCanReviewTranslationSuggestionsInLanguages.includes(
-            this.languageCode) && this.username !== this.activeSuggestion.
-            author_name
-        );
+            this.languageCode
+          ) && this.username !== this.activeSuggestion.author_name;
       });
     this.isContentExpanded = false;
     this.isTranslationExpanded = false;
@@ -275,27 +306,21 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     this.errorFound = false;
     this.startedEditing = false;
     this.resolvingSuggestion = false;
-    this.lastSuggestionToReview = (
-      Object.keys(this.allContributions).length <= 1);
-    this.translationHtml = (
-      this.activeSuggestion.change_cmd.translation_html);
+    this.lastSuggestionToReview =
+      Object.keys(this.allContributions).length <= 1;
+    this.translationHtml = this.activeSuggestion.change_cmd.translation_html;
     this.status = this.activeSuggestion.status;
-    this.contentHtml = (
-      this.activeSuggestion.change_cmd.content_html);
-    this.explorationContentHtml = (
-      this.activeSuggestion.exploration_content_html);
-    this.contentTypeIsHtml = (
-      this.activeSuggestion.change_cmd.data_format === 'html'
-    );
-    this.contentTypeIsUnicode = (
-      this.activeSuggestion.change_cmd.data_format === 'unicode'
-    );
-    this.contentTypeIsSetOfStrings = (
+    this.contentHtml = this.activeSuggestion.change_cmd.content_html;
+    this.explorationContentHtml =
+      this.activeSuggestion.exploration_content_html;
+    this.contentTypeIsHtml =
+      this.activeSuggestion.change_cmd.data_format === 'html';
+    this.contentTypeIsUnicode =
+      this.activeSuggestion.change_cmd.data_format === 'unicode';
+    this.contentTypeIsSetOfStrings =
       this.activeSuggestion.change_cmd.data_format ===
         'set_of_normalized_string' ||
-      this.activeSuggestion.change_cmd.data_format ===
-        'set_of_unicode_string'
-    );
+      this.activeSuggestion.change_cmd.data_format === 'set_of_unicode_string';
     this.reviewMessage = '';
     if (!this.reviewable) {
       this._getThreadMessagesAsync(this.activeSuggestionId).then(() => {
@@ -303,15 +328,17 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
         // became obsolete and was auto-rejected in a batch job. See issue
         // #16022.
         if (!this.reviewMessage && !this.explorationContentHtml) {
-          this.reviewMessage = (
-            AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG);
+          this.reviewMessage =
+            AppConstants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG;
         }
       });
     }
     this.explorationImagesString = this.getImageInfoForSuggestion(
-      this.contentHtml);
+      this.contentHtml
+    );
     this.suggestionImagesString = this.getImageInfoForSuggestion(
-      this.translationHtml);
+      this.translationHtml
+    );
     setTimeout(() => {
       this.computePanelOverflowState();
     }, 0);
@@ -319,12 +346,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
 
   computePanelOverflowState(): void {
     setTimeout(() => {
-      this.isContentOverflowing = (
+      this.isContentOverflowing =
         this.contentPanel.elementRef.nativeElement.offsetHeight >
-        this.contentContainer.nativeElement.offsetHeight);
-      this.isTranslationOverflowing = (
+        this.contentContainer.nativeElement.offsetHeight;
+      this.isTranslationOverflowing =
         this.translationPanel.elementRef.nativeElement.offsetHeight >
-        this.translationContainer.nativeElement.offsetHeight);
+        this.translationContainer.nativeElement.offsetHeight;
     }, 0);
   }
 
@@ -351,12 +378,13 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       () => {
         this.translationUpdated = true;
         this.startedEditing = false;
-        this.contributionOpportunitiesService.
-          reloadOpportunitiesEventEmitter.emit();
+        this.contributionOpportunitiesService.reloadOpportunitiesEventEmitter.emit();
       },
-      this.showTranslationSuggestionUpdateError);
+      this.showTranslationSuggestionUpdateError
+    );
     this.suggestionImagesString = this.getImageInfoForSuggestion(
-      this.translationHtml);
+      this.translationHtml
+    );
   }
 
   // The length of the commit message should not exceed 375 characters,
@@ -371,11 +399,12 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   async _getThreadMessagesAsync(threadId: string): Promise<void> {
-    const response = await this.threadDataBackendApiService.fetchMessagesAsync(
-      threadId);
+    const response =
+      await this.threadDataBackendApiService.fetchMessagesAsync(threadId);
     const threadMessageBackendDicts = response.messages;
-    let threadMessages = threadMessageBackendDicts.map(
-      m => ThreadMessage.createFromBackendDict(m));
+    let threadMessages = threadMessageBackendDicts.map(m =>
+      ThreadMessage.createFromBackendDict(m)
+    );
     // This is to prevent a console error when a contribution
     // doesn't have a review message. When a contribution has
     // a review message the second element of the threadMessages
@@ -421,86 +450,277 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   resolveSuggestionAndUpdateModal(): void {
-    this.resolvedSuggestionIds.push(this.activeSuggestionId);
+    if (this.isUndoFeatureEnabled) {
+      if (this.queuedSuggestion) {
+        this.resolvedSuggestionIds.push(this.queuedSuggestion.suggestion_id);
 
-    // Resolved contributions don't need to be displayed in the modal.
-    delete this.allContributions[this.activeSuggestionId];
+        // Resolved contributions don't need to be displayed in the modal.
+        this.removedSuggestion =
+          this.allContributions[this.queuedSuggestion?.suggestion_id];
+        delete this.allContributions[this.queuedSuggestion?.suggestion_id];
 
-    // If the reviewed item was the last item, close the modal.
-    if (this.lastSuggestionToReview || this.isLastItem) {
-      this.activeModal.close(this.resolvedSuggestionIds);
-      return;
+        // If the reviewed item was the last item, close the modal.
+        if (this.lastSuggestionToReview || this.isLastItem) {
+          this.commitQueuedSuggestion();
+          this.activeModal.close(this.resolvedSuggestionIds);
+          return;
+        }
+      }
+      this.goToNextItem();
+    } else {
+      this.resolvedSuggestionIds.push(this.activeSuggestionId);
+
+      // Resolved contributions don't need to be displayed in the modal.
+      delete this.allContributions[this.activeSuggestionId];
+
+      // If the reviewed item was the last item, close the modal.
+      if (this.lastSuggestionToReview || this.isLastItem) {
+        this.activeModal.close(this.resolvedSuggestionIds);
+        return;
+      }
+      this.goToNextItem();
     }
-    this.goToNextItem();
   }
 
   acceptAndReviewNext(): void {
-    this.finalCommitMessage = this.generateCommitMessage();
-    const reviewMessageForSubmitter = this.reviewMessage + (
-      this.translationUpdated ? (
-        (this.reviewMessage.length > 0 ? ': ' : '') +
-        '(Note: This suggestion was submitted with reviewer edits.)') :
-      '');
-    this.resolvingSuggestion = true;
-    this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
-      'Translation');
+    if (this.isUndoFeatureEnabled) {
+      this.finalCommitMessage = this.generateCommitMessage();
+      const reviewMessageForSubmitter =
+        this.reviewMessage +
+        (this.translationUpdated
+          ? (this.reviewMessage.length > 0 ? ': ' : '') +
+            '(Note: This suggestion was submitted with reviewer edits.)'
+          : '');
+      this.resolvingSuggestion = true;
+      this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
+        'Translation'
+      );
+      this.queuedSuggestion = {
+        target_id: this.activeSuggestion.target_id,
+        suggestion_id: this.activeSuggestionId,
+        action_status: AppConstants.ACTION_ACCEPT_SUGGESTION,
+        reviewer_message: reviewMessageForSubmitter,
+        commit_message: this.finalCommitMessage,
+      };
+      this.hasQueuedSuggestion = true;
+      this.resolveSuggestionAndUpdateModal();
+      this.startCommitTimeout();
+      this.showSnackbar();
+    } else {
+      this.finalCommitMessage = this.generateCommitMessage();
+      const reviewMessageForSubmitter =
+        this.reviewMessage +
+        (this.translationUpdated
+          ? (this.reviewMessage.length > 0 ? ': ' : '') +
+            '(Note: This suggestion was submitted with reviewer edits.)'
+          : '');
+      this.resolvingSuggestion = true;
+      this.siteAnalyticsService.registerContributorDashboardAcceptSuggestion(
+        'Translation'
+      );
 
-    this.contributionAndReviewService.reviewExplorationSuggestion(
-      this.activeSuggestion.target_id, this.activeSuggestionId,
-      AppConstants.ACTION_ACCEPT_SUGGESTION,
-      reviewMessageForSubmitter, this.finalCommitMessage,
-      () => {
-        this.alertsService.clearMessages();
-        this.alertsService.addSuccessMessage('Suggestion accepted.');
-        this.resolveSuggestionAndUpdateModal();
-      }, (errorMessage) => {
-        this.alertsService.clearWarnings();
-        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-      });
+      this.contributionAndReviewService.reviewExplorationSuggestion(
+        this.activeSuggestion.target_id,
+        this.activeSuggestionId,
+        AppConstants.ACTION_ACCEPT_SUGGESTION,
+        reviewMessageForSubmitter,
+        this.finalCommitMessage,
+        () => {
+          this.alertsService.clearMessages();
+          this.alertsService.addSuccessMessage('Suggestion accepted.');
+          this.resolveSuggestionAndUpdateModal();
+        },
+        errorMessage => {
+          this.alertsService.clearWarnings();
+          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+        }
+      );
+    }
   }
 
   rejectAndReviewNext(reviewMessage: string): void {
-    if (this.validatorsService.isValidReviewMessage(reviewMessage,
-      /* ShowWarnings= */ true)) {
-      this.resolvingSuggestion = true;
-      this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
-        'Translation');
+    if (this.isUndoFeatureEnabled) {
+      if (
+        this.validatorsService.isValidReviewMessage(
+          reviewMessage,
+          /* ShowWarnings= */ true
+        )
+      ) {
+        this.resolvingSuggestion = true;
+        this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
+          'Translation'
+        );
+        this.queuedSuggestion = {
+          target_id: this.activeSuggestion.target_id,
+          suggestion_id: this.activeSuggestionId,
+          action_status: AppConstants.ACTION_REJECT_SUGGESTION,
+          reviewer_message: reviewMessage || this.reviewMessage,
+        };
+        this.hasQueuedSuggestion = true;
+        this.resolveSuggestionAndUpdateModal();
+        this.startCommitTimeout();
+        this.showSnackbar();
+      }
+    } else {
+      if (
+        this.validatorsService.isValidReviewMessage(
+          reviewMessage,
+          /* ShowWarnings= */ true
+        )
+      ) {
+        this.resolvingSuggestion = true;
+        this.siteAnalyticsService.registerContributorDashboardRejectSuggestion(
+          'Translation'
+        );
 
-      // In case of rejection, the suggestion is not applied, so there is no
-      // commit message. Because there is no commit to make.
-      this.contributionAndReviewService.reviewExplorationSuggestion(
-        this.activeSuggestion.target_id, this.activeSuggestionId,
-        AppConstants.ACTION_REJECT_SUGGESTION,
-        reviewMessage || this.reviewMessage, null,
-        () => {
-          this.alertsService.clearMessages();
-          this.alertsService.addSuccessMessage('Suggestion rejected.');
-          this.resolveSuggestionAndUpdateModal();
-        }, (errorMessage) => {
-          this.alertsService.clearWarnings();
-          this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
-        });
+        // In case of rejection, the suggestion is not applied, so there is no
+        // commit message. Because there is no commit to make.
+        this.contributionAndReviewService.reviewExplorationSuggestion(
+          this.activeSuggestion.target_id,
+          this.activeSuggestionId,
+          AppConstants.ACTION_REJECT_SUGGESTION,
+          reviewMessage || this.reviewMessage,
+          null,
+          () => {
+            this.alertsService.clearMessages();
+            this.alertsService.addSuccessMessage('Suggestion rejected.');
+            this.resolveSuggestionAndUpdateModal();
+          },
+          errorMessage => {
+            this.alertsService.clearWarnings();
+            this.alertsService.addWarning(
+              `Invalid Suggestion: ${errorMessage}`
+            );
+          }
+        );
+      }
     }
+  }
+
+  revertSuggestionResolution(): void {
+    // Remove the suggestion ID from resolvedSuggestionIds.
+    if (this.queuedSuggestion && this.removedSuggestion) {
+      const index = this.resolvedSuggestionIds.indexOf(
+        this.queuedSuggestion?.suggestion_id
+      );
+      if (index > -1) {
+        this.resolvedSuggestionIds.splice(index, 1);
+      }
+
+      // Add the removed suggestion back to allContributions.
+      this.allContributions[this.queuedSuggestion?.suggestion_id] =
+        this.removedSuggestion;
+    }
+  }
+
+  startCommitTimeout(): void {
+    clearTimeout(this.commitTimeout); // Clear existing timeout.
+
+    // Start a new timeout for commit after timeframe.
+    this.commitTimeout = setTimeout(() => {
+      this.commitQueuedSuggestion();
+    }, COMMIT_TIMEOUT_DURATION);
+  }
+
+  commitQueuedSuggestion(): void {
+    if (!this.queuedSuggestion) {
+      return;
+    }
+    this.contributionAndReviewService.reviewExplorationSuggestion(
+      this.queuedSuggestion.target_id,
+      this.queuedSuggestion.suggestion_id,
+      this.queuedSuggestion.action_status,
+      this.queuedSuggestion.reviewer_message,
+      this.queuedSuggestion.action_status === 'accept' &&
+        this.queuedSuggestion.commit_message
+        ? this.queuedSuggestion.commit_message
+        : null,
+      // Only include commit_message for accepted suggestions.
+      () => {
+        this.alertsService.clearMessages();
+        this.alertsService.addSuccessMessage(
+          `Suggestion ${
+            this.queuedSuggestion?.action_status === 'accept'
+              ? 'accepted'
+              : 'rejected'
+          }.`
+        );
+        this.clearQueuedSuggestion();
+      },
+      errorMessage => {
+        this.alertsService.clearWarnings();
+        this.alertsService.addWarning(`Invalid Suggestion: ${errorMessage}`);
+        this.revertSuggestionResolution();
+      }
+    );
+  }
+
+  clearQueuedSuggestion(): void {
+    this.queuedSuggestion = undefined;
+    this.hasQueuedSuggestion = false;
+  }
+
+  undoReviewAction(): void {
+    clearTimeout(this.commitTimeout); // Clear the commit timeout.
+    if (this.queuedSuggestion) {
+      const indexToRemove = this.resolvedSuggestionIds.indexOf(
+        this.queuedSuggestion.suggestion_id
+      );
+      if (indexToRemove !== -1) {
+        this.resolvedSuggestionIds.splice(indexToRemove, 1);
+        if (this.removedSuggestion) {
+          this.allContributions[this.queuedSuggestion.suggestion_id] =
+            this.removedSuggestion;
+        }
+      }
+    }
+    this.clearQueuedSuggestion();
+  }
+
+  showSnackbar(): void {
+    this.currentSnackbarRef =
+      this.snackBar.openFromComponent<UndoSnackbarComponent>(
+        UndoSnackbarComponent,
+        {
+          duration: COMMIT_TIMEOUT_DURATION,
+          verticalPosition: 'bottom',
+          horizontalPosition: 'right',
+        }
+      );
+    this.currentSnackbarRef.instance.message = 'Suggestion queued';
+
+    this.currentSnackbarRef.onAction().subscribe(() => {
+      this.undoReviewAction();
+    });
+
+    this.currentSnackbarRef.afterDismissed().subscribe(() => {
+      if (this.hasQueuedSuggestion) {
+        this.commitQueuedSuggestion();
+      }
+    });
   }
 
   // Returns whether the active suggestion's exploration_content_html
   // differs from the content_html of the suggestion's change object.
   hasExplorationContentChanged(): boolean {
     return !this.isHtmlContentEqual(
-      this.contentHtml, this.explorationContentHtml);
+      this.contentHtml,
+      this.explorationContentHtml
+    );
   }
 
   isHtmlContentEqual(
-      first: string | string[] | null,
-      second: string | string[] | null
+    first: string | string[] | null,
+    second: string | string[] | null
   ): boolean {
     if (Array.isArray(first) && Array.isArray(second)) {
       // Check equality of all array elements.
       return (
         first.length === second.length &&
         first.every(
-          (val, index) => this.stripWhitespace(val) === this.stripWhitespace(
-            second[index]))
+          (val, index) =>
+            this.stripWhitespace(val) === this.stripWhitespace(second[index])
+        )
       );
     }
     if (angular.isString(first) && angular.isString(second)) {
@@ -527,6 +747,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
   }
 
   cancel(): void {
+    this.commitQueuedSuggestion();
     this.activeModal.close(this.resolvedSuggestionIds);
   }
 
@@ -583,7 +804,9 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       this.altTextIsDisplayed = true;
       const doc = new DOMParser().parseFromString(content, 'text/html');
       const imgElements = doc.querySelectorAll('oppia-noninteractive-image');
-      htmlString = Array.from(imgElements).map((img) => img.outerHTML).join('');
+      htmlString = Array.from(imgElements)
+        .map(img => img.outerHTML)
+        .join('');
     }
 
     return htmlString;

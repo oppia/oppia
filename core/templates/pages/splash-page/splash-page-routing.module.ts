@@ -16,24 +16,19 @@
  * @fileoverview Routing module for splash page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { SplashPageRootComponent } from './splash-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {SplashPageRootComponent} from './splash-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: SplashPageRootComponent
-  }
+    component: SplashPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class SplashPageRoutingModule {}

@@ -22,43 +22,45 @@ var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
-var ExplorationEditorPage = (
-  require('../webdriverio_utils/ExplorationEditorPage.js'));
-var ReleaseCoordinatorPage = require(
-  '../webdriverio_utils/ReleaseCoordinatorPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
+var ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 
-describe('Improvements tab', function() {
+describe('Improvements tab', function () {
   let explorationEditorPage = null;
   let explorationEditorImprovementsTab = null;
   let releaseCoordinatorPage = null;
   let improvementsTabFeature = null;
   let adminPage = null;
 
-  beforeAll(async() => {
+  beforeAll(async () => {
     adminPage = new AdminPage.AdminPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    releaseCoordinatorPage = (
-      new ReleaseCoordinatorPage.ReleaseCoordinatorPage());
+    releaseCoordinatorPage =
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
     await users.createAndLoginCurriculumAdminUser(
-      'superUser@improvementsTab.com', 'superUser');
+      'superUser@improvementsTab.com',
+      'superUser'
+    );
     await adminPage.get();
     await adminPage.addRole('superUser', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();
-    improvementsTabFeature = (
-      await releaseCoordinatorPage.getImprovementsTabFeatureElement());
+    improvementsTabFeature =
+      await releaseCoordinatorPage.getImprovementsTabFeatureElement();
     await releaseCoordinatorPage.enableFeature(improvementsTabFeature);
-    explorationEditorImprovementsTab = (
-      explorationEditorPage.getImprovementsTab());
+    explorationEditorImprovementsTab =
+      explorationEditorPage.getImprovementsTab();
     await users.logout();
   });
 
-  afterEach(async() => {
+  afterEach(async () => {
     await general.checkForConsoleErrors([]);
   });
 
-  it('should not be present in an unpublished exploration', async() => {
+  it('should not be present in an unpublished exploration', async () => {
     await users.createUser(
-      'drafter@improvementsTab.com', 'improvementsTabDrafter');
+      'drafter@improvementsTab.com',
+      'improvementsTabDrafter'
+    );
     await users.login('drafter@improvementsTab.com');
     await workflow.createExploration(true);
 
