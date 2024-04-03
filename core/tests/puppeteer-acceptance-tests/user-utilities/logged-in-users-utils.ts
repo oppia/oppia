@@ -954,19 +954,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the Terms page using the oppia website footer.
-   */
-  async navigateToVolunteerPageViaFooter(): Promise<void> {
-    await this.page.waitForXPath('(//a[contains(text(),"volunteer")])');
-
-    const [link] = await this.page.$x('(//a[contains(text(),"volunteer")])');
-
-    await Promise.all([this.page.waitForNavigation(), await link.click()]);
-
-    expect(this.page.url()).toBe(volunteerUrl);
-  }
-
-  /**
    * Function to click an anchor tag and check if it opens the expected destination
    * in a new tab. Closes the tab afterwards.
    */
