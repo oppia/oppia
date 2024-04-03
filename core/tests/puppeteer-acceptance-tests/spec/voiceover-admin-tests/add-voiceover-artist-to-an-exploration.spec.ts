@@ -28,8 +28,10 @@ const invalidIdErrorToastMessage =
   'Sorry, we could not find the specified user.';
 
 ConsoleReporter.setConsoleErrorsToIgnore([
-  'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400',
-  'Sorry, we could not find the specified user.',
+  new RegExp(
+    'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
+  ),
+  new RegExp('Sorry, we could not find the specified user.'),
 ]);
 
 describe('Voiceover Admin', function () {
