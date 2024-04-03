@@ -199,7 +199,8 @@ def create_suggestion(
             suggestion_registry.SuggestionEditStateContent(
                 thread_id, target_id, target_version_at_submission, status,
                 author_id, None, change_cmd, score_category, language_code,
-                False
+                False, datetime.datetime.utcnow(),
+                datetime.datetime.utcnow()
             )
         )
     elif suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
@@ -221,8 +222,8 @@ def create_suggestion(
                 'was submitted.')
         suggestion = suggestion_registry.SuggestionTranslateContent(
             thread_id, target_id, target_version_at_submission, status,
-            author_id, None, change_cmd, score_category, language_code, False
-        )
+            author_id, None, change_cmd, score_category, language_code, False,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
     elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
@@ -245,7 +246,8 @@ def create_suggestion(
         suggestion = suggestion_registry.SuggestionAddQuestion(
             thread_id, target_id, target_version_at_submission, status,
             author_id, None, change_cmd, score_category,
-            add_question_language_code, False
+            add_question_language_code, False,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow()
         )
     else:
         raise Exception('Invalid suggestion type %s' % suggestion_type)
