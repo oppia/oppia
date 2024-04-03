@@ -226,15 +226,14 @@ class EntityVoiceoversHandler(
     """Handler class to get entity voiceover data."""
 
     @acl_decorators.open_access
-    def get(self):
-        assert self.normalized_request is not None
-        entity_type = self.normalized_request.get('entity_type')
-        entity_id = self.normalized_request.get('entity_id')
-        entity_version = self.normalized_request.get('entity_version')
-        language_accent_code = self.normalized_request.get(
-            'language_accent_code')
-        content_id = self.normalized_request.get('content_id')
-
+    def get(
+        self,
+        entity_type,
+        entity_id,
+        entity_version,
+        language_accent_code,
+        content_id
+    ):
         entity_voiceovers = (
             voiceover_services.get_voiceovers_for_given_language_accent_code(
                 entity_type, entity_id, entity_version, language_accent_code

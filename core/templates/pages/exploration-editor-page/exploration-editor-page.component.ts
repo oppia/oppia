@@ -240,6 +240,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         'exploration',
         explorationData.version
       );
+      this.contextService.setExplorationVersion(explorationData.version);
 
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(

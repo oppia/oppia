@@ -22,6 +22,11 @@ import {Injectable} from '@angular/core';
 
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {RecordedVoiceOverBackendDict} from 'domain/exploration/recorded-voiceovers.model';
+import {
+  Voiceover,
+  VoiceoverBackendDict,
+} from 'domain/exploration/voiceover.model';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -34,6 +39,16 @@ interface VoiceoverAdminDataBackendDict {
       [languageAccentCode: string]: boolean;
     };
   };
+}
+
+interface VoiceoverTypeToVoiceoverBackendDict {
+  voiceover_type_to_voiceovers: {
+    [type: string]: VoiceoverBackendDict;
+  };
+}
+
+interface VoiceoverTypeToVoiceover {
+  manualVoiceover: Voiceover;
 }
 
 interface ExplorationIdToFilenamesBackendDict {
@@ -212,6 +227,40 @@ export class VoiceoverBackendApiService {
             reject(errorResponse?.error);
           }
         );
+    });
+  }
+
+  async fetchVoiceoversAsync(
+    entityType: string,
+    entitytId: string,
+    entityVersion: number,
+    languageAccentCode: string,
+    contentId: string
+  ): Promise<VoiceoverTypeToVoiceover> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<VoiceoverTypeToVoiceoverBackendDict>(
+          this.urlInterpolationService.interpolateUrl(
+            '/entity_voiceovers_handler',
+            {
+              entity_type: entityType,
+              entity_id: entitytId,
+              entity_version: String(entityVersion),
+              language_accent_code: languageAccentCode,
+              content_id: contentId,
+            }
+          )
+        )
+        .toPromise()
+        .then(response => {
+          let manualVoiceover = Voiceover.createFromBackendDict(
+            response.voiceover_type_to_voiceovers['manual']
+          );
+
+          resolve({
+            manualVoiceover: manualVoiceover,
+          });
+        });
     });
   }
 }

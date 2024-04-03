@@ -2090,12 +2090,12 @@ def compute_models_to_put_when_saving_new_exp_version(
         if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
             voiceover_changes.append(change)
 
-    new_voiceover_models = voiceover_services.compute_voiceover_related_change(
-        updated_exploration,
-        voiceover_changes
-    )
+    # new_voiceover_models = voiceover_services.compute_voiceover_related_change(
+    #     updated_exploration,
+    #     voiceover_changes
+    # )
 
-    models_to_put.extend(new_voiceover_models)
+    # models_to_put.extend(new_voiceover_models)
 
     translation_changes = []
     for change in change_list:

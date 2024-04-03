@@ -92,6 +92,7 @@ import {ExplorationSaveAndPublishButtonsComponent} from './exploration-save-and-
 import {ExplorationSavePromptModalComponent} from './modal-templates/exploration-save-prompt-modal.component';
 import {AddAudioTranslationModalComponent} from './translation-tab/modal-templates/add-audio-translation-modal.component';
 import {AudioTranslationBarComponent} from './translation-tab/audio-translation-bar/audio-translation-bar.component';
+import {VoiceoverCardComponent} from './translation-tab/voiceover-card/voiceover-card.component';
 import {StateTranslationEditorComponent} from './translation-tab/state-translation-editor/state-translation-editor.component';
 import {StateTranslationComponent} from './translation-tab/state-translation/state-translation.component';
 import {TranslatorOverviewComponent} from './translation-tab/translator-overview/translator-overview.component';
@@ -176,6 +177,7 @@ import {ExplorationEditorPageComponent} from './exploration-editor-page.componen
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
+    VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
     MetadataVersionHistoryModalComponent,
@@ -242,6 +244,7 @@ import {ExplorationEditorPageComponent} from './exploration-editor-page.componen
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
     AudioTranslationBarComponent,
+    VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
     MetadataVersionHistoryModalComponent,
