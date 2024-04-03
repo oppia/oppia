@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance Test for checking if logged-in users
- * can open all the links on the "Get Started" page.
+ * can click all the buttons on the "Teach" page.
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';

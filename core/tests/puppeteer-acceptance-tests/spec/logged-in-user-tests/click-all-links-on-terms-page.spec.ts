@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance Test for checking if logged-in users
- * can open all the links on the "Get Started" page.
+ * can open all the links on the "Terms of Use" page.
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -34,7 +34,7 @@ describe('Logged-in Users', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
-    'should be able to navigate to the Creator Guidelines page using the footer',
+    'should be able to navigate to the Terms of Use page using the footer',
     async function () {
       await testUser.navigateToAboutFoundationPage();
       await testUser.navigateToTermsPageViaFooter();
@@ -42,13 +42,13 @@ describe('Logged-in Users', function () {
     DEFAULT_SPEC_TIMEOUT
   );
 
-  describe('on the Get Started page', function () {
+  describe('on the Terms of Use page', function () {
     beforeEach(async function () {
       await testUser.navigateToTermsPage();
     }, DEFAULT_SPEC_TIMEOUT);
 
     it(
-      'should be able to use the "forum" link',
+      'should be able to follow the link about the CC-BY-SA 4.0 license',
       async function () {
         await testUser.clickLinkToLicenseOnTermsPage();
       },
@@ -56,7 +56,7 @@ describe('Logged-in Users', function () {
     );
 
     it(
-      'should be able to use the "Design Tips" link',
+      'should be able to follow the link to the Oppia Annouce google group.',
       async function () {
         await testUser.clickLinkToGoogleGroupOnTermsPage();
       },

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance Test for checking if logged-in users can
- * navigate using all the links under the "About Oppia" footer section.
+ * follow links in the oppia footer not covered by other tests.
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -39,7 +39,7 @@ describe('Logged-in User', function () {
   });
 
   it(
-    'should open About page via the footer',
+    'should open the "Volunteer" page via the footer',
     async function () {
       await testUser.navigateToVolunteerPageViaFooter();
     },

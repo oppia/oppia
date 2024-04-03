@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance Test for checking if logged-in users
- * can open all the links on the "Get Started" page.
+ * can open all the links on the "Creator Guidelines" page.
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
@@ -42,7 +42,7 @@ describe('Logged-in Users', function () {
     DEFAULT_SPEC_TIMEOUT
   );
 
-  describe('on the Get Started page', function () {
+  describe('on the Creator Guidelines page', function () {
     beforeEach(async function () {
       await testUser.navigateToCreatorGuidelinesPage();
     }, DEFAULT_SPEC_TIMEOUT);

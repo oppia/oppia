@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Acceptance Test for checking if logged-in users
- * can open all the links on the "Privacy Policy" page.
+ * can visit all the oppia social pages via icons in the footer.
  */
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
