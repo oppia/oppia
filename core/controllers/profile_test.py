@@ -1367,15 +1367,15 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 data.headers['Content-Disposition'],
                 'attachment; filename=%s' % filename)
-            zf_saved = zipfile.ZipFile(io.BytesIO(data.body))
-            self.assertEqual(
-                zf_saved.namelist(),
-                [
-                    'oppia_takeout_data.json',
-                    'images/user_settings_profile_picture.png',
-                    'images/user_settings_profile_picture.webp'
-                ]
-            )
+            with  zipfile.ZipFile(io.BytesIO(data.body)) as zf_saved :
+                self.assertEqual(
+                    zf_saved.namelist(),
+                    [
+                        'oppia_takeout_data.json',
+                        'images/user_settings_profile_picture.png',
+                        'images/user_settings_profile_picture.webp'
+                    ]
+                )
 
     def test_data_does_not_export_if_user_id_leaked(self) -> None:
         # Update user settings to constants.
@@ -1448,13 +1448,13 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 data.headers['Content-Disposition'],
                 'attachment; filename=%s' % filename)
-            zf_saved = zipfile.ZipFile(io.BytesIO(data.body))
-            self.assertEqual(
-                zf_saved.namelist(),
-                [
-                    'oppia_takeout_data.json',
-                ]
-            )
+            with zipfile.ZipFile(io.BytesIO(data.body)) as zf_saved :
+                self.assertEqual(
+                    zf_saved.namelist(),
+                    [
+                        'oppia_takeout_data.json',
+                    ]
+                )
 
     def test_export_account_handler_enabled_logged_out(self) -> None:
         self.logout()

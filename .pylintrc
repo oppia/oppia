@@ -146,7 +146,6 @@ disable=abstract-method,
         wrong-import-order,
 # TODO(#12912): Remove these after the Python 3 migration.
         arguments-renamed,
-        consider-using-with,
         import-outside-toplevel,
         not-an-iterable,
         unnecessary-pass,
