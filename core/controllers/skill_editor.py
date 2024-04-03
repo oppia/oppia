@@ -315,13 +315,13 @@ class EditableSkillDataHandler(
             InvalidInputException. The skill still has associated questions.
         """
         assert self.user_id is not None
-        skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
 
         if skill_services.skill_has_associated_questions(skill_id):
             raise self.InvalidInputException(
                 'Please delete all questions associated with this skill '
                 'first.')
 
+        skill_services.remove_skill_from_all_topics(self.user_id, skill_id)
         skill_services.delete_skill(self.user_id, skill_id)
 
         self.render_json(self.values)
