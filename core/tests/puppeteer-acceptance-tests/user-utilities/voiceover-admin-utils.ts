@@ -57,6 +57,16 @@ const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
 const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
+const mobileNavToggelbutton = '.e2e-test-mobile-options';
+const mobileChangesDropdown = '.e2e-test-mobile-changes-dropdown';
+const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
+const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
+const mobileSaveChangesButton =
+  'button.e2e-test-save-changes-for-small-screens';
+const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
+const mobileVoiceoverArtistsHeader =
+  '.e2e-test-voice-artist-collapsible-card-header';
+
 export class VoiceoverAdmin extends BaseUser {
   /**
    * Function to navigate to creator dashboard page
@@ -70,7 +80,13 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
-    await this.clickOn(explorationSettingsTab);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavToggelbutton);
+      await this.clickOn(mobileOptionsDropdown);
+      await this.clickOn(mobileSettingsButton);
+    } else {
+      await this.clickOn(explorationSettingsTab);
+    }
   }
 
   /**
@@ -114,8 +130,14 @@ export class VoiceoverAdmin extends BaseUser {
       hidden: true,
     });
 
-    await this.page.waitForSelector(`${saveChangesButton}:not([disabled])`);
-    await this.clickOn(saveChangesButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavToggelbutton);
+      await this.clickOn(mobileSaveChangesButton);
+    } else {
+      await this.page.waitForSelector(`${saveChangesButton}:not([disabled])`);
+      await this.clickOn(saveChangesButton);
+    }
+
     await this.page.waitForFunction('document.readyState === "complete"');
     await this.page.waitForSelector(saveDraftButton, {visible: true});
     await this.clickOn(saveDraftButton);
@@ -129,11 +151,18 @@ export class VoiceoverAdmin extends BaseUser {
   async publishExplorationWithTitle(
     explorationTitle: string
   ): Promise<string | null> {
-    await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`
-    );
-    await this.clickOn(publishExplorationButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileChangesDropdown);
+      await this.clickOn(mobilePublishButton);
+    } else {
+      await this.page.waitForSelector(
+        `${publishExplorationButton}:not([disabled])`
+      );
+      await this.clickOn(publishExplorationButton);
+    }
+    await this.clickOn(explorationTitleInput);
     await this.type(explorationTitleInput, `${explorationTitle}`);
+    await this.clickOn(explorationGoalInput);
     await this.type(explorationGoalInput, `${explorationTitle}`);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
@@ -169,6 +198,9 @@ export class VoiceoverAdmin extends BaseUser {
    * @param artistUsername - The username of the voiceover artist to check for
    */
   async expectVoiceoverArtistNotExists(artistUsername: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileVoiceoverArtistsHeader);
+    }
     const allVoiceoverArtists = await this.getAllVoiceoverArtists();
     if (allVoiceoverArtists.includes(artistUsername)) {
       throw new Error(

@@ -377,7 +377,7 @@
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
         <h3 tabindex="0">Voice Artists</h3>
-        <i class="fa fa-caret-down"
+        <i class="fa fa-caret-down e2e-test-voice-artist-collapsible-card-header"
            *ngIf="!voiceArtistsCardIsShown"
            aria-hidden="true">
         </i>
@@ -386,7 +386,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="voiceArtistsCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content e2e-test-voice-artist-card" *ngIf="voiceArtistsCardIsShown">
         <div>
           <div [hidden]="isVoiceoverFormOpen" tabindex="0" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
