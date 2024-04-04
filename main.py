@@ -440,7 +440,9 @@ URLS = [
         feconf.TOPIC_ID_TO_DIAGNOSTIC_TEST_SKILL_IDS_HANDLER,
         topics_and_skills_dashboard.TopicIdToDiagnosticTestSkillIdsHandler),
     get_redirect_route(
-        r'%s/story' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/story' % 
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler),
     get_redirect_route(
         r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
@@ -496,7 +498,9 @@ URLS = [
         r'/<subtopic_url_fragment>' % feconf.SUBTOPIC_DATA_HANDLER,
         subtopic_viewer.SubtopicPageDataHandler),
     get_redirect_route(
-        r'%s/revision' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/revision' % 
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler),
     get_redirect_route(
         r'%s/revision/<subtopic_url_fragment>' %
@@ -506,13 +510,16 @@ URLS = [
         topic_editor.TopicEditorStoryHandler),
 
     get_redirect_route(
-        r'%s/can_access_topic_viewer_page' %
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler
     ),
 
     get_redirect_route(
-        r'%s/practice' % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/practice' % 
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler),
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'
