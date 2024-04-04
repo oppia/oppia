@@ -609,6 +609,7 @@ export class ExplorationCreator extends BaseUser {
     await this.page.waitForNavigation({waitUntil: 'networkidle2'});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(navBarOpener);
+      await this.clickOn(basicSettingsDropDown);
     }
   }
 
@@ -616,9 +617,6 @@ export class ExplorationCreator extends BaseUser {
    *This function checks whether changes has discarded successfully or not.
    */
   async expectTitleToBe(titleBeforeChanges: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(basicSettingsDropDown);
-    }
     await this.page.waitForSelector('.e2e-test-exploration-title-input');
     const titleInput = await this.page.$('.e2e-test-exploration-title-input');
     const titleAfterChanges = await this.page.evaluate(
