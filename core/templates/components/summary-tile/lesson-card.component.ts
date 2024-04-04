@@ -6,7 +6,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
-import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'lesson-card',
@@ -23,18 +22,10 @@ export class LessonCardComponent implements OnInit {
   progress!: number;
   title!: string;
   lessonTopic!: string;
-  /**
-   * if lessonType === classes
-   * Move functions from
-   * - exploration-summary-tile.component
-   *  - getThumbnailIconUrl - imgUrl
-   *  - getExplorationLink (?)
-   *  - Translation Key
-   */
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -43,7 +34,7 @@ export class LessonCardComponent implements OnInit {
 
       this.desc = this.story.getTitle();
       this.imgColor = this.story.getThumbnailBgColor();
-      //check if undefined needs to be tested
+
       if (this.story.getThumbnailFilename()) {
         this.imgUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
           AppConstants.ENTITY_TYPE.STORY,
@@ -57,7 +48,7 @@ export class LessonCardComponent implements OnInit {
       let classFragment = this.story.getClassroomUrlFragment();
       let topicFragment = this.story.getTopicUrlFragment();
 
-      //check if undefined needs to be tested
+      //put as separate function
       this.lessonUrl =
         classFragment === undefined || topicFragment === undefined
           ? '#'
@@ -77,7 +68,7 @@ export class LessonCardComponent implements OnInit {
       );
       this.lessonTopic = this.topic;
     } else {
-      /*  Implementation for explorations & collections */
+      /* Implementation for explorations & collections */
       this.desc = this.story.objective;
       this.imgColor = this.story.thumbnailBgColor;
       this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
@@ -96,22 +87,11 @@ export class LessonCardComponent implements OnInit {
     }
   }
 
-  //go back 1 - add test case
   getProgress(arg: number): string {
-    return (
-      'linear-gradient(' +
-      (50 >= arg ? 180 + (arg / 100) * 180 : 270) +
-      'deg, #00645c ' +
-      (50 >= arg ? arg : 50) +
-      '%, transparent ' +
-      (50 >= arg ? arg : 50) +
-      '%),' +
-      'linear-gradient(0deg, #00645c ' +
-      (arg > 50 ? arg - 50 : 0) +
-      '%, lightgray ' +
-      (arg > 50 ? arg - 50 : 0) +
-      '%)'
-    );
+    let leftCircle = 50 >= arg ? arg : 50;
+    let rightCircle = arg > 50 ? arg - 50 : 0;
+
+    return `linear-gradient(${50 >= arg ? 180 + (arg / 100) * 180 : 270} deg, #00645c ${leftCircle}%, transparent ${leftCircle}%), linear-gradient(0deg, #00645c ${rightCircle}%, lightgray ${rightCircle}%)`;
   }
 }
 
