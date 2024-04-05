@@ -253,6 +253,18 @@ export class RteHelperModalComponent {
         );
         return;
       }
+    } else if (this.componentId === this.COMPONENT_ID_TABS) {
+      // Value[0] corresponds to tab Contents.
+      for (let tab = 0; tab < value[0].length; tab++) {
+        if (value[0][tab].title === '' || value[0][tab].content === '') {
+          this.updateRteErrorMessage(
+            'Please ensure that each title and content are filled'
+          );
+          break;
+        } else {
+          this.updateRteErrorMessage('');
+        }
+      }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
       let url: string = value[0];
       let text: string = value[1];
@@ -409,6 +421,30 @@ export class RteHelperModalComponent {
     } else {
       for (let i = 0; i < this.tmpCustomizationArgs.length; i++) {
         const caName = this.tmpCustomizationArgs[i].name;
+        if (this.componentId === this.COMPONENT_ID_VIDEO) {
+          if (caName === 'video_id') {
+            this.tmpCustomizationArgs[i].value =
+              this.extractVideoIdFromVideoUrl(
+                this.tmpCustomizationArgs[i].value.toString()
+              );
+          }
+        } else if (this.componentId === this.COMPONENT_ID_LINK) {
+          if (caName === 'text') {
+            // Set the link `text` to the link `url` if the `text` is empty.
+            (
+              customizationArgsDict as {
+                [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+              }
+            )[caName] =
+              this.tmpCustomizationArgs[i].value ||
+              this.tmpCustomizationArgs[i - 1].value;
+          }
+        }
+        (
+          customizationArgsDict as {
+            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+          }
+        )[caName] = this.tmpCustomizationArgs[i].value;
         if (this.componentId === this.COMPONENT_ID_VIDEO) {
           if (caName === 'video_id') {
             this.tmpCustomizationArgs[i].value =
