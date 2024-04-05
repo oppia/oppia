@@ -498,66 +498,24 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
             'exploration %s.'
         )
 
-        debug_logs_1 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-5',
-            'Newly added filenames: [\'filename3.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor2',
-            'Snapshot ID: exploration_id_1-3',
-            'Newly added filenames: [\'filename2.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-2',
-            'Newly added filenames: [\'filename1.mp3\']',
-            'Referred filename: filename1.mp3, is present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
-        debug_logs_2 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-5',
-            'Newly added filenames: [\'filename7.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor4',
-            'Snapshot ID: exploration_id_2-4',
-            'Newly added filenames: [\'filename6.mp3\']',
-            'Referred filename: filename6.mp3, is present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor3',
-            'Snapshot ID: exploration_id_2-3',
-            'Newly added filenames: [\'filename5.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-2',
-            'Newly added filenames: [\'filename4.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
+        debug_logs_1 = (
+            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
+            '[filename3.mp3]\n---\n---\nVoice Artist: editor2\nSnapshot ID: '
+            'exploration_id_1-3\nNewly added filenames: [filename2.mp3]\n---'
+            '\n---\nVoice Artist: editor1\nSnapshot ID: exploration_id_1-2'
+            '\nNewly added filenames: [filename1.mp3]\n---\n'
+        )
+        debug_logs_2 = (
+            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
+            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
+            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
+            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
+            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
+            '[filename4.mp3]\n---\n'
+        )
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
@@ -634,58 +592,22 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
-        debug_logs_1 = str([
-            '-------------------------------',
-            'Voice Artist: editor2',
-            'Snapshot ID: exploration_id_1-3',
-            'Newly added filenames: [\'filename2.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-2',
-            'Newly added filenames: [\'filename1.mp3\']',
-            'Referred filename: filename1.mp3, is present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
-        debug_logs_2 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-5',
-            'Newly added filenames: [\'filename7.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor4',
-            'Snapshot ID: exploration_id_2-4',
-            'Newly added filenames: [\'filename6.mp3\']',
-            'Referred filename: filename6.mp3, is present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor3',
-            'Snapshot ID: exploration_id_2-3',
-            'Newly added filenames: [\'filename5.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-2',
-            'Newly added filenames: [\'filename4.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
+        debug_logs_1 = (
+            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
+            'editor2\nSnapshot ID: exploration_id_1-3\nNewly added filenames: '
+            '[filename2.mp3]\n---\n---\nVoice Artist: editor1\nSnapshot ID: '
+            'exploration_id_1-2\nNewly added filenames: [filename1.mp3]\n---\n'
+        )
+        debug_logs_2 = (
+            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
+            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
+            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---\n'
+            '---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\nNewly'
+            ' added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
+            '[filename4.mp3]\n---\n'
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -737,69 +659,6 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                 expected_content_id_voiceovers_mapping
             )
 
-    def test_should_skip_exploration_for_invalid_exploration(
-        self
-    ) -> None:
-        self._create_curated_explorations()
-        self._create_non_curated_exploration()
-
-        job_result_template = (
-            'Generated exploration voice artist link model for '
-            'exploration %s.'
-        )
-        debug_logs = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-5',
-            'Newly added filenames: [\'filename7.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor4',
-            'Snapshot ID: exploration_id_2-4',
-            'Newly added filenames: [\'filename6.mp3\']',
-            'Referred filename: filename6.mp3, is present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor3',
-            'Snapshot ID: exploration_id_2-3',
-            'Newly added filenames: [\'filename5.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-2',
-            'Newly added filenames: [\'filename4.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
-
-        exploration_id: str = 'exploration_id_1'
-        exploration_model: exp_models.ExplorationModel = (
-            exp_models.ExplorationModel.get_by_id(exploration_id))
-        # Deleting recorded voiceovers field to make this exploration invalid.
-        del exploration_model.states[
-            'Introduction']['recorded_voiceovers']
-        exploration_model.update_timestamps()
-        exploration_model.commit(
-            'committer_id', 'commit message', [])
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
-                stderr=''),
-            job_run_result.JobRunResult(stdout=debug_logs, stderr=''),
-
-        ])
-
 
 class AuditVoiceArtistMetadataModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
@@ -821,66 +680,25 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'Generated exploration voice artist link model for '
             'exploration %s.'
         )
-        debug_logs_1 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-5',
-            'Newly added filenames: [\'filename3.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor2',
-            'Snapshot ID: exploration_id_1-3',
-            'Newly added filenames: [\'filename2.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-2',
-            'Newly added filenames: [\'filename1.mp3\']',
-            'Referred filename: filename1.mp3, is present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
-        debug_logs_2 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-5',
-            'Newly added filenames: [\'filename7.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor4',
-            'Snapshot ID: exploration_id_2-4',
-            'Newly added filenames: [\'filename6.mp3\']',
-            'Referred filename: filename6.mp3, is present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor3',
-            'Snapshot ID: exploration_id_2-3',
-            'Newly added filenames: [\'filename5.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-2',
-            'Newly added filenames: [\'filename4.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
+        debug_logs_1 = (
+            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
+            '[filename3.mp3]\n---\n---\nVoice Artist: editor2\nSnapshot ID: '
+            'exploration_id_1-3\nNewly added filenames: [filename2.mp3]\n---'
+            '\n---\nVoice Artist: editor1\nSnapshot ID: exploration_id_1-2'
+            '\nNewly added filenames: [filename1.mp3]\n---\n'
+        )
+        debug_logs_2 = (
+            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
+            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
+            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
+            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
+            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
+            '[filename4.mp3]\n---\n'
+        )
+
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
@@ -917,58 +735,22 @@ class AuditVoiceArtistMetadataModelsJobTests(
                 snapshot_model_id))
         snapshot_model.delete()
 
-        debug_logs_1 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-5',
-            'Newly added filenames: [\'filename3.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-2',
-            'Newly added filenames: [\'filename1.mp3\']',
-            'Referred filename: filename1.mp3, is present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
-        debug_logs_2 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-5',
-            'Newly added filenames: [\'filename7.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor4',
-            'Snapshot ID: exploration_id_2-4',
-            'Newly added filenames: [\'filename6.mp3\']',
-            'Referred filename: filename6.mp3, is present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor3',
-            'Snapshot ID: exploration_id_2-3',
-            'Newly added filenames: [\'filename5.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-2',
-            'Newly added filenames: [\'filename4.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
+        debug_logs_1 = (
+            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
+            '[filename3.mp3]\n---\n---\nVoice Artist: editor1\nSnapshot ID: '
+            'exploration_id_1-2\nNewly added filenames: [filename1.mp3]\n---\n'
+        )
+        debug_logs_2 = (
+            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
+            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
+            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
+            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
+            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
+            '[filename4.mp3]\n---\n'
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -998,67 +780,25 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'exploration %s.'
         )
 
-        debug_logs_1 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-5',
-            'Newly added filenames: [\'filename3.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: Not Found for user ID: non_existent_user.',
-            'Snapshot ID: exploration_id_1-3',
-            'Newly added filenames: [\'filename2.mp3\']',
-            'Referred filename: filename1.mp3, is not present in filenames.',
-            'Referred filename: filename2.mp3, is present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_1-2',
-            'Newly added filenames: [\'filename1.mp3\']',
-            'Referred filename: filename1.mp3, is present in filenames.',
-            'Referred filename: filename2.mp3, is not present in filenames.',
-            'Referred filename: filename3.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
-
-        debug_logs_2 = str([
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-5',
-            'Newly added filenames: [\'filename7.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor4',
-            'Snapshot ID: exploration_id_2-4',
-            'Newly added filenames: [\'filename6.mp3\']',
-            'Referred filename: filename6.mp3, is present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor3',
-            'Snapshot ID: exploration_id_2-3',
-            'Newly added filenames: [\'filename5.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is not present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-            '-------------------------------',
-            'Voice Artist: editor1',
-            'Snapshot ID: exploration_id_2-2',
-            'Newly added filenames: [\'filename4.mp3\']',
-            'Referred filename: filename6.mp3, is not present in filenames.',
-            'Referred filename: filename4.mp3, is present in filenames.',
-            'Referred filename: filename7.mp3, is not present in filenames.',
-            '-------------------------------',
-        ])
+        debug_logs_1 = (
+            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
+            '[filename3.mp3]\n---\n---\nVoice Artist: Not Found for user ID: '
+            'non_existent_user.\nSnapshot ID: exploration_id_1-3\nNewly added '
+            'filenames: [filename2.mp3]\n---\n---\nVoice Artist: editor1\n'
+            'Snapshot ID: exploration_id_1-2\nNewly added filenames: '
+            '[filename1.mp3]\n---\n'
+        )
+        debug_logs_2 = (
+            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
+            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
+            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
+            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
+            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
+            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
+            '[filename4.mp3]\n---\n'
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -1076,114 +816,6 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
     VoiceArtistMetadataModelsTestsBaseClass
 ):
     """Test class to validate helper methods."""
-
-    def test_should_update_content_id_to_voiceovers_mapping(self) -> None:
-        filenames = [
-            'filename1.mp3',
-            'filename3.mp3',
-            'filename4.mp3',
-            'filename5.mp3',
-            'filename2.mp3',
-            'filename6.mp3',
-        ]
-        latest_content_id_to_voiceover_mapping = {
-            'content_0': {
-                'en': self.voiceover_dict_1,
-                'hi': self.voiceover_dict_2
-            },
-            'content_1': {
-                'en': self.voiceover_dict_3
-            },
-            'content_2': {
-                'en': self.voiceover_dict_4,
-            }
-        }
-        content_id_to_voiceovers_mapping = {
-            'content_2': {
-                'en': ('voice_artist_1', self.voiceover_dict_4)
-            }
-        }
-        voice_artist_id = 'voice_artist_1'
-
-        expected_content_id_to_voiceovers_mapping = {
-            'content_0': {
-                'en': ('voice_artist_1', self.voiceover_dict_1),
-                'hi': ('voice_artist_1', self.voiceover_dict_2)
-            },
-            'content_1': {
-                'en': ('voice_artist_1', self.voiceover_dict_3)
-            },
-            'content_2': {
-                'en': ('voice_artist_1', self.voiceover_dict_4)
-            }
-        }
-
-        (
-            updated_content_id_to_voiceovers_mapping,
-            number_of_voiceovers_identified,
-            _
-        ) = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            update_content_id_to_voiceovers_mapping(
-                latest_content_id_to_voiceover_mapping,
-                filenames,
-                content_id_to_voiceovers_mapping,
-                voice_artist_id
-            )
-        )
-
-        self.assertDictEqual(
-            updated_content_id_to_voiceovers_mapping,
-            expected_content_id_to_voiceovers_mapping
-        )
-        self.assertEqual(
-            number_of_voiceovers_identified, 4)
-
-    def test_should_create_empty_exploration_voice_artist_link_model(
-        self
-    ) -> None:
-        exploration = self.save_new_valid_exploration(
-            self.CURATED_EXPLORATION_ID_1,
-            self.owner_id,
-            title='title1',
-            category=constants.ALL_CATEGORIES[0],
-            end_state_name='End State',
-        )
-        self.publish_exploration(self.owner_id, exploration.id)
-
-        exp_services.update_exploration(
-            self.owner_id, self.CURATED_EXPLORATION_ID_1,
-            [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'Introduction',
-                'new_value': {
-                    'content_id': 'content_0',
-                    'html': '<p>A content to translate.</p>'
-                }
-            })],
-            'Changes content.'
-        )
-
-        exploration_models: List[exp_models.ExplorationModel] = list(
-            exp_models.ExplorationModel.get_all().fetch())
-
-        snapshot_models: List[
-            exp_models.ExplorationSnapshotContentModel] = list(
-                exp_models.ExplorationSnapshotContentModel.get_all().fetch())
-
-        exp_link_model, _ = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            get_exploration_voice_artists_link_model(
-                exploration_models[0], snapshot_models
-            ))
-        assert exp_link_model is not None
-
-        self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
-        self.assertDictEqual(
-            exp_link_model.content_id_to_voiceovers_mapping, {})
 
     def test_should_create_exploration_link_for_voice_artist(self) -> None:
         exploration = self.save_new_valid_exploration(
@@ -1243,6 +875,9 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
         snapshot_models: List[
             exp_models.ExplorationSnapshotContentModel] = list(
                 exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+        metadata_models: List[
+            exp_models.ExplorationSnapshotMetadataModel] = list(
+                exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
 
         expected_content_id_to_voiceovers_mapping = {
             'content_0': {
@@ -1254,7 +889,7 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             get_exploration_voice_artists_link_model(
-                exploration_models[0], snapshot_models))
+                exploration_models[0], snapshot_models, metadata_models))
         assert exp_link_model is not None
 
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
@@ -1280,24 +915,6 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             is_exploration_curated(exploration_id=None) # type: ignore[arg-type]
         )
         self.assertFalse(is_exploration_curated)
-
-    def test_check_committer_id_for_invalid_id(self) -> None:
-        committer_id = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            get_committer_id_for_given_snapshot_model_id(snapshot_model_id='')
-        )
-        self.assertIsNone(committer_id)
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        committer_id = (
-            manual_voice_artist_name_job.
-            CreateExplorationVoiceArtistLinkModelsJob.
-            get_committer_id_for_given_snapshot_model_id(snapshot_model_id=None) # type: ignore[arg-type]
-        )
-        self.assertIsNone(committer_id)
 
     def test_should_get_empty_filenames_successfully(self) -> None:
         exploration = self.save_new_valid_exploration(
@@ -1386,17 +1003,23 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             exp_models.ExplorationSnapshotContentModel] = list(
                 exp_models.ExplorationSnapshotContentModel.get_all().fetch())
 
+        metadata_models: List[
+            exp_models.ExplorationSnapshotMetadataModel] = list(
+                exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+
         exp_link_model, _ = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             get_exploration_voice_artists_link_model(
-                exploration_models[0], snapshot_models
+                exploration_models[0], snapshot_models, metadata_models
             ))
         assert exp_link_model is not None
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
         self.assertEqual(exp_link_model.content_id_to_voiceovers_mapping, {})
 
-    def test_should_skip_checking_if_voice_artist_id_is_none(self) -> None:
+    def test_should_create_empty_exploration_voice_artist_link_model(
+        self
+    ) -> None:
         exploration = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
             self.owner_id,
@@ -1420,59 +1043,31 @@ class HelperMethodsForExplorationVoiceArtistLinkJobTest(
             'Changes content.'
         )
 
-        new_voiceovers_dict_1: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {
-                        'en': self.voiceover_dict_1
-                    },
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
-            }
-        old_voiceover_dict_1: Dict[str, Dict[str, Dict[
-            str, state_domain.VoiceoverDict]]] = {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'ca_placeholder_2': {},
-                    'default_outcome_1': {}
-                }
-            }
-
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_value': new_voiceovers_dict_1,
-            'old_value': old_voiceover_dict_1
-        })]
-        exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
-            change_list, 'Translation commits')
-
-        # Deleting an exploration commit log entry model.
-        snapshot_model_id: str = 'exploration_id_1-3'
-        snapshot_model: exp_models.ExplorationSnapshotMetadataModel = (
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                snapshot_model_id))
-        snapshot_model.committer_id = ''
-        snapshot_model.update_timestamps()
-        snapshot_model.put()
-
         exploration_models: List[exp_models.ExplorationModel] = list(
             exp_models.ExplorationModel.get_all().fetch())
 
         snapshot_models: List[
             exp_models.ExplorationSnapshotContentModel] = list(
                 exp_models.ExplorationSnapshotContentModel.get_all().fetch())
+        metadata_models: List[
+            exp_models.ExplorationSnapshotMetadataModel] = list(
+                exp_models.ExplorationSnapshotMetadataModel.get_all().fetch())
+
+        snapshot_metadata_model = (
+            exp_models.ExplorationSnapshotMetadataModel.get(
+                'exploration_id_1-2'))
+        del snapshot_metadata_model.commit_cmds[0]['cmd']
+        snapshot_metadata_model.update_timestamps()
+        snapshot_metadata_model.put()
 
         exp_link_model, _ = (
             manual_voice_artist_name_job.
             CreateExplorationVoiceArtistLinkModelsJob.
             get_exploration_voice_artists_link_model(
-                exploration_models[0], snapshot_models
+                exploration_models[0], snapshot_models, metadata_models
             ))
         assert exp_link_model is not None
+
         self.assertEqual(exp_link_model.id, self.CURATED_EXPLORATION_ID_1)
-        self.assertEqual(exp_link_model.content_id_to_voiceovers_mapping, {})
+        self.assertDictEqual(
+            exp_link_model.content_id_to_voiceovers_mapping, {})
