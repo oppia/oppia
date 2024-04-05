@@ -58,12 +58,8 @@ var ContributorDashboardAdminPage = function () {
   var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
   var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
   var languageSelector = $('.e2e-test-language-selector');
-  const lastDatePicker = $('.e2e-test-last-date-picker');
-  const lastDatePickerInput = $('.e2e-test-last-date-picker-input');
-  const lastDatePickerToggle = $('.e2e-test-last-date-picker-toggle');
-  const firstDatePicker = $('.e2e-test-first-date-picker');
-  const firstDatePickerInput = $('.e2e-test-first-date-picker-input');
-  const firstDatePickerToggle = $('.e2e-test-first-date-picker-toggle');
+  var lastDatePickerInput = $('.e2e-test-last-date-picker-input');
+  var firstDatePickerInput = $('.e2e-test-first-date-picker-input');
   var noDataMessage = $('.e2e-test-no-data-message');
   var loadingMessage = $('.e2e-test-loading-message');
   var languageDropdown = $('.e2e-test-language-selector-dropdown');
@@ -238,17 +234,16 @@ var ContributorDashboardAdminPage = function () {
       `.e2e-test-language-selector-option=${language}`
     );
     await action.click(`${language} option selector`, selectorOption);
-    // await action.click('Language Selector', languageSelector);
   };
 
   this.selectDate = async function (datePickerToggle, day, month, year) {
     await action.click('Date Picker Toggle', $(datePickerToggle));
 
     if (year) {
-      const nextMonthButton = $('.mat-calendar-next-button');
-      const prevMonthButton = $('.mat-calendar-previous-button');
+      var nextMonthButton = $('.mat-calendar-next-button');
+      var prevMonthButton = $('.mat-calendar-previous-button');
 
-      const yearsToNavigate = year - new Date().getFullYear();
+      var yearsToNavigate = year - new Date().getFullYear();
 
       if (yearsToNavigate > 0) {
         for (let i = 0; i < yearsToNavigate * 12; i++) {
@@ -262,11 +257,11 @@ var ContributorDashboardAdminPage = function () {
     }
 
     if (month) {
-      const nextMonthButton = $('.mat-calendar-next-button');
-      const prevMonthButton = $('.mat-calendar-previous-button');
+      var nextMonthButton = $('.mat-calendar-next-button');
+      var prevMonthButton = $('.mat-calendar-previous-button');
 
-      const currentMonth = new Date().getMonth() + 1;
-      const monthsToNavigate = month - currentMonth;
+      var currentMonth = new Date().getMonth() + 1;
+      var monthsToNavigate = month - currentMonth;
 
       if (monthsToNavigate > 0) {
         for (let i = 0; i < monthsToNavigate; i++) {
@@ -281,7 +276,7 @@ var ContributorDashboardAdminPage = function () {
 
     if (day) {
       console.log('day condition');
-      const daySelector = $(`aria/${day}`);
+      var daySelector = $(`aria/${day}`);
       await action.click('Day Selector', daySelector);
     }
   };
@@ -294,14 +289,13 @@ var ContributorDashboardAdminPage = function () {
       new Date(selectedDate).getFullYear()
     );
 
-    const inputDateFormat = `${new Date(selectedDate).toLocaleString(
-      'default',
-      {day: '2-digit'}
-    )}-${new Date(selectedDate).toLocaleString('default', {
+    var inputDateFormat = `${new Date(selectedDate).toLocaleString('default', {
+      day: '2-digit',
+    })}-${new Date(selectedDate).toLocaleString('default', {
       month: 'short',
     })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
 
-    const newlySetDate = await action.getValue(
+    var newlySetDate = await action.getValue(
       'First Date Picker Input',
       lastDatePickerInput
     );
@@ -317,14 +311,13 @@ var ContributorDashboardAdminPage = function () {
       new Date(selectedDate).getFullYear()
     );
 
-    const inputDateFormat = `${new Date(selectedDate).toLocaleString(
-      'default',
-      {day: '2-digit'}
-    )}-${new Date(selectedDate).toLocaleString('default', {
+    var inputDateFormat = `${new Date(selectedDate).toLocaleString('default', {
+      day: '2-digit',
+    })}-${new Date(selectedDate).toLocaleString('default', {
       month: 'short',
     })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
 
-    const newlySetDate = await action.getValue(
+    var newlySetDate = await action.getValue(
       'First Date Picker Input',
       firstDatePickerInput
     );
