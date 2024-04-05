@@ -74,14 +74,6 @@ export default {
     ExternalLink: {
       AboutCookies: 'https://allaboutcookies.org/how-to-manage-cookies',
     },
-    OppiaSocial: {
-      YouTube: 'https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw',
-      FaceBook: 'https://www.facebook.com/oppiaorg',
-      Instagram: 'https://www.instagram.com/oppia.global/',
-      Twitter: 'https://twitter.com/oppiaorg',
-      Github: 'https://github.com/oppia',
-      LinkedIn: 'https://www.linkedin.com/company/oppia-org',
-    },
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -108,6 +100,32 @@ export default {
       __dirname,
       '../images/blog-post-thumbnail.svg'
     ),
+  },
+  OppiaSocials: {
+    YouTube: {
+      Domain: 'youtube.com',
+      Id: 'UC5c1G7BNDCfv1rczcBp9FPw',
+    },
+    FaceBook: {
+      Domain: 'facebook.com',
+      Id: 'oppiaorg',
+    },
+    Instagram: {
+      Domain: 'instagram.com',
+      Id: 'oppia.global',
+    },
+    Twitter: {
+      Domain: 'twitter.com',
+      Id: 'oppiaorg',
+    },
+    Github: {
+      Domain: 'github.com',
+      Id: 'oppia',
+    },
+    LinkedIn: {
+      Domain: 'linkedin.com',
+      Id: 'oppia-org',
+    },
   },
   DEFAULT_SPEC_TIMEOUT: 300000,
 };

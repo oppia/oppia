@@ -59,12 +59,6 @@ const allAboutCookiesUrl = testConstants.URLs.ExternalLink.AboutCookies;
 const googleAnalyticsPartnerPoliciesUrl =
   testConstants.URLs.GoogleAnalytics.PartnerPolicies;
 const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
-const oppiaYouTubeUrl = testConstants.URLs.OppiaSocial.YouTube;
-const oppiaFacebookUrl = testConstants.URLs.OppiaSocial.FaceBook;
-const oppiaInstagramUrl = testConstants.URLs.OppiaSocial.Instagram;
-const oppiaTwitterUrl = testConstants.URLs.OppiaSocial.Twitter;
-const oppiaGithubUrl = testConstants.URLs.OppiaSocial.Github;
-const oppiaLinkedInUrl = testConstants.URLs.OppiaSocial.LinkedIn;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -1253,10 +1247,15 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Click the speficed social icon and checks it's destination.
+   *
+   * Due to the somewhat unpredictable behaviors of these external sites,
+   * such as sometimes redirecting to log-in pages,
+   * we don't match the full url.
    */
   private async openSocialLinkInNewTabViaIcon(
     socialIconSelector: string,
-    expectedDestinationPageUrl: string
+    expectedDestinationDomain: string,
+    expectedAccountId: string
   ): Promise<void> {
     await this.page.waitForSelector(socialIconSelector);
     const pageTarget = this.page.target();
@@ -1267,7 +1266,8 @@ export class LoggedInUser extends BaseUser {
     const newTabPage = await newTarget.page();
 
     expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    expect(newTabPage?.url()).toContain(expectedDestinationDomain);
+    expect(newTabPage?.url()).toContain(expectedAccountId);
 
     await newTabPage?.close();
   }
@@ -1278,7 +1278,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToOppiaYouTubeViaFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaYouTubeLinkIcon,
-      oppiaYouTubeUrl
+      testConstants.OppiaSocials.YouTube.Domain,
+      testConstants.OppiaSocials.YouTube.Id
     );
   }
 
@@ -1288,7 +1289,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToOppiaFacebookViaFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaFacebookLinkIcon,
-      oppiaFacebookUrl
+      testConstants.OppiaSocials.FaceBook.Domain,
+      testConstants.OppiaSocials.FaceBook.Id
     );
   }
 
@@ -1298,7 +1300,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToOppiaInstagramViaFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaInstagramLinkIcon,
-      oppiaInstagramUrl
+      testConstants.OppiaSocials.Instagram.Domain,
+      testConstants.OppiaSocials.Instagram.Id
     );
   }
 
@@ -1308,7 +1311,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToOppiaTwitterViaFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaTwitterLinkIcon,
-      oppiaTwitterUrl
+      testConstants.OppiaSocials.Twitter.Domain,
+      testConstants.OppiaSocials.Twitter.Id
     );
   }
 
@@ -1318,7 +1322,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToOppiaGithubViaFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaGithubLinkIcon,
-      oppiaGithubUrl
+      testConstants.OppiaSocials.Github.Domain,
+      testConstants.OppiaSocials.Github.Id
     );
   }
 
@@ -1328,7 +1333,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToOppiaLinkedInViaFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaLinkedInLinkIcon,
-      oppiaLinkedInUrl
+      testConstants.OppiaSocials.LinkedIn.Domain,
+      testConstants.OppiaSocials.LinkedIn.Id
     );
   }
 }
