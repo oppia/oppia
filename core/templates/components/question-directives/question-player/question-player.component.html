@@ -95,12 +95,19 @@
 
     <div class="results-footer">
       <div class="question-player-results-footer" *ngIf="showActionButtonsFooter()">
-        <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons"
+        <span *ngFor="let actionButton of questionPlayerConfig.resultActionButtons | slice:0:2"
               (click)="performAction(actionButton)">
-          <div class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
+          <div *ngIf="!(actionButton.type === 'RETRY_SESSION') && actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && !(getWorstSkillIds().length === 0)"
+               class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
                role="button"
-               tabindex="0"
-               *ngIf="!(actionButton.type === 'RETRY_SESSION') && !(actionButton.type === 'DASHBOARD' && !userIsLoggedIn) && !(actionButton.type === 'REVIEW_LOWEST_SCORED_SKILL' && getWorstSkillIds().length === 0)">
+               tabindex="0">
+            <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
+            <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
+          </div>
+          <div *ngIf="!(actionButton.type === 'RETRY_SESSION') && actionButton.type === 'DASHBOARD' && userIsLoggedIn"
+               class="action-button-inner {{getActionButtonInnerClass(actionButton.type)}}"
+               role="button"
+               tabindex="0">
             <span [innerHTML]="getActionButtonIconHtml(actionButton.type)"></span>
             <span class="action-button-text" translate="{{actionButton.i18nId}}"></span>
           </div>
