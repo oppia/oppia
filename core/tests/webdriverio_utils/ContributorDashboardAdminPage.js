@@ -275,7 +275,6 @@ var ContributorDashboardAdminPage = function () {
     }
 
     if (day) {
-      console.log('day condition');
       var daySelector = $(`aria/${day}`);
       await action.click('Day Selector', daySelector);
     }
