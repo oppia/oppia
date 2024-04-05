@@ -28,7 +28,6 @@ import {
 } from '@angular/core/testing';
 
 import {ConversationSkinService} from './conversation-skin.service';
-import {ConversationSkinComponent} from '../learner-experience/conversation-skin.component';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {AudioPlayerService} from 'services/audio-player.service';
@@ -44,14 +43,15 @@ import {StatsReportingService} from '../services/stats-reporting.service';
 import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {InteractionRulesService} from '../services/answer-classification.service';
 import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {AppConstants} from 'app.constants';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {CurrentInteractionService} from './current-interaction.service';
+import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 
 class MockWindowRef {
   nativeWindow = {
@@ -67,13 +67,13 @@ class MockWindowRef {
   };
 }
 
-fdescribe('Conversation skin component', () => {
+describe('Conversation skin component', () => {
   let audioPlayerService: AudioPlayerService;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
-  let conversationSkinComponentMock: jasmine.SpyObj<ConversationSkinComponent>;
   let conversationSkinService: ConversationSkinService;
+  let currentInteractionService: CurrentInteractionService;
   let explorationEngineService: ExplorationEngineService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let focusManagerService: FocusManagerService;
@@ -84,6 +84,7 @@ fdescribe('Conversation skin component', () => {
   let questionPlayerStateService: QuestionPlayerStateService;
   let statsReportingService: StatsReportingService;
   let translateService: TranslateService;
+  let windowDimensionsService: WindowDimensionsService;
 
   let displayedCard = new StateCard(
     null,
@@ -315,6 +316,7 @@ fdescribe('Conversation skin component', () => {
           useClass: MockTranslateService,
         },
       ],
+      schemas: [NO_ERRORS_SCHEMA],
     });
 
     audioPlayerService = TestBed.inject(AudioPlayerService);
@@ -325,19 +327,8 @@ fdescribe('Conversation skin component', () => {
     contentTranslationManagerService = TestBed.inject(
       ContentTranslationManagerService
     );
-    conversationSkinComponentMock = jasmine.createSpyObj(
-      'ConversationSkinComponent',
-      [
-        'isSupplementalCardNonempty',
-        'canWindowShowTwoCards',
-        'animateToTwoCards',
-        'animateToOneCard',
-        'showUpcomingCard',
-      ]
-    );
-    conversationSkinComponentMock.displayedCard = displayedCard;
-
     conversationSkinService = TestBed.inject(ConversationSkinService);
+    currentInteractionService = TestBed.inject(CurrentInteractionService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
@@ -349,6 +340,7 @@ fdescribe('Conversation skin component', () => {
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     statsReportingService = TestBed.inject(StatsReportingService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
   }));
 
   it('should handle new card addition', () => {
@@ -364,59 +356,39 @@ fdescribe('Conversation skin component', () => {
       contentTranslationManagerService,
       'displayTranslations'
     ).and.returnValue();
-    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(2);
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValues(2, 1);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(playerPositionService, 'changeCurrentQuestion');
 
-    // First condition
-    conversationSkinComponentMock.isSupplementalCardNonempty.and.returnValue(
+    spyOn(
+      conversationSkinService,
+      'isSupplementalCardNonempty'
+    ).and.returnValues(false, true);
+    spyOn(conversationSkinService, 'canWindowShowTwoCards').and.returnValue(
       true
     );
-    conversationSkinService.handleNewCardAddition(
-      displayedCard,
-      conversationSkinComponentMock
-    );
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
-    expect(
-      conversationSkinComponentMock.animateToTwoCards
-    ).toHaveBeenCalledWith();
+    spyOn(conversationSkinService, 'animateToTwoCards');
 
-    // Second condition
-    conversationSkinComponentMock.isSupplementalCardNonempty.and.returnValue(
-      false
-    );
-    conversationSkinService.handleNewCardAddition(
-      displayedCard,
-      conversationSkinComponentMock
-    );
+    conversationSkinService.handleNewCardAddition(displayedCard);
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
+    expect(conversationSkinService.animateToTwoCards).toHaveBeenCalled();
+
+    conversationSkinService.handleNewCardAddition(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
 
-    // Default condition
-    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    conversationSkinService.handleNewCardAddition(
-      displayedCard,
-      conversationSkinComponentMock
-    );
+    conversationSkinService.handleNewCardAddition(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(0);
     expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalledWith(0);
   });
 
   it('should submit answer and reset current answer state', fakeAsync(() => {
     spyOn(displayedCard, 'updateCurrentAnswer');
-    conversationSkinComponentMock.displayedCard = displayedCard;
-    conversationSkinComponentMock.answerIsBeingProcessed = true;
-
-    conversationSkinService.submitAnswerNavigation(
-      '',
-      null,
-      conversationSkinComponentMock
-    );
-
-    expect(displayedCard.updateCurrentAnswer).toHaveBeenCalledOnceWith(null);
-    conversationSkinComponentMock.answerIsBeingProcessed = false;
+    conversationSkinService.displayedCard = displayedCard;
+    conversationSkinService.answerIsBeingProcessed = false;
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(
-      conversationSkinComponentMock,
+      conversationSkinService,
       'isCurrentCardAtEndOfTranscript'
     ).and.returnValue(true);
     let explorationModeSpy = spyOn(
@@ -424,15 +396,8 @@ fdescribe('Conversation skin component', () => {
       'isPresentingIsolatedQuestions'
     );
     explorationModeSpy.and.returnValue(false);
-    conversationSkinComponentMock.isInPreviewMode = false;
 
     spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
-    spyOn(conversationSkinComponentMock, 'showPendingCard');
-    conversationSkinService.submitAnswerNavigation(
-      '',
-      null,
-      conversationSkinComponentMock
-    );
 
     spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValues(
       false,
@@ -440,29 +405,21 @@ fdescribe('Conversation skin component', () => {
       false,
       true
     );
-    spyOn(conversationSkinComponentMock, 'initLearnerAnswerInfoService');
+    spyOn(explorationEngineService, 'getState');
     spyOn(playerTranscriptService, 'addNewInput');
-
     spyOn(playerTranscriptService, 'addNewResponse');
     spyOn(playerPositionService.onHelpCardAvailable, 'emit');
     spyOn(playerPositionService, 'setDisplayedCardIndex');
 
-    conversationSkinService.submitAnswerNavigation(
-      '',
-      null,
-      conversationSkinComponentMock
-    );
-    tick(200);
-
     spyOn(playerPositionService, 'recordAnswerSubmission');
-    spyOn(explorationPlayerStateService, 'getLanguageCode').and.returnValue(
-      'en'
-    );
-
     spyOn(
       explorationPlayerStateService,
       'getCurrentEngineService'
     ).and.returnValue(explorationEngineService);
+    spyOn(explorationPlayerStateService, 'getLanguageCode').and.returnValue(
+      'en'
+    );
+
     let callback = (
       answer: string,
       interactionRulesService: InteractionRulesService,
@@ -568,7 +525,7 @@ fdescribe('Conversation skin component', () => {
         ''
       );
       explorationModeSpy.and.returnValue(true);
-      conversationSkinComponentMock.displayedCard = new StateCard(
+      conversationSkinService.displayedCard = new StateCard(
         null,
         null,
         null,
@@ -597,7 +554,7 @@ fdescribe('Conversation skin component', () => {
         null,
         ''
       );
-      conversationSkinComponentMock.displayedCard = new StateCard(
+      conversationSkinService.displayedCard = new StateCard(
         null,
         null,
         null,
@@ -626,7 +583,6 @@ fdescribe('Conversation skin component', () => {
       return false;
     };
     spyOn(explorationEngineService, 'submitAnswer').and.callFake(callback);
-
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'oldState'
     );
@@ -654,20 +610,15 @@ fdescribe('Conversation skin component', () => {
     );
     spyOn(explorationPlayerStateService, 'recordNewCardAdded');
 
-    conversationSkinComponentMock.explorationActuallyStarted = false;
+    conversationSkinService.explorationActuallyStarted = false;
 
-    conversationSkinService.submitAnswerNavigation(
-      '',
-      null,
-      conversationSkinComponentMock
-    );
+    conversationSkinService.submitAnswerNavigation('', null);
     tick(2000);
   }));
 
-  it('should process feedback and prerequisite skills', () => {
-    // Test case 1: feedbackHtml is provided and displayedCard is not inline
+  it('should process feedback and prerequisite skills', fakeAsync(() => {
     const feedbackHtml = 'Feedback HTML';
-    const missingPrerequisiteSkillId = null;
+    const missingPrerequisiteSkillId = 'Skill ID';
     spyOn(
       conceptCardBackendApiService,
       'loadConceptCardsAsync'
@@ -675,76 +626,160 @@ fdescribe('Conversation skin component', () => {
       Promise.resolve([new ConceptCard(new SubtitledHtml('', ''), [], null)])
     );
     spyOn(playerPositionService.onHelpCardAvailable, 'emit');
+    spyOn(playerTranscriptService, 'addNewResponse');
+
+    conversationSkinService.displayedCard = displayedCard;
+    spyOn(conversationSkinService.displayedCard, 'markAsCompleted');
+    spyOn(
+      conversationSkinService.displayedCard,
+      'isInteractionInline'
+    ).and.returnValue(false);
 
     conversationSkinService.processFeedbackAndPrerequisiteSkills(
       feedbackHtml,
-      missingPrerequisiteSkillId,
-      conversationSkinComponentMock
+      null
     );
+    tick(200);
     expect(playerTranscriptService.addNewResponse).toHaveBeenCalledWith(
       feedbackHtml
     );
 
-    // Test case 2: missingPrerequisiteSkillId is provided
-    const missingPrerequisiteSkillId2 = 'Skill ID';
-
     conversationSkinService.processFeedbackAndPrerequisiteSkills(
       null,
-      missingPrerequisiteSkillId2,
-      conversationSkinComponentMock
+      missingPrerequisiteSkillId
     );
+    tick(200);
     expect(
-      conversationSkinComponentMock.displayedCard.markAsCompleted
+      conversationSkinService.displayedCard.markAsCompleted
     ).toHaveBeenCalled();
-  });
+  }));
 
   it('should handle navigation properly for the final question', () => {
     spyOn(
       explorationPlayerStateService,
       'isInQuestionPlayerMode'
     ).and.returnValue(true);
+    spyOn(conversationSkinService.onShowUpcomingCard, 'emit');
+    spyOn(playerTranscriptService, 'addNewResponse');
 
-    conversationSkinService.handleFinalQuestionNavigation(
-      'feedback',
-      true,
-      conversationSkinComponentMock
-    );
+    conversationSkinService.displayedCard = displayedCard;
+    spyOn(
+      conversationSkinService.displayedCard,
+      'isInteractionInline'
+    ).and.returnValue(false);
+
+    conversationSkinService.handleFinalQuestionNavigation('feedback', true);
     expect(
-      conversationSkinComponentMock.showUpcomingCard
+      conversationSkinService.onShowUpcomingCard.emit
     ).not.toHaveBeenCalled();
 
-    conversationSkinService.handleFinalQuestionNavigation(
-      '',
-      true,
-      conversationSkinComponentMock
-    );
-    expect(conversationSkinComponentMock.showUpcomingCard).toHaveBeenCalled();
+    conversationSkinService.handleFinalQuestionNavigation('', true);
+    expect(conversationSkinService.onShowUpcomingCard.emit).toHaveBeenCalled();
   });
 
   it('should handle navigation properly for available feedback', () => {
     spyOn(playerTranscriptService, 'hasEncounteredStateBefore').and.returnValue(
       true
     );
-    spyOn(
-      conversationSkinComponentMock.displayedCard,
-      'isInteractionInline'
-    ).and.returnValue(false);
-    spyOn(playerPositionService.onNewCardAvailable, 'emit');
-
-    conversationSkinService.handleFeedbackNavigation(
-      'feedback',
-      displayedCard,
-      conversationSkinComponentMock
+    spyOn(displayedCard, 'isInteractionInline').and.returnValue(false);
+    const onNewCardAvailableSpy = spyOn(
+      playerPositionService.onNewCardAvailable,
+      'emit'
     );
+    spyOn(playerTranscriptService, 'addNewResponse');
+    conversationSkinService.displayedCard = displayedCard;
+    conversationSkinService.nextCard = displayedCard;
+
+    conversationSkinService.handleFeedbackNavigation('feedback', displayedCard);
     expect(playerPositionService.onNewCardAvailable.emit).toHaveBeenCalled();
 
-    conversationSkinService.handleFeedbackNavigation(
-      '',
-      displayedCard,
-      conversationSkinComponentMock
-    );
+    onNewCardAvailableSpy.calls.reset();
+    conversationSkinService.handleFeedbackNavigation(null, displayedCard);
     expect(
       playerPositionService.onNewCardAvailable.emit
     ).not.toHaveBeenCalled();
   });
+
+  it('should submit answer from progress nav and toggle submit clicked', () => {
+    conversationSkinService.displayedCard = displayedCard;
+    spyOn(displayedCard, 'toggleSubmitClicked');
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
+    spyOn(currentInteractionService, 'submitAnswer');
+
+    conversationSkinService.submitAnswerFromProgressNav();
+
+    expect(currentInteractionService.submitAnswer).toHaveBeenCalled();
+    expect(displayedCard.toggleSubmitClicked).toHaveBeenCalledOnceWith(true);
+  });
+
+  it('should tell if window can show two cards', () => {
+    spyOn(windowDimensionsService, 'getWidth').and.returnValue(
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
+    );
+
+    expect(conversationSkinService.canWindowShowTwoCards()).toBeTrue();
+  });
+
+  it('should tell if current supplemental card is non empty', () => {
+    conversationSkinService.displayedCard = displayedCard;
+    spyOn(
+      conversationSkinService,
+      'isSupplementalCardNonempty'
+    ).and.returnValues(true, false);
+
+    expect(
+      conversationSkinService.isCurrentSupplementalCardNonempty()
+    ).toBeTrue();
+    expect(
+      conversationSkinService.isCurrentSupplementalCardNonempty()
+    ).toBeFalse();
+  });
+
+  it('should scroll to bottom', fakeAsync(() => {
+    conversationSkinService.scrollToBottom();
+    tick(200);
+
+    spyOn(window, '$').and.returnValue({
+      offset: () => {
+        return {top: 10};
+      },
+      outerHeight: () => 10,
+      scrollTop: () => 0,
+      height: () => 0,
+      animate: () => {},
+    } as unknown as JQLite);
+
+    conversationSkinService.scrollToBottom();
+    tick(200);
+    expect(window.$).toHaveBeenCalled();
+  }));
+
+  it('should tell if current is at end of transcript', () => {
+    let index = 1;
+    spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(
+      index
+    );
+
+    expect(conversationSkinService.isCurrentCardAtEndOfTranscript()).toBeTrue();
+    expect(playerTranscriptService.isLastCard).toHaveBeenCalledWith(index);
+  });
+
+  it('should animate to one card', fakeAsync(() => {
+    let doneCallbackSpy = jasmine.createSpy('done callback');
+    conversationSkinService.animateToOneCard(doneCallbackSpy);
+
+    tick(600);
+    expect(conversationSkinService.isAnimatingToOneCard).toBeFalse();
+    expect(doneCallbackSpy).toHaveBeenCalled();
+  }));
+
+  it('should animate to two cards', fakeAsync(() => {
+    let doneCallbackSpy = jasmine.createSpy('done callback');
+    conversationSkinService.animateToTwoCards(doneCallbackSpy);
+
+    tick(1000);
+    expect(conversationSkinService.isAnimatingToTwoCards).toBeFalse();
+    expect(doneCallbackSpy).toHaveBeenCalled();
+  }));
 });

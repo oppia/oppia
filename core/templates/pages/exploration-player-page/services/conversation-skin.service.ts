@@ -77,21 +77,21 @@ export class ConversationSkinService {
   answerIsBeingProcessed: boolean = false;
   answerIsCorrect: boolean = false;
 
-  onGiveFeedbackAndStayOnCurrentCard = new EventEmitter<{
+  private _onGiveFeedbackAndStayOnCurrentCard = new EventEmitter<{
     feedbackHtml: string | null;
     missingPrerequisiteSkillId: string | null;
     refreshInteraction: boolean;
     refresherExplorationId: string | null;
   }>();
 
-  onMoveToNewCard = new EventEmitter<{
+  private _onMoveToNewCard = new EventEmitter<{
     feedbackHtml: string | null;
     isFinalQuestion: boolean;
     nextCard: StateCard;
   }>();
 
-  onShowUpcomingCard = new EventEmitter<void>();
-  onShowPendingCard = new EventEmitter<void>();
+  private _onShowUpcomingCard = new EventEmitter<void>();
+  private _onShowPendingCard = new EventEmitter<void>();
 
   constructor(
     private audioPlayerService: AudioPlayerService,
@@ -465,6 +465,31 @@ export class ConversationSkinService {
         );
       }
     }, 100);
+  }
+
+  get onGiveFeedbackAndStayOnCurrentCard(): EventEmitter<{
+    feedbackHtml: string;
+    missingPrerequisiteSkillId: string;
+    refreshInteraction: boolean;
+    refresherExplorationId: string;
+  }> {
+    return this._onGiveFeedbackAndStayOnCurrentCard;
+  }
+
+  get onMoveToNewCard(): EventEmitter<{
+    feedbackHtml: string;
+    isFinalQuestion: boolean;
+    nextCard: StateCard;
+  }> {
+    return this._onMoveToNewCard;
+  }
+
+  get onShowPendingCard(): EventEmitter<void> {
+    return this._onShowPendingCard;
+  }
+
+  get onShowUpcomingCard(): EventEmitter<void> {
+    return this._onShowUpcomingCard;
   }
 }
 
