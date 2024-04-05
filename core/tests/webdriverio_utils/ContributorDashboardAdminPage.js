@@ -241,67 +241,94 @@ var ContributorDashboardAdminPage = function () {
     // await action.click('Language Selector', languageSelector);
   };
 
+  this.selectDate = async function (datePickerToggle, day, month, year) {
+    await action.click('Date Picker Toggle', $(datePickerToggle));
+
+    if (year) {
+      const nextMonthButton = $('.mat-calendar-next-button');
+      const prevMonthButton = $('.mat-calendar-previous-button');
+
+      const yearsToNavigate = year - new Date().getFullYear();
+
+      if (yearsToNavigate > 0) {
+        for (let i = 0; i < yearsToNavigate * 12; i++) {
+          await action.click('Next Month Button', nextMonthButton);
+        }
+      } else if (yearsToNavigate < 0) {
+        for (let i = 0; i < Math.abs(yearsToNavigate) * 12; i++) {
+          await action.click('Previous Month Button', prevMonthButton);
+        }
+      }
+    }
+
+    if (month) {
+      const nextMonthButton = $('.mat-calendar-next-button');
+      const prevMonthButton = $('.mat-calendar-previous-button');
+
+      const currentMonth = new Date().getMonth() + 1;
+      const monthsToNavigate = month - currentMonth;
+
+      if (monthsToNavigate > 0) {
+        for (let i = 0; i < monthsToNavigate; i++) {
+          await action.click('Next Month Button', nextMonthButton);
+        }
+      } else if (monthsToNavigate < 0) {
+        for (let i = 0; i < Math.abs(monthsToNavigate); i++) {
+          await action.click('Previous Month Button', prevMonthButton);
+        }
+      }
+    }
+
+    if (day) {
+      console.log('day condition');
+      const daySelector = $(`aria/${day}`);
+      await action.click('Day Selector', daySelector);
+    }
+  };
+
   this.setLastDatePickerValue = async function (selectedDate) {
-    action.click('Last Date Picker Toggle', lastDatePickerToggle);
-
-    // await waitFor.visibilityOf(
-    //   lastDatePicker,
-    //   'Last Date Picker is not visible'
-    // );
-
-    const dateToSelect = $(
-      '.mat-calendar-body-cell-content',
-      new Date(new Date(selectedDate).getTime() + 24 * 60 * 60 * 1000)
-        .toISOString()
-        .substring(0, 10)
+    await this.selectDate(
+      '.e2e-test-last-date-picker-toggle',
+      new Date(selectedDate).getDate(),
+      new Date(selectedDate).getMonth() + 1,
+      new Date(selectedDate).getFullYear()
     );
-    await action.click('Date to select', dateToSelect);
 
-    const newlySetDate = await action.getValue(
-      'First Date Picker Input',
-      lastDatePickerInput
-    );
     const inputDateFormat = `${new Date(selectedDate).toLocaleString(
       'default',
       {day: '2-digit'}
     )}-${new Date(selectedDate).toLocaleString('default', {
       month: 'short',
     })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
+
+    const newlySetDate = await action.getValue(
+      'First Date Picker Input',
+      lastDatePickerInput
+    );
+
     expect(newlySetDate).toBe(inputDateFormat);
   };
 
   this.setFirstDatePickerValue = async function (selectedDate) {
-    await action.click('First Date Picker Toggle', firstDatePickerToggle);
+    await this.selectDate(
+      '.e2e-test-first-date-picker-toggle',
+      new Date(selectedDate).getDate(),
+      new Date(selectedDate).getMonth() + 1,
+      new Date(selectedDate).getFullYear()
+    );
 
-    // await waitFor.visibilityOf(
-    //   firstDatePicker,
-    //   'First Date Picker is not visible'
-    // );
-
-    const dateToSelectAriaLabel = `${new Date(selectedDate).toLocaleString(
+    const inputDateFormat = `${new Date(selectedDate).toLocaleString(
       'default',
-      {weekday: 'short'}
-    )} ${new Date(selectedDate).toLocaleString('default', {
+      {day: '2-digit'}
+    )}-${new Date(selectedDate).toLocaleString('default', {
       month: 'short',
-    })} ${new Date(selectedDate).toLocaleString('default', {
-      day: '2-digit',
-    })}  ${new Date(selectedDate).toLocaleString('default', {
-      year: 'numeric',
-    })}`;
-
-    const dateToSelect = $(`aria/${dateToSelectAriaLabel}`);
-    await action.click('Date to select', dateToSelect);
+    })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
 
     const newlySetDate = await action.getValue(
       'First Date Picker Input',
       firstDatePickerInput
     );
-    const inputDateFormat = `${new Date(selectedDate).toLocaleString(
-      'default',
-      {day: '2-digit'}
-    )} ${new Date(selectedDate).toLocaleString('default', {
-      month: 'short',
-    })} ${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
+
     expect(newlySetDate).toBe(inputDateFormat);
   };
 

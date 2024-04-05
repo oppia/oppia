@@ -367,8 +367,6 @@ describe('Contributor Admin Dashboard', function () {
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
         new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-          .toISOString()
-          .substring(0, 10)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
@@ -393,8 +391,6 @@ describe('Contributor Admin Dashboard', function () {
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
         new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-          .toISOString()
-          .substring(0, 10)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
@@ -416,8 +412,6 @@ describe('Contributor Admin Dashboard', function () {
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
         new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-          .toISOString()
-          .substring(0, 10)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
@@ -426,23 +420,20 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  fit(
-    'should be able to filter question reviewers using time range' + ' filter',
-    async function () {
-      await users.login(QUESTION_COORDINATOR_EMAIL);
-      await contributorDashboardAdminPage.get();
+  fit('should be able to filter question reviewers using time range filter', async function () {
+    await users.login(QUESTION_COORDINATOR_EMAIL);
+    await contributorDashboardAdminPage.get();
 
-      await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
-      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+    await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
-      await contributorDashboardAdminPage.setFirstDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-      );
-      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-      await contributorDashboardAdminPage.expectNoStatsElement();
+    await contributorDashboardAdminPage.setFirstDatePickerValue(
+      new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+    );
+    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+    await contributorDashboardAdminPage.expectNoStatsElement();
 
-      await users.logout();
-    }
-  );
+    await users.logout();
+  });
 });
