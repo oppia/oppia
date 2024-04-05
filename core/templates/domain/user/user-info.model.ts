@@ -23,6 +23,7 @@ export enum UserRoles {
   BLOG_POST_EDITOR = 'BLOG_POST_EDITOR',
   TRANSLATION_ADMIN = 'TRANSLATION_ADMIN',
   TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR',
+  VOICEOVER_ADMIN = 'VOICEOVER_ADMIN',
 }
 
 export interface UserInfoBackendDict {
@@ -112,6 +113,10 @@ export class UserInfo {
 
   isBlogAdmin(): boolean {
     return this._roles.includes(UserRoles.BLOG_ADMIN);
+  }
+
+  isVoiceoverAdmin(): boolean {
+    return this._roles.includes(UserRoles.VOICEOVER_ADMIN);
   }
 
   isBlogPostEditor(): boolean {

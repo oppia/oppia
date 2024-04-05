@@ -33,8 +33,10 @@ import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {
+  BackendPreferenceUpdateType,
   EmailPreferencesBackendDict,
   SubscriptionSummary,
+  UpdatePreferenceDict,
   UserBackendApiService,
 } from 'services/user-backend-api.service';
 import {UserService} from 'services/user.service';
@@ -45,11 +47,25 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
+import {FormControl, FormGroup} from '@angular/forms';
 
 interface AudioLangaugeChoice {
   id: string;
   text: string;
 }
+
+// A Dict that maps the form Control names in the frontend
+// to the backend update_types.
+const BACKEND_UPDATE_TYPE_DICT: {[key: string]: BackendPreferenceUpdateType} = {
+  profilePicturePngDataUrl: 'profile_picture_data_url',
+  userBio: 'user_bio',
+  defaultDashboard: 'default_dashboard',
+  subjectInterests: 'subject_interests',
+  preferredLanguageCodes: 'preferred_language_codes',
+  preferredSiteLanguageCode: 'preferred_site_language_code',
+  preferredAudioLanguageCode: 'preferred_audio_language_code',
+  emailPreferences: 'email_preferences',
+};
 
 @Component({
   selector: 'oppia-preferences-page',
@@ -60,16 +76,7 @@ export class PreferencesPageComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  subjectInterests!: string;
-  preferredLanguageCodes!: string[];
-  preferredSiteLanguageCode!: string;
-  preferredAudioLanguageCode!: string;
-  profilePicturePngDataUrl!: string;
-  profilePictureWebpDataUrl!: string;
   AUDIO_LANGUAGE_CHOICES!: AudioLangaugeChoice[];
-  userBio!: string;
-  defaultDashboard!: string;
-  subscriptionList!: SubscriptionSummary[];
   TAG_REGEX_STRING!: string;
   LANGUAGE_CHOICES!: LanguageIdAndText[];
   // The following two properties are set to null when the
@@ -80,16 +87,14 @@ export class PreferencesPageComponent {
   DASHBOARD_TYPE_CREATOR = AppConstants.DASHBOARD_TYPE_CREATOR;
   DASHBOARD_TYPE_LEARNER = AppConstants.DASHBOARD_TYPE_LEARNER;
   DASHBOARD_TYPE_CONTRIBUTOR = AppConstants.DASHBOARD_TYPE_CONTRIBUTOR;
-  subjectInterestsChangeAtLeastOnce: boolean = false;
   exportingData: boolean = false;
   hasPageLoaded: boolean = false;
-  canReceiveEmailUpdates: boolean = false;
-  canReceiveEditorRoleEmail: boolean = false;
-  canReceiveSubscriptionEmail: boolean = false;
-  canReceiveFeedbackMessageEmail: boolean = false;
   showEmailSignupLink: boolean = false;
   emailSignupLink: string = AppConstants.BULK_EMAIL_SERVICE_SIGNUP_URL;
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
+
+  subscriptionList: SubscriptionSummary[] = [];
+  preferencesForm!: FormGroup;
 
   @ViewChild('firstRadio') firstRadio!: ElementRef;
 
@@ -116,76 +121,6 @@ export class PreferencesPageComponent {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  private _saveDataItem(
-    updateType: string,
-    data: string | string[] | EmailPreferencesBackendDict
-  ): void {
-    this.preventPageUnloadEventService.addListener();
-    this.userBackendApiService
-      .updatePreferencesDataAsync(updateType, data)
-      .then(returnData => {
-        this.preventPageUnloadEventService.removeListener();
-        if (returnData.bulk_email_signup_message_should_be_shown) {
-          this.canReceiveEmailUpdates = false;
-          this.showEmailSignupLink = true;
-        } else {
-          this.alertsService.addInfoMessage('Saved!', 1000);
-        }
-      });
-  }
-
-  saveUserBio(userBio: string): void {
-    this._saveDataItem('user_bio', userBio);
-  }
-
-  registerBioChanged(): void {
-    this.preventPageUnloadEventService.addListener();
-  }
-
-  onSubjectInterestsSelectionChange(subjectInterests: string): void {
-    this.alertsService.clearWarnings();
-    this.subjectInterestsChangeAtLeastOnce = true;
-    this._saveDataItem('subject_interests', subjectInterests);
-  }
-
-  savePreferredSiteLanguageCodes(preferredSiteLanguageCode: string): void {
-    this.i18nLanguageCodeService.setI18nLanguageCode(preferredSiteLanguageCode);
-    this._saveDataItem(
-      'preferred_site_language_code',
-      preferredSiteLanguageCode
-    );
-  }
-
-  savePreferredAudioLanguageCode(preferredAudioLanguageCode: string): void {
-    this._saveDataItem(
-      'preferred_audio_language_code',
-      preferredAudioLanguageCode
-    );
-  }
-
-  saveEmailPreferences(
-    canReceiveEmailUpdates: boolean,
-    canReceiveEditorRoleEmail: boolean,
-    canReceiveFeedbackMessageEmail: boolean,
-    canReceiveSubscriptionEmail: boolean
-  ): void {
-    let data: EmailPreferencesBackendDict = {
-      can_receive_email_updates: canReceiveEmailUpdates,
-      can_receive_editor_role_email: canReceiveEditorRoleEmail,
-      can_receive_feedback_message_email: canReceiveFeedbackMessageEmail,
-      can_receive_subscription_email: canReceiveSubscriptionEmail,
-    };
-    this._saveDataItem('email_preferences', data);
-  }
-
-  savePreferredLanguageCodes(preferredLanguageCodes: string[]): void {
-    this._saveDataItem('preferred_language_codes', preferredLanguageCodes);
-  }
-
-  saveDefaultDashboard(defaultDashboard: string): void {
-    this._saveDataItem('default_dashboard', defaultDashboard);
-  }
-
   showUsernamePopover(creatorUsername: string): string {
     // The popover on the subscription card is only shown if the length
     // of the creator username is greater than 10 and the user hovers
@@ -203,14 +138,23 @@ export class PreferencesPageComponent {
     }
   }
 
-  private saveProfileImage(newProfilePictureDataUrl: string): void {
-    if (AssetsBackendApiService.EMULATOR_MODE) {
-      this._saveProfileImageToLocalStorage(newProfilePictureDataUrl);
-    } else {
-      this._postProfileImageToServer(newProfilePictureDataUrl);
-    }
+  private updateAndMarkProfileImageAsChanged(
+    newProfilePictureDataUrl: string
+  ): void {
+    const pngControl = this.preferencesForm.controls.profilePicturePngDataUrl;
+    const webpControl = this.preferencesForm.controls.profilePictureWebpDataUrl;
+    pngControl.setValue(newProfilePictureDataUrl);
+    webpControl.setValue(newProfilePictureDataUrl);
+    // We need to mark the control as dirty programmatically because it
+    // is not changed by the user but by the component.
+    pngControl.markAsDirty();
+    webpControl.markAsDirty();
+    // The following line is needed to emit the statusChanges observable.
+    pngControl.updateValueAndValidity();
+    webpControl.updateValueAndValidity();
   }
 
+  // TODO(#19737): Remove the following function.
   private _saveProfileImageToLocalStorage(image: string): void {
     const newImageFile =
       this.imageUploadHelperService.convertImageDataToImageFile(image);
@@ -227,17 +171,6 @@ export class PreferencesPageComponent {
       );
     };
     reader.readAsDataURL(newImageFile);
-    // The reload is needed in order to update the profile picture
-    // in the top-right corner.
-    this.windowRef.nativeWindow.location.reload();
-  }
-
-  private _postProfileImageToServer(image: string): void {
-    this.userService.setProfileImageDataUrlAsync(image).then(() => {
-      // The reload is needed in order to update the profile picture
-      // in the top-right corner.
-      this.windowRef.nativeWindow.location.reload();
-    });
   }
 
   showEditProfilePictureModal(): void {
@@ -247,7 +180,9 @@ export class PreferencesPageComponent {
 
     modalRef.result.then(
       newProfilePictureDataUrl => {
-        this.saveProfileImage(newProfilePictureDataUrl);
+        if (newProfilePictureDataUrl) {
+          this.updateAndMarkProfileImageAsChanged(newProfilePictureDataUrl);
+        }
       },
       () => {
         // Note to developers:
@@ -294,23 +229,6 @@ export class PreferencesPageComponent {
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
     let userInfoPromise = this.userService.getUserInfoAsync();
-    userInfoPromise.then(userInfo => {
-      this.username = userInfo.getUsername();
-      this.email = userInfo.getEmail();
-      if (this.username !== null) {
-        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
-          this.userService.getProfileImageDataUrl(this.username);
-      } else {
-        this.profilePictureWebpDataUrl =
-          this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
-          );
-        this.profilePicturePngDataUrl =
-          this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
-          );
-      }
-    });
 
     this.AUDIO_LANGUAGE_CHOICES = AppConstants.SUPPORTED_AUDIO_LANGUAGES.map(
       languageItem => {
@@ -324,30 +242,162 @@ export class PreferencesPageComponent {
     this.hasPageLoaded = false;
 
     let preferencesPromise = this.userBackendApiService.getPreferencesAsync();
-    preferencesPromise.then(data => {
-      this.userBio = data.user_bio;
-      this.subjectInterests = data.subject_interests;
-      this.preferredLanguageCodes = data.preferred_language_codes;
-      this.defaultDashboard = data.default_dashboard;
-      this.canReceiveEmailUpdates = data.can_receive_email_updates;
-      this.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
-      this.canReceiveSubscriptionEmail = data.can_receive_subscription_email;
-      this.canReceiveFeedbackMessageEmail =
-        data.can_receive_feedback_message_email;
-      this.preferredSiteLanguageCode = data.preferred_site_language_code;
-      this.preferredAudioLanguageCode = data.preferred_audio_language_code;
-      this.subscriptionList = data.subscription_list;
-      this.hasPageLoaded = true;
-    });
 
-    Promise.all([userInfoPromise, preferencesPromise]).then(() => {
-      this.loaderService.hideLoadingScreen();
-    });
+    Promise.all([userInfoPromise, preferencesPromise]).then(
+      ([userInfo, preferencesData]) => {
+        this.username = userInfo.getUsername();
+        this.email = userInfo.getEmail();
+        let profilePicturePngDataUrl: string;
+        let profilePictureWebpDataUrl: string;
+        if (this.username !== null) {
+          [profilePicturePngDataUrl, profilePictureWebpDataUrl] =
+            this.userService.getProfileImageDataUrl(this.username);
+        } else {
+          profilePictureWebpDataUrl =
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+            );
+          profilePicturePngDataUrl =
+            this.urlInterpolationService.getStaticImageUrl(
+              AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
+            );
+        }
+        this.preferencesForm = new FormGroup({
+          profilePicturePngDataUrl: new FormControl(profilePicturePngDataUrl),
+          profilePictureWebpDataUrl: new FormControl(profilePictureWebpDataUrl),
+          userBio: new FormControl(preferencesData.user_bio),
+          defaultDashboard: new FormControl(preferencesData.default_dashboard),
+          subjectInterests: new FormControl(preferencesData.subject_interests),
+          preferredLanguageCodes: new FormControl(
+            preferencesData.preferred_language_codes
+          ),
+          preferredSiteLanguageCode: new FormControl(
+            preferencesData.preferred_site_language_code
+          ),
+          preferredAudioLanguageCode: new FormControl(
+            preferencesData.preferred_audio_language_code
+          ),
+          emailPreferences: new FormGroup({
+            canReceiveEmailUpdates: new FormControl(
+              preferencesData.can_receive_email_updates
+            ),
+            canReceiveEditorRoleEmail: new FormControl(
+              preferencesData.can_receive_editor_role_email
+            ),
+            canReceiveFeedbackMessageEmail: new FormControl(
+              preferencesData.can_receive_feedback_message_email
+            ),
+            canReceiveSubscriptionEmail: new FormControl(
+              preferencesData.can_receive_subscription_email
+            ),
+          }),
+        });
 
-    this.subjectInterestsChangeAtLeastOnce = false;
+        this.subscriptionList = preferencesData.subscription_list;
+
+        // Subscribe to the statusChanges observable of the form.
+        this.preferencesForm.statusChanges.subscribe(() => {
+          // Check if any of the controls is dirty.
+          if (this.preferencesForm.dirty) {
+            this.preventPageUnloadEventService.addListener();
+          } else {
+            this.preventPageUnloadEventService.removeListener();
+          }
+        });
+
+        this.hasPageLoaded = true;
+        this.loaderService.hideLoadingScreen();
+      }
+    );
+
     this.TAG_REGEX_STRING = '^[a-z ]+$';
     this.LANGUAGE_CHOICES = this.languageUtilService.getLanguageIdsAndTexts();
     this.SITE_LANGUAGE_CHOICES = AppConstants.SUPPORTED_SITE_LANGUAGES;
+  }
+
+  savePreferences(): void {
+    if (!this.preferencesForm.dirty) {
+      return;
+    }
+    this.alertsService.clearWarnings();
+
+    // Get the updated fields to send to the backend on-save.
+    let updates: UpdatePreferenceDict[] = [];
+    for (let key in this.preferencesForm.value) {
+      if (!this.preferencesForm.controls[key].dirty) {
+        // We don't send unchanged fields to the backend.
+        continue;
+      }
+      if (key === 'profilePictureWebpDataUrl') {
+        // We send only png data url because png and webp urls same here as
+        // we are not converting the image to webp format.
+        continue;
+      }
+      if (key === 'emailPreferences') {
+        let emailFormData = this.preferencesForm.controls[key].value;
+        let emailData: EmailPreferencesBackendDict = {
+          can_receive_email_updates: emailFormData.canReceiveEmailUpdates,
+          can_receive_editor_role_email:
+            emailFormData.canReceiveEditorRoleEmail,
+          can_receive_feedback_message_email:
+            emailFormData.canReceiveFeedbackMessageEmail,
+          can_receive_subscription_email:
+            emailFormData.canReceiveSubscriptionEmail,
+        };
+        updates.push({
+          update_type: BACKEND_UPDATE_TYPE_DICT[key],
+          data: emailData,
+        });
+        continue;
+      }
+      updates.push({
+        update_type: BACKEND_UPDATE_TYPE_DICT[key],
+        data: this.preferencesForm.controls[key].value,
+      });
+    }
+
+    // TODO(#19737): Remove the following condition.
+    if (AssetsBackendApiService.EMULATOR_MODE) {
+      // Remove 'profile_picture_data_url' from updates if the emulator mode is
+      // on because the backend doesn't support updating profile picture in
+      // emulator mode.
+      updates = updates.filter(update => {
+        return update.update_type !== 'profile_picture_data_url';
+      });
+    }
+
+    this.userBackendApiService
+      .updateMultiplePreferencesDataAsync(updates)
+      .then(returnData => {
+        if (this.preferencesForm.controls.preferredSiteLanguageCode.dirty) {
+          this.i18nLanguageCodeService.setI18nLanguageCode(
+            this.preferencesForm.controls.preferredSiteLanguageCode.value
+          );
+        }
+        if (returnData.bulk_email_signup_message_should_be_shown) {
+          const formGrp = this.preferencesForm.controls
+            .emailPreferences as FormGroup;
+          formGrp.controls.canReceiveEmailUpdates.setValue(false);
+          this.showEmailSignupLink = true;
+        } else {
+          this.alertsService.addInfoMessage('Saved!', 1000);
+        }
+        if (this.preferencesForm.controls.profilePicturePngDataUrl.dirty) {
+          // TODO(#19737): Remove the following 'if' condition.
+          if (AssetsBackendApiService.EMULATOR_MODE) {
+            this._saveProfileImageToLocalStorage(
+              this.preferencesForm.controls.profilePicturePngDataUrl.value
+            );
+          }
+          // The reload is needed in order to update the profile picture
+          // in the top-right corner(Nav Bar).
+          this.preventPageUnloadEventService.removeListener();
+          this.windowRef.nativeWindow.location.reload();
+        }
+        // Marks all the preferences as unchanged and updates the form status.
+        this.preferencesForm.markAsPristine();
+        this.preferencesForm.updateValueAndValidity();
+      });
   }
 }
 
