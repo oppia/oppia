@@ -131,8 +131,10 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(interactionAddbutton);
     await this.clickOn(endInteractionTab);
     await this.clickOn(saveInteractionButton);
-    showMessage('End Exploration has been added successfully.');
-    showMessage('Successfully created a minimal exploration!');
+    showMessage(
+      'End Exploration has been added and' +
+        'successfully created an exploration.'
+    );
   }
 
   /**
@@ -312,10 +314,6 @@ export class ExplorationCreator extends BaseUser {
     }
   }
 
-  async updateSettingsSuccessfully(): Promise<void> {
-    showMessage('Successfully updated basic settings!');
-  }
-
   /**
    * This function checks if tags are successfully added.
    */
@@ -376,8 +374,6 @@ export class ExplorationCreator extends BaseUser {
    */
   async enableAutomaticTextToSpeech(): Promise<void> {
     await this.clickOn(textToSpeechToggle);
-
-    showMessage('Successfully updated advanced settings!');
   }
 
   /**
@@ -546,7 +542,6 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(commitMessage);
     await this.type(commitMessage, 'Testing Testing');
     await this.clickOn('.e2e-test-save-draft-button');
-    showMessage('Successfully drafted.');
   }
 
   /**

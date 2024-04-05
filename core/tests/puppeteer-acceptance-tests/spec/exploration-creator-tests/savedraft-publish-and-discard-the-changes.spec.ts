@@ -59,7 +59,6 @@ describe('Exploration Publisher, Saver and Drafter', function () {
       await explorationCreator.selectACategory('Algebra');
       await explorationCreator.selectALanguage('Arabic');
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
-      await explorationCreator.updateSettingsSuccessfully();
 
       await explorationCreator.publishExploration();
 
