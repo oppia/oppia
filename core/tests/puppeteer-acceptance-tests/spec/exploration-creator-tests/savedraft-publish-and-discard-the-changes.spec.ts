@@ -52,11 +52,10 @@ describe('Exploration Publisher, Saver and Drafter', function () {
       );
       await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
-      await explorationCreator.showMessageOfSuccessfulExplorationCreation();
 
       await explorationCreator.goToSettingsTab();
       await explorationCreator.addTitle('Old Title');
-      await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
+      await explorationCreator.updateGoalTo('OppiaAcceptanceTestsCheck');
       await explorationCreator.selectACategory('Algebra');
       await explorationCreator.selectALanguage('Arabic');
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);

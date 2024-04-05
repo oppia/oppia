@@ -132,10 +132,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(endInteractionTab);
     await this.clickOn(saveInteractionButton);
     showMessage('End Exploration has been added successfully.');
-  }
-
-  async showMessageOfSuccessfulExplorationCreation(): Promise<void> {
-    showMessage('Successfully created a exploration!');
+    showMessage('Successfully created a minimal exploration!');
   }
 
   /**
@@ -194,10 +191,9 @@ export class ExplorationCreator extends BaseUser {
   /**
    * This function helps in adding a goal.
    */
-  async updateGoal(goal: string): Promise<void> {
+  async updateGoalTo(goal: string): Promise<void> {
     await this.clickOn(addGoal);
     await this.type(addGoal, goal);
-    showMessage('Goal has been filled');
   }
 
   /**
@@ -309,7 +305,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding tags.
    */
   async addTags(TagNames: string[]): Promise<void> {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < TagNames.length; i++) {
       await this.clickOn(addTags);
       await this.type(addTags, TagNames[i].toLowerCase());
       await this.page.keyboard.press('Tab');
@@ -412,7 +408,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(addRoleBar);
     await this.clickOn(collaborator);
     await this.clickOn(saveRole);
-    showMessage('Collaborator has been added.');
+    showMessage(`${username} has been added as collaborator.`);
   }
 
   /**
@@ -428,7 +424,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(addRoleBar);
     await this.clickOn(playtester);
     await this.clickOn(saveRole);
-    showMessage('Playtester has been added.');
+    showMessage(`${username} has been added as playtester.`);
   }
 
   /**
@@ -468,7 +464,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding voice artist.
    */
   async addVoiceArtists(voiceArtists: string[]): Promise<void> {
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < voiceArtists.length; i++) {
       await this.clickOn(voiceArtistEditButton);
       await this.clickOn(addVoiceArtistUserName);
       await this.page.waitForSelector(
@@ -529,7 +525,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(): Promise<void> {
     try {
-      await this.page.goto(explorationUrlAfterPublished);
+      await this.goto(explorationUrlAfterPublished);
       throw new Error('Exploration is not deleted successfully.');
     } catch (error) {
       showMessage('Exploration is successfully deleted.');

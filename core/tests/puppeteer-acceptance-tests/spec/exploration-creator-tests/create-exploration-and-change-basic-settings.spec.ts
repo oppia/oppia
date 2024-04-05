@@ -82,14 +82,13 @@ describe('Exploration Creator', function () {
       );
       await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
-      await explorationCreator.showMessageOfSuccessfulExplorationCreation();
 
       await explorationCreator.goToSettingsTab();
 
       await explorationCreator.addTitle('Your Title Here');
       await explorationCreator.expectTitleToHaveMaxLength(36);
 
-      await explorationCreator.updateGoal('OppiaAcceptanceTestsCheck');
+      await explorationCreator.updateGoalTo('OppiaAcceptanceTestsCheck');
       await explorationCreator.expectGoalToEqual('OppiaAcceptanceTestsCheck');
 
       await explorationCreator.selectACategory('Algebra');
@@ -100,8 +99,6 @@ describe('Exploration Creator', function () {
 
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
       await explorationCreator.expectTagsToBeAdded(['TagA', 'TagB', 'TagC']);
-
-      await explorationCreator.updateSettingsSuccessfully();
 
       await explorationCreator.previewSummary();
 
