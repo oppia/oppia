@@ -261,6 +261,76 @@ describe('TopNavigationBarComponent', () => {
     })
   );
 
+  it('should display headerText and subheaderText when windowIsNarrow is true', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+
+    component.headerText = 'Test Header';
+    component.subheaderText = 'Test Subheader';
+    fixture.detectChanges();
+
+    const headerTextElement = fixture.nativeElement.querySelector(
+      '.nav-mobile-header-editor'
+    );
+    const subheaderTextElement = fixture.nativeElement.querySelector(
+      '.nav-mobile-header-text'
+    );
+
+    expect(component.windowIsNarrow).toBe(true);
+    expect(headerTextElement.textContent).toContain('Test Header');
+    expect(subheaderTextElement.textContent).toContain('Test Subheader');
+
+    flush();
+  }));
+
+  it(
+    'should not display headerText and subheaderText when windowIsNarrow ' +
+      'is false',
+    fakeAsync(() => {
+      spyOn(component, 'truncateNavbar').and.stub();
+      spyOn(wds, 'isWindowNarrow').and.returnValue(false);
+
+      component.headerText = 'Test Header';
+      component.subheaderText = 'Test Subheader';
+      fixture.detectChanges();
+
+      const headerTextElement = fixture.nativeElement.querySelector(
+        '.nav-mobile-header-editor'
+      );
+      const subheaderTextElement = fixture.nativeElement.querySelector(
+        '.nav-mobile-header-text'
+      );
+
+      expect(component.windowIsNarrow).toBe(false);
+      expect(headerTextElement).toBeNull();
+      expect(subheaderTextElement).toBeNull();
+
+      flush();
+    })
+  );
+
+  it('should not display headerText and subheaderText when headerText is empty', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(wds, 'isWindowNarrow').and.returnValue(true);
+
+    component.headerText = '';
+    component.subheaderText = 'Test Subheader';
+    fixture.detectChanges();
+
+    const headerTextElement = fixture.nativeElement.querySelector(
+      '.nav-mobile-header-editor'
+    );
+    const subheaderTextElement = fixture.nativeElement.querySelector(
+      '.nav-mobile-header-text'
+    );
+
+    expect(component.windowIsNarrow).toBe(true);
+    expect(headerTextElement).toBeNull();
+    expect(subheaderTextElement).toBeNull();
+
+    flush();
+  }));
+
   it("should show Oppia's logos", () => {
     expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
       '/assets/images/logo/288x128_logo_white.webp'

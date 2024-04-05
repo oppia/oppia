@@ -153,7 +153,6 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
 
     this.isStoryPublished = this.storyEditorStateService.isStoryPublished;
     this.currentTitle = this.nodeIdToTitleMap[this.nodeId];
-    this.pageTitleService.setNavbarSubtitleForMobileView(this.currentTitle);
     this.editableTitle = this.currentTitle;
     this.currentDescription = this.description;
     this.editableDescription = this.currentDescription;
@@ -596,7 +595,6 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.pageTitleService.setNavbarTitleForMobileView('Chapter Editor');
     this.chapterOutlineIsShown = !this.windowDimensionsService.isWindowNarrow();
     this.chapterTodoCardIsShown =
       !this.windowDimensionsService.isWindowNarrow();

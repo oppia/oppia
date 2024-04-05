@@ -18,6 +18,7 @@
 
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable, EventEmitter} from '@angular/core';
+import {PageTitleService} from 'services/page-title.service';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 
@@ -37,7 +38,10 @@ export class StoryEditorNavigationService {
   private _activeTabIsSwitchedEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
 
-  constructor(private windowRef: WindowRef) {}
+  constructor(
+    private windowRef: WindowRef,
+    private pageTitleService: PageTitleService
+  ) {}
 
   getActiveTab(): string {
     return this.activeTab;
@@ -55,12 +59,18 @@ export class StoryEditorNavigationService {
     return this.chapterId;
   }
 
-  navigateToChapterEditorWithId(id: string, index: number | null): void {
+  navigateToChapterEditorWithId(
+    id: string,
+    index: number | null,
+    title: string
+  ): void {
     this.activeTab = CHAPTER_EDITOR;
     this.setChapterId(id);
     this._activeTabIsSwitchedEventEmitter.emit(CHAPTER_EDITOR);
     this.chapterIndex = index;
     this.windowRef.nativeWindow.location.hash = '/chapter_editor/' + id;
+    this.pageTitleService.setNavbarTitleForMobileView('Chapter Editor');
+    this.pageTitleService.setNavbarSubtitleForMobileView(title);
   }
 
   checkIfPresentInChapterEditor(): boolean {
@@ -80,7 +90,7 @@ export class StoryEditorNavigationService {
   }
 
   navigateToChapterEditor(): void {
-    this.navigateToChapterEditorWithId(this.chapterId, null);
+    this.navigateToChapterEditorWithId(this.chapterId, null, '');
   }
 
   navigateToStoryEditor(): void {

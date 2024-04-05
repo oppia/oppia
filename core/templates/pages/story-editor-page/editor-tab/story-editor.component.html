@@ -210,7 +210,7 @@
                      cdkDrag>
                   <div class="story-editor-node"
                        [ngClass]="{'selected-node': (node.getId() === idOfNodeToEdit)}"
-                       (click)="navigateToChapterWithId(node.getId(), idx)">
+                       (click)="navigateToChapterWithId(node.getId(), idx, node.getTitle())">
                     <div class="story-editor-node-title">
                       <span> {{ idx+1 }}. </span>
                       <span class="e2e-test-chapter-title">{{ node.getTitle() }}</span>

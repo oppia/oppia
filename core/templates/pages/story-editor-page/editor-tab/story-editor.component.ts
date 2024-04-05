@@ -313,8 +313,12 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToChapterWithId(id: string, index: number): void {
-    this.storyEditorNavigationService.navigateToChapterEditorWithId(id, index);
+  navigateToChapterWithId(id: string, index: number, title: string): void {
+    this.storyEditorNavigationService.navigateToChapterEditorWithId(
+      id,
+      index,
+      title
+    );
   }
 
   updateStoryDescriptionStatus(description: string): void {

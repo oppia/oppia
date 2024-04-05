@@ -617,7 +617,7 @@ describe('Story Editor Component having three story nodes', () => {
       'navigateToChapterEditorWithId'
     );
 
-    component.navigateToChapterWithId('chapter_1', 0);
+    component.navigateToChapterWithId('chapter_1', 0, 'Chapter 1');
 
     expect(navigationSpy).toHaveBeenCalled();
   });

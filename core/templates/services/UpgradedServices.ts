@@ -826,7 +826,10 @@ export class UpgradedServices {
         upgradedServices['UtilsService']
       );
     upgradedServices['StoryEditorNavigationService'] =
-      new StoryEditorNavigationService(upgradedServices['WindowRef']);
+      new StoryEditorNavigationService(
+        upgradedServices['WindowRef'],
+        upgradedServices['PageTitleService']
+      );
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']
     );
