@@ -24,63 +24,65 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
-const takeMeToEditorButton = '.e2e-test-dismiss-welcome-modal';
+const takeMeToEditorButton = 'button.e2e-test-dismiss-welcome-modal';
 const addCardName = '.e2e-test-state-name-text';
-const introSubmitButton = '.e2e-test-state-name-submit';
-const forButtonToBeEnabled = '.e2e-test-state-name-submit:not([disabled])';
-const introTitleSubmitButton = '.e2e-test-save-state-content';
+const explorationIntroBox = 'div.e2e-test-rte';
+const introSubmitButton = 'button.e2e-test-state-name-submit';
+const forButtonToBeEnabled =
+  'button.e2e-test-state-name-submit:not([disabled])';
+const introTitleSubmitButton = 'button.e2e-test-save-state-content';
 const interactionAddbutton = 'button.e2e-test-open-add-interaction-modal';
 const endInteractionTab = '.e2e-test-interaction-tile-EndExploration';
-const saveInteractionButton = '.e2e-test-save-interaction';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
 const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
 const addTitleBar = 'input#explorationTitle';
 const addGoal = '.e2e-test-exploration-objective-input';
-const categoryDropDown = '.e2e-test-exploration-category-dropdown';
+const categoryDropDown = 'mat-select.e2e-test-exploration-category-dropdown';
 const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
-const addTags = '.e2e-test-chip-list-tags';
-const previewSummaryButton = '.e2e-test-open-preview-summary-modal';
-const dismissPreviewButton = '.e2e-test-close-preview-summary-modal';
+const addTags = 'input.e2e-test-chip-list-tags';
+const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
+const dismissPreviewButton = 'button.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label[for="text-speech-switch"]';
 const feedbackToggleOff = 'label[for="feedback-switch"]';
 
 const editbutton = '.e2e-test-edit-roles';
 const addUserName = '#newMemberUsername';
-const addRoleBar = '.e2e-test-role-select';
+const addRoleBar = 'mat-select.e2e-test-role-select';
 const collaborator = 'Collaborator (can make changes)';
 const playtester = 'Playtester (can give feedback)';
-const saveRole = '.e2e-test-save-role';
-const deleteExplorationButton = '.e2e-test-delete-exploration-button';
-const saveDraftButton = '.e2e-test-save-changes';
-const publishButton = '.e2e-test-publish-exploration';
+const saveRole = 'button.e2e-test-save-role';
+const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
+const saveDraftButton = 'button.e2e-test-save-changes';
+const publishButton = 'button.e2e-test-publish-exploration';
 const discardDraftButton = 'a.e2e-test-discard-changes';
-const discardConfirmButton = '.e2e-test-confirm-discard-changes';
-const deleteConfirmButton = '.e2e-test-really-delete-exploration-button';
+const discardConfirmButton = 'button.e2e-test-confirm-discard-changes';
+const deleteConfirmButton = 'button.e2e-test-really-delete-exploration-button';
 const voiceArtistEditButton = '.e2e-test-edit-voice-artist-roles';
-const voiceArtistSaveButton = '.e2e-test-add-voice-artist-role-button';
-const publishConfirmButton = '.e2e-test-confirm-publish';
+const voiceArtistSaveButton = 'button.e2e-test-add-voice-artist-role-button';
+const publishConfirmButton = 'button.e2e-test-confirm-publish';
 const commitMessage = '.e2e-test-commit-message-input';
-const closePublishedPopUp = '.e2e-test-share-publish-close';
-const addVoiceArtistUserName = '#newVoicAartistUsername';
+const closePublishedPopUp = 'button.e2e-test-share-publish-close';
+const addVoiceArtistUserName = 'input#newVoicAartistUsername';
 
 /**
  * For mobile.
  */
 const navBarOpener = '.e2e-test-mobile-options';
-const optionsDropDown = '.e2e-test-mobile-options-dropdown';
+const optionsDropDown = 'div.e2e-test-mobile-options-dropdown';
 const mobileSettingsBar = '.e2e-test-mobile-settings-button';
-const basicSettingsDropDown = '.e2e-test-settings-container';
-const feedbackSettingsDropdown = '.e2e-test-feedback-settings-container';
-const permissionSettingsDropDown = '.e2e-test-permission-settings-container';
+const basicSettingsDropDown = 'h3.e2e-test-settings-container';
+const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
+const permissionSettingsDropDown = 'h3.e2e-test-permission-settings-container';
 const voiceArtistSettingsDropDown =
-  '.e2e-test-voice-artists-settings-container';
-const rolesSettingsDropDown = '.e2e-test-roles-settings-container';
-const advanceSettingsDropDown = '.e2e-test-advanced-settings-container';
+  'h3.e2e-test-voice-artists-settings-container';
+const rolesSettingsDropDown = 'h3.e2e-test-roles-settings-container';
+const advanceSettingsDropDown = 'h3.e2e-test-advanced-settings-container';
 const explorationControlsSettingsDropDown =
-  '.e2e-test-controls-bar-settings-container';
+  'h3.e2e-test-controls-bar-settings-container';
 const mobileSaveDraftButton = 'button.e2e-test-save-changes-for-small-screens';
-const mobilePublishButton = '.e2e-test-mobile-publish-button';
-const publishButtonDropDown = '#discardButtonPopup';
-const mobileDiscardButton = '.e2e-test-mobile-exploration-discard-tab';
+const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
+const publishButtonDropDown = 'div.e2e-test-mobile-changes-dropdown';
+const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
 
 let explorationUrlAfterPublished = '';
 export class ExplorationCreator extends BaseUser {
@@ -115,8 +117,8 @@ export class ExplorationCreator extends BaseUser {
    */
   async updateExplorationIntroText(Introtext: string): Promise<void> {
     await this.clickOn('div.e2e-test-state-edit-content');
-    await this.clickOn('div.e2e-test-rte');
-    await this.type('div.e2e-test-rte', Introtext);
+    await this.clickOn(explorationIntroBox);
+    await this.type(explorationIntroBox, Introtext);
     await this.clickOn(introTitleSubmitButton);
     showMessage('Intro text updated successfully.');
   }
@@ -434,16 +436,31 @@ export class ExplorationCreator extends BaseUser {
    *of the exploration to Public/Private
    */
   async expectExplorationToBePublished(): Promise<void> {
-    const publishButton = await this.page.$('.e2e-test-publish-exploration');
-    if (publishButton) {
-      showMessage(
-        'Exploration is set to Private and is not' +
-          ' accessible to Oppia users.'
-      );
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(publishButtonDropDown);
+      const publishButton = await this.page.$(mobilePublishButton);
+      if (!publishButton) {
+        showMessage(
+          'Exploration is set to Public and is accessible to Oppia users.'
+        );
+      } else {
+        throw new Error(
+          'Exploration is set to Private and is not' +
+            ' accessible to Oppia users.'
+        );
+      }
     } else {
-      showMessage(
-        'Exploration is set to Public and is accessible to Oppia users.'
-      );
+      const publishButton = await this.page.$('.e2e-test-publish-exploration');
+      if (!publishButton) {
+        showMessage(
+          'Exploration is set to Public and is accessible to Oppia users.'
+        );
+      } else {
+        throw new Error(
+          'Exploration is set to Private and is not' +
+            ' accessible to Oppia users.'
+        );
+      }
     }
   }
 
@@ -454,12 +471,15 @@ export class ExplorationCreator extends BaseUser {
     for (let i = 0; i < 3; i++) {
       await this.clickOn(voiceArtistEditButton);
       await this.clickOn(addVoiceArtistUserName);
+      await this.page.waitForSelector(
+        `${addVoiceArtistUserName}:not([disabled])`
+      );
       await this.page.click(addVoiceArtistUserName, {clickCount: 3});
       await this.page.keyboard.press('Backspace');
       await this.type(addVoiceArtistUserName, voiceArtists[i]);
       await this.clickOn(voiceArtistSaveButton);
 
-      showMessage(voiceArtists[i] + 'has been added successfully.');
+      showMessage(voiceArtists[i] + ' has been added successfully.');
     }
   }
 
@@ -485,10 +505,10 @@ export class ExplorationCreator extends BaseUser {
       input => (input as HTMLInputElement).checked
     );
 
-    if (isChecked) {
+    if (!isChecked) {
       showMessage('suggestions notifications via email are enabled.');
     } else {
-      showMessage('Feedback notifications via email are enabled.');
+      throw new Error('suggestions notifications via email are disabled.');
     }
   }
 
@@ -496,6 +516,9 @@ export class ExplorationCreator extends BaseUser {
    * This funciton helps in deleting the exploration successfully.
    */
   async deleteExploration(): Promise<void> {
+    await this.page.waitForSelector(
+      `${deleteExplorationButton}:not([disabled]`
+    );
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(deleteConfirmButton);
   }
@@ -562,14 +585,13 @@ export class ExplorationCreator extends BaseUser {
       await this.page.waitForSelector(`${mobilePublishButton}:not([disabled])`);
       await this.clickOn(mobilePublishButton);
     } else {
-      await this.page.waitForSelector(
-        '.oppia-editor-publish-button:not([disabled])'
-      );
+      await this.page.waitForSelector(`${publishButton}:not([disabled])`);
       await this.clickOn(publishButton);
     }
 
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
+    await this.page.waitForSelector(closePublishedPopUp, {visible: true});
     await this.clickOn(closePublishedPopUp);
 
     explorationUrlAfterPublished = await this.page.url();
@@ -616,15 +638,15 @@ export class ExplorationCreator extends BaseUser {
   /**
    *This function checks whether changes has discarded successfully or not.
    */
-  async expectTitleToBe(titleBeforeChanges: string): Promise<void> {
+  async expectTitleToBe(expectedTitle: string): Promise<void> {
     await this.page.waitForSelector('.e2e-test-exploration-title-input');
     const titleInput = await this.page.$('.e2e-test-exploration-title-input');
-    const titleAfterChanges = await this.page.evaluate(
+    const titlePresent = await this.page.evaluate(
       input => input.value,
       titleInput
     );
 
-    if (titleBeforeChanges === titleAfterChanges) {
+    if (expectedTitle === titlePresent) {
       showMessage('Changes have been updated successfully.');
     } else {
       throw new Error('Failed to update changes.');
