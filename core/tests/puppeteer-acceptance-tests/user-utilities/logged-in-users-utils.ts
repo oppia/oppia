@@ -895,7 +895,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerPrivacyPolicyLink,
-      'Privacy Polocy link in the footer',
+      'Privacy Policy link in the footer',
       privacyPolicyUrl,
       'Privacy Policy'
     );

@@ -56,7 +56,7 @@ describe('Logged-in Users', function () {
     );
 
     it(
-      'should be able to use the "Accesss the Android app" button',
+      'should be able to use the "Access the Android app" button',
       async function () {
         await testUser.clickAccessTheAndroidAppOnTeachPage();
       },
