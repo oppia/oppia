@@ -156,15 +156,15 @@
           <div class="date-selector-inner-container">
             <b class="filter-label">Filter:</b>
             <mat-form-field>
-              <input matInput [matDatepicker]="lastDatepicker" (dateChange)="changeLastActivity($event)" [(ngModel)]="selectedLastActivity" [max]="selectedFirstActivity">
-              <mat-datepicker-toggle matSuffix [for]="lastDatepicker"></mat-datepicker-toggle>
-              <mat-datepicker #lastDatepicker></mat-datepicker>
+              <input matInput class="e2e-test-mobile-last-date-picker-input" [matDatepicker]="lastDatepicker" (dateChange)="changeLastActivity($event.value)" [(ngModel)]="selectedLastActivity" [max]="selectedFirstActivity">
+              <mat-datepicker-toggle matSuffix class="e2e-test-mobile-last-date-picker-toggle" [for]="lastDatepicker"></mat-datepicker-toggle>
+              <mat-datepicker #lastDatepicker class="e2e-test-mobile-last-date-picker"></mat-datepicker>
             </mat-form-field>
             <b class="filter-label">To</b>
             <mat-form-field>
-              <input matInput [matDatepicker]="firstDatepicker" (dateChange)="changeFirstActivity($event)" [(ngModel)]="selectedFirstActivity" [max]="today" [min]="selectedLastActivity">
-              <mat-datepicker-toggle matSuffix [for]="firstDatepicker"></mat-datepicker-toggle>
-              <mat-datepicker #firstDatepicker></mat-datepicker>
+              <input matInput class="e2e-test-mobile-first-date-picker-input" [matDatepicker]="firstDatepicker" (dateChange)="changeFirstActivity($event.value)" [(ngModel)]="selectedFirstActivity" [max]="today" [min]="selectedLastActivity">
+              <mat-datepicker-toggle matSuffix class="e2e-test-mobile-first-date-picker-toggle" [for]="firstDatepicker"></mat-datepicker-toggle>
+              <mat-datepicker #firstDatepicker class="e2e-test-mobile-first-date-picker"></mat-datepicker>
             </mat-form-field>
           </div>
         </div>
