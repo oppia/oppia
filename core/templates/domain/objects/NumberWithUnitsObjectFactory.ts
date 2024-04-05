@@ -273,6 +273,12 @@ export class NumberWithUnitsObjectFactory {
     }
 
     const unitsObj = this.unitsFactory.fromRawInputString(units);
+    let unitList = units.split(' ').filter(obj => {return this.unitsFactory.isunit(obj)});
+    if (unitList.length != this.unitsFactory.fromStringToList(units).length){
+      throw new Error(
+        ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS.INVALID_DOUBLE_UNITS
+      );
+    }
     return new NumberWithUnits(type, real, fractionObj, unitsObj);
   }
 
