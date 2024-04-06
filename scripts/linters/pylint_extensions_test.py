@@ -47,7 +47,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_break_after_hanging_indent = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
@@ -72,7 +72,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node_break_after_hanging_indent = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
@@ -99,7 +99,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
@@ -125,13 +125,14 @@ class HangingIndentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
                     u"""self.post_json(  # Random comment
                     '(',
-                    self.payload, expect_errors=True, expected_status_int=401)""")
+                    self.payload, expect_errors=True,
+                    expected_status_int=401)""")
             node_with_no_error_message.file = filename
             node_with_no_error_message.path = filename
 
@@ -148,13 +149,14 @@ class HangingIndentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
                     u"""self.post_json(func(  # Random comment
                     '(',
-                    self.payload, expect_errors=True, expected_status_int=401))""")
+                    self.payload, expect_errors=True,
+                    expected_status_int=401))""")
             node_with_no_error_message.file = filename
             node_with_no_error_message.path = filename
 
@@ -171,7 +173,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
@@ -192,7 +194,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
@@ -232,7 +234,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_no_newline_below_class_docstring = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -262,7 +264,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -294,7 +296,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -326,7 +328,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -357,7 +359,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -382,7 +384,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -406,7 +408,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
         node_class_with_no_docstring = astroid.scoped_nodes.Module(
             name='test',
             doc=None)
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -429,7 +431,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -455,7 +457,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             astroid.scoped_nodes.Module(
                 name='test',
                 doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -1903,7 +1905,7 @@ class BackslashContinuationCheckerTests(unittest.TestCase):
             pylint_extensions.BackslashContinuationChecker)
         checker_test_object.setup_method()
         node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2275,7 +2277,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
         node_missing_newline_at_eof = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2285,7 +2287,8 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             node_missing_newline_at_eof.file = filename
             node_missing_newline_at_eof.path = filename
 
-            checker_test_object.checker.process_module(node_missing_newline_at_eof)
+            checker_test_object.checker.process_module(
+                node_missing_newline_at_eof)
 
             with checker_test_object.assertAddsMessages(
                 testutils.MessageTest(
@@ -2299,7 +2302,7 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(u"""1""")
@@ -2320,14 +2323,15 @@ class SingleCharAndNewlineAtEOFCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test')
 
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(u"""x = 'something dummy'""")
             node_with_no_error_message.file = filename
             node_with_no_error_message.path = filename
 
-            checker_test_object.checker.process_module(node_with_no_error_message)
+            checker_test_object.checker.process_module(
+                node_with_no_error_message)
 
             with checker_test_object.assertNoMessages():
                 temp_file.close()
@@ -2365,7 +2369,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2394,7 +2398,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2426,7 +2430,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2470,7 +2474,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2502,7 +2506,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2536,7 +2540,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2586,7 +2590,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2625,7 +2629,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2655,7 +2659,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2686,7 +2690,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2715,7 +2719,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2745,7 +2749,7 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2796,14 +2800,14 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
                     u"""
-                    # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                    # are not available yet.
+                    # TODO(#sll): Here we use MyPy ignore because
+                    # stubs of protobuf are not available yet.
 
                     def foo(exp_id: str) -> str:  # type: ignore
                         return 'hi' #@
@@ -2836,22 +2840,22 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
                     u"""
-                    # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                    # are not available yet.
+                    # TODO(#sll): Here we use MyPy ignore because
+                    # stubs of protobuf are not available yet.
                     def foo(exp_id: str) -> str:  # type: ignore[arg-type]
                         return 'hi' #@
 
                     def foo(exp_id: str) -> str:  # type: ignore
                         return 'hi' #@
 
-                    # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                    # are not available yet.
+                    # TODO(#sll): Here we use MyPy ignore because
+                    # stubs of protobuf are not available yet.
                     def foo(exp_id: str) -> str:  # type: ignore[misc]
                         return 'hi' #@
                     """
@@ -2875,14 +2879,14 @@ class TypeIgnoreCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
                 tmp.write(
                     u"""
-                    # TODO(#sll): Here we use MyPy ignore because stubs of protobuf
-                    # are not available yet.
+                    # TODO(#sll): Here we use MyPy ignore because
+                    # stubs of protobuf are not available yet.
 
                     def foo(exp_id: str) -> str:  # type: ignore[arg-type]
                         return 'hi' #@
@@ -2914,7 +2918,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2933,7 +2937,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 node=node_with_any_type
             )
             with self.checker_test_object.assertAddsMessages(message):
-                self.checker_test_object.checker.visit_module(node_with_any_type)
+                self.checker_test_object.checker.visit_module(
+                    node_with_any_type)
             temp_file.close()
 
         # Checking for object class.
@@ -2941,7 +2946,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2958,7 +2963,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 node=node_with_object_type
             )
             with self.checker_test_object.assertAddsMessages(message):
-                self.checker_test_object.checker.visit_module(node_with_object_type)
+                self.checker_test_object.checker.visit_module(
+                    node_with_object_type)
             temp_file.close()
 
         # Checking for cast method.
@@ -2966,7 +2972,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -2983,7 +2989,8 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 node=node_with_cast_method
             )
             with self.checker_test_object.assertAddsMessages(message):
-                self.checker_test_object.checker.visit_module(node_with_cast_method)
+                self.checker_test_object.checker.visit_module(
+                    node_with_cast_method)
             temp_file.close()
 
     def test_raises_error_if_exceptional_types_are_combined_in_module(
@@ -2993,7 +3000,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3050,7 +3057,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3077,7 +3084,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3104,7 +3111,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3131,7 +3138,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3172,7 +3179,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3195,7 +3202,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3221,7 +3228,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3261,7 +3268,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3309,7 +3316,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3338,7 +3345,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3383,7 +3390,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
                 doc='Custom test'
             )
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3417,7 +3424,7 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             name='test',
             doc='Custom test'
         )
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3452,7 +3459,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_invalid_punctuation = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3479,7 +3486,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_no_space_at_beginning = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3503,7 +3510,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_no_capital_letter_at_beginning = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3529,7 +3536,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_with_excluded_phrase = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3551,7 +3558,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3575,7 +3582,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_allowed_pragma = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3597,7 +3604,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_inline_comment_with_invalid_pragma = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3623,7 +3630,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_variable_name_in_comment = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3645,7 +3652,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_with_version_info = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3667,7 +3674,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_data_type_in_comment = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3689,7 +3696,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_comment_inside_docstring = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3712,7 +3719,7 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3746,7 +3753,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_no_empty_line_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3776,7 +3783,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3811,7 +3818,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3845,7 +3852,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_no_empty_line_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3876,7 +3883,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3901,7 +3908,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_file_with_no_file_overview = astroid.scoped_nodes.Module(
             name='test',
             doc=None)
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3923,7 +3930,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
         node_file_overview_at_end_of_file = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3960,7 +3967,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
         node_pragma_for_multiline = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -3993,7 +4000,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
     def test_enable_single_line_pragma_for_multiline(self) -> None:
         node_enable_single_line_pragma_for_multiline = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -4024,7 +4031,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
     def test_enable_single_line_pragma_with_invalid_name(self) -> None:
         node_enable_single_line_pragma_with_invalid_name = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -4055,7 +4062,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
     def test_single_line_pylint_pragma(self) -> None:
         node_with_no_error_message = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -4076,7 +4083,7 @@ class SingleLinePragmaCheckerTests(unittest.TestCase):
     def test_no_and_extra_space_before_pylint(self) -> None:
         node_no_and_extra_space_before_pylint = (
             astroid.scoped_nodes.Module(name='test', doc='Custom test'))
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -4117,7 +4124,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         node_no_space_after_keyword = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -4158,7 +4165,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         node_multiple_spaces_after_keyword = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:
@@ -4199,7 +4206,7 @@ class SingleSpaceAfterKeyWordCheckerTests(unittest.TestCase):
         node_single_space_after_keyword = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
             filename = temp_file.name
 
             with utils.open_file(filename, 'w') as tmp:

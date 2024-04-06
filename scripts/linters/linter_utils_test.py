@@ -32,7 +32,7 @@ class RedirectStoutTest(test_utils.GenericTestBase):
     """Tests for the redirect_stdout function."""
 
     def test_redirect_stdout(self) -> None:
-        with tempfile.NamedTemporaryFile() as temp_file :
+        with tempfile.NamedTemporaryFile() as temp_file:
 
             with utils.open_file(temp_file.name, 'r+') as temp_file_contents:
                 with linter_utils.redirect_stdout(temp_file_contents):
