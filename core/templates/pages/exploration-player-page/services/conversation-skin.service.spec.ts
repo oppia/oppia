@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Conversation skin component.
+ * @fileoverview Unit tests for common conversation skin service.
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
