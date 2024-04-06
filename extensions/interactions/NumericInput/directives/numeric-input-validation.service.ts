@@ -249,7 +249,7 @@ export class NumericInputValidationService {
     decimalSeparator: string
   ): string | undefined {
     value = value.toString().trim();
-    const invalidChars = /[^0-9e.-]/g;
+    const invalidChars = /[^0-9e.,-]/g;
     const trailingDot = /[\.|\,|\u066B]\d/g;
     const twoDecimals = /.*[\.|\,|\u066B].*[\.|\,|\u066B]/g;
     const trailingMinus = /(^-)|(e-)/g;

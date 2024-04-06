@@ -159,18 +159,18 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     represents all the nodes the user has completed.
 
         Raises:
-            PageNotFoundException. The new structure viewer updates are
+            NotFoundException. The new structure viewer updates are
                 not enabled, or the provided story_id or node_id is invalid.
         """
         assert self.user_id is not None
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         try:
             story_fetchers.get_node_index_by_story_id_and_node_id(
                 story_id, node_id)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         next_exp_ids = []
         next_node_id = None
