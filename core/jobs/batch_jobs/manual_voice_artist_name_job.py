@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import collections
 import logging
+import threading
 
 from core.domain import opportunity_services
 from core.domain import state_domain
@@ -191,17 +192,14 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
             - The debug logs.
         """
 
-        # The key for sorting is defined separately because of a mypy bug.
-        # A [no-any-return] is thrown if key is defined in the sort()
-        # method instead.
-        # https://github.com/python/mypy/issues/9590
-        k = lambda model: model.id
-        snapshot_models.sort(key=k, reverse=True)
-
         metadata_models_dict: Dict[
             str, exp_models.ExplorationSnapshotMetadataModel] = {}
         for metadata_model in metadata_models:
             metadata_models_dict[metadata_model.id] = metadata_model
+
+        snapshot_models_dict = {}
+        for snapshot_model in snapshot_models:
+            snapshot_models_dict[snapshot_model.id] = snapshot_model
 
         # Identifying a voiceover means finding the voice artist who contributed
         # to that voiceover, using the previous versions of exploration
@@ -216,7 +214,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
 
         # Collects all the debug logs.
         debug_logs: str = (
-            'Debug logs for exploration: %s.\n' % exploration_model.id)
+            'Exp ID: %s.\n' % exploration_model.id)
+        debug_logs += ('Snapshots: %s\n' % len(snapshot_models))
 
         # The dictionary contains information about voice artists and their
         # provided voiceovers in the given exploration. This dict is built
@@ -238,6 +237,10 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                         content_id][lang_code] = voiceover_dict
                     total_number_of_voiceovers_to_identify += 1
 
+        current_version = exploration_model.version
+
+        logging.info('Logs for exploration: %s.\n' % exploration_model.id)
+
         # Note that, in this code, we don't need to explicitly handle the case
         # where explorations were reverted to previous versions. This is
         # because voiceover filenames include a random hash, which makes those
@@ -246,11 +249,24 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
         # version, we can be sure that those represent the exact same voiceover
         # and can thus uniquely attribute the voiceover to the user who
         # introduced it in the earlier version.
-        for index, new_snapshot_model in enumerate(snapshot_models[:-1]):
-            old_snapshot_model = snapshot_models[index + 1]
+        for version in range(current_version, 0, -1):
+            new_snapshot_id = exploration_model.id + '-' + str(version)
+            old_snapshot_id = exploration_model.id + '-' + str(version - 1)
 
-            if new_snapshot_model.id not in metadata_models_dict:
+            logging.info(
+                'Current iteration for snapshots: %s and %s\n' % (
+                    old_snapshot_id, new_snapshot_id))
+            logging.info('Thread ID: %s\n' % threading.get_native_id())
+
+            if old_snapshot_id not in snapshot_models_dict:
                 continue
+            if new_snapshot_id not in snapshot_models_dict:
+                continue
+            if new_snapshot_id not in metadata_models_dict:
+                continue
+
+            new_snapshot_model = snapshot_models_dict[new_snapshot_id]
+            old_snapshot_model = snapshot_models_dict[old_snapshot_id]
 
             # If the commit does not contain voiceover changes, then we should
             # skip the snapshot model.
@@ -291,12 +307,23 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 voice_artist_username = (
                     'Not Found for user ID: %s.' % voice_artist_id)
 
-            debug_logs += ('---\n')
-            debug_logs += ('Voice Artist: %s\n' % voice_artist_username)
-            debug_logs += ('Snapshot ID: %s\n' % new_snapshot_model.id)
-            debug_logs += ('Newly added filenames: [%s]\n' % ', '.join(
-                filenames_in_this_version))
-            debug_logs += ('---\n')
+            debug_logs += ('-\n')
+            debug_logs += ('a. %s\n' % voice_artist_username)
+            debug_logs += ('b. %s & %s\n' % (
+                old_snapshot_model.id, new_snapshot_model.id))
+            debug_logs += ('c. %s, [%s]\n' % (
+                len(filenames_in_this_version),
+                ', '.join(filenames_in_this_version)
+            ))
+
+            logging.info('-\n')
+            logging.info('a. %s\n' % voice_artist_username)
+            logging.info('b. %s & %s\n' % (
+                old_snapshot_model.id, new_snapshot_model.id))
+            logging.info('c. %s, [%s]\n' % (
+                len(filenames_in_this_version),
+                ', '.join(filenames_in_this_version)
+            ))
 
             for content_id, lang_code_to_voiceovers in (
                     latest_content_id_to_voiceover_mapping.items()):
@@ -330,6 +357,8 @@ class CreateExplorationVoiceArtistLinkModelsJob(base_jobs.JobBase):
                 total_number_of_voiceovers_identified
             ):
                 break
+
+        debug_logs += ('\n')
 
         with datastore_services.get_ndb_context():
             exploration_voice_artists_link_model = (

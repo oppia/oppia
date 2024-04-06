@@ -499,22 +499,19 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         )
 
         debug_logs_1 = (
-            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
-            '[filename3.mp3]\n---\n---\nVoice Artist: editor2\nSnapshot ID: '
-            'exploration_id_1-3\nNewly added filenames: [filename2.mp3]\n---'
-            '\n---\nVoice Artist: editor1\nSnapshot ID: exploration_id_1-2'
-            '\nNewly added filenames: [filename1.mp3]\n---\n'
+            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
+            '\na. editor2\nb. exploration_id_1-2 & exploration_id_1-3\nc. 1, '
+            '[filename2.mp3]\n-\na. editor1\nb. exploration_id_1-1 & '
+            'exploration_id_1-2\nc. 1, [filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
-            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
-            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
-            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
-            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
-            '[filename4.mp3]\n---\n'
+            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
+            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
+            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
+            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
+            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
         )
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -593,20 +590,18 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         snapshot_model.put()
 
         debug_logs_1 = (
-            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
-            'editor2\nSnapshot ID: exploration_id_1-3\nNewly added filenames: '
-            '[filename2.mp3]\n---\n---\nVoice Artist: editor1\nSnapshot ID: '
-            'exploration_id_1-2\nNewly added filenames: [filename1.mp3]\n---\n'
+            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor2\nb. '
+            'exploration_id_1-2 & exploration_id_1-3\nc. 1, [filename2.mp3]\n-'
+            '\na. editor1\nb. exploration_id_1-1 & exploration_id_1-2\nc. 1, '
+            '[filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
-            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
-            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---\n'
-            '---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\nNewly'
-            ' added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
-            '[filename4.mp3]\n---\n'
+            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]'
+            '\n-\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1,'
+            ' [filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
+            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
+            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -681,22 +676,19 @@ class AuditVoiceArtistMetadataModelsJobTests(
             'exploration %s.'
         )
         debug_logs_1 = (
-            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
-            '[filename3.mp3]\n---\n---\nVoice Artist: editor2\nSnapshot ID: '
-            'exploration_id_1-3\nNewly added filenames: [filename2.mp3]\n---'
-            '\n---\nVoice Artist: editor1\nSnapshot ID: exploration_id_1-2'
-            '\nNewly added filenames: [filename1.mp3]\n---\n'
+            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
+            '\na. editor2\nb. exploration_id_1-2 & exploration_id_1-3\nc. 1, '
+            '[filename2.mp3]\n-\na. editor1\nb. exploration_id_1-1 & '
+            'exploration_id_1-2\nc. 1, [filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
-            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
-            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
-            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
-            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
-            '[filename4.mp3]\n---\n'
+            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
+            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
+            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
+            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
+            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -736,20 +728,63 @@ class AuditVoiceArtistMetadataModelsJobTests(
         snapshot_model.delete()
 
         debug_logs_1 = (
-            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
-            '[filename3.mp3]\n---\n---\nVoice Artist: editor1\nSnapshot ID: '
-            'exploration_id_1-2\nNewly added filenames: [filename1.mp3]\n---\n'
+            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
+            '\na. editor1\nb. exploration_id_1-1 & exploration_id_1-2\nc. 1, '
+            '[filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
-            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
-            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
-            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
-            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
-            '[filename4.mp3]\n---\n'
+            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
+            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
+            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
+            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
+            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_1,
+                stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % self.CURATED_EXPLORATION_ID_2,
+                stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_1, stderr=''),
+            job_run_result.JobRunResult(stdout=debug_logs_2, stderr='')
+        ])
+
+    def test_generate_exp_link_model_if_some_snapshot_models_are_missing(
+        self
+    ) -> None:
+
+        self._create_curated_explorations()
+        self._create_non_curated_exploration()
+
+        job_result_template = (
+            'Generated exploration voice artist link model for '
+            'exploration %s.'
+        )
+
+        # Deleting an exploration commit log entry model.
+        snapshot_model_id: str = 'exploration_id_1-3'
+        snapshot_model: exp_models.ExplorationSnapshotContentModel = (
+            exp_models.ExplorationSnapshotContentModel.get_by_id(
+                snapshot_model_id))
+        snapshot_model.delete()
+
+        debug_logs_1 = (
+            'Exp ID: exploration_id_1.\nSnapshots: 4\n-\na. editor1\nb. '
+            'exploration_id_1-4 & exploration_id_1-5\nc. 1, '
+            '[filename3.mp3]\n-\na. editor1\nb. exploration_id_1-1 & '
+            'exploration_id_1-2\nc. 1, [filename1.mp3]\n\n'
+        )
+        debug_logs_2 = (
+            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
+            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
+            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
+            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
+            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
@@ -781,23 +816,20 @@ class AuditVoiceArtistMetadataModelsJobTests(
         )
 
         debug_logs_1 = (
-            'Debug logs for exploration: exploration_id_1.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_1-5\nNewly added filenames: '
-            '[filename3.mp3]\n---\n---\nVoice Artist: Not Found for user ID: '
-            'non_existent_user.\nSnapshot ID: exploration_id_1-3\nNewly added '
-            'filenames: [filename2.mp3]\n---\n---\nVoice Artist: editor1\n'
-            'Snapshot ID: exploration_id_1-2\nNewly added filenames: '
-            '[filename1.mp3]\n---\n'
+            'Exp ID: exploration_id_1.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_1-4 & exploration_id_1-5\nc. 1, [filename3.mp3]\n-'
+            '\na. Not Found for user ID: non_existent_user.\nb. '
+            'exploration_id_1-2 & exploration_id_1-3\nc. 1, [filename2.mp3]\n-'
+            '\na. editor1\nb. exploration_id_1-1 & exploration_id_1-2\nc. 1, '
+            '[filename1.mp3]\n\n'
         )
         debug_logs_2 = (
-            'Debug logs for exploration: exploration_id_2.\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-5\nNewly added filenames: '
-            '[filename7.mp3]\n---\n---\nVoice Artist: editor4\nSnapshot ID: '
-            'exploration_id_2-4\nNewly added filenames: [filename6.mp3]\n---'
-            '\n---\nVoice Artist: editor3\nSnapshot ID: exploration_id_2-3\n'
-            'Newly added filenames: [filename5.mp3]\n---\n---\nVoice Artist: '
-            'editor1\nSnapshot ID: exploration_id_2-2\nNewly added filenames: '
-            '[filename4.mp3]\n---\n'
+            'Exp ID: exploration_id_2.\nSnapshots: 5\n-\na. editor1\nb. '
+            'exploration_id_2-4 & exploration_id_2-5\nc. 1, [filename7.mp3]\n-'
+            '\na. editor4\nb. exploration_id_2-3 & exploration_id_2-4\nc. 1, '
+            '[filename6.mp3]\n-\na. editor3\nb. exploration_id_2-2 & '
+            'exploration_id_2-3\nc. 1, [filename5.mp3]\n-\na. editor1\nb. '
+            'exploration_id_2-1 & exploration_id_2-2\nc. 1, [filename4.mp3]\n\n'
         )
 
         self.assert_job_output_is([
