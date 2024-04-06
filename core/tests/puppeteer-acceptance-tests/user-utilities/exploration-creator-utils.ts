@@ -486,7 +486,7 @@ export class ExplorationCreator extends BaseUser {
    * Exception function to verify the choice of receiving feedback
    * and suggestion notifications via email
    */
-  async expectEmailNotificationToBeActivated(): Promise<void> {
+  async expectEmailNotificationsToBeActivated(): Promise<void> {
     await this.page.waitForSelector('input[id="feedback-switch"]');
     const input = await this.page.$('input[id="feedback-switch"]');
 
