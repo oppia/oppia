@@ -44,14 +44,22 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {UserExplorationPermissionsService} from '../../services/user-exploration-permissions.service';
-import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 
 class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
     };
+  }
+}
+
+class MockContextService {
+  getExplorationId() {
+    return 'expId';
+  }
+
+  isExplorationLinkedToStory() {
+    return true;
   }
 }
 
@@ -84,14 +92,14 @@ describe('Translator Overview component', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
+        {
+          provide: ContextService,
+          useClass: MockContextService,
+        },
         WindowRef,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-
-    UserExplorationPermissionsService.permissionsPromise = Promise.resolve({
-      canVoiceover: true,
-    } as ExplorationPermissions);
   }));
 
   beforeEach(fakeAsync(() => {
