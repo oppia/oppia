@@ -118,7 +118,7 @@ describe('Exploration Creator', function () {
       ]);
 
       await explorationCreator.optInToEmailNotifications();
-      await explorationCreator.expectEmailNotificationToBeActivated();
+      await explorationCreator.expectEmailNotificationsToBeActivated();
 
       await explorationCreator.deleteExploration();
       await explorationVisitor.expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard();
