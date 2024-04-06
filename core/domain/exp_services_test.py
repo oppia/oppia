@@ -2795,7 +2795,7 @@ version: 3
             # Read function returns bytes, so we need to decode them before
             # we compare.
             self.assertEqual(
-                zf.open('A title.yaml').read().decode('utf-8'),
+                zf.read('A title.yaml').decode('utf-8'),
                 self.SAMPLE_YAML_CONTENT)
 
     def test_export_to_zip_file_with_unpublished_exploration(self) -> None:
@@ -2925,9 +2925,9 @@ version: 3
             # Read function returns bytes, so we need to decode them before
             # we compare.
             self.assertEqual(
-                zf.open('A title.yaml').read().decode('utf-8'),
+                zf.read('A title.yaml').decode('utf-8'),
                 self.SAMPLE_YAML_CONTENT)
-            self.assertEqual(zf.open('assets/image/abc.png').read(), raw_image)
+            self.assertEqual(zf.read('assets/image/abc.png'), raw_image)
 
     def test_export_by_versions(self) -> None:
         """Test export_to_zip_file() for different versions."""
@@ -3032,7 +3032,7 @@ version: 3
             # Read function returns bytes, so we need to decode them before
             # we compare.
             self.assertEqual(
-                zf.open('A title.yaml').read().decode('utf-8'),
+                zf.read('A title.yaml').decode('utf-8'),
                 self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
@@ -3042,7 +3042,7 @@ version: 3
             # Read function returns bytes, so we need to decode them before
             # we compare.
             self.assertEqual(
-                zf.open('A title.yaml').read().decode('utf-8'),
+                zf.read('A title.yaml').decode('utf-8'),
                 self.UPDATED_YAML_CONTENT)
 
 

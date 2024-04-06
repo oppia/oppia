@@ -736,10 +736,10 @@ solicit_answer_details: false
                     ['The title for ZIP download handler test!.yaml'])
                 # Compare saved with golden file.
                 self.assertEqual(
-                    zf_saved.open(
-                        'The title for ZIP download handler test.yaml').read(),
-                    zf_gold.open(
-                        'The title for ZIP download handler test!.yaml').read())
+                    zf_saved.read(
+                        'The title for ZIP download handler test.yaml'),
+                    zf_gold.read(
+                        'The title for ZIP download handler test!.yaml'))
 
         # Check download to JSON.
         exp_services.update_exploration(
