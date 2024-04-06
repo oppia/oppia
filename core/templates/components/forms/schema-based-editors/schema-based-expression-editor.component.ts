@@ -16,19 +16,25 @@
  * @fileoverview Component for a schema-based editor for expressions.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { AbstractControl, ControlValueAccessor, ValidationErrors, Validator } from '@angular/forms';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaBasedDictEditorComponent } from './schema-based-dict-editor.component';
+import {Component, Input, OnInit} from '@angular/core';
+import {
+  AbstractControl,
+  ControlValueAccessor,
+  ValidationErrors,
+  Validator,
+} from '@angular/forms';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {SchemaBasedDictEditorComponent} from './schema-based-dict-editor.component';
 
 @Component({
   selector: 'oppia-schema-based-editor',
-  templateUrl: './schema-based-expression-editor.component.html'
+  templateUrl: './schema-based-expression-editor.component.html',
 })
 export class SchemaBasedExpressionEditorComponent
-implements ControlValueAccessor, Validator, OnInit {
+  implements ControlValueAccessor, Validator, OnInit
+{
   localValue!: SchemaDefaultValue;
   @Input() disabled!: boolean;
   @Input() outputType!: 'bool' | 'int' | 'float';
@@ -54,8 +60,7 @@ implements ControlValueAccessor, Validator, OnInit {
   }
 
   // Implemented as a part of ControlValueAccessor interface.
-  registerOnTouched(): void {
-  }
+  registerOnTouched(): void {}
 
   // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors {
@@ -79,6 +84,6 @@ implements ControlValueAccessor, Validator, OnInit {
 angular.module('oppia').directive(
   'schemaBasedExpressionEditor',
   downgradeComponent({
-    component: SchemaBasedDictEditorComponent
+    component: SchemaBasedDictEditorComponent,
   }) as angular.IDirectiveFactory
 );

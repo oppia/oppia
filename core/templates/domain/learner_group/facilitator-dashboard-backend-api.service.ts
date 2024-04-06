@@ -17,42 +17,56 @@
  * on the facilitator dashboard.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { ShortLearnerGroupSummary, ShortLearnerGroupSummaryBackendDict }
-  from './short-learner-group-summary.model';
+import {
+  ShortLearnerGroupSummary,
+  ShortLearnerGroupSummaryBackendDict,
+} from './short-learner-group-summary.model';
 
 interface FacilitatorDashboardBackendResponse {
   learner_groups_list: ShortLearnerGroupSummaryBackendDict[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FacilitatorDashboardBackendApiService {
   constructor(private http: HttpClient) {}
 
-  async _fetchTeacherDashboardLearnerGroupsAsync():
-  Promise<ShortLearnerGroupSummary[]> {
+  async _fetchTeacherDashboardLearnerGroupsAsync(): Promise<
+    ShortLearnerGroupSummary[]
+  > {
     return new Promise((resolve, reject) => {
-      this.http.get<FacilitatorDashboardBackendResponse>(
-        '/facilitator_dashboard_handler').toPromise().then(dashboardData => {
-        resolve(
-          dashboardData.learner_groups_list.map(
-            shortLearnerGroupSummary => ShortLearnerGroupSummary
-              .createFromBackendDict(shortLearnerGroupSummary)));
-      });
+      this.http
+        .get<FacilitatorDashboardBackendResponse>(
+          '/facilitator_dashboard_handler'
+        )
+        .toPromise()
+        .then(dashboardData => {
+          resolve(
+            dashboardData.learner_groups_list.map(shortLearnerGroupSummary =>
+              ShortLearnerGroupSummary.createFromBackendDict(
+                shortLearnerGroupSummary
+              )
+            )
+          );
+        });
     });
   }
 
-  async fetchTeacherDashboardLearnerGroupsAsync():
-  Promise<ShortLearnerGroupSummary[]> {
+  async fetchTeacherDashboardLearnerGroupsAsync(): Promise<
+    ShortLearnerGroupSummary[]
+  > {
     return this._fetchTeacherDashboardLearnerGroupsAsync();
   }
 }
 
-angular.module('oppia').factory(
-  'FacilitatorDashboardBackendApiService',
-  downgradeInjectable(FacilitatorDashboardBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'FacilitatorDashboardBackendApiService',
+    downgradeInjectable(FacilitatorDashboardBackendApiService)
+  );

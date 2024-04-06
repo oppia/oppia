@@ -16,22 +16,32 @@
  * @fileoverview Component for the answer group editor.
  */
 
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AnswerChoice, StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { Rule } from 'domain/exploration/rule.model';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {
+  AnswerChoice,
+  StateEditorService,
+} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {Rule} from 'domain/exploration/rule.model';
 import isEqual from 'lodash/isEqual';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { TrainingDataEditorPanelService } from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
+import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import {TrainingDataEditorPanelService} from 'pages/exploration-editor-page/editor-tab/training-panel/training-data-editor-panel.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
 import cloneDeep from 'lodash/cloneDeep';
-import { AppConstants } from 'app.constants';
-import { ExternalSaveService } from 'services/external-save.service';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { BaseTranslatableObject } from 'interactions/rule-input-defs';
+import {AppConstants} from 'app.constants';
+import {ExternalSaveService} from 'services/external-save.service';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 
 interface TaggedMisconception {
   skillId: string;
@@ -40,7 +50,7 @@ interface TaggedMisconception {
 
 @Component({
   selector: 'oppia-answer-group-editor',
-  templateUrl: './answer-group-editor.component.html'
+  templateUrl: './answer-group-editor.component.html',
 })
 export class AnswerGroupEditor implements OnInit, OnDestroy {
   @Input() displayFeedback: boolean;
@@ -71,7 +81,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     private stateInteractionIdService: StateInteractionIdService,
     private alertsService: AlertsService,
     private trainingDataEditorPanelService: TrainingDataEditorPanelService,
-    private externalSaveService: ExternalSaveService,
+    private externalSaveService: ExternalSaveService
   ) {}
 
   sendOnSaveTaggedMisconception(event: TaggedMisconception): void {
@@ -107,8 +117,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   getDefaultInputValue(
-      varType: string): null | boolean |
-      number | number[] | string | object | object[] {
+    varType: string
+  ): null | boolean | number | number[] | string | object | object[] {
     // TODO(bhenning): Typed objects in the backend should be required
     // to provide a default value specific for their type.
     switch (varType) {
@@ -136,12 +146,13 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           code: this.getDefaultInputValue('UnicodeString'),
           error: this.getDefaultInputValue('UnicodeString'),
           evaluation: this.getDefaultInputValue('UnicodeString'),
-          output: this.getDefaultInputValue('UnicodeString')
+          output: this.getDefaultInputValue('UnicodeString'),
         };
       case 'CoordTwoDim':
         return [
           this.getDefaultInputValue('Real'),
-          this.getDefaultInputValue('Real')];
+          this.getDefaultInputValue('Real'),
+        ];
       case 'ListOfUnicodeString':
       case 'SetOfAlgebraicIdentifier':
       case 'SetOfUnicodeString':
@@ -153,7 +164,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           assumptions_string: this.getDefaultInputValue('UnicodeString'),
           correct: this.getDefaultInputValue('Boolean'),
           proof_string: this.getDefaultInputValue('UnicodeString'),
-          target_string: this.getDefaultInputValue('UnicodeString')
+          target_string: this.getDefaultInputValue('UnicodeString'),
         };
       case 'Graph':
         return {
@@ -161,47 +172,46 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           isDirected: this.getDefaultInputValue('Boolean'),
           isLabeled: this.getDefaultInputValue('Boolean'),
           isWeighted: this.getDefaultInputValue('Boolean'),
-          vertices: []
+          vertices: [],
         };
       case 'NormalizedRectangle2D':
         return [
           [
             this.getDefaultInputValue('Real'),
-            this.getDefaultInputValue('Real')
+            this.getDefaultInputValue('Real'),
           ],
           [
             this.getDefaultInputValue('Real'),
-            this.getDefaultInputValue('Real')
-          ]];
+            this.getDefaultInputValue('Real'),
+          ],
+        ];
       case 'ImageRegion':
         return {
           area: this.getDefaultInputValue('NormalizedRectangle2D'),
-          regionType: this.getDefaultInputValue('UnicodeString')
+          regionType: this.getDefaultInputValue('UnicodeString'),
         };
       case 'ImageWithRegions':
         return {
           imagePath: this.getDefaultInputValue('Filepath'),
-          labeledRegions: []
+          labeledRegions: [],
         };
       case 'ClickOnImage':
         return {
           clickPosition: [
             this.getDefaultInputValue('Real'),
-            this.getDefaultInputValue('Real')
+            this.getDefaultInputValue('Real'),
           ],
-          clickedRegions: []
+          clickedRegions: [],
         };
       case 'TranslatableSetOfNormalizedString':
         return {
           contentId: null,
-          normalizedStrSet:
-            this.getDefaultInputValue('SetOfNormalizedString')
+          normalizedStrSet: this.getDefaultInputValue('SetOfNormalizedString'),
         };
       case 'TranslatableSetOfUnicodeString':
         return {
           contentId: null,
-          normalizedStrSet:
-            this.getDefaultInputValue('SetOfUnicodeString')
+          normalizedStrSet: this.getDefaultInputValue('SetOfUnicodeString'),
         };
     }
   }
@@ -209,8 +219,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   addNewRule(): void {
     // Build an initial blank set of inputs for the initial rule.
     let interactionId = this.getCurrentInteractionId();
-    let ruleDescriptions = (
-      INTERACTION_SPECS[interactionId].rule_descriptions);
+    let ruleDescriptions = INTERACTION_SPECS[interactionId].rule_descriptions;
     let ruleTypes = Object.keys(ruleDescriptions);
     if (ruleTypes.length === 0) {
       // This should never happen. An interaction must have at least
@@ -243,8 +252,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     // TODO(bhenning): Should use functionality in ruleEditor.js, but
     // move it to ResponsesService in StateResponses.js to properly
     // form a new rule.
-    const rule = Rule.createNew(
-      ruleType, inputs, inputTypes);
+    const rule = Rule.createNew(ruleType, inputs, inputTypes);
     this.rules.push(rule);
     this.changeActiveRuleIndex(this.rules.length - 1);
   }
@@ -255,7 +263,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
     if (this.rules.length === 0) {
       this.alertsService.addWarning(
-        'All answer groups must have at least one rule.');
+        'All answer groups must have at least one rule.'
+      );
     }
   }
 
@@ -269,14 +278,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
 
   saveRules(): void {
     if (this.originalContentIdToContent !== undefined) {
-      const updatedContentIdToContent = (
-        this.getTranslatableRulesContentIdToContentMap()
-      );
+      const updatedContentIdToContent =
+        this.getTranslatableRulesContentIdToContentMap();
 
       const contentIdsWithModifiedContent = [];
-      Object.keys(
-        this.originalContentIdToContent
-      ).forEach(contentId => {
+      Object.keys(this.originalContentIdToContent).forEach(contentId => {
         if (
           this.originalContentIdToContent.hasOwnProperty(contentId) &&
           updatedContentIdToContent.hasOwnProperty(contentId) &&
@@ -307,9 +313,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
       return;
     }
 
-    this.originalContentIdToContent = (
-      this.getTranslatableRulesContentIdToContentMap()
-    );
+    this.originalContentIdToContent =
+      this.getTranslatableRulesContentIdToContentMap();
     this.rulesMemento = cloneDeep(this.rules);
     this.changeActiveRuleIndex(index);
   }
@@ -322,9 +327,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let interactionId = this.getCurrentInteractionId();
     if (!INTERACTION_SPECS.hasOwnProperty(interactionId)) {
       throw new Error(
-        'Invalid interaction id - ' + interactionId +
-        '. Answer group rules: ' +
-        this.rules.map(rule => rule.type).join(', '));
+        'Invalid interaction id - ' +
+          interactionId +
+          '. Answer group rules: ' +
+          this.rules.map(rule => rule.type).join(', ')
+      );
     }
     return INTERACTION_SPECS[interactionId].is_trainable;
   }
@@ -352,8 +359,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
         // BaseTranslatableObject having dict structure with contentId
         // as a key.
         if (ruleInput && ruleInput.hasOwnProperty('contentId')) {
-          contentIdToContentMap[(
-            ruleInput as BaseTranslatableObject).contentId] = ruleInput;
+          contentIdToContentMap[
+            (ruleInput as BaseTranslatableObject).contentId
+          ] = ruleInput;
         }
       });
     });
@@ -372,11 +380,14 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
           if (this.stateEditorService.checkCurrentRuleInputIsValid()) {
             this.saveRules();
           } else {
-            let messageContent = (
+            let messageContent =
               'There was an unsaved rule input which was invalid and ' +
-              'has been discarded.');
-            if (!this.alertsService.messages.some(messageObject => (
-              messageObject.content === messageContent))) {
+              'has been discarded.';
+            if (
+              !this.alertsService.messages.some(
+                messageObject => messageObject.content === messageContent
+              )
+            ) {
               this.alertsService.addInfoMessage(messageContent);
             }
           }
@@ -391,14 +402,12 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      this.stateInteractionIdService.onInteractionIdChanged.subscribe(
-        () => {
-          if (this.isRuleEditorOpen()) {
-            this.saveRules();
-          }
-          this.answerChoices = this.getAnswerChoices();
+      this.stateInteractionIdService.onInteractionIdChanged.subscribe(() => {
+        if (this.isRuleEditorOpen()) {
+          this.saveRules();
         }
-      )
+        this.answerChoices = this.getAnswerChoices();
+      })
     );
 
     this.rulesMemento = null;
@@ -412,7 +421,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaAnswerGroupEditor',
+angular.module('oppia').directive(
+  'oppiaAnswerGroupEditor',
   downgradeComponent({
-    component: AnswerGroupEditor
-  }) as angular.IDirectiveFactory);
+    component: AnswerGroupEditor,
+  }) as angular.IDirectiveFactory
+);

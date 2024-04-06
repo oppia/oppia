@@ -16,8 +16,12 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, { Page, Browser } from 'puppeteer';
+import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
+import isElementClickable from '../functions/is-element-clickable';
+import {ConsoleReporter} from './console-reporter';
+
+const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -26,7 +30,7 @@ const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const acceptedBrowserAlerts = [
   '',
   'Changes that you made may not be saved.',
-  'This action is irreversible. Are you sure?'
+  'This action is irreversible. Are you sure?',
 ];
 
 export class BaseUser {
@@ -44,10 +48,11 @@ export class BaseUser {
   async openBrowser(): Promise<Page> {
     const args: string[] = [
       '--start-fullscreen',
-      '--use-fake-ui-for-media-stream'
+      '--use-fake-ui-for-media-stream',
     ];
 
     const headless = process.env.HEADLESS === 'true';
+    const mobile = process.env.MOBILE === 'true';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -63,13 +68,32 @@ export class BaseUser {
          * headless mode. As per the expected behavior we need to make sure
          * every test passes on both modes. */
         headless,
-        args
+        args,
       })
-      .then(async(browser) => {
+      .then(async browser => {
+        ConsoleReporter.trackConsoleMessagesInBrowser(browser);
         this.browserObject = browser;
         this.page = await browser.newPage();
-        await this.page.setViewport({ width: 1920, height: 1080 });
-        this.page.on('dialog', async(dialog) => {
+
+        if (mobile) {
+          // This is the default viewport and user agent settings for iPhone 6.
+          await this.page.setViewport({
+            width: 375,
+            height: 667,
+            deviceScaleFactor: 2,
+            isMobile: true,
+            hasTouch: true,
+            isLandscape: false,
+          });
+          await this.page.setUserAgent(
+            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
+              'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
+              'Mobile/15A372 Safari/604.1'
+          );
+        } else {
+          await this.page.setViewport({width: 1920, height: 1080});
+        }
+        this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
             await dialog.accept();
@@ -78,6 +102,7 @@ export class BaseUser {
           }
         });
       });
+
     return this.page;
   }
 
@@ -104,7 +129,8 @@ export class BaseUser {
     await this.type('input.e2e-test-username-input', username);
     await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
     await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])');
+      'button.e2e-test-register-user:not([disabled])'
+    );
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
 
@@ -120,18 +146,40 @@ export class BaseUser {
   }
 
   /**
+   * This function waits for an element to be clickable either by its CSS selector or
+   * by the ElementHandle.
+   */
+  async waitForElementToBeClickable(
+    selector: string | ElementHandle<Element>
+  ): Promise<void> {
+    try {
+      const element =
+        typeof selector === 'string'
+          ? await this.page.waitForSelector(selector)
+          : selector;
+      await this.page.waitForFunction(isElementClickable, {}, element);
+    } catch (error) {
+      throw new Error(`Element ${selector} took too long to be clickable.`);
+    }
+  }
+
+  /**
    * The function clicks the element using the text on the button.
    */
   async clickOn(selector: string): Promise<void> {
-    try {
-      /** Normalize-space is used to remove the extra spaces in the text.
-       * Check the documentation for the normalize-space function here :
-       * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-      const [button] = await this.page.$x(
-        `\/\/*[contains(text(), normalize-space('${selector}'))]`);
+    /** Normalize-space is used to remove the extra spaces in the text.
+     * Check the documentation for the normalize-space function here :
+     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+    const [button] = await this.page.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined) {
+      await this.waitForElementToBeClickable(button);
       await button.click();
-    } catch (error) {
-      await this.page.waitForSelector(selector);
+    } else {
+      await this.waitForElementToBeClickable(selector);
       await this.page.click(selector);
     }
   }
@@ -172,6 +220,28 @@ export class BaseUser {
   }
 
   /**
+   * This function validates whether an anchor tag is correctly linked
+   * to external PDFs or not. Use this particularly when interacting with
+   * buttons associated with external PDF links, because Puppeteer,
+   * in headless-mode, does not natively support the opening of external PDFs.
+   */
+  async openExternalPdfLink(
+    selector: string,
+    expectedUrl: string
+  ): Promise<void> {
+    await this.page.waitForSelector(selector);
+    const href = await this.page.$eval(selector, element =>
+      element.getAttribute('href')
+    );
+    if (href === null) {
+      throw new Error(`The ${selector} does not have a href attribute!`);
+    }
+    if (href !== expectedUrl) {
+      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
+    }
+  }
+
+  /**
    * This function logs out the current user.
    */
   async logout(): Promise<void> {
@@ -184,6 +254,31 @@ export class BaseUser {
    */
   async closeBrowser(): Promise<void> {
     await this.browserObject.close();
+  }
+
+  /**
+   * This function returns the current viewport of the page.
+   */
+  get viewport(): Viewport {
+    const viewport = this.page.viewport();
+    if (viewport === null) {
+      throw new Error('Viewport is not defined.');
+    }
+    return viewport;
+  }
+
+  /**
+   * This function checks if the viewport is at mobile width.
+   */
+  isViewportAtMobileWidth(): boolean {
+    return this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX;
+  }
+
+  /**
+   * This function gets the current URL of the page without parameters.
+   */
+  getCurrentUrlWithoutParameters(): string {
+    return this.page.url().split('?')[0];
   }
 }
 

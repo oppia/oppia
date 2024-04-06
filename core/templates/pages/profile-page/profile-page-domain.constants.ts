@@ -19,5 +19,5 @@
 export const ProfilePageDomainConstants = {
   PROFILE_SUBSCRIBE_URL: '/subscribehandler',
   PROFILE_UNSUBSCRIBE_URL: '/unsubscribehandler',
-  PROFILE_DATA_URL: '/profilehandler/data/<username>'
+  PROFILE_DATA_URL: '/profilehandler/data/<username>',
 } as const;

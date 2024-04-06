@@ -16,19 +16,22 @@
  * @fileoverview Unit tests for SkillEditorStateService.js
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 
-import { SkillBackendApiService } from 'domain/skill/skill-backend-api.service';
-import { SkillRights, SkillRightsBackendDict } from 'domain/skill/skill-rights.model';
-import { SkillRightsBackendApiService } from 'domain/skill/skill-rights-backend-api.service';
-import { SkillUpdateService } from 'domain/skill/skill-update.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {
+  SkillRights,
+  SkillRightsBackendDict,
+} from 'domain/skill/skill-rights.model';
+import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
+import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {
   Skill,
   SkillBackendDict,
   SkillObjectFactory,
 } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 
 const skillContentsDict = {
   explanation: {
@@ -50,23 +53,29 @@ const skillContentsDict = {
 const skillDict: SkillBackendDict = {
   id: 'skill_id_1',
   description: 'Description',
-  misconceptions: [{
-    id: 2,
-    name: 'test name',
-    notes: 'test notes',
-    feedback: 'test feedback',
-    must_be_addressed: true,
-  }],
-  rubrics: [{
-    difficulty: 'Easy',
-    explanations: ['explanation'],
-  }, {
-    difficulty: 'Medium',
-    explanations: ['explanation'],
-  }, {
-    difficulty: 'Hard',
-    explanations: ['explanation'],
-  }],
+  misconceptions: [
+    {
+      id: 2,
+      name: 'test name',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true,
+    },
+  ],
+  rubrics: [
+    {
+      difficulty: 'Easy',
+      explanations: ['explanation'],
+    },
+    {
+      difficulty: 'Medium',
+      explanations: ['explanation'],
+    },
+    {
+      difficulty: 'Hard',
+      explanations: ['explanation'],
+    },
+  ],
   skill_contents: skillContentsDict,
   language_code: 'en',
   version: 3,
@@ -79,17 +88,21 @@ const skillDict: SkillBackendDict = {
 const skillDict2: SkillBackendDict = {
   id: 'skill_id_2',
   description: 'Description 2',
-  misconceptions: [{
-    id: 2,
-    name: 'test name',
-    notes: 'test notes',
-    feedback: 'test feedback',
-    must_be_addressed: true,
-  }],
-  rubrics: [{
-    difficulty: 'Easy',
-    explanations: ['explanation'],
-  }],
+  misconceptions: [
+    {
+      id: 2,
+      name: 'test name',
+      notes: 'test notes',
+      feedback: 'test feedback',
+      must_be_addressed: true,
+    },
+  ],
+  rubrics: [
+    {
+      difficulty: 'Easy',
+      explanations: ['explanation'],
+    },
+  ],
   skill_contents: skillContentsDict,
   language_code: 'en',
   version: 3,
@@ -237,13 +250,11 @@ describe('Skill editor state service', () => {
       can_edit_skill_description: true,
     };
     fakeSkillRightsBackendApiService.backendSkillRightsObject =
-    skillRightsObject;
+      skillRightsObject;
 
     fakeSkillBackendApiService.newBackendSkillObject = skillDict;
     fakeSkillBackendApiService.skillObject =
-    skillObjectFactory.createFromBackendDict(
-      skillDict
-    );
+      skillObjectFactory.createFromBackendDict(skillDict);
   });
 
   it('should test getters', () => {
@@ -264,63 +275,59 @@ describe('Skill editor state service', () => {
     expect(skillEditorStateService.isLoadingSkill()).toBe(false);
   }));
 
-  it('should indicate a collection is no longer loading after an error',
-    fakeAsync(() => {
-      expect(skillEditorStateService.isLoadingSkill()).toBe(false);
-      fakeSkillBackendApiService.failure = 'Internal 500 error';
-      skillEditorStateService.loadSkill('skill_id_1');
-      expect(skillEditorStateService.isLoadingSkill()).toBe(true);
-      tick(1000);
-      expect(skillEditorStateService.isLoadingSkill()).toBe(false);
-    }));
+  it('should indicate a collection is no longer loading after an error', fakeAsync(() => {
+    expect(skillEditorStateService.isLoadingSkill()).toBe(false);
+    fakeSkillBackendApiService.failure = 'Internal 500 error';
+    skillEditorStateService.loadSkill('skill_id_1');
+    expect(skillEditorStateService.isLoadingSkill()).toBe(true);
+    tick(1000);
+    expect(skillEditorStateService.isLoadingSkill()).toBe(false);
+  }));
 
-  it('should report that a skill has loaded through loadSkill()',
-    fakeAsync(() => {
-      spyOn(
-        fakeSkillRightsBackendApiService,
-        'fetchSkillRightsAsync'
-      ).and.callThrough();
-      expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
-      skillEditorStateService.loadSkill('skill_id_1');
-      expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
-      tick(1000);
-      expect(skillEditorStateService.hasLoadedSkill()).toBe(true);
-      const groupedSkillSummaries =
-    skillEditorStateService.getGroupedSkillSummaries();
-      expect(groupedSkillSummaries.current.length).toEqual(2);
-      expect(groupedSkillSummaries.others.length).toEqual(2);
+  it('should report that a skill has loaded through loadSkill()', fakeAsync(() => {
+    spyOn(
+      fakeSkillRightsBackendApiService,
+      'fetchSkillRightsAsync'
+    ).and.callThrough();
+    expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
+    skillEditorStateService.loadSkill('skill_id_1');
+    expect(skillEditorStateService.hasLoadedSkill()).toBe(false);
+    tick(1000);
+    expect(skillEditorStateService.hasLoadedSkill()).toBe(true);
+    const groupedSkillSummaries =
+      skillEditorStateService.getGroupedSkillSummaries();
+    expect(groupedSkillSummaries.current.length).toEqual(2);
+    expect(groupedSkillSummaries.others.length).toEqual(2);
 
-      expect(groupedSkillSummaries.current[0].id).toEqual('skill_id_1');
-      expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
+    expect(groupedSkillSummaries.current[0].id).toEqual('skill_id_1');
+    expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
 
-      expect(
-        skillEditorStateService.getAssignedSkillTopicData()
-      ).toEqual({
-        topicName: ['tester']
-      });
-    }));
+    expect(skillEditorStateService.getAssignedSkillTopicData()).toEqual({
+      topicName: ['tester'],
+    });
+  }));
 
-  it('should return the last skill loaded as the same object',
-    fakeAsync(() => {
-      skillEditorStateService.setSkillRights(
-        SkillRights.createFromBackendDict(skillRightsObject));
-      skillEditorStateService.loadSkill('skill_id_1');
-      tick(1000);
-      const previousSkill = skillEditorStateService.getSkill();
+  it('should return the last skill loaded as the same object', fakeAsync(() => {
+    skillEditorStateService.setSkillRights(
+      SkillRights.createFromBackendDict(skillRightsObject)
+    );
+    skillEditorStateService.loadSkill('skill_id_1');
+    tick(1000);
+    const previousSkill = skillEditorStateService.getSkill();
 
-      fakeSkillBackendApiService.newBackendSkillObject = skillDict2;
-      fakeSkillBackendApiService.skillObject =
-        skillObjectFactory.createFromBackendDict(skillDict2);
+    fakeSkillBackendApiService.newBackendSkillObject = skillDict2;
+    fakeSkillBackendApiService.skillObject =
+      skillObjectFactory.createFromBackendDict(skillDict2);
 
-      const expectedSkill = fakeSkillBackendApiService.skillObject;
-      expect(previousSkill).not.toEqual(expectedSkill);
-      skillEditorStateService.loadSkill('skill_id_2');
-      tick(1000);
-      const actualSkill = skillEditorStateService.getSkill();
-      expect(actualSkill).toEqual(expectedSkill);
-      expect(actualSkill).toBe(previousSkill);
-      expect(actualSkill).not.toBe(expectedSkill);
-    }));
+    const expectedSkill = fakeSkillBackendApiService.skillObject;
+    expect(previousSkill).not.toEqual(expectedSkill);
+    skillEditorStateService.loadSkill('skill_id_2');
+    tick(1000);
+    const actualSkill = skillEditorStateService.getSkill();
+    expect(actualSkill).toEqual(expectedSkill);
+    expect(actualSkill).toBe(previousSkill);
+    expect(actualSkill).not.toBe(expectedSkill);
+  }));
 
   it('should fail to load a skill without first loading one', () => {
     expect(() => {
@@ -328,51 +335,50 @@ describe('Skill editor state service', () => {
     }).toThrowError('Cannot save a skill before one is loaded.');
   });
 
-  it('should not save the skill if there are no pending changes',
-    fakeAsync(() => {
-      skillEditorStateService.loadSkill('skill_id_1');
-      tick(1000);
-      expect(skillEditorStateService.saveSkill(
+  it('should not save the skill if there are no pending changes', fakeAsync(() => {
+    skillEditorStateService.loadSkill('skill_id_1');
+    tick(1000);
+    expect(
+      skillEditorStateService.saveSkill(
         'commit message',
-        () => 'Cannot save a skill before one is loaded.')).toBe(
-        false
-      );
-    }));
+        () => 'Cannot save a skill before one is loaded.'
+      )
+    ).toBe(false);
+  }));
 
-  it('should be able to save the collection and pending changes', fakeAsync(
-    () => {
-      spyOn(fakeSkillBackendApiService, 'updateSkillAsync').and.callThrough();
+  it('should be able to save the collection and pending changes', fakeAsync(() => {
+    spyOn(fakeSkillBackendApiService, 'updateSkillAsync').and.callThrough();
 
-      skillEditorStateService.loadSkill('skill_id_1');
-      tick(1000);
-      expect(skillEditorStateService.hasLoadedSkill()).toBeTrue();
-      skillUpdateService.setSkillDescription(
-        skillEditorStateService.getSkill(),
-        'new description'
-      );
-      tick(1000);
+    skillEditorStateService.loadSkill('skill_id_1');
+    tick(1000);
+    expect(skillEditorStateService.hasLoadedSkill()).toBeTrue();
+    skillUpdateService.setSkillDescription(
+      skillEditorStateService.getSkill(),
+      'new description'
+    );
+    tick(1000);
 
-      expect(skillEditorStateService.saveSkill('commit message', () => {}));
-      tick(1000);
+    expect(skillEditorStateService.saveSkill('commit message', () => {}));
+    tick(1000);
 
-      const expectedId = 'skill_id_1';
-      const expectedVersion = 3;
-      const expectedCommitMessage = 'commit message';
-      const updateSkillSpy = fakeSkillBackendApiService.updateSkillAsync;
-      expect(updateSkillSpy).toHaveBeenCalledWith(
-        expectedId,
-        expectedVersion,
-        expectedCommitMessage,
-        [
-          {
-            property_name: 'description',
-            new_value: 'new description',
-            old_value: 'Description',
-            cmd: 'update_skill_property',
-          },
-        ]
-      );
-    }));
+    const expectedId = 'skill_id_1';
+    const expectedVersion = 3;
+    const expectedCommitMessage = 'commit message';
+    const updateSkillSpy = fakeSkillBackendApiService.updateSkillAsync;
+    expect(updateSkillSpy).toHaveBeenCalledWith(
+      expectedId,
+      expectedVersion,
+      expectedCommitMessage,
+      [
+        {
+          property_name: 'description',
+          new_value: 'new description',
+          old_value: 'Description',
+          cmd: 'update_skill_property',
+        },
+      ]
+    );
+  }));
 
   it('should track whether it is currently saving the skill', fakeAsync(() => {
     skillEditorStateService.loadSkill('skill_id_1');
@@ -391,27 +397,26 @@ describe('Skill editor state service', () => {
     expect(skillEditorStateService.isSavingSkill()).toBe(false);
   }));
 
-  it('should indicate a skill is no longer saving after an error',
-    fakeAsync(() => {
-      skillEditorStateService.loadSkill('skill_id_1');
-      tick(1000);
-      expect(skillEditorStateService.hasLoadedSkill()).toBeTrue();
-      skillUpdateService.setSkillDescription(
-        skillEditorStateService.getSkill(),
-        'new description'
-      );
-      tick(1000);
+  it('should indicate a skill is no longer saving after an error', fakeAsync(() => {
+    skillEditorStateService.loadSkill('skill_id_1');
+    tick(1000);
+    expect(skillEditorStateService.hasLoadedSkill()).toBeTrue();
+    skillUpdateService.setSkillDescription(
+      skillEditorStateService.getSkill(),
+      'new description'
+    );
+    tick(1000);
 
-      expect(skillEditorStateService.isSavingSkill()).toBe(false);
-      fakeSkillBackendApiService.failure = 'Internal 500 error';
+    expect(skillEditorStateService.isSavingSkill()).toBe(false);
+    fakeSkillBackendApiService.failure = 'Internal 500 error';
 
-      skillEditorStateService.saveSkill('commit message', () => {});
+    skillEditorStateService.saveSkill('commit message', () => {});
 
-      expect(skillEditorStateService.isSavingSkill()).toBe(true);
-      tick(1000);
+    expect(skillEditorStateService.isSavingSkill()).toBe(true);
+    tick(1000);
 
-      expect(skillEditorStateService.isSavingSkill()).toBe(false);
-    }));
+    expect(skillEditorStateService.isSavingSkill()).toBe(false);
+  }));
 
   it('should request to load the skill rights from the backend', () => {
     spyOn(
@@ -426,14 +431,15 @@ describe('Skill editor state service', () => {
   });
 
   it('should be able to set a new skill rights with an in-place copy', () => {
-    skillEditorStateService.setSkillRights(SkillRights.createFromBackendDict({
-      skill_id: 'skill_id',
-      can_edit_skill_description: true,
-    }));
-    const previousSkillRights = skillEditorStateService.getSkillRights();
-    const expectedSkillRights = SkillRights.createFromBackendDict(
-      skillRightsObject
+    skillEditorStateService.setSkillRights(
+      SkillRights.createFromBackendDict({
+        skill_id: 'skill_id',
+        can_edit_skill_description: true,
+      })
     );
+    const previousSkillRights = skillEditorStateService.getSkillRights();
+    const expectedSkillRights =
+      SkillRights.createFromBackendDict(skillRightsObject);
     expect(previousSkillRights).not.toEqual(expectedSkillRights);
 
     skillEditorStateService.setSkillRights(expectedSkillRights);
@@ -453,27 +459,38 @@ describe('Skill editor state service', () => {
     expect(skillEditorStateService.getSkillValidationIssues()).toEqual([]);
   }));
 
-  it('should update the skill description when calling ' +
-    '\'updateExistenceOfSkillDescription\'', fakeAsync(() => {
-    spyOn(fakeSkillBackendApiService, 'doesSkillWithDescriptionExistAsync')
-      .and.callThrough();
-    let successCb = jasmine.createSpy('success');
-    skillEditorStateService.updateExistenceOfSkillDescription(
-      'description', successCb);
-    tick();
+  it(
+    'should update the skill description when calling ' +
+      "'updateExistenceOfSkillDescription'",
+    fakeAsync(() => {
+      spyOn(
+        fakeSkillBackendApiService,
+        'doesSkillWithDescriptionExistAsync'
+      ).and.callThrough();
+      let successCb = jasmine.createSpy('success');
+      skillEditorStateService.updateExistenceOfSkillDescription(
+        'description',
+        successCb
+      );
+      tick();
 
-    expect(successCb).toHaveBeenCalledWith(true);
-  }));
+      expect(successCb).toHaveBeenCalledWith(true);
+    })
+  );
 
-  it('should fail to update the skill description when ' +
-    'description is empty', fakeAsync(() => {
-    spyOn(fakeSkillBackendApiService, 'doesSkillWithDescriptionExistAsync')
-      .and.callThrough();
-    let successCb = jasmine.createSpy('success');
-    skillEditorStateService.updateExistenceOfSkillDescription(
-      '', successCb);
-    tick();
+  it(
+    'should fail to update the skill description when ' +
+      'description is empty',
+    fakeAsync(() => {
+      spyOn(
+        fakeSkillBackendApiService,
+        'doesSkillWithDescriptionExistAsync'
+      ).and.callThrough();
+      let successCb = jasmine.createSpy('success');
+      skillEditorStateService.updateExistenceOfSkillDescription('', successCb);
+      tick();
 
-    expect(successCb).not.toHaveBeenCalled();
-  }));
+      expect(successCb).not.toHaveBeenCalled();
+    })
+  );
 });

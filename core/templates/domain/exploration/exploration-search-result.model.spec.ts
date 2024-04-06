@@ -16,7 +16,7 @@
  * @fileoverview Tests for ExplorationSearchResult model.
  */
 
-import { ExplorationSearchResult } from './exploration-search-result.model';
+import {ExplorationSearchResult} from './exploration-search-result.model';
 
 describe('Exploration Search Result model', () => {
   let sampleExplorationSearchResult: ExplorationSearchResult;
@@ -26,18 +26,20 @@ describe('Exploration Search Result model', () => {
       id: '12',
       objective:
         'learn how to count permutations accurately and systematically',
-      title: 'Protractor Test'
+      title: 'Protractor Test',
     };
 
-
-    sampleExplorationSearchResult = ExplorationSearchResult.
-      createFromBackendDict(sampleExplorationSearchResultBackendDict);
+    sampleExplorationSearchResult =
+      ExplorationSearchResult.createFromBackendDict(
+        sampleExplorationSearchResultBackendDict
+      );
   });
 
-  it('should be able to get all the values', function() {
+  it('should be able to get all the values', function () {
     expect(sampleExplorationSearchResult.id).toEqual('12');
     expect(sampleExplorationSearchResult.objective).toEqual(
-      'learn how to count permutations accurately and systematically');
+      'learn how to count permutations accurately and systematically'
+    );
     expect(sampleExplorationSearchResult.title).toEqual('Protractor Test');
   });
 });

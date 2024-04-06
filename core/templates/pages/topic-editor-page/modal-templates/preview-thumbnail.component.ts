@@ -16,14 +16,14 @@
  * @fileoverview Component for previewing thumbnails.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ContextService } from 'services/context.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ContextService} from 'services/context.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 
 @Component({
   selector: 'oppia-preview-thumbnail',
-  templateUrl: './preview-thumbnail.component.html'
+  templateUrl: './preview-thumbnail.component.html',
 })
 export class PreviewThumbnailComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -49,17 +49,18 @@ export class PreviewThumbnailComponent {
     if (entityType === undefined) {
       throw new Error('No image present for preview');
     }
-    this.editableThumbnailDataUrl = (
+    this.editableThumbnailDataUrl =
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.filename,
         entityType,
         this.contextService.getEntityId()
-      )
-    );
+      );
   }
 }
 
-angular.module('oppia').directive('oppiaPreviewThumbnail',
+angular.module('oppia').directive(
+  'oppiaPreviewThumbnail',
   downgradeComponent({
-    component: PreviewThumbnailComponent
-  }) as angular.IDirectiveFactory);
+    component: PreviewThumbnailComponent,
+  }) as angular.IDirectiveFactory
+);

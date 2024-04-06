@@ -23,24 +23,24 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'There should not be any unused dependency and all dependencies ' +
-        'should be sorted.'),
+        'should be sorted.',
       category: 'Variables',
-      recommended: true
+      recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
       unusedDirective: '{{dependencyName}} is injected but never used.',
-      sortedDependency: 'Dependencies are not sorted.'
-    }
+      sortedDependency: 'Dependencies are not sorted.',
+    },
   },
 
-  create: function(context) {
+  create: function (context) {
     const sourceCode = context.getSourceCode();
 
-    var isEquals = function(sortedImports, params) {
+    var isEquals = function (sortedImports, params) {
       for (var i = 0; i < sortedImports.length; ++i) {
         if (sortedImports[i] !== params[i]) {
           return false;
@@ -49,9 +49,9 @@ module.exports = {
       return true;
     };
 
-    var isUnused = function(param, tokensList) {
+    var isUnused = function (param, tokensList) {
       var variableCounter = 0;
-      tokensList.forEach((token) => {
+      tokensList.forEach(token => {
         if (param === token) {
           variableCounter += 1;
         }
@@ -63,12 +63,12 @@ module.exports = {
       }
     };
 
-    var checkSortedDependency = function(node, params) {
+    var checkSortedDependency = function (node, params) {
       var dollarImports = [];
       var regularImports = [];
       var constantImports = [];
       var re = new RegExp('[a-z]');
-      params.forEach((param) => {
+      params.forEach(param => {
         if (param.startsWith('$')) {
           dollarImports.push(param);
         } else if (re.test(param)) {
@@ -80,13 +80,14 @@ module.exports = {
       dollarImports.sort();
       regularImports.sort();
       constantImports.sort();
-      var sortedImports = dollarImports.concat(
-        regularImports).concat(constantImports);
+      var sortedImports = dollarImports
+        .concat(regularImports)
+        .concat(constantImports);
       if (!isEquals(sortedImports, params)) {
         context.report({
           node,
           loc: node.loc,
-          messageId: 'sortedDependency'
+          messageId: 'sortedDependency',
         });
       }
     };
@@ -98,12 +99,20 @@ module.exports = {
         if (!node.parent.key) {
           return true;
         }
-        if (!(node.parent.key.name === 'controller' &&
-            node.parent.parent.type === 'ObjectExpression')) {
+        if (
+          !(
+            node.parent.key.name === 'controller' &&
+            node.parent.parent.type === 'ObjectExpression'
+          )
+        ) {
           return true;
         }
-        if (!(node.elements[node.elements.length - 1].type ===
-            'FunctionExpression')) {
+        if (
+          !(
+            node.elements[node.elements.length - 1].type ===
+            'FunctionExpression'
+          )
+        ) {
           return true;
         }
         var params = node.elements[node.elements.length - 1].params;
@@ -112,25 +121,25 @@ module.exports = {
           paramsList.push(param.name);
         }
         var tokens = sourceCode.getTokens(node);
-        tokens.forEach((token) => {
+        tokens.forEach(token => {
           if (token.type !== 'Punctuator') {
             tokensList.push(token.value);
           }
         });
         checkSortedDependency(node, paramsList);
-        paramsList.forEach((param) => {
+        paramsList.forEach(param => {
           if (isUnused(param, tokensList)) {
             context.report({
               node,
               loc: node.loc,
               messageId: 'unusedDirective',
               data: {
-                dependencyName: param
-              }
+                dependencyName: param,
+              },
             });
           }
         });
-      }
+      },
     };
-  }
+  },
 };

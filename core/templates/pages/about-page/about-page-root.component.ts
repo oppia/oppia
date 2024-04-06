@@ -16,18 +16,16 @@
  * @fileoverview About-page-root component.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-about-page-root',
-  templateUrl: './about-page-root.component.html'
+  templateUrl: './about-page-root.component.html',
 })
 export class AboutPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -38,10 +36,12 @@ export class AboutPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT.META
+    );
   }
 
   ngOnInit(): void {

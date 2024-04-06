@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for StateStatsModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { RouterService } from 'pages/exploration-editor-page/services/router.service';
-import { StateStatsModalComponent } from './state-stats-modal.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {RouterService} from 'pages/exploration-editor-page/services/router.service';
+import {StateStatsModalComponent} from './state-stats-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -45,30 +45,29 @@ describe('State Stats Modal Component', () => {
     totalAnswersCount: 10,
     numTimesSolutionViewed: 4,
     totalHitCount: 13,
-    numCompletions: 8
+    numCompletions: 8,
   };
-  let visualizationsInfo = [{
-    data: 'Hola',
-    options: 'Options',
-    id: '1',
-    addressed_info_is_supported: true
-  }];
-  let interactionArgs = {
-  };
+  let visualizationsInfo = [
+    {
+      data: 'Hola',
+      options: 'Options',
+      id: '1',
+      addressed_info_is_supported: true,
+    },
+  ];
+  let interactionArgs = {};
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        StateStatsModalComponent
-      ],
+      declarations: [StateStatsModalComponent],
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
+          useClass: MockActiveModal,
         },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -90,15 +89,15 @@ describe('State Stats Modal Component', () => {
     fixture.detectChanges();
   });
 
-  it('should initialize component properties after component is initialized',
-    () => {
-      expect(component.stateName).toBe(stateName);
-      expect(component.numEnters).toEqual(stateStats.totalHitCount);
-      expect(component.numQuits)
-        .toEqual(stateStats.totalHitCount - stateStats.numCompletions);
-      expect(component.interactionArgs).toBe(interactionArgs);
-      expect(component.visualizationsInfo).toEqual(visualizationsInfo);
-    });
+  it('should initialize component properties after component is initialized', () => {
+    expect(component.stateName).toBe(stateName);
+    expect(component.numEnters).toEqual(stateStats.totalHitCount);
+    expect(component.numQuits).toEqual(
+      stateStats.totalHitCount - stateStats.numCompletions
+    );
+    expect(component.interactionArgs).toBe(interactionArgs);
+    expect(component.visualizationsInfo).toEqual(visualizationsInfo);
+  });
 
   it('should navigate to state editor', () => {
     spyOn(ngbActiveModal, 'dismiss').and.stub();
@@ -117,7 +116,7 @@ describe('State Stats Modal Component', () => {
       height: 270,
       legendPosition: 'right',
       title: 'title',
-      width: 240
+      width: 240,
     });
     expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
     expect(routerService.navigateToMainTab).toHaveBeenCalledWith(stateName);

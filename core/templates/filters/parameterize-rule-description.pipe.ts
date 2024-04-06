@@ -16,31 +16,41 @@
  * @fileoverview ParameterizeRuleDescription Pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
-import { Fraction } from 'domain/objects/fraction.model';
-import { Ratio } from 'domain/objects/ratio.model';
-import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
-import { NumberWithUnitsObjectFactory } from 'domain/objects/NumberWithUnitsObjectFactory';
-import { Rule } from 'domain/exploration/rule.model';
-import { FractionAnswer, MusicNotesAnswer, NumberWithUnitsAnswer, RatioInputAnswer } from 'interactions/answer-defs';
-import { TranslatableSetOfNormalizedString, TranslatableSetOfUnicodeString } from 'interactions/rule-input-defs';
-import { AnswerChoice } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { AppConstants } from 'app.constants';
+import {Pipe, PipeTransform} from '@angular/core';
+import {Fraction} from 'domain/objects/fraction.model';
+import {Ratio} from 'domain/objects/ratio.model';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
+import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {Rule} from 'domain/exploration/rule.model';
+import {
+  FractionAnswer,
+  MusicNotesAnswer,
+  NumberWithUnitsAnswer,
+  RatioInputAnswer,
+} from 'interactions/answer-defs';
+import {
+  TranslatableSetOfNormalizedString,
+  TranslatableSetOfUnicodeString,
+} from 'interactions/rule-input-defs';
+import {AnswerChoice} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {AppConstants} from 'app.constants';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 @Pipe({
-  name: 'parameterizeRuleDescriptionPipe'
+  name: 'parameterizeRuleDescriptionPipe',
 })
 export class ParameterizeRuleDescriptionPipe implements PipeTransform {
   constructor(
-      private formatRtePreviewPipe: FormatRtePreviewPipe,
-      private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory,
-  ) { }
+    private formatRtePreviewPipe: FormatRtePreviewPipe,
+    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory
+  ) {}
 
   transform(
-      rule: Rule | null, interactionId: string | null,
-      choices: AnswerChoice[] | null): string {
+    rule: Rule | null,
+    interactionId: string | null,
+    choices: AnswerChoice[] | null
+  ): string {
     if (!rule || !interactionId) {
       return '';
     }
@@ -50,19 +60,22 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
       return '';
     }
 
-    let ruleTypesToDescriptions = INTERACTION_SPECS[
-      interactionId as InteractionSpecsKey].rule_descriptions;
+    let ruleTypesToDescriptions =
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].rule_descriptions;
 
     type RuleTypeToDescription = {
       [key in keyof typeof ruleTypesToDescriptions]: string;
     };
 
-    let description: string = ruleTypesToDescriptions[
-      rule.type as keyof RuleTypeToDescription];
+    let description: string =
+      ruleTypesToDescriptions[rule.type as keyof RuleTypeToDescription];
     if (!description) {
       console.error(
-        'Cannot find description for rule ' + rule.type +
-         ' for interaction ' + interactionId);
+        'Cannot find description for rule ' +
+          rule.type +
+          ' for interaction ' +
+          interactionId
+      );
       return '';
     }
 
@@ -99,7 +112,8 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
               replacementText += 'INVALID';
             } else {
               replacementText += this.formatRtePreviewPipe.transform(
-                choices[choiceIndex].label);
+                choices[choiceIndex].label
+              );
             }
             if (i < key.length - 1) {
               replacementText += ',';
@@ -119,7 +133,8 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
                 replacementText += 'INVALID';
               } else {
                 replacementText += this.formatRtePreviewPipe.transform(
-                  choices[choiceIndex].label);
+                  choices[choiceIndex].label
+                );
               }
             }
             replacementText += ']';
@@ -135,9 +150,10 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
           // TranslatableHtmlContentId.
           for (var i = 0; i < choices.length; i++) {
             if (choices[i].val === inputs[varName]) {
-              var filteredLabelText =
-                 this.formatRtePreviewPipe.transform(choices[i].label);
-              replacementText = '\'' + filteredLabelText + '\'';
+              var filteredLabelText = this.formatRtePreviewPipe.transform(
+                choices[i].label
+              );
+              replacementText = "'" + filteredLabelText + "'";
             }
           }
         }
@@ -158,79 +174,92 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
         let latitude = key[0] || 0.0;
         let longitude = key[1] || 0.0;
         replacementText = '(';
-        replacementText += (
-           key[0] >= 0.0 ?
-           latitude.toFixed(2) + '°N' :
-           -latitude.toFixed(2) + '°S');
+        replacementText +=
+          key[0] >= 0.0
+            ? latitude.toFixed(2) + '°N'
+            : -latitude.toFixed(2) + '°S';
         replacementText += ', ';
-        replacementText += (
-           key[1] >= 0.0 ?
-           longitude.toFixed(2) + '°E' :
-           -longitude.toFixed(2) + '°W');
+        replacementText +=
+          key[1] >= 0.0
+            ? longitude.toFixed(2) + '°E'
+            : -longitude.toFixed(2) + '°W';
         replacementText += ')';
       } else if (varType === 'Graph') {
         replacementText = '[reference graph]';
       } else if (varType === 'Fraction') {
         replacementText = Fraction.fromDict(
-             (inputs[varName]) as FractionAnswer).toString();
+          inputs[varName] as FractionAnswer
+        ).toString();
       } else if (varType === 'NumberWithUnits') {
         replacementText = this.numberWithUnitsObjectFactory
-          .fromDict((inputs[varName]) as NumberWithUnitsAnswer).toString();
+          .fromDict(inputs[varName] as NumberWithUnitsAnswer)
+          .toString();
       } else if (varType === 'TranslatableSetOfNormalizedString') {
         replacementText = '[';
-        for (var i = 0; i < (
-             inputs[varName] as TranslatableSetOfNormalizedString)
-          .normalizedStrSet.length; i++) {
+        for (
+          var i = 0;
+          i <
+          (inputs[varName] as TranslatableSetOfNormalizedString)
+            .normalizedStrSet.length;
+          i++
+        ) {
           if (i !== 0) {
             replacementText += ', ';
           }
           replacementText += (
-                 (inputs[varName]) as TranslatableSetOfNormalizedString)
-            .normalizedStrSet[i];
+            inputs[varName] as TranslatableSetOfNormalizedString
+          ).normalizedStrSet[i];
         }
         replacementText += ']';
       } else if (varType === 'TranslatableSetOfUnicodeString') {
         replacementText = '[';
-        for (var i = 0; i < (
-             inputs[varName] as TranslatableSetOfUnicodeString)
-          .unicodeStrSet.length; i++) {
+        for (
+          var i = 0;
+          i <
+          (inputs[varName] as TranslatableSetOfUnicodeString).unicodeStrSet
+            .length;
+          i++
+        ) {
           if (i !== 0) {
             replacementText += ', ';
           }
-          replacementText += (
-                 inputs[varName] as TranslatableSetOfUnicodeString)
+          replacementText += (inputs[varName] as TranslatableSetOfUnicodeString)
             .unicodeStrSet[i];
         }
         replacementText += ']';
       } else if (
         varType === 'Real' ||
-         varType === 'NonnegativeInt' ||
-         varType === 'Int' ||
-         varType === 'PositiveInt'
+        varType === 'NonnegativeInt' ||
+        varType === 'Int' ||
+        varType === 'PositiveInt'
       ) {
         replacementText = inputs[varName] + '';
       } else if (
         varType === 'CodeString' ||
-         varType === 'UnicodeString' ||
-         varType === 'NormalizedString' ||
-         varType === 'AlgebraicExpression' ||
-         varType === 'MathEquation' ||
-         varType === 'NumericExpression'
+        varType === 'UnicodeString' ||
+        varType === 'NormalizedString' ||
+        varType === 'AlgebraicExpression' ||
+        varType === 'MathEquation' ||
+        varType === 'NumericExpression'
       ) {
         replacementText = String(inputs[varName]);
       } else if (varType === 'PositionOfTerms') {
-        for (var i = 0; i < AppConstants.POSITION_OF_TERMS_MAPPING.length;
-          i++) {
+        for (
+          var i = 0;
+          i < AppConstants.POSITION_OF_TERMS_MAPPING.length;
+          i++
+        ) {
           if (
-            AppConstants.POSITION_OF_TERMS_MAPPING[i].name ===
-            inputs[varName]) {
+            AppConstants.POSITION_OF_TERMS_MAPPING[i].name === inputs[varName]
+          ) {
             replacementText =
-               AppConstants.POSITION_OF_TERMS_MAPPING[i].humanReadableName;
+              AppConstants.POSITION_OF_TERMS_MAPPING[i].humanReadableName;
           }
         }
       } else if (varType === 'RatioExpression') {
         replacementText = Ratio.fromList(
-             (inputs[varName]) as RatioInputAnswer).toAnswerString();
+          inputs[varName] as RatioInputAnswer
+        ).toAnswerString();
       }
 
       // Replaces all occurances of $ with $$.

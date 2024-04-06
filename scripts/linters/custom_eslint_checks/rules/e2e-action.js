@@ -25,22 +25,22 @@ module.exports = {
   meta: {
     type: 'problem',
     docs: {
-      description: (
+      description:
         'The functions in action.js should be used wherever possible ' +
-        'instead of interacting with elements directly.'),
+        'instead of interacting with elements directly.',
       category: 'Best Practices',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      action: (
+      action:
         '{{elementName}}.{{functionName}}() is called instead of using ' +
-        'action.{{functionName}}()'),
+        'action.{{functionName}}()',
     },
   },
 
-  create: function(context) {
+  create: function (context) {
     return {
       CallExpression: function checkExpression(node) {
         if (node.callee.type !== 'MemberExpression') {
@@ -65,7 +65,7 @@ module.exports = {
             },
           });
         }
-      }
+      },
     };
-  }
+  },
 };

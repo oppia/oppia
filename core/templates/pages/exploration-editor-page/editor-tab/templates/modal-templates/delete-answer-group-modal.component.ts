@@ -16,16 +16,15 @@
  * @fileoverview Component for Delete Answer Group Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'delete-answer-group-modal',
-  templateUrl: './delete-answer-group-modal.component.html'
+  templateUrl: './delete-answer-group-modal.component.html',
 })
-export class DeleteAnswerGroupModalComponent
-  extends ConfirmOrCancelModal {
+export class DeleteAnswerGroupModalComponent extends ConfirmOrCancelModal {
   constructor(ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }

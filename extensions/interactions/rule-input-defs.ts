@@ -20,8 +20,8 @@ import {
   FractionAnswer,
   NumberWithUnitsAnswer,
   MusicNotesAnswer,
-  GraphAnswer } from
-  'interactions/answer-defs';
+  GraphAnswer,
+} from 'interactions/answer-defs';
 
 export interface AlgebraicExpressionRuleInputs {
   x: string;
@@ -49,10 +49,10 @@ export interface DragAndDropHasElementXBeforeElementYRuleInputs {
   y: string;
 }
 
-export type DragAndDropRuleInputs = (
-  DragAndDropCheckEqualityRuleInputs |
-  DragAndDropHasElementXAtPositionYRuleInputs |
-  DragAndDropHasElementXBeforeElementYRuleInputs);
+export type DragAndDropRuleInputs =
+  | DragAndDropCheckEqualityRuleInputs
+  | DragAndDropHasElementXAtPositionYRuleInputs
+  | DragAndDropHasElementXBeforeElementYRuleInputs;
 
 export interface EndExplorationRuleInputs {}
 
@@ -66,9 +66,9 @@ export interface FractionIntegerPartRuleInputs {
   x: number;
 }
 
-export type FractionRuleInputs = (
-  FractionEquivalentRuleInputs |
-  FractionIntegerPartRuleInputs);
+export type FractionRuleInputs =
+  | FractionEquivalentRuleInputs
+  | FractionIntegerPartRuleInputs;
 
 // GraphInput interaction has multiple types of inputs based on
 // rule type.
@@ -80,9 +80,9 @@ export interface GraphIsomorphicRuleInputs {
   g: GraphAnswer;
 }
 
-export type GraphRuleInputs = (
-  GraphPropertyRuleInputs |
-  GraphIsomorphicRuleInputs);
+export type GraphRuleInputs =
+  | GraphPropertyRuleInputs
+  | GraphIsomorphicRuleInputs;
 
 export interface ImageClickRuleInputs {
   x: string;
@@ -109,9 +109,9 @@ export interface MathEquationRuleInputsWithoutSide {
   x: string;
 }
 
-export type MathEquationRuleInputs = (
-  MathEquationRuleInputsWithSide |
-  MathEquationRuleInputsWithoutSide);
+export type MathEquationRuleInputs =
+  | MathEquationRuleInputsWithSide
+  | MathEquationRuleInputsWithoutSide;
 
 export interface MultipleChoiceRuleInputs {
   x: number;
@@ -148,13 +148,13 @@ export interface MusicNotesIsTranspositionOfExceptForRuleInputs {
   k: number;
 }
 
-export type MusicNotesRuleInputs = (
-  MusicNotesEqualsRuleInputs |
-  MusicNotesIsLongerThanRuleInputs |
-  MusicNotesHasLengthInclusivelyBetweenRuleInputs |
-  MusicNotesIsEqualToExceptForRuleInputs |
-  MusicNotesIsTranspositionOfRuleInputs |
-  MusicNotesIsTranspositionOfExceptForRuleInputs);
+export type MusicNotesRuleInputs =
+  | MusicNotesEqualsRuleInputs
+  | MusicNotesIsLongerThanRuleInputs
+  | MusicNotesHasLengthInclusivelyBetweenRuleInputs
+  | MusicNotesIsEqualToExceptForRuleInputs
+  | MusicNotesIsTranspositionOfRuleInputs
+  | MusicNotesIsTranspositionOfExceptForRuleInputs;
 
 export interface NumberWithUnitsRuleInputs {
   f: NumberWithUnitsAnswer;
@@ -180,10 +180,10 @@ export interface NumericInputIsWithinToleranceRuleInputs {
   tol: number;
 }
 
-export type NumericInputRuleInputs = (
-  NumericInputEqualRuleInputs |
-  NumericInputIsInclusivelyBetweenRuleInputs |
-  NumericInputIsWithinToleranceRuleInputs);
+export type NumericInputRuleInputs =
+  | NumericInputEqualRuleInputs
+  | NumericInputIsInclusivelyBetweenRuleInputs
+  | NumericInputIsWithinToleranceRuleInputs;
 
 export interface PencilCodeEditorRuleInputs {
   x: string;
@@ -202,10 +202,10 @@ export interface RatioInputHasSpecificTermEqualToRuleInputs {
   y: number;
 }
 
-export type RatioInputRuleInputs = (
-  RatioInputEqualRuleInputs |
-  RatioInputHasNumberOfTermsEqualToRuleInputs |
-  RatioInputHasSpecificTermEqualToRuleInputs);
+export type RatioInputRuleInputs =
+  | RatioInputEqualRuleInputs
+  | RatioInputHasNumberOfTermsEqualToRuleInputs
+  | RatioInputHasSpecificTermEqualToRuleInputs;
 
 export interface BaseTranslatableObject {
   contentId: string | null;
@@ -228,24 +228,24 @@ export interface TextInputRuleInputs extends BaseTranslatableObject {
   x: TranslatableSetOfNormalizedString;
 }
 
-export type InteractionRuleInputs = (
-  AlgebraicExpressionRuleInputs |
-  CodeReplRuleInputs |
-  ContinueRuleInputs |
-  DragAndDropRuleInputs |
-  EndExplorationRuleInputs |
-  FractionRuleInputs |
-  GraphRuleInputs |
-  ImageClickRuleInputs |
-  InteractiveMapRuleInputs |
-  ItemSelectionRuleInputs |
-  MathEquationRuleInputs |
-  MultipleChoiceRuleInputs |
-  MusicNotesRuleInputs |
-  NumericExpressionRuleInputs |
-  NumberWithUnitsRuleInputs |
-  NumericInputRuleInputs |
-  PencilCodeEditorRuleInputs |
-  RatioInputRuleInputs|
-  SetInputRuleInputs |
-  TextInputRuleInputs);
+export type InteractionRuleInputs =
+  | AlgebraicExpressionRuleInputs
+  | CodeReplRuleInputs
+  | ContinueRuleInputs
+  | DragAndDropRuleInputs
+  | EndExplorationRuleInputs
+  | FractionRuleInputs
+  | GraphRuleInputs
+  | ImageClickRuleInputs
+  | InteractiveMapRuleInputs
+  | ItemSelectionRuleInputs
+  | MathEquationRuleInputs
+  | MultipleChoiceRuleInputs
+  | MusicNotesRuleInputs
+  | NumericExpressionRuleInputs
+  | NumberWithUnitsRuleInputs
+  | NumericInputRuleInputs
+  | PencilCodeEditorRuleInputs
+  | RatioInputRuleInputs
+  | SetInputRuleInputs
+  | TextInputRuleInputs;

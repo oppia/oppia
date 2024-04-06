@@ -16,23 +16,22 @@
  * @fileoverview Root component for Classroom Page.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { PageHeadService } from 'services/page-head.service';
-import { UrlService } from 'services/contextual/url.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {PageHeadService} from 'services/page-head.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-classroom-page-root',
-  templateUrl: './classroom-page-root.component.html'
+  templateUrl: './classroom-page-root.component.html',
 })
 export class ClassroomPageRootComponent {
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private pageHeadService: PageHeadService,
-    private urlService: UrlService,
+    private urlService: UrlService
   ) {}
 
   errorPageIsShown: boolean = false;
@@ -40,18 +39,23 @@ export class ClassroomPageRootComponent {
   classroomUrlFragment!: string;
 
   ngOnInit(): void {
-    this.classroomUrlFragment = (
-      this.urlService.getClassroomUrlFragmentFromUrl());
+    this.classroomUrlFragment =
+      this.urlService.getClassroomUrlFragmentFromUrl();
 
-    this.accessValidationBackendApiService.validateAccessToClassroomPage(
-      this.classroomUrlFragment).then(() => {
-      this.errorPageIsShown = false;
-      this.pageIsShown = true;
-      this.pageHeadService.updateTitleAndMetaTags(
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
-        AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META);
-    }, () => {
-      this.errorPageIsShown = true;
-    });
+    this.accessValidationBackendApiService
+      .validateAccessToClassroomPage(this.classroomUrlFragment)
+      .then(
+        () => {
+          this.errorPageIsShown = false;
+          this.pageIsShown = true;
+          this.pageHeadService.updateTitleAndMetaTags(
+            AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.TITLE,
+            AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.META
+          );
+        },
+        () => {
+          this.errorPageIsShown = true;
+        }
+      );
   }
 }

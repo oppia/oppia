@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the preview thumbnail component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { ThumbnailDisplayComponent } from 'components/forms/custom-forms-directives/thumbnail-display.component';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { PreviewThumbnailComponent } from './preview-thumbnail.component';
-import { ContextService } from 'services/context.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {ThumbnailDisplayComponent} from 'components/forms/custom-forms-directives/thumbnail-display.component';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {PreviewThumbnailComponent} from './preview-thumbnail.component';
+import {ContextService} from 'services/context.service';
 
-describe('Preview Thumbnail Component', function() {
+describe('Preview Thumbnail Component', function () {
   let componentInstance: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
   let imageUploadHelperService: ImageUploadHelperService;
@@ -33,27 +33,22 @@ describe('Preview Thumbnail Component', function() {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        PreviewThumbnailComponent,
-        ThumbnailDisplayComponent
-      ],
-      providers: [
-        ImageUploadHelperService,
-        ContextService
-      ]
+      declarations: [PreviewThumbnailComponent, ThumbnailDisplayComponent],
+      providers: [ImageUploadHelperService, ContextService],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PreviewThumbnailComponent);
     componentInstance = fixture.componentInstance;
-    imageUploadHelperService = (
-       TestBed.inject(ImageUploadHelperService)) as
-         jasmine.SpyObj<ImageUploadHelperService>;
+    imageUploadHelperService = TestBed.inject(
+      ImageUploadHelperService
+    ) as jasmine.SpyObj<ImageUploadHelperService>;
     contextService = TestBed.inject(ContextService);
     spyOn(
-      imageUploadHelperService, 'getTrustedResourceUrlForThumbnailFilename')
-      .and.returnValue(testUrl);
+      imageUploadHelperService,
+      'getTrustedResourceUrlForThumbnailFilename'
+    ).and.returnValue(testUrl);
   });
 
   it('should create', () => {

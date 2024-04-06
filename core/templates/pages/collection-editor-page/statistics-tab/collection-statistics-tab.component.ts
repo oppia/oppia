@@ -16,12 +16,12 @@
  * @fileoverview Component for the statistics tab of the collection editor.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'collection-statistics-tab',
   templateUrl: './collection-statistics-tab.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CollectionStatisticsTabComponent {
   constructor() {}

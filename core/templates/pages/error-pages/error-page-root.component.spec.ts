@@ -16,27 +16,29 @@
  * @fileoverview Unit tests for error page root.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ActivatedRoute, UrlSegment } from '@angular/router';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {ActivatedRoute, UrlSegment} from '@angular/router';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ErrorPageRootComponent } from './error-page-root.component';
-import { BaseRootComponent } from 'pages/base-root.component';
-import { PageHeadService } from 'services/page-head.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ErrorPageRootComponent} from './error-page-root.component';
+import {BaseRootComponent} from 'pages/base-root.component';
+import {PageHeadService} from 'services/page-head.service';
 
 class MockWindowRef {
   nativeWindow = {
     document: {
       getElementsByTagName(tagName: string) {
-        return [{
-          getAttribute(attr: string) {
-            return '401';
-          }
-        }];
-      }
-    }
+        return [
+          {
+            getAttribute(attr: string) {
+              return '401';
+            },
+          },
+        ];
+      },
+    },
   };
 }
 
@@ -45,9 +47,9 @@ class MockActivatedRoute {
     paramMap: {
       get: (key: string) => {
         return '500';
-      }
+      },
     },
-    url: []
+    url: [],
   };
 }
 
@@ -64,14 +66,14 @@ describe('ErrorPageRootComponent', () => {
         TranslateService,
         {
           provide: WindowRef,
-          useClass: MockWindowRef
+          useClass: MockWindowRef,
         },
         {
           provide: ActivatedRoute,
-          useClass: MockActivatedRoute
-        }
+          useClass: MockActivatedRoute,
+        },
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ErrorPageRootComponent);
@@ -85,8 +87,9 @@ describe('ErrorPageRootComponent', () => {
 
     expect(component.statusCode).toEqual('500');
     expect(parentNgOnInitSpy).toHaveBeenCalledTimes(1);
-    expect(component.titleInterpolationParams).toEqual(
-      {statusCode: component.statusCode});
+    expect(component.titleInterpolationParams).toEqual({
+      statusCode: component.statusCode,
+    });
   });
 
   it('should obtain status code from activated router', () => {
@@ -105,7 +108,8 @@ describe('ErrorPageRootComponent', () => {
     );
     const getElementsByTagNameSpy = spyOn(
       component.windowRef.nativeWindow.document,
-      'getElementsByTagName').and.callThrough();
+      'getElementsByTagName'
+    ).and.callThrough();
 
     component.ngOnInit();
 
@@ -121,7 +125,8 @@ describe('ErrorPageRootComponent', () => {
     );
     const getElementsByTagNameSpy = spyOn(
       component.windowRef.nativeWindow.document,
-      'getElementsByTagName');
+      'getElementsByTagName'
+    );
 
     component.ngOnInit();
 
@@ -135,7 +140,8 @@ describe('ErrorPageRootComponent', () => {
     component.activatedRoute.snapshot.url = [new UrlSegment('nested_path', {})];
     const getElementsByTagNameSpy = spyOn(
       component.windowRef.nativeWindow.document,
-      'getElementsByTagName');
+      'getElementsByTagName'
+    );
 
     component.ngOnInit();
 

@@ -16,16 +16,15 @@
  * @fileoverview Component for Delete State Skill Modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'delete-state-skill-modal',
-  templateUrl: './delete-state-skill-modal.component.html'
+  templateUrl: './delete-state-skill-modal.component.html',
 })
-export class DeleteStateSkillModalComponent
-  extends ConfirmOrCancelModal {
+export class DeleteStateSkillModalComponent extends ConfirmOrCancelModal {
   constructor(ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }

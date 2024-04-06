@@ -382,6 +382,7 @@ import { SignupPageBackendApiService } from 'pages/signup-page/services/signup-p
 import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import { PageHeadService } from './page-head.service';
 import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/services/collection-player-backend-api.service';
+import { CollectionPlayerAuthGuard } from 'pages/collection-player-page/collection-player-auth.guard';
 import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
 import { EmailDashboardResultBackendApiService } from 'pages/email-dashboard-pages/email-dashboard-result-backend-api.service';
 import { I18nService } from 'i18n/i18n.service';
@@ -453,6 +454,7 @@ import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashb
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
 import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
+import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
   ['CollectionEditorPageAuthGuard', CollectionEditorPageAuthGuard],
@@ -512,6 +514,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionEditorRoutingService', CollectionEditorRoutingService],
   ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionPlayerBackendApiService', CollectionPlayerBackendApiService],
+  ['CollectionPlayerAuthGuard', CollectionPlayerAuthGuard],
   ['CollectionRightsBackendApiService', CollectionRightsBackendApiService],
   ['CollectionValidationService', CollectionValidationService],
   ['CollectionUpdateService', CollectionUpdateService],
@@ -941,5 +944,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['HtmlLengthService', HtmlLengthService],
   ['ContributorDashboardAdminStatsBackendApiService',
     ContributorDashboardAdminStatsBackendApiService],
-  ['InsertScriptService', InsertScriptService]
+  ['InsertScriptService', InsertScriptService],
+  ['VoiceoverAdminAuthGuard', VoiceoverAdminAuthGuard],
 ];

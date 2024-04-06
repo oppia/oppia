@@ -16,12 +16,9 @@
  * @fileoverview Logged-in users utility file.
  */
 
-import { BaseUser } from
-  '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from
-  '../puppeteer-testing-utilities/test-constants';
-import { showMessage } from
-  '../puppeteer-testing-utilities/show-message-utils';
+import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
+import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
@@ -42,7 +39,14 @@ const evenThoseWhoAreInSchoolUrl =
   testConstants.URLs.ExternalLinkEvenThoseWhoAreInSchool;
 const _420MillionUrl = testConstants.URLs.ExternalLink61MillionChildren;
 const thanksForDonatingUrl = testConstants.URLs.DonateWithThanksModal;
-const watchAVideoUrl = testConstants.URLs.ExternalLinkWatchAVideo;
+const desktopWatchAVideoUrl = testConstants.URLs.DesktopExternalLinkWatchAVideo;
+const mobileWatchAVideoUrl = testConstants.URLs.MobileExternalLinkWatchAVideo;
+const getStartedUrl = testConstants.URLs.GetStarted;
+const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
+const electromagnetismUrl = testConstants.URLs.Electromagnetism;
+const programmingWithCarlaUrl = testConstants.URLs.ProgrammingWithCarla;
+const creatingAnExplorationUrl = testConstants.URLs.CreatingAnExploration;
+const embeddingAnExplorationUrl = testConstants.URLs.EmbeddingAnExploration;
 
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarAboutTabAboutButton = 'a.e2e-test-about-link';
@@ -59,6 +63,12 @@ const navbarGetInvolvedTabDonateButton =
 const navbarGetInvolvedTabContactUsButton =
   'a.e2e-test-navbar-get-involved-menu-contact-us-button';
 const navbarDonateButton = 'a.e2e-test-navbar-donate-button';
+
+const footerAboutLink = 'a.e2e-test-footer-about-link';
+const footerAboutFoundationLink = 'a.e2e-test-footer-about-foundation-link';
+const footerBlogLink = 'a.e2e-test-footer-blog-link';
+const footerForumlink = 'a.e2e-test-footer-forum-link';
+const footerGetStartedLink = 'a.e2e-test-get-started-link';
 
 const browseOurLessonsButton = '.e2e-test-about-page-browse-our-lessons-button';
 const accessAndroidAppButton = '.e2e-test-about-page-access-android-app-button';
@@ -89,6 +99,20 @@ const dismissButton = 'i.e2e-test-thanks-for-donating-page-dismiss-button';
 const thanksForDonatingClass = '.modal-open';
 const donatePage = '.modal-backdrop.fade';
 
+const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
+const mobileSidebarAboutFoundationButton =
+  'a.e2e-mobile-test-sidebar-about-foundation-button';
+const mobileSidebarExpandGetInvolvedMenuButton =
+  'div.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileSidebarGetInvolvedMenuPartnershipsButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-partnerships-button';
+const mobileSidebarGetInvolvedMenuVolunteerButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-volunteer-button';
+const mobileSidevbarGetInvolvedMenuDonateButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
+const mobileSidebarGetInvolvedMenuContactUsButton =
+  'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
 export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -122,27 +146,28 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to navigate to the Get Started page.
+   */
+  async navigateToGetStartedPage(): Promise<void> {
+    await this.goto(getStartedUrl);
+  }
+
+  /**
    * Function to click a button and check if it opens the expected destination.
    */
   async clickButtonToNavigateToNewPage(
-      button: string,
-      buttonName: string,
-      expectedDestinationPageUrl: string,
-      expectedDestinationPageName: string
+    button: string,
+    buttonName: string,
+    expectedDestinationPageUrl: string,
+    expectedDestinationPageName: string
   ): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation(),
-      await this.clickOn(button),
-    ]);
-    if (this.page.url() !== expectedDestinationPageUrl) {
-      throw new Error (
-        'The ' + buttonName + ' does not open the ' +
-        expectedDestinationPageName + ' page!');
-    } else {
-      showMessage(
-        'The ' + buttonName + ' opens the ' +
-        expectedDestinationPageName + ' page.');
-    }
+    await Promise.all([this.page.waitForNavigation(), this.clickOn(button)]);
+
+    expect(this.page.url())
+      .withContext(
+        `${buttonName} should open the ${expectedDestinationPageName} page`
+      )
+      .toBe(expectedDestinationPageUrl);
   }
 
   /**
@@ -150,10 +175,23 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the About page.
    */
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
-    await this.clickOn(navbarAboutTab);
-    await this.clickButtonToNavigateToNewPage(
-      navbarAboutTabAboutButton,
-      'About Oppia button in the About Menu on navbar', aboutUrl, 'About');
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarAboutButton,
+        'About Oppia button in the About Menu on mobile sidebar',
+        aboutUrl,
+        'About'
+      );
+    } else {
+      await this.clickOn(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabAboutButton,
+        'About Oppia button in the About Menu on navbar',
+        aboutUrl,
+        'About'
+      );
+    }
   }
 
   /**
@@ -163,7 +201,10 @@ export class LoggedInUser extends BaseUser {
   async clickBrowseOurLessonsButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       browseOurLessonsButton,
-      'Browse Our Lessons button', mathClassroomUrl, 'Math Classroom');
+      'Browse Our Lessons button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
   }
 
   /**
@@ -173,7 +214,10 @@ export class LoggedInUser extends BaseUser {
   async clickAccessAndroidAppButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       accessAndroidAppButton,
-      'Access the Android App button', androidUrl, 'Android');
+      'Access the Android App button',
+      androidUrl,
+      'Android'
+    );
   }
 
   /**
@@ -183,7 +227,10 @@ export class LoggedInUser extends BaseUser {
   async clickVisitClassroomButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       visitClassroomButton,
-      'Visit Classroom button', mathClassroomUrl, 'Math Classroom');
+      'Visit Classroom button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
   }
 
   /**
@@ -193,7 +240,10 @@ export class LoggedInUser extends BaseUser {
   async clickBrowseLibraryButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       browseLibraryButton,
-      'Browse Library button', communityLibraryUrl, 'Community Library');
+      'Browse Library button',
+      communityLibraryUrl,
+      'Community Library'
+    );
   }
 
   /**
@@ -203,24 +253,28 @@ export class LoggedInUser extends BaseUser {
   async clickCreateLessonsButtonInAboutPage(): Promise<void> {
     await this.clickOn(createLessonsButton);
     if (this.page.url() !== creatorDashboardCreateModeUrl) {
-      throw new Error (
+      throw new Error(
         'The Create Lessons button does not open the Creator Dashboard ' +
-        'in Create Mode!');
+          'in Create Mode!'
+      );
     } else {
       showMessage(
         'The Create Lessons button opens the Creator Dashboard ' +
-        'in Create Mode.');
+          'in Create Mode.'
+      );
     }
     await this.page.waitForNavigation();
     const urlRegex =
       /http:\/\/localhost:8181\/create\/\w*(\/gui\/Introduction)?/;
     if (this.page.url().match(urlRegex) === null) {
-      throw new Error (
+      throw new Error(
         'The Create Lessons button does not display ' +
-        'the Exploration Editor page!');
+          'the Exploration Editor page!'
+      );
     } else {
       showMessage(
-        'The Create Lessons button displays the Exploration Editor page.');
+        'The Create Lessons button displays the Exploration Editor page.'
+      );
     }
   }
 
@@ -231,7 +285,10 @@ export class LoggedInUser extends BaseUser {
   async clickExploreLessonsButtonInAboutPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButton,
-      'Explore Lessons button', mathClassroomUrl, 'Math Classroom');
+      'Explore Lessons button',
+      mathClassroomUrl,
+      'Math Classroom'
+    );
   }
 
   /**
@@ -239,22 +296,31 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens The About Foundation page.
    */
   async clickAboutFoundationButtonInAboutMenuOnNavbar(): Promise<void> {
-    await this.clickOn(navbarAboutTab);
-    await this.clickOn(navbarAboutTabAboutFoundationButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarAboutFoundationButton);
+    } else {
+      await this.clickOn(navbarAboutTab);
+      await this.clickOn(navbarAboutTabAboutFoundationButton);
+    }
     await this.page.waitForSelector(aboutFoundationClass);
     const displayedH1 = await this.page.$eval(
       aboutFoundationClass,
-      (element) => (element as HTMLElement).innerText
+      element => (element as HTMLElement).innerText
     );
-    if ((this.page.url() !== aboutFoundationUrl) &&
-      (displayedH1 !== 'THE OPPIA FOUNDATION')) {
-      throw new Error (
+    if (
+      this.page.url() !== aboutFoundationUrl &&
+      displayedH1 !== 'THE OPPIA FOUNDATION'
+    ) {
+      throw new Error(
         'The Oppia Foundation button in About Menu on navbar ' +
-        'does not open the About Foundation page!');
+          'does not open the About Foundation page!'
+      );
     } else {
       showMessage(
         'The Oppia Foundation button in About Menu on navbar ' +
-        'opens the About Foundation page.');
+          'opens the About Foundation page.'
+      );
     }
   }
 
@@ -270,48 +336,40 @@ export class LoggedInUser extends BaseUser {
     );
 
     if (buttonText !== '61 million children') {
-      throw new Error (
-        'The 61 Million Children button does not exist!');
+      throw new Error('The 61 Million Children button does not exist!');
     }
-    await this.page.$eval(
-      millionsOfContentId,
-      element => element.getElementsByTagName('a')[0].click()
+    await this.page.$eval(millionsOfContentId, element =>
+      element.getElementsByTagName('a')[0].click()
     );
     if (this.page.url() !== _61MillionChildrenUrl) {
-      throw new Error (
-        'The 61 Million Children link does not open the right page!');
+      throw new Error(
+        'The 61 Million Children link does not open the right page!'
+      );
     } else {
-      showMessage(
-        'The 61 Million Children link opens the right page.');
+      showMessage('The 61 Million Children link opens the right page.');
     }
   }
-
   /**
    * Function to click the even those who are in school link
    * in the About Foundation page and check if it opens the right page.
    */
   async clickEvenThoseWhoAreInSchoolLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(millionsOfContentId);
+    const anchorElementSelector = `${millionsOfContentId} a:nth-child(2)`;
     const buttonText = await this.page.$eval(
-      millionsOfContentId,
-      element => element.getElementsByTagName('a')[1].textContent
+      anchorElementSelector,
+      element => element.textContent
     );
     if (buttonText !== 'even those who are in school') {
-      throw new Error (
-        'The Even Those Who Are In School button does not exist!');
+      throw new Error(
+        'The Even Those Who Are In School button does not exist!'
+      );
     }
-    await this.page.$eval(
-      millionsOfContentId,
-      element => element.getElementsByTagName('a')[1].click()
+    await this.openExternalPdfLink(
+      anchorElementSelector,
+      evenThoseWhoAreInSchoolUrl
     );
-    if (this.page.url() !== evenThoseWhoAreInSchoolUrl) {
-      throw new Error (
-        'The Even Those Who Are In School link does not open ' +
-        'the right page!');
-    } else {
-      showMessage(
-        'The Even Those Who Are In School link opens the right page.');
-    }
+    showMessage('The Even Those Who Are In School link opens the right page.');
   }
 
   /**
@@ -321,7 +379,10 @@ export class LoggedInUser extends BaseUser {
   async clickSourceUnescoLinkInAboutFoundation(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       sourceUnescoButton,
-      'Source: UNESCO link', sourceUnescoUrl, 'right');
+      'Source: UNESCO link',
+      sourceUnescoUrl,
+      'right'
+    );
   }
 
   /**
@@ -335,19 +396,15 @@ export class LoggedInUser extends BaseUser {
       element => element.getElementsByTagName('a')[0].textContent
     );
     if (buttonText !== '420 million') {
-      throw new Error (
-        'The 420 Million link does not exist!');
+      throw new Error('The 420 Million link does not exist!');
     }
-    await this.page.$eval(
-      weCannotContentId,
-      element => element.getElementsByTagName('a')[0].click()
+    await this.page.$eval(weCannotContentId, element =>
+      element.getElementsByTagName('a')[0].click()
     );
     if (this.page.url() !== _420MillionUrl) {
-      throw new Error (
-        'The 420 Million link does not open the right page!');
+      throw new Error('The 420 Million link does not open the right page!');
     } else {
-      showMessage(
-        'The 420 Million link opens the right page.');
+      showMessage('The 420 Million link opens the right page.');
     }
   }
 
@@ -361,11 +418,11 @@ export class LoggedInUser extends BaseUser {
       target => target.url() === aboutUrl
     );
     if (newTab.url() !== aboutUrl) {
-      throw new Error (
-        'The Learn More About Oppia button does not open the About page!');
+      throw new Error(
+        'The Learn More About Oppia button does not open the About page!'
+      );
     } else {
-      showMessage(
-        'The Learn More About Oppia button opens the About page.');
+      showMessage('The Learn More About Oppia button opens the About page.');
     }
   }
 
@@ -379,11 +436,11 @@ export class LoggedInUser extends BaseUser {
       target => target.url() === volunteerUrl
     );
     if (newTab.url() !== volunteerUrl) {
-      throw new Error (
-        'The Become A Volunteer button does not open the Volunteer page!');
+      throw new Error(
+        'The Become A Volunteer button does not open the Volunteer page!'
+      );
     } else {
-      showMessage(
-        'The Become A Volunteer button opens the Volunteer page.');
+      showMessage('The Become A Volunteer button opens the Volunteer page.');
     }
   }
 
@@ -391,29 +448,30 @@ export class LoggedInUser extends BaseUser {
    * Function to click the Consider Becoming A Partner Today! link
    * in the About Foundation page and check if it opens the Partnerships page.
    */
-  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation():
-    Promise<void> {
+  async clickConsiderBecomingAPartnerTodayLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(sectionSixPart1);
     const buttonText = await this.page.$eval(
       sectionSixPart1,
       element => element.getElementsByTagName('a')[0].textContent
     );
     if (buttonText !== 'Consider becoming a partner today!') {
-      throw new Error (
-        'The Consider becoming a partner today! link does not exist!');
+      throw new Error(
+        'The Consider becoming a partner today! link does not exist!'
+      );
     }
-    await this.page.$eval(
-      sectionSixPart1,
-      element => element.getElementsByTagName('a')[0].click()
+    await this.page.$eval(sectionSixPart1, element =>
+      element.getElementsByTagName('a')[0].click()
     );
     if (this.page.url() !== partnershipsUrl) {
-      throw new Error (
+      throw new Error(
         'The Consider becoming a partner today! link does not open ' +
-        'the Partnerships page!');
+          'the Partnerships page!'
+      );
     } else {
       showMessage(
         'The Consider becoming a partner today! link opens ' +
-        'the Partnerships page.');
+          'the Partnerships page.'
+      );
     }
   }
 
@@ -421,29 +479,30 @@ export class LoggedInUser extends BaseUser {
    * Function to click the Join our large volunteer community! link
    * in the About Foundation page and check if it opens the Volunteer page.
    */
-  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation():
-    Promise<void> {
+  async clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation(): Promise<void> {
     await this.page.waitForSelector(sectionSixPart2);
     const buttonText = await this.page.$eval(
       sectionSixPart2,
       element => element.getElementsByTagName('a')[0].textContent
     );
     if (buttonText !== 'Join our large volunteer community!') {
-      throw new Error (
-        'The Join our large volunteer community! link does not exist!');
+      throw new Error(
+        'The Join our large volunteer community! link does not exist!'
+      );
     }
-    await this.page.$eval(
-      sectionSixPart2,
-      element => element.getElementsByTagName('a')[0].click()
+    await this.page.$eval(sectionSixPart2, element =>
+      element.getElementsByTagName('a')[0].click()
     );
     if (this.page.url() !== volunteerUrl) {
-      throw new Error (
+      throw new Error(
         'The Join our large volunteer community! link does not open ' +
-        'the Volunteer page!');
+          'the Volunteer page!'
+      );
     } else {
       showMessage(
         'The Join our large volunteer community! link opens ' +
-        'the Volunteer page.');
+          'the Volunteer page.'
+      );
     }
   }
 
@@ -458,19 +517,15 @@ export class LoggedInUser extends BaseUser {
       element => element.getElementsByTagName('a')[0].textContent
     );
     if (buttonText !== 'donations') {
-      throw new Error (
-        'The donations link does not exist!');
+      throw new Error('The donations link does not exist!');
     }
-    await this.page.$eval(
-      sectionSixPart3,
-      element => element.getElementsByTagName('a')[0].click()
+    await this.page.$eval(sectionSixPart3, element =>
+      element.getElementsByTagName('a')[0].click()
     );
     if (this.page.url() !== donateUrl) {
-      throw new Error (
-        'The donations link does not open the Donate page!');
+      throw new Error('The donations link does not open the Donate page!');
     } else {
-      showMessage(
-        'The donations link opens the Donate page.');
+      showMessage('The donations link opens the Donate page.');
     }
   }
 
@@ -479,10 +534,15 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Blog page.
    */
   async clickBlogButtonInAboutMenuOnNavbar(): Promise<void> {
-    await this.clickOn(navbarAboutTab);
-    await this.clickButtonToNavigateToNewPage(
-      navbarAboutTabBlogButton,
-      'Blog button in the About Menu on navbar', blogUrl, 'Blog');
+    if (!this.isViewportAtMobileWidth()) {
+      await this.clickOn(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabBlogButton,
+        'Blog button in the About Menu on navbar',
+        blogUrl,
+        'Blog'
+      );
+    }
   }
 
   /**
@@ -490,11 +550,24 @@ export class LoggedInUser extends BaseUser {
    * Get Involved Menu on navbar and check if it opens the Partnerships page.
    */
   async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.clickOn(navbarGetInvolvedTab);
-    await this.clickButtonToNavigateToNewPage(
-      navbarGetInvolvedTabSchoolAndOrganizationsButton,
-      'School and Organizations in the Get Involved Menu on navbar',
-      partnershipsUrl, 'Partnerships');
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuPartnershipsButton,
+        'School and Organizations in the Get Involved Menu on mobile sidebar',
+        partnershipsUrl,
+        'Partnerships'
+      );
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabSchoolAndOrganizationsButton,
+        'School and Organizations in the Get Involved Menu on navbar',
+        partnershipsUrl,
+        'Partnerships'
+      );
+    }
   }
 
   /**
@@ -502,11 +575,24 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Volunteer page.
    */
   async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.clickOn(navbarGetInvolvedTab);
-    await this.clickButtonToNavigateToNewPage(
-      navbarGetInvolvedTabVolunteerButton,
-      'Volunteer button in the Get Involved Menu on navbar',
-      volunteerUrl, 'Volunteer');
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuVolunteerButton,
+        'Volunteer in the Get Involved Menu on mobile sidebar',
+        volunteerUrl,
+        'Volunteer'
+      );
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabVolunteerButton,
+        'Volunteer in the Get Involved Menu on navbar',
+        volunteerUrl,
+        'Volunteer'
+      );
+    }
   }
 
   /**
@@ -514,10 +600,24 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Donate page.
    */
   async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.clickOn(navbarGetInvolvedTab);
-    await this.clickButtonToNavigateToNewPage(
-      navbarGetInvolvedTabDonateButton,
-      'Donate button in the Get Involved Menu on navbar', donateUrl, 'Donate');
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidevbarGetInvolvedMenuDonateButton,
+        'Donate in the Get Involved Menu on mobile sidebar',
+        donateUrl,
+        'Donate'
+      );
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabDonateButton,
+        'Donate in the Get Involved Menu on navbar',
+        donateUrl,
+        'Donate'
+      );
+    }
   }
 
   /**
@@ -525,11 +625,24 @@ export class LoggedInUser extends BaseUser {
    * on navbar and check if it opens the Partnerships page.
    */
   async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
-    await this.clickOn(navbarGetInvolvedTab);
-    await this.clickButtonToNavigateToNewPage(
-      navbarGetInvolvedTabContactUsButton,
-      'Contact Us button in the Get Involved Menu on navbar',
-      contactUrl, 'Contact');
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickButtonToNavigateToNewPage(
+        mobileSidebarGetInvolvedMenuContactUsButton,
+        'Contact Us in the Get Involved Menu on mobile sidebar',
+        contactUrl,
+        'Contact'
+      );
+    } else {
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarGetInvolvedTabContactUsButton,
+        'Contact Us in the Get Involved Menu on navbar',
+        contactUrl,
+        'Contact'
+      );
+    }
   }
 
   /**
@@ -537,8 +650,14 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Donate page.
    */
   async clickDonateButtonOnNavbar(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      navbarDonateButton, 'Donate button on navbar', donateUrl, 'Donate');
+    if (!this.isViewportAtMobileWidth()) {
+      await this.clickButtonToNavigateToNewPage(
+        navbarDonateButton,
+        'Donate button on navbar',
+        donateUrl,
+        'Donate'
+      );
+    }
   }
 
   /**
@@ -552,20 +671,21 @@ export class LoggedInUser extends BaseUser {
       element => (element as HTMLElement).innerText
     );
     if (buttonText !== 'Watch a video') {
-      throw new Error (
-        'The Watch A Video button does not exist!');
+      throw new Error('The Watch A Video button does not exist!');
     }
     await Promise.all([
       this.page.waitForNavigation(),
       this.clickOn(watchAVideoButton),
     ]);
-    if (this.page.url() !== watchAVideoUrl) {
-      throw new Error (
-        'The Watch A Video button does not open the right page!');
-    } else {
-      showMessage(
-        'The Watch A Video button opens the right page.');
+
+    const url = this.getCurrentUrlWithoutParameters();
+    const expectedWatchAVideoUrl = this.isViewportAtMobileWidth()
+      ? mobileWatchAVideoUrl
+      : desktopWatchAVideoUrl;
+    if (url !== expectedWatchAVideoUrl) {
+      throw new Error('The Watch A Video button does not open the right page!');
     }
+    showMessage('The Watch A Video button opens the right page.');
   }
 
   /**
@@ -579,19 +699,16 @@ export class LoggedInUser extends BaseUser {
       element => (element as HTMLElement).innerText
     );
     if (buttonText !== 'Read our blog') {
-      throw new Error (
-        'The Read Our Blog button does not exist!');
+      throw new Error('The Read Our Blog button does not exist!');
     }
     await Promise.all([
       this.page.waitForNavigation(),
       this.clickOn(readOurBlogButton),
     ]);
     if (this.page.url() !== blogUrl) {
-      throw new Error (
-        'The Read Our Blog button does not open the Blog page!');
+      throw new Error('The Read Our Blog button does not open the Blog page!');
     } else {
-      showMessage(
-        'The Read Our Blog button opens the Blog page.');
+      showMessage('The Read Our Blog button opens the Blog page.');
     }
   }
 
@@ -604,18 +721,176 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(dismissButton);
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
-      throw new Error (
-        'The dismiss button does not close the Thanks for Donating popup!');
+      throw new Error(
+        'The dismiss button does not close the Thanks for Donating popup!'
+      );
     }
     const donatePageShowed = await this.page.$(donatePage);
     if (donatePageShowed === null) {
-      throw new Error (
-        'The dismiss button does not show the Donate page!');
+      throw new Error('The dismiss button does not show the Donate page!');
     } else {
       showMessage(
         'The dismiss button closes the Thanks for Donating popup ' +
-        'and if the Donate page is shown.');
+          'and if the Donate page is shown.'
+      );
     }
+  }
+
+  /**
+   * Navigates to the About page using the oppia website footer.
+   */
+  async navigateToAboutPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerAboutLink,
+      'About Oppia link in the About Oppia section in the footer',
+      aboutUrl,
+      'About'
+    );
+  }
+  /**
+   * Navigates to the About Foundation page using the oppia website footer.
+   */
+  async navigateToAboutFoundationPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerAboutFoundationLink,
+      'About Foundation link in the About Oppia section in the footer',
+      aboutFoundationUrl,
+      'About Foundation'
+    );
+  }
+  /**
+   * Navigates to the Blog page using the oppia website footer.
+   */
+  async navigateToBlogPageViaFooter(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      footerBlogLink,
+      'Blog link in the About Oppia section in the footer',
+      blogUrl,
+      'Blog'
+    );
+  }
+
+  /**
+   * Navigates to the Forum page using the oppia website footer.
+   */
+  async navigateToForumPageViaFooter(): Promise<void> {
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn(footerForumlink),
+    ]);
+
+    expect(this.page.url()).toBe('https://groups.google.com/g/oppia');
+  }
+
+  /**
+   * Navigates to the GetStarted page using the oppia website footer.
+   */
+  async navigateToGetStartedPageViaFooter(): Promise<void> {
+    await this.page.waitForSelector(footerGetStartedLink);
+    await this.clickButtonToNavigateToNewPage(
+      footerGetStartedLink,
+      'About Oppia button in the About Menu on navbar',
+      getStartedUrl,
+      'Get Started'
+    );
+  }
+
+  /**
+   * Function to click an anchor tag and check if it opens the expected destination
+   * in a new tab. Closes the tab afterwards.
+   */
+  private async clickLinkAnchorToNewTab(
+    anchorInnerText: string,
+    expectedDestinationPageUrl: string
+  ): Promise<void> {
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    const pageTarget = this.page.target();
+    await this.clickOn(anchorInnerText);
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
+    await newTabPage?.close();
+  }
+
+  /**
+   * Clicks the link with the text "create on here" on the Get Stated page.
+   */
+  async clickCreateOneHereLinkInGetStartedPage(): Promise<void> {
+    await this.page.waitForXPath('//a[contains(text(),"create one here")]');
+    const pageTarget = this.page.target();
+    await this.clickOn('create one here');
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    await newTabPage?.waitForNetworkIdle();
+    expect(newTabPage?.url()).toContain(
+      'https://accounts.google.com/lifecycle/steps/signup/name'
+    );
+    await newTabPage?.close();
+  }
+
+  /**
+   * Clicks the link with the text "Welcome to Oppia" on the Get Stated page.
+   */
+  async clickWelcomeToOppiaLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab('Welcome to Oppia', welcomeToOppiaUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Get Electrified!" on the Get Stated page.
+   */
+  async clickGetElectrifiedLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab('Get Electrified!', electromagnetismUrl);
+  }
+
+  /**
+   * Clicks the link with the text "Programming with Carla" on the Get Stated page.
+   */
+  async clickProgrammingWithCarlaLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'Programming with Carla',
+      programmingWithCarlaUrl
+    );
+  }
+
+  /**
+   * Clicks the link with the text "in our user documentation" on the Get Stated page.
+   */
+  async clickInOurUserDocumentationLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'in our user documentation',
+      creatingAnExplorationUrl
+    );
+  }
+
+  /**
+   * Clicks the link with the text "embed it in your own web page" on the Get Stated page.
+   */
+  async clickEmbedItInYourOwnWebPageLinkInGetStartedPage(): Promise<void> {
+    await this.clickLinkAnchorToNewTab(
+      'embed it in your own web page',
+      embeddingAnExplorationUrl
+    );
+  }
+
+  /**
+   * Clicks the link with the text "discover more ways to get involved" on the Get Stated page.
+   */
+  async clickDiscoverMoreWaysToGetInvolvedLinkInGetStartedPage(): Promise<void> {
+    await this.page.waitForXPath(
+      '//a[contains(text(),"discover more ways to get involved")]'
+    );
+
+    await Promise.all([
+      this.page.waitForNavigation(),
+      await this.clickOn('discover more ways to get involved'),
+    ]);
+
+    expect(this.page.url()).toBe(contactUrl);
   }
 }
 

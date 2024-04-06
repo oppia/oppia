@@ -16,30 +16,27 @@
  * @fileoverview Module for the collection editor page.
  */
 
-import { RouterModule } from '@angular/router';
-import { SharedComponentsModule } from 'components/shared-component.module';
-
-
-import { CollectionHistoryTabComponent } from
-  'pages/collection-editor-page/history-tab/collection-history-tab.component';
-import { CollectionNodeEditorComponent } from './editor-tab/collection-node-editor.component';
-import { CollectionSettingsTabComponent } from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
-import { CollectionStatisticsTabComponent } from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
-import { CollectionDetailsEditorComponent } from './settings-tab/collection-details-editor.component';
-import { CollectionPermissionsCardComponent } from './settings-tab/collection-permissions-card.component';
-import { CollectionEditorNavbarBreadcrumbComponent } from './navbar/collection-editor-navbar-breadcrumb.component';
-import { CollectionEditorNavbarComponent } from './navbar/collection-editor-navbar.component';
-import { CollectionNodeCreatorComponent } from './editor-tab/collection-node-creator.component';
-import { CollectionEditorTabComponent } from './editor-tab/collection-editor-tab.component';
-import { CollectionEditorSaveModalComponent } from './modals/collection-editor-save-modal.component';
-import { CollectionEditorPrePublishModalComponent } from './modals/collection-editor-pre-publish-modal.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/lightweight-oppia-root/app.module';
-import { FormsModule } from '@angular/forms';
-import { NgModule } from '@angular/core';
-import { CollectionEditorPageComponent } from './collection-editor-page.component';
-import { CollectionEditorPageAuthGuard } from './collection-editor-page-auth.guard';
-import { CollectionEditorPageRootComponent } from './collection-editor-page-root.component';
+import {RouterModule} from '@angular/router';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {CollectionHistoryTabComponent} from 'pages/collection-editor-page/history-tab/collection-history-tab.component';
+import {CollectionNodeEditorComponent} from './editor-tab/collection-node-editor.component';
+import {CollectionSettingsTabComponent} from 'pages/collection-editor-page/settings-tab/collection-settings-tab.component';
+import {CollectionStatisticsTabComponent} from 'pages/collection-editor-page/statistics-tab/collection-statistics-tab.component';
+import {CollectionDetailsEditorComponent} from './settings-tab/collection-details-editor.component';
+import {CollectionPermissionsCardComponent} from './settings-tab/collection-permissions-card.component';
+import {CollectionEditorNavbarBreadcrumbComponent} from './navbar/collection-editor-navbar-breadcrumb.component';
+import {CollectionEditorNavbarComponent} from './navbar/collection-editor-navbar.component';
+import {CollectionNodeCreatorComponent} from './editor-tab/collection-node-creator.component';
+import {CollectionEditorTabComponent} from './editor-tab/collection-editor-tab.component';
+import {CollectionEditorSaveModalComponent} from './modals/collection-editor-save-modal.component';
+import {CollectionEditorPrePublishModalComponent} from './modals/collection-editor-pre-publish-modal.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/lightweight-oppia-root/app.module';
+import {FormsModule} from '@angular/forms';
+import {NgModule} from '@angular/core';
+import {CollectionEditorPageComponent} from './collection-editor-page.component';
+import {CollectionEditorPageAuthGuard} from './collection-editor-page-auth.guard';
+import {CollectionEditorPageRootComponent} from './collection-editor-page-root.component';
 
 @NgModule({
   imports: [
@@ -70,7 +67,7 @@ import { CollectionEditorPageRootComponent } from './collection-editor-page-root
     CollectionPermissionsCardComponent,
     CollectionSettingsTabComponent,
     CollectionStatisticsTabComponent,
-    CollectionEditorPageRootComponent
+    CollectionEditorPageRootComponent,
   ],
   entryComponents: [
     CollectionNodeCreatorComponent,

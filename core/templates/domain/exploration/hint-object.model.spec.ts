@@ -16,33 +16,38 @@
  * @fileoverview Unit tests for Hint.
  */
 
-import { Hint } from 'domain/exploration/hint-object.model';
+import {Hint} from 'domain/exploration/hint-object.model';
 
 describe('Hint model', () => {
-  it('should create a Hint from dict and convert a Hint Object to' +
-     'backend dict correctly', inject(() => {
-    var testHint = Hint.createNew('content_id', '<p>Some Hint</p>');
-    expect(testHint.toBackendDict()).toEqual({
-      hint_content: {
-        html: '<p>Some Hint</p>',
-        content_id: 'content_id'
-      }
-    });
-    expect(Hint.createFromBackendDict({
-      hint_content: {
-        html: '<p>Some Hint</p>',
-        content_id: 'content_id'
-      }
-    })).toEqual(Hint.createNew('content_id', '<p>Some Hint</p>'));
-  }));
+  it(
+    'should create a Hint from dict and convert a Hint Object to' +
+      'backend dict correctly',
+    inject(() => {
+      var testHint = Hint.createNew('content_id', '<p>Some Hint</p>');
+      expect(testHint.toBackendDict()).toEqual({
+        hint_content: {
+          html: '<p>Some Hint</p>',
+          content_id: 'content_id',
+        },
+      });
+      expect(
+        Hint.createFromBackendDict({
+          hint_content: {
+            html: '<p>Some Hint</p>',
+            content_id: 'content_id',
+          },
+        })
+      ).toEqual(Hint.createNew('content_id', '<p>Some Hint</p>'));
+    })
+  );
 
   it('should be able to create a new hint object', inject(() => {
     expect(Hint.createNew('content_id', '<p>Some Hint</p>')).toEqual(
       Hint.createFromBackendDict({
         hint_content: {
           html: '<p>Some Hint</p>',
-          content_id: 'content_id'
-        }
+          content_id: 'content_id',
+        },
       })
     );
   }));

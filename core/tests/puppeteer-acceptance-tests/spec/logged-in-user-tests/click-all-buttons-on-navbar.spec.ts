@@ -17,67 +17,91 @@
  * can open link by clicking all buttons on navbar
  */
 
-import { UserFactory } from
-  '../../puppeteer-testing-utilities/user-factory';
-import { LoggedInUser } from '../../user-utilities/logged-in-users-utils';
-import testConstants from
-  '../../puppeteer-testing-utilities/test-constants';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
-describe('Logged-in User', function() {
+describe('Logged-in User', function () {
   let testUser: LoggedInUser;
 
-  beforeAll(async function() {
+  beforeAll(async function () {
     testUser = await UserFactory.createNewUser(
-      'testuser', 'testuser@example.com');
+      'testuser',
+      'testuser@example.com'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
-  it('should open About Url with About Oppia button in About Menu on navbar',
-    async function() {
+  it(
+    'should open About Url with About Oppia button in About Menu on navbar',
+    async function () {
       await testUser.clickAboutButtonInAboutMenuOnNavbar();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open About Foundation Url with The Oppia Foundation button ' +
-    'in About Menu on navbar',
-  async function() {
-    await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should open About Foundation Url with The Oppia Foundation button ' +
+      'in About Menu on navbar',
+    async function () {
+      await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Blog Url with Blog button in About Menu on navbar',
-    async function() {
+  it(
+    'should open Blog Url with Blog button in About Menu on navbar',
+    async function () {
       await testUser.clickBlogButtonInAboutMenuOnNavbar();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Partnerships Url with School and Organizations button ' +
-    'in Get Involved menu on navbar',
-  async function() {
-    await testUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should open Partnerships Url with School and Organizations button ' +
+      'in Get Involved menu on navbar',
+    async function () {
+      await testUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Volunteer Url with Volunteer button in Get Involved menu ' +
-    'on navbar',
-  async function() {
-    await testUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should open Volunteer Url with Volunteer button in Get Involved menu ' +
+      'on navbar',
+    async function () {
+      await testUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Donate Url with Donate button in Get Involved menu on navbar',
-    async function() {
+  it(
+    'should open Donate Url with Donate button in Get Involved menu on navbar',
+    async function () {
       await testUser.clickDonateButtonInGetInvolvedMenuOnNavbar();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Contact Url with Contact Us button in Get Involved menu ' +
-    'on navbar',
-  async function() {
-    await testUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
-  }, DEFAULT_SPEC_TIMEOUT);
+  it(
+    'should open Contact Url with Contact Us button in Get Involved menu ' +
+      'on navbar',
+    async function () {
+      await testUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  it('should open Donate Url with Donate button on navbar',
-    async function() {
+  it(
+    'should open Donate Url with Donate button on navbar',
+    async function () {
       await testUser.clickDonateButtonOnNavbar();
-    }, DEFAULT_SPEC_TIMEOUT);
+    },
+    DEFAULT_SPEC_TIMEOUT
+  );
 
-  afterAll(async function() {
+  afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
 });

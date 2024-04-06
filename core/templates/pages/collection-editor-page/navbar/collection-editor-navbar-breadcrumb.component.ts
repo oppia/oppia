@@ -16,12 +16,12 @@
  * @fileoverview Component for the navbar breadcrumb of the collection editor.
  */
 
-import { Component } from '@angular/core';
-import { Collection } from 'domain/collection/collection.model';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { CollectionEditorPageConstants } from '../collection-editor-page.constants';
-import { CollectionEditorRoutingService } from '../services/collection-editor-routing.service';
-import { CollectionEditorStateService } from '../services/collection-editor-state.service';
+import {Component} from '@angular/core';
+import {Collection} from 'domain/collection/collection.model';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {CollectionEditorPageConstants} from '../collection-editor-page.constants';
+import {CollectionEditorRoutingService} from '../services/collection-editor-routing.service';
+import {CollectionEditorStateService} from '../services/collection-editor-state.service';
 
 // TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller
@@ -32,7 +32,7 @@ import { CollectionEditorStateService } from '../services/collection-editor-stat
 
 @Component({
   selector: 'collection-editor-navbar-breadcrumb',
-  templateUrl: './collection-editor-navbar-breadcrumb.component.html'
+  templateUrl: './collection-editor-navbar-breadcrumb.component.html',
 })
 export class CollectionEditorNavbarBreadcrumbComponent {
   // These properties are initialized using Angular lifecycle hooks
@@ -61,7 +61,8 @@ export class CollectionEditorNavbarBreadcrumbComponent {
   editCollectionTitle(): void {
     this.activeTabName = this._TAB_NAMES_TO_HUMAN_READABLE_NAMES.settings;
     this.focusManagerService.setFocus(
-      CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+      CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL
+    );
   }
 
   ngOnInit(): void {

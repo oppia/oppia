@@ -13,10 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Puppeteer acceptance test type definitions.
+ * @fileoverview Component for Custom undo snackbar.
  */
 
-type Uppercase<S extends string> = S;
-type Lowercase<S extends string> = S;
-type Capitalize<S extends string> = S;
-type Uncapitalize<S extends string> = S;
+import {Component} from '@angular/core';
+import {MatSnackBarRef} from '@angular/material/snack-bar';
+
+@Component({
+  selector: 'app-custom-snackbar',
+  templateUrl: './undo-snackbar.component.html',
+})
+export class UndoSnackbarComponent {
+  message!: string;
+
+  constructor(private snackBarRef: MatSnackBarRef<UndoSnackbarComponent>) {}
+
+  onUndo(): void {
+    this.snackBarRef.dismissWithAction();
+  }
+
+  onDismiss(): void {
+    this.snackBarRef.dismiss();
+  }
+}

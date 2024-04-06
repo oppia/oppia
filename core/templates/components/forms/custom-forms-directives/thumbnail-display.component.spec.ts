@@ -15,11 +15,16 @@
  * @fileoverview Unit tests for Thumbnail Display component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+} from '@angular/core/testing';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
-import { ThumbnailDisplayComponent } from './thumbnail-display.component';
+import {ThumbnailDisplayComponent} from './thumbnail-display.component';
 
 describe('Thumbnail Component', () => {
   let component: ThumbnailDisplayComponent;
@@ -38,12 +43,11 @@ describe('Thumbnail Component', () => {
    * </svg>
    */
 
-  const safeSvg = (
+  const safeSvg =
     'data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2' +
     'VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID' +
     'xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD' +
-    'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KPC9zdmc+'
-  );
+    'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KPC9zdmc+';
 
   /**
    * Malicious SVG Decoded
@@ -55,29 +59,25 @@ describe('Thumbnail Component', () => {
    * </script>
    * </svg>
    */
-  const maliciousSvg = (
+  const maliciousSvg =
     'data:image/svg+xml;base64,PHN2ZyBpZD0ic291cmNlIiB2ZXJzaW9uPSIxLjEiIGJhc2' +
     'VQcm9maWxlPSJmdWxsIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogID' +
     'xwb2x5Z29uIGlkPSJ0cmlhbmdsZSIgcG9pbnRzPSIwLDAgMCw1MCA1MCwwIiBmaWxsPSIjMD' +
     'A5OTAwIiBzdHJva2U9IiMwMDQ0MDAiPjwvcG9seWdvbj4KICA8c2NyaXB0IHR5cGU9InRleH' +
     'QvamF2YXNjcmlwdCI+CiAgICBhbGVydCgnVGhpcyBhcHAgaXMgcHJvYmFibHkgdnVsbmVyYW' +
-    'JsZSB0byBYU1MgYXR0YWNrcyEnKTsKICA8L3NjcmlwdD4KPC9zdmc+'
-  );
-
+    'JsZSB0byBYU1MgYXR0YWNrcyEnKTsKICA8L3NjcmlwdD4KPC9zdmc+';
 
   const invalidBase64data = 'data:image/svg+xml;base64,This is invalid %3D';
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        ThumbnailDisplayComponent
-      ],
+      declarations: [ThumbnailDisplayComponent],
       providers: [
         {
           provide: SvgSanitizerService,
-          useClass: MockSvgSanitizerService
-        }
-      ]
+          useClass: MockSvgSanitizerService,
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ThumbnailDisplayComponent);
@@ -85,9 +85,8 @@ describe('Thumbnail Component', () => {
     svgSanitizerService = TestBed.get(SvgSanitizerService);
   }));
 
-  it('should not render malicious SVG\'s on Init', fakeAsync(() => {
-    const sanitizerSpy = spyOn(
-      svgSanitizerService, 'getTrustedSvgResourceUrl');
+  it("should not render malicious SVG's on Init", fakeAsync(() => {
+    const sanitizerSpy = spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = maliciousSvg;
     component.ngOnInit();
@@ -98,9 +97,8 @@ describe('Thumbnail Component', () => {
     expect(component.imageSourceInView).toBe(safeSvg);
   }));
 
-  it('should not render malicious SVG\'s on value change', fakeAsync(() => {
-    const sanitizerSpy = spyOn(
-      svgSanitizerService, 'getTrustedSvgResourceUrl');
+  it("should not render malicious SVG's on value change", fakeAsync(() => {
+    const sanitizerSpy = spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = maliciousSvg;
     component.ngOnChanges();
@@ -112,8 +110,7 @@ describe('Thumbnail Component', () => {
   }));
 
   it('should not try to render invalid base64 images', fakeAsync(() => {
-    const sanitizerSpy = spyOn(
-      svgSanitizerService, 'getTrustedSvgResourceUrl');
+    const sanitizerSpy = spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl');
     sanitizerSpy.and.returnValue(null);
     component.imgSrc = invalidBase64data;
     component.ngOnChanges();

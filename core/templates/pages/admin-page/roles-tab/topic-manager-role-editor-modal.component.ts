@@ -16,12 +16,11 @@
  * @fileoverview Component for editing user roles.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { AdminBackendApiService } from 'domain/admin/admin-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
-
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-topic-manager-role-editor-modal',
@@ -49,7 +48,8 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
 
   private updateTopicIdsForSelection(): void {
     this.topicIdsForSelection = Object.keys(this.topicIdToName).filter(
-      topicId => !this.managedTopicIds.includes(topicId));
+      topicId => !this.managedTopicIds.includes(topicId)
+    );
     this.newTopicId = this.topicIdsForSelection[0];
   }
 
@@ -60,33 +60,44 @@ export class TopicManagerRoleEditorModalComponent implements OnInit {
     this.managedTopicIds.push(this.newTopicId);
     this.topicIdInUpdate = this.newTopicId;
     this.newTopicId = null;
-    this.adminBackendApiService.assignManagerToTopicAsync(
-      this.username, this.topicIdInUpdate).then(()=> {
-      this.topicIdInUpdate = null;
-      this.updateTopicIdsForSelection();
-    }, errorMessage => {
-      if (this.topicIdInUpdate !== null) {
-        let topicIdIndex = this.managedTopicIds.indexOf(
-          this.topicIdInUpdate);
-        this.managedTopicIds.splice(topicIdIndex, 1);
-      }
-      this.alertsService.addWarning(
-        errorMessage || 'Error communicating with server.');
-    });
+    this.adminBackendApiService
+      .assignManagerToTopicAsync(this.username, this.topicIdInUpdate)
+      .then(
+        () => {
+          this.topicIdInUpdate = null;
+          this.updateTopicIdsForSelection();
+        },
+        errorMessage => {
+          if (this.topicIdInUpdate !== null) {
+            let topicIdIndex = this.managedTopicIds.indexOf(
+              this.topicIdInUpdate
+            );
+            this.managedTopicIds.splice(topicIdIndex, 1);
+          }
+          this.alertsService.addWarning(
+            errorMessage || 'Error communicating with server.'
+          );
+        }
+      );
   }
 
   removeTopicId(topicIdToRemove: string): void {
     let topicIdIndex = this.managedTopicIds.indexOf(topicIdToRemove);
     this.topicIdInUpdate = topicIdToRemove;
-    this.adminBackendApiService.deassignManagerFromTopicAsync(
-      this.username, topicIdToRemove).then(() => {
-      this.managedTopicIds.splice(topicIdIndex, 1);
-      this.topicIdInUpdate = null;
-      this.updateTopicIdsForSelection();
-    }, errorMessage => {
-      this.alertsService.addWarning(
-        errorMessage || 'Error communicating with server.');
-    });
+    this.adminBackendApiService
+      .deassignManagerFromTopicAsync(this.username, topicIdToRemove)
+      .then(
+        () => {
+          this.managedTopicIds.splice(topicIdIndex, 1);
+          this.topicIdInUpdate = null;
+          this.updateTopicIdsForSelection();
+        },
+        errorMessage => {
+          this.alertsService.addWarning(
+            errorMessage || 'Error communicating with server.'
+          );
+        }
+      );
   }
 
   close(): void {

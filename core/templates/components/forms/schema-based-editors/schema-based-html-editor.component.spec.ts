@@ -16,12 +16,17 @@
  * @fileoverview Unit tests for Schema Based Html Editor Component
  */
 
-import { FormControl, FormsModule } from '@angular/forms';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { SchemaBasedHtmlEditorComponent } from './schema-based-html-editor.component';
+import {FormControl, FormsModule} from '@angular/forms';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  waitForAsync,
+} from '@angular/core/testing';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
+import {SchemaBasedHtmlEditorComponent} from './schema-based-html-editor.component';
 
 describe('Schema Based Html Editor Component', () => {
   let component: SchemaBasedHtmlEditorComponent;
@@ -30,14 +35,9 @@ describe('Schema Based Html Editor Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [
-        SchemaBasedHtmlEditorComponent
-      ],
-      providers: [
-        FocusManagerService,
-        SchemaFormSubmittedService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [SchemaBasedHtmlEditorComponent],
+      providers: [FocusManagerService, SchemaFormSubmittedService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -47,7 +47,7 @@ describe('Schema Based Html Editor Component', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    let mockFunction = function(value: string) {
+    let mockFunction = function (value: string) {
       return value;
     };
     component.registerOnChange(mockFunction);
@@ -58,7 +58,7 @@ describe('Schema Based Html Editor Component', () => {
     expect(component.onChange).toEqual(mockFunction);
   }));
 
-  it('should test the case when the input isn\'t valid', () => {
+  it("should test the case when the input isn't valid", () => {
     expect(component.validate(new FormControl(1))).toEqual({});
   });
 

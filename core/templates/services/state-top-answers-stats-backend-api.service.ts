@@ -16,39 +16,47 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { ServicesConstants } from 'services/services.constants';
+import {ServicesConstants} from 'services/services.constants';
 import {
   StateTopAnswersStats,
   StateTopAnswersStatsBackendDict,
-  StateTopAnswersStatsObjectFactory
+  StateTopAnswersStatsObjectFactory,
 } from 'domain/statistics/state-top-answers-stats-object.factory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({providedIn: 'root'})
 export class StateTopAnswersStatsBackendApiService {
   constructor(
-      private http: HttpClient,
-      private stateTopAnswersStatsObjectFactory:
-        StateTopAnswersStatsObjectFactory,
-      private urlInterpolationService: UrlInterpolationService) {}
+    private http: HttpClient,
+    private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   async fetchStatsAsync(expId: string): Promise<StateTopAnswersStats> {
-    return this.http.get<StateTopAnswersStatsBackendDict>(
-      this.urlInterpolationService.interpolateUrl(
-        ServicesConstants.STATE_ANSWER_STATS_URL, {exploration_id: expId}))
-      .toPromise().then(
+    return this.http
+      .get<StateTopAnswersStatsBackendDict>(
+        this.urlInterpolationService.interpolateUrl(
+          ServicesConstants.STATE_ANSWER_STATS_URL,
+          {exploration_id: expId}
+        )
+      )
+      .toPromise()
+      .then(
         d => this.stateTopAnswersStatsObjectFactory.createFromBackendDict(d),
         errorResponse => {
           throw new Error(errorResponse.error.error);
-        });
+        }
+      );
   }
 }
 
-angular.module('oppia').factory(
-  'StateTopAnswersStatsBackendApiService',
-  downgradeInjectable(StateTopAnswersStatsBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'StateTopAnswersStatsBackendApiService',
+    downgradeInjectable(StateTopAnswersStatsBackendApiService)
+  );

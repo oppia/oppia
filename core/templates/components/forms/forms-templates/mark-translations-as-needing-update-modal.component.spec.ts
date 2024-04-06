@@ -16,11 +16,11 @@
  * @fileoverview Unit Test for Mark Audio As Needing Update Modal Component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, waitForAsync, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { MarkTranslationsAsNeedingUpdateModalComponent } from './mark-translations-as-needing-update-modal.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MarkTranslationsAsNeedingUpdateModalComponent} from './mark-translations-as-needing-update-modal.component';
 
 class MockActiveModal {
   close(): void {
@@ -34,25 +34,25 @@ class MockActiveModal {
 
 describe('Mark Translations As Needing Update Modal Component', () => {
   let component: MarkTranslationsAsNeedingUpdateModalComponent;
-  let fixture: (
-        ComponentFixture<MarkTranslationsAsNeedingUpdateModalComponent>);
+  let fixture: ComponentFixture<MarkTranslationsAsNeedingUpdateModalComponent>;
   let ngbActiveModal: NgbActiveModal;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        MarkTranslationsAsNeedingUpdateModalComponent
+      declarations: [MarkTranslationsAsNeedingUpdateModalComponent],
+      providers: [
+        {
+          provide: NgbActiveModal,
+          useClass: MockActiveModal,
+        },
       ],
-      providers: [{
-        provide: NgbActiveModal,
-        useClass: MockActiveModal
-      }],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(
-      MarkTranslationsAsNeedingUpdateModalComponent);
+      MarkTranslationsAsNeedingUpdateModalComponent
+    );
     component = fixture.componentInstance;
     fixture.detectChanges();
 

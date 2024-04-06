@@ -16,86 +16,74 @@
  * @fileoverview Tests for new classroom model.
  */
 
-
-import { TestBed } from '@angular/core/testing';
-import { NewClassroomData } from './new-classroom.model';
-
+import {TestBed} from '@angular/core/testing';
+import {NewClassroomData} from './new-classroom.model';
 
 describe('Classroom admin model', () => {
   let classroomData: NewClassroomData;
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      providers: []
+      providers: [],
     });
 
     classroomData = new NewClassroomData('classroomId', 'math', 'math');
   });
 
-  it(
-    'should return error messgage when classroom name exceeds max len',
-    () => {
-      classroomData.setClassroomName(
-        'Long classroom name with some random texts abcdefghi');
+  it('should return error messgage when classroom name exceeds max len', () => {
+    classroomData.setClassroomName(
+      'Long classroom name with some random texts abcdefghi'
+    );
 
-      expect(classroomData.getClassroomNameValidationErrors()).toEqual(
-        'The classroom name should contain at most 39 characters.'
-      );
-    });
+    expect(classroomData.getClassroomNameValidationErrors()).toEqual(
+      'The classroom name should contain at most 39 characters.'
+    );
+  });
 
-  it(
-    'should present error messgae when classroom name is empty',
-    () => {
-      classroomData.setClassroomName('');
+  it('should present error messgae when classroom name is empty', () => {
+    classroomData.setClassroomName('');
 
-      expect(classroomData.getClassroomNameValidationErrors()).toEqual(
-        'The classroom name should not be empty.'
-      );
-    });
+    expect(classroomData.getClassroomNameValidationErrors()).toEqual(
+      'The classroom name should not be empty.'
+    );
+  });
 
-  it(
-    'should not present any error when classroom name is valid', () => {
-      classroomData.setClassroomName('Discrete maths');
+  it('should not present any error when classroom name is valid', () => {
+    classroomData.setClassroomName('Discrete maths');
 
-      expect(classroomData.getClassroomNameValidationErrors()).toEqual('');
-    });
+    expect(classroomData.getClassroomNameValidationErrors()).toEqual('');
+  });
 
-  it(
-    'should present error messgae when clasroom url fragment is empty', () => {
-      classroomData.setUrlFragment('');
+  it('should present error messgae when clasroom url fragment is empty', () => {
+    classroomData.setUrlFragment('');
 
-      expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
-        'The classroom URL fragment should not be empty.'
-      );
-    });
+    expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
+      'The classroom URL fragment should not be empty.'
+    );
+  });
 
-  it(
-    'should present error message when classroom url fragment exceeds max len',
-    () => {
-      classroomData.setUrlFragment('long-url-fragment-for-raising-error-msg');
+  it('should present error message when classroom url fragment exceeds max len', () => {
+    classroomData.setUrlFragment('long-url-fragment-for-raising-error-msg');
 
-      expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
-        'The classroom URL fragment should contain at most 20 characters.'
-      );
-    });
+    expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
+      'The classroom URL fragment should contain at most 20 characters.'
+    );
+  });
 
-  it(
-    'should present error message when classroom url fragment is invalid',
-    () => {
-      classroomData.setUrlFragment('Incorrect-url');
+  it('should present error message when classroom url fragment is invalid', () => {
+    classroomData.setUrlFragment('Incorrect-url');
 
-      expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
-        'The classroom URL fragment should only contain lowercase ' +
+    expect(classroomData.getClassroomUrlValidationErrors()).toEqual(
+      'The classroom URL fragment should only contain lowercase ' +
         'letters separated by hyphens.'
-      );
-    });
+    );
+  });
 
-  it(
-    'should not present error for valid classroom url fragment', () => {
-      classroomData.setUrlFragment('physics-url-fragment');
+  it('should not present error for valid classroom url fragment', () => {
+    classroomData.setUrlFragment('physics-url-fragment');
 
-      expect(classroomData.getClassroomUrlValidationErrors()).toEqual('');
-    });
+    expect(classroomData.getClassroomUrlValidationErrors()).toEqual('');
+  });
 
   it('should be able to set and get classroom validity flag', () => {
     classroomData.setClassroomValidityFlag(false);

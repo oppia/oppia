@@ -17,25 +17,30 @@
  * in components which registered both on hybrid and angular pages.
  */
 
-import { Directive, HostListener, Input, NgModule } from '@angular/core';
-import { LocationStrategy } from '@angular/common';
-import { RouterModule, RouterLinkWithHref, Router, ActivatedRoute } from '@angular/router';
+import {Directive, HostListener, Input, NgModule} from '@angular/core';
+import {LocationStrategy} from '@angular/common';
+import {
+  RouterModule,
+  RouterLinkWithHref,
+  Router,
+  ActivatedRoute,
+} from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 // TODO(#13443): Remove hybrid router module provider once all pages are
 // migrated to angular router.
 
 @Directive({
-  selector: '[smartRouterLink]'
+  selector: '[smartRouterLink]',
 })
 export class SmartRouterLink extends RouterLinkWithHref {
   constructor(
-      router: Router,
-      route: ActivatedRoute,
-      locationStrategy: LocationStrategy,
-      private windowRef: WindowRef
+    router: Router,
+    route: ActivatedRoute,
+    locationStrategy: LocationStrategy,
+    private windowRef: WindowRef
   ) {
     super(router, route, locationStrategy);
   }
@@ -50,24 +55,23 @@ export class SmartRouterLink extends RouterLinkWithHref {
     '$event.ctrlKey',
     '$event.shiftKey',
     '$event.altKey',
-    '$event.metaKey'
+    '$event.metaKey',
   ])
   onClick(
-      button: number,
-      ctrlKey: boolean,
-      shiftKey: boolean,
-      altKey: boolean,
-      metaKey: boolean
+    button: number,
+    ctrlKey: boolean,
+    shiftKey: boolean,
+    altKey: boolean,
+    metaKey: boolean
   ): boolean {
     let bodyContent = window.document.querySelector('body');
-    let currentPageIsInRouter = (
+    let currentPageIsInRouter =
       // eslint-disable-next-line oppia/no-inner-html
-      bodyContent && bodyContent.innerHTML.includes('<router-outlet>'));
-    let currentPageIsInLightweightRouter = (
+      bodyContent && bodyContent.innerHTML.includes('<router-outlet>');
+    let currentPageIsInLightweightRouter =
       bodyContent &&
       // eslint-disable-next-line oppia/no-inner-html
-      bodyContent.innerHTML.includes('<router-outlet custom="light">')
-    );
+      bodyContent.innerHTML.includes('<router-outlet custom="light">');
     if (!currentPageIsInRouter && !currentPageIsInLightweightRouter) {
       this.windowRef.nativeWindow.location.href = this.urlTree.toString();
       return false;
@@ -75,9 +79,9 @@ export class SmartRouterLink extends RouterLinkWithHref {
 
     let lightweightRouterPagesRoutes = [];
     let routerPagesRoutes = [];
-    for (
-      let page of Object.values(AppConstants.PAGES_REGISTERED_WITH_FRONTEND)
-    ) {
+    for (let page of Object.values(
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    )) {
       let routeRegex = '^';
       for (let partOfRoute of page.ROUTE.split('/')) {
         if (partOfRoute.startsWith(':')) {
@@ -117,14 +121,8 @@ export class SmartRouterLink extends RouterLinkWithHref {
 }
 
 @NgModule({
-  imports: [
-    RouterModule
-  ],
-  declarations: [
-    SmartRouterLink
-  ],
-  exports: [
-    SmartRouterLink
-  ]
+  imports: [RouterModule],
+  declarations: [SmartRouterLink],
+  exports: [SmartRouterLink],
 })
 export class SmartRouterModule {}
