@@ -17,24 +17,15 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {
-  ComponentFixture,
-  fakeAsync,
-  TestBed,
-  tick,
-  waitForAsync,
-  flush,
-} from '@angular/core/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 
 import {ConversationSkinService} from './conversation-skin.service';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {AudioPlayerService} from 'services/audio-player.service';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {LearnerParamsService} from '../services/learner-params.service';
 import {PlayerPositionService} from '../services/player-position.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
@@ -52,6 +43,7 @@ import {ConceptCard} from 'domain/skill/concept-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {CurrentInteractionService} from './current-interaction.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -68,7 +60,6 @@ class MockWindowRef {
 }
 
 describe('Conversation skin component', () => {
-  let audioPlayerService: AudioPlayerService;
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
@@ -76,14 +67,12 @@ describe('Conversation skin component', () => {
   let currentInteractionService: CurrentInteractionService;
   let explorationEngineService: ExplorationEngineService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
-  let focusManagerService: FocusManagerService;
   let learnerParamsService: LearnerParamsService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let questionPlayerStateService: QuestionPlayerStateService;
   let statsReportingService: StatsReportingService;
-  let translateService: TranslateService;
   let windowDimensionsService: WindowDimensionsService;
 
   let displayedCard = new StateCard(
@@ -97,215 +86,6 @@ describe('Conversation skin component', () => {
     null
   );
 
-  let explorationDict = {
-    states: {
-      Start: {
-        classifier_model_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            ca_placeholder_0: {},
-            feedback_1: {},
-            rule_input_2: {},
-            content: {},
-            default_outcome: {},
-          },
-        },
-        solicit_answer_details: false,
-        interaction: {
-          solution: null,
-          confirmed_unclassified_answers: [],
-          id: 'TextInput',
-          hints: [],
-          customization_args: {
-            rows: {
-              value: 1,
-            },
-            placeholder: {
-              value: {
-                unicode_str: '',
-                content_id: 'ca_placeholder_0',
-              },
-            },
-            catchMisspellings: {
-              value: false,
-            },
-          },
-          answer_groups: [
-            {
-              outcome: {
-                missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
-                labelled_as_correct: false,
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '<p>Good Job</p>',
-                },
-                param_changes: [],
-                dest_if_really_stuck: null,
-                dest: 'Mid',
-              },
-              training_data: [],
-              rule_specs: [
-                {
-                  inputs: {
-                    x: {
-                      normalizedStrSet: ['answer'],
-                      contentId: 'rule_input_2',
-                    },
-                  },
-                  rule_type: 'FuzzyEquals',
-                },
-              ],
-              tagged_skill_misconception_id: null,
-            },
-          ],
-          default_outcome: {
-            missing_prerequisite_skill_id: null,
-            refresher_exploration_id: null,
-            labelled_as_correct: false,
-            feedback: {
-              content_id: 'default_outcome',
-              html: '<p>Try again.</p>',
-            },
-            param_changes: [],
-            dest_if_really_stuck: null,
-            dest: 'Start',
-          },
-        },
-        param_changes: [],
-        card_is_checkpoint: true,
-        linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: '<p>First Question</p>',
-        },
-      },
-      End: {
-        classifier_model_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-          },
-        },
-        solicit_answer_details: false,
-        interaction: {
-          solution: null,
-          confirmed_unclassified_answers: [],
-          id: 'EndExploration',
-          hints: [],
-          customization_args: {
-            recommendedExplorationIds: {
-              value: ['recommnendedExplorationId'],
-            },
-          },
-          answer_groups: [],
-          default_outcome: null,
-        },
-        param_changes: [],
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: 'Congratulations, you have finished!',
-        },
-      },
-      Mid: {
-        classifier_model_id: null,
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            ca_placeholder_0: {},
-            feedback_1: {},
-            rule_input_2: {},
-            content: {},
-            default_outcome: {},
-          },
-        },
-        solicit_answer_details: false,
-        interaction: {
-          solution: null,
-          confirmed_unclassified_answers: [],
-          id: 'TextInput',
-          hints: [],
-          customization_args: {
-            rows: {
-              value: 1,
-            },
-            placeholder: {
-              value: {
-                unicode_str: '',
-                content_id: 'ca_placeholder_0',
-              },
-            },
-            catchMisspellings: {
-              value: false,
-            },
-          },
-          answer_groups: [
-            {
-              outcome: {
-                missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
-                labelled_as_correct: false,
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: ' <p>Good Job</p>',
-                },
-                param_changes: [],
-                dest_if_really_stuck: null,
-                dest: 'End',
-              },
-              training_data: [],
-              rule_specs: [
-                {
-                  inputs: {
-                    x: {
-                      normalizedStrSet: ['answer'],
-                      contentId: 'rule_input_2',
-                    },
-                  },
-                  rule_type: 'FuzzyEquals',
-                },
-              ],
-              tagged_skill_misconception_id: null,
-            },
-          ],
-          default_outcome: {
-            missing_prerequisite_skill_id: null,
-            refresher_exploration_id: null,
-            labelled_as_correct: false,
-            feedback: {
-              content_id: 'default_outcome',
-              html: '<p>try again.</p>',
-            },
-            param_changes: [],
-            dest_if_really_stuck: null,
-            dest: 'Mid',
-          },
-        },
-        param_changes: [],
-        card_is_checkpoint: false,
-        linked_skill_id: null,
-        content: {
-          content_id: 'content',
-          html: '<p>Second Question</p>',
-        },
-      },
-    },
-    auto_tts_enabled: true,
-    version: 2,
-    draft_change_list_id: 9,
-    is_version_of_draft_valid: null,
-    title: 'Exploration',
-    language_code: 'en',
-    init_state_name: 'Start',
-    param_changes: [],
-    next_content_id_index: 4,
-    param_specs: null,
-    draft_changes: null,
-  };
-
-  let uniqueProgressIdResponse = '123456';
-
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -315,11 +95,14 @@ describe('Conversation skin component', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     });
 
-    audioPlayerService = TestBed.inject(AudioPlayerService);
     conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
     contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService
@@ -333,7 +116,6 @@ describe('Conversation skin component', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
     );
-    focusManagerService = TestBed.inject(FocusManagerService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
@@ -637,18 +419,12 @@ describe('Conversation skin component', () => {
 
     conversationSkinService.processFeedbackAndPrerequisiteSkills(
       feedbackHtml,
-      null
+      missingPrerequisiteSkillId
     );
     tick(200);
     expect(playerTranscriptService.addNewResponse).toHaveBeenCalledWith(
       feedbackHtml
     );
-
-    conversationSkinService.processFeedbackAndPrerequisiteSkills(
-      null,
-      missingPrerequisiteSkillId
-    );
-    tick(200);
     expect(
       conversationSkinService.displayedCard.markAsCompleted
     ).toHaveBeenCalled();
@@ -668,12 +444,12 @@ describe('Conversation skin component', () => {
       'isInteractionInline'
     ).and.returnValue(false);
 
-    conversationSkinService.handleFinalQuestionNavigation('feedback', true);
+    conversationSkinService.handleFinalQuestionNavigation('feedback');
     expect(
       conversationSkinService.onShowUpcomingCard.emit
     ).not.toHaveBeenCalled();
 
-    conversationSkinService.handleFinalQuestionNavigation('', true);
+    conversationSkinService.handleFinalQuestionNavigation('');
     expect(conversationSkinService.onShowUpcomingCard.emit).toHaveBeenCalled();
   });
 
@@ -782,4 +558,22 @@ describe('Conversation skin component', () => {
     expect(conversationSkinService.isAnimatingToTwoCards).toBeFalse();
     expect(doneCallbackSpy).toHaveBeenCalled();
   }));
+
+  it('should check if answer can be submitted safely', () => {
+    conversationSkinService.displayedCard = displayedCard;
+    conversationSkinService.answerIsBeingProcessed = true;
+
+    expect(conversationSkinService.canSubmitAnswerSafely()).toBeFalse();
+
+    conversationSkinService.answerIsBeingProcessed = false;
+    spyOn(
+      conversationSkinService,
+      'isCurrentCardAtEndOfTranscript'
+    ).and.returnValue(true);
+    spyOn(conversationSkinService.displayedCard, 'isCompleted').and.returnValue(
+      false
+    );
+
+    expect(conversationSkinService.canSubmitAnswerSafely()).toBeTrue();
+  });
 });

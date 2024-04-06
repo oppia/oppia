@@ -66,7 +66,6 @@ import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {AppConstants} from 'app.constants';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
 import {StoryViewerDomainConstants} from 'domain/story_viewer/story-viewer-domain.constants';
-import {ConceptCard} from 'domain/skill/concept-card.model';
 import {CollectionPlayerBackendApiService} from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -87,7 +86,6 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 const TIME_FADEOUT_MSEC = 100;
 const TIME_HEIGHT_CHANGE_MSEC = 500;
 const TIME_FADEIN_MSEC = 100;
-const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -1209,7 +1207,9 @@ export class ConversationSkinComponent {
     interactionRulesService: InteractionRulesService
   ): void {
     this.conversationSkinService.displayedCard.updateCurrentAnswer(null);
-    this.conversationSkinService.submitAnswerSafetyCheck();
+    if (!this.conversationSkinService.canSubmitAnswerSafely()) {
+      return;
+    }
 
     if (!this.isInPreviewMode) {
       this.fatigueDetectionService.recordSubmissionTimestamp();
@@ -1267,7 +1267,7 @@ export class ConversationSkinComponent {
     missingPrerequisiteSkillId: string | null,
     refreshInteraction: boolean,
     refresherExplorationId: string | null
-  ) {
+  ): void {
     this.numberOfIncorrectSubmissions++;
     this.hintsAndSolutionManagerService.recordWrongAnswer();
     this.conceptCardManagerService.recordWrongAnswer();
@@ -1317,15 +1317,17 @@ export class ConversationSkinComponent {
     feedbackHtml: string | null,
     isFinalQuestion: boolean,
     nextCard: StateCard
-  ) {
+  ): void {
     // There is a new card. If there is no feedback, move on
     // immediately. Otherwise, give the learner a chance to read
     // the feedback, and display a 'Continue' button.
     this.conversationSkinService.pendingCardWasSeenBefore = false;
-    this.conversationSkinService.handleFinalQuestionNavigation(
-      feedbackHtml,
-      isFinalQuestion
-    );
+    this.conversationSkinService.displayedCard.markAsCompleted();
+
+    if (isFinalQuestion) {
+      this.conversationSkinService.handleFinalQuestionNavigation(feedbackHtml);
+      return;
+    }
 
     this.fatigueDetectionService.reset();
     this.numberAttemptsService.reset();

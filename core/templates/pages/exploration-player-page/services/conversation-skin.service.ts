@@ -39,6 +39,7 @@ import {AppConstants} from 'app.constants';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {CurrentInteractionService} from './current-interaction.service';
+import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -55,25 +56,25 @@ export class ConversationSkinService {
   TIME_SCROLL_MSEC = 600;
   MIN_CARD_LOADING_DELAY_MSEC = 950;
 
-  displayedCard: StateCard;
-  nextCard: StateCard | null;
-  nextCardIfStuck: StateCard | null;
-  conceptCard: ConceptCard;
+  displayedCard!: StateCard;
+  nextCard!: StateCard | null;
+  nextCardIfStuck!: StateCard | null;
+  conceptCard!: ConceptCard;
 
-  isAnimatingToTwoCards: boolean;
-  isAnimatingToOneCard: boolean;
-  pendingCardWasSeenBefore: boolean;
+  isAnimatingToTwoCards!: boolean;
+  isAnimatingToOneCard!: boolean;
+  pendingCardWasSeenBefore!: boolean;
 
   // 'completedChaptersCount' is fetched via a HTTP request.
   // Until the response is received, it remains undefined.
-  completedChaptersCount: number | undefined;
-  _editorPreviewMode: boolean;
-  _nextFocusLabel: string | null;
-  upcomingInlineInteractionHtml: string | null;
+  completedChaptersCount!: number | undefined;
+  _editorPreviewMode!: boolean;
+  _nextFocusLabel!: string | null;
+  upcomingInlineInteractionHtml!: string | null;
 
-  moveToExploration: boolean;
-  explorationActuallyStarted: boolean;
-  questionSessionCompleted: boolean;
+  moveToExploration!: boolean;
+  explorationActuallyStarted!: boolean;
+  questionSessionCompleted!: boolean;
   answerIsBeingProcessed: boolean = false;
   answerIsCorrect: boolean = false;
 
@@ -110,7 +111,7 @@ export class ConversationSkinService {
     private currentInteractionService: CurrentInteractionService
   ) {}
 
-  handleNewCardAddition(newCard: StateCard) {
+  handleNewCardAddition(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
     const explorationLanguageCode =
       this.explorationPlayerStateService.getLanguageCode();
@@ -159,21 +160,22 @@ export class ConversationSkinService {
     );
   }
 
-  submitAnswerSafetyCheck() {
+  canSubmitAnswerSafely(): boolean {
     // Safety check to prevent double submissions from occurring.
     if (
       this.answerIsBeingProcessed ||
       !this.isCurrentCardAtEndOfTranscript() ||
       this.displayedCard.isCompleted()
     ) {
-      return;
+      return false;
     }
+    return true;
   }
 
   submitAnswerNavigation(
     answer: string,
     interactionRulesService: InteractionRulesService
-  ) {
+  ): void {
     let timeAtServerCall = new Date().getTime();
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
@@ -182,19 +184,19 @@ export class ConversationSkinService {
       answer,
       interactionRulesService,
       (
-        nextCard,
-        refreshInteraction,
-        feedbackHtml,
-        feedbackAudioTranslations,
-        refresherExplorationId,
-        missingPrerequisiteSkillId,
-        remainOnCurrentCard,
-        taggedSkillMisconceptionId,
-        wasOldStateInitial,
-        isFirstHit,
-        isFinalQuestion,
-        nextCardIfReallyStuck,
-        focusLabel
+        nextCard: StateCard,
+        refreshInteraction: boolean,
+        feedbackHtml: string,
+        feedbackAudioTranslations: BindableVoiceovers,
+        refresherExplorationId: string,
+        missingPrerequisiteSkillId: string,
+        remainOnCurrentCard: boolean,
+        taggedSkillMisconceptionId: string,
+        wasOldStateInitial: boolean,
+        isFirstHit: boolean,
+        isFinalQuestion: boolean,
+        nextCardIfReallyStuck: StateCard | null,
+        focusLabel: string
       ) => {
         this.nextCard = nextCard;
         this.nextCardIfStuck = nextCardIfReallyStuck;
@@ -298,9 +300,9 @@ export class ConversationSkinService {
   }
 
   processFeedbackAndPrerequisiteSkills(
-    feedbackHtml: string | null,
+    feedbackHtml: string,
     missingPrerequisiteSkillId: string | null
-  ) {
+  ): void {
     this.playerTranscriptService.addNewResponse(feedbackHtml);
     let helpCardAvailable = false;
     if (feedbackHtml && !this.displayedCard.isInteractionInline()) {
@@ -329,37 +331,33 @@ export class ConversationSkinService {
     }
   }
 
-  handleFinalQuestionNavigation(
-    feedbackHtml: string | null,
-    isFinalQuestion: boolean
-  ) {
-    this.displayedCard.markAsCompleted();
-    if (isFinalQuestion) {
-      if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
-        // We will redirect to the results page here.
-        this.questionSessionCompleted = true;
-      }
-      this.moveToExploration = true;
-      if (feedbackHtml) {
-        this.playerTranscriptService.addNewResponse(feedbackHtml);
-        if (!this.displayedCard.isInteractionInline()) {
-          this.playerPositionService.onHelpCardAvailable.emit({
-            helpCardHtml: feedbackHtml,
-            hasContinueButton: true,
-          });
-        }
-      } else {
-        this.onShowUpcomingCard.emit();
-      }
-      this.answerIsBeingProcessed = false;
-      return;
+  handleFinalQuestionNavigation(feedbackHtml: string | null): void {
+    if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+      // We will redirect to the results page here.
+      this.questionSessionCompleted = true;
     }
+    this.moveToExploration = true;
+    if (feedbackHtml) {
+      this.playerTranscriptService.addNewResponse(feedbackHtml);
+      if (!this.displayedCard.isInteractionInline()) {
+        this.playerPositionService.onHelpCardAvailable.emit({
+          helpCardHtml: feedbackHtml,
+          hasContinueButton: true,
+        });
+      }
+    } else {
+      this.onShowUpcomingCard.emit();
+    }
+    this.answerIsBeingProcessed = false;
   }
 
-  handleFeedbackNavigation(feedbackHtml: string | null, nextCard: StateCard) {
-    let _isNextInteractionInline = this.nextCard.isInteractionInline();
+  handleFeedbackNavigation(
+    feedbackHtml: string | null,
+    nextCard: StateCard
+  ): void {
+    let _isNextInteractionInline = this.nextCard?.isInteractionInline();
     this.upcomingInlineInteractionHtml = _isNextInteractionInline
-      ? this.nextCard.getInteractionHtml()
+      ? this.nextCard?.getInteractionHtml() ?? ''
       : '';
 
     if (feedbackHtml) {
@@ -383,7 +381,7 @@ export class ConversationSkinService {
       this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
       this.scrollToBottom();
     } else {
-      this.playerTranscriptService.addNewResponse(feedbackHtml);
+      this.playerTranscriptService.addNewResponse(feedbackHtml as string);
       // If there is no feedback, it immediately moves on
       // to next card. Therefore this.answerIsCorrect needs
       // to be set to false before it proceeds to next card.
@@ -452,11 +450,15 @@ export class ConversationSkinService {
       if (tutorCard && tutorCard.length === 0) {
         return;
       }
-      let tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight();
-      if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
+      let tutorCardBottom =
+        (tutorCard?.offset()?.top ?? 0) + (tutorCard?.outerHeight() ?? 0);
+      if (
+        ($(window)?.scrollTop() ?? 0) + ($(window)?.height() ?? 0) <
+        tutorCardBottom
+      ) {
         $('html, body').animate(
           {
-            scrollTop: tutorCardBottom - $(window).height() + 12,
+            scrollTop: tutorCardBottom - ($(window)?.height() ?? 0) + 12,
           },
           {
             duration: this.TIME_SCROLL_MSEC,
@@ -468,16 +470,16 @@ export class ConversationSkinService {
   }
 
   get onGiveFeedbackAndStayOnCurrentCard(): EventEmitter<{
-    feedbackHtml: string;
-    missingPrerequisiteSkillId: string;
+    feedbackHtml: string | null;
+    missingPrerequisiteSkillId: string | null;
     refreshInteraction: boolean;
-    refresherExplorationId: string;
+    refresherExplorationId: string | null;
   }> {
     return this._onGiveFeedbackAndStayOnCurrentCard;
   }
 
   get onMoveToNewCard(): EventEmitter<{
-    feedbackHtml: string;
+    feedbackHtml: string | null;
     isFinalQuestion: boolean;
     nextCard: StateCard;
   }> {
