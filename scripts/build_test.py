@@ -793,7 +793,8 @@ class BuildTests(test_utils.GenericTestBase):
             with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
                 tmp.write('Some content in mock_app_dev.yaml\n')
                 tmp.write(
-                    '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host)
+                    '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' %
+                        firebase_host)
                 tmp.write('version: default')
 
             with tempfile.NamedTemporaryFile() as app_yaml_temp_file:
