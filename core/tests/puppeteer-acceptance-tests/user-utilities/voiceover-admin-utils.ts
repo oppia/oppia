@@ -262,7 +262,7 @@ export class VoiceoverAdmin extends BaseUser {
     const allVoiceoverArtists = await this.getAllVoiceoverArtists();
     if (!allVoiceoverArtists.includes(artistUsername)) {
       throw new Error(
-        `Expected all artists to contain ${artistUsername} but got ${allVoiceoverArtists}`
+        `Expected ${artistUsername} to be a voiceover artist. Current voice artists for this exploration are: ${allVoiceoverArtists}`
       );
     }
     showMessage(
