@@ -57,19 +57,19 @@ const publishButton = 'button.e2e-test-publish-exploration';
 const discardDraftButton = 'a.e2e-test-discard-changes';
 const discardConfirmButton = 'button.e2e-test-confirm-discard-changes';
 const deleteConfirmButton = 'button.e2e-test-really-delete-exploration-button';
-const voiceArtistEditButton = '.e2e-test-edit-voice-artist-roles';
+const voiceArtistEditButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistSaveButton = 'button.e2e-test-add-voice-artist-role-button';
 const publishConfirmButton = 'button.e2e-test-confirm-publish';
-const commitMessage = '.e2e-test-commit-message-input';
+const commitMessage = 'textarea.e2e-test-commit-message-input';
 const closePublishedPopUp = 'button.e2e-test-share-publish-close';
 const addVoiceArtistUserName = 'input#newVoicAartistUsername';
 
 /**
  * For mobile.
  */
-const navBarOpener = '.e2e-test-mobile-options';
+const navBarOpener = 'i.e2e-test-mobile-options';
 const optionsDropDown = 'div.e2e-test-mobile-options-dropdown';
-const mobileSettingsBar = '.e2e-test-mobile-settings-button';
+const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const basicSettingsDropDown = 'h3.e2e-test-settings-container';
 const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
 const permissionSettingsDropDown = 'h3.e2e-test-permission-settings-container';
@@ -142,6 +142,7 @@ export class ExplorationCreator extends BaseUser {
    */
   async goToSettingsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(navBarOpener, {visible: true});
       await this.clickOn(navBarOpener);
       await this.clickOn(optionsDropDown);
       await this.clickOn(mobileSettingsBar);
@@ -621,6 +622,7 @@ export class ExplorationCreator extends BaseUser {
 
     await this.page.waitForNavigation({waitUntil: 'networkidle2'});
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(navBarOpener, {visible: true});
       await this.clickOn(navBarOpener);
       await this.clickOn(basicSettingsDropDown);
     }
