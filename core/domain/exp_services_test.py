@@ -2789,7 +2789,7 @@ version: 3
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_0_ID)
         fs.commit('image/abc.png', raw_image)
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        with zipfile.ZipFile(zip_file_output) as zf :
+        with zipfile.ZipFile(zip_file_output) as zf:
             self.assertEqual(
                 zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
             # Read function returns bytes, so we need to decode them before
@@ -2804,7 +2804,7 @@ version: 3
             self.EXP_0_ID, self.owner_id, title='')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        with zipfile.ZipFile(zip_file_output) as zf :
+        with zipfile.ZipFile(zip_file_output) as zf:
             self.assertEqual(zf.namelist(), ['Unpublished_exploration.yaml'])
 
     def test_export_to_zip_file_with_a_nonstandard_char(self) -> None:
@@ -2813,7 +2813,7 @@ version: 3
             self.EXP_0_ID, self.owner_id, title='What is a Fraction?')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        with zipfile.ZipFile(zip_file_output) as zf :
+        with zipfile.ZipFile(zip_file_output) as zf:
             self.assertEqual(zf.namelist(), ['What is a Fraction.yaml'])
 
     def test_export_to_zip_file_with_all_nonstandard_chars(self) -> None:
@@ -2822,7 +2822,7 @@ version: 3
             self.EXP_0_ID, self.owner_id, title='?!!!!!?')
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        with  zipfile.ZipFile(zip_file_output) as zf :
+        with zipfile.ZipFile(zip_file_output) as zf:
             self.assertEqual(zf.namelist(), ['exploration.yaml'])
 
     def test_export_to_zip_file_with_assets(self) -> None:
@@ -2919,7 +2919,7 @@ version: 3
         fs.commit('audio/cafe.mp3', raw_audio)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_0_ID)
-        with zipfile.ZipFile(zip_file_output) as zf :
+        with zipfile.ZipFile(zip_file_output) as zf:
             self.assertEqual(
                 zf.namelist(), ['A title.yaml', 'assets/image/abc.png'])
             # Read function returns bytes, so we need to decode them before
@@ -3028,7 +3028,7 @@ version: 3
         # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=2)
-        with zipfile.ZipFile(zip_file_output) as zf :
+        with zipfile.ZipFile(zip_file_output) as zf:
             # Read function returns bytes, so we need to decode them before
             # we compare.
             self.assertEqual(
@@ -3038,7 +3038,7 @@ version: 3
         # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(
             self.EXP_0_ID, version=3)
-        with zipfile.ZipFile(zip_file_output) as zf :
+        with zipfile.ZipFile(zip_file_output) as zf:
             # Read function returns bytes, so we need to decode them before
             # we compare.
             self.assertEqual(

@@ -728,7 +728,7 @@ solicit_answer_details: false
         with utils.open_file(
             golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
-        
+
         with zipfile.ZipFile(io.BytesIO(golden_zipfile)) as zf_gold:
             with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
                 self.assertEqual(
@@ -791,7 +791,7 @@ solicit_answer_details: false
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
 
-        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved :
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
             self.assertEqual(zf_saved.namelist(), [u'Hola.yaml'])
 
         self.logout()
@@ -819,8 +819,10 @@ solicit_answer_details: false
             response.headers['Content-Disposition'],
             'attachment; filename=%s' % filename)
 
-        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved :
-            self.assertEqual(zf_saved.namelist(), ['Unpublished_exploration.yaml'])
+        with zipfile.ZipFile(io.BytesIO(response.body)) as zf_saved:
+            self.assertEqual(
+                zf_saved.namelist(),
+                ['Unpublished_exploration.yaml'])
 
         self.logout()
 

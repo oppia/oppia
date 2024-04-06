@@ -1367,7 +1367,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 data.headers['Content-Disposition'],
                 'attachment; filename=%s' % filename)
-            with  zipfile.ZipFile(io.BytesIO(data.body)) as zf_saved :
+            with zipfile.ZipFile(io.BytesIO(data.body)) as zf_saved:
                 self.assertEqual(
                     zf_saved.namelist(),
                     [
@@ -1448,7 +1448,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 data.headers['Content-Disposition'],
                 'attachment; filename=%s' % filename)
-            with zipfile.ZipFile(io.BytesIO(data.body)) as zf_saved :
+            with zipfile.ZipFile(io.BytesIO(data.body)) as zf_saved:
                 self.assertEqual(
                     zf_saved.namelist(),
                     [
