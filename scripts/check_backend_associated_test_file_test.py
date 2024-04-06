@@ -47,8 +47,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self) -> None:
         with tempfile.TemporaryDirectory(
             prefix=os.getcwd() + '/core/') as tempdir:
-            backend_file = os.path.join(tempdir.name, 'backend_file.py')
-            frontend_file = os.path.join(tempdir.name, 'frontend_file.ts')
+            backend_file = os.path.join(tempdir, 'backend_file.py')
+            frontend_file = os.path.join(tempdir, 'frontend_file.ts')
 
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
@@ -71,7 +71,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             self) -> None:
         with tempfile.TemporaryDirectory(
             prefix=os.getcwd() + '/core/') as tempdir:
-            backend_file = os.path.join(tempdir.name, 'backend_file.py')
+            backend_file = os.path.join(tempdir, 'backend_file.py')
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         (
@@ -92,9 +92,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         with tempfile.TemporaryDirectory(
             prefix=os.path.join(os.getcwd(), feconf.TESTS_DATA_DIR, '')
         ) as tempdir:
-            backend_file = os.path.join(tempdir.name, 'backend_file.py')
+            backend_file = os.path.join(tempdir, 'backend_file.py')
             backend_test_file = os.path.join(
-                tempdir.name, 'backend_file_test.py')
+                tempdir, 'backend_file_test.py')
 
             with open(backend_file, 'w', encoding='utf8') as f:
                 f.write('Example code')
