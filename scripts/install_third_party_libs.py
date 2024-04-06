@@ -167,7 +167,7 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 
-def fix_google_module(correct_google_path):
+def fix_google_module(correct_google_path: str) -> None:
     """Fixes the google module by creating __init__.py files in the
     correct google module directory.
 
