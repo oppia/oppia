@@ -361,7 +361,13 @@
   <div joyrideStep="translationTabReRecordingOverview" [stepContent]="TranslationTabReRecordingOverview"></div>
   <div joyrideStep="translationTabTutorialComplete" [stepContent]="TranslationTabTutorialComplete"></div>
   <div *ngIf="isVoiceoverModeActive()" id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
-    <oppia-audio-translation-bar [isTranslationTabBusy]="isTranslationTabBusy"></oppia-audio-translation-bar>
+    <div *ngIf="!isVoiceoverContributionEnabled()">
+      <p class="voiceover-disabled-text-class">
+        Adding voiceover functionality is temporarily disabled due to maintenance. Try some time later.
+      </p>
+    </div>
+    <oppia-audio-translation-bar *ngIf="isVoiceoverContributionEnabled()" [isTranslationTabBusy]="isTranslationTabBusy">
+    </oppia-audio-translation-bar>
   </div>
   <div *ngIf="!isVoiceoverModeActive()">
     <oppia-state-translation-editor></oppia-state-translation-editor>
@@ -376,7 +382,10 @@
   .oppia-translation-preview-list {
     display: block;
   }
-
+  .voiceover-disabled-text-class {
+    margin-top: revert;
+    text-align: center;
+  }
   .oppia-translation-preview {
     list-style: none;
     margin-bottom: 0;
