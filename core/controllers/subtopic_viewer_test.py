@@ -158,7 +158,7 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
 
     def test_any_user_can_access_subtopic_viewer_page(self) -> None:
         self.get_html_response(
-            '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'))
+            '/learn/staging/%s/revision/%s' % ('name', 'sub-url-frag-one'), expected_status_int=200)
 
     def test_accessibility_of_subtopic_viewer_page_of_unpublished_topic(
         self

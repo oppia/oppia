@@ -500,7 +500,7 @@ URLS = [
         topic_viewer.TopicViewerPage),
     get_redirect_route(
         r'%s/revision/<subtopic_url_fragment>' %
-        feconf.TOPIC_VIEWER_URL_PREFIX, subtopic_viewer.SubtopicViewerPage),
+        feconf.TOPIC_VIEWER_URL_PREFIX, oppia_root.OppiaRootPage),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
