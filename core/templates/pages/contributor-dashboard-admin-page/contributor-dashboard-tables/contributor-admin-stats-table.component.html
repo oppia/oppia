@@ -7,7 +7,7 @@
   </div>
   <div *ngIf="!loadingMessage && noDataMessage" class="e2e-test-no-data-message">
     <div class="m-auto oppia-dashboard-aggregated-stats oppia-contributor-dashboard-main-content pt-1"
-    [ngClass]="{'oppia-contributor-dashboard-mobile-mode': checkMobileView()}">
+    [ngClass]="{'oppia-contributor-dashboard-mobile-mode': isMobileView()}">
       <mat-card layout="row" class="oppia-mat-card">
         <div class="translation-reviewer stats-card" tabindex="0">
           <h2>{{ noDataMessage }}</h2>
@@ -15,7 +15,7 @@
       </mat-card>
     </div>
   </div>
-  <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage && checkMobileView()">
+  <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage && isMobileView()">
     <div class="dashboard-list-header-count">
       <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
     </div>
@@ -76,59 +76,29 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="submittedTranslationsCount">
-      <th mat-header-cell *matHeaderCellDef><b> Translated Cards </b></th>
-      <td mat-cell *matCellDef="let element">
-        <span class="mobile-label">Translated Cards:</span>
-        {{ element.submittedTranslationsCount }}
-      </td>
-    </ng-container>
-
     <ng-container matColumnDef="lastContributedInDays">
-      <div *ngIf="inputs.activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
+      <div>
         <th mat-header-cell *matHeaderCellDef>
-          <b>Last Translated</b>
+          <b>{{getLastContributedType(this.inputs.activeTab)}}</b>
         </th>
       </div>
-      <div
-        *ngIf="inputs.activeTab === TAB_NAME_TRANSLATION_REVIEWER ||
-               inputs.activeTab === TAB_NAME_QUESTION_REVIEWER">
-        <th mat-header-cell *matHeaderCellDef><b> Last Reviewed</b></th>
-      </div>
-      <div *ngIf="inputs.activeTab === TAB_NAME_QUESTION_SUBMITTER">
-        <th mat-header-cell *matHeaderCellDef><b> Last Submitted </b></th>
-      </div>
       <td mat-cell *matCellDef="let element">
-        <span class="mobile-label" *ngIf="inputs.activeTab === TAB_NAME_TRANSLATION_SUBMITTER">Last Translated:</span>
-        <span class="mobile-label" *ngIf="(inputs.activeTab === TAB_NAME_TRANSLATION_REVIEWER) || (inputs.activeTab === TAB_NAME_QUESTION_REVIEWER)">Last Reviewed:</span>
-        <span class="mobile-label" *ngIf="inputs.activeTab === TAB_NAME_QUESTION_SUBMITTER">Last Submitted:</span>
+        <span class="mobile-label">{{getLastContributedType(this.inputs.activeTab)}}:</span>
         {{element.lastContributedInDays === 0 ? "Today" : element.lastContributedInDays + " " +
               (element.lastContributedInDays === 1 ? "day" : "days") + " ago"
         }}
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="reviewedTranslationsCount">
-      <th mat-header-cell *matHeaderCellDef><b> Reviewed Cards </b></th>
+    <ng-container matColumnDef="contributionCount">
+      <th mat-header-cell *matHeaderCellDef><b> {{getContributionCountLabel(this.inputs.activeTab)}} </b></th>
       <td mat-cell *matCellDef="let element">
-        <span class="mobile-label">Reviewed Cards:</span>
-        {{ element.reviewedTranslationsCount }}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="submittedQuestionsCount">
-      <th mat-header-cell *matHeaderCellDef><b> Questions Submitted </b></th>
-      <td mat-cell *matCellDef="let element">
-        <span class="mobile-label">Questions Submitted:</span>
-        {{ element.submittedQuestionsCount }}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="reviewedQuestionsCount">
-      <th mat-header-cell *matHeaderCellDef><b> Questions Reviewed </b></th>
-      <td mat-cell *matCellDef="let element">
-        <span class="mobile-label">Questions Reviewed:</span>
-        {{ element.reviewedQuestionsCount }}
+        <span class="mobile-label">{{getContributionCountLabel(this.inputs.activeTab)}}:</span>
+        {{ getContributionCount(this.inputs.activeTab,
+                                element.submittedTranslationsCount,
+                                element.reviewedTranslationsCount,
+                                element.submittedQuestionsCount,
+                                element.reviewedQuestionsCount) }}
       </td>
     </ng-container>
 
@@ -136,12 +106,12 @@
       <th mat-header-cell *matHeaderCellDef><b> Role </b></th>
       <td mat-cell *matCellDef="let element">
         <button mat-raised-button (click)="openRoleEditor(element.contributorName)">
-          {{ checkMobileView() ? 'EDIT ROLE' : 'EDIT' }}
+          {{ isMobileView() ? 'EDIT ROLE' : 'EDIT' }}
         </button>
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="chevron" *ngIf="!checkMobileView()">
+    <ng-container matColumnDef="chevron" *ngIf="!isMobileView()">
       <th mat-header-cell *matHeaderCellDef><b> </b></th>
       <td mat-cell *matCellDef="let element">
         <div class="chevron">
@@ -152,7 +122,7 @@
       </td>
     </ng-container>
 
-    <ng-container matColumnDef="chevron" *ngIf="checkMobileView()">
+    <ng-container matColumnDef="chevron" *ngIf="isMobileView()">
       <th mat-header-cell *matHeaderCellDef><b> </b></th>
       <td mat-cell *matCellDef="let element" class="mobile-chevron">
         <div class="chevron">
@@ -170,199 +140,14 @@
           [attr.colspan]="columnsToDisplay.length">
         <div class="example-element-detail e2e-test-expanded-row"
              [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-          <div class="details-container"
-               *ngIf="inputs.activeTab === TAB_NAME_TRANSLATION_SUBMITTER">
+          <div class="details-container">
             <div class="details-sub-container">
-              <div class="attribute-container">
+              <div class="attribute-container"
+              *ngFor="let attribute of getFormattedContributorAttributes(element)">
                 <div class="attribute-sub-container">
-                  <div class="attribute-key">Date Joined</div>
+                  <div class="attribute-key">{{attribute.key}}</div>
                   <div class="attribute-value">
-                    {{ element.firstContributionDate }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Submitted Translations</div>
-                  <div class="attribute-value">
-                    {{ element.submittedTranslationsCount }} card{{
-                      element.submittedTranslationsCount !== 1 ? "s" : ""
-                    }}, {{ element.submittedTranslationWordCount }} word{{
-                      element.submittedTranslationWordCount !== 1 ? "s" : ""
-                    }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Accepted Translations</div>
-                  <div class="attribute-value">
-                    {{ element.acceptedTranslationsCount }} card{{
-                      element.acceptedTranslationsCount !== 1 ? "s" : ""
-                    }} ({{
-                      element.acceptedTranslationsWithoutReviewerEditsCount
-                    }} without edits), {{ element.acceptedTranslationWordCount }} word{{
-                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
-                    }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Rejected Translations</div>
-                  <div class="attribute-value">
-                    {{ element.rejectedTranslationsCount }} card{{
-                      element.rejectedTranslationsCount !== 1 ? "s" : ""
-                    }}, {{ element.rejectedTranslationWordCount }} word{{
-                      element.rejectedTranslationWordCount !== 1 ? "s" : ""
-                    }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Active Topics</div>
-                  <div class="attribute-value">
-                    {{ element.topicsWithTranslationSubmissions ? element.topicsWithTranslationSubmissions.join(', ') : 'No topics available' }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="details-container"
-               *ngIf="inputs.activeTab === TAB_NAME_TRANSLATION_REVIEWER">
-            <div class="details-sub-container">
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Date Joined</div>
-                  <div class="attribute-value">
-                    {{ element.firstContributionDate }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Accepted Translations</div>
-                  <div class="attribute-value">
-                    {{ element.acceptedTranslationsCount }} card{{
-                      element.acceptedTranslationsCount !== 1 ? "s" : ""
-                    }} ({{element.acceptedTranslationsWithReviewerEditsCount}} edited), {{
-                      element.acceptedTranslationWordCount }} word{{
-                      element.acceptedTranslationWordCount !== 1 ? "s" : ""
-                    }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Rejected Translations</div>
-                  <div class="attribute-value">
-                    {{ element.rejectedTranslationsCount }} card{{
-                      element.rejectedTranslationsCount !== 1 ? "s" : ""
-                    }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Active Topics</div>
-                  <div class="attribute-value">
-                    {{ element.topicsWithTranslationReviews ? element.topicsWithTranslationReviews.join(', ') : 'No topics available' }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="details-container"
-               *ngIf="inputs.activeTab === TAB_NAME_QUESTION_SUBMITTER">
-            <div class="details-sub-container">
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Date Joined</div>
-                  <div class="attribute-value">
-                    {{ element.firstContributionDate }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Submitted Questions</div>
-                  <div class="attribute-value">
-                    {{ element.submittedQuestionsCount }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Accepted Questions</div>
-                  <div class="attribute-value">
-                    {{ element.acceptedQuestionsCount }} ({{ element.acceptedQuestionsWithoutReviewerEditsCount }} without edits)
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Rejected Questions</div>
-                  <div class="attribute-value">
-                    {{ element.rejectedQuestionsCount }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Active Topics</div>
-                  <div class="attribute-value e2e-test-topic-names">
-                    {{ element.topicsWithQuestionSubmissions ? element.topicsWithQuestionSubmissions.join(', ') : 'No topics available' }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="details-container"
-               *ngIf="inputs.activeTab === TAB_NAME_QUESTION_REVIEWER">
-            <div class="details-sub-container">
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Date Joined</div>
-                  <div class="attribute-value">
-                    {{ element.firstContributionDate }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Reviewed Questions</div>
-                  <div class="attribute-value">
-                    {{ element.reviewedQuestionsCount }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Accepted Questions</div>
-                  <div class="attribute-value">
-                    {{ element.acceptedQuestionsCount }} ({{
-                      element.acceptedQuestionsWithReviewerEditsCount
-                    }}
-                    edited)
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Rejected Questions</div>
-                  <div class="attribute-value">
-                    {{ element.rejectedQuestionsCount }}
-                  </div>
-                </div>
-              </div>
-              <div class="attribute-container">
-                <div class="attribute-sub-container">
-                  <div class="attribute-key">Active Topics</div>
-                  <div class="attribute-value">
-                    <span class="e2e-test-topic-names">
-                      {{ element.topicsWithQuestionReviews ? element.topicsWithQuestionReviews.join(', ') : 'No topics available' }}
-                    </span>
+                      {{attribute.displayText}}
                   </div>
                 </div>
               </div>
@@ -384,7 +169,7 @@
         class="example-detail-row">
     </tr>
   </table>
-  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && !checkMobileView()">
+  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && !isMobileView()">
     <div class="dashboard-list-footer-count">
       <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
     </div>
@@ -404,7 +189,7 @@
       </div>
     </div>
   </div>
-  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && checkMobileView()">
+  <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && isMobileView()">
     <div class="navigate-page-div">
       <i class="fa fa-angle-left stats-pagination-arrow" (click)="navigatePage(MOVE_TO_PREV_PAGE)" *ngIf="statsPageNumber > 0"></i>
       <span class="dashboard-list-pagination-value">

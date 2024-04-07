@@ -44,15 +44,16 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatTableModule} from '@angular/material/table';
 import {By} from '@angular/platform-browser';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {AlertsService} from 'services/alerts.service';
 
 describe('Contributor dashboard Admin page', () => {
   let component: ContributorAdminDashboardPageComponent;
   let fixture: ComponentFixture<ContributorAdminDashboardPageComponent>;
+  let alertsService: AlertsService;
   let contributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService;
   let contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService;
   let ngbModal: NgbModal;
   let $window: WindowRef;
-
   class MockNgbModalRef {
     componentInstance!: {};
   }
@@ -60,6 +61,7 @@ describe('Contributor dashboard Admin page', () => {
   let fetchAssignedLanguageIdsSpy: jasmine.Spy;
   let getUserInfoSpy: jasmine.Spy;
   let fetchContributorAdminStatsSpy: jasmine.Spy;
+  let alertsServiceAddWarningSpy: jasmine.Spy;
   let ContAdminStatsSpy: jasmine.Spy;
   let translationCoordinatorInfo = new UserInfo(
     ['USER_ROLE', 'TRANSLATION_COORDINATOR'],
@@ -109,6 +111,18 @@ describe('Contributor dashboard Admin page', () => {
     'tester@example.com',
     true
   );
+  let questionAdminUserInfo = new UserInfo(
+    ['USER_ROLE', 'QUESTION_ADMIN'],
+    true,
+    false,
+    false,
+    false,
+    true,
+    'en',
+    'username1',
+    'tester@example.com',
+    true
+  );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -141,6 +155,7 @@ describe('Contributor dashboard Admin page', () => {
     contributorDashboardAdminStatsBackendApiService = TestBed.inject(
       ContributorDashboardAdminStatsBackendApiService
     );
+    alertsService = TestBed.inject(AlertsService);
     userService = TestBed.inject(UserService);
     contributorDashboardAdminBackendApiService = TestBed.inject(
       ContributorDashboardAdminBackendApiService
@@ -159,22 +174,6 @@ describe('Contributor dashboard Admin page', () => {
     Object.defineProperty($window.nativeWindow, 'innerWidth', {
       get: () => 1000,
     });
-
-    spyOn(
-      contributorDashboardAdminStatsBackendApiService,
-      'fetchCommunityStats'
-    ).and.returnValue(
-      Promise.resolve({
-        translation_reviewers_count: {
-          en: 1,
-          ar: 1,
-          ms: 1,
-          az: 1,
-          'hi-en': 1,
-        },
-        question_reviewers_count: 1,
-      } as CommunityContributionStatsBackendDict)
-    );
 
     fetchAssignedLanguageIdsSpy = spyOn(
       contributorDashboardAdminStatsBackendApiService,
@@ -206,6 +205,21 @@ describe('Contributor dashboard Admin page', () => {
 
   describe('when user is not logged in', () => {
     beforeEach(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchCommunityStats'
+      ).and.returnValue(
+        Promise.resolve({
+          translation_reviewers_count: {
+            en: 1,
+            ar: 1,
+            ms: 1,
+            az: 1,
+            'hi-en': 1,
+          },
+          question_reviewers_count: 1,
+        } as CommunityContributionStatsBackendDict)
+      );
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(nullUserInfo)
       );
@@ -228,6 +242,21 @@ describe('Contributor dashboard Admin page', () => {
 
   describe('when no languages are available', () => {
     beforeEach(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchCommunityStats'
+      ).and.returnValue(
+        Promise.resolve({
+          translation_reviewers_count: {
+            en: 1,
+            ar: 1,
+            ms: 1,
+            az: 1,
+            'hi-en': 1,
+          },
+          question_reviewers_count: 1,
+        } as CommunityContributionStatsBackendDict)
+      );
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo)
       );
@@ -250,8 +279,51 @@ describe('Contributor dashboard Admin page', () => {
     );
   });
 
+  describe('when user has only question_admin rights', () => {
+    beforeEach(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchCommunityStats'
+      ).and.returnValue(
+        Promise.reject({
+          error: 'Error fetching community stats',
+        })
+      );
+      getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve(questionAdminUserInfo)
+      );
+
+      fixture.detectChanges();
+
+      component.ngOnInit();
+    });
+
+    it('should display a warning when fetchCommunityStats returns an error', fakeAsync(() => {
+      alertsServiceAddWarningSpy = spyOn(alertsService, 'addWarning');
+      component.ngOnInit();
+      fixture.detectChanges();
+      tick();
+      expect(alertsServiceAddWarningSpy).toHaveBeenCalledTimes(1);
+    }));
+  });
+
   describe('when user is logged in', () => {
     beforeEach(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchCommunityStats'
+      ).and.returnValue(
+        Promise.resolve({
+          translation_reviewers_count: {
+            en: 1,
+            ar: 1,
+            ms: 1,
+            az: 1,
+            'hi-en': 1,
+          },
+          question_reviewers_count: 1,
+        } as CommunityContributionStatsBackendDict)
+      );
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(fullAccessUserInfo)
       );

@@ -41,6 +41,12 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
+import {
+  QuestionReviewerStats,
+  QuestionSubmitterStats,
+  TranslationReviewerStats,
+  TranslationSubmitterStats,
+} from '../contributor-dashboard-admin-summary.model';
 
 describe('Contributor stats component', () => {
   let component: ContributorAdminStatsTable;
@@ -52,6 +58,61 @@ describe('Contributor stats component', () => {
   class MockNgbModalRef {
     componentInstance!: {};
   }
+
+  let translationSubmitterStats: TranslationSubmitterStats =
+    new TranslationSubmitterStats(
+      'user1',
+      'en',
+      ['topic1', 'topic2'],
+      2,
+      1.0,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      'firstcontributiondate',
+      10
+    );
+  let translationReviewerStats: TranslationReviewerStats =
+    new TranslationReviewerStats(
+      'user1',
+      'en',
+      ['topic1', 'topic2'],
+      2,
+      1.0,
+      3,
+      4,
+      5,
+      'firstcontributiondate',
+      10
+    );
+  let questionSubmitterStats: QuestionSubmitterStats =
+    new QuestionSubmitterStats(
+      'user1',
+      ['topic1', 'topic2'],
+      6,
+      2,
+      1.0,
+      3,
+      4,
+      5,
+      'firstcontributiondate',
+      10
+    );
+  const questionReviewerStats: QuestionReviewerStats =
+    new QuestionReviewerStats(
+      'user1',
+      ['topic1', 'topic2'],
+      2,
+      1,
+      4,
+      6,
+      'firstcontributiondate',
+      2
+    );
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -115,7 +176,7 @@ describe('Contributor stats component', () => {
         'fetchContributorAdminStats'
       ).and.returnValue(
         Promise.resolve({
-          stats: [],
+          stats: [translationSubmitterStats],
           nextOffset: 1,
           more: false,
         } as TranslationSubmitterStatsData)
@@ -132,13 +193,13 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
         'contributorName',
         'recentPerformance',
         'overallAccuracy',
-        'submittedTranslationsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
       ]);
@@ -150,12 +211,11 @@ describe('Contributor stats component', () => {
         'fetchContributorAdminStats'
       ).and.returnValue(
         Promise.resolve({
-          stats: [],
+          stats: [translationReviewerStats],
           nextOffset: 1,
           more: false,
         } as TranslationReviewerStatsData)
       );
-
       const changes: SimpleChanges = {
         activeTab: {
           currentValue: component.TAB_NAME_TRANSLATION_REVIEWER,
@@ -167,11 +227,11 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
         'contributorName',
-        'reviewedTranslationsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
       ]);
@@ -183,12 +243,11 @@ describe('Contributor stats component', () => {
         'fetchContributorAdminStats'
       ).and.returnValue(
         Promise.resolve({
-          stats: [],
+          stats: [questionSubmitterStats],
           nextOffset: 1,
           more: false,
         } as QuestionSubmitterStatsData)
       );
-
       const changes: SimpleChanges = {
         activeTab: {
           currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
@@ -200,13 +259,13 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
         'contributorName',
         'recentPerformance',
         'overallAccuracy',
-        'submittedQuestionsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
       ]);
@@ -218,12 +277,11 @@ describe('Contributor stats component', () => {
         'fetchContributorAdminStats'
       ).and.returnValue(
         Promise.resolve({
-          stats: [],
+          stats: [questionReviewerStats],
           nextOffset: 1,
           more: false,
         } as QuestionReviewerStatsData)
       );
-
       const changes: SimpleChanges = {
         activeTab: {
           currentValue: component.TAB_NAME_QUESTION_REVIEWER,
@@ -235,11 +293,11 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'chevron',
         'contributorName',
-        'reviewedQuestionsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
       ]);
@@ -279,6 +337,16 @@ describe('Contributor stats component', () => {
       spyOnProperty($window.nativeWindow, 'innerWidth').and.returnValue(600);
     }));
     it('should show translation submitter stats', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
+          stats: [translationSubmitterStats],
+          nextOffset: 1,
+          more: false,
+        } as TranslationSubmitterStatsData)
+      );
       const changes: SimpleChanges = {
         activeTab: {
           currentValue: component.TAB_NAME_TRANSLATION_SUBMITTER,
@@ -290,12 +358,12 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
         'recentPerformance',
         'overallAccuracy',
-        'submittedTranslationsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
         'chevron',
@@ -303,6 +371,16 @@ describe('Contributor stats component', () => {
     }));
 
     it('should show translation reviewer stats', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
+          stats: [translationReviewerStats],
+          nextOffset: 1,
+          more: false,
+        } as TranslationReviewerStatsData)
+      );
       const changes: SimpleChanges = {
         activeTab: {
           currentValue: component.TAB_NAME_TRANSLATION_REVIEWER,
@@ -314,10 +392,10 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
-        'reviewedTranslationsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
         'chevron',
@@ -325,6 +403,16 @@ describe('Contributor stats component', () => {
     }));
 
     it('should show question submitter stats', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
+          stats: [questionSubmitterStats],
+          nextOffset: 1,
+          more: false,
+        } as QuestionSubmitterStatsData)
+      );
       const changes: SimpleChanges = {
         activeTab: {
           currentValue: component.TAB_NAME_QUESTION_SUBMITTER,
@@ -336,12 +424,12 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
         'recentPerformance',
         'overallAccuracy',
-        'submittedQuestionsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
         'chevron',
@@ -349,6 +437,16 @@ describe('Contributor stats component', () => {
     }));
 
     it('should show question reviewer stats', fakeAsync(() => {
+      spyOn(
+        contributorDashboardAdminStatsBackendApiService,
+        'fetchContributorAdminStats'
+      ).and.returnValue(
+        Promise.resolve({
+          stats: [questionReviewerStats],
+          nextOffset: 1,
+          more: false,
+        } as QuestionReviewerStatsData)
+      );
       const changes: SimpleChanges = {
         activeTab: {
           currentValue: component.TAB_NAME_QUESTION_REVIEWER,
@@ -360,25 +458,14 @@ describe('Contributor stats component', () => {
       component.inputs.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
       component.ngOnChanges(changes);
       component.updateColumnsToDisplay();
-
+      tick();
       expect(component.columnsToDisplay).toEqual([
         'contributorName',
-        'reviewedQuestionsCount',
+        'contributionCount',
         'lastContributedInDays',
         'role',
         'chevron',
       ]);
-
-      spyOn(
-        contributorDashboardAdminStatsBackendApiService,
-        'fetchContributorAdminStats'
-      ).and.returnValue(
-        Promise.resolve({
-          stats: [],
-          nextOffset: 1,
-          more: false,
-        } as QuestionReviewerStatsData)
-      );
     }));
   });
 
@@ -603,4 +690,159 @@ describe('Contributor stats component', () => {
 
     expect(modalSpy).toHaveBeenCalledWith(CdAdminTranslationRoleEditorModal);
   }));
+
+  describe('when displaying the stats table', () => {
+    it('should return the translation submitter stats attributes correctly', fakeAsync(() => {
+      expect(
+        component.getFormattedContributorAttributes(translationSubmitterStats)
+      ).toEqual([
+        {
+          key: 'Date Joined',
+          displayText: 'firstcontributiondate',
+        },
+        {
+          key: 'Submitted Translations',
+          displayText: '3 cards, 4 words',
+        },
+        {
+          key: 'Accepted Translations',
+          displayText: '5 cards (6 without edits), 7 words',
+        },
+        {
+          key: 'Rejected Translations',
+          displayText: '8 cards, 9 words',
+        },
+        {
+          key: 'Active Topics',
+          displayText: 'topic1, topic2',
+        },
+      ]);
+    }));
+
+    it('should return the translation reviewer stats attributes correctly', fakeAsync(() => {
+      expect(
+        component.getFormattedContributorAttributes(translationReviewerStats)
+      ).toEqual([
+        {
+          key: 'Date Joined',
+          displayText: 'firstcontributiondate',
+        },
+        {
+          key: 'Accepted Translations',
+          displayText: '1 card (3 edited), 4 words',
+        },
+        {
+          key: 'Rejected Translations',
+          displayText: '5 cards',
+        },
+        {
+          key: 'Active Topics',
+          displayText: 'topic1, topic2',
+        },
+      ]);
+    }));
+
+    it('should return the question submitter stats attributes correctly', fakeAsync(() => {
+      expect(
+        component.getFormattedContributorAttributes(questionSubmitterStats)
+      ).toEqual([
+        {
+          key: 'Date Joined',
+          displayText: 'firstcontributiondate',
+        },
+        {
+          key: 'Submitted Questions',
+          displayText: '1 card',
+        },
+        {
+          key: 'Accepted Questions',
+          displayText: '3 cards (4 without edits)',
+        },
+        {
+          key: 'Rejected Questions',
+          displayText: '5 cards',
+        },
+        {
+          key: 'Active Topics',
+          displayText: 'topic1, topic2',
+        },
+      ]);
+    }));
+
+    it('should return the question reviewer stats attributes correctly', fakeAsync(() => {
+      expect(
+        component.getFormattedContributorAttributes(questionReviewerStats)
+      ).toEqual([
+        {
+          key: 'Date Joined',
+          displayText: 'firstcontributiondate',
+        },
+        {
+          key: 'Reviewed Questions',
+          displayText: '2',
+        },
+        {
+          key: 'Accepted Questions',
+          displayText: '1 card (4 edited)',
+        },
+        {
+          key: 'Rejected Questions',
+          displayText: '6 cards',
+        },
+        {
+          key: 'Active Topics',
+          displayText: 'topic1, topic2',
+        },
+      ]);
+    }));
+
+    it('should return the last contributed type correctly', fakeAsync(() => {
+      let activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
+      expect(component.getLastContributedType(activeTab)).toEqual(
+        'Last Translated'
+      );
+      activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
+      expect(component.getLastContributedType(activeTab)).toEqual(
+        'Last Reviewed'
+      );
+      activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      expect(component.getLastContributedType(activeTab)).toEqual(
+        'Last Submitted'
+      );
+      activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      expect(component.getLastContributedType(activeTab)).toEqual(
+        'Last Reviewed'
+      );
+    }));
+
+    it('should return the contribution count label correctly', fakeAsync(() => {
+      let activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
+      expect(component.getContributionCountLabel(activeTab)).toEqual(
+        'Translated Cards'
+      );
+      activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
+      expect(component.getContributionCountLabel(activeTab)).toEqual(
+        'Reviewed Cards'
+      );
+      activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      expect(component.getContributionCountLabel(activeTab)).toEqual(
+        'Questions Submitted'
+      );
+      activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      expect(component.getContributionCountLabel(activeTab)).toEqual(
+        'Questions Reviewed'
+      );
+    }));
+
+    it('should return the contribution count correctly', fakeAsync(() => {
+      let activeTab = component.TAB_NAME_TRANSLATION_SUBMITTER;
+      expect(component.getContributionCount(activeTab, 1, 2, 3, 4)).toEqual(1);
+      activeTab = component.TAB_NAME_TRANSLATION_REVIEWER;
+      expect(component.getContributionCount(activeTab, 1, 2, 3, 4)).toEqual(2);
+      activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+      expect(component.getContributionCount(activeTab, 1, 2, 3, 4)).toEqual(3);
+      activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+      expect(component.getContributionCount(activeTab, 1, 2, 3, 4)).toEqual(4);
+    }));
+  });
 });
