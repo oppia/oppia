@@ -121,6 +121,11 @@ export class LoggedInUser extends BaseUser {
     await this.goto(homeUrl);
   }
 
+  async pageScreenshot(): Promise<string | Buffer> {
+    const screenshot = await this.page.screenshot();
+    return screenshot;
+  }
+
   /**
    * Function to navigate to the about page.
    */
