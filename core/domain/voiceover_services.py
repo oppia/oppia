@@ -149,7 +149,13 @@ def compute_voiceover_related_change(
         entity_id, entity_type, entity_version)
 
     for entity_voiceovers in entity_voiceovers_objects:
-        entity_voiceover_id_to_entity_voiceovers[entity_voiceovers.id] = (
+        entity_voiceovers_id = (
+            entity_voiceovers.entity_type +
+            entity_voiceovers.entity_id +
+            str(entity_voiceovers.entity_version) +
+            entity_voiceovers.language_accent_code
+        )
+        entity_voiceover_id_to_entity_voiceovers[entity_voiceovers_id] = (
             entity_voiceovers)
 
     for change in voiceover_changes:

@@ -13,21 +13,33 @@
       </mat-select>
     </mat-form-field>
   </div>
+  <div *ngIf="pageIsLoaded && !voiceoversAreLoaded">
+    <p>Please select an accent to get voiceovers!</p>
+  </div>
 
-  <div *ngIf="pageIsLoaded">
+  <div *ngIf="pageIsLoaded && voiceoversAreLoaded">
     <div class="manual-voiceovers">
-      <div>
-        <button class="btn btn-secondary audio-button">
-          <mat-icon>play_arrow</mat-icon>
+      <div class="voiceovers-component" *ngIf="manualVoiceover">
+        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename)">
+          <mat-icon *ngIf="!audioPlayerService.isPlaying()">play_arrow</mat-icon>
+          <mat-icon *ngIf="audioPlayerService.isPlaying()">pause_arrow</mat-icon>
         </button>
-        <mat-progress-bar mode="determinate" value="40"></mat-progress-bar>
-        <span>
-          00.00 / 00.00
+        <mat-progress-bar mode="determinate"
+                          value="voiceoverProgress"
+                          class="voiceover-progress">
+        </mat-progress-bar>
+        <span class="voiceover-timer">
+          {{audioPlayerService.getCurrentTime() | formatTime}} / {{manualVoiceoverDuration | formatTime}}
         </span>
-        <button
+        <button (click)="deleteManualVoiceover()"
                 mat-icon-button
                 mat-button>
           <mat-icon>close</mat-icon>
+        </button>
+        <button (click)="toggleAudioNeedsUpdate()"
+                mat-icon-button
+                mat-button>
+          <mat-icon>warning</mat-icon>
         </button>
       </div>
       <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
@@ -38,12 +50,30 @@
 </mat-card>
 
 <style>
+  .voiceover-timer {
+    margin: 10px;
+  }
+  .audio-button {
+    border-radius: 20px;
+    margin: 10px;
+  }
+  .voiceover-progress {
+    margin: 10px;
+    width: 50%;
+  }
+  .voiceovers-component {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly
+  }
+  .add-new-manual-voiceovers {
+    text-align: center;
+  }
   .add-manual-voiceover-button {
     border-style: dashed;
     color: #009688;
-    font-size: large;
-    height: 50px;
-    margin: 0 75px;
-    width: 80%;
+    height: 40px;
+    /* margin: 0 75px; */
+    width: 90%;
   }
 </style>

@@ -66,13 +66,17 @@ export class VoiceoverCardComponent implements OnInit {
   languageCode: string;
   availableLanguageAccentCodesToDescriptions;
   contentId: string;
-  manualVoiceoverIsDisplayed: boolean = false;
   manualVoiceover = null;
   pageIsLoaded: boolean = false;
   startingDuration: number;
   durationSecs: number;
   languageAccentCode: string;
   isAudioAvailable: boolean = false;
+  voiceoversAreLoaded: boolean = false;
+  audioIsLoaded: boolean = false;
+  manualVoiceoverDuration;
+  voiceoverProgress;
+  languageAccentDescription!: string;
 
   constructor(
     private audioPlayerService: AudioPlayerService,
@@ -87,6 +91,8 @@ export class VoiceoverCardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.pageIsLoaded = false;
+    this.voiceoversAreLoaded = false;
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
         this.languageCode =
@@ -102,6 +108,14 @@ export class VoiceoverCardComponent implements OnInit {
           });
       })
     );
+    setInterval(() => {
+      if (this.audioPlayerService.isPlaying()) {
+        this.voiceoverProgress =
+          (this.audioPlayerService.getCurrentTime() /
+            this.manualVoiceoverDuration) *
+          100;
+      }
+    }, 1000);
   }
 
   getVoiceovers(languageAccentCode: string): void {
@@ -122,18 +136,71 @@ export class VoiceoverCardComponent implements OnInit {
       )
       .then(response => {
         this.manualVoiceover = response.manualVoiceover;
-        this.manualVoiceoverIsDisplayed = true;
+        if (this.manualVoiceover !== null) {
+          this.manualVoiceoverDuration = Math.round(
+            this.manualVoiceover.durationSecs
+          );
+        }
       });
+
+    this.voiceoversAreLoaded = true;
   }
-  isPlayingUploadedAudio() {
-    return true;
+  calculateVoiceoverProgress(currentDuration, totalDuration) {
+    console.log(currentDuration);
+    console.log(totalDuration);
+    let progressValue = (currentDuration / totalDuration) * 100;
+    console.log(progressValue);
   }
 
-  playAudio() {}
+  playAndPauseVoiceover(filename) {
+    console.log('Playing' + filename);
+    if (this.audioPlayerService.isPlaying()) {
+      this.audioPlayerService.pause();
+      return;
+    }
+    if (this.audioIsLoaded) {
+      this.audioPlayerService.play();
+    } else {
+      this.audioPlayerService.loadAsync(filename).then(() => {
+        this.audioIsLoaded = true;
+        this.audioPlayerService.play();
+      });
+    }
+  }
 
   deleteManualVoiceover() {
-    this.manualVoiceover = null;
-    this.manualVoiceoverIsDisplayed = false;
+    const modalRef = this.ngbModal.open(AddAudioTranslationModalComponent, {
+      backdrop: 'static',
+    });
+    modalRef.result.then(
+      () => {
+        this.manualVoiceover = null;
+        this.changeListService.editVoiceovers(
+          this.contentId,
+          this.languageAccentCode,
+          {}
+        );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
+  }
+
+  toggleAudioNeedsUpdate() {
+    console.log('Marking audio!');
+    console.log(this.manualVoiceover.needsUpdate);
+    this.manualVoiceover.needsUpdate = !this.manualVoiceover.needsUpdate;
+    console.log(this.manualVoiceover.needsUpdate);
+    this.changeListService.editVoiceovers(
+      this.contentId,
+      this.languageAccentCode,
+      {
+        manual: this.manualVoiceover.toBackendDict(),
+      }
+    );
   }
 
   addManualVoiceover() {
@@ -162,7 +229,9 @@ export class VoiceoverCardComponent implements OnInit {
             manual: this.manualVoiceover.toBackendDict(),
           }
         );
-        this.manualVoiceoverIsDisplayed = true;
+        this.manualVoiceoverDuration = Math.round(
+          this.manualVoiceover.durationSecs
+        );
       },
       () => {
         this.alertsService.clearWarnings();

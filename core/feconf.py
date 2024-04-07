@@ -1701,7 +1701,8 @@ class TranslatedContentDict(TypedDict):
 
 
 class VoiceoverType(enum.Enum):
-    """Represents all possible voicever types."""
+    """Represents only manual voicever types but in future we will introduce
+    automatic voiceovers.
+    """
 
-    AUTO = 'auto'
     MANUAL = 'manual'

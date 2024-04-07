@@ -101,6 +101,7 @@ import {TranslationTabComponent} from './translation-tab/translation-tab.compone
 import {ValueGeneratorEditorComponent} from './param-changes-editor/value-generator-editor.component';
 import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-editor.component';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
+import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
 
 @NgModule({
   imports: [
@@ -129,6 +130,7 @@ import {ExplorationEditorPageComponent} from './exploration-editor-page.componen
     SaveVersionMismatchModalComponent,
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
+    VoiceoverRemovalConfirmModalComponent,
     LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
@@ -196,6 +198,7 @@ import {ExplorationEditorPageComponent} from './exploration-editor-page.componen
     SaveVersionMismatchModalComponent,
     SaveValidationFailModalComponent,
     ChangesInHumanReadableFormComponent,
+    VoiceoverRemovalConfirmModalComponent,
     LostChangesModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,

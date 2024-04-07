@@ -269,9 +269,9 @@ class EntityVoiceoversHandler(
                 entity_type, entity_id, entity_version, language_accent_code
             )
         )
-        voiceover_type_to_voiceovers = entity_voiceovers.voiceovers.get(
+        entity_voiceovers_dict = entity_voiceovers.to_dict()
+        voiceover_type_to_voiceovers = entity_voiceovers_dict['voiceovers'].get(
             content_id, {})
-
         self.values.update({
             'voiceover_type_to_voiceovers': voiceover_type_to_voiceovers
         })

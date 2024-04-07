@@ -366,14 +366,14 @@
         Adding voiceover functionality is temporarily disabled due to maintenance. Try some time later.
       </p>
     </div>
-    <oppia-audio-translation-bar *ngIf="isVoiceoverContributionEnabled()" [isTranslationTabBusy]="isTranslationTabBusy">
-    </oppia-audio-translation-bar>
+    <div *ngIf="isVoiceoverContributionEnabled()">
+      <oppia-audio-translation-bar *ngIf="!isVoiceoverContributionWithAccentEnabled()" [isTranslationTabBusy]="isTranslationTabBusy">
+      </oppia-audio-translation-bar>
+      <oppia-voiceover-card *ngIf="isVoiceoverContributionWithAccentEnabled()"></oppia-voiceover-card>
+    </div>
   </div>
   <div *ngIf="!isVoiceoverModeActive()">
     <oppia-state-translation-editor></oppia-state-translation-editor>
-  </div>
-  <div>
-    <oppia-voiceover-card></oppia-voiceover-card>
   </div>
 </div>
 
