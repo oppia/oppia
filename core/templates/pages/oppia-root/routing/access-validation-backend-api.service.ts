@@ -58,6 +58,9 @@ export class AccessValidationBackendApiService {
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
+  SUBTOPIC_VIEWER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE = 
+    '/access_validation_handler/can_access_subtopic_viewer_page'
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -72,6 +75,19 @@ export class AccessValidationBackendApiService {
       })
       .toPromise();
   }
+
+  validateAccessToSubtopicViewerPage(
+    classroomUrlFragment: string,
+    topicUrlFragment: string,
+    subtopicUrlFragment: string) : Promise<void> {
+      return this.http.get<void>(this.SUBTOPIC_VIEWER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE, {
+        params: {
+          classroom_url_fragment: classroomUrlFragment,
+          topic_url_fragment: topicUrlFragment,
+          subtopic_url_fragment: subtopicUrlFragment
+        }
+      }).toPromise();
+    }
 
   validateAccessToBlogHomePage(): Promise<void> {
     return this.http

@@ -92,8 +92,8 @@ class SubtopicViewerPageAccessValidationHandlerTests(test_utils.GenericEmailTest
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        subtopic = test_utils.save_new_subtopic("s1", "o1", "t1")
-        topic = test_utils.save_new_topic("t1", "o1", subtopics = [subtopic])
+        subtopic = test_utils.GenericTestBase.save_new_subtopic("s1", "o1", "t1")
+        topic = test_utils.GenericTestBase.save_new_topic("t1", "o1", subtopics = [subtopic])
 
         math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
