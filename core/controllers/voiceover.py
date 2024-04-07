@@ -33,7 +33,7 @@ class VoiceoverAdminDataHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_voiceover_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves relevant data for the voiceover admin page."""
 
@@ -225,22 +225,54 @@ class EntityVoiceoversHandler(
 ):
     """Handler class to get entity voiceover data."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_version': {
+            'schema': {
+                'type': 'int'
+            }
+        },
+        'language_accent_code': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'content_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
     @acl_decorators.open_access
     def get(
         self,
-        entity_type,
-        entity_id,
-        entity_version,
-        language_accent_code,
-        content_id
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        language_accent_code: str,
+        content_id: str
     ):
         entity_voiceovers = (
             voiceover_services.get_voiceovers_for_given_language_accent_code(
                 entity_type, entity_id, entity_version, language_accent_code
             )
         )
-        voiceover_type_to_voiceovers = entity_voiceovers.voiceovers[content_id]
+        voiceover_type_to_voiceovers = entity_voiceovers.voiceovers.get(
+            content_id, {})
 
         self.values.update({
             'voiceover_type_to_voiceovers': voiceover_type_to_voiceovers
         })
+        self.render_json(self.values)

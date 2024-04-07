@@ -22,4 +22,7 @@ export const VoiceoverDomainConstants = {
   VOICE_ARTIST_METADATA_HANDLER_URL: '/voice_artist_metadata_handler',
   GET_VOICEOVERS_FOR_VOICE_ARTIST_URL_TEMPLATE:
     '/get_sample_voiceovers/<voice_artist_id>/<language_code>',
+  GET_ENTITY_VOICEOVERS:
+    '/entity_voiceovers_handler/<entity_type>/<entity_id>/<entity_version>/' +
+    '<language_accent_code>/<content_id>',
 } as const;

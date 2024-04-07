@@ -1,19 +1,49 @@
 <mat-card>
   <h3>Voiceovers</h3>
-  <div>
-    <mat-label>Select accent: </mat-label>
-    <mat-select></mat-select>
+  <div *ngIf="pageIsLoaded">
+    <mat-form-field class="oppia-language-accent-dropdown-selector">
+      <mat-label>Select Accent: </mat-label>
+      <mat-select (selectionChange)="getVoiceovers($event.value)">
+        <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
+                    [value]="languageAccentCodeToDescription.key">
+          <span>
+            {{languageAccentCodeToDescription.value}}
+          </span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
-  <div>
+
+  <div *ngIf="pageIsLoaded">
     <div class="manual-voiceovers">
-      <div class="display-existing-voiceovers">
+      <div>
+        <button class="btn btn-secondary audio-button">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <mat-progress-bar mode="determinate" value="40"></mat-progress-bar>
+        <span>
+          00.00 / 00.00
+        </span>
+        <button
+                mat-icon-button
+                mat-button>
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
-      <div class="add-new-manual-voiceovers">
+      <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
+        <button (click)="addManualVoiceover()" class="add-manual-voiceover-button">ADD MANUAL VOICEOVER</button>
       </div>
     </div>
   </div>
 </mat-card>
 
 <style>
-
+  .add-manual-voiceover-button {
+    border-style: dashed;
+    color: #009688;
+    font-size: large;
+    height: 50px;
+    margin: 0 75px;
+    width: 80%;
+  }
 </style>

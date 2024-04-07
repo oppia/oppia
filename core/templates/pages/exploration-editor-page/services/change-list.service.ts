@@ -61,6 +61,7 @@ import {
 import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {VoiceoverTypeToVoiceoversBackendDict} from 'domain/exploration/voiceover.model';
 
 export type StatePropertyValues =
   | AnswerGroup[]
@@ -191,6 +192,7 @@ export class ChangeListService {
     // opened):
     // - Changes are not mergeable when a version mismatch occurs.
     // - Non-strict Validation Fail.
+    console.log('Autosave method');
     this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList as ExplorationChange[],
       response => {
@@ -437,6 +439,22 @@ export class ChangeListService {
       language_code: languageCode,
       content_id: contentId,
       translation: translatedContent.toBackendDict(),
+    });
+  }
+
+  /**
+   * Saves a change dict that represents editing voiceovers.
+   */
+  editVoiceovers(
+    contentId: string,
+    languageAccentCode: string,
+    voiceovers: VoiceoverTypeToVoiceoversBackendDict
+  ): void {
+    this.addChange({
+      cmd: 'update_voiceovers',
+      language_accent_code: languageAccentCode,
+      content_id: contentId,
+      voiceovers: voiceovers,
     });
   }
 

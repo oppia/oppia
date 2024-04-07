@@ -99,9 +99,8 @@ class EntityVoiceovers:
         voiceovers_dict = {}
         for content_id, voiceover_type_to_voiceover in self.voiceovers.items():
             voiceovers_dict[content_id] = {
-                voiceover_type.value: voiceover_type_to_voiceover[
-                    voiceover_type].to_dict()
-                for voiceover_type in feconf.VoiceoverType
+                'manual': voiceover_type_to_voiceover[
+                    feconf.VoiceoverType.MANUAL].to_dict()
             }
         return {
             'entity_id': self.entity_id,
@@ -191,6 +190,9 @@ class EntityVoiceovers:
             voiceover: Voiceover. The voiceover instance to be added to the
                 entity voiceovers object.
         """
+        if content_id not in self.voiceovers:
+            self.voiceovers[content_id] = {}
+
         self.voiceovers[content_id][voiceover_type] = voiceover
 
     def remove_voiceover(

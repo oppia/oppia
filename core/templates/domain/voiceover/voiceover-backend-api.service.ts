@@ -241,7 +241,7 @@ export class VoiceoverBackendApiService {
       this.http
         .get<VoiceoverTypeToVoiceoverBackendDict>(
           this.urlInterpolationService.interpolateUrl(
-            '/entity_voiceovers_handler',
+            VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS,
             {
               entity_type: entityType,
               entity_id: entitytId,
@@ -253,9 +253,12 @@ export class VoiceoverBackendApiService {
         )
         .toPromise()
         .then(response => {
-          let manualVoiceover = Voiceover.createFromBackendDict(
-            response.voiceover_type_to_voiceovers['manual']
-          );
+          let manualVoiceover = null;
+          if ('manual' in response.voiceover_type_to_voiceovers) {
+            manualVoiceover = Voiceover.createFromBackendDict(
+              response.voiceover_type_to_voiceovers['manual']
+            );
+          }
 
           resolve({
             manualVoiceover: manualVoiceover,

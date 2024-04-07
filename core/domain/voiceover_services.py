@@ -111,12 +111,14 @@ def get_entity_voiceovers_for_given_exploration(
 ):
     entity_voiceovers_objects = []
     entity_voiceover_models = (
-        voiceover_models.get_entity_voiceovers_for_given_exploration(
+        voiceover_models.EntityVoiceoversModel.
+        get_entity_voiceovers_for_given_exploration(
             entity_id, entity_type, entity_version))
 
     for model_instance in entity_voiceover_models:
         entity_voiceovers_objects.append(
             _get_entity_voiceovers_from_model(model_instance))
+    return entity_voiceovers_objects
 
 
 def compute_voiceover_related_change(
@@ -137,7 +139,7 @@ def compute_voiceover_related_change(
     """
     new_voiceovers_models = []
     entity_voiceover_id_to_entity_voiceovers = {}
-    generate_id = voiceover_models.EntityVoiceoversModel.generate_id
+    generate_id_method = voiceover_models.EntityVoiceoversModel.generate_id
 
     entity_id = updated_exploration.id
     entity_version = updated_exploration.version - 1
@@ -153,9 +155,8 @@ def compute_voiceover_related_change(
     for change in voiceover_changes:
         language_accent_code = change.language_accent_code
         content_id = change.content_id
-        voiceovers = change.voiceovers
 
-        entity_voiceover_id = generate_id(
+        entity_voiceover_id = generate_id_method(
             entity_type, entity_id, entity_version, language_accent_code)
 
         if entity_voiceover_id in entity_voiceover_id_to_entity_voiceovers:
@@ -165,20 +166,27 @@ def compute_voiceover_related_change(
             entity_voiceovers = voiceover_domain.EntityVoiceovers.create_empty(
                 entity_id, entity_type, entity_version, language_accent_code)
 
-        entity_voiceovers.voiceovers[content_id] = voiceovers
+        manual_voiceover = state_domain.Voiceover.from_dict(
+            change.voiceovers['manual'])
+        entity_voiceovers.add_voiceover(
+            content_id,
+            feconf.VoiceoverType.MANUAL,
+            manual_voiceover
+        )
         entity_voiceovers.validate()
 
         entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
             entity_voiceovers)
 
     for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():
+        entity_voiceovers_dict = entity_voiceovers.to_dict()
         new_voiceovers_models.append(
             voiceover_models.EntityVoiceoversModel.create_new(
-                entity_voiceovers.entity_type,
-                entity_voiceovers.entity_id,
-                entity_voiceovers.entity_version + 1,
-                entity_voiceovers.language_accent_code,
-                entity_voiceovers.voiceovers
+                entity_voiceovers_dict['entity_type'],
+                entity_voiceovers_dict['entity_id'],
+                entity_voiceovers_dict['entity_version'] + 1,
+                entity_voiceovers_dict['language_accent_code'],
+                entity_voiceovers_dict['voiceovers']
             )
         )
 

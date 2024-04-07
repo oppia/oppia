@@ -53,43 +53,61 @@ import {Voiceover} from 'domain/exploration/voiceover.model';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import {VoiceoverRecordingService} from '../services/voiceover-recording.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 
 @Component({
-  selector: 'oppia-audio-translation-bar',
-  templateUrl: './audio-translation-bar.component.html',
+  selector: 'oppia-voiceover-card',
+  templateUrl: './voiceover-card.component.html',
 })
 export class VoiceoverCardComponent implements OnInit {
   @Input() isTranslationTabBusy: boolean;
   @ViewChild('visualized') visualized!: ElementRef<Element>;
-
+  directiveSubscriptions = new Subscription();
   languageCode: string;
-  languageAccentCodeToDescription;
+  availableLanguageAccentCodesToDescriptions;
   contentId: string;
   manualVoiceoverIsDisplayed: boolean = false;
-  manualVoiceover;
+  manualVoiceover = null;
+  pageIsLoaded: boolean = false;
+  startingDuration: number;
+  durationSecs: number;
+  languageAccentCode: string;
+  isAudioAvailable: boolean = false;
 
   constructor(
+    private audioPlayerService: AudioPlayerService,
     private contextService: ContextService,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private ngbModal: NgbModal,
+    private idGenerationService: IdGenerationService,
+    private alertsService: AlertsService,
+    private changeListService: ChangeListService
   ) {}
 
-  ngOnInit(): void {}
-
-  getLanguageAccentCodes(): void {
-    this.languageCode = this.translationLanguageService.getActiveLanguageCode();
-    this.voiceoverBackendApiService
-      .fetchVoiceoverAdminDataAsync()
-      .then(response => {
-        this.languageAccentCodeToDescription =
-          response.languageCodesMapping[this.languageCode];
-      });
+  ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
+        this.languageCode =
+          this.translationLanguageService.getActiveLanguageCode();
+        this.voiceoverBackendApiService
+          .fetchVoiceoverAdminDataAsync()
+          .then(response => {
+            this.availableLanguageAccentCodesToDescriptions =
+              response.languageAccentMasterList[this.languageCode];
+            this.pageIsLoaded = true;
+            this.contentId =
+              this.translationTabActiveContentIdService.getActiveContentId();
+          });
+      })
+    );
   }
 
   getVoiceovers(languageAccentCode: string): void {
+    this.languageAccentCode = languageAccentCode;
     let explorationId = this.contextService.getExplorationId();
-    let contentId =
+    this.contentId =
       this.translationTabActiveContentIdService.getActiveContentId();
     let explorationVersion = this.contextService.getExplorationVersion();
     let entityType = 'exploration';
@@ -100,18 +118,18 @@ export class VoiceoverCardComponent implements OnInit {
         explorationId,
         explorationVersion,
         languageAccentCode,
-        contentId
+        this.contentId
       )
       .then(response => {
         this.manualVoiceover = response.manualVoiceover;
         this.manualVoiceoverIsDisplayed = true;
       });
   }
-
-  displayManualVoiceover(voiceover) {
-    this.manualVoiceoverIsDisplayed = true;
-    this.manualVoiceover = voiceover;
+  isPlayingUploadedAudio() {
+    return true;
   }
+
+  playAudio() {}
 
   deleteManualVoiceover() {
     this.manualVoiceover = null;
@@ -119,9 +137,48 @@ export class VoiceoverCardComponent implements OnInit {
   }
 
   addManualVoiceover() {
-    // upload file, follow current behaviour.
-    // this.manualVoiceover = ;
-    this.manualVoiceoverIsDisplayed = true;
+    const modalRef = this.ngbModal.open(AddAudioTranslationModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.componentInstance.audioFile = undefined;
+    modalRef.componentInstance.generatedFilename = this.generateNewFilename();
+    modalRef.componentInstance.languageCode = this.languageCode;
+    modalRef.componentInstance.isAudioAvailable = this.isAudioAvailable;
+
+    modalRef.result.then(
+      result => {
+        this.manualVoiceover = new Voiceover(
+          result.filename,
+          result.fileSizeBytes,
+          false,
+          result.durationSecs
+        );
+
+        this.changeListService.editVoiceovers(
+          this.contentId,
+          this.languageAccentCode,
+          {
+            manual: this.manualVoiceover.toBackendDict(),
+          }
+        );
+        this.manualVoiceoverIsDisplayed = true;
+      },
+      () => {
+        this.alertsService.clearWarnings();
+      }
+    );
+  }
+
+  generateNewFilename() {
+    return (
+      this.contentId +
+      '-' +
+      this.languageAccentCode +
+      '-' +
+      this.idGenerationService.generateNewId() +
+      '.mp3'
+    );
   }
 }
 
