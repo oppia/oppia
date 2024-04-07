@@ -78,6 +78,7 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {ConversationSkinService} from '../services/conversation-skin.service';
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
@@ -88,8 +89,6 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 // should only be used within this file.
 const TIME_FADEOUT_MSEC = 100;
 const TIME_HEIGHT_CHANGE_MSEC = 500;
-const TIME_FADEIN_MSEC = 100;
-const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -102,7 +101,6 @@ export class ConversationSkinComponent {
   directiveSubscriptions = new Subscription();
   // The minimum width, in pixels, needed to be able to show two cards
   // side-by-side.
-  TIME_PADDING_MSEC = 250;
   TIME_SCROLL_MSEC = 600;
   MIN_CARD_LOADING_DELAY_MSEC = 950;
 
@@ -144,8 +142,6 @@ export class ConversationSkinComponent {
   startCardChangeAnimation: boolean;
   collectionSummary;
   redirectToRefresherExplorationConfirmed;
-  isAnimatingToTwoCards: boolean;
-  isAnimatingToOneCard: boolean;
   isRefresherExploration: boolean;
   parentExplorationIds: string[];
   conceptCard: ConceptCard;
@@ -188,8 +184,6 @@ export class ConversationSkinComponent {
     private changeDetectorRef: ChangeDetectorRef,
     private collectionPlayerBackendApiService: CollectionPlayerBackendApiService,
     private conceptCardBackendApiService: ConceptCardBackendApiService,
-    private contentTranslationLanguageService: ContentTranslationLanguageService,
-    private contentTranslationManagerService: ContentTranslationManagerService,
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
     private explorationEngineService: ExplorationEngineService,
@@ -221,12 +215,12 @@ export class ConversationSkinComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private userService: UserService,
-    private windowDimensionsService: WindowDimensionsService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private platformFeatureService: PlatformFeatureService,
     private translateService: TranslateService,
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
+    private conversationSkinService: ConversationSkinService
   ) {}
 
   adjustPageHeightOnresize(): void {
@@ -742,13 +736,12 @@ export class ConversationSkinComponent {
     return this.displayedCard && this.displayedCard.isTerminal();
   }
 
-  isSupplementalCardNonempty(card: StateCard): boolean {
-    return !card.isInteractionInline();
-  }
-
   isCurrentSupplementalCardNonempty(): boolean {
     return (
-      this.displayedCard && this.isSupplementalCardNonempty(this.displayedCard)
+      this.displayedCard &&
+      this.conversationSkinService.isSupplementalCardNonempty(
+        this.displayedCard
+      )
     );
   }
 
@@ -905,29 +898,6 @@ export class ConversationSkinComponent {
     this.playerPositionService.setDisplayedCardIndex(numCards - 1);
   }
 
-  animateToTwoCards(doneCallback: () => void): void {
-    this.isAnimatingToTwoCards = true;
-    setTimeout(
-      () => {
-        this.isAnimatingToTwoCards = false;
-        if (doneCallback) {
-          doneCallback();
-        }
-      },
-      TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + this.TIME_PADDING_MSEC
-    );
-  }
-
-  animateToOneCard(doneCallback: () => void): void {
-    this.isAnimatingToOneCard = true;
-    setTimeout(() => {
-      this.isAnimatingToOneCard = false;
-      if (doneCallback) {
-        doneCallback();
-      }
-    }, TIME_NUM_CARDS_CHANGE_MSEC);
-  }
-
   isCurrentCardAtEndOfTranscript(): boolean {
     return this.playerTranscriptService.isLastCard(
       this.playerPositionService.getDisplayedCardIndex()
@@ -935,52 +905,7 @@ export class ConversationSkinComponent {
   }
 
   private _addNewCard(newCard): void {
-    this.playerTranscriptService.addNewCard(newCard);
-    const explorationLanguageCode =
-      this.explorationPlayerStateService.getLanguageCode();
-    const selectedLanguageCode =
-      this.contentTranslationLanguageService.getCurrentContentLanguageCode();
-    if (explorationLanguageCode !== selectedLanguageCode) {
-      this.contentTranslationManagerService.displayTranslations(
-        selectedLanguageCode
-      );
-    }
-
-    let totalNumCards = this.playerTranscriptService.getNumCards();
-
-    let previousSupplementalCardIsNonempty =
-      totalNumCards > 1 &&
-      this.isSupplementalCardNonempty(
-        this.playerTranscriptService.getCard(totalNumCards - 2)
-      );
-
-    let nextSupplementalCardIsNonempty = this.isSupplementalCardNonempty(
-      this.playerTranscriptService.getLastCard()
-    );
-
-    if (
-      totalNumCards > 1 &&
-      this.canWindowShowTwoCards() &&
-      !previousSupplementalCardIsNonempty &&
-      nextSupplementalCardIsNonempty
-    ) {
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-      this.animateToTwoCards(function () {});
-    } else if (
-      totalNumCards > 1 &&
-      this.canWindowShowTwoCards() &&
-      previousSupplementalCardIsNonempty &&
-      !nextSupplementalCardIsNonempty
-    ) {
-      this.animateToOneCard(() => {
-        this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-      });
-    } else {
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-    }
-    this.playerPositionService.changeCurrentQuestion(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
+    this.conversationSkinService.handleNewCardAddition(newCard);
 
     if (this.displayedCard && this.displayedCard.isTerminal()) {
       this.isRefresherExploration = false;
@@ -1581,7 +1506,9 @@ export class ConversationSkinComponent {
         this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
         this.scrollToTop();
       },
-      0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + 0.5 * TIME_FADEIN_MSEC
+      0.1 * TIME_FADEOUT_MSEC +
+        TIME_HEIGHT_CHANGE_MSEC +
+        0.5 * this.conversationSkinService.TIME_FADEIN_MSEC
     );
 
     setTimeout(
@@ -1590,8 +1517,8 @@ export class ConversationSkinComponent {
       },
       0.1 * TIME_FADEOUT_MSEC +
         TIME_HEIGHT_CHANGE_MSEC +
-        TIME_FADEIN_MSEC +
-        this.TIME_PADDING_MSEC
+        this.conversationSkinService.TIME_FADEIN_MSEC +
+        this.conversationSkinService.TIME_PADDING_MSEC
     );
 
     this.playerPositionService.onNewCardOpened.emit(this.nextCard);
@@ -1701,15 +1628,6 @@ export class ConversationSkinComponent {
       );
       return false;
     });
-  }
-
-  // Returns whether the screen is wide enough to fit two
-  // cards (e.g., the tutor and supplemental cards) side-by-side.
-  canWindowShowTwoCards(): boolean {
-    return (
-      this.windowDimensionsService.getWidth() >
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
-    );
   }
 
   onNavigateFromIframe(): void {
