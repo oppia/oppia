@@ -6,7 +6,19 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
+import {StoryNode} from 'domain/story/story-node.model';
 
+interface LessonUrl {
+  classroom: string;
+  topic: string;
+  story: string;
+  currentStory: StoryNode;
+}
+
+interface ThumbnailUrl {
+  filename: string;
+  id: string;
+}
 @Component({
   selector: 'lesson-card',
   templateUrl: './lesson-card.component.html',
@@ -34,35 +46,25 @@ export class LessonCardComponent implements OnInit {
 
       this.desc = this.story.getTitle();
       this.imgColor = this.story.getThumbnailBgColor();
+      this.imgUrl = this.getStorySummaryThumbnailUrl({
+        filename: this.story.getThumbnailFilename(),
+        id: this.story.getId(),
+      });
 
-      if (this.story.getThumbnailFilename()) {
-        this.imgUrl = this.assetsBackendApiService.getThumbnailUrlForPreview(
-          AppConstants.ENTITY_TYPE.STORY,
-          this.story.getId(),
-          this.story.getThumbnailFilename()
-        );
-      }
-
+      let nextStory =
+        completedStories === this.story.getAllNodes().length
+          ? completedStories - 1
+          : completedStories;
       //last completed story index works because if 1 is completed, 1 index is 2nd item
-      let currentStory = this.story.getAllNodes()[completedStories];
-      let classFragment = this.story.getClassroomUrlFragment();
-      let topicFragment = this.story.getTopicUrlFragment();
+      let lessonArgs = {
+        classroom: this.story.getClassroomUrlFragment(),
+        topic: this.story.getTopicUrlFragment(),
+        currentStory: this.story.getAllNodes()[nextStory],
+        story: this.story.getUrlFragment(),
+      };
+      this.lessonUrl = this.getStorySummaryLessonUrl(lessonArgs);
 
-      //put as separate function
-      this.lessonUrl =
-        classFragment === undefined || topicFragment === undefined
-          ? '#'
-          : `/explore/${currentStory.getExplorationId()}?` +
-            Object.entries({
-              topic_url_fragment: topicFragment,
-              classroom_url_fragment: classFragment,
-              story_url_fragment: this.story.getUrlFragment(),
-              node_id: currentStory.getId(),
-            })
-              .map(([key, value]) => `${key}=${value}`)
-              .join('&');
-
-      this.title = `Chapter ${completedStories + 1}: ${this.story.getNodeTitles()[completedStories]}`;
+      this.title = `Chapter ${nextStory + 1}: ${this.story.getNodeTitles()[nextStory]}`;
       this.progress = Math.floor(
         (completedStories / this.story.getNodeTitles().length) * 100
       );
@@ -91,7 +93,36 @@ export class LessonCardComponent implements OnInit {
     let leftCircle = 50 >= arg ? arg : 50;
     let rightCircle = arg > 50 ? arg - 50 : 0;
 
-    return `linear-gradient(${50 >= arg ? 180 + (arg / 100) * 180 : 270} deg, #00645c ${leftCircle}%, transparent ${leftCircle}%), linear-gradient(0deg, #00645c ${rightCircle}%, lightgray ${rightCircle}%)`;
+    return `linear-gradient(${50 >= arg ? 180 + (arg / 100) * 180 : 270}deg, #00645c ${leftCircle}%, transparent ${leftCircle}%), linear-gradient(0deg, #00645c ${rightCircle}%, lightgray ${rightCircle}%)`;
+  }
+
+  getStorySummaryThumbnailUrl({filename, id}: ThumbnailUrl): string {
+    if (filename) {
+      return this.assetsBackendApiService.getThumbnailUrlForPreview(
+        AppConstants.ENTITY_TYPE.STORY,
+        id,
+        filename
+      );
+    }
+  }
+
+  getStorySummaryLessonUrl({
+    classroom,
+    topic,
+    story,
+    currentStory,
+  }: LessonUrl): string {
+    return classroom === undefined || topic === undefined
+      ? '#'
+      : `/explore/${currentStory.getExplorationId()}?` +
+          Object.entries({
+            topic_url_fragment: topic,
+            classroom_url_fragment: classroom,
+            story_url_fragment: story,
+            node_id: currentStory.getId(),
+          })
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&');
   }
 }
 
