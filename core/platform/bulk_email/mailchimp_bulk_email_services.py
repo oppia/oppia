@@ -280,7 +280,7 @@ def add_or_update_user_status(
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
                 unsubscribed_mailchimp_data)
 
-    except mailchimpclient.MailChimpError as error:
+    except Exception as error:
         # This has to be done since the message can only be accessed from
         # MailChimpError by error.message in Python2, but this is deprecated in
         # Python3.
