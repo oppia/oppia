@@ -388,14 +388,12 @@ export class CurriculumAdmin extends BaseUser {
         }
       });
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.page.waitForSelector(
+        `${closeSaveModalButton}:not([disabled])`
+      );
       await this.clickOn(closeSaveModalButton);
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        visible: true,
-      });
-      await this.clickOn('.e2e-test-toast-message');
-      await this.page.waitForSelector('.e2e-test-toast-message', {
-        hidden: true,
-      });
+      await this.page.waitForSelector(modalDiv, {hidden: true});
+      await this.openTopicEditor();
     } else {
       await this.clickOn(saveTopicButton);
       await this.page.waitForSelector(modalDiv, {visible: true});
@@ -499,6 +497,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.saveTopicDraft();
 
     if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-options-base');
       await this.clickOn('.e2e-test-mobile-save-topic-dropdown');
 
       await this.page.waitForSelector('.e2e-test-mobile-publish-topic-button');
