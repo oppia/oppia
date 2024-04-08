@@ -198,6 +198,9 @@ def add_or_update_user_status(
         bool. Whether the user was successfully added to the db. This will be
         False if and only if MailChimp throws an error or getting the MailChimp
         client fails.
+
+    Raises:
+        Exception. Raised if the tag or merge fields are invalid.
     """
     client = _get_mailchimp_class()
     if not client:
