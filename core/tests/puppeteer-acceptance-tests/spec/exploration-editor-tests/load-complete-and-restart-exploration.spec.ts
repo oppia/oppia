@@ -20,11 +20,16 @@ import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT: number = testConstants.DEFAULT_SPEC_TIMEOUT;
-
+const NEW_CARD: string = '/';
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = ' Continue Button ',
   NUMERIC_INPUT = ' Number Input ',
   END_EXPLORATION = ' End Exploration ',
+}
+enum CARD_NAME {
+  INTRODUCTION = 'Introduction',
+  TEST_QUESTION = 'Test Question ',
+  RECAP = 'Recap ',
 }
 
 describe('Exploration Editor', function () {
@@ -48,36 +53,48 @@ describe('Exploration Editor', function () {
       await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
       // The following block of code adds a new card to the exploration that contains a question.
-      await explorationEditor.navigateToOppiaResponses();
-      await explorationEditor.oppiaDirectlearnersTo();
-      await explorationEditor.nameTheNewCard();
-      await explorationEditor.navigateToCard('Question Card ');
+      await explorationEditor.viewOppiaResponses();
+      await explorationEditor.oppiaDirectlearnersTo(NEW_CARD);
+      await explorationEditor.nameNewCard('Test Question');
+      await explorationEditor.saveExplorationDraft();
+
+      await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
       await explorationEditor.updateCardContent(
-        'mention a negative number greater than -100.'
+        'Enter a negative number greater than -100.'
       );
       await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-      await explorationEditor.addResponseToTheInteraction('-45');
+      await explorationEditor.addResponseToTheInteraction('-99');
 
       // The following block adds the final card with an ‘End’ interaction to conclude the exploration.
-      await explorationEditor.oppiaDirectlearnersTo();
-      await explorationEditor.nameTheNewCard();
-      await explorationEditor.navigateToCard('Last Card ');
-      await explorationEditor.updateCardContent('');
+      await explorationEditor.oppiaDirectlearnersTo(NEW_CARD);
+      await explorationEditor.nameNewCard('Recap');
+      await explorationEditor.saveExplorationDraft();
+
+      await explorationEditor.navigateToCard(CARD_NAME.RECAP);
+      await explorationEditor.updateCardContent(
+        'We Practiced negative numbers and exploration ends here.'
+      );
       await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
-      await explorationEditor.navigateToCard('');
+      await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
       await explorationEditor.saveExplorationDraft();
 
       await explorationEditor.navigateToPreviewTab();
-      await explorationEditor.expectTheExplorationToStartFromIntroductionCard(
-        'Exploration begins'
+      await explorationEditor.expectCardContentToBe(
+        'Test exploration to question negative numbers'
       );
 
-      await explorationEditor.completeTheExplorationInPreviewTab();
-      await explorationEditor.expectTheExplorationToComplete();
+      await explorationEditor.continueToNextCard();
+      await explorationEditor.enterAnswer('-40');
+      await explorationEditor.submitAnswer();
+      await explorationEditor.continueToNextCard();
+
+      await explorationEditor.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
       await explorationEditor.restartExploration();
-      await explorationEditor.expectTheExplorationToRestart(
-        'Exploration begins'
+      await explorationEditor.expectCardContentToBe(
+        'Test exploration to question negative numbers'
       );
     },
     DEFAULT_SPEC_TIMEOUT

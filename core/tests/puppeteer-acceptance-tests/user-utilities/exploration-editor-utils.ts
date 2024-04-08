@@ -30,7 +30,6 @@ const stateEditSelector = 'div.e2e-test-state-edit-content';
 const explorationContentInput = 'div.oppia-rte';
 const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const endInteractionSelector = '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 const saveDraftButton = 'button.e2e-test-save-draft-button';
@@ -46,13 +45,12 @@ const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 const oppiaResponseSelector = '.oppia-click-to-start-editing';
 
 // Preview tab elements.
-const testContinueButton = '.e2e-test-continue-button';
 const testFloatFormInput = '.e2e-test-float-form-input';
 const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationRestartButton = '.e2e-preview-restart-button';
 const explorationConversationContent = '.e2e-test-conversation-content';
-const explorationCompletedMessage: string = 'div.toast-message';
+const explorationCompletionToastMessage: string = 'div.toast-message';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -64,101 +62,10 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to create an exploration in the Exploration Editor.
-   * @param {string} content - The content in the Exploration.
    */
   async createExploration(): Promise<void> {
     await this.page.click(createExplorationButtonSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      visible: true,
-    });
     await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-    await this.page.waitForFunction('document.readyState === "complete"');
-  }
-
-  async updateCardContents(content: string): Promise<void> {
-    await this.page.waitForSelector(stateEditSelector, {visible: true});
-    await this.clickOn(stateEditSelector);
-
-    await this.page.waitForSelector(explorationContentInput, {visible: true});
-    await this.page.type(explorationContentInput, `${content}`);
-    await this.clickOn(saveContentButton);
-  }
-
-  /**
-   * Function to add an interaction to the exploration.
-   * @param {string} interactionToAdd - The interaction type to add to the Exploration.
-   */
-  async addInteraction(interactionToAdd: string): Promise<void> {
-    await this.page.waitForSelector(addInteractionButton);
-    await this.clickOn(addInteractionButton);
-    await this.page.waitForSelector(endInteractionSelector, {visible: true});
-    await this.clickOn(interactionToAdd);
-    await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector('.customize-interaction-body-container', {
-      hidden: true,
-    });
-  }
-
-  async navigateToOppiaResponses(): Promise<void> {
-    await this.clickOn('.oppia-response-header');
-  }
-
-  async oppiaDirectlearnersTo(): Promise<void> {}
-
-  async nameTheNewCard(): Promise<void> {}
-
-  /**
-   * Function to save an exploration draft.
-   */
-  async saveExplorationDraft(): Promise<void> {
-    await this.clickOn(saveChangesButton);
-    await this.page.waitForFunction('document.readyState === "complete"');
-    await this.page.waitForSelector(saveDraftButton, {visible: true});
-    await this.clickOn(saveDraftButton);
-    await this.page.waitForSelector(saveDraftButton, {hidden: true});
-
-    await this.page.waitForFunction('document.readyState === "complete"');
-  }
-
-  /**
-   * Function to create a new card in the exploration creator.
-   * @param {string} cardName - The name of the card to be created.
-   */
-  async addANewCardToTheExploration(cardName: string): Promise<void> {
-    await this.clickOn(openOutcomeDestButton);
-    await this.page.select(destinationCardSelector, '/');
-    await this.page.waitForSelector(addStateInput);
-    await this.page.type(addStateInput, cardName);
-    await this.clickOn(saveOutcomeDestButton);
-  }
-
-  /**
-   * Function to navigate to a specific card in the exploration.
-   * @param {string} cardName - The name of the card to navigate to.
-   */
-  async navigateToCard(cardName: string): Promise<void> {
-    await this.clickOn(cardName);
-    await this.page.waitForNetworkIdle({idleTime: 700});
-  }
-
-  /**
-   * Function to navigate to a specific card in the exploration.
-   * @param {number} cardNum - The number of the card to navigate to.
-   */
-  async goToTheIntroductionCard(cardNum: number): Promise<void> {
-    const selector = testNodeBackground;
-    await this.page.waitForSelector(selector);
-    const elements = await this.page.$$(selector);
-    if (elements.length > cardNum) {
-      await elements[cardNum].click();
-    } else {
-      throw new Error(
-        `There are not enough elements to click on the ${cardNum}th element.`
-      );
-    }
   }
 
   /**
@@ -176,14 +83,82 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to add an interaction to a card.
-   * @param {string} interaction - The interaction to be added to the card.
+   * Function to add an interaction to the exploration.
+   * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    */
-  async addAnInteractionToTheCard(interaction: string): Promise<void> {
+  async addInteraction(interactionToAdd: string): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {visible: true});
     await this.clickOn(addInteractionButton);
-    await this.clickOn(interaction);
+    await this.clickOn(interactionToAdd);
     await this.clickOn(saveInteractionButton);
+  }
+
+  /**
+   * Function to display the Oppia responses section.
+   */
+  async viewOppiaResponses(): Promise<void> {
+    await this.page.waitForSelector('.oppia-response-header');
+    await this.page.click('.oppia-response-header');
+  }
+
+  /**
+   * Function to select the card that learners will be directed to from the current card.
+   */
+  async oppiaDirectlearnersTo(card: string): Promise<void> {
+    await this.page.waitForSelector(openOutcomeDestButton, {visible: true});
+    await this.page.click(openOutcomeDestButton);
+    await this.page.select(destinationCardSelector, card);
+  }
+
+  /**
+   * Function to name a new card in the exploration.
+   */
+  async nameNewCard(cardName: string): Promise<void> {
+    await this.page.type(addStateInput, cardName);
+    await this.page.waitForSelector(saveOutcomeDestButton, {visible: true});
+    await this.page.click(saveOutcomeDestButton);
+  }
+
+  /**
+   * Function to save an exploration draft.
+   */
+  async saveExplorationDraft(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-options');
+      await this.clickOn('.e2e-test-save-changes-for-small-screens');
+      await this.clickOn(saveDraftButton);
+    } else {
+      await this.clickOn(saveChangesButton);
+      await this.clickOn(saveDraftButton);
+    }
+  }
+
+  /**
+   * Function to navigate to a specific card in the exploration.
+   * @param {string} cardName - The name of the card to navigate to.
+   */
+  async navigateToCard(cardName: string): Promise<void> {
+    const isMobileWidth = this.isViewportAtMobileWidth();
+    const selector = testNodeBackground;
+
+    if (cardName === 'Introduction' && !isMobileWidth) {
+      await this.page.waitForSelector(selector);
+      const elements = await this.page.$$(selector);
+      await elements[0].click();
+    } else if (cardName === 'Introduction' && isMobileWidth) {
+      await this.clickOn('.oppia-exp-graph-modal-icon-container');
+      await this.page.waitForSelector(selector);
+      const elements = await this.page.$$(selector);
+      await elements[0].click();
+    } else if (isMobileWidth) {
+      await this.page.waitForSelector('.oppia-exp-graph-modal-icon-container');
+      await this.page.click('.oppia-exp-graph-modal-icon-container');
+      await this.clickOn(cardName);
+      await this.page.waitForNetworkIdle({idleTime: 700});
+    } else {
+      await this.clickOn(cardName);
+      await this.page.waitForNetworkIdle({idleTime: 700});
+    }
   }
 
   /**
@@ -191,13 +166,19 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} response - response to be added.
    */
   async addResponseToTheInteraction(response: string): Promise<void> {
-    await this.page.waitForSelector(floatFormInput);
+    if (this.isViewportAtMobileWidth()) {
+      await this.type(floatFormInput, response);
+      await this.clickOn('.e2e-test-open-feedback-editor');
+      await this.type(explorationContentInput, 'correct');
+      await this.clickOn(correctAnswerInTheGroupSelector);
+      await this.clickOn(addNewResponseButton);
+    }
     await this.type(floatFormInput, response);
     await this.page.waitForSelector(oppiaResponseSelector);
-    await this.clickOn(oppiaResponseSelector);
-    await this.page.waitForSelector(explorationContentInput, {visible: true});
+    await this.page.click(oppiaResponseSelector);
     await this.type(explorationContentInput, 'correct');
-    await this.clickOn(correctAnswerInTheGroupSelector);
+    await this.page.waitForSelector(correctAnswerInTheGroupSelector);
+    await this.page.click(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
   }
 
@@ -205,23 +186,21 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
-    await this.page.waitForSelector(navigateToPreviewTabButton, {
-      visible: true,
-    });
-    await this.clickOn(navigateToPreviewTabButton);
-
-    await this.page.waitForFunction('document.readyState === "complete"');
-    await this.page.waitForNetworkIdle();
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('.e2e-test-mobile-options');
+      await this.clickOn('.e2e-test-mobile-options-dropdown');
+      await this.clickOn('.e2e-test-mobile-preview-button');
+    } else {
+      await this.clickOn(navigateToPreviewTabButton);
+    }
   }
 
   /**
    * Function to verify if the exploration tab is loading correctly in
-   * the preview tab or not.
+   * the preview tab or not via checking the content of the Introduction(first) card.
    * @param {string} text - The expected introduction card text.
    */
-  async expectTheExplorationToStartFromIntroductionCard(
-    text: string
-  ): Promise<void> {
+  async expectCardContentToBe(text: string): Promise<void> {
     await this.page.waitForSelector(explorationConversationContent, {
       visible: true,
     });
@@ -242,23 +221,30 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to complete the exploration in the preview tab.
+   * Functions to complete the exploration in the preview tab.
    */
-  async completeTheExplorationInPreviewTab(): Promise<void> {
-    await this.clickOn(testContinueButton);
-    await this.page.waitForSelector(testFloatFormInput);
-    await this.type(testFloatFormInput, '-1');
-    await this.clickOn(submitAnswerButton);
-    await this.page.waitForSelector(nextCardButton);
+  async continueToNextCard(): Promise<void> {
     await this.clickOn(nextCardButton);
+  }
+  async enterAnswer(answer: string): Promise<void> {
+    await this.type(testFloatFormInput, answer);
+  }
+  async submitAnswer(): Promise<void> {
+    await this.clickOn(submitAnswerButton);
   }
 
   /**
-   * Function to verify if the exploration is completed in the preview tab.
+   * Function to verify if the exploration is completed in the preview tab via checking the toast message.
    */
-  async expectTheExplorationToComplete(): Promise<void> {
-    await this.page.waitForSelector(explorationCompletedMessage);
-    if (explorationCompletedMessage) {
+  async expectExplorationCompletionToastMessage(
+    message: string
+  ): Promise<void> {
+    const toastMessage = await this.page.$eval(
+      explorationCompletionToastMessage,
+      toastElement => (toastElement ? toastElement.textContent : null)
+    );
+
+    if (toastMessage && toastMessage.includes(message)) {
       showMessage('Exploration has completed successfully');
     } else {
       throw new Error('Exploration did not complete successfully');
@@ -269,30 +255,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to restart the exploration after it has been completed.
    */
   async restartExploration(): Promise<void> {
-    await this.page.waitForSelector(explorationCompletedMessage, {
-      hidden: true,
-    });
-    await this.page.waitForSelector(explorationRestartButton, {visible: true});
     await this.clickOn(explorationRestartButton);
-  }
-
-  /**
-   * Function to verify if the exploration is restarting after
-   * getting completed or not.
-   * @param {string} text - The expected introduction card text after restart.
-   */
-  async expectTheExplorationToRestart(text: string): Promise<void> {
-    await this.page.waitForSelector(explorationConversationContent);
-    const element = await this.page.$(explorationConversationContent);
-    const introMessage = await this.page.evaluate(
-      element => element.textContent,
-      element
-    );
-    if (introMessage === text) {
-      showMessage('Exploration has restarted successfully');
-    } else {
-      throw new Error('Exploration has not restarted successfully');
-    }
   }
 }
 
