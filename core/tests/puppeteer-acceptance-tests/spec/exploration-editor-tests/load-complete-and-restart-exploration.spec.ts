@@ -70,9 +70,9 @@ describe('Exploration Editor', function () {
       await explorationEditor.nameNewCard('Recap');
       await explorationEditor.saveExplorationDraft();
 
-      await explorationEditor.navigateToCard(CARD_NAME.RECAP);
+      await explorationEditor.navigateToCard('Recap ');
       await explorationEditor.updateCardContent(
-        'We Practiced negative numbers and exploration ends here.'
+        'We practiced negative numbers and exploration ends here.'
       );
       await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 

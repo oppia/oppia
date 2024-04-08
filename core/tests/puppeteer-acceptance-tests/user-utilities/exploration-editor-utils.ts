@@ -42,7 +42,6 @@ const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
-const oppiaResponseSelector = '.oppia-click-to-start-editing';
 
 // Preview tab elements.
 const testFloatFormInput = '.e2e-test-float-form-input';
@@ -50,7 +49,8 @@ const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationRestartButton = '.e2e-preview-restart-button';
 const explorationConversationContent = '.e2e-test-conversation-content';
-const explorationCompletionToastMessage: string = 'div.toast-message';
+const explorationCompletionToastMessage: string =
+  '.e2e-test-lesson-completion-message';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -169,17 +169,16 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.type(floatFormInput, response);
       await this.clickOn('.e2e-test-open-feedback-editor');
-      await this.type(explorationContentInput, 'correct');
+      await this.type(explorationContentInput, 'Correct Answer, You got that!');
       await this.clickOn(correctAnswerInTheGroupSelector);
       await this.clickOn(addNewResponseButton);
+    } else {
+      await this.type(floatFormInput, response);
+      await this.clickOn('.e2e-test-open-feedback-editor');
+      await this.type(explorationContentInput, 'Correct Answer, You got that!');
+      await this.clickOn(correctAnswerInTheGroupSelector);
+      await this.clickOn('Save Response');
     }
-    await this.type(floatFormInput, response);
-    await this.page.waitForSelector(oppiaResponseSelector);
-    await this.page.click(oppiaResponseSelector);
-    await this.type(explorationContentInput, 'correct');
-    await this.page.waitForSelector(correctAnswerInTheGroupSelector);
-    await this.page.click(correctAnswerInTheGroupSelector);
-    await this.clickOn(addNewResponseButton);
   }
 
   /**
@@ -211,11 +210,11 @@ export class ExplorationEditor extends BaseUser {
     );
     if (introMessage === text) {
       showMessage(
-        'Exploration is loading correctly from Introduction card in the preview tab'
+        'Preview is on the Introduction card and is loading correctly.'
       );
     } else {
       throw new Error(
-        'Exploration is not loading correctly form Introduction card in the preview tab'
+        'Preview is not on the Introduction card or is not loading correctly.'
       );
     }
   }
@@ -239,11 +238,14 @@ export class ExplorationEditor extends BaseUser {
   async expectExplorationCompletionToastMessage(
     message: string
   ): Promise<void> {
-    const toastMessage = await this.page.$eval(
-      explorationCompletionToastMessage,
-      toastElement => (toastElement ? toastElement.textContent : null)
+    await this.page.waitForSelector(explorationCompletionToastMessage, {
+      visible: true,
+    });
+    const element = await this.page.$(explorationCompletionToastMessage);
+    const toastMessage = await this.page.evaluate(
+      element => element.textContent,
+      element
     );
-
     if (toastMessage && toastMessage.includes(message)) {
       showMessage('Exploration has completed successfully');
     } else {
