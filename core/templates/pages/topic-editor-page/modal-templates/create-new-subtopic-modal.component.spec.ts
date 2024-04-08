@@ -206,7 +206,7 @@ describe('create new subtopic modal', function () {
 
   it(
     'should update editableThumbnailFilename when ' +
-      'filename updated in "Thubmnail Image" modal',
+      'filename updated in "Thumbnail Image" modal',
     () => {
       let newFileName = 'shivamOppiaFile';
       component.updateSubtopicThumbnailFilename(newFileName);
@@ -217,7 +217,7 @@ describe('create new subtopic modal', function () {
 
   it(
     'should update ThumbnailBgColor when ' +
-      'user select new color in "Thubmnail Image" modal',
+      'user select new color in "Thumbnail Image" modal',
     () => {
       let newThumbnailBgColor = 'red';
       component.updateSubtopicThumbnailBgColor(newThumbnailBgColor);
