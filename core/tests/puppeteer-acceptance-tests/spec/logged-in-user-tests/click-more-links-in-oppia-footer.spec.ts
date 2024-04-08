@@ -35,7 +35,7 @@ describe('Logged-in User', function () {
 
   beforeEach(async function () {
     // Navigate to a page that has the oppia footer.
-    await testUser.goto(testConstants.URLs.About);
+    await testUser.navigateToAboutPage();
   });
 
   it(

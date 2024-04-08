@@ -40,7 +40,7 @@ describe('Logged-in Users', function () {
   it(
     'should be able to visit the Oppia YouTube',
     async function () {
-      await testUser.navigateToOppiaYouTubeViaFooter();
+      await testUser.clickYouTubeIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
@@ -48,7 +48,7 @@ describe('Logged-in Users', function () {
   it(
     'should be able to visit the Oppia Facebook',
     async function () {
-      await testUser.navigateToOppiaFacebookViaFooter();
+      await testUser.clickFacebookIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
@@ -56,7 +56,7 @@ describe('Logged-in Users', function () {
   it(
     'should be able to visit the Oppia Instagram',
     async function () {
-      await testUser.navigateToOppiaInstagramViaFooter();
+      await testUser.clickInstagramIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
@@ -64,7 +64,7 @@ describe('Logged-in Users', function () {
   it(
     'should be able to visit the Oppia Twitter',
     async function () {
-      await testUser.navigateToOppiaTwitterViaFooter();
+      await testUser.clickTwitterIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
@@ -72,7 +72,7 @@ describe('Logged-in Users', function () {
   it(
     'should be able to visit the Oppia Github',
     async function () {
-      await testUser.navigateToOppiaGithubViaFooter();
+      await testUser.clickGithubIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );
@@ -80,7 +80,7 @@ describe('Logged-in Users', function () {
   it(
     'should be able to visit the Oppia LinkedIn',
     async function () {
-      await testUser.navigateToOppiaLinkedInViaFooter();
+      await testUser.clickLinkedInIconInFooter();
     },
     DEFAULT_SPEC_TIMEOUT
   );

@@ -1200,12 +1200,10 @@ export class LoggedInUser extends BaseUser {
       '//a[contains(text(),"https://www.oppia.org")]'
     );
     await Promise.all([
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
       this.clickOn('https://www.oppia.org'),
     ]);
 
-    //  Wait for redirect.
-    await this.page.waitForNetworkIdle();
     expect(this.page.url()).toBe(learnerDashboardUrl);
   }
 
@@ -1275,7 +1273,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the YouTube social icon in the footer.
    */
-  async navigateToOppiaYouTubeViaFooter(): Promise<void> {
+  async clickYouTubeIconInFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaYouTubeLinkIcon,
       testConstants.OppiaSocials.YouTube.Domain,
@@ -1286,7 +1284,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the Facebooksocial icon in the footer.
    */
-  async navigateToOppiaFacebookViaFooter(): Promise<void> {
+  async clickFacebookIconInFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaFacebookLinkIcon,
       testConstants.OppiaSocials.FaceBook.Domain,
@@ -1297,7 +1295,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the Instagram social icon in the footer.
    */
-  async navigateToOppiaInstagramViaFooter(): Promise<void> {
+  async clickInstagramIconInFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaInstagramLinkIcon,
       testConstants.OppiaSocials.Instagram.Domain,
@@ -1308,7 +1306,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the Twitter social icon in the footer.
    */
-  async navigateToOppiaTwitterViaFooter(): Promise<void> {
+  async clickTwitterIconInFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaTwitterLinkIcon,
       testConstants.OppiaSocials.Twitter.Domain,
@@ -1319,7 +1317,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the Github social icon in the footer.
    */
-  async navigateToOppiaGithubViaFooter(): Promise<void> {
+  async clickGithubIconInFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaGithubLinkIcon,
       testConstants.OppiaSocials.Github.Domain,
@@ -1330,7 +1328,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Clicks the LinkedIn social icon in the footer.
    */
-  async navigateToOppiaLinkedInViaFooter(): Promise<void> {
+  async clickLinkedInIconInFooter(): Promise<void> {
     await this.openSocialLinkInNewTabViaIcon(
       oppiaLinkedInLinkIcon,
       testConstants.OppiaSocials.LinkedIn.Domain,
