@@ -352,7 +352,7 @@ describe('Contributor Admin Dashboard', function () {
   });
 
   it(
-    'should be able to filter translation submissions using time range' +
+    'should be able to filter translation submissions using date range' +
       ' filter',
     async function () {
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
@@ -376,7 +376,7 @@ describe('Contributor Admin Dashboard', function () {
   );
 
   it(
-    'should be able to filter translation reviewers using time range' +
+    'should be able to filter translation reviewers using date range' +
       ' filter',
     async function () {
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
@@ -400,7 +400,7 @@ describe('Contributor Admin Dashboard', function () {
   );
 
   it(
-    'should be able to filter question submissions using time range' +
+    'should be able to filter question submissions using date range' +
       ' filter',
     async function () {
       await users.login(QUESTION_COORDINATOR_EMAIL);
@@ -420,7 +420,7 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  it('should be able to filter question reviewers using time range filter', async function () {
+  it('should be able to filter question reviewers using date range filter', async function () {
     await users.login(QUESTION_COORDINATOR_EMAIL);
     await contributorDashboardAdminPage.get();
 

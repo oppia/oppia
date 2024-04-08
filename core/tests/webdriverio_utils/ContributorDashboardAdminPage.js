@@ -59,7 +59,9 @@ var ContributorDashboardAdminPage = function () {
   var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
   var languageSelector = $('.e2e-test-language-selector');
   var lastDatePickerInput = $('.e2e-test-last-date-picker-input');
+  var lastDatePickerToggle = $('.e2e-test-last-date-picker-toggle');
   var firstDatePickerInput = $('.e2e-test-first-date-picker-input');
+  var firstDatePickerToggle = $('.e2e-test-first-date-picker-toggle');
   var noDataMessage = $('.e2e-test-no-data-message');
   var loadingMessage = $('.e2e-test-loading-message');
   var languageDropdown = $('.e2e-test-language-selector-dropdown');
@@ -236,21 +238,43 @@ var ContributorDashboardAdminPage = function () {
     await action.click(`${language} option selector`, selectorOption);
   };
 
-  this.selectDate = async function (datePickerToggle, day, month, year) {
-    await action.click('Date Picker Toggle', $(datePickerToggle));
+  this.selectDate = async function (
+    datePickerToggle,
+    datePickerInput,
+    selectedDate
+  ) {
+    var initialValueOfDatePicker = await action.getValue(
+      'Date Picker Input',
+      datePickerInput
+    );
+
+    await action.click('Date Picker Toggle', datePickerToggle);
+
+    var day = new Date(selectedDate).getDate();
+    var month = new Date(selectedDate).getMonth() + 1;
+    var year = new Date(selectedDate).getFullYear();
 
     if (year) {
       var nextMonthButton = $('.mat-calendar-next-button');
       var prevMonthButton = $('.mat-calendar-previous-button');
 
-      var yearsToNavigate = year - new Date().getFullYear();
+      var yearsToNavigate =
+        year - new Date(initialValueOfDatePicker).getFullYear();
 
       if (yearsToNavigate > 0) {
         for (let i = 0; i < yearsToNavigate * 12; i++) {
+          await waitFor.visibilityOf(
+            nextMonthButton,
+            'Next Month Button is not visible'
+          );
           await action.click('Next Month Button', nextMonthButton);
         }
       } else if (yearsToNavigate < 0) {
         for (let i = 0; i < Math.abs(yearsToNavigate) * 12; i++) {
+          await waitFor.visibilityOf(
+            prevMonthButton,
+            'Previous Month Button is not visible'
+          );
           await action.click('Previous Month Button', prevMonthButton);
         }
       }
@@ -260,15 +284,23 @@ var ContributorDashboardAdminPage = function () {
       var nextMonthButton = $('.mat-calendar-next-button');
       var prevMonthButton = $('.mat-calendar-previous-button');
 
-      var currentMonth = new Date().getMonth() + 1;
+      var currentMonth = new Date(initialValueOfDatePicker).getMonth() + 1;
       var monthsToNavigate = month - currentMonth;
 
       if (monthsToNavigate > 0) {
         for (let i = 0; i < monthsToNavigate; i++) {
+          await waitFor.visibilityOf(
+            nextMonthButton,
+            'Next Month Button is not visible'
+          );
           await action.click('Next Month Button', nextMonthButton);
         }
       } else if (monthsToNavigate < 0) {
         for (let i = 0; i < Math.abs(monthsToNavigate); i++) {
+          await waitFor.visibilityOf(
+            prevMonthButton,
+            'Previous Month Button is not visible'
+          );
           await action.click('Previous Month Button', prevMonthButton);
         }
       }
@@ -278,50 +310,38 @@ var ContributorDashboardAdminPage = function () {
       var daySelector = $(`aria/${day}`);
       await action.click('Day Selector', daySelector);
     }
+
+    var formattedInputDate = `${new Date(selectedDate).toLocaleString(
+      'default',
+      {
+        day: '2-digit',
+      }
+    )}-${new Date(selectedDate).toLocaleString('default', {
+      month: 'short',
+    })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
+
+    var finalValueOfDatePicker = await action.getValue(
+      'Date Picker Input',
+      datePickerInput
+    );
+
+    expect(finalValueOfDatePicker).toBe(formattedInputDate);
   };
 
   this.setLastDatePickerValue = async function (selectedDate) {
     await this.selectDate(
-      '.e2e-test-last-date-picker-toggle',
-      new Date(selectedDate).getDate(),
-      new Date(selectedDate).getMonth() + 1,
-      new Date(selectedDate).getFullYear()
+      lastDatePickerToggle,
+      lastDatePickerInput,
+      selectedDate
     );
-
-    var inputDateFormat = `${new Date(selectedDate).toLocaleString('default', {
-      day: '2-digit',
-    })}-${new Date(selectedDate).toLocaleString('default', {
-      month: 'short',
-    })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
-
-    var newlySetDate = await action.getValue(
-      'First Date Picker Input',
-      lastDatePickerInput
-    );
-
-    expect(newlySetDate).toBe(inputDateFormat);
   };
 
   this.setFirstDatePickerValue = async function (selectedDate) {
     await this.selectDate(
-      '.e2e-test-first-date-picker-toggle',
-      new Date(selectedDate).getDate(),
-      new Date(selectedDate).getMonth() + 1,
-      new Date(selectedDate).getFullYear()
+      firstDatePickerToggle,
+      firstDatePickerInput,
+      selectedDate
     );
-
-    var inputDateFormat = `${new Date(selectedDate).toLocaleString('default', {
-      day: '2-digit',
-    })}-${new Date(selectedDate).toLocaleString('default', {
-      month: 'short',
-    })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
-
-    var newlySetDate = await action.getValue(
-      'First Date Picker Input',
-      firstDatePickerInput
-    );
-
-    expect(newlySetDate).toBe(inputDateFormat);
   };
 
   this.expectUserToBeTranslationReviewer = async function (
