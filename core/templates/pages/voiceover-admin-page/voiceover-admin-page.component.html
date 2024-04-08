@@ -73,7 +73,7 @@
     No voice artist data present for lebelling.
   </p>
 
-  <div class="table-container" *ngIf="voiceArtistsDataCount > 0">
+  <div class="table-container" *ngIf="voiceArtistsDataCount > 0 && pageIsInitialized">
     <table mat-table [dataSource]="voiceArtistIdToLanguageMappingList" class="voice-artist-table">
       <ng-container matColumnDef="voiceArtist">
         <th mat-header-cell *matHeaderCellDef class="table-header"> Voice Artist </th>

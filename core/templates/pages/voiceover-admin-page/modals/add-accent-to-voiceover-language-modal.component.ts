@@ -58,11 +58,21 @@ export class AddAccentToVoiceoverLanguageModalComponent extends ConfirmOrCancelM
         this.explorationIdsToFilenames = explorationIdToFilenames;
         this.pageIsInitialized = true;
       });
+    setInterval(() => {
+      if (!this.audioPlayerService.isPlaying()) {
+        this.currentFilename = '';
+      }
+    }, 1000);
   }
 
   update(): void {
     this.pauseAudio();
     this.ngbActiveModal.close(this.languageAccentCode);
+  }
+
+  removeSelectedAccent(): void {
+    this.languageAccentCode = '';
+    this.updateButtonIsDisabled = false;
   }
 
   cancel(): void {
@@ -78,10 +88,10 @@ export class AddAccentToVoiceoverLanguageModalComponent extends ConfirmOrCancelM
   playAudio(filename: string, explorationId: string): void {
     this.pauseAudio();
 
-    this.currentFilename = filename;
     this.contextService.explorationId = explorationId;
 
     this.audioPlayerService.loadAsync(filename).then(() => {
+      this.currentFilename = filename;
       this.audioPlayerService.play();
     });
   }
