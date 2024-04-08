@@ -127,7 +127,7 @@ export class ExplorationCreator extends BaseUser {
    * This function helps in adding interaction.
    */
   async addEndInteraction(): Promise<void> {
-    await this.page.waitForNavigation({waitUntil: 'networkidle2'});
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
     await this.clickOn(interactionAddbutton);
     await this.clickOn(endInteractionTab);
     await this.clickOn(saveInteractionButton);
@@ -574,13 +574,11 @@ export class ExplorationCreator extends BaseUser {
     await this.saveDraftExploration();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(publishButtonDropDown);
-      await this.page.waitForSelector(`${mobilePublishButton}:not([disabled])`);
       await this.clickOn(mobilePublishButton);
     } else {
       await this.page.waitForSelector(`${publishButton}:not([disabled])`);
       await this.clickOn(publishButton);
     }
-
     await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
     await this.clickOn(publishConfirmButton);
     await this.page.waitForSelector(closePublishedPopUp, {visible: true});
@@ -618,11 +616,11 @@ export class ExplorationCreator extends BaseUser {
     await this.page.waitForSelector('.e2e-test-confirm-discard-changes', {
       visible: true,
     });
-    await this.clickOn(discardConfirmButton);
-
-    await this.page.waitForNavigation({waitUntil: 'networkidle2'});
+    await Promise.all([
+      this.clickOn(discardConfirmButton),
+      this.page.waitForNavigation(),
+    ]);
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(navBarOpener, {visible: true});
       await this.clickOn(navBarOpener);
       await this.clickOn(basicSettingsDropDown);
     }
