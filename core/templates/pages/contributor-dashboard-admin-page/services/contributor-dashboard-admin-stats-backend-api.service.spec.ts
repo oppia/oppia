@@ -478,6 +478,25 @@ describe('Contribution Admin dashboard stats service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
+  it('should not return community contribution stats if user is not authorised', fakeAsync(() => {
+    spyOn(cdasbas, 'fetchCommunityStats').and.callThrough();
+    const url = '/community-contribution-stats';
+
+    cdasbas.fetchCommunityStats().then(successHandler, failHandler);
+    let req = http.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush(fetchCommunityStatsResponse, {
+      status: 401,
+      statusText: 'Unauthorised.',
+    });
+    flushMicrotasks();
+
+    expect(cdasbas.fetchCommunityStats).toHaveBeenCalled();
+
+    expect(failHandler).toHaveBeenCalled();
+    expect(successHandler).not.toHaveBeenCalled();
+  }));
+
   it('should return assigned languages to the user', fakeAsync(() => {
     spyOn(cdasbas, 'fetchAssignedLanguageIds').and.callThrough();
     const url = '/adminrolehandler?filter_criterion=username&username=user';
