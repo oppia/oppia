@@ -130,7 +130,7 @@
         </div>
         <div class="oppia-topic-nav-dropdown-option">
           <div *ngIf="!topicRights.isPublished()"
-              class="e2e-test-mobile-publish-topic-button"
+               class="e2e-test-mobile-publish-topic-button"
                (click)="publishTopic()"
                [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="fas fa-pen"></i>
