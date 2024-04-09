@@ -26,10 +26,10 @@ import {RouterTestingModule} from '@angular/router/testing';
 
 import {AppConstants} from 'app.constants';
 import {FacilitatorDashboardPageAuthGuard} from './facilitator-dashboard-page-auth.guard';
-import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {AccessValidationBackendApiService} from '../../pages/oppia-root/routing/access-validation-backend-api.service';
 
 class MockAccessValidationBackendApiService {
-  validateAccessToLearnerGroupCreatorPage() {
+  validateAccessToFacilitatorDashboardPage() {
     return Promise.resolve();
   }
 }
