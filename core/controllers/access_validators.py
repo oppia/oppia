@@ -121,7 +121,7 @@ class FacilitatorDashboardPageAccessValidationHandler(
         if not learner_group_services.is_learner_group_feature_enabled(
             self.user_id
         ):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
 
 class ManageOwnAccountValidationHandler(
