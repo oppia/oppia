@@ -16,47 +16,18 @@
  * @fileoverview Facilitator Dashboard page root component.
  */
 
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import {Component} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import {MetaTagData} from 'pages/base-root.component';
-import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import {PageHeadService} from 'services/page-head.service';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-facilitator-dashboard-page-root',
   templateUrl: './facilitator-dashboard-page-root.component.html',
 })
-export class FacilitatorDashboardPageRootComponent implements OnInit {
+export class FacilitatorDashboardPageRootComponent extends BaseRootComponent {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD.TITLE;
 
   meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
     .FACILITATOR_DASHBOARD.META as unknown as Readonly<MetaTagData>[];
-
-  pageIsShown: boolean = false;
-
-  constructor(
-    private avbas: AccessValidationBackendApiService,
-    private pageHeadService: PageHeadService,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    this.avbas.validateAccessToFacilitatorDashboardPage().then(
-      () => {
-        this.pageIsShown = true;
-        this.pageHeadService.updateTitleAndMetaTags(
-          AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD
-            .TITLE,
-          AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD.META
-        );
-      },
-      () => {
-        this.router.navigate([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
-        ]);
-      }
-    );
-  }
 }

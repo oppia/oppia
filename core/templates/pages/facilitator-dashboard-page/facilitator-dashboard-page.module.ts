@@ -23,6 +23,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {ToastrModule} from 'ngx-toastr';
 import {RouterModule} from '@angular/router';
 import {FacilitatorDashboardPageRootComponent} from './facilitator-dashboard-page-root.component';
+import {FacilitatorDashboardAuthGuard} from './facilitator-dashboard-auth.guard';
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import {FacilitatorDashboardPageRootComponent} from './facilitator-dashboard-pag
       {
         path: '',
         component: FacilitatorDashboardPageRootComponent,
+        canActivate: [FacilitatorDashboardAuthGuard],
       },
     ]),
   ],
