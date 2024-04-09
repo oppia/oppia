@@ -164,7 +164,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
-  communtiyLessonsDataLoaded: boolean = false;
+  communityLessonsDataLoaded: boolean = false;
   loadingIndicatorIsShown: boolean = false;
   homeImageUrl: string = '';
   todolistImageUrl: string = '';
@@ -258,65 +258,65 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
-    let dashboardCollectionsDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardCollectionsDataAsync());
+    let dashboardCollectionsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
     dashboardCollectionsDataPromise.then(
       responseData => {
-        this.completedCollectionsList = (
-          responseData.completedCollectionsList);
-        this.incompleteCollectionsList = (
-          responseData.incompleteCollectionsList);
-        this.completedToIncompleteCollections = (
-          responseData.completedToIncompleteCollections);
+        this.completedCollectionsList = responseData.completedCollectionsList;
+        this.incompleteCollectionsList = responseData.incompleteCollectionsList;
+        this.completedToIncompleteCollections =
+          responseData.completedToIncompleteCollections;
         this.collectionPlaylist = responseData.collectionPlaylist;
-      }, errorResponseStatus => {
+      },
+      errorResponseStatus => {
         if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-          ) !== -1) {
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+        ) {
           this.alertsService.addWarning(
-            'Failed to get learner dashboard collections data');
+            'Failed to get learner dashboard collections data'
+          );
         }
       }
     );
 
-    let dashboardExplorationsDataPromise = (
-      this.learnerDashboardBackendApiService
-        .fetchLearnerDashboardExplorationsDataAsync());
+    let dashboardExplorationsDataPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
     dashboardExplorationsDataPromise.then(
       responseData => {
-        this.completedExplorationsList = (
-          responseData.completedExplorationsList);
-        this.incompleteExplorationsList = (
-          responseData.incompleteExplorationsList);
+        this.completedExplorationsList = responseData.completedExplorationsList;
+        this.incompleteExplorationsList =
+          responseData.incompleteExplorationsList;
         this.subscriptionsList = responseData.subscriptionList;
         this.explorationPlaylist = responseData.explorationPlaylist;
-      }, errorResponseStatus => {
+      },
+      errorResponseStatus => {
         if (
-          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus
-          ) !== -1) {
+          AppConstants.FATAL_ERROR_CODES.indexOf(errorResponseStatus) !== -1
+        ) {
           this.alertsService.addWarning(
-            'Failed to get learner dashboard explorations data');
+            'Failed to get learner dashboard explorations data'
+          );
         }
       }
     );
-    
+
     Promise.all([
       userInfoPromise,
       dashboardTopicAndStoriesDataPromise,
       learnerGroupFeatureIsEnabledPromise,
       dashboardCollectionsDataPromise,
-      dashboardExplorationsDataPromise
-    ]).then(() => {
-      setTimeout(() => {
-        this.loaderService.hideLoadingScreen();
-        // So that focus is applied after the loading screen has dissapeared.
-        this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
-      }, 0);
-    }).catch(errorResponse => {
-      // This is placed here in order to satisfy Unit tests.
-    });
-
+      dashboardExplorationsDataPromise,
+    ])
+      .then(() => {
+        setTimeout(() => {
+          this.loaderService.hideLoadingScreen();
+          // So that focus is applied after the loading screen has dissapeared.
+          this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
+        }, 0);
+      })
+      .catch(errorResponse => {
+        // This is placed here in order to satisfy Unit tests.
+      });
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -415,7 +415,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .then(() => {
           setTimeout(() => {
             this.loaderService.hideLoadingScreen();
-            this.communtiyLessonsDataLoaded = true;
+            this.communityLessonsDataLoaded = true;
             // So that focus is applied after the loading screen has dissapeared.
             this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
           }, 0);
@@ -484,7 +484,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .then(() => {
           setTimeout(() => {
             this.loaderService.hideLoadingScreen();
-            this.communtiyLessonsDataLoaded = true;
+            this.communityLessonsDataLoaded = true;
             // So that focus is applied after the loading screen has dissapeared.
             this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
           }, 0);
