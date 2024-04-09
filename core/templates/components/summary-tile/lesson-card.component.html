@@ -22,7 +22,7 @@
         </div>
       </div>
       <a class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none" [href]="lessonUrl" target="_self">
-        {{'I18N_LEARNER_DASHBOARD_CARD_BUTTON' | translate: {progressText: (progress ===  100 ? 'Redo' : (progress === 0 ? 'Start' : 'Resume'))} }}
+        {{ 'I18N_LEARNER_DASHBOARD_CARD_BUTTON' | translate: {progressText: (progress ===  100 ? 'Redo' : (progress === 0 ? 'Start' : 'Resume'))} }}
       </a>
     </div>
   </div>

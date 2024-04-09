@@ -16,11 +16,11 @@
  * @fileoverview Component for home tab in the Learner Dashboard page.
  */
 
-import { AppConstants } from 'app.constants';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import {AppConstants} from 'app.constants';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
@@ -70,14 +70,7 @@ export class HomeTabComponent {
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
-    console.log(this.untrackedTopics)
-    console.log(this.partiallyLearntTopicsList)
-    /**
-     * tbd 1- Replace
-     * const mappedGoals = allGoals.reduce((acc, curr) => ({...acc,[curr.id] : curr}), {})
-     * const uniqueGoals = new Set(allGoals.map(goal => goal.id)).forEach(id => mappedGoals[id])
-     * tbd 2 - do I need currentGoals here?, just partiallyLearntTopicsList?
-     */
+
     if (allGoals.length !== 0) {
       var allGoalIds = [];
       for (var goal of allGoals) {
@@ -89,7 +82,7 @@ export class HomeTabComponent {
         this.continueWhereYouLeftOffList.push(allGoals[index]);
       }
     }
-    /***/
+
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
@@ -132,7 +125,6 @@ export class HomeTabComponent {
     return this.currentGoalsLength === AppConstants.MAX_CURRENT_GOALS_COUNT;
   }
 
-  /* redesign - remove */
   getWidth(length: number): number {
     /**
      * If there are 3 or more topics for each untrackedTopic, the total
@@ -149,15 +141,10 @@ export class HomeTabComponent {
      */
     return (length + 1) * 164;
   }
-  /* redesign - remove */
+
   changeActiveSection(): void {
     this.setActiveSection.emit(
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.GOALS
     );
-  }
-
-  /* redesign - testing */
-  getImageUrl(arg): string {
-    return this.urlInterpolationService.getStaticImageUrl(arg);
   }
 }

@@ -1,7 +1,6 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -9,17 +8,10 @@ import {LessonCardComponent} from './lesson-card.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {AppConstants} from 'app.constants';
 
-/* Models */
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 
-/* 
-  Combines test cases from:
-  - collection-summary-tile (CollectionSummary)
-  - exploration-summary-tile (LearnerExplorationSummary)
-  - learner-story-summary-tile (StorySummary)
-*/
 describe('LessonCardComponent', () => {
   let component: LessonCardComponent;
   let fixture: ComponentFixture<LessonCardComponent>;
@@ -42,7 +34,6 @@ describe('LessonCardComponent', () => {
     node_count: 0,
   };
 
-  /* exploration-summary-tile, from community-lessons-tab*/
   const sampleExploration = {
     last_updated_msec: 1591296737470.528,
     community_owned: false,
@@ -87,7 +78,6 @@ describe('LessonCardComponent', () => {
     unpublishing_reason: null,
   };
 
-  /* learner-story-summary-tile */
   const sampleTopic = {
     id: '0',
     title: 'Story Title',
@@ -146,7 +136,6 @@ describe('LessonCardComponent', () => {
     expect(component.imgColor).toEqual(sampleCollection.thumbnail_bg_color);
     expect(component.title).toEqual(sampleCollection.title);
 
-    /* temporary until collections are redone */
     expect(component.progress).toEqual(0);
     expect(component.lessonTopic).toEqual('Collections');
   });
@@ -161,7 +150,6 @@ describe('LessonCardComponent', () => {
     expect(component.imgColor).toEqual(sampleExploration.thumbnail_bg_color);
     expect(component.title).toEqual(sampleExploration.title);
 
-    /* temporary until collections are redone */
     expect(component.progress).toEqual(0);
     expect(component.lessonTopic).toEqual('Community Lessons');
   });
@@ -272,7 +260,7 @@ describe('LessonCardComponent', () => {
     );
 
     expect(progressStyle).toBe(
-      `linear-gradient(270deg, #00645c 50%, transparent 50%), linear-gradient(0deg, #00645c 0%, lightgray 0%)`
+      'linear-gradient(270deg, #00645c 50%, transparent 50%), linear-gradient(0deg, #00645c 0%, lightgray 0%)'
     );
   });
 });
