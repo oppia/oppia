@@ -2081,7 +2081,7 @@ def compute_models_to_put_when_saving_new_exp_version(
     )
 
     voiceover_services.update_exploration_voice_artist_link_model(
-        exploration_id, committer_id, change_list)
+        committer_id, change_list, old_exploration, updated_exploration)
 
     new_content_id_set = set(updated_exploration.get_translatable_content_ids())
     content_ids_corresponding_translations_to_remove = (
