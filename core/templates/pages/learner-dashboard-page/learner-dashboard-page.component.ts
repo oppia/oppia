@@ -258,6 +258,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     learnerGroupFeatureIsEnabledPromise.then(featureIsEnabled => {
       this.LEARNER_GROUP_FEATURE_IS_ENABLED = featureIsEnabled;
     });
+
     let dashboardCollectionsDataPromise =
       this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
     dashboardCollectionsDataPromise.then(
