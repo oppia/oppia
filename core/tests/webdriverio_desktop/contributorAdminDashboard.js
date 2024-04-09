@@ -351,7 +351,7 @@ describe('Contributor Admin Dashboard', function () {
     await users.logout();
   });
 
-  fit(
+  it(
     'should be able to filter those translation submitters, who have submitted' +
       ' translations between a given date range',
     async function () {
@@ -366,6 +366,12 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
 
       await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+      );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
@@ -397,6 +403,12 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
       await contributorDashboardAdminPage.setFirstDatePickerValue(
         new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       );
@@ -422,6 +434,12 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
       await contributorDashboardAdminPage.setFirstDatePickerValue(
         new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       );
@@ -444,6 +462,12 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.get();
 
       await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+      );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
