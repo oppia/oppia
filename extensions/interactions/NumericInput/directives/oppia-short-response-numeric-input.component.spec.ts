@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the NumericInput short response.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ShortResponseNumericInput } from './oppia-short-response-numeric-input.component';
-import { NumberConversionService } from 'services/number-conversion.service';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ShortResponseNumericInput} from './oppia-short-response-numeric-input.component';
+import {NumberConversionService} from 'services/number-conversion.service';
 
 describe('ShortResponseNumericInput', () => {
   let component: ShortResponseNumericInput;
@@ -43,12 +43,12 @@ describe('ShortResponseNumericInput', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
+          useClass: mockHtmlEscaperService,
         },
         {
           provide: NumberConversionService,
-          useClass: MockNumberConversionService
-        }
+          useClass: MockNumberConversionService,
+        },
       ],
     }).compileComponents();
   }));

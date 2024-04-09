@@ -19,7 +19,7 @@
 import {
   PlatformParameterRule,
   PlatformParameterRuleBackendDict,
-  PlatformParameterValue
+  PlatformParameterValue,
 } from 'domain/platform-parameter/platform-parameter-rule.model';
 
 export enum FeatureStage {
@@ -29,12 +29,12 @@ export enum FeatureStage {
 }
 
 export interface PlatformParameterBackendDict {
-  'name': string;
-  'description': string;
-  'data_type': string;
-  'rules': PlatformParameterRuleBackendDict[];
-  'rule_schema_version': number;
-  'default_value': PlatformParameterValue;
+  name: string;
+  description: string;
+  data_type: string;
+  rules: PlatformParameterRuleBackendDict[];
+  rule_schema_version: number;
+  default_value: PlatformParameterValue;
 }
 
 /**
@@ -53,9 +53,13 @@ export class PlatformParameter {
   defaultValue: PlatformParameterValue;
 
   constructor(
-      name: string, description: string, dataType: string,
-      rules: PlatformParameterRule[], ruleSchemaVersion: number,
-      defaultValue: PlatformParameterValue) {
+    name: string,
+    description: string,
+    dataType: string,
+    rules: PlatformParameterRule[],
+    ruleSchemaVersion: number,
+    defaultValue: PlatformParameterValue
+  ) {
     this.name = name;
     this.description = description;
     this.dataType = dataType;
@@ -65,16 +69,15 @@ export class PlatformParameter {
   }
 
   static createFromBackendDict(
-      backendDict: PlatformParameterBackendDict): PlatformParameter {
+    backendDict: PlatformParameterBackendDict
+  ): PlatformParameter {
     return new PlatformParameter(
       backendDict.name,
       backendDict.description,
       backendDict.data_type,
-      backendDict.rules.map(
-        ruleDict => (
-          PlatformParameterRule.createFromBackendDict(
-            ruleDict)
-        )),
+      backendDict.rules.map(ruleDict =>
+        PlatformParameterRule.createFromBackendDict(ruleDict)
+      ),
       backendDict.rule_schema_version,
       backendDict.default_value
     );

@@ -16,17 +16,23 @@
  * @fileoverview Unit tests for RefresherExplorationConfirmationModalComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ExplorationEngineService } from '../services/exploration-engine.service';
-import { RefresherExplorationConfirmationModal } from './refresher-exploration-confirmation-modal.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {RefresherExplorationConfirmationModal} from './refresher-exploration-confirmation-modal.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
 
 describe('Refresher Exploration Confirmation Modal', () => {
   let fixture: ComponentFixture<RefresherExplorationConfirmationModal>;
@@ -38,7 +44,7 @@ describe('Refresher Exploration Confirmation Modal', () => {
 
   class MockUrlService {
     getUrlParams(): object {
-      return { collection_id: collectionId };
+      return {collection_id: collectionId};
     }
 
     getQueryFieldValuesAsList(feildName: string): string[] {
@@ -55,24 +61,21 @@ describe('Refresher Exploration Confirmation Modal', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        MockTranslatePipe,
-        RefresherExplorationConfirmationModal
-      ],
+      declarations: [MockTranslatePipe, RefresherExplorationConfirmationModal],
       providers: [
         WindowRef,
         ExplorationEngineService,
         UrlInterpolationService,
         {
           provide: UrlService,
-          useClass: MockUrlService
+          useClass: MockUrlService,
         },
         NgbActiveModal,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
-      ]
+          useClass: MockTranslateService,
+        },
+      ],
     });
   }));
 

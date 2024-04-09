@@ -16,31 +16,28 @@
  * @fileoverview Component for the edit learner group page.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { LearnerGroupBackendApiService } from
-  'domain/learner_group/learner-group-backend-api.service';
-import { ContextService } from 'services/context.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {ContextService} from 'services/context.service';
 
 import './edit-learner-group-page.component.css';
-
 
 @Component({
   selector: 'oppia-edit-learner-group-page',
   templateUrl: './edit-learner-group-page.component.html',
-  styleUrls: ['./edit-learner-group-page.component.css']
+  styleUrls: ['./edit-learner-group-page.component.css'],
 })
 export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
-  EDIT_LEARNER_GROUP_TABS_I18N_IDS = (
-    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS);
+  EDIT_LEARNER_GROUP_TABS_I18N_IDS =
+    LearnerGroupPagesConstants.EDIT_LEARNER_GROUP_TABS;
 
   activeTab!: string;
   learnerGroupId!: string;
@@ -59,12 +56,12 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.activeTab = this.EDIT_LEARNER_GROUP_TABS_I18N_IDS.OVERVIEW;
     if (this.learnerGroupId) {
       this.loaderService.showLoadingScreen('Loading');
-      this.learnerGroupBackendApiService.fetchLearnerGroupInfoAsync(
-        this.learnerGroupId
-      ).then(learnerGroup => {
-        this.learnerGroup = learnerGroup;
-        this.loaderService.hideLoadingScreen();
-      });
+      this.learnerGroupBackendApiService
+        .fetchLearnerGroupInfoAsync(this.learnerGroupId)
+        .then(learnerGroup => {
+          this.learnerGroup = learnerGroup;
+          this.loaderService.hideLoadingScreen();
+        });
     }
     this.subscribeToOnLangChange();
   }
@@ -79,7 +76,8 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_EDIT_LEARNER_GROUP_PAGE_TITLE'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -99,7 +97,3 @@ export class EditLearnerGroupPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaEditLearnerGroupPage',
-  downgradeComponent({component: EditLearnerGroupPageComponent}));

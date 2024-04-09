@@ -17,34 +17,34 @@
  * interaction in webdriverio.
  */
 
-var action = require(
-  process.cwd() + '/core/tests/webdriverio_utils/action.js');
+var action = require(process.cwd() + '/core/tests/webdriverio_utils/action.js');
 var objects = require(process.cwd() + '/extensions/objects/webdriverio.js');
 /**
  * Add recommended exploration Id to End Exploration interaction.
  * @param {Object} elem - The Customize Exploration modal for End Exploration.
  * @param {string[]} recommendedExplorationIdArray - Exploration Id array.
  */
-var customizeInteraction = async function(
-    elem, recommendedExplorationIdArray) {
+var customizeInteraction = async function (
+  elem,
+  recommendedExplorationIdArray
+) {
   if (recommendedExplorationIdArray) {
     if (Array.isArray(recommendedExplorationIdArray) === false) {
-      throw new Error ('Please use array to add recommendation Ids');
+      throw new Error('Please use array to add recommendation Ids');
     }
     for (var explorationId of recommendedExplorationIdArray) {
       var addExplorationIdButton = $('.e2e-test-add-list-entry');
       await action.click('Add Exploration Id Button', addExplorationIdButton);
-      await objects.UnicodeStringEditor(
-        elem.$('<schema-based-unicode-editor>')
-      ).setValue(explorationId);
+      await objects
+        .UnicodeStringEditor(elem.$('<schema-based-unicode-editor>'))
+        .setValue(explorationId);
     }
   }
 };
 
-var expectInteractionDetailsToMatch = async function(elem) {
+var expectInteractionDetailsToMatch = async function (elem) {
   await expect(
-    await elem.$(
-      '<oppia-interactive-end-exploration>').isExisting()
+    await elem.$('<oppia-interactive-end-exploration>').isExisting()
   ).toBe(true);
 };
 

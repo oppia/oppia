@@ -16,13 +16,13 @@
  * @fileoverview Unit tests for delete account page.
  */
 
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { DeleteAccountPageComponent } from './delete-account-page.component';
-import { DeleteAccountBackendApiService } from './services/delete-account-backend-api.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {DeleteAccountPageComponent} from './delete-account-page.component';
+import {DeleteAccountBackendApiService} from './services/delete-account-backend-api.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Delete account page', () => {
   let component: DeleteAccountPageComponent;
@@ -34,10 +34,8 @@ describe('Delete account page', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [DeleteAccountPageComponent, MockTranslatePipe],
-      providers: [
-        DeleteAccountBackendApiService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [DeleteAccountBackendApiService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
@@ -49,22 +47,21 @@ describe('Delete account page', () => {
     spyOn(deleteAccountService, 'deleteAccount').and.callThrough();
   });
 
-  it('should open a delete account modal',
-    fakeAsync(() => {
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-        return ({
-          result: Promise.resolve('success')
-        }) as NgbModalRef;
-      });
-      component.deleteAccount();
-      expect(modalSpy).toHaveBeenCalled();
-    }));
+  it('should open a delete account modal', fakeAsync(() => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
+    component.deleteAccount();
+    expect(modalSpy).toHaveBeenCalled();
+  }));
 
   it('should do nothing when cancel button is clicked', () => {
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return ({
-        result: Promise.reject('cancel')
-      }) as NgbModalRef;
+      return {
+        result: Promise.reject('cancel'),
+      } as NgbModalRef;
     });
 
     component.deleteAccount();

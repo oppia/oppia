@@ -18,23 +18,14 @@
 
 import 'core-js/es7/reflect';
 import 'zone.js';
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { LoadingDotsComponent } from './loading-dots.component';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {LoadingDotsComponent} from './loading-dots.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-  ],
-  declarations: [
-    LoadingDotsComponent
-  ],
-  entryComponents: [
-    LoadingDotsComponent
-  ],
-  exports: [
-    LoadingDotsComponent
-  ],
+  imports: [CommonModule],
+  declarations: [LoadingDotsComponent],
+  entryComponents: [LoadingDotsComponent],
+  exports: [LoadingDotsComponent],
 })
-
-export class CommonElementsModule { }
+export class CommonElementsModule {}

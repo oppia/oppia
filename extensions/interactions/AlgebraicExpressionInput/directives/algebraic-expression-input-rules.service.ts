@@ -16,29 +16,29 @@
  * @fileoverview Rules service for the AlgebraicExpressionInput interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import { MathInteractionsService } from 'services/math-interactions.service';
-import { AlgebraicExpressionAnswer } from 'interactions/answer-defs';
-import {
-  AlgebraicExpressionRuleInputs
-} from 'interactions/rule-input-defs';
-import { NumericExpressionInputRulesService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
+import {MathInteractionsService} from 'services/math-interactions.service';
+import {AlgebraicExpressionAnswer} from 'interactions/answer-defs';
+import {AlgebraicExpressionRuleInputs} from 'interactions/rule-input-defs';
+import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AlgebraicExpressionInputRulesService {
   constructor(
     private mathInteractionsService: MathInteractionsService,
-    private numericExpressionRuleService: NumericExpressionInputRulesService) {}
+    private numericExpressionRuleService: NumericExpressionInputRulesService
+  ) {}
 
   MatchesExactlyWith(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputs): boolean {
+    answer: AlgebraicExpressionAnswer,
+    inputs: AlgebraicExpressionRuleInputs
+  ): boolean {
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
     if (
@@ -46,7 +46,9 @@ export class AlgebraicExpressionInputRulesService {
       !this.mathInteractionsService.containsAtLeastOneVariable(inputs.x)
     ) {
       return this.numericExpressionRuleService.MatchesExactlyWith(
-        answer, inputs);
+        answer,
+        inputs
+      );
     }
 
     // Inserting '*' signs between variables if not present.
@@ -56,19 +58,22 @@ export class AlgebraicExpressionInputRulesService {
   }
 
   MatchesUpToTrivialManipulations(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputs
+    answer: AlgebraicExpressionAnswer,
+    inputs: AlgebraicExpressionRuleInputs
   ): boolean {
     // Inserting '*' signs between variables if not present.
     answer = this.mathInteractionsService.insertMultiplicationSigns(answer);
     inputs.x = this.mathInteractionsService.insertMultiplicationSigns(inputs.x);
     return this.numericExpressionRuleService.MatchesUpToTrivialManipulations(
-      answer, inputs);
+      answer,
+      inputs
+    );
   }
 
   IsEquivalentTo(
-      answer: AlgebraicExpressionAnswer,
-      inputs: AlgebraicExpressionRuleInputs): boolean {
+    answer: AlgebraicExpressionAnswer,
+    inputs: AlgebraicExpressionRuleInputs
+  ): boolean {
     // If the answer and the inputs are both purely numeric, we use the numeric
     // expression input's rule functions.
     if (
@@ -84,17 +89,20 @@ export class AlgebraicExpressionInputRulesService {
 
     let expandedLearnerAnswer = nerdamer(answer).expand().text();
     let simplifiedLearnerAnswer = nerdamer(
-      `simplify(${expandedLearnerAnswer})`).text();
+      `simplify(${expandedLearnerAnswer})`
+    ).text();
 
     let expandedCreatorAnswer = nerdamer(inputs.x).expand().text();
     let simplifiedCreatorAnswer = nerdamer(
-      `simplify(${expandedCreatorAnswer})`).text();
-    return nerdamer(
-      simplifiedLearnerAnswer
-    ).eq(simplifiedCreatorAnswer);
+      `simplify(${expandedCreatorAnswer})`
+    ).text();
+    return nerdamer(simplifiedLearnerAnswer).eq(simplifiedCreatorAnswer);
   }
 }
 
-angular.module('oppia').factory(
-  'AlgebraicExpressionInputRulesService',
-  downgradeInjectable(AlgebraicExpressionInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'AlgebraicExpressionInputRulesService',
+    downgradeInjectable(AlgebraicExpressionInputRulesService)
+  );

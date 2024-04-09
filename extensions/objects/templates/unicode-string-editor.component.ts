@@ -19,24 +19,34 @@
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { Subscription } from 'rxjs';
-import { ExternalSaveService } from 'services/external-save.service';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {Subscription} from 'rxjs';
+import {ExternalSaveService} from 'services/external-save.service';
 
 // The following properties are optional since there is a possibility that the
 // current and previous values have not yet been specified in the form.
 interface UnicodeStringEditorArguments {
-  currentValue?: { largeInput: string };
-  previousValue?: { largeInput: string };
+  currentValue?: {largeInput: string};
+  previousValue?: {largeInput: string};
 }
 
 @Component({
   selector: 'unicode-string-editor',
-  templateUrl: './unicode-string-editor.component.html'
+  templateUrl: './unicode-string-editor.component.html',
 })
-export class UnicodeStringEditorComponent implements
-    OnInit, OnChanges, OnDestroy {
+export class UnicodeStringEditorComponent
+  implements OnInit, OnChanges, OnDestroy
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -47,7 +57,7 @@ export class UnicodeStringEditorComponent implements
   componentSubscriptions = new Subscription();
   active: boolean = false;
   largeInput = false;
-  constructor(private externalSaveService: ExternalSaveService) { }
+  constructor(private externalSaveService: ExternalSaveService) {}
 
   ngOnInit(): void {
     if (!this.alwaysEditable) {
@@ -86,7 +96,7 @@ export class UnicodeStringEditorComponent implements
       changes.initArgs.currentValue.largeInput &&
       changes.initArgs.previousValue &&
       changes.initArgs.currentValue?.largeInput !==
-      changes.initArgs.previousValue?.largeInput
+        changes.initArgs.previousValue?.largeInput
     ) {
       this.largeInput = changes.initArgs.currentValue?.largeInput;
     }
@@ -97,6 +107,9 @@ export class UnicodeStringEditorComponent implements
   }
 }
 
-angular.module('oppia').directive('unicodeStringEditor', downgradeComponent({
-  component: UnicodeStringEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'unicodeStringEditor',
+  downgradeComponent({
+    component: UnicodeStringEditorComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -19,23 +19,21 @@
 
 var _ = require('lodash');
 
-var ExplorationEditorPage = require(
-  '../webdriverio_utils/ExplorationEditorPage.js');
+var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 var waitFor = require('./waitFor.js');
 var dragAndDropScript = require('html-dnd').code;
 var action = require('../webdriverio_utils/action.js');
 
-var dragAndDrop = async function(fromElement, toElement) {
+var dragAndDrop = async function (fromElement, toElement) {
   await waitFor.visibilityOf(
     fromElement,
-    'fromElement taking too long to load');
-  await waitFor.visibilityOf(
-    toElement,
-    'toElement taking too long to load');
+    'fromElement taking too long to load'
+  );
+  await waitFor.visibilityOf(toElement, 'toElement taking too long to load');
   await browser.execute(dragAndDropScript, fromElement, toElement);
 };
 
-var scrollToTop = async function() {
+var scrollToTop = async function () {
   await browser.execute('window.scrollTo(0,0);');
 };
 
@@ -47,16 +45,19 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   // them.
   _.escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
-    'relyingparty/getAccountInfo?key=fake-api-key'),
+      'relyingparty/getAccountInfo?key=fake-api-key'
+  ),
   _.escapeRegExp(
     'http://localhost:9099/www.googleapis.com/identitytoolkit/v3/' +
-    'relyingparty/verifyPassword?key=fake-api-key'),
+      'relyingparty/verifyPassword?key=fake-api-key'
+  ),
   // This error covers the case when the PencilCode site uses an
   // invalid SSL certificate (which can happen when it expires).
   // In such cases, we ignore the error since it is out of our control.
   _.escapeRegExp(
     'https://pencilcode.net/lib/pencilcodeembed.js - Failed to ' +
-    'load resource: net::ERR_CERT_DATE_INVALID'),
+      'load resource: net::ERR_CERT_DATE_INVALID'
+  ),
   // These errors are related to the gtag script that is used to track events.
   // They are of the form "Failed to load resource: the server responded
   // with a status of 405", this happens when the HTTP method used for a
@@ -66,14 +67,16 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   // use gtag and it does not affect the user experience in any way.
   // Considering these reasons, the error may be ignored.
   new RegExp(
-    'https:\/\/www.googletagmanager.com\/a.* Failed to load resource: ' +
-    'the server responded with a status of 405 ()',
+    'https://www.googletagmanager.com/a.* Failed to load resource: ' +
+      'the server responded with a status of 405 ()',
     'g'
-  )
+  ),
 ];
 
-var checkForConsoleErrors = async function(
-    errorsToIgnore, skipDebugging = true) {
+var checkForConsoleErrors = async function (
+  errorsToIgnore,
+  skipDebugging = true
+) {
   errorsToIgnore = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   // The mobile tests run on the latest version of Chrome.
   // The newer versions report 'Slow Network' as a console error.
@@ -83,14 +86,16 @@ var checkForConsoleErrors = async function(
   }
 
   var browserLogs = await browser.getLogs('browser');
-  var browserErrors = browserLogs.filter(logEntry => (
-    logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
-    errorsToIgnore.every(e => logEntry.message.match(e) === null)));
+  var browserErrors = browserLogs.filter(
+    logEntry =>
+      logEntry.level.value > CONSOLE_LOG_THRESHOLD &&
+      errorsToIgnore.every(e => logEntry.message.match(e) === null)
+  );
   expect(browserErrors).toEqual([]);
 };
 
-var isInDevMode = async function() {
-  return await browser.config.params.devMode === 'true';
+var isInDevMode = async function () {
+  return (await browser.config.params.devMode) === 'true';
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:8181';
@@ -108,28 +113,29 @@ var EXPLORATION_ID_LENGTH = 12;
 
 var FIRST_STATE_DEFAULT_NAME = 'Introduction';
 
-var _getExplorationId = async function(currentUrlPrefix) {
+var _getExplorationId = async function (currentUrlPrefix) {
   var url = await browser.getUrl();
   expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
   var explorationId = url.slice(
     currentUrlPrefix.length,
-    currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
+    currentUrlPrefix.length + EXPLORATION_ID_LENGTH
+  );
   return explorationId;
 };
 
 // If we are currently in the editor, this will return a promise with the
 // exploration ID.
-var getExplorationIdFromEditor = async function() {
+var getExplorationIdFromEditor = async function () {
   return await _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
 };
 
 // Likewise for the player.
-var getExplorationIdFromPlayer = async function() {
+var getExplorationIdFromPlayer = async function () {
   return await _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
 
 // The explorationId here should be a string, not a promise.
-var openEditor = async function(explorationId, welcomeModalIsShown) {
+var openEditor = async function (explorationId, welcomeModalIsShown) {
   await browser.url(EDITOR_URL_SLICE + explorationId);
   await waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
@@ -139,41 +145,42 @@ var openEditor = async function(explorationId, welcomeModalIsShown) {
   }
 };
 
-var openPlayer = async function(explorationId) {
+var openPlayer = async function (explorationId) {
   await browser.url(PLAYER_URL_SLICE + explorationId);
   await waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
 // NOTE: we do not use the preview button because that will open a new window.
-var moveToPlayer = async function() {
+var moveToPlayer = async function () {
   var explorationId = await getExplorationIdFromEditor();
   await openPlayer(explorationId);
 };
 
 // Takes the user from the exploration player to its editor.
-var moveToEditor = async function(welcomeModalIsShown) {
+var moveToEditor = async function (welcomeModalIsShown) {
   var explorationId = await getExplorationIdFromPlayer();
   await openEditor(explorationId, welcomeModalIsShown);
 };
 
-var expectErrorPage = async(errorNum) => {
+var expectErrorPage = async errorNum => {
   var errorContainer = $('.e2e-test-error-container');
   await waitFor.visibilityOf(
     errorContainer,
-    'Protractor test error container taking too long to appear');
-  await expect(await errorContainer.getText()).
-    toMatch(`Error ${errorNum}`);
+    'Protractor test error container taking too long to appear'
+  );
+  await expect(await errorContainer.getText()).toMatch(`Error ${errorNum}`);
 };
 
 // Checks no untranslated values are shown in the page.
-var ensurePageHasNoTranslationIds = async function() {
+var ensurePageHasNoTranslationIds = async function () {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
   var oppiaBaseContainer = $('.e2e-test-base-container');
   await waitFor.visibilityOf(
     oppiaBaseContainer,
-    'Oppia base container taking too long to appear.');
+    'Oppia base container taking too long to appear.'
+  );
 
   // We are using getHTML for getting the innerHTML by passing
   // false argument to it.
@@ -183,36 +190,42 @@ var ensurePageHasNoTranslationIds = async function() {
   // not displayed.
   var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
   var REGEX_NGB_TOOLTIP_ATTR = new RegExp(
-    'tooltip="I18N_|tooltip="\'I18N_', 'g');
-  var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
-  var REGEX_NG_TOP_NAV_VISIBILITY = (
-    new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g'));
+    'tooltip="I18N_|tooltip="\'I18N_',
+    'g'
+  );
+  var REGEX_NG_VARIABLE = new RegExp("<\\['I18N_", 'g');
+  var REGEX_NG_TOP_NAV_VISIBILITY = new RegExp(
+    'ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_',
+    'g'
+  );
   await expect(
-    promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
+    promiseValue
+      .replace(REGEX_TRANSLATE_ATTR, '')
       .replace(REGEX_NGB_TOOLTIP_ATTR, '')
       .replace(REGEX_NG_VARIABLE, '')
-      .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
+      .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')
+  ).not.toContain('I18N');
 };
 
-var acceptPrompt = async function(promptResponse) {
+var acceptPrompt = async function (promptResponse) {
   await waitFor.alertToBePresent();
   await browser.sendAlertText(promptResponse);
   await browser.acceptAlert();
   await waitFor.pageToFullyLoad();
 };
 
-var acceptAlert = async function() {
+var acceptAlert = async function () {
   await waitFor.alertToBePresent();
   await browser.acceptAlert();
   await waitFor.pageToFullyLoad();
 };
 
-var closeCurrentTabAndSwitchTo = async function(destHandle) {
+var closeCurrentTabAndSwitchTo = async function (destHandle) {
   await browser.closeWindow();
   await browser.switchToWindow(destHandle);
 };
 
-var _getUniqueLogMessages = function(logs) {
+var _getUniqueLogMessages = function (logs) {
   // Returns unique log messages.
   var logsDict = {};
   for (var i = 0; i < logs.length; i++) {
@@ -223,7 +236,7 @@ var _getUniqueLogMessages = function(logs) {
   return Object.keys(logsDict);
 };
 
-var checkConsoleErrorsExist = async function(expectedErrors) {
+var checkConsoleErrorsExist = async function (expectedErrors) {
   // Checks that browser logs match entries in expectedErrors array.
   var browserLogs = await browser.getLogs('browser');
   // Some browsers such as chrome raise two errors for a missing resource.
@@ -243,48 +256,56 @@ var checkConsoleErrorsExist = async function(expectedErrors) {
 };
 
 // This function checks if any text is selected on the page.
-var expectNoTextToBeSelected = async function() {
-  expect(await browser.execute(function() {
-    var selection = window.getSelection();
-    return selection.toString() === '';
-  })).toBe(true);
+var expectNoTextToBeSelected = async function () {
+  expect(
+    await browser.execute(function () {
+      var selection = window.getSelection();
+      return selection.toString() === '';
+    })
+  ).toBe(true);
 };
 
-var goToHomePage = async function() {
+var goToHomePage = async function () {
   var oppiaMainLogo = $('.e2e-test-oppia-main-logo');
   await action.click('Oppia Main Logo', oppiaMainLogo);
   return await waitFor.pageToFullyLoad();
 };
 
-var openProfileDropdown = async function() {
+var openProfileDropdown = async function () {
   var profileDropdown = $('.e2e-test-profile-dropdown');
   await action.click(
     'Profile dropdown taking too long to be clickable.',
-    profileDropdown);
+    profileDropdown
+  );
 };
 
-var openAboutDropdown = async function() {
+var openAboutDropdown = async function () {
   var aboutDropdown = $('.e2e-test-about-oppia-list-item');
   await action.click('About dropdown', aboutDropdown);
 };
 
-var navigateToTopicsAndSkillsDashboardPage = async function() {
+var navigateToTopicsAndSkillsDashboardPage = async function () {
   await openProfileDropdown();
   var topicsAndSkillsDashboardLink = $(
-    '.e2e-test-topics-and-skills-dashboard-link');
-  await waitFor.clientSideRedirection(async() => {
-    await action.click(
-      'Topics and skills dashboard link from dropdown',
-      topicsAndSkillsDashboardLink);
-  }, (url) => {
-    return /topics-and-skills-dashboard/.test(url);
-  },
-  async() => {
-    await waitFor.pageToFullyLoad();
-  });
+    '.e2e-test-topics-and-skills-dashboard-link'
+  );
+  await waitFor.clientSideRedirection(
+    async () => {
+      await action.click(
+        'Topics and skills dashboard link from dropdown',
+        topicsAndSkillsDashboardLink
+      );
+    },
+    url => {
+      return /topics-and-skills-dashboard/.test(url);
+    },
+    async () => {
+      await waitFor.pageToFullyLoad();
+    }
+  );
 };
 
-var goOnline = async function() {
+var goOnline = async function () {
   // Download throughput refers to the maximum number of bytes that can be
   // downloaded in a given time.
   // Upload throughput refers to the maximum number of bytes that can be
@@ -296,11 +317,11 @@ var goOnline = async function() {
     offline: false,
     downloadThroughput: 450 * 1024,
     uploadThroughput: 150 * 1024,
-    latency: 150
+    latency: 150,
   });
 };
 
-var goOffline = async function() {
+var goOffline = async function () {
   // Download throughput refers to the maximum number of bytes that can be
   // downloaded in a given time.
   // Upload throughput refers to the maximum number of bytes that can be
@@ -309,7 +330,7 @@ var goOffline = async function() {
     offline: true,
     downloadThroughput: 0,
     uploadThroughput: 0,
-    latency: 0
+    latency: 0,
   });
 };
 
@@ -324,14 +345,16 @@ var goOffline = async function() {
  * including the lines from the caller function.
  * @param {function} func - Function you want to call.
  * @param {string} errStack - Put this: new Error().stack.
-*/
-var callFunctionAndCollectFullStackTraceOnError = async function(
-    func, errStack) {
+ */
+var callFunctionAndCollectFullStackTraceOnError = async function (
+  func,
+  errStack
+) {
   try {
     await func();
   } catch (error) {
-    error.stack = error.stack + '\n' +
-    errStack.substring(errStack.indexOf('\n') + 1);
+    error.stack =
+      error.stack + '\n' + errStack.substring(errStack.indexOf('\n') + 1);
     throw error;
   }
 };
@@ -371,10 +394,10 @@ exports.checkConsoleErrorsExist = checkConsoleErrorsExist;
 
 exports.goToHomePage = goToHomePage;
 exports.openProfileDropdown = openProfileDropdown;
-exports.navigateToTopicsAndSkillsDashboardPage = (
-  navigateToTopicsAndSkillsDashboardPage);
+exports.navigateToTopicsAndSkillsDashboardPage =
+  navigateToTopicsAndSkillsDashboardPage;
 
 exports.goOffline = goOffline;
 exports.goOnline = goOnline;
-exports.callFunctionAndCollectFullStackTraceOnError = (
-  callFunctionAndCollectFullStackTraceOnError);
+exports.callFunctionAndCollectFullStackTraceOnError =
+  callFunctionAndCollectFullStackTraceOnError;

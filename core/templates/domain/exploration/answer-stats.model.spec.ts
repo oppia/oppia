@@ -16,17 +16,18 @@
  * @fileoverview Unit tests for answer-stats.model.ts
  */
 
-import { AnswerStats } from 'domain/exploration/answer-stats.model';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
 
 describe('Answer Stats Object Factory', () => {
   it('should create an answer stats object from backend dict', () => {
     const answerStatsObjectBackend = {
       answer: 'hola',
-      frequency: 1
+      frequency: 1,
     };
 
-    const answerStatsObject = (
-      AnswerStats.createFromBackendDict(answerStatsObjectBackend));
+    const answerStatsObject = AnswerStats.createFromBackendDict(
+      answerStatsObjectBackend
+    );
 
     expect(answerStatsObject.toBackendDict()).toEqual(answerStatsObjectBackend);
     expect(answerStatsObject.getAnswer()).toBe('hola');
@@ -35,20 +36,26 @@ describe('Answer Stats Object Factory', () => {
     expect(answerStatsObject.getIsAddressed()).toBeFalse();
   });
 
-  it('should create an answer stats object from backend dict when answer is ' +
-    'not a string', () => {
-    const answerStatsObjectBackend = {
-      answer: 2,
-      frequency: 1
-    };
+  it(
+    'should create an answer stats object from backend dict when answer is ' +
+      'not a string',
+    () => {
+      const answerStatsObjectBackend = {
+        answer: 2,
+        frequency: 1,
+      };
 
-    const answerStatsObject = (
-      AnswerStats.createFromBackendDict(answerStatsObjectBackend));
+      const answerStatsObject = AnswerStats.createFromBackendDict(
+        answerStatsObjectBackend
+      );
 
-    expect(answerStatsObject.toBackendDict()).toEqual(answerStatsObjectBackend);
-    expect(answerStatsObject.getAnswer()).toBe(2);
-    expect(answerStatsObject.getAnswerHtml()).toBe('2');
-    expect(answerStatsObject.getFrequency()).toBe(1);
-    expect(answerStatsObject.getIsAddressed()).toBeFalse();
-  });
+      expect(answerStatsObject.toBackendDict()).toEqual(
+        answerStatsObjectBackend
+      );
+      expect(answerStatsObject.getAnswer()).toBe(2);
+      expect(answerStatsObject.getAnswerHtml()).toBe('2');
+      expect(answerStatsObject.getFrequency()).toBe(1);
+      expect(answerStatsObject.getIsAddressed()).toBeFalse();
+    }
+  );
 });

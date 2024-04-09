@@ -16,24 +16,28 @@
  * @fileoverview Unit tests for practiceTab.
  */
 
-import { TestBed, async, ComponentFixture, fakeAsync, flushMicrotasks, tick } from
-  '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
+import {
+  TestBed,
+  async,
+  ComponentFixture,
+  fakeAsync,
+  flushMicrotasks,
+  tick,
+} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
 
-import { Subtopic } from 'domain/topic/subtopic.model';
-import { PracticeTabComponent } from './practice-tab.component';
-import { QuestionBackendApiService } from
-  'domain/question/question-backend-api.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { LoaderService } from 'services/loader.service';
+import {Subtopic} from 'domain/topic/subtopic.model';
+import {PracticeTabComponent} from './practice-tab.component';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {LoaderService} from 'services/loader.service';
 
 class MockUrlService {
   getTopicUrlFragmentFromLearnerUrl() {
@@ -49,9 +53,9 @@ class MockWindowRef {
   _window = {
     location: {
       href: '',
-      reload: (val: boolean) => val
+      reload: (val: boolean) => val,
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 
   get nativeWindow() {
@@ -72,8 +76,7 @@ class MockTranslateService {
   }
 }
 
-
-describe('Practice tab component', function() {
+describe('Practice tab component', function () {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
@@ -94,18 +97,18 @@ describe('Practice tab component', function() {
         I18nLanguageCodeService,
         LoaderService,
         UrlInterpolationService,
-        { provide: UrlService, useClass: MockUrlService },
-        { provide: WindowRef, useValue: windowRef },
+        {provide: UrlService, useClass: MockUrlService},
+        {provide: WindowRef, useValue: windowRef},
         {
           provide: QuestionBackendApiService,
-          useValue: questionBackendApiService
+          useValue: questionBackendApiService,
         },
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -114,33 +117,39 @@ describe('Practice tab component', function() {
     component = fixture.componentInstance;
     component.topicName = 'Topic Name';
     component.subtopicsList = [
-      Subtopic.create({
-        id: 1,
-        title: 'Subtopic 1',
-        skill_ids: ['1', '2'],
-        thumbnail_filename: '',
-        thumbnail_bg_color: '',
-        url_fragment: ''
-      }, {
-        1: 'First skill',
-        2: 'Second skill'
-      }),
-      Subtopic.create({
-        id: 2,
-        title: 'Subtopic 2',
-        skill_ids: [],
-        thumbnail_filename: '',
-        thumbnail_bg_color: '',
-        url_fragment: ''
-      }, {
-        1: 'First skill',
-        2: 'Second skill'
-      })
+      Subtopic.create(
+        {
+          id: 1,
+          title: 'Subtopic 1',
+          skill_ids: ['1', '2'],
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+          url_fragment: '',
+        },
+        {
+          1: 'First skill',
+          2: 'Second skill',
+        }
+      ),
+      Subtopic.create(
+        {
+          id: 2,
+          title: 'Subtopic 2',
+          skill_ids: [],
+          thumbnail_filename: '',
+          thumbnail_bg_color: '',
+          url_fragment: '',
+        },
+        {
+          1: 'First skill',
+          2: 'Second skill',
+        }
+      ),
     ];
     component.subtopicIds = [1, 2, 3];
     component.subtopicMastery = {
       1: 0,
-      2: 1
+      2: 1,
     };
     fixture.detectChanges();
     ngbModal = TestBed.inject(NgbModal);
@@ -149,219 +158,260 @@ describe('Practice tab component', function() {
     translateService = TestBed.inject(TranslateService);
   });
 
-  it('should initialize controller properties after its initilization',
-    function() {
-      component.ngOnInit();
-
-      expect(component.selectedSubtopics).toEqual([]);
-      expect(component.availableSubtopics.length).toBe(1);
-      expect(component.selectedSubtopicIndices).toEqual([false]);
-    });
-
-  it('should obtain topic translation key upon initialization, and subscribe ' +
-  'to the language change event emitter', () => {
-    component.topicId = 'topic_id_1';
-    spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
-      'dummy_topic_translation_key');
-    spyOn(component, 'subscribeToOnLangChange');
-    spyOn(component, 'getTranslatedTopicName');
-
+  it('should initialize controller properties after its initilization', function () {
     component.ngOnInit();
 
-    expect(i18nLanguageCodeService.getTopicTranslationKey)
-      .toHaveBeenCalledWith('topic_id_1', 'TITLE');
-    expect(component.topicNameTranslationKey).toEqual(
-      'dummy_topic_translation_key');
-    expect(component.subscribeToOnLangChange).toHaveBeenCalled();
+    expect(component.selectedSubtopics).toEqual([]);
+    expect(component.availableSubtopics.length).toBe(1);
+    expect(component.selectedSubtopicIndices).toEqual([false]);
+  });
+
+  it(
+    'should obtain topic translation key upon initialization, and subscribe ' +
+      'to the language change event emitter',
+    () => {
+      component.topicId = 'topic_id_1';
+      spyOn(i18nLanguageCodeService, 'getTopicTranslationKey').and.returnValue(
+        'dummy_topic_translation_key'
+      );
+      spyOn(component, 'subscribeToOnLangChange');
+      spyOn(component, 'getTranslatedTopicName');
+
+      component.ngOnInit();
+
+      expect(
+        i18nLanguageCodeService.getTopicTranslationKey
+      ).toHaveBeenCalledWith('topic_id_1', 'TITLE');
+      expect(component.topicNameTranslationKey).toEqual(
+        'dummy_topic_translation_key'
+      );
+      expect(component.subscribeToOnLangChange).toHaveBeenCalled();
+      expect(component.getTranslatedTopicName).toHaveBeenCalled();
+    }
+  );
+
+  it('should obtain translated topic name whenever selected language changes', () => {
+    component.subscribeToOnLangChange();
+    spyOn(component, 'getTranslatedTopicName');
+
+    translateService.onLangChange.emit();
+
     expect(component.getTranslatedTopicName).toHaveBeenCalled();
   });
 
-  it('should obtain translated topic name whenever selected language changes',
+  it(
+    'should obtain translated topic name and set it when hacky ' +
+      'translations are available',
     () => {
-      component.subscribeToOnLangChange();
-      spyOn(component, 'getTranslatedTopicName');
+      spyOn(
+        i18nLanguageCodeService,
+        'isHackyTranslationAvailable'
+      ).and.returnValue(true);
+      spyOn(
+        i18nLanguageCodeService,
+        'isCurrentLanguageEnglish'
+      ).and.returnValue(false);
+      spyOn(translateService, 'instant').and.callThrough();
+      component.topicNameTranslationKey = 'dummy_translation_key';
 
-      translateService.onLangChange.emit();
+      component.getTranslatedTopicName();
 
-      expect(component.getTranslatedTopicName).toHaveBeenCalled();
-    });
+      expect(translateService.instant).toHaveBeenCalledWith(
+        'dummy_translation_key'
+      );
+      expect(component.translatedTopicName).toEqual('dummy_translation_key');
+    }
+  );
 
-  it('should obtain translated topic name and set it when hacky ' +
-    'translations are available', () => {
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValue(true);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
-    spyOn(translateService, 'instant').and.callThrough();
-    component.topicNameTranslationKey = 'dummy_translation_key';
+  it(
+    'should not obtain translated topic name when hacky translations are ' +
+      'unavailable, and use the default english topic name instead',
+    () => {
+      spyOn(
+        i18nLanguageCodeService,
+        'isHackyTranslationAvailable'
+      ).and.returnValue(false);
+      spyOn(
+        i18nLanguageCodeService,
+        'isCurrentLanguageEnglish'
+      ).and.returnValue(false);
+      spyOn(translateService, 'instant');
+      component.topicName = 'default_topic_name';
 
-    component.getTranslatedTopicName();
+      component.getTranslatedTopicName();
 
-    expect(translateService.instant)
-      .toHaveBeenCalledWith('dummy_translation_key');
-    expect(component.translatedTopicName).toEqual('dummy_translation_key');
+      expect(translateService.instant).not.toHaveBeenCalled();
+      expect(component.translatedTopicName).toEqual('default_topic_name');
+    }
+  );
+
+  it('should have start button enabled when a subtopic is selected', function () {
+    component.selectedSubtopicIndices[0] = true;
+    component.questionsAreAvailable = true;
+
+    expect(component.isStartButtonDisabled()).toBe(false);
   });
 
-  it('should not obtain translated topic name when hacky translations are ' +
-    'unavailable, and use the default english topic name instead', () => {
-    spyOn(i18nLanguageCodeService, 'isHackyTranslationAvailable')
-      .and.returnValue(false);
-    spyOn(i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
-    spyOn(translateService, 'instant');
-    component.topicName = 'default_topic_name';
+  it('should have start button disabled when there is no subtopic selected', function () {
+    component.selectedSubtopicIndices[0] = false;
 
-    component.getTranslatedTopicName();
-
-    expect(translateService.instant).not.toHaveBeenCalled();
-    expect(component.translatedTopicName).toEqual('default_topic_name');
+    expect(component.isStartButtonDisabled()).toBe(true);
   });
 
-  it('should have start button enabled when a subtopic is selected',
-    function() {
+  it('should have start button disabled when the disable boolean is set', function () {
+    component.previewMode = true;
+
+    expect(component.isStartButtonDisabled()).toBe(true);
+  });
+
+  it(
+    'should open a new practice session containing the selected subtopic' +
+      ' when start button is clicked for topicViewer display area',
+    function () {
+      spyOn(loaderService, 'showLoadingScreen');
       component.selectedSubtopicIndices[0] = true;
-      component.questionsAreAvailable = true;
 
-      expect(component.isStartButtonDisabled()).toBe(false);
-    });
+      component.openNewPracticeSession();
 
-  it('should have start button disabled when there is no subtopic selected',
-    function() {
-      component.selectedSubtopicIndices[0] = false;
+      expect(windowRef.nativeWindow.location.href).toBe(
+        '/learn/classroom_1/topic_1/practice/session?' +
+          'selected_subtopic_ids=%5B1%5D'
+      );
+      expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
+    }
+  );
 
-      expect(component.isStartButtonDisabled()).toBe(true);
-    });
+  it('should check if questions exist for the selected subtopics', fakeAsync(() => {
+    component.checkIfQuestionsExist([true]);
+    flushMicrotasks();
 
-  it('should have start button disabled when the disable boolean is set',
-    function() {
-      component.previewMode = true;
+    expect(component.questionsAreAvailable).toBeTrue();
 
-      expect(component.isStartButtonDisabled()).toBe(true);
-    });
+    component.checkIfQuestionsExist([false]);
+    flushMicrotasks();
 
-  it('should open a new practice session containing the selected subtopic' +
-    ' when start button is clicked for topicViewer display area', function() {
-    spyOn(loaderService, 'showLoadingScreen');
-    component.selectedSubtopicIndices[0] = true;
+    expect(component.questionsAreAvailable).toBeFalse();
+  }));
 
-    component.openNewPracticeSession();
-
-    expect(windowRef.nativeWindow.location.href).toBe(
-      '/learn/classroom_1/topic_1/practice/session?' +
-      'selected_subtopic_ids=%5B1%5D'
-    );
-    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
-  });
-
-  it('should check if questions exist for the selected subtopics',
+  it(
+    'should not ask learner for confirmation before starting a new practice ' +
+      'session if site language is set to English',
     fakeAsync(() => {
-      component.checkIfQuestionsExist([true]);
-      flushMicrotasks();
+      let isLanguageEnglishSpy = spyOn(
+        i18nLanguageCodeService,
+        'isCurrentLanguageEnglish'
+      ).and.returnValue(true);
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (modal, modalOptions) => {
+          return {
+            result: Promise.resolve(),
+          } as NgbModalRef;
+        }
+      );
 
-      expect(component.questionsAreAvailable).toBeTrue();
+      component.checkSiteLanguageBeforeBeginningPracticeSession();
+      tick();
 
-      component.checkIfQuestionsExist([false]);
-      flushMicrotasks();
+      expect(isLanguageEnglishSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).not.toHaveBeenCalled();
+    })
+  );
 
-      expect(component.questionsAreAvailable).toBeFalse();
-    }));
+  it(
+    'should ask learner for confirmation before starting a new practice ' +
+      'session if site language is not set to English',
+    fakeAsync(() => {
+      let isLanguageEnglishSpy = spyOn(
+        i18nLanguageCodeService,
+        'isCurrentLanguageEnglish'
+      ).and.returnValue(false);
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (modal, modalOptions) => {
+          return {
+            result: Promise.resolve(),
+          } as NgbModalRef;
+        }
+      );
 
-  it('should not ask learner for confirmation before starting a new practice ' +
-    'session if site language is set to English', fakeAsync(() => {
-    let isLanguageEnglishSpy = spyOn(
-      i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(true);
-    let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (modal, modalOptions) => {
-        return ({
-          result: Promise.resolve()
-        } as NgbModalRef);
-      });
+      component.checkSiteLanguageBeforeBeginningPracticeSession();
+      tick();
 
-    component.checkSiteLanguageBeforeBeginningPracticeSession();
-    tick();
+      expect(isLanguageEnglishSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).toHaveBeenCalled();
+    })
+  );
 
-    expect(isLanguageEnglishSpy).toHaveBeenCalled();
-    expect(ngbModalSpy).not.toHaveBeenCalled();
-  }));
+  it(
+    'should start a new practice session if the learner agrees to ' +
+      'continue when site language is not set to English',
+    fakeAsync(() => {
+      let isLanguageEnglishSpy = spyOn(
+        i18nLanguageCodeService,
+        'isCurrentLanguageEnglish'
+      ).and.returnValue(false);
+      let newPracticeSessionSpy = spyOn(component, 'openNewPracticeSession');
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (modal, modalOptions) => {
+          return {
+            result: Promise.resolve(),
+          } as NgbModalRef;
+        }
+      );
 
-  it('should ask learner for confirmation before starting a new practice ' +
-    'session if site language is not set to English', fakeAsync(() => {
-    let isLanguageEnglishSpy = spyOn(
-      i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
-    let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (modal, modalOptions) => {
-        return ({
-          result: Promise.resolve()
-        } as NgbModalRef);
-      });
+      component.checkSiteLanguageBeforeBeginningPracticeSession();
+      tick();
 
-    component.checkSiteLanguageBeforeBeginningPracticeSession();
-    tick();
+      expect(isLanguageEnglishSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).toHaveBeenCalled();
+      expect(newPracticeSessionSpy).toHaveBeenCalled();
+    })
+  );
 
-    expect(isLanguageEnglishSpy).toHaveBeenCalled();
-    expect(ngbModalSpy).toHaveBeenCalled();
-  }));
+  it(
+    'should not start a new practice session if the learner refuses to ' +
+      'continue when site language is not set to English',
+    fakeAsync(() => {
+      let isLanguageEnglishSpy = spyOn(
+        i18nLanguageCodeService,
+        'isCurrentLanguageEnglish'
+      ).and.returnValue(false);
+      let newPracticeSessionSpy = spyOn(component, 'openNewPracticeSession');
+      let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
+        (modal, modalOptions) => {
+          return {
+            result: Promise.reject(),
+          } as NgbModalRef;
+        }
+      );
 
-  it('should start a new practice session if the learner agrees to ' +
-  'continue when site language is not set to English', fakeAsync(() => {
-    let isLanguageEnglishSpy = spyOn(
-      i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
-    let newPracticeSessionSpy = spyOn(component, 'openNewPracticeSession');
-    let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (modal, modalOptions) => {
-        return ({
-          result: Promise.resolve()
-        } as NgbModalRef);
-      });
+      component.checkSiteLanguageBeforeBeginningPracticeSession();
+      tick();
 
-    component.checkSiteLanguageBeforeBeginningPracticeSession();
-    tick();
+      expect(isLanguageEnglishSpy).toHaveBeenCalled();
+      expect(ngbModalSpy).toHaveBeenCalled();
+      expect(newPracticeSessionSpy).not.toHaveBeenCalled();
+    })
+  );
 
-    expect(isLanguageEnglishSpy).toHaveBeenCalled();
-    expect(ngbModalSpy).toHaveBeenCalled();
-    expect(newPracticeSessionSpy).toHaveBeenCalled();
-  }));
+  it(
+    'should open a new practice session containing the selected subtopic' +
+      ' when start button is clicked and learner agrees to continue',
+    function () {
+      spyOn(loaderService, 'showLoadingScreen');
+      component.displayArea = 'progressTab';
+      component.topicUrlFragment = 'topic_1';
+      component.classroomUrlFragment = 'classroom_1';
+      component.selectedSubtopicIndices[0] = true;
 
-  it('should not start a new practice session if the learner refuses to ' +
-  'continue when site language is not set to English', fakeAsync(() => {
-    let isLanguageEnglishSpy = spyOn(
-      i18nLanguageCodeService, 'isCurrentLanguageEnglish')
-      .and.returnValue(false);
-    let newPracticeSessionSpy = spyOn(component, 'openNewPracticeSession');
-    let ngbModalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (modal, modalOptions) => {
-        return ({
-          result: Promise.reject()
-        } as NgbModalRef);
-      });
+      component.openNewPracticeSession();
 
-    component.checkSiteLanguageBeforeBeginningPracticeSession();
-    tick();
-
-    expect(isLanguageEnglishSpy).toHaveBeenCalled();
-    expect(ngbModalSpy).toHaveBeenCalled();
-    expect(newPracticeSessionSpy).not.toHaveBeenCalled();
-  }));
-
-  it('should open a new practice session containing the selected subtopic' +
-    ' when start button is clicked and learner agrees to continue', function() {
-    spyOn(loaderService, 'showLoadingScreen');
-    component.displayArea = 'progressTab';
-    component.topicUrlFragment = 'topic_1';
-    component.classroomUrlFragment = 'classroom_1';
-    component.selectedSubtopicIndices[0] = true;
-
-    component.openNewPracticeSession();
-
-    expect(windowRef.nativeWindow.location.href).toBe(
-      '/learn/classroom_1/topic_1/practice/session?' +
-      'selected_subtopic_ids=%5B1%5D'
-    );
-    expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
-  });
+      expect(windowRef.nativeWindow.location.href).toBe(
+        '/learn/classroom_1/topic_1/practice/session?' +
+          'selected_subtopic_ids=%5B1%5D'
+      );
+      expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
+    }
+  );
 
   it('should return background for progress of a subtopic', () => {
     component.subtopicMasteryArray = [10, 20];

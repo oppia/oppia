@@ -17,23 +17,20 @@
  * changes for the translation.
  */
 
-import { Component, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-mark-translations-as-needing-update-modal',
-  templateUrl: './mark-translations-as-needing-update-modal.component.html'
+  templateUrl: './mark-translations-as-needing-update-modal.component.html',
 })
-export class MarkTranslationsAsNeedingUpdateModalComponent
-  extends ConfirmOrCancelModal {
+export class MarkTranslationsAsNeedingUpdateModalComponent extends ConfirmOrCancelModal {
   @Input() contentId!: string;
   @Input() markNeedsUpdateHandler!: (contentId: string) => void;
   @Input() removeHandler!: (contentId: string) => void;
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

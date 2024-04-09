@@ -17,13 +17,13 @@
  * difficulty modal.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { QuestionsListConstants } from 'components/question-directives/questions-list/questions-list.constants';
-import { SkillDifficulty } from 'domain/skill/skill-difficulty.model';
-import { SkillSummaryBackendDict } from 'domain/skill/skill-summary.model';
+import {Component, Input, OnInit} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {QuestionsListConstants} from 'components/question-directives/questions-list/questions-list.constants';
+import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
+import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 
 interface Summary {
   id: string;
@@ -33,10 +33,12 @@ interface Summary {
 @Component({
   selector: 'oppia-questions-list-select-skill-and-difficulty-modal',
   templateUrl:
-    './questions-list-select-skill-and-difficulty-modal.component.html'
+    './questions-list-select-skill-and-difficulty-modal.component.html',
 })
 export class QuestionsListSelectSkillAndDifficultyModalComponent
-  extends ConfirmOrCancelModal implements OnInit {
+  extends ConfirmOrCancelModal
+  implements OnInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -55,15 +57,12 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
   MODE_SELECT_SKILL!: string;
   skillsToShow: SkillSummaryBackendDict[] = [];
 
-  constructor(
-    private ngbActiveModal: NgbActiveModal
-  ) {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.instructionMessage = (
-      'Select the skill(s) to link the question to:');
+    this.instructionMessage = 'Select the skill(s) to link the question to:';
     this.skillSummaries = this.allSkillSummaries;
     this.skillSummariesInitial = [];
     this.skillSummariesFinal = [];
@@ -75,11 +74,9 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
 
     for (let idx = 0; idx < this.allSkillSummaries.length; idx++) {
       if (idx < this.countOfSkillsToPrioritize) {
-        this.skillSummariesInitial.push(
-          this.allSkillSummaries[idx]);
+        this.skillSummariesInitial.push(this.allSkillSummaries[idx]);
       } else {
-        this.skillSummariesFinal.push(
-          this.allSkillSummaries[idx]);
+        this.skillSummariesFinal.push(this.allSkillSummaries[idx]);
       }
     }
   }
@@ -92,7 +89,7 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     skillSelector = skillSelector.toLowerCase();
 
     this.skillsToShow = this.skillSummariesInitial.filter(
-      option => (option.description.toLowerCase().indexOf(skillSelector) >= 0)
+      option => option.description.toLowerCase().indexOf(skillSelector) >= 0
     );
   }
 
@@ -104,14 +101,18 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
     if (!this.isSkillSelected(summary.id)) {
       this.linkedSkillsWithDifficulty.push(
         SkillDifficulty.create(
-          summary.id, summary.description,
-          this.DEFAULT_SKILL_DIFFICULTY));
+          summary.id,
+          summary.description,
+          this.DEFAULT_SKILL_DIFFICULTY
+        )
+      );
       this.selectedSkills.push(summary.id);
     } else {
-      let idIndex = this.linkedSkillsWithDifficulty.map(
-        (linkedSkillWithDifficulty) => {
+      let idIndex = this.linkedSkillsWithDifficulty
+        .map(linkedSkillWithDifficulty => {
           return linkedSkillWithDifficulty.getId();
-        }).indexOf(summary.id);
+        })
+        .indexOf(summary.id);
       this.linkedSkillsWithDifficulty.splice(idIndex, 1);
       let index = this.selectedSkills.indexOf(summary.id);
       this.selectedSkills.splice(index, 1);
@@ -119,7 +120,8 @@ export class QuestionsListSelectSkillAndDifficultyModalComponent
   }
 
   changeSkillWithDifficulty(
-      newSkillWithDifficulty: SkillDifficulty, index: number
+    newSkillWithDifficulty: SkillDifficulty,
+    index: number
   ): void {
     this.linkedSkillsWithDifficulty[index] = newSkillWithDifficulty;
   }

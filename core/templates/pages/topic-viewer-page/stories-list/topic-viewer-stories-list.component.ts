@@ -16,21 +16,22 @@
  * @fileoverview Component for the topic viewer stories list.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { StorySummary } from 'domain/story/story-summary.model';
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { WindowDimensionsService } from
-  'services/contextual/window-dimensions.service';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 import './topic-viewer-stories-list.component.css';
-
 
 @Component({
   selector: 'stories-list',
   templateUrl: './topic-viewer-stories-list.component.html',
-  styleUrls: ['./topic-viewer-stories-list.component.css']
+  styleUrls: ['./topic-viewer-stories-list.component.css'],
 })
 export class StoriesListComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -51,10 +52,16 @@ export class StoriesListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.topicNameTranslationKey = this.i18nLanguageCodeService
-      .getTopicTranslationKey(this.topicId, TranslationKeyType.TITLE);
-    this.topicDescTranslationKey = this.i18nLanguageCodeService
-      .getTopicTranslationKey(this.topicId, TranslationKeyType.DESCRIPTION);
+    this.topicNameTranslationKey =
+      this.i18nLanguageCodeService.getTopicTranslationKey(
+        this.topicId,
+        TranslationKeyType.TITLE
+      );
+    this.topicDescTranslationKey =
+      this.i18nLanguageCodeService.getTopicTranslationKey(
+        this.topicId,
+        TranslationKeyType.DESCRIPTION
+      );
   }
 
   isHackyTopicNameTranslationDisplayed(): boolean {
@@ -77,6 +84,9 @@ export class StoriesListComponent implements OnInit {
     return this.windowDimensionsService.getWidth() < 768;
   }
 }
-angular.module('oppia').directive(
-  'storiesList', downgradeComponent(
-    {component: StoriesListComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'storiesList',
+    downgradeComponent({component: StoriesListComponent})
+  );

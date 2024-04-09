@@ -16,28 +16,29 @@
  * @fileoverview Unti tests for the FractionInput response.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ResponseFractionInput } from './oppia-response-fraction-input.component';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ResponseFractionInput} from './oppia-response-fraction-input.component';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 describe('ResponseFractionInput', () => {
   let component: ResponseFractionInput;
   let fixture: ComponentFixture<ResponseFractionInput>;
   let mockHtmlEscaperService = {
-    escapedJsonToObj: function(answer: string) {
+    escapedJsonToObj: function (answer: string) {
       return JSON.parse(answer);
-    }
+    },
   };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResponseFractionInput],
-      providers: [HtmlEscaperService,
+      providers: [
+        HtmlEscaperService,
         {
           provide: HtmlEscaperService,
-          useValue: mockHtmlEscaperService
-        }
-      ]
+          useValue: mockHtmlEscaperService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -46,8 +47,9 @@ describe('ResponseFractionInput', () => {
     component = fixture.componentInstance;
   });
 
-  it('should display user\'s response', () => {
-    component.answer = '{' +
+  it("should display user's response", () => {
+    component.answer =
+      '{' +
       '"isNegative": false,' +
       '"wholeNumber": 0,' +
       '"numerator": 1,' +

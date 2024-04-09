@@ -16,29 +16,32 @@
  * @fileoverview Tests for Admin Platform Parameters tab component.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, async, TestBed, flushMicrotasks, tick } from
-  '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  async,
+  TestBed,
+  flushMicrotasks,
+  tick,
+} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AdminPageData } from 'domain/admin/admin-backend-api.service';
-import { AdminDataService } from 'pages/admin-page/services/admin-data.service';
-import { AdminTaskManagerService } from
-  'pages/admin-page/services/admin-task-manager.service';
-import { AdminFeaturesTabConstants } from
-  'pages/release-coordinator-page/features-tab/features-tab.constants';
-import { PlatformParameterAdminBackendApiService } from
-  'domain/platform-parameter/platform-parameter-admin-backend-api.service';
-import { AdminPlatformParametersTabComponent } from
+import {AdminPageData} from 'domain/admin/admin-backend-api.service';
+import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
+import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
+import {AdminFeaturesTabConstants} from 'pages/release-coordinator-page/features-tab/features-tab.constants';
+import {PlatformParameterAdminBackendApiService} from 'domain/platform-parameter/platform-parameter-admin-backend-api.service';
+import {
+  AdminPlatformParametersTabComponent,
   // eslint-disable-next-line max-len
-  'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { PlatformParameterFilterType } from
-  'domain/platform-parameter/platform-parameter-filter.model';
-import { PlatformParameter } from 'domain/platform-parameter/platform-parameter.model';
-import { HttpErrorResponse } from '@angular/common/http';
+} from 'pages/admin-page/platform-parameters-tab/admin-platform-parameters-tab.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PlatformParameterFilterType} from 'domain/platform-parameter/platform-parameter-filter.model';
+import {PlatformParameter} from 'domain/platform-parameter/platform-parameter.model';
+import {HttpErrorResponse} from '@angular/common/http';
 
 class MockWindowRef {
   nativeWindow = {
@@ -50,10 +53,9 @@ class MockWindowRef {
     },
     prompt() {
       return 'mock msg';
-    }
+    },
   };
 }
-
 
 describe('Admin page platform parameters tab', () => {
   let component: AdminPlatformParametersTabComponent;
@@ -74,10 +76,10 @@ describe('Admin page platform parameters tab', () => {
         AdminTaskManagerService,
         {
           provide: WindowRef,
-          useValue: mockWindowRef
-        }
+          useValue: mockWindowRef,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdminPlatformParametersTabComponent);
@@ -94,24 +96,28 @@ describe('Admin page platform parameters tab', () => {
           description: 'This is a dummy platform parameter.',
           name: 'dummy_platform_parameter',
           rule_schema_version: 1,
-          rules: [{
-            filters: [
-              {
-                type: PlatformParameterFilterType.PlatformType,
-                conditions: [['=', 'Web']]
-              }
-            ],
-            // This does not match the data type of platform param, but this is
-            // intended as string values are more suitable for
-            // identifying rules in the following tests.
-            value_when_matched: 'original',
-          }],
-        })
-      ]
+          rules: [
+            {
+              filters: [
+                {
+                  type: PlatformParameterFilterType.PlatformType,
+                  conditions: [['=', 'Web']],
+                },
+              ],
+              // This does not match the data type of platform param, but this is
+              // intended as string values are more suitable for
+              // identifying rules in the following tests.
+              value_when_matched: 'original',
+            },
+          ],
+        }),
+      ],
     } as AdminPageData);
 
-    updateApiSpy = spyOn(parameterApiService, 'updatePlatformParameter')
-      .and.resolveTo();
+    updateApiSpy = spyOn(
+      parameterApiService,
+      'updatePlatformParameter'
+    ).and.resolveTo();
 
     component.ngOnInit();
   }));
@@ -119,56 +125,77 @@ describe('Admin page platform parameters tab', () => {
   it('should load platform parameters on init', () => {
     expect(component.platformParameters.length).toBe(1);
     expect(component.platformParameters[0].name).toEqual(
-      'dummy_platform_parameter');
+      'dummy_platform_parameter'
+    );
   });
 
   describe('.getPlatformParamSchema', () => {
     it('should return unicode schema for string data type', () => {
       const schema = component.getPlatformParamSchema(
-        'string', component.platformParameters[0].name);
+        'string',
+        component.platformParameters[0].name
+      );
       expect(schema).toEqual({type: 'unicode'});
     });
 
-    it('should return correct unicode schema for email_footer ' +
-    'platform parameter', () => {
-      const schema = component.getPlatformParamSchema(
-        'string', 'email_footer');
-      expect(schema).toEqual(
-        {type: 'unicode', ui_config: {rows: 5}});
-    });
+    it(
+      'should return correct unicode schema for email_footer ' +
+        'platform parameter',
+      () => {
+        const schema = component.getPlatformParamSchema(
+          'string',
+          'email_footer'
+        );
+        expect(schema).toEqual({type: 'unicode', ui_config: {rows: 5}});
+      }
+    );
 
-    it('should return correct unicode schema for signup_email_body_content ' +
-    'platform parameter', () => {
-      const schema = component.getPlatformParamSchema(
-        'string', 'signup_email_body_content');
-      expect(schema).toEqual(
-        {type: 'unicode', ui_config: {rows: 20}});
-    });
+    it(
+      'should return correct unicode schema for signup_email_body_content ' +
+        'platform parameter',
+      () => {
+        const schema = component.getPlatformParamSchema(
+          'string',
+          'signup_email_body_content'
+        );
+        expect(schema).toEqual({type: 'unicode', ui_config: {rows: 20}});
+      }
+    );
 
-    it('should return correct unicode schema for unpublish_exploration_email' +
-    '_html_body platform parameter', () => {
-      const schema = component.getPlatformParamSchema(
-        'string', 'unpublish_exploration_email_html_body');
-      expect(schema).toEqual(
-        {type: 'unicode', ui_config: {rows: 20}});
-    });
+    it(
+      'should return correct unicode schema for unpublish_exploration_email' +
+        '_html_body platform parameter',
+      () => {
+        const schema = component.getPlatformParamSchema(
+          'string',
+          'unpublish_exploration_email_html_body'
+        );
+        expect(schema).toEqual({type: 'unicode', ui_config: {rows: 20}});
+      }
+    );
 
     it('should return float schema for number data type', () => {
       const schema = component.getPlatformParamSchema(
-        'number', component.platformParameters[0].name);
+        'number',
+        component.platformParameters[0].name
+      );
       expect(schema).toEqual({type: 'float'});
     });
 
     it('should return bool schema for bool data type', () => {
       const schema = component.getPlatformParamSchema(
-        'bool', component.platformParameters[0].name);
+        'bool',
+        component.platformParameters[0].name
+      );
       expect(schema).toEqual({type: 'bool'});
     });
 
     it('should raise error for unknown schema', () => {
       expect(() => {
         component.getPlatformParamSchema(
-          'float', component.platformParameters[0].name);
+          'float',
+          component.platformParameters[0].name
+        );
       }).toThrowError();
     });
   });
@@ -249,10 +276,12 @@ describe('Admin page platform parameters tab', () => {
       // Original filter list: ['platform_type']
       // Verifies it's ['platform_type', 'app_version'] after adding a new
       // filter to the end.
-      expect(rule.filters[0].type)
-        .toEqual(PlatformParameterFilterType.PlatformType);
-      expect(rule.filters[1].type)
-        .toEqual(PlatformParameterFilterType.AppVersion);
+      expect(rule.filters[0].type).toEqual(
+        PlatformParameterFilterType.PlatformType
+      );
+      expect(rule.filters[1].type).toEqual(
+        PlatformParameterFilterType.AppVersion
+      );
     });
   });
 
@@ -267,8 +296,9 @@ describe('Admin page platform parameters tab', () => {
       // Original filter list: ['platform_type', 'app_version']
       // Verifies it's ['app_version'] after removing the first filter.
       expect(rule.filters.length).toBe(1);
-      expect(rule.filters[0].type)
-        .toEqual(PlatformParameterFilterType.AppVersion);
+      expect(rule.filters[0].type).toEqual(
+        PlatformParameterFilterType.AppVersion
+      );
     });
   });
 
@@ -283,10 +313,8 @@ describe('Admin page platform parameters tab', () => {
 
       // Original condition list: ['=dev']
       // Verifies it's ['=dev', '=mock'] after adding.
-      expect(filter.conditions[0])
-        .toEqual(['=', 'Web']);
-      expect(filter.conditions[1])
-        .toEqual(['=', 'mock']);
+      expect(filter.conditions[0]).toEqual(['=', 'Web']);
+      expect(filter.conditions[1]).toEqual(['=', 'mock']);
     });
   });
 
@@ -317,16 +345,18 @@ describe('Admin page platform parameters tab', () => {
   });
 
   describe('.clearChanges', () => {
-    it('should not do anything when no changes are done to platform ' +
-    'param', () => {
-      const platformParameter = component.platformParameters[0];
+    it(
+      'should not do anything when no changes are done to platform ' + 'param',
+      () => {
+        const platformParameter = component.platformParameters[0];
 
-      expect(platformParameter.rules.length).toBe(1);
+        expect(platformParameter.rules.length).toBe(1);
 
-      component.clearChanges(platformParameter);
+        component.clearChanges(platformParameter);
 
-      expect(platformParameter.rules.length).toBe(1);
-    });
+        expect(platformParameter.rules.length).toBe(1);
+      }
+    );
 
     it('should clear changes', () => {
       spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(true);
@@ -340,7 +370,7 @@ describe('Admin page platform parameters tab', () => {
       expect(platformParameter.rules).toEqual(originalRules);
     });
 
-    it('should not proceed if the user doesn\'t confirm', () => {
+    it("should not proceed if the user doesn't confirm", () => {
       spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(false);
       const platformParameter = component.platformParameters[0];
 
@@ -356,15 +386,13 @@ describe('Admin page platform parameters tab', () => {
   describe('.shiftToEditMode', () => {
     it('should shift to edit mode', () => {
       const platformParameter = component.platformParameters[0];
-      expect(
-        component.platformParametersInEditMode.get(platformParameter.name)
-      ).toBeFalse;
+      expect(component.platformParametersInEditMode.get(platformParameter.name))
+        .toBeFalse;
 
       component.shiftToEditMode(platformParameter);
 
-      expect(
-        component.platformParametersInEditMode.get(platformParameter.name)
-      ).toBeTrue;
+      expect(component.platformParametersInEditMode.get(platformParameter.name))
+        .toBeTrue;
     });
   });
 
@@ -372,37 +400,41 @@ describe('Admin page platform parameters tab', () => {
     it('should shift to read mode', () => {
       const platformParameter = component.platformParameters[0];
       component.shiftToEditMode(platformParameter);
-      expect(
-        component.platformParametersInEditMode.get(platformParameter.name)
-      ).toBeTrue;
+      expect(component.platformParametersInEditMode.get(platformParameter.name))
+        .toBeTrue;
 
       component.shiftToReadMode(platformParameter);
 
-      expect(
-        component.platformParametersInEditMode.get(platformParameter.name)
-      ).toBeFalse;
+      expect(component.platformParametersInEditMode.get(platformParameter.name))
+        .toBeFalse;
     });
   });
 
   describe('.getReadonlyFilterValues', () => {
-    it('should get read only value of the rule with one filter and one ' +
-    'condition', () => {
-      const platformParameter = component.platformParameters[0];
+    it(
+      'should get read only value of the rule with one filter and one ' +
+        'condition',
+      () => {
+        const platformParameter = component.platformParameters[0];
 
-      expect(
-        component.getReadonlyFilterValues(platformParameter.rules[0])
-      ).toBe('Platform Type in [Web]');
-    });
+        expect(
+          component.getReadonlyFilterValues(platformParameter.rules[0])
+        ).toBe('Platform Type in [Web]');
+      }
+    );
 
-    it('should get read only value of the rule with one filter and multiple ' +
-    'condition', () => {
-      const platformParameter = component.platformParameters[0];
-      component.addNewCondition(platformParameter.rules[0].filters[0]);
+    it(
+      'should get read only value of the rule with one filter and multiple ' +
+        'condition',
+      () => {
+        const platformParameter = component.platformParameters[0];
+        component.addNewCondition(platformParameter.rules[0].filters[0]);
 
-      expect(
-        component.getReadonlyFilterValues(platformParameter.rules[0])
-      ).toBe('Platform Type in [Web, Web]');
-    });
+        expect(
+          component.getReadonlyFilterValues(platformParameter.rules[0])
+        ).toBe('Platform Type in [Web, Web]');
+      }
+    );
 
     it('should get read only value of the rule with multiple filter', () => {
       const platformParameter = component.platformParameters[0];
@@ -433,7 +465,8 @@ describe('Admin page platform parameters tab', () => {
 
       expect(warnings.length).toEqual(1);
       expect(warnings[0]).toEqual(
-        'In rule 1, there should be at least one filter.');
+        'In rule 1, there should be at least one filter.'
+      );
     });
   });
 
@@ -456,7 +489,7 @@ describe('Admin page platform parameters tab', () => {
       expect(updateApiSpy).toHaveBeenCalled();
     }));
 
-    it('should not proceed if the user doesn\'t confirm', fakeAsync(() => {
+    it("should not proceed if the user doesn't confirm", fakeAsync(() => {
       spyOn(mockWindowRef.nativeWindow, 'confirm').and.returnValue(false);
 
       component.saveDefaultValueToStorage();
@@ -486,59 +519,63 @@ describe('Admin page platform parameters tab', () => {
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
       ];
       component.updateParameterRulesAsync(platformParameter);
 
       flushMicrotasks();
 
       expect(updateApiSpy).toHaveBeenCalledWith(
-        platformParameter.name, 'mock msg', platformParameter.rules, false);
+        platformParameter.name,
+        'mock msg',
+        platformParameter.rules,
+        false
+      );
       expect(setStatusSpy).toHaveBeenCalledWith('Saved successfully.');
     }));
 
-    it('should update platform param backup after update succeeds',
-      fakeAsync(() => {
-        promptSpy.and.returnValue('mock msg');
+    it('should update platform param backup after update succeeds', fakeAsync(() => {
+      promptSpy.and.returnValue('mock msg');
 
-        const platformParameter = component.platformParameters[0];
+      const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToBottom(platformParameter);
-        platformParameter.rules[1].filters[0].conditions = [
-          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
-        ];
-        component.updateParameterRulesAsync(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
+      ];
+      component.updateParameterRulesAsync(platformParameter);
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(component.platformParameterNameToBackupMap.get(
-          platformParameter.name)).toEqual(platformParameter);
-      }));
+      expect(
+        component.platformParameterNameToBackupMap.get(platformParameter.name)
+      ).toEqual(platformParameter);
+    }));
 
-    it('should not update platform param backup if update fails',
-      fakeAsync(() => {
-        promptSpy.and.returnValue('mock msg');
-        const errorResponse = new HttpErrorResponse({
-          error: 'Error loading exploration 1.',
-          status: 500,
-          statusText: 'Internal Server Error'
-        });
-        updateApiSpy.and.rejectWith(errorResponse);
+    it('should not update platform param backup if update fails', fakeAsync(() => {
+      promptSpy.and.returnValue('mock msg');
+      const errorResponse = new HttpErrorResponse({
+        error: 'Error loading exploration 1.',
+        status: 500,
+        statusText: 'Internal Server Error',
+      });
+      updateApiSpy.and.rejectWith(errorResponse);
 
-        const platformParameter = component.platformParameters[0];
-        const originalFeatureFlag = cloneDeep(platformParameter);
+      const platformParameter = component.platformParameters[0];
+      const originalFeatureFlag = cloneDeep(platformParameter);
 
-        component.addNewRuleToBottom(platformParameter);
-        platformParameter.rules[1].filters[0].conditions = [
-          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
-        ];
-        component.updateParameterRulesAsync(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
+      ];
+      component.updateParameterRulesAsync(platformParameter);
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(component.platformParameterNameToBackupMap.get(
-          platformParameter.name)).toEqual(originalFeatureFlag);
-      }));
+      expect(
+        component.platformParameterNameToBackupMap.get(platformParameter.name)
+      ).toEqual(originalFeatureFlag);
+    }));
 
     it('should not proceed if there is another task running', fakeAsync(() => {
       promptSpy.and.returnValue('mock msg');
@@ -549,7 +586,7 @@ describe('Admin page platform parameters tab', () => {
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
       ];
       component.updateParameterRulesAsync(platformParameter);
 
@@ -565,24 +602,22 @@ describe('Admin page platform parameters tab', () => {
       adminTaskManagerService.finishTask();
     }));
 
-    it('should not proceed if the user cancels the prompt', fakeAsync(
-      () => {
-        promptSpy.and.returnValue(null);
+    it('should not proceed if the user cancels the prompt', fakeAsync(() => {
+      promptSpy.and.returnValue(null);
 
-        const platformParameter = component.platformParameters[0];
+      const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToBottom(platformParameter);
-        platformParameter.rules[1].filters[0].conditions = [
-          ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
-        ];
-        component.updateParameterRulesAsync(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
+      platformParameter.rules[1].filters[0].conditions = [
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
+      ];
+      component.updateParameterRulesAsync(platformParameter);
 
-        flushMicrotasks();
+      flushMicrotasks();
 
-        expect(updateApiSpy).not.toHaveBeenCalled();
-        expect(setStatusSpy).not.toHaveBeenCalled();
-      })
-    );
+      expect(updateApiSpy).not.toHaveBeenCalled();
+      expect(setStatusSpy).not.toHaveBeenCalled();
+    }));
 
     it('should not proceed if there is any validation issue', fakeAsync(() => {
       promptSpy.and.returnValue(null);
@@ -606,14 +641,14 @@ describe('Admin page platform parameters tab', () => {
       const errorResponse = new HttpErrorResponse({
         error: 'Error loading exploration 1.',
         status: 500,
-        statusText: 'Internal Server Error'
+        statusText: 'Internal Server Error',
       });
       updateApiSpy.and.rejectWith(errorResponse);
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
       ];
       component.updateParameterRulesAsync(platformParameter);
 
@@ -628,17 +663,17 @@ describe('Admin page platform parameters tab', () => {
 
       const errorResponse = new HttpErrorResponse({
         error: {
-          error: 'validation error.'
+          error: 'validation error.',
         },
         status: 500,
-        statusText: 'Internal Server Error'
+        statusText: 'Internal Server Error',
       });
       updateApiSpy.and.rejectWith(errorResponse);
       const platformParameter = component.platformParameters[0];
 
       component.addNewRuleToBottom(platformParameter);
       platformParameter.rules[1].filters[0].conditions = [
-        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
+        ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
       ];
       component.updateParameterRulesAsync(platformParameter);
 
@@ -646,7 +681,8 @@ describe('Admin page platform parameters tab', () => {
 
       expect(updateApiSpy).toHaveBeenCalled();
       expect(setStatusSpy).toHaveBeenCalledWith(
-        'Update failed: validation error.');
+        'Update failed: validation error.'
+      );
     }));
 
     it('should throw error if error resonse is unexpected', fakeAsync(() => {
@@ -663,26 +699,19 @@ describe('Admin page platform parameters tab', () => {
   });
 
   describe('.isPlatformParamChanged', () => {
-    it('should return false if the parameter is same as the backup instance',
-      () => {
-        const platformParameter = component.platformParameters[0];
+    it('should return false if the parameter is same as the backup instance', () => {
+      const platformParameter = component.platformParameters[0];
 
-        expect(component.isPlatformParamChanged(platformParameter))
-          .toBeFalse();
-      }
-    );
+      expect(component.isPlatformParamChanged(platformParameter)).toBeFalse();
+    });
 
-    it(
-      'should return true if the parameter is different from backup instance',
-      () => {
-        const platformParameter = component.platformParameters[0];
+    it('should return true if the parameter is different from backup instance', () => {
+      const platformParameter = component.platformParameters[0];
 
-        component.addNewRuleToBottom(platformParameter);
+      component.addNewRuleToBottom(platformParameter);
 
-        expect(component.isPlatformParamChanged(platformParameter))
-          .toBeTrue();
-      }
-    );
+      expect(component.isPlatformParamChanged(platformParameter)).toBeTrue();
+    });
 
     it('should return true when default value is changed', () => {
       const platformParameter = component.platformParameters[0];
@@ -703,15 +732,15 @@ describe('Admin page platform parameters tab', () => {
             filters: [
               {
                 type: PlatformParameterFilterType.PlatformType,
-                conditions: [['=', 'Web']]
-              }
+                conditions: [['=', 'Web']],
+              },
             ],
             value_when_matched: true,
           },
           {
             filters: [],
-            value_when_matched: true
-          }
+            value_when_matched: true,
+          },
         ],
       });
 
@@ -736,9 +765,9 @@ describe('Admin page platform parameters tab', () => {
                 {
                   type: PlatformParameterFilterType.PlatformType,
                   conditions: [
-                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[0]]
-                  ]
-                }
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[0]],
+                  ],
+                },
               ],
               value_when_matched: true,
             },
@@ -747,12 +776,12 @@ describe('Admin page platform parameters tab', () => {
                 {
                   type: PlatformParameterFilterType.PlatformType,
                   conditions: [
-                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
-                  ]
-                }
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
+                  ],
+                },
               ],
-              value_when_matched: true
-            }
+              value_when_matched: true,
+            },
           ],
         })
       );
@@ -774,22 +803,22 @@ describe('Admin page platform parameters tab', () => {
                 {
                   type: PlatformParameterFilterType.PlatformType,
                   conditions: [
-                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
-                  ]
-                }
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
+                  ],
+                },
               ],
-              value_when_matched: true
+              value_when_matched: true,
             },
             {
               filters: [
                 {
                   type: PlatformParameterFilterType.PlatformType,
                   conditions: [
-                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]]
-                  ]
-                }
+                    ['=', AdminFeaturesTabConstants.ALLOWED_PLATFORM_TYPES[1]],
+                  ],
+                },
               ],
-              value_when_matched: true
+              value_when_matched: true,
             },
           ],
         })
@@ -811,21 +840,20 @@ describe('Admin page platform parameters tab', () => {
               filters: [
                 {
                   type: PlatformParameterFilterType.PlatformType,
-                  conditions: [['=', 'Web']]
+                  conditions: [['=', 'Web']],
                 },
                 {
                   type: PlatformParameterFilterType.PlatformType,
-                  conditions: [['=', 'Web']]
-                }
+                  conditions: [['=', 'Web']],
+                },
               ],
-              value_when_matched: true
+              value_when_matched: true,
             },
           ],
         })
       );
 
-      expect(issues).toEqual([
-        'In rule 1, filters 1 & 2 are identical.']);
+      expect(issues).toEqual(['In rule 1, filters 1 & 2 are identical.']);
     });
 
     it('should return issues if there are identical conditions', () => {
@@ -841,17 +869,21 @@ describe('Admin page platform parameters tab', () => {
               filters: [
                 {
                   type: PlatformParameterFilterType.PlatformType,
-                  conditions: [['=', 'Web'], ['=', 'Web']]
+                  conditions: [
+                    ['=', 'Web'],
+                    ['=', 'Web'],
+                  ],
                 },
               ],
-              value_when_matched: true
+              value_when_matched: true,
             },
           ],
         })
       );
 
       expect(issues).toEqual([
-        'In rule 1, filter 1, conditions 1 & 2 are identical.']);
+        'In rule 1, filter 1, conditions 1 & 2 are identical.',
+      ]);
     });
 
     it('should return issues if filter has no condition', () => {
@@ -867,17 +899,18 @@ describe('Admin page platform parameters tab', () => {
               filters: [
                 {
                   type: PlatformParameterFilterType.PlatformType,
-                  conditions: []
+                  conditions: [],
                 },
               ],
-              value_when_matched: true
+              value_when_matched: true,
             },
           ],
         })
       );
 
-      expect(issues).toEqual(
-        ['In rule 1, filter 1 should have at least one condition.']);
+      expect(issues).toEqual([
+        'In rule 1, filter 1 should have at least one condition.',
+      ]);
     });
 
     it('should return issues if there is no filter in the rule', () => {
@@ -891,14 +924,15 @@ describe('Admin page platform parameters tab', () => {
           rules: [
             {
               filters: [],
-              value_when_matched: true
+              value_when_matched: true,
             },
           ],
         })
       );
 
-      expect(issues).toEqual(
-        ['In rule 1, there should be at least one filter.']);
+      expect(issues).toEqual([
+        'In rule 1, there should be at least one filter.',
+      ]);
     });
 
     it('should return issues if the app version condition is empty', () => {
@@ -914,17 +948,18 @@ describe('Admin page platform parameters tab', () => {
               filters: [
                 {
                   type: PlatformParameterFilterType.AppVersion,
-                  conditions: [['=', '']]
+                  conditions: [['=', '']],
                 },
               ],
-              value_when_matched: true
+              value_when_matched: true,
             },
           ],
         })
       );
 
-      expect(issues).toEqual(
-        ['In rule 1, filter 1, condition 1, the app version is empty.']);
+      expect(issues).toEqual([
+        'In rule 1, filter 1, condition 1, the app version is empty.',
+      ]);
     });
   });
 });

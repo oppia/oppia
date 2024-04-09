@@ -17,14 +17,14 @@
  * SwitchContentLanguageRefreshRequiredModalComponent.
  */
 
-import { async, ComponentFixture, TestBed } from
-  '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { SwitchContentLanguageRefreshRequiredModalComponent } from
+import {
+  SwitchContentLanguageRefreshRequiredModalComponent,
   // eslint-disable-next-line max-len
-  'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import { WindowRef } from 'services/contextual/window-ref.service';
+} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockActiveModal {
   dismiss(): void {
@@ -37,7 +37,7 @@ class MockActiveModal {
 class MockWindowRef {
   _window = {
     location: {
-      href: 'host.name:1234/explore/0'
+      href: 'host.name:1234/explore/0',
     },
   };
 
@@ -46,10 +46,9 @@ class MockWindowRef {
   }
 }
 
-describe('SwitchContentLanguageRefreshRequiredModalComponent', function() {
+describe('SwitchContentLanguageRefreshRequiredModalComponent', function () {
   let component: SwitchContentLanguageRefreshRequiredModalComponent;
-  let fixture: ComponentFixture<
-    SwitchContentLanguageRefreshRequiredModalComponent>;
+  let fixture: ComponentFixture<SwitchContentLanguageRefreshRequiredModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let windowRef: MockWindowRef;
 
@@ -58,15 +57,16 @@ describe('SwitchContentLanguageRefreshRequiredModalComponent', function() {
     TestBed.configureTestingModule({
       declarations: [SwitchContentLanguageRefreshRequiredModalComponent],
       providers: [
-        { provide: NgbActiveModal, useClass: MockActiveModal },
-        { provide: WindowRef, useValue: windowRef }
-      ]
+        {provide: NgbActiveModal, useClass: MockActiveModal},
+        {provide: WindowRef, useValue: windowRef},
+      ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      SwitchContentLanguageRefreshRequiredModalComponent);
+      SwitchContentLanguageRefreshRequiredModalComponent
+    );
     component = fixture.componentInstance;
     ngbActiveModal = TestBed.get(NgbActiveModal);
     windowRef = TestBed.get(WindowRef);
@@ -78,19 +78,21 @@ describe('SwitchContentLanguageRefreshRequiredModalComponent', function() {
     expect(dismissSpy).toHaveBeenCalled();
   });
 
-  it('should set the href with the correct URL parameters on confirm',
-    () => {
-      expect(windowRef.nativeWindow.location.href).toBe(
-        'host.name:1234/explore/0');
+  it('should set the href with the correct URL parameters on confirm', () => {
+    expect(windowRef.nativeWindow.location.href).toBe(
+      'host.name:1234/explore/0'
+    );
 
-      component.languageCode = 'fr';
-      component.confirm();
-      expect(windowRef.nativeWindow.location.href).toBe(
-        'host.name:1234/explore/0?initialContentLanguageCode=fr');
+    component.languageCode = 'fr';
+    component.confirm();
+    expect(windowRef.nativeWindow.location.href).toBe(
+      'host.name:1234/explore/0?initialContentLanguageCode=fr'
+    );
 
-      component.languageCode = 'en';
-      component.confirm();
-      expect(windowRef.nativeWindow.location.href).toBe(
-        'host.name:1234/explore/0?initialContentLanguageCode=en');
-    });
+    component.languageCode = 'en';
+    component.confirm();
+    expect(windowRef.nativeWindow.location.href).toBe(
+      'host.name:1234/explore/0?initialContentLanguageCode=en'
+    );
+  });
 });

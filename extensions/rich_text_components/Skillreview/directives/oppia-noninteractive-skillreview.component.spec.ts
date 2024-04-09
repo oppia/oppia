@@ -16,13 +16,20 @@
  * @fileoverview Directive for the concept card rich-text component.
  */
 
-import { async, ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
-import { CkEditorCopyContentService } from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { NoninteractiveSkillreview } from './oppia-noninteractive-skillreview.component';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { ContextService } from 'services/context.service';
-import { SimpleChanges } from '@angular/core';
+import {
+  async,
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {NoninteractiveSkillreview} from './oppia-noninteractive-skillreview.component';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {ContextService} from 'services/context.service';
+import {SimpleChanges} from '@angular/core';
 
 describe('NoninteractiveSkillreview', () => {
   let component: NoninteractiveSkillreview;
@@ -40,7 +47,7 @@ describe('NoninteractiveSkillreview', () => {
   class MockNgbModalRef {
     componentInstance = {
       skillId: null,
-      explorationId: null
+      explorationId: null,
     };
   }
 
@@ -50,9 +57,9 @@ describe('NoninteractiveSkillreview', () => {
       providers: [
         {
           provide: HtmlEscaperService,
-          useClass: mockHtmlEscaperService
-        }
-      ]
+          useClass: mockHtmlEscaperService,
+        },
+      ],
     }).compileComponents();
   }));
 
@@ -67,15 +74,18 @@ describe('NoninteractiveSkillreview', () => {
     component.textWithValue = 'concept card';
   });
 
-  it('should initialise component when user inserts a concept card in the' +
-  ' rich text editor', () => {
-    component.ngOnInit();
+  it(
+    'should initialise component when user inserts a concept card in the' +
+      ' rich text editor',
+    () => {
+      component.ngOnInit();
 
-    expect(component.skillId).toBe('skillId');
-    expect(component.linkText).toBe('concept card');
-  });
+      expect(component.skillId).toBe('skillId');
+      expect(component.linkText).toBe('concept card');
+    }
+  );
 
-  it('should not initialise when \'skillIdWithValue\' is empty', () => {
+  it("should not initialise when 'skillIdWithValue' is empty", () => {
     component.skillIdWithValue = '';
 
     component.ngOnInit();
@@ -84,7 +94,7 @@ describe('NoninteractiveSkillreview', () => {
     expect(component.linkText).toBeUndefined();
   });
 
-  it('should not initialise when \'textWithValue\' is empty', () => {
+  it("should not initialise when 'textWithValue' is empty", () => {
     component.textWithValue = '';
 
     component.ngOnInit();
@@ -99,18 +109,18 @@ describe('NoninteractiveSkillreview', () => {
       currentTarget: {
         offsetParent: {
           dataset: {
-            ckeWidgetId: false
-          }
-        }
-      }
+            ckeWidgetId: false,
+          },
+        },
+      },
     } as unknown as MouseEvent;
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-          { componentInstance: MockNgbModalRef,
-            result: Promise.resolve()
-          }) as NgbModalRef;
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
     });
 
     component.openConceptCard(e);
@@ -121,10 +131,10 @@ describe('NoninteractiveSkillreview', () => {
 
   it('should close concept card when user clicks the link', fakeAsync(() => {
     spyOn(contextService, 'setCustomEntityContext');
-    spyOn(contextService, 'getEntityId').and.callFake(function() {
+    spyOn(contextService, 'getEntityId').and.callFake(function () {
       return 'InitialEntityId';
     });
-    spyOn(contextService, 'getEntityType').and.callFake(function() {
+    spyOn(contextService, 'getEntityType').and.callFake(function () {
       return 'InitialEntityType';
     });
     spyOn(contextService, 'removeCustomEntityContext');
@@ -132,18 +142,18 @@ describe('NoninteractiveSkillreview', () => {
       currentTarget: {
         offsetParent: {
           dataset: {
-            ckeWidgetId: false
-          }
-        }
-      }
+            ckeWidgetId: false,
+          },
+        },
+      },
     } as unknown as MouseEvent;
 
     ckEditorCopyContentService.copyModeActive = false;
     const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-          { componentInstance: MockNgbModalRef,
-            result: Promise.reject('cancel')
-          }) as NgbModalRef;
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject('cancel'),
+      } as NgbModalRef;
     });
 
     component.openConceptCard(e);
@@ -152,68 +162,72 @@ describe('NoninteractiveSkillreview', () => {
     expect(modalSpy).toHaveBeenCalled();
     expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
     expect(contextService.setCustomEntityContext).toHaveBeenCalledWith(
-      'InitialEntityType', 'InitialEntityId');
+      'InitialEntityType',
+      'InitialEntityId'
+    );
   }));
 
-  it('should throw error when modal is closed in a method other than' +
-  '\'cancel\', \'escape key press\' or \'backdrop click\'', fakeAsync(() => {
-    let e = {
-      currentTarget: {
-        offsetParent: {
-          dataset: {
-            ckeWidgetId: false
-          }
-        }
-      }
-    } as unknown as MouseEvent;
-
-    ckEditorCopyContentService.copyModeActive = false;
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-          { componentInstance: MockNgbModalRef,
-            result: Promise.reject('close')
-          }) as NgbModalRef;
-    });
-
-    let error;
-    try {
-      component.openConceptCard(e);
-      flush();
-    // We use unknown type because we are unsure of the type of error
-    // that was thrown. Since the catch block cannot identify the
-    // specific type of error, we are unable to further optimise the
-    // code by introducing more types of errors.
-    } catch (e: unknown) {
-      error = e as Error;
-      expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
-    }
-    expect(error).not.toBeUndefined();
-  }));
-
-  it('should not open modal when ck Editor copy mode is active',
+  it(
+    'should throw error when modal is closed in a method other than' +
+      "'cancel', 'escape key press' or 'backdrop click'",
     fakeAsync(() => {
-      // This throws "Type object is not assignable to type
-      // 'MouseEvent'." We need to suppress this error
-      // because of the need to test validations. This
-      // throws an error only in the test environment.
-      // @ts-ignore
       let e = {
         currentTarget: {
           offsetParent: {
             dataset: {
-              ckeWidgetId: false
-            }
-          }
-        }
-      } as MouseEvent;
-      const modalSpy = spyOn(ngbModal, 'open');
-      ckEditorCopyContentService.copyModeActive = true;
+              ckeWidgetId: false,
+            },
+          },
+        },
+      } as unknown as MouseEvent;
 
-      component.openConceptCard(e);
-      tick();
+      ckEditorCopyContentService.copyModeActive = false;
+      spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.reject('close'),
+        } as NgbModalRef;
+      });
 
-      expect(modalSpy).not.toHaveBeenCalled();
-    }));
+      let error;
+      try {
+        component.openConceptCard(e);
+        flush();
+        // We use unknown type because we are unsure of the type of error
+        // that was thrown. Since the catch block cannot identify the
+        // specific type of error, we are unable to further optimise the
+        // code by introducing more types of errors.
+      } catch (e: unknown) {
+        error = e as Error;
+        expect(error.message.indexOf('Error: close') !== -1).toBeTrue();
+      }
+      expect(error).not.toBeUndefined();
+    })
+  );
+
+  it('should not open modal when ck Editor copy mode is active', fakeAsync(() => {
+    // This throws "Type object is not assignable to type
+    // 'MouseEvent'." We need to suppress this error
+    // because of the need to test validations. This
+    // throws an error only in the test environment.
+    // @ts-ignore
+    let e = {
+      currentTarget: {
+        offsetParent: {
+          dataset: {
+            ckeWidgetId: false,
+          },
+        },
+      },
+    } as MouseEvent;
+    const modalSpy = spyOn(ngbModal, 'open');
+    ckEditorCopyContentService.copyModeActive = true;
+
+    component.openConceptCard(e);
+    tick();
+
+    expect(modalSpy).not.toHaveBeenCalled();
+  }));
 
   it('should update view when user edits the concept card link', () => {
     let changes: SimpleChanges = {
@@ -221,8 +235,8 @@ describe('NoninteractiveSkillreview', () => {
         currentValue: 'new skillId',
         previousValue: 'skillId',
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.skillIdWithValue = 'new skillId';
 
@@ -237,8 +251,8 @@ describe('NoninteractiveSkillreview', () => {
         currentValue: 'new text',
         previousValue: 'text',
         firstChange: false,
-        isFirstChange: () => false
-      }
+        isFirstChange: () => false,
+      },
     };
     component.textWithValue = 'new text';
 

@@ -36,6 +36,7 @@ import string
 from types import TracebackType
 import unittest
 
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
@@ -50,6 +51,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import object_registry
@@ -80,7 +82,7 @@ import requests_mock
 from typing import (
     IO, Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
     Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set, Tuple,
-    Type, TypedDict, Union, cast, overload
+    Type, TypedDict, TypeVar, Union, cast, overload
 )
 import webapp2
 import webtest
@@ -131,6 +133,8 @@ BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES: Final = (
     'BaseSnapshotMetadataModel',
     'VersionedModel',
 )
+
+_GenericHandlerFunctionReturnType = TypeVar('_GenericHandlerFunctionReturnType')
 
 
 class NewIndexDict(TypedDict):
@@ -320,6 +324,88 @@ def generate_random_hexa_str() -> str:
     uppercase = 'ABCDEF'
     lowercase = 'abcdef'
     return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))
+
+
+@contextlib.contextmanager
+def swap_is_feature_flag_enabled_function(
+    feature_flag_names: List[feature_flag_list.FeatureNames]
+) -> Iterator[None]:
+    """Mocks is_feature_flag_enabled function within the context of a
+    'with' statement. is_feature_flag_enabled will return True for all
+    the features present in feature_flag_names.
+
+    Args:
+        feature_flag_names: List[FeatureNames]. The name of the feature
+            flags for which the value should be returned as True.
+
+    Yields:
+        context. The context with function replaced.
+    """
+    def mock_is_feature_flag_enabled(
+        _: Optional[str], feature_flag_name: str
+    ) -> bool:
+        """Mocks is_feature_flag_enabled function to return True if the
+        target_feature_flag_name is present in feature_flag_names.
+
+        Args:
+            _: str|None. The id of the user, can be None.
+            feature_flag_name: str. The name of the target feature flag.
+
+        Returns:
+            enable_feature_flag: bool. Returns True if the target feature flag
+            name is in feature_flag_names list.
+        """
+        return any(
+            expected_feature_flag_name.value == feature_flag_name
+            for expected_feature_flag_name in feature_flag_names
+        )
+
+    original_is_feature_flag_enabled = getattr(
+       feature_flag_services, 'is_feature_flag_enabled')
+    setattr(
+       feature_flag_services,
+       'is_feature_flag_enabled',
+       mock_is_feature_flag_enabled
+    )
+    try:
+        yield
+    finally:
+        setattr(
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            original_is_feature_flag_enabled
+       )
+
+
+def enable_feature_flags(
+   feature_flag_names: List[feature_flag_list.FeatureNames]
+) -> Callable[[Callable[
+        ..., _GenericHandlerFunctionReturnType]],
+        Callable[..., _GenericHandlerFunctionReturnType]
+]:
+    """This method guarantees to enable the given feature flags for the
+    scope of the test.
+
+    Args:
+        feature_flag_names: List[feature_flag_list.FeatureNames]. The list
+            of the names of the feature flags that will be enabled.
+
+    Returns:
+        function. The newly decorated function that enables given
+        feature flags for the scope of the test.
+    """
+    def decorator(
+        func: Callable[..., _GenericHandlerFunctionReturnType]
+    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
+        # Here we use type Any because this method can accept arbitrary number
+        # of arguments with different types.
+        def wrapper(
+            *args: Any, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
+            with swap_is_feature_flag_enabled_function(feature_flag_names):
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
 
 
 class ElasticSearchStub:

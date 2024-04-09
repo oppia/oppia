@@ -16,16 +16,14 @@
  * @fileoverview Service for managing exploration-level statistics.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { ExplorationStats } from
-  'domain/statistics/exploration-stats.model';
-import { ExplorationStatsBackendApiService } from
-  'services/exploration-stats-backend-api.service';
+import {ExplorationStats} from 'domain/statistics/exploration-stats.model';
+import {ExplorationStatsBackendApiService} from 'services/exploration-stats-backend-api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationStatsService {
   // 'statsCache' will be null until the exploration stats are fetched from
@@ -33,18 +31,23 @@ export class ExplorationStatsService {
   private statsCache: Promise<ExplorationStats> | null = null;
 
   constructor(
-      private explorationStatsBackendApiService:
-        ExplorationStatsBackendApiService) {}
+    private explorationStatsBackendApiService: ExplorationStatsBackendApiService
+  ) {}
 
   async getExplorationStatsAsync(expId: string): Promise<ExplorationStats> {
     if (this.statsCache === null) {
-      this.statsCache = (
+      this.statsCache =
         this.explorationStatsBackendApiService.fetchExplorationStatsAsync(
-          expId));
+          expId
+        );
     }
     return this.statsCache;
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationStatsService', downgradeInjectable(ExplorationStatsService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationStatsService',
+    downgradeInjectable(ExplorationStatsService)
+  );

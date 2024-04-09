@@ -205,8 +205,8 @@
               Please confirm before subscribing.
             </div>
             <div class="oppia-android-updates-input-padding text-center">
-              <oppia-primary-button [disabled]="!userCanSubscribe || !validateEmailAddress()"
-                                    (onClickPrimaryButton)="subscribeToAndroidList()"
+              <oppia-primary-button (onClickPrimaryButton)="subscribeToAndroidList()"
+                                    [disabled]="!userCanSubscribe || !validateEmailAddress()"
                                     [customClasses]="'btn oppia-android-updates-button w-100'"
                                     [buttonText]="'I18N_ANDROID_PAGE_UPDATES_SUBMIT_BUTTON_TEXT' | translate">
               </oppia-primary-button>

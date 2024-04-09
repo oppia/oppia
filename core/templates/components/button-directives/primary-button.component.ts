@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,47 +13,94 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the primary buttons displayed on static pages.
+ * @fileoverview Component for primary buttons displayed on static pages.
  */
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { WindowRef } from
-  'services/contextual/window-ref.service';
+import {Component, Input, Output, EventEmitter, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import './primary-button.component.css';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-primary-button',
   templateUrl: './primary-button.component.html',
-  styleUrls: ['./primary-button.component.css']
+  styleUrls: ['./primary-button.component.css'],
 })
-export class PrimaryButtonComponent {
+export class PrimaryButtonComponent implements OnInit {
+  /**
+   * The main text to be displayed on the button.
+   */
   @Input() buttonText: string = '';
+
+  /**
+   * An optional array of custom CSS classes to be applied to the component.
+   */
   @Input() customClasses?: string[];
+
+  /**
+   * The URL the button should navigate to when clicked, optional.
+   * If no buttonHref is provided then the component acts like an HTML button
+   * element instead of an anchor link element.
+   */
+  @Input() buttonHref: string = '#';
+
+  /**
+   * A boolean value indicating whether the button should be disabled, optional.
+   * Valid only when the component is an HTML button element and not an anchor.
+   */
   @Input() disabled?: boolean = false;
-  @Input() buttonHref: string | null = null;
+
+  /**
+   * The function to execute when the component is clicked, optional.
+   * The return type of the function must be void.
+   */
   @Output() onClickPrimaryButton: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(
-    private windowRef: WindowRef,
-  ) {}
+  componentIsButton: boolean = false;
+  openInNewTab: boolean = false;
 
-  handleButtonClick(): void {
-    if (this.onClickPrimaryButton.observers.length > 0) {
-      this.onClickPrimaryButton.emit();
-    } else if (this.buttonHref) {
-      const isExternalLink = this.isExternalLink(this.buttonHref);
-      if (isExternalLink) {
-        this.openExternalLink(this.buttonHref);
-      } else {
-        this.windowRef.nativeWindow.location.href = this.buttonHref;
-      }
-    }
+  constructor(private windowRef: WindowRef) {}
+
+  ngOnInit(): void {
+    this.componentIsButton = this.buttonHref === '#';
+  }
+
+  getButtonHref(): string {
+    return this.buttonHref;
+  }
+
+  getTarget(): string {
+    this.openInNewTab = this.isExternalLink(this.buttonHref);
+    return this.openInNewTab ? '_blank' : '_self';
   }
 
   private isExternalLink(link: string): boolean {
     return link.startsWith('http://') || link.startsWith('https://');
+  }
+
+  handleButtonClick(event: MouseEvent): void {
+    // Prevent the browser from loading the next page
+    // and thus unloading the current page, before the functions
+    // passed to component such as registering Google analytics
+    // have finished executing. Reference -
+    // https://developers.google.com/analytics/devguides/collection/gtagjs/sending-data#know_when_an_event_has_been_sent
+    event.preventDefault();
+
+    if (this.onClickPrimaryButton.observers.length > 0) {
+      this.onClickPrimaryButton.emit();
+    }
+
+    if (!this.componentIsButton) {
+      const target = event.target as HTMLAnchorElement;
+      const link = target.href; // The actual link to redirect to.
+      const linkTarget = target.target; // '_blank' or '_self'.
+
+      if (linkTarget === '_blank') {
+        this.openExternalLink(link);
+      } else {
+        this.windowRef.nativeWindow.location.href = link;
+      }
+    }
   }
 
   private openExternalLink(link: string): void {
@@ -65,7 +112,9 @@ export class PrimaryButtonComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaPrimaryButton',
+angular.module('oppia').directive(
+  'oppiaPrimaryButton',
   downgradeComponent({
-    component: PrimaryButtonComponent
-  }) as angular.IDirectiveFactory);
+    component: PrimaryButtonComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -16,7 +16,7 @@
  * @fileoverview Development environment config file for Webpack.
  */
 
-const { merge } = require('webpack-merge');
+const {merge} = require('webpack-merge');
 const common = require('./webpack.common.config.ts');
 var path = require('path');
 
@@ -25,11 +25,11 @@ module.exports = merge(common, {
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'webpack_bundles'),
-    publicPath: '/webpack_bundles/'
+    publicPath: '/webpack_bundles/',
   },
   devtool: 'eval',
   watchOptions: {
     aggregateTimeout: 500,
-    poll: 1000
-  }
+    poll: 1000,
+  },
 });

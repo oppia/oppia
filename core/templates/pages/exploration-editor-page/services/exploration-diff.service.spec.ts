@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { TestBed } from '@angular/core/testing';
-import { StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { ExplorationDiffService, ExplorationGraphChangeList } from './exploration-diff.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import {TestBed} from '@angular/core/testing';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {
+  ExplorationDiffService,
+  ExplorationGraphChangeList,
+} from './exploration-diff.service';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 /**
  * @fileoverview Unit tests for the Exploration Diff Service.
@@ -31,23 +34,39 @@ describe('Exploration Diff Service', () => {
     stateObjectFactory = TestBed.inject(StateObjectFactory);
   });
 
-  it('should throw error if try to access graph ' +
-    'diff data with invalid command', () => {
-    let newState = stateObjectFactory.createDefaultState(
-      'newState', 'content_0', 'default_outcome_1');
-    let oldState = stateObjectFactory.createDefaultState(
-      'oldState', 'content_0', 'default_outcome_1');
-    explorationGraphChangeList = [{
-      changeList: [{
-        cmd: 'invalidCommand',
-        state_name: 'newState'
-      } as unknown as ExplorationChange],
-      directionForwards: true
-    }];
+  it(
+    'should throw error if try to access graph ' +
+      'diff data with invalid command',
+    () => {
+      let newState = stateObjectFactory.createDefaultState(
+        'newState',
+        'content_0',
+        'default_outcome_1'
+      );
+      let oldState = stateObjectFactory.createDefaultState(
+        'oldState',
+        'content_0',
+        'default_outcome_1'
+      );
+      explorationGraphChangeList = [
+        {
+          changeList: [
+            {
+              cmd: 'invalidCommand',
+              state_name: 'newState',
+            } as unknown as ExplorationChange,
+          ],
+          directionForwards: true,
+        },
+      ];
 
-    expect(() => {
-      explorationDiffService.getDiffGraphData(
-        {newState: newState}, {oldState: oldState}, explorationGraphChangeList);
-    }).toThrowError('Invalid change command: invalidCommand');
-  });
+      expect(() => {
+        explorationDiffService.getDiffGraphData(
+          {newState: newState},
+          {oldState: oldState},
+          explorationGraphChangeList
+        );
+      }).toThrowError('Invalid change command: invalidCommand');
+    }
+  );
 });

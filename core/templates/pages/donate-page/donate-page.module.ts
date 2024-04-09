@@ -16,15 +16,15 @@
  * @fileoverview Module for the donate page.
  */
 
-import { NgModule } from '@angular/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { DonatePageComponent } from './donate-page.component';
-import { DonationBoxComponent } from './donation-box/donation-box.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { DonatePageRootComponent } from './donate-page-root.component';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
+import {NgModule} from '@angular/core';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {DonatePageComponent} from './donate-page.component';
+import {DonationBoxComponent} from './donation-box/donation-box.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {DonatePageRootComponent} from './donate-page-root.component';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
+import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 
 @NgModule({
   imports: [
@@ -47,7 +47,7 @@ import { DonationBoxModalComponent } from './donation-box/donation-box-modal.com
   entryComponents: [
     DonatePageComponent,
     DonatePageRootComponent,
-    DonationBoxModalComponent
+    DonationBoxModalComponent,
   ],
 })
 export class DonatePageModule {}

@@ -16,21 +16,21 @@
  * @fileoverview Unit tests for the FocusManagerService.
  */
 
-import { fakeAsync, flush, TestBed } from '@angular/core/testing';
+import {fakeAsync, flush, TestBed} from '@angular/core/testing';
 
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { IdGenerationService } from 'services/id-generation.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {AppConstants} from 'app.constants';
+import {IdGenerationService} from 'services/id-generation.service';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 describe('Focus Manager Service', () => {
   let focusManagerService: FocusManagerService;
   let deviceInfoService: DeviceInfoService;
   let idGenerationService: IdGenerationService;
-  let windowRef: WindowRef = new WindowRef;
+  let windowRef: WindowRef = new WindowRef();
 
   const clearLabel = AppConstants.LABEL_FOR_CLEARING_FOCUS;
   const focusLabel = 'FocusLabel';
@@ -83,9 +83,10 @@ describe('Focus Manager Service', () => {
     }
   }));
 
-  it('should set focus without scrolling when schema based list editor is not' +
-  'active', fakeAsync(
-    () => {
+  it(
+    'should set focus without scrolling when schema based list editor is not' +
+      'active',
+    fakeAsync(() => {
       spyOn(focusManagerService, 'setFocus');
       spyOn(windowRef.nativeWindow, 'scrollTo');
       focusManagerService.schemaBasedListEditorIsActive = false;
@@ -97,9 +98,10 @@ describe('Focus Manager Service', () => {
     })
   );
 
-  it('should set focus without scrolling to top when schema based list editor' +
-  'is active', fakeAsync(
-    () => {
+  it(
+    'should set focus without scrolling to top when schema based list editor' +
+      'is active',
+    fakeAsync(() => {
       spyOn(focusManagerService, 'setFocus');
       spyOn(windowRef.nativeWindow, 'scrollTo');
       focusManagerService.schemaBasedListEditorIsActive = true;

@@ -16,28 +16,30 @@
  * @fileoverview A data service that stores the content ids
  * to audio translations.
  */
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { StatePropertyService } from
+import {AlertsService} from 'services/alerts.service';
+import {
+  StatePropertyService,
   // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
-import { RecordedVoiceovers } from
-  'domain/exploration/recorded-voiceovers.model';
-import { UtilsService } from 'services/utils.service';
+} from 'components/state-editor/state-editor-properties-services/state-property.service';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {UtilsService} from 'services/utils.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class StateRecordedVoiceoversService extends
-  StatePropertyService<RecordedVoiceovers> {
+export class StateRecordedVoiceoversService extends StatePropertyService<RecordedVoiceovers> {
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveRecordedVoiceovers';
   }
 }
 
-angular.module('oppia').factory(
-  'StateRecordedVoiceoversService', downgradeInjectable(
-    StateRecordedVoiceoversService));
+angular
+  .module('oppia')
+  .factory(
+    'StateRecordedVoiceoversService',
+    downgradeInjectable(StateRecordedVoiceoversService)
+  );

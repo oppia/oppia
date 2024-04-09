@@ -16,20 +16,21 @@
  * @fileoverview Module for the console_errors page.
  */
 
-import { APP_INITIALIZER, NgModule, StaticProvider } from '@angular/core';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { OppiaAngularRootComponent } from
-  'components/oppia-angular-root.component';
-import { platformFeatureInitFactory, PlatformFeatureService } from
-  'services/platform-feature.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
+import {APP_INITIALIZER, NgModule, StaticProvider} from '@angular/core';
+import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import {RequestInterceptor} from 'services/request-interceptor.service';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
+import {
+  platformFeatureInitFactory,
+  PlatformFeatureService,
+} from 'services/platform-feature.service';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ToastrModule} from 'ngx-toastr';
+import {MyHammerConfig, toastrConfig} from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [
@@ -37,35 +38,35 @@ import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
     BrowserAnimationsModule,
     HttpClientModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
+      multi: true,
     },
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    }
-  ]
+      useClass: MyHammerConfig,
+    },
+  ],
 })
 class ConsoleErrorPageModule {
   // Empty placeholder method to satisfy the `Compiler`.
   ngDoBootstrap() {}
 }
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeModule } from '@angular/upgrade/static';
+import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
+import {downgradeModule} from '@angular/upgrade/static';
 
-const bootstrapFnAsync = async(extraProviders: StaticProvider[]) => {
+const bootstrapFnAsync = async (extraProviders: StaticProvider[]) => {
   const platformRef = platformBrowserDynamic(extraProviders);
   return platformRef.bootstrapModule(ConsoleErrorPageModule);
 };
@@ -80,5 +81,6 @@ angular.module('oppia').directive(
   // bootstrap the Angular 8.
   'oppiaAngularRoot',
   downgradeComponent({
-    component: OppiaAngularRootComponent
-  }) as angular.IDirectiveFactory);
+    component: OppiaAngularRootComponent,
+  }) as angular.IDirectiveFactory
+);
