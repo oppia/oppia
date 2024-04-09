@@ -32,7 +32,7 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 @Injectable({
   providedIn: 'root',
 })
-export class FacilitatorDashboardAuthGuard implements CanActivate {
+export class FacilitatorDashboardPageAuthGuard implements CanActivate {
   constructor(
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for FacilitatorDashboardAuthGuard
+ * @fileoverview Tests for FacilitatorDashboardPageAuthGuard
  */
 import {Location} from '@angular/common';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
@@ -25,7 +25,7 @@ import {
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {AppConstants} from 'app.constants';
-import {FacilitatorDashboardAuthGuard} from './facilitator-dashboard-auth.guard';
+import {FacilitatorDashboardPageAuthGuard} from './facilitator-dashboard-page-auth.guard';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 class MockAccessValidationBackendApiService {
@@ -41,7 +41,7 @@ class MockRouter {
 }
 
 describe('FacilitatorDashboardAuthGuard', () => {
-  let guard: FacilitatorDashboardAuthGuard;
+  let guard: FacilitatorDashboardPageAuthGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;
 
@@ -49,7 +49,7 @@ describe('FacilitatorDashboardAuthGuard', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       providers: [
-        FacilitatorDashboardAuthGuard,
+        FacilitatorDashboardPageAuthGuard,
         {
           provide: AccessValidationBackendApiService,
           useClass: MockAccessValidationBackendApiService,
@@ -59,7 +59,7 @@ describe('FacilitatorDashboardAuthGuard', () => {
       ],
     });
 
-    guard = TestBed.inject(FacilitatorDashboardAuthGuard);
+    guard = TestBed.inject(FacilitatorDashboardPageAuthGuard);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService
     );
