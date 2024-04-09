@@ -640,9 +640,6 @@ def main(args: Optional[List[str]] = None) -> None:
 
     if not feconf.OPPIA_IS_DOCKERIZED:
         install_third_party_libs.main()
-    else:
-        install_third_party_libs.fix_google_module(
-            '/app/oppia/third_party/python_libs/google')
 
     print('Starting Linter....')
 
