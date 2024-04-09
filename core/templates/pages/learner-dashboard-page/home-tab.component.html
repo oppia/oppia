@@ -95,15 +95,12 @@
           ) | translate
         }}
       </p>
-      <!--go back 3 - title should stay in place when scrolling for small screens -->
       <div class="w-100">
         <ng-container *ngIf="continueWhereYouLeftOffList.length === 0; else continueTiles">
           <p class="oppia-learner-dash-section_heading mb-0">
             {{ 'I18N_LEARNER_DASHBOARD_EMPTY_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
           </p>
         </ng-container>
-        <!--tbd 2 - handling how exploratitons & topics are sorted by the most recent, add gap-4, temporarily mr-4 -->
-        <!--tbd 3 - explorations are only retrieved when clicking on community lessons, can't calculate total number of cards for widht -->
         <div class="d-flex mt-4 subsection-container pb-1 pl-1 mb-n1 ml-n1" *ngIf="continueWhereYouLeftOffList.length !== 0"> 
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
@@ -129,7 +126,7 @@
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </div>
-        <a [href]="getClassroomLink(item.key)" [oppiaFocusOn]="'ourLessonsBtn'" target="{{ openInNewWindow ? '_blank' : '_self' }}"
+        <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
            class="align-items-center d-inline-flex justify-content-center mt-4 oppia-learner-dash-home-button text-center">
           <span class="fa fa-arrow-right mr-2"></span>
           {{ 'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key} }}
