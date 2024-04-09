@@ -915,7 +915,7 @@ describe('Learner dashboard page', () => {
         expect(fetchCollectionsDataSpy).toHaveBeenCalled();
         flush();
         expect(fetchExplorationsDataSpy).toHaveBeenCalled();
-        expect(component.communtiyLessonsDataLoaded).toEqual(true);
+        expect(component.communityLessonsDataLoaded).toEqual(true);
       })
     );
 
@@ -1042,7 +1042,7 @@ describe('Learner dashboard page', () => {
         expect(fetchCollectionsDataSpy).toHaveBeenCalled();
         flush();
         expect(fetchExplorationsDataSpy).toHaveBeenCalled();
-        expect(component.communtiyLessonsDataLoaded).toEqual(true);
+        expect(component.communityLessonsDataLoaded).toEqual(true);
       })
     );
 
