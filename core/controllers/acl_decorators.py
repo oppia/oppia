@@ -551,12 +551,13 @@ def can_edit_collection(
 
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
+
         if collection_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if rights_manager.check_can_edit_activity(
-                self.user, collection_rights):
+        if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
             return handler(self, collection_id, **kwargs)
+
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this collection.')

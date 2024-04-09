@@ -621,7 +621,7 @@ class CollectionEditorPageAccessValidationHandler(test_utils.GenericTestBase):
         self.get_html_response(
             '%s/can_access_collection_editor_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
-            ), expected_status_int=200
+            ), expected_status_int=401
         )
         self.logout()
 
