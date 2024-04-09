@@ -44,6 +44,12 @@ export class NumberWithUnitsRulesService {
     answer: NumberWithUnitsAnswer,
     inputs: NumberWithUnitsRuleInputs
   ): boolean {
+    // Implement validation to prevent duplicate units.
+    var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+    if (this.hasDuplicateUnits(inputsObject)) {
+      console.error('Duplicate units detected. Please provide unique units.');
+      return false;
+    }
     // Returns true only if input is exactly equal to answer.
     var answerObject = this.unitsObjectFactory.fromDict(answer);
     var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
@@ -77,6 +83,11 @@ export class NumberWithUnitsRulesService {
     var answerString = answerObject.toMathjsCompatibleString();
     var inputsString = inputsObject.toMathjsCompatibleString();
     return unit(answerString).equals(unit(inputsString));
+  }
+
+  private hasDuplicateUnits(inputsObject: any): boolean {
+    var uniqueUnits = new Set(inputsObject.units);
+    return uniqueUnits.size !== inputsObject.units.length;
   }
 }
 
