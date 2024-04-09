@@ -218,8 +218,7 @@
   }
 }
 
-/*REDESIGN CLASSES - can be used for other tabs*/
-.oppia-learner-dash_greeting {
+.oppia-learner-dash-greeting {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 32px;
@@ -244,10 +243,8 @@
   font-weight: 500;
   margin-bottom: 0;
 }
-/******************/
 
-/*REDESIGN CLASSES - exclusively for home*/
-.oppia-learner-dash-home_classes {
+.oppia-learner-dash-home-classes {
   -webkit-appearance: none;
 }
 
@@ -267,4 +264,3 @@
   color: #205d86;
   text-decoration: none;
 }
-/******************/
