@@ -13,7 +13,7 @@ import {AppConstants} from 'app.constants';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
-import {StoryNode} from 'domain/story/story-node.model';
+
 /* 
   Combines test cases from:
   - collection-summary-tile (CollectionSummary)
@@ -68,7 +68,7 @@ describe('LessonCardComponent', () => {
     title: 'Test Title',
   };
 
-  const sampleStoryNode = {
+  const sampleNode = {
     id: 'node_1',
     thumbnail_filename: 'image.png',
     title: 'Chapter 1',
@@ -87,8 +87,6 @@ describe('LessonCardComponent', () => {
     unpublishing_reason: null,
   };
 
-  const storyNode = StoryNode.createFromBackendDict(sampleStoryNode);
-
   /* learner-story-summary-tile */
   const sampleTopic = {
     id: '0',
@@ -100,7 +98,7 @@ describe('LessonCardComponent', () => {
     story_is_published: true,
     completed_node_titles: ['Chapter 1'],
     url_fragment: 'story-title',
-    all_node_dicts: [storyNode],
+    all_node_dicts: [sampleNode],
     topic_name: 'Topic',
     classroom_url_fragment: 'math',
     topic_url_fragment: 'topic',
@@ -116,7 +114,7 @@ describe('LessonCardComponent', () => {
     story_is_published: true,
     completed_node_titles: ['Chapter 1'],
     url_fragment: 'story-title',
-    all_node_dicts: [sampleStoryNode, sampleStoryNode],
+    all_node_dicts: [sampleNode, sampleNode],
     topic_name: 'Topic',
     classroom_url_fragment: 'math',
     topic_url_fragment: 'topic',
@@ -168,7 +166,7 @@ describe('LessonCardComponent', () => {
     expect(component.lessonTopic).toEqual('Community Lessons');
   });
 
-  it('should set story to StorySummary and its non-url values to the respective fields', () => {
+  it('should set story to complete StorySummary and its non-url values to the respective fields', () => {
     component.story = StorySummary.createFromBackendDict(sampleTopic);
     component.topic = sampleTopic.topic_name;
 
@@ -197,6 +195,31 @@ describe('LessonCardComponent', () => {
     expect(component.lessonTopic).toEqual(sampleTopic.topic_name);
   });
 
+  it('should set story to incomplete StorySummary and its non-url values to the respective fields', () => {
+    component.story = StorySummary.createFromBackendDict(sampleTopic2);
+    component.topic = sampleTopic2.topic_name;
+
+    fixture.detectChanges();
+
+    let nextStory =
+      sampleTopic2.completed_node_titles.length -
+      (sampleTopic2.completed_node_titles.length ===
+      sampleTopic2.node_titles.length
+        ? 1
+        : 0);
+
+    expect(component.title).toEqual(
+      `Chapter ${nextStory + 1}: ${sampleTopic2.node_titles[nextStory]}`
+    );
+    expect(component.progress).toEqual(
+      Math.floor(
+        (sampleTopic2.completed_node_titles.length /
+          sampleTopic2.node_titles.length) *
+          100
+      )
+    );
+  });
+
   it('should set story to CollectionSummary and set its imgUrl correctly', () => {
     component.story = CollectionSummary.createFromBackendDict(sampleCollection);
 
@@ -213,23 +236,10 @@ describe('LessonCardComponent', () => {
     component.story = StorySummary.createFromBackendDict(sampleTopic);
     component.topic = sampleTopic.topic_name;
 
-    spyOn(component, 'getStorySummaryLessonUrl');
     fixture.detectChanges();
 
-    let nextStory =
-      sampleTopic.completed_node_titles.length -
-      (sampleTopic.completed_node_titles.length ===
-      sampleTopic.node_titles.length
-        ? 1
-        : 0);
-    expect(component.getStorySummaryLessonUrl).toHaveBeenCalledWith({
-      classroom: sampleTopic.classroom_url_fragment,
-      topic: sampleTopic.topic_url_fragment,
-      currentStory: sampleTopic.all_node_dicts[nextStory],
-      story: sampleTopic.url_fragment,
-    });
     expect(component.lessonUrl).toBe(
-      `/explore/${sampleStoryNode.exploration_id}?topic_url_fragment=${sampleTopic.topic_url_fragment}&classroom_url_fragment=${sampleTopic.classroom_url_fragment}&story_url_fragment=${sampleTopic.url_fragment}&node_id=${sampleStoryNode.id}`
+      `/explore/${sampleNode.exploration_id}?topic_url_fragment=${sampleTopic.topic_url_fragment}&classroom_url_fragment=${sampleTopic.classroom_url_fragment}&story_url_fragment=${sampleTopic.url_fragment}&node_id=${sampleNode.id}`
     );
   });
 
@@ -239,7 +249,7 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.lessonUrl).toBe(
+    expect(component.imgUrl).toBe(
       assetsBackendApiService.getThumbnailUrlForPreview(
         AppConstants.ENTITY_TYPE.STORY,
         sampleTopic.id,
@@ -251,16 +261,8 @@ describe('LessonCardComponent', () => {
   it('should set story to StorySummary and get the correct progress', () => {
     component.story = StorySummary.createFromBackendDict(sampleTopic2);
     component.topic = sampleTopic2.topic_name;
-    spyOn(component, 'getProgress');
     fixture.detectChanges();
 
-    expect(component.getProgress).toHaveBeenCalledWith(
-      Math.floor(
-        (sampleTopic2.completed_node_titles.length /
-          sampleTopic2.node_titles.length) *
-          100
-      )
-    );
     const progressStyle = component.getProgress(
       Math.floor(
         (sampleTopic2.completed_node_titles.length /
@@ -268,8 +270,9 @@ describe('LessonCardComponent', () => {
           100
       )
     );
+
     expect(progressStyle).toBe(
-      `linear-gradient(270 deg, #00645c 50%, transparent 50%), linear-gradient(0deg, #00645c 0%, lightgray 0%)`
+      `linear-gradient(270deg, #00645c 50%, transparent 50%), linear-gradient(0deg, #00645c 0%, lightgray 0%)`
     );
   });
 });
