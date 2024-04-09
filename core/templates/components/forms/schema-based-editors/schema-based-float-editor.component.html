@@ -14,7 +14,7 @@
              (keypress)="onKeypress($event)"
              applyValidation [validators]="validators"
              (blur)="onBlur()" (focus)="onFocus()"
-             inputmode="numeric">
+             inputmode="decimal">
       <span *ngIf="errorStringI18nKey" class="oppia-form-error oppia-numeric-input-error" tabindex="0">
         {{ errorStringI18nKey | translate }}
       </span>
