@@ -250,13 +250,20 @@ var ContributorDashboardAdminPage = function () {
 
     await action.click('Date Picker Toggle', datePickerToggle);
 
-    var day = new Date(selectedDate).getDate();
-    var month = new Date(selectedDate).getMonth() + 1;
-    var year = new Date(selectedDate).getFullYear();
+    // Here selectedDate is a Date object that is to be selected by date picker.
+    var day = selectedDate.getDate();
+    var month = selectedDate.getMonth() + 1;
+    var year = selectedDate.getFullYear();
 
     if (year) {
-      var nextMonthButton = $('.mat-calendar-next-button');
-      var prevMonthButton = $('.mat-calendar-previous-button');
+      var nextMonthButton = $(
+        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
+          'mat-calendar/mat-calendar-header/div/div/button[3]'
+      );
+      var prevMonthButton = $(
+        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
+          'mat-calendar/mat-calendar-header/div/div/button[2]'
+      );
 
       var yearsToNavigate =
         year - new Date(initialValueOfDatePicker).getFullYear();
@@ -281,8 +288,14 @@ var ContributorDashboardAdminPage = function () {
     }
 
     if (month) {
-      var nextMonthButton = $('.mat-calendar-next-button');
-      var prevMonthButton = $('.mat-calendar-previous-button');
+      var nextMonthButton = $(
+        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
+          'mat-calendar/mat-calendar-header/div/div/button[3]'
+      );
+      var prevMonthButton = $(
+        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
+          'mat-calendar/mat-calendar-header/div/div/button[2]'
+      );
 
       var currentMonth = new Date(initialValueOfDatePicker).getMonth() + 1;
       var monthsToNavigate = month - currentMonth;
@@ -308,17 +321,15 @@ var ContributorDashboardAdminPage = function () {
 
     if (day) {
       var daySelector = $(`aria/${day}`);
+      await waitFor.visibilityOf(daySelector, 'Date to select is not visible');
       await action.click('Day Selector', daySelector);
     }
 
-    var formattedInputDate = `${new Date(selectedDate).toLocaleString(
-      'default',
-      {
-        day: '2-digit',
-      }
-    )}-${new Date(selectedDate).toLocaleString('default', {
+    var formattedInputDate = `${new Date(selectedDate).toLocaleString('en-US', {
+      day: '2-digit',
+    })}-${new Date(selectedDate).toLocaleString('en-US', {
       month: 'short',
-    })}-${new Date(selectedDate).toLocaleString('default', {year: 'numeric'})}`;
+    })}-${new Date(selectedDate).toLocaleString('en-US', {year: 'numeric'})}`;
 
     var finalValueOfDatePicker = await action.getValue(
       'Date Picker Input',

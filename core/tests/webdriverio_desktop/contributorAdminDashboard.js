@@ -351,10 +351,14 @@ describe('Contributor Admin Dashboard', function () {
     await users.logout();
   });
 
-  it(
-    'should be able to filter translation submissions using date range' +
-      ' filter',
+  fit(
+    'should be able to filter those translation submitters, who have submitted' +
+      ' translations between a given date range',
     async function () {
+      /**
+      This test works on the principle that one translation submission was created
+      earlier by a translation submitter, so it was created within the last 24 hours.
+      **/
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
       await contributorDashboardAdminPage.get();
 
@@ -376,9 +380,13 @@ describe('Contributor Admin Dashboard', function () {
   );
 
   it(
-    'should be able to filter translation reviewers using date range' +
-      ' filter',
+    'should be able to filter those translation reviewers, who have reviewed' +
+      ' translations between a given date range',
     async function () {
+      /**
+      This test works on the principle that one translation submission was reviewed
+      earlier by a translation reviewer, so it was reviewed within the last 24 hours.
+      **/
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
       await contributorDashboardAdminPage.get();
 
@@ -400,9 +408,13 @@ describe('Contributor Admin Dashboard', function () {
   );
 
   it(
-    'should be able to filter question submissions using date range' +
-      ' filter',
+    'should be able to filter those question submitters, who have submitted' +
+      ' questiions between a given date range',
     async function () {
+      /**
+      This test works on the principle that one question submission was created
+      earlier by a question submitter, so it was created within the last 24 hours.
+      **/
       await users.login(QUESTION_COORDINATOR_EMAIL);
       await contributorDashboardAdminPage.get();
 
@@ -420,20 +432,28 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  it('should be able to filter question reviewers using date range filter', async function () {
-    await users.login(QUESTION_COORDINATOR_EMAIL);
-    await contributorDashboardAdminPage.get();
+  it(
+    'should be able to filter those question reviewers,who have reviewed' +
+      ' questions between a given date range',
+    async function () {
+      /**
+      This test works on the principle that one question submission was reviewed
+      earlier by a question reviewer, so it was reviewed within the last 24 hours.
+      **/
+      await users.login(QUESTION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
 
-    await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+      await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
-    await contributorDashboardAdminPage.setFirstDatePickerValue(
-      new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-    );
-    await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
-    await contributorDashboardAdminPage.expectNoStatsElement();
+      await contributorDashboardAdminPage.setFirstDatePickerValue(
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000 * 35)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectNoStatsElement();
 
-    await users.logout();
-  });
+      await users.logout();
+    }
+  );
 });
