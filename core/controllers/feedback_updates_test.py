@@ -257,7 +257,8 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
             'exploration.exp1.thread1', 'exp1',
             1, suggestion_models.STATUS_ACCEPTED, 'author',
             'review_id', change_dict, 'translation.Algebra',
-            'en', False, datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+            'en', False, datetime.datetime(2016, 4, 10, 0, 0, 0, 0),
+            datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         )
 
         response_dict = self.get_json(
