@@ -78,6 +78,9 @@ export class NumericInputRulesService {
     answer: NumericInputAnswer,
     inputs: NumericInputIsWithinToleranceRuleInputs
   ): boolean {
+    if (inputs.tol <= 0) {
+      throw new Error('Tolerance value must be greater than zero.');
+    }
     return answer >= inputs.x - inputs.tol && answer <= inputs.x + inputs.tol;
   }
 }
