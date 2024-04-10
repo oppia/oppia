@@ -217,7 +217,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/click-all-buttons-on-about-page',
     'logged-in-user-tests/click-all-buttons-on-about-foundation-page',
     'logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page',
-    'logged-in-user-tests/try-to-add-exploration-to-play-latee-give-feedback-and-report-it', # pylint: disable=line-too-long
+    'logged-in-user-tests/' +
+        'try-to-add-exploration-to-play-latee-give-feedback-and-report-it',
     'logged-in-user-tests/click-all-buttons-on-navbar',
     'logged-in-user-tests/click-all-links-in-about-oppia-footer',
     'logged-in-user-tests/click-all-links-on-get-started-page',
