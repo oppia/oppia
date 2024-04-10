@@ -37,7 +37,7 @@ export enum FeatureNames {
   LearnerGroupsAreEnabled = 'learner_groups_are_enabled',
   CdAdminDashboardNewUi = 'cd_admin_dashboard_new_ui',
   NewLessonPlayer = 'new_lesson_player',
-  ADD_VOICEOVER_WITH_ACCENT = 'add_voiceover_with_accent',
+  AddVoiceoverWithAccent = 'add_voiceover_with_accent',
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
   EnableVoiceoverContribution = 'enable_voiceover_contribution',
 }
