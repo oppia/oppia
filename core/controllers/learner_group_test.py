@@ -406,7 +406,7 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
     LEARNER_2_USERNAME: Final = 'user2'
     TOPIC_ID_1: Final = 'topic_id_1'
     STORY_ID_1: Final = 'story_id_1'
-    SUBTOPIC_PAGE_ID_1: Final = TOPIC_ID_1 + ':1'
+    SUBTOPIC_PAGE_ID_1: Final = '%s:1' % TOPIC_ID_1
     STORY_URL_FRAGMENT: Final = 'title-one'
     STORY_URL_FRAGMENT_TWO: Final = 'story-two'
     NODE_ID_1: Final = 'node_1'
@@ -664,7 +664,7 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
     LEARNER_1_USERNAME: Final = 'user1'
     TOPIC_ID_1: Final = 'topic_id_1'
     STORY_ID_1: Final = 'story_id_1'
-    SUBTOPIC_PAGE_ID_1: Final = TOPIC_ID_1 + ':1'
+    SUBTOPIC_PAGE_ID_1: Final = '%s:1' % TOPIC_ID_1
     STORY_URL_FRAGMENT: Final = 'title-one'
     STORY_URL_FRAGMENT_TWO: Final = 'story-two'
     NODE_ID_1: Final = 'node_1'
@@ -1195,8 +1195,8 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
 class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
     """Tests for Learner Stories Chapters Progress Handler."""
 
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
-    NODE_ID_2: Final = story_domain.NODE_ID_PREFIX + '2'
+    NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
+    NODE_ID_2: Final = '%s2' % story_domain.NODE_ID_PREFIX
 
     def setUp(self) -> None:
         super().setUp()
@@ -1235,7 +1235,7 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s1' % story_domain.NODE_ID_PREFIX,
                 'old_value': None,
                 'new_value': self.exp_id_1
             })
