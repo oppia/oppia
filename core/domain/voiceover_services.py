@@ -526,7 +526,7 @@ def update_exploration_voice_artist_link_model(
 
     Args:
         user_id: str. The committer ID for the given change list.
-        change_list: list(ExplorationChange). A list of exploration chnage
+        change_list: list(ExplorationChange). A list of exploration change
             objects.
         old_exploration: Exploration. An instance of exploration class
             representing an old version.
