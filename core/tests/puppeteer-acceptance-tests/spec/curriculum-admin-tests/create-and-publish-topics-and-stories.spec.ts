@@ -25,7 +25,6 @@ const ROLES = testConstants.Roles;
 
 describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
-  let explorationUrl: string | null;
   let explorationId: string;
 
   let exploration = {
@@ -59,18 +58,6 @@ describe('Curriculum Admin', function () {
     description: 'This story is to test curriculum admin utility.',
   };
 
-  const getExplorationIdFromUrl = (url: string | null): string => {
-    if (!url) {
-      throw new Error('Exploration URL is null or empty');
-    }
-    const parts = url.split('/');
-    const explorationId = parts.length > 0 ? parts[parts.length - 1] : '';
-    if (!explorationId) {
-      throw new Error('Failed to extract exploration ID from URL');
-    }
-    return explorationId;
-  };
-
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
@@ -83,8 +70,7 @@ describe('Curriculum Admin', function () {
     'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
-      explorationUrl = await curriculumAdmin.createExploration(exploration);
-      explorationId = getExplorationIdFromUrl(explorationUrl);
+      explorationId = await curriculumAdmin.createExploration(exploration);
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
       await curriculumAdmin.createTopic(topic);

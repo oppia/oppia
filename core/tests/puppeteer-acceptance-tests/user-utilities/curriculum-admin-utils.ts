@@ -292,7 +292,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating an exploration as a curriculum admin.
    */
-  async createExploration(exploration: Exploration): Promise<string | null> {
+  async createExploration(exploration: Exploration): Promise<string> {
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
       `${dismissWelcomeModalSelector}:not([disabled])`
@@ -343,7 +343,10 @@ export class CurriculumAdmin extends BaseUser {
       explorationIdElement,
       element => element.textContent
     );
-    return explorationIdUrl;
+    if (!explorationIdUrl) {
+      throw new Error('Failed to fetch newly created exploration URL.');
+    }
+    return this.getExplorationIdFromUrl(explorationIdUrl);
   }
 
   /**
