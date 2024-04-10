@@ -17,7 +17,7 @@
  */
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {ReactiveFormsModule} from '@angular/forms';
+import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
   ComponentFixture,
@@ -110,7 +110,7 @@ describe('Topic editor tab directive', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ReactiveFormsModule],
+      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
       declarations: [
         TopicEditorTabComponent,
         RearrangeSkillsInSubtopicsModalComponent,
