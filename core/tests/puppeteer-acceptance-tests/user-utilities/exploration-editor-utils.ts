@@ -21,7 +21,8 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
 const creatorDashboardAdminUrl = testConstants.URLs.CreatorDashboard;
-const navigateToPreviewTabButton = '.e2e-test-preview-tab';
+const previewTabButton = '.e2e-test-preview-tab';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 
 // Elements in exploration creator.
 const createExplorationButtonSelector = 'button.e2e-test-create-activity';
@@ -37,7 +38,7 @@ const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = 'input.e2e-test-float-form-input';
 
-const testNodeBackground = '.e2e-test-node';
+const testNodeSelector = '.e2e-test-node';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
@@ -45,14 +46,19 @@ const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 const oppiaResponsesSelector = '.oppia-response-header';
 const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
 const resonseModalHeaderSelector = '.e2e-test-add-response-modal-header';
+const mobileGraphResizeButton = '.e2e-test-oppia-mobile-graph-resize-button';
+const mobileNavbarDropdown = '.e2e-test-mobile-options-dropdown';
+const mobileNavbarOptions = '.navbar-mobile-options';
+const mobileOptionsButton = '.e2e-test-mobile-options';
+const mobileSaveChangesButton = '.e2e-test-save-changes-for-small-screens';
+const mobileTestNodeSelector = '.e2e-test-node-background';
 
 // Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
 const explorationRestartButton = '.e2e-preview-restart-button';
 const explorationConversationContent = '.e2e-test-conversation-content';
-const explorationCompletionToastMessage: string =
-  '.e2e-test-lesson-completion-message';
+const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 export class ExplorationEditor extends BaseUser {
   /**
@@ -125,8 +131,11 @@ export class ExplorationEditor extends BaseUser {
    */
   async saveExplorationDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('.e2e-test-mobile-options');
-      await this.clickOn('.e2e-test-save-changes-for-small-screens');
+      const element = await this.page.$(mobileNavbarOptions);
+      if (!element) {
+        await this.clickOn(mobileOptionsButton);
+      }
+      await this.clickOn(mobileSaveChangesButton);
       await this.clickOn(saveDraftButton);
     } else {
       await this.clickOn(saveChangesButton);
@@ -140,20 +149,24 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string): Promise<void> {
-    const selector = testNodeBackground;
-
     if (cardName === 'Introduction' && this.isViewportAtMobileWidth()) {
-      await this.clickOn('.e2e-test-oppia-mobile-graph-resize-button');
-      await this.page.waitForSelector(selector);
-      const elements = await this.page.$$(selector);
-      await elements[0].click();
+      await this.clickOn(mobileGraphResizeButton);
+      await this.page.waitForSelector(mobileTestNodeSelector);
+      const elements = await this.page.$$(mobileTestNodeSelector);
+      await elements[3].click();
     } else if (cardName === 'Introduction') {
-      await this.page.waitForSelector(selector);
-      const elements = await this.page.$$(selector);
+      await this.page.waitForSelector(testNodeSelector);
+      const elements = await this.page.$$(testNodeSelector);
       await elements[0].click();
     } else if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('.e2e-test-oppia-mobile-graph-resize-button');
-      await this.clickOn(cardName);
+      await this.clickOn(mobileGraphResizeButton);
+      await this.page.waitForSelector(mobileTestNodeSelector);
+      const elements = await this.page.$$(mobileTestNodeSelector);
+      if (cardName === 'Test Question ') {
+        await elements[3].click();
+      } else {
+        await elements[5].click();
+      }
       await this.page.waitForNetworkIdle({idleTime: 700});
     } else {
       await this.clickOn(cardName);
@@ -179,12 +192,11 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('.e2e-test-mobile-options');
-      await this.clickOn('.e2e-test-mobile-options-dropdown');
-      await this.clickOn('.e2e-test-mobile-preview-button');
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(mobilePreviewTabButton);
       await this.page.waitForNavigation();
     } else {
-      await this.clickOn(navigateToPreviewTabButton);
+      await this.clickOn(previewTabButton);
       await this.page.waitForNavigation();
     }
   }
@@ -254,7 +266,15 @@ export class ExplorationEditor extends BaseUser {
    * Function to restart the exploration after it has been completed.
    */
   async restartExploration(): Promise<void> {
-    await this.clickOn(explorationRestartButton);
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      if (element) {
+        await this.clickOn(mobileOptionsButton);
+      }
+      await this.clickOn(explorationRestartButton);
+    } else {
+      await this.clickOn(explorationRestartButton);
+    }
   }
 }
 
