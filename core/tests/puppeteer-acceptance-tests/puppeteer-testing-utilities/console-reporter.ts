@@ -74,6 +74,10 @@ const CONSOLE_ERRORS_TO_FIX = [
   new RegExp(
     'Uncaught \\(in promise\\).*learner_groups_feature_status_handler'
   ),
+  // TODO(#17277): Failed to execute 'convertToSpecifiedUnits' on 'SVGLength': Could not resolve relative length.
+  new RegExp(
+    "Failed to execute 'convertToSpecifiedUnits' on 'SVGLength': Could not resolve relative length."
+  ),
   // TODO(#19733): 404 (Not Found) for resources used in midi-js.
   escapeRegExp(
     'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/acoustic' +
