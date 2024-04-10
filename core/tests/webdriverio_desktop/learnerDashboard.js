@@ -132,14 +132,14 @@ describe('Learner dashboard functionality', function () {
     await users.logout();
   });
 
-  it('should add exploration to play later list', async function () {
-    var EXPLORATION_FRACTION = 'fraction';
-    var EXPLORATION_SINGING = 'singing';
-    var CATEGORY_MATHEMATICS = 'Mathematics';
-    var CATEGORY_MUSIC = 'Music';
-    var LANGUAGE_ENGLISH = 'English';
-    var EXPLORATION_OBJECTIVE = 'hold the light of two trees';
-    var EXPLORATION_OBJECTIVE2 = 'show us the darkness';
+  it('should add and remove exploration to play later list', async function () {
+    let EXPLORATION_FRACTION = 'fraction';
+    let EXPLORATION_SINGING = 'singing';
+    let CATEGORY_MATHEMATICS = 'Mathematics';
+    let CATEGORY_MUSIC = 'Music';
+    let LANGUAGE_ENGLISH = 'English';
+    let EXPLORATION_OBJECTIVE = 'hold the light of two trees';
+    let EXPLORATION_OBJECTIVE2 = 'show us the darkness';
 
     await users.createUser(
       'creator@learnerDashboard.com',
@@ -181,6 +181,18 @@ describe('Learner dashboard functionality', function () {
     await learnerDashboardPage.get();
     await learnerDashboardPage.navigateToCommunityLessonsSection();
     await learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      EXPLORATION_SINGING
+    );
+    await learnerDashboardPage.removeExplorationSummaryTileFromPlaylist(
+      EXPLORATION_FRACTION
+    );
+    await learnerDashboardPage.expectExplorationTileToBeRemovedFromPlaylist(
+      EXPLORATION_FRACTION
+    );
+    await learnerDashboardPage.removeExplorationSummaryTileFromPlaylist(
+      EXPLORATION_SINGING
+    );
+    await learnerDashboardPage.expectExplorationTileToBeRemovedFromPlaylist(
       EXPLORATION_SINGING
     );
     await users.logout();
