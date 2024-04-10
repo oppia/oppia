@@ -136,7 +136,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 .date-selector-container {
   display: inline-block;
   vertical-align: top;
-  width: 58%;
+  width: 60%;
 }
 .date-selector-inner-container {
   align-items: center;
@@ -154,12 +154,16 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
 .date-selector-inner-container .mat-form-field-wrapper {
   padding-bottom: 0;
 }
-.date-selector-inner-container mat-form-field .filter-label {
+.date-selector-inner-container .filter-label {
   margin: 2px;
 }
 .date-selector-inner-container mat-form-field .mat-form-field-infix {
   border-top: 0;
   padding-left: 4px;
+  width: 100px;
+}
+.date-selector-inner-container mat-form-field .mat-form-field-wrapper .mat-form-field-flex {
+  margin: 0 2px 0 2px;
 }
 @media (max-width: 815px) {
   .oppia-dashboard-container {
@@ -246,7 +250,7 @@ mat-chip-list .mat-standard-chip .mat-chip-remove {
   color: #00645c;
 }
 .topic-selector-container {
-  width: 40%;
+  width: 38%;
 }
 .dashboard-tabs .dashboard-tabs-text:hover,
 .dashboard-tabs .dashboard-tabs-text:focus {

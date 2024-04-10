@@ -99,10 +99,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   loadingMessage!: string;
   allTopicNames: string[] = [];
   today!: Date;
-  selectedFirstActivity!: Date;
-  selectedLastActivity!: Date;
-  selectedFirstActivityInDays!: number;
-  selectedLastActivityInDays!: number;
+  startDateForUsersLastActivity!: Date;
+  endDateForUsersLastActivity!: Date;
+  startDateForUsersLastActivityInDays!: number;
+  endDateForUsersLastActivityInDays!: number;
   selectedTopicIds: string[] = [];
   selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
@@ -155,10 +155,9 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
               return;
             }
             this.today = new Date();
-            this.selectedFirstActivity = new Date();
-            this.selectedLastActivity = new Date(
-              this.today.getTime() - 24 * 60 * 60 * 1000 * 90
-            );
+            this.startDateForUsersLastActivity = new Date();
+            this.endDateForUsersLastActivity =
+              this.getDateThatIsDaysBeforeToday(90);
             this.selectFirstActivity();
             this.selectLastActivity();
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
@@ -252,18 +251,70 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.languageDropdownShown = !this.languageDropdownShown;
   }
 
+  getDateThatIsDaysBeforeToday(numberOfDaysBeforeToday: number): Date {
+    return new Date(
+      this.today.getTime() - 24 * 60 * 60 * 1000 * numberOfDaysBeforeToday
+    );
+  }
+
+  selectFirstActivity(): number {
+    this.today = new Date();
+    if (this.today.getTime() >= this.startDateForUsersLastActivity.getTime()) {
+      if (
+        this.endDateForUsersLastActivity &&
+        this.startDateForUsersLastActivity.getTime() >=
+          new Date(this.endDateForUsersLastActivity).getTime()
+      ) {
+        const oneDay = 24 * 60 * 60 * 1000;
+        return Math.floor(
+          Math.abs(
+            this.today.getTime() - this.startDateForUsersLastActivity.getTime()
+          ) / oneDay
+        );
+      }
+    }
+  }
+
+  selectLastActivity(): number {
+    this.today = new Date();
+    if (this.today.getTime() >= this.endDateForUsersLastActivity.getTime()) {
+      if (
+        this.startDateForUsersLastActivity &&
+        this.endDateForUsersLastActivity.getTime() <=
+          new Date(this.startDateForUsersLastActivity).getTime()
+      ) {
+        const oneDay = 24 * 60 * 60 * 1000;
+        return Math.floor(
+          Math.abs(
+            this.today.getTime() - this.endDateForUsersLastActivity.getTime()
+          ) / oneDay
+        );
+      }
+    }
+  }
+
   createFilter(): void {
     const tempFilter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      this.selectedFirstActivityInDays,
-      this.selectedLastActivityInDays
+      this.selectFirstActivity(),
+      this.selectLastActivity()
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {
       this.filter = tempFilter;
     }
+  }
+
+  changeFirstActivity(value: Date): void {
+    this.startDateForUsersLastActivity = new Date(value);
+    this.createFilter();
+  }
+
+  changeLastActivity(value: Date): void {
+    this.endDateForUsersLastActivity = new Date(value);
+    this.createFilter();
   }
 
   applyTopicFilter(): void {
@@ -290,52 +341,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     this.translationReviewersCount =
       this.translationReviewersCountByLanguage[this.selectedLanguage.id];
     this.createFilter();
-  }
-
-  changeFirstActivity(value: Date): void {
-    this.selectedFirstActivity = new Date(value);
-    this.selectFirstActivity();
-  }
-
-  changeLastActivity(value: Date): void {
-    this.selectedLastActivity = new Date(value);
-    this.selectLastActivity();
-  }
-
-  selectFirstActivity(): void {
-    this.today = new Date();
-    const selectedFirstDate = new Date(this.selectedFirstActivity);
-    if (this.today.getTime() >= selectedFirstDate.getTime()) {
-      if (
-        this.selectedLastActivity &&
-        selectedFirstDate.getTime() >=
-          new Date(this.selectedLastActivity).getTime()
-      ) {
-        const oneDay = 24 * 60 * 60 * 1000;
-        this.selectedFirstActivityInDays = Math.floor(
-          Math.abs(this.today.getTime() - selectedFirstDate.getTime()) / oneDay
-        );
-        this.createFilter();
-      }
-    }
-  }
-
-  selectLastActivity(): void {
-    this.today = new Date();
-    const selectedLastDate = new Date(this.selectedLastActivity);
-    if (this.today.getTime() >= selectedLastDate.getTime()) {
-      if (
-        this.selectedFirstActivity &&
-        selectedLastDate.getTime() <=
-          new Date(this.selectedFirstActivity).getTime()
-      ) {
-        const oneDay = 24 * 60 * 60 * 1000;
-        this.selectedLastActivityInDays = Math.floor(
-          Math.abs(this.today.getTime() - selectedLastDate.getTime()) / oneDay
-        );
-        this.createFilter();
-      }
-    }
   }
 
   setActiveTab(tabName: string): void {
