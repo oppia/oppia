@@ -236,6 +236,10 @@ export class SchemaBasedListEditorComponent
     this.onChange(this.localValue);
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   ngOnInit(): void {
     this.baseFocusLabel =
       this.labelForFocusTarget ||
