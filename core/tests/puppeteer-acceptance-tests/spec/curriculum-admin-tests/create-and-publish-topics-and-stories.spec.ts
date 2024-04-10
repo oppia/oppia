@@ -27,37 +27,6 @@ describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
   let explorationId: string;
 
-  let exploration = {
-    state: 'Test Exploration',
-    title: 'Test Exploration Title 1',
-    goal: 'Test Exploration Goal 1',
-  };
-
-  let skill = {
-    description: 'Test Skill 1',
-    reviewMaterial: 'This is a test skill for curriculum admin.',
-    questionCount: 3,
-  };
-
-  let topic = {
-    name: 'Test Topic 1',
-    url_fragment: 'test-topic-one',
-    web_fragment: 'Test Topic 1',
-    description: 'This topic is to test curriculum admin utility.',
-  };
-
-  let subtopic = {
-    title: 'Test Subtopic 1',
-    url_fragment: 'test-subtopic-one',
-    description: 'This subtopic is to test curriculum admin utility.',
-  };
-
-  let story = {
-    title: 'Test Story 1',
-    url_fragment: 'test-story-one',
-    description: 'This story is to test curriculum admin utility.',
-  };
-
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
@@ -70,15 +39,24 @@ describe('Curriculum Admin', function () {
     'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
-      explorationId = await curriculumAdmin.createExploration(exploration);
+      explorationId = await curriculumAdmin.createExploration(
+        'Test Exploration',
+        'Test Exploration Title 1'
+      );
 
       await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-      await curriculumAdmin.createTopic(topic);
-      await curriculumAdmin.createSubtopic(subtopic);
-      await curriculumAdmin.createSkill(skill);
-      await curriculumAdmin.addDiagnosticTestSkillAndPublishTopic(skill);
+      await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
+      await curriculumAdmin.createSubtopic(
+        'Test Subtopic 1',
+        'test-subtopic-one'
+      );
+      await curriculumAdmin.createSkill('Test Skill 1', 3);
+      await curriculumAdmin.addDiagnosticTestSkillAndPublishTopic(
+        'Test Skill 1'
+      );
       await curriculumAdmin.createAndPublishStoryWithChapter(
-        story,
+        'Test Story 1',
+        'test-story-one',
         explorationId
       );
 

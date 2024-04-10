@@ -159,37 +159,6 @@ const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
-interface Skill {
-  description: string;
-  reviewMaterial: string;
-  questionCount: number;
-}
-
-interface Exploration {
-  state: string;
-  title: string;
-  goal: string;
-}
-
-interface Topic {
-  name: string;
-  url_fragment: string;
-  web_fragment: string;
-  description: string;
-}
-
-interface Subtopic {
-  title: string;
-  url_fragment: string;
-  description: string;
-}
-
-interface Story {
-  title: string;
-  url_fragment: string;
-  description: string;
-}
-
 export class CurriculumAdmin extends BaseUser {
   /**
    * Function for navigating to the topic and skills dashboard page.
@@ -204,24 +173,27 @@ export class CurriculumAdmin extends BaseUser {
    * We need to generate at least 3 questions for the skill as a
    * pre-requisite for publishing the topic later.
    */
-  async createSkill(skill: Skill): Promise<void> {
+  async createSkill(description: string, questionCount: number): Promise<void> {
     await this.openTopicEditor();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
     await this.clickOn(addSkillButton);
-    await this.type(skillDescriptionField, skill.description);
+    await this.type(skillDescriptionField, description);
     await this.page.waitForSelector(skillReviewMaterialHeader);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
-    await this.type(richTextAreaField, skill.reviewMaterial);
+    await this.type(
+      richTextAreaField,
+      `Review material text content for ${description}.`
+    );
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillCreationButton);
     await this.page.bringToFront();
 
-    for (let i = 0; i < skill.questionCount; i++) {
+    for (let i = 0; i < questionCount; i++) {
       await this.createQuestion();
     }
     await this.assignSkillToSubtopic();
@@ -292,7 +264,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating an exploration as a curriculum admin.
    */
-  async createExploration(exploration: Exploration): Promise<string> {
+  async createExploration(state: string, title: string): Promise<string> {
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
       `${dismissWelcomeModalSelector}:not([disabled])`
@@ -303,7 +275,7 @@ export class CurriculumAdmin extends BaseUser {
     });
     await this.clickOn(textStateEditSelector);
     await this.page.keyboard.press('Tab');
-    await this.type(richTextAreaField, exploration.state);
+    await this.type(richTextAreaField, state);
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
@@ -332,8 +304,8 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(publishExplorationButton);
     }
 
-    await this.type(explorationTitleInput, exploration.title);
-    await this.type(explorationGoalInput, exploration.goal);
+    await this.type(explorationTitleInput, title);
+    await this.type(explorationGoalInput, `${title} Goal`);
     await this.clickOn(explorationCategoryDropdown);
     await this.clickOn('Algebra');
     await this.clickOn(saveExplorationChangesButton);
@@ -352,12 +324,15 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a topic in the topics-and-skills dashboard.
    */
-  async createTopic(topic: Topic): Promise<void> {
+  async createTopic(name: string, url_fragment: string): Promise<void> {
     await this.clickOn(addTopicButton);
-    await this.type(topicNameField, topic.name);
-    await this.type(topicUrlFragmentField, topic.url_fragment);
-    await this.type(topicWebFragmentField, topic.web_fragment);
-    await this.type(topicDescriptionField, topic.description);
+    await this.type(topicNameField, name);
+    await this.type(topicUrlFragmentField, url_fragment);
+    await this.type(topicWebFragmentField, name);
+    await this.type(
+      topicDescriptionField,
+      `Topic creation description test for ${name}.`
+    );
 
     await this.clickOn(photoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -441,18 +416,21 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a subtopic as a curriculum admin.
    */
-  async createSubtopic(subtopic: Subtopic): Promise<void> {
+  async createSubtopic(title: string, url_fragment: string): Promise<void> {
     await this.openTopicEditor();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
     await this.clickOn(addSubtopicButton);
-    await this.type(subtopicTitleField, subtopic.title);
-    await this.type(subtopicUrlFragmentField, subtopic.url_fragment);
+    await this.type(subtopicTitleField, title);
+    await this.type(subtopicUrlFragmentField, url_fragment);
 
     await this.clickOn(subtopicDescriptionEditorToggle);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, subtopic.description);
+    await this.type(
+      richTextAreaField,
+      `Subtopic creation description text for ${title}`
+    );
 
     await this.clickOn(subtopicPhotoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -492,7 +470,9 @@ export class CurriculumAdmin extends BaseUser {
    * Function for adding a skill for diagnostic tests and then publishing the topic.
    * Adding a skill to diagnostic tests is necessary for publishing the topic.
    */
-  async addDiagnosticTestSkillAndPublishTopic(skill: Skill): Promise<void> {
+  async addDiagnosticTestSkillAndPublishTopic(
+    skill_description: string
+  ): Promise<void> {
     await this.openTopicEditor();
     await this.clickOn(addDiagnosticTestSkillButton);
     await this.page.waitForSelector(diagnosticTestSkillSelector, {
@@ -526,7 +506,7 @@ export class CurriculumAdmin extends BaseUser {
         const event = new Event('change', {bubbles: true});
         selectElem.dispatchEvent(event);
       },
-      skill.description,
+      skill_description,
       diagnosticTestSkillSelector
     );
 
@@ -553,7 +533,8 @@ export class CurriculumAdmin extends BaseUser {
    * the story, and then publishing the story.
    */
   async createAndPublishStoryWithChapter(
-    story: Story,
+    story_title: string,
+    story_url_fragment: string,
     explorationId: string
   ): Promise<void> {
     await this.openTopicEditor();
@@ -561,9 +542,12 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileStoryDropdown);
     }
     await this.clickOn(addStoryButton);
-    await this.type(storyTitleField, story.title);
-    await this.type(storyUrlFragmentField, story.url_fragment);
-    await this.type(storyDescriptionField, story.description);
+    await this.type(storyTitleField, story_title);
+    await this.type(storyUrlFragmentField, story_url_fragment);
+    await this.type(
+      storyDescriptionField,
+      `Story creation description for ${story_title}.`
+    );
 
     await this.clickOn(storyPhotoBoxButton);
     await this.uploadFile(curriculumAdminThumbnailImage);
