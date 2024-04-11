@@ -58,7 +58,7 @@ const mobileStateNodeSelector = '.e2e-test-node-background';
 // Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
-const previewRestartButton = '.e2e-preview-restart-button';
+const previewRestartButton = '.e2e-test-preview-restart-button';
 const stateConversationContent = '.e2e-test-conversation-content';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
