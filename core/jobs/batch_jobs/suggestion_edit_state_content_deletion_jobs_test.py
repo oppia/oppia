@@ -35,6 +35,8 @@ if MYPY: # pragma: no cover
     models.Names.SUGGESTION
 ])
 
+suggestion_model = suggestion_models.GeneralSuggestionModel
+
 
 class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     job_test_utils.JobTestBase):
@@ -91,7 +93,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     def setUp(self) -> None:
         super().setUp()
 
-        self.suggestion_1_model: suggestion_models.GeneralSuggestionModel = (
+        self.edit_state_content_suggestion_model_1: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -101,7 +103,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 None
             ))
 
-        self.suggestion_2_model: suggestion_models.GeneralSuggestionModel = (
+        self.edit_state_content_suggestion_model_2: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -111,7 +113,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 None
             ))
 
-        self.suggestion_3_model: suggestion_models.GeneralSuggestionModel = (
+        self.create_translation_suggestion_model: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -121,7 +123,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'hi'
             ))
 
-        self.suggestion_4_model: suggestion_models.GeneralSuggestionModel = (
+        self.add_question_suggestion_model: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -132,15 +134,15 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             ))
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
-        self.suggestion_1_model.update_timestamps()
-        self.suggestion_2_model.update_timestamps()
-        self.suggestion_3_model.update_timestamps()
-        self.suggestion_4_model.update_timestamps()
+        self.edit_state_content_suggestion_model_1.update_timestamps()
+        self.edit_state_content_suggestion_model_2.update_timestamps()
+        self.create_translation_suggestion_model.update_timestamps()
+        self.add_question_suggestion_model.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([
-            self.suggestion_1_model,
-            self.suggestion_2_model,
-            self.suggestion_3_model,
-            self.suggestion_4_model])
+            self.edit_state_content_suggestion_model_1,
+            self.edit_state_content_suggestion_model_2,
+            self.create_translation_suggestion_model,
+            self.add_question_suggestion_model])
 
         queries = [(
             'suggestion_type',
@@ -215,7 +217,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
     def setUp(self) -> None:
         super().setUp()
 
-        self.suggestion_1_model: suggestion_models.GeneralSuggestionModel = (
+        self.edit_state_content_suggestion_model_1: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -225,7 +227,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 None
             ))
 
-        self.suggestion_2_model: suggestion_models.GeneralSuggestionModel = (
+        self.edit_state_content_suggestion_model_2: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -235,7 +237,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 None
             ))
 
-        self.suggestion_3_model: suggestion_models.GeneralSuggestionModel = (
+        self.create_translation_suggestion_model: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -245,7 +247,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
                 'hi'
             ))
 
-        self.suggestion_4_model: suggestion_models.GeneralSuggestionModel = (
+        self.add_question_suggestion_model: suggestion_model = (
             self.create_suggestion(
                 feconf.SUGGESTION_TYPE_ADD_QUESTION,
                 feconf.ENTITY_TYPE_EXPLORATION,
@@ -256,15 +258,15 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             ))
 
     def test_job_deletes_suggestion_edit_state_content_model(self) -> None:
-        self.suggestion_1_model.update_timestamps()
-        self.suggestion_2_model.update_timestamps()
-        self.suggestion_3_model.update_timestamps()
-        self.suggestion_4_model.update_timestamps()
+        self.edit_state_content_suggestion_model_1.update_timestamps()
+        self.edit_state_content_suggestion_model_2.update_timestamps()
+        self.create_translation_suggestion_model.update_timestamps()
+        self.add_question_suggestion_model.update_timestamps()
         suggestion_models.GeneralSuggestionModel.put_multi([
-            self.suggestion_1_model,
-            self.suggestion_2_model,
-            self.suggestion_3_model,
-            self.suggestion_4_model])
+            self.edit_state_content_suggestion_model_1,
+            self.edit_state_content_suggestion_model_2,
+            self.create_translation_suggestion_model,
+            self.add_question_suggestion_model])
 
         queries = [(
             'suggestion_type',
