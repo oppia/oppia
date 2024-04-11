@@ -901,6 +901,9 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Navigates to the Community Library page using the oppia website footer.
+   */
   async navigateToCommunityLibraryPageViaFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
@@ -911,6 +914,9 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Navigates to the Contact page using the oppia website footer.
+   */
   async navigateToContactPageViaFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
