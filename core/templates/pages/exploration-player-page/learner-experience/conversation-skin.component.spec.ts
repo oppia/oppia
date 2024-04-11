@@ -2977,4 +2977,19 @@ describe('Conversation skin component', () => {
     ).toHaveBeenCalled();
     expect(componentInstance.showPendingCard).toHaveBeenCalled();
   }));
+
+  it('should tell if window can show two cards or not', () => {
+    spyOn(conversationFlowService, 'canWindowShowTwoCards').and.returnValue(
+      false
+    );
+    expect(componentInstance.canWindowShowTwoCards()).toBeFalse();
+  });
+
+  it('should tell if player is animating to one card or two cards', () => {
+    conversationFlowService.playerIsAnimatingToOneCard = false;
+    conversationFlowService.playerIsAnimatingToTwoCards = true;
+
+    expect(componentInstance.isPlayerAnimatingToOneCard()).toBeFalse();
+    expect(componentInstance.isPlayerAnimatingToTwoCards()).toBeTrue();
+  });
 });
