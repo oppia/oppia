@@ -75,7 +75,7 @@ describe('Exploration Editor', function () {
       // Navigate to the final card and update its content.
       await explorationEditor.navigateToCard(CARD_NAME.RECAP);
       await explorationEditor.updateCardContent(
-        'We practiced negative numbers and exploration ends here.'
+        'We have practiced negative numbers.'
       );
       await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
@@ -94,10 +94,10 @@ describe('Exploration Editor', function () {
       await explorationEditor.continueToNextCard();
 
       // Check the completion message and restart the exploration.
-      await explorationEditor.expectExplorationCompletionToastMessage(
+      await explorationEditor.expectPreviewCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
-      await explorationEditor.restartExploration();
+      await explorationEditor.restartPreview();
       await explorationEditor.expectCardContentToBe(INTRODUCTION_CARD_CONTENT);
     },
     DEFAULT_SPEC_TIMEOUT
