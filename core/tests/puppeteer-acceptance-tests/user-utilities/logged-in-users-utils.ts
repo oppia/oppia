@@ -791,7 +791,7 @@ export class LoggedInUser extends BaseUser {
       await this.navigateToCommunityLibraryPage();
     }
     await this.findExplorationInCommunityLibrary(explorationName);
-    await this.page.click(communityExplorationCard);
+    await this.clickOn(communityExplorationCard);
     await this.page.waitForNavigation();
   }
 
