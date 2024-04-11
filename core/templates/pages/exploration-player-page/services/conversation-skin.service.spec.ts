@@ -158,7 +158,7 @@ describe('Conversation skin service', () => {
     conversationSkinService.animateToOneCard(doneCallbackSpy);
 
     tick(600);
-    expect(conversationSkinService.isPlayerAnimatingToOneCard()).toBeFalse();
+    expect(conversationSkinService.playerIsAnimatingToOneCard).toBeFalse();
     expect(doneCallbackSpy).toHaveBeenCalled();
   }));
 
@@ -167,7 +167,7 @@ describe('Conversation skin service', () => {
     conversationSkinService.animateToTwoCards(doneCallbackSpy);
 
     tick(1000);
-    expect(conversationSkinService.isPlayerAnimatingToTwoCards()).toBeFalse();
+    expect(conversationSkinService.playerIsAnimatingToTwoCards).toBeFalse();
     expect(doneCallbackSpy).toHaveBeenCalled();
   }));
 });

@@ -1667,6 +1667,14 @@ export class ConversationSkinComponent {
   isProgressClearanceMessageShown(): boolean {
     return this.showProgressClearanceMessage;
   }
+
+  isPlayerAnimatingToOneCard(): boolean {
+    return this.conversationSkinService.playerIsAnimatingToOneCard;
+  }
+
+  isPlayerAnimatingToTwoCards(): boolean {
+    return this.conversationSkinService.playerIsAnimatingToTwoCards;
+  }
 }
 
 angular.module('oppia').directive(

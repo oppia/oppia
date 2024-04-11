@@ -107,14 +107,6 @@ export class ConversationSkinService {
     );
   }
 
-  isPlayerAnimatingToOneCard(): boolean {
-    return this.playerIsAnimatingToOneCard;
-  }
-
-  isPlayerAnimatingToTwoCards(): boolean {
-    return this.playerIsAnimatingToTwoCards;
-  }
-
   animateToTwoCards(doneCallback: () => void): void {
     this.playerIsAnimatingToTwoCards = true;
     setTimeout(
