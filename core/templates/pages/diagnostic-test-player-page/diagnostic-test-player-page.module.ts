@@ -20,7 +20,6 @@ import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatCardModule} from '@angular/material/card';
 import {MatTooltipModule} from '@angular/material/tooltip';
-
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
@@ -29,14 +28,13 @@ import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {SummaryTilesModule} from 'components/summary-tile/summary-tile.module';
 import {DiagnosticTestPlayerPageRootComponent} from './diagnostic-test-player-page-root.component';
 import {CommonModule} from '@angular/common';
-import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
-import {DiagnosticTestPlayerPageRoutingModule} from './diagnostic-test-player-page-routing.module';
+import {RouterModule} from '@angular/router';
+import {DiagnosticTestPlayerPageAuthGuard} from './diagnostic-test-player-page-auth.guard';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
-    DiagnosticTestPlayerPageRoutingModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     MatCardModule,
@@ -46,16 +44,21 @@ import {DiagnosticTestPlayerPageRoutingModule} from './diagnostic-test-player-pa
     SharedComponentsModule,
     SummaryTilesModule,
     ToastrModule.forRoot(toastrConfig),
-    Error404PageModule,
-    SharedComponentsModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: DiagnosticTestPlayerPageRootComponent,
+        canActivate: [DiagnosticTestPlayerPageAuthGuard],
+      },
+    ]),
   ],
   declarations: [
-    DiagnosticTestPlayerComponent,
     DiagnosticTestPlayerPageRootComponent,
+    DiagnosticTestPlayerComponent,
   ],
   entryComponents: [
-    DiagnosticTestPlayerComponent,
     DiagnosticTestPlayerPageRootComponent,
+    DiagnosticTestPlayerComponent,
   ],
 })
 export class DiagnosticTestPlayerPageModule {}
