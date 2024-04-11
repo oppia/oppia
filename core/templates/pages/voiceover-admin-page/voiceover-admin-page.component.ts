@@ -110,11 +110,14 @@ export class VoiceoverAdminPageComponent implements OnInit {
         backdrop: 'static',
       }
     );
+    let currentLanguageAccentCode =
+      this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode];
 
     modalRef.componentInstance.languageCode = languageCode;
     modalRef.componentInstance.voiceArtistId = voiceArtistId;
     modalRef.componentInstance.voiceArtistName =
       this.voiceArtistIdToVoiceArtistName[voiceArtistId];
+    modalRef.componentInstance.languageAccentCode = currentLanguageAccentCode;
     modalRef.componentInstance.languageAccentCodes = languageAccentCodes;
 
     modalRef.result.then(
