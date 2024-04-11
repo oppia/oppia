@@ -520,7 +520,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont' +
+                    '/cron/mail/reviewers/new_cont%s' %
                     'ributor_dashboard_suggestions')
 
             mock_send.assert_not_called()
@@ -575,7 +575,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.cannot_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr%s' %
                     'ibutor_dashboard_suggestions')
 
             mock_send.assert_not_called()
@@ -599,7 +599,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
-                    '/cron/mail/reviewers/new_cont' +
+                    '/cron/mail/reviewers/new_cont%s' %
                     'ributor_dashboard_suggestions')
             mock_send.assert_called_once_with(
                 {'en': [self.reviewer_id]},
@@ -631,7 +631,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             )
             with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr%s' %
                     'ibutor_dashboard_suggestions')
             mock_send.assert_called_once_with(
                 {'en': []},
@@ -655,7 +655,7 @@ class CronMailReviewerNewSuggestionsHandlerTests(
 
             with self.can_send_emails, self.testapp_swap, swap_platform_parameter_value: # pylint: disable=line-too-long
                 self.get_json(
-                    '/cron/mail/reviewers/new_contr' +
+                    '/cron/mail/reviewers/new_contr%s' %
                     'ibutor_dashboard_suggestions')
 
             mock_send.assert_called_once_with(
