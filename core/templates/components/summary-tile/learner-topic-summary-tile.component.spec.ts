@@ -16,16 +16,14 @@
  * @fileoverview Unit tests for LearnerStorySummaryTileComponent.
  */
 
-import { async, ComponentFixture, TestBed } from
-  '@angular/core/testing';
-import { MaterialModule } from 'modules/material.module';
-import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
-import { LearnerTopicSummaryTileComponent } from './learner-topic-summary-tile.component';
-
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {MaterialModule} from 'modules/material.module';
+import {FormsModule} from '@angular/forms';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
+import {LearnerTopicSummaryTileComponent} from './learner-topic-summary-tile.component';
 
 describe('Learner Topic Summary Tile Component', () => {
   let component: LearnerTopicSummaryTileComponent;
@@ -34,18 +32,10 @@ describe('Learner Topic Summary Tile Component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        MaterialModule,
-        FormsModule,
-        HttpClientTestingModule
-      ],
-      declarations: [
-        LearnerTopicSummaryTileComponent,
-      ],
-      providers: [
-        UrlInterpolationService,
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [MaterialModule, FormsModule, HttpClientTestingModule],
+      declarations: [LearnerTopicSummaryTileComponent],
+      providers: [UrlInterpolationService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -59,7 +49,7 @@ describe('Learner Topic Summary Tile Component', () => {
       title: 'subtopic_name',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#F8BF74',
-      url_fragment: 'subtopic-name'
+      url_fragment: 'subtopic-name',
     };
 
     let nodeDict = {
@@ -78,7 +68,7 @@ describe('Learner Topic Summary Tile Component', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
     const learnerTopicSummaryBackendDict = {
       id: 'sample_topic_id',
@@ -92,38 +82,42 @@ describe('Learner Topic Summary Tile Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [nodeDict],
+        },
+      ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
     component.topicSummary = LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict);
+      learnerTopicSummaryBackendDict
+    );
     fixture.detectChanges();
   });
 
   it('should get the topic link url for topic page', () => {
     const urlSpy = spyOn(
-      urlInterpolationService, 'interpolateUrl')
-      .and.returnValue('/learn/math/topic');
+      urlInterpolationService,
+      'interpolateUrl'
+    ).and.returnValue('/learn/math/topic');
 
     component.getTopicLink();
     fixture.detectChanges();
@@ -138,7 +132,7 @@ describe('Learner Topic Summary Tile Component', () => {
       title: 'subtopic_name',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#F8BF74',
-      url_fragment: 'subtopic-name'
+      url_fragment: 'subtopic-name',
     };
 
     let nodeDict = {
@@ -157,7 +151,7 @@ describe('Learner Topic Summary Tile Component', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
     const learnerTopicSummaryBackendDict = {
       id: 'sample_topic_id',
@@ -171,33 +165,35 @@ describe('Learner Topic Summary Tile Component', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: '',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [nodeDict],
+        },
+      ],
       url_fragment: '',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
     component.topicSummary = LearnerTopicSummary.createFromBackendDict(
-      learnerTopicSummaryBackendDict);
-    const urlSpy = spyOn(
-      urlInterpolationService, 'interpolateUrl');
+      learnerTopicSummaryBackendDict
+    );
+    const urlSpy = spyOn(urlInterpolationService, 'interpolateUrl');
 
     component.getTopicLink();
     fixture.detectChanges();

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Check Revert Service.
  */
 
-import { CheckRevertService } from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
+import {CheckRevertService} from 'pages/exploration-editor-page/history-tab/services/check-revert.service';
 
 describe('Check revert service', () => {
   describe('check revert service', () => {

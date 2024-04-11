@@ -16,21 +16,22 @@
  * @fileoverview Component for the Create Exploration/Collection button.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UserService } from 'services/user.service';
-import { CreateActivityModalComponent } from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
-import { AppConstants } from 'app.constants';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UserService} from 'services/user.service';
+import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/create-activity-modal.component';
+import {AppConstants} from 'app.constants';
 
- @Component({
-   selector: 'oppia-create-activity-button',
-   templateUrl: './create-activity-button.component.html',
- })
+@Component({
+  selector: 'oppia-create-activity-button',
+  templateUrl: './create-activity-button.component.html',
+  encapsulation: ViewEncapsulation.None,
+})
 export class CreateActivityButtonComponent implements OnInit {
   creationInProgress: boolean = false;
   canCreateCollections: boolean = false;
@@ -47,8 +48,7 @@ export class CreateActivityButtonComponent implements OnInit {
   ) {}
 
   onRedirectToLogin(destinationUrl: string): boolean {
-    this.siteAnalyticsService.registerStartLoginEvent(
-      'createActivityButton');
+    this.siteAnalyticsService.registerStartLoginEvent('createActivityButton');
     setTimeout(() => {
       this.windowRef.nativeWindow.location.href = destinationUrl;
     }, 150);
@@ -60,7 +60,7 @@ export class CreateActivityButtonComponent implements OnInit {
   }
 
   checkTabletView(): boolean {
-    return (this.windowRef.nativeWindow.innerWidth < 768);
+    return this.windowRef.nativeWindow.innerWidth < 768;
   }
 
   initCreationProcess(): void {
@@ -76,14 +76,17 @@ export class CreateActivityButtonComponent implements OnInit {
       this.explorationCreationService.createNewExploration();
     } else if (this.urlService.getPathname() !== '/creator-dashboard') {
       this.windowRef.nativeWindow.location.replace(
-        '/creator-dashboard?mode=create');
+        '/creator-dashboard?mode=create'
+      );
     } else {
-      this.ngbModal.open(
-        CreateActivityModalComponent,
-        {backdrop: true}
-      ).result.then(() => {}, () => {
-        this.creationInProgress = false;
-      });
+      this.ngbModal
+        .open(CreateActivityModalComponent, {backdrop: true})
+        .result.then(
+          () => {},
+          () => {
+            this.creationInProgress = false;
+          }
+        );
     }
   }
 
@@ -112,6 +115,9 @@ export class CreateActivityButtonComponent implements OnInit {
     });
   }
 }
-angular.module('oppia').directive(
-  'oppiaCreateActivityButton', downgradeComponent(
-    {component: CreateActivityButtonComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaCreateActivityButton',
+    downgradeComponent({component: CreateActivityButtonComponent})
+  );

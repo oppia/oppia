@@ -16,10 +16,13 @@
  * @fileoverview Unit tests for I18nLanguageCodeService.
  */
 
-import { EventEmitter } from '@angular/core';
+import {EventEmitter} from '@angular/core';
 
-import { I18nLanguageCodeService, TranslationKeyType } from 'services/i18n-language-code.service';
-import { Subscription } from 'rxjs';
+import {
+  I18nLanguageCodeService,
+  TranslationKeyType,
+} from 'services/i18n-language-code.service';
+import {Subscription} from 'rxjs';
 
 describe('I18nLanguageCodeService', () => {
   const i18nLanguageCodeService = new I18nLanguageCodeService();
@@ -30,8 +33,10 @@ describe('I18nLanguageCodeService', () => {
   beforeEach(() => {
     testSubscriptions = new Subscription();
     testSubscriptions.add(
-      i18nLanguageCodeService.onI18nLanguageCodeChange
-        .subscribe((code: string) => languageCode = code));
+      i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(
+        (code: string) => (languageCode = code)
+      )
+    );
   });
 
   afterEach(() => {
@@ -72,69 +77,92 @@ describe('I18nLanguageCodeService', () => {
   it('should check whether hacky translation is available correctly', () => {
     // I18N_CLASSROOM_MATH_TITLE is present in constants file and hence
     // it is valid.
-    hackyTranslationIsAvailable = i18nLanguageCodeService
-      .isHackyTranslationAvailable('I18N_CLASSROOM_MATH_TITLE');
+    hackyTranslationIsAvailable =
+      i18nLanguageCodeService.isHackyTranslationAvailable(
+        'I18N_CLASSROOM_MATH_TITLE'
+      );
     expect(hackyTranslationIsAvailable).toBe(true);
 
     // I18N_TOPIC_12345axa_TITLE is not present in constants file and hence
     // it is invalid.
-    hackyTranslationIsAvailable = i18nLanguageCodeService
-      .isHackyTranslationAvailable('I18N_TOPIC_12345axa_TITLE');
+    hackyTranslationIsAvailable =
+      i18nLanguageCodeService.isHackyTranslationAvailable(
+        'I18N_TOPIC_12345axa_TITLE'
+      );
     expect(hackyTranslationIsAvailable).toBe(false);
   });
 
   it('should get classroom translation key correctly', () => {
-    translationKey = i18nLanguageCodeService.getClassroomTranslationKey(
-      'Math');
+    translationKey = i18nLanguageCodeService.getClassroomTranslationKey('Math');
     expect(translationKey).toBe('I18N_CLASSROOM_MATH_TITLE');
 
-    translationKey = i18nLanguageCodeService.getClassroomTranslationKey(
-      'Science');
+    translationKey =
+      i18nLanguageCodeService.getClassroomTranslationKey('Science');
     expect(translationKey).toBe('I18N_CLASSROOM_SCIENCE_TITLE');
   });
 
   it('should get topic and subtopic translation key correctly', () => {
     translationKey = i18nLanguageCodeService.getTopicTranslationKey(
-      'abc1234', TranslationKeyType.TITLE);
+      'abc1234',
+      TranslationKeyType.TITLE
+    );
     expect(translationKey).toBe('I18N_TOPIC_abc1234_TITLE');
 
     translationKey = i18nLanguageCodeService.getSubtopicTranslationKey(
-      'abc1234', 'test-subtopic', TranslationKeyType.TITLE);
+      'abc1234',
+      'test-subtopic',
+      TranslationKeyType.TITLE
+    );
     expect(translationKey).toBe('I18N_SUBTOPIC_abc1234_test-subtopic_TITLE');
 
     translationKey = i18nLanguageCodeService.getTopicTranslationKey(
-      'abc1234', TranslationKeyType.DESCRIPTION);
+      'abc1234',
+      TranslationKeyType.DESCRIPTION
+    );
     expect(translationKey).toBe('I18N_TOPIC_abc1234_DESCRIPTION');
 
     translationKey = i18nLanguageCodeService.getSubtopicTranslationKey(
-      'abc1234', 'test-subtopic', TranslationKeyType.DESCRIPTION);
+      'abc1234',
+      'test-subtopic',
+      TranslationKeyType.DESCRIPTION
+    );
     expect(translationKey).toBe(
-      'I18N_SUBTOPIC_abc1234_test-subtopic_DESCRIPTION');
+      'I18N_SUBTOPIC_abc1234_test-subtopic_DESCRIPTION'
+    );
   });
 
   it('should get story translation keys correctly', () => {
     translationKey = i18nLanguageCodeService.getStoryTranslationKey(
-      'abc1234', TranslationKeyType.TITLE);
+      'abc1234',
+      TranslationKeyType.TITLE
+    );
     expect(translationKey).toBe('I18N_STORY_abc1234_TITLE');
 
     translationKey = i18nLanguageCodeService.getStoryTranslationKey(
-      'abc1234', TranslationKeyType.DESCRIPTION);
+      'abc1234',
+      TranslationKeyType.DESCRIPTION
+    );
     expect(translationKey).toBe('I18N_STORY_abc1234_DESCRIPTION');
   });
 
   it('should get exploration translation key correctly', () => {
     translationKey = i18nLanguageCodeService.getExplorationTranslationKey(
-      'abc1234', TranslationKeyType.TITLE);
+      'abc1234',
+      TranslationKeyType.TITLE
+    );
     expect(translationKey).toBe('I18N_EXPLORATION_abc1234_TITLE');
 
     translationKey = i18nLanguageCodeService.getExplorationTranslationKey(
-      'abc1234', TranslationKeyType.DESCRIPTION);
+      'abc1234',
+      TranslationKeyType.DESCRIPTION
+    );
     expect(translationKey).toBe('I18N_EXPLORATION_abc1234_DESCRIPTION');
   });
 
   it('should get event emitter for loading of preferred language codes', () => {
     let mockPreferredLanguageCodesLoadedEventEmitter = new EventEmitter();
     expect(i18nLanguageCodeService.onPreferredLanguageCodesLoaded).toEqual(
-      mockPreferredLanguageCodesLoadedEventEmitter);
+      mockPreferredLanguageCodesLoadedEventEmitter
+    );
   });
 });

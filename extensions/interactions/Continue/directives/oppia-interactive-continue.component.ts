@@ -20,19 +20,19 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ContinueCustomizationArgs } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { ContextService } from 'services/context.service';
-import { ContinueRulesService } from './continue-rules.service';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ContinueCustomizationArgs} from 'interactions/customization-args-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {ContextService} from 'services/context.service';
+import {ContinueRulesService} from './continue-rules.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-interactive-continue',
   templateUrl: './continue-interaction.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class OppiaInteractiveContinue implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -42,25 +42,25 @@ export class OppiaInteractiveContinue implements OnInit {
   buttonText: string = '';
   isInEditorMode: boolean = false;
   readonly DEFAULT_BUTTON_TEXT: string = 'Continue';
-  readonly DEFAULT_HUMAN_READABLE_ANSWER: string = (
-    'Please continue.');
+  readonly DEFAULT_HUMAN_READABLE_ANSWER: string = 'Please continue.';
 
   constructor(
     private continueRulesService: ContinueRulesService,
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService) {}
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService
+  ) {}
 
   ngOnInit(): void {
     this.isInEditorMode = this.contextService.isInExplorationEditorMode();
-    const { buttonText } = (
+    const {buttonText} =
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'Continue',
         {
-          buttonTextWithValue: this.buttonTextWithValue
-        }) as ContinueCustomizationArgs);
+          buttonTextWithValue: this.buttonTextWithValue,
+        }
+      ) as ContinueCustomizationArgs;
     this.buttonText = buttonText.value.unicode;
     const submitAnswer = () => {
       // We used to show "(Continue)" to indicate a 'continue' action when
@@ -73,10 +73,14 @@ export class OppiaInteractiveContinue implements OnInit {
         humanReadableAnswer = this.buttonText;
       }
       this.currentInteractionService.onSubmit(
-        humanReadableAnswer, this.continueRulesService);
+        humanReadableAnswer,
+        this.continueRulesService
+      );
     };
     this.currentInteractionService.registerCurrentInteraction(
-      submitAnswer, null);
+      submitAnswer,
+      null
+    );
   }
 
   isLanguageRTL(): boolean {
@@ -84,5 +88,8 @@ export class OppiaInteractiveContinue implements OnInit {
   }
 }
 angular.module('oppia').directive(
-  'oppiaInteractiveContinue', downgradeComponent(
-    {component: OppiaInteractiveContinue}) as angular.IDirectiveFactory);
+  'oppiaInteractiveContinue',
+  downgradeComponent({
+    component: OppiaInteractiveContinue,
+  }) as angular.IDirectiveFactory
+);

@@ -17,29 +17,29 @@
  * in the translation tab is currently active.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { LanguageUtilService } from 'domain/utilities/language-util.service';
-import { LoggerService } from 'services/contextual/logger.service';
-
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TranslationLanguageService {
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private activeLanguageCode!: string;
-  private allAudioLanguageCodes: string[] = (
-    this.languageUtilService.getAllVoiceoverLanguageCodes());
+  private allAudioLanguageCodes: string[] =
+    this.languageUtilService.getAllVoiceoverLanguageCodes();
 
   private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
     private languageUtilService: LanguageUtilService,
-    private loggerService: LoggerService) {}
+    private loggerService: LoggerService
+  ) {}
 
   getActiveLanguageCode(): string {
     return this.activeLanguageCode;
@@ -47,15 +47,19 @@ export class TranslationLanguageService {
 
   getActiveLanguageDirection(): string {
     return this.languageUtilService.getLanguageDirection(
-      this.getActiveLanguageCode());
+      this.getActiveLanguageCode()
+    );
   }
 
   // This function throws an error if 'newActiveLanguageCode' is invalid.
   setActiveLanguageCode(newActiveLanguageCode: string): void {
-    if (newActiveLanguageCode &&
-        this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
+    if (
+      newActiveLanguageCode &&
+      this.allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0
+    ) {
       this.loggerService.error(
-        'Invalid active language code: ' + newActiveLanguageCode);
+        'Invalid active language code: ' + newActiveLanguageCode
+      );
       return;
     }
     this.activeLanguageCode = newActiveLanguageCode;
@@ -68,7 +72,8 @@ export class TranslationLanguageService {
       return null;
     }
     return this.languageUtilService.getAudioLanguageDescription(
-      this.activeLanguageCode);
+      this.activeLanguageCode
+    );
   }
 
   get onActiveLanguageChanged(): EventEmitter<void> {
@@ -76,6 +81,9 @@ export class TranslationLanguageService {
   }
 }
 
-angular.module('oppia').service(
-  'TranslationLanguageService',
-  downgradeInjectable(TranslationLanguageService));
+angular
+  .module('oppia')
+  .service(
+    'TranslationLanguageService',
+    downgradeInjectable(TranslationLanguageService)
+  );

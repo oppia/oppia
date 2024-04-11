@@ -16,26 +16,26 @@
  * @fileoverview Module for the about foundation page.
  */
 
-import { NgModule } from '@angular/core';
-import { AboutFoundationPageComponent } from './about-foundation-page.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { AboutFoundationPageRootComponent } from './about-foundation-page-root.component';
-import { CommonModule } from '@angular/common';
-import { AboutFoundationPageRoutingModule } from './about-foundation-page-routing.module';
+import {NgModule} from '@angular/core';
+import {AboutFoundationPageComponent} from './about-foundation-page.component';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {AboutFoundationPageRootComponent} from './about-foundation-page-root.component';
+import {CommonModule} from '@angular/common';
+import {AboutFoundationPageRoutingModule} from './about-foundation-page-routing.module';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    AboutFoundationPageRoutingModule
+    AboutFoundationPageRoutingModule,
   ],
   declarations: [
     AboutFoundationPageComponent,
-    AboutFoundationPageRootComponent
+    AboutFoundationPageRootComponent,
   ],
   entryComponents: [
     AboutFoundationPageComponent,
-    AboutFoundationPageRootComponent
-  ]
+    AboutFoundationPageRootComponent,
+  ],
 })
 export class AboutFoundationPageModule {}

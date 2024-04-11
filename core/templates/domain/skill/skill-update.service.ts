@@ -17,29 +17,33 @@
  */
 
 import cloneDeep from 'lodash/cloneDeep';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EventEmitter, Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EventEmitter, Injectable} from '@angular/core';
 import {
   BackendChangeObject,
   Change,
   DomainObject,
   SkillChange,
 } from 'domain/editor/undo_redo/change.model';
-import { Misconception } from 'domain/skill/MisconceptionObjectFactory';
-import { Skill } from 'domain/skill/SkillObjectFactory';
-import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { WorkedExample, WorkedExampleBackendDict } from 'domain/skill/worked-example.model';
-import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import { LocalStorageService } from 'services/local-storage.service';
-import { EntityEditorBrowserTabsInfo } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import { EntityEditorBrowserTabsInfoDomainConstants } from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
-import { Params } from '@angular/router';
+import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Skill} from 'domain/skill/SkillObjectFactory';
+import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {
+  WorkedExample,
+  WorkedExampleBackendDict,
+} from 'domain/skill/worked-example.model';
+import {
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+} from 'domain/exploration/subtitled-html.model';
+import {LocalStorageService} from 'services/local-storage.service';
+import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
+import {EntityEditorBrowserTabsInfoDomainConstants} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info-domain.constants';
+import {Params} from '@angular/router';
 
-type SkillUpdateApply = (
-  skillChange: SkillChange, skill: Skill) => void;
-type SkillUpdateReverse = (
-  skillChange: SkillChange, skill: Skill) => void;
+type SkillUpdateApply = (skillChange: SkillChange, skill: Skill) => void;
+type SkillUpdateReverse = (skillChange: SkillChange, skill: Skill) => void;
 type ChangeBackendDict = (
   backendChangeObject: BackendChangeObject,
   domainObject: DomainObject
@@ -57,18 +61,19 @@ export class SkillUpdateService {
   ) {}
 
   private _applyChange = (
-      skill: Skill,
-      command: string,
-      params: Params | BackendChangeObject,
-      apply: SkillUpdateApply,
-      reverse: SkillUpdateReverse
+    skill: Skill,
+    command: string,
+    params: Params | BackendChangeObject,
+    apply: SkillUpdateApply,
+    reverse: SkillUpdateReverse
   ) => {
     const changeDict = cloneDeep(params);
     changeDict.cmd = command;
     const changeObj = new Change(
       changeDict as BackendChangeObject,
       apply as ChangeBackendDict,
-      reverse as ChangeBackendDict);
+      reverse as ChangeBackendDict
+    );
     this.undoRedoService.applyChange(changeObj, skill);
     this._updateSkillEditorBrowserTabsUnsavedChangesStatus(skill);
   };
@@ -76,11 +81,11 @@ export class SkillUpdateService {
   private _updateSkillEditorBrowserTabsUnsavedChangesStatus(skill: Skill) {
     // EntityEditorBrowserTabsInfo if the data is found on the local
     // storage. Otherwise, returns null.
-    const skillEditorBrowserTabsInfo:
-      EntityEditorBrowserTabsInfo | null = (
-        this.localStorageService.getEntityEditorBrowserTabsInfo(
-          EntityEditorBrowserTabsInfoDomainConstants
-            .OPENED_SKILL_EDITOR_BROWSER_TABS, skill.getId()));
+    const skillEditorBrowserTabsInfo: EntityEditorBrowserTabsInfo | null =
+      this.localStorageService.getEntityEditorBrowserTabsInfo(
+        EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
+        skill.getId()
+      );
     if (
       this.undoRedoService.getChangeCount() > 0 &&
       skillEditorBrowserTabsInfo &&
@@ -89,18 +94,18 @@ export class SkillUpdateService {
       skillEditorBrowserTabsInfo.setSomeTabHasUnsavedChanges(true);
       this.localStorageService.updateEntityEditorBrowserTabsInfo(
         skillEditorBrowserTabsInfo,
-        EntityEditorBrowserTabsInfoDomainConstants
-          .OPENED_SKILL_EDITOR_BROWSER_TABS);
+        EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
+      );
     }
   }
 
   private _applyPropertyChange = (
-      skill: Skill,
-      propertyName: string,
-      newValue: string,
-      oldValue: string,
-      apply: SkillUpdateApply,
-      reverse: SkillUpdateReverse
+    skill: Skill,
+    propertyName: string,
+    newValue: string,
+    oldValue: string,
+    apply: SkillUpdateApply,
+    reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -116,13 +121,13 @@ export class SkillUpdateService {
   };
 
   private _applyMisconceptionPropertyChange = (
-      skill: Skill,
-      misconceptionId: number,
-      propertyName: string,
-      newValue: string | boolean,
-      oldValue: string | boolean,
-      apply: SkillUpdateApply,
-      reverse: SkillUpdateReverse
+    skill: Skill,
+    misconceptionId: number,
+    propertyName: string,
+    newValue: string | boolean,
+    oldValue: string | boolean,
+    apply: SkillUpdateApply,
+    reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -139,11 +144,11 @@ export class SkillUpdateService {
   };
 
   private _applyRubricPropertyChange = (
-      skill: Skill,
-      difficulty: string,
-      explanations: string[],
-      apply: SkillUpdateApply,
-      reverse: SkillUpdateReverse
+    skill: Skill,
+    difficulty: string,
+    explanations: string[],
+    apply: SkillUpdateApply,
+    reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -158,12 +163,12 @@ export class SkillUpdateService {
   };
 
   private _applySkillContentsPropertyChange = (
-      skill: Skill,
-      propertyName: string,
-      newValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
-      oldValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
-      apply: SkillUpdateApply,
-      reverse: SkillUpdateReverse
+    skill: Skill,
+    propertyName: string,
+    newValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
+    oldValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
+    apply: SkillUpdateApply,
+    reverse: SkillUpdateReverse
   ) => {
     this._applyChange(
       skill,
@@ -179,12 +184,12 @@ export class SkillUpdateService {
   };
 
   private _getParameterFromChangeDict = (
-      changeDict: BackendChangeObject,
-      paramName: string
+    changeDict: BackendChangeObject,
+    paramName: string
   ) => changeDict[paramName as keyof BackendChangeObject];
 
   private _getNewPropertyValueFromChangeDict = (
-      changeDict: BackendChangeObject
+    changeDict: BackendChangeObject
   ) => this._getParameterFromChangeDict(changeDict, 'new_value');
 
   setSkillDescription(skill: Skill, newDescription: string): void {
@@ -229,10 +234,10 @@ export class SkillUpdateService {
     this._applySkillContentsPropertyChange(
       skill,
       SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map((workedExample) => {
+      newWorkedExamples.map(workedExample => {
         return workedExample.toBackendDict();
       }),
-      oldWorkedExamples.map((workedExample) => workedExample.toBackendDict()),
+      oldWorkedExamples.map(workedExample => workedExample.toBackendDict()),
       (changeDict, skill) => {
         skill.getConceptCard().setWorkedExamples(newWorkedExamples);
       },
@@ -251,10 +256,10 @@ export class SkillUpdateService {
     this._applySkillContentsPropertyChange(
       skill,
       SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map((workedExample) => {
+      newWorkedExamples.map(workedExample => {
         return workedExample.toBackendDict();
       }),
-      oldWorkedExamples.map((workedExample) => {
+      oldWorkedExamples.map(workedExample => {
         return workedExample.toBackendDict();
       }),
       (changeDict, skill) => {
@@ -271,10 +276,10 @@ export class SkillUpdateService {
     this._applySkillContentsPropertyChange(
       skill,
       SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map((workedExample) => {
+      newWorkedExamples.map(workedExample => {
         return workedExample.toBackendDict();
       }),
-      oldWorkedExamples.map((workedExample) => {
+      oldWorkedExamples.map(workedExample => {
         return workedExample.toBackendDict();
       }),
       (changeDict, skill) => {
@@ -287,20 +292,18 @@ export class SkillUpdateService {
   }
 
   updateWorkedExample(
-      skill: Skill,
-      workedExampleIndex: number,
-      newWorkedExampleQuestionHtml: string,
-      newWorkedExampleAnswerHtml: string
+    skill: Skill,
+    workedExampleIndex: number,
+    newWorkedExampleQuestionHtml: string,
+    newWorkedExampleAnswerHtml: string
   ): void {
     const newWorkedExamples = cloneDeep(
       skill.getConceptCard().getWorkedExamples()
     );
-    newWorkedExamples[workedExampleIndex]
-      .getQuestion()
-      .html = newWorkedExampleQuestionHtml;
-    newWorkedExamples[workedExampleIndex]
-      .getExplanation()
-      .html = newWorkedExampleAnswerHtml;
+    newWorkedExamples[workedExampleIndex].getQuestion().html =
+      newWorkedExampleQuestionHtml;
+    newWorkedExamples[workedExampleIndex].getExplanation().html =
+      newWorkedExampleAnswerHtml;
     this.updateWorkedExamples(skill, newWorkedExamples);
   }
 
@@ -382,10 +385,10 @@ export class SkillUpdateService {
   }
 
   updateMisconceptionName(
-      skill: Skill,
-      misconceptionId: number,
-      oldName: string,
-      newName: string
+    skill: Skill,
+    misconceptionId: number,
+    oldName: string,
+    newName: string
   ): void {
     const misconception = skill.findMisconceptionById(misconceptionId);
     if (misconception) {
@@ -406,10 +409,10 @@ export class SkillUpdateService {
   }
 
   updateMisconceptionMustBeAddressed(
-      skill: Skill,
-      misconceptionId: number,
-      oldValue: boolean,
-      newValue: boolean
+    skill: Skill,
+    misconceptionId: number,
+    oldValue: boolean,
+    newValue: boolean
   ): void {
     const misconception = skill.findMisconceptionById(misconceptionId);
     if (misconception) {
@@ -430,10 +433,10 @@ export class SkillUpdateService {
   }
 
   updateMisconceptionNotes(
-      skill: Skill,
-      misconceptionId: number,
-      oldNotes: string,
-      newNotes: string
+    skill: Skill,
+    misconceptionId: number,
+    oldNotes: string,
+    newNotes: string
   ): void {
     const misconception = skill.findMisconceptionById(misconceptionId);
     if (misconception) {
@@ -454,10 +457,10 @@ export class SkillUpdateService {
   }
 
   updateMisconceptionFeedback(
-      skill: Skill,
-      misconceptionId: number,
-      oldFeedback: string,
-      newFeedback: string
+    skill: Skill,
+    misconceptionId: number,
+    oldFeedback: string,
+    newFeedback: string
   ): void {
     const misconception = skill.findMisconceptionById(misconceptionId);
     if (misconception) {
@@ -478,9 +481,9 @@ export class SkillUpdateService {
   }
 
   updateRubricForDifficulty(
-      skill: Skill,
-      difficulty: string,
-      explanations: string[]
+    skill: Skill,
+    difficulty: string,
+    explanations: string[]
   ): void {
     if (skill.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw new Error('Invalid difficulty value passed');
@@ -500,5 +503,6 @@ export class SkillUpdateService {
   }
 }
 
-angular.module('oppia')
+angular
+  .module('oppia')
   .factory('SkillUpdateService', downgradeInjectable(SkillUpdateService));

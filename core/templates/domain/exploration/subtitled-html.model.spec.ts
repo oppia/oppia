@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for the subtitled-html model.
  */
 
-import { SubtitledHtml } from
-  'domain/exploration/subtitled-html.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 describe('SubtitledHtml model', () => {
   let subtitledHtml: SubtitledHtml;
@@ -25,7 +24,7 @@ describe('SubtitledHtml model', () => {
   beforeEach(() => {
     subtitledHtml = SubtitledHtml.createFromBackendDict({
       content_id: 'content_id',
-      html: '<p>some html</p>'
+      html: '<p>some html</p>',
     });
   });
 
@@ -54,13 +53,15 @@ describe('SubtitledHtml model', () => {
   it('should convert to backend dict correctly', () => {
     expect(subtitledHtml.toBackendDict()).toEqual({
       content_id: 'content_id',
-      html: '<p>some html</p>'
+      html: '<p>some html</p>',
     });
   });
 
   it('should create default object', () => {
-    const defaultSubtitledHtml =
-     SubtitledHtml.createDefault('test html', 'content_id');
+    const defaultSubtitledHtml = SubtitledHtml.createDefault(
+      'test html',
+      'content_id'
+    );
     expect(defaultSubtitledHtml.html).toEqual('test html');
     expect(defaultSubtitledHtml.contentId).toEqual('content_id');
   });

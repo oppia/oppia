@@ -16,13 +16,12 @@
  * @fileoverview Constants for the skills mastery list.
  */
 
-import {SkillMasteryListConstants} from
-  'components/skills-mastery-list/skills-mastery-list.constants';
+import {SkillMasteryListConstants} from 'components/skills-mastery-list/skills-mastery-list.constants';
 
-angular.module('oppia').constant(
-  'MASTERY_CUTOFF',
-  SkillMasteryListConstants.MASTERY_CUTOFF);
+angular
+  .module('oppia')
+  .constant('MASTERY_CUTOFF', SkillMasteryListConstants.MASTERY_CUTOFF);
 
-angular.module('oppia').constant(
-  'MASTERY_COLORS',
-  SkillMasteryListConstants.MASTERY_COLORS);
+angular
+  .module('oppia')
+  .constant('MASTERY_COLORS', SkillMasteryListConstants.MASTERY_COLORS);

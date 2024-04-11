@@ -16,18 +16,30 @@
  * @fileoverview Unit tests for the question misconception editor component.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Outcome, QuestionMisconceptionEditorComponent } from './question-misconception-editor.component';
-import { ExternalSaveService } from 'services/external-save.service';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { MisconceptionSkillMap, MisconceptionObjectFactory } from 'domain/skill/MisconceptionObjectFactory';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {
+  Outcome,
+  QuestionMisconceptionEditorComponent,
+} from './question-misconception-editor.component';
+import {ExternalSaveService} from 'services/external-save.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {
+  MisconceptionSkillMap,
+  MisconceptionObjectFactory,
+} from 'domain/skill/MisconceptionObjectFactory';
 
 class MockNgbModalRef {
   componentInstance = {
-    taggedSkillMisconceptionId: null
+    taggedSkillMisconceptionId: null,
   };
 }
 
@@ -42,21 +54,16 @@ describe('Question Misconception Editor Component', () => {
   let outcome = {
     feedback: {
       content_id: null,
-      html: ''
-    }
+      html: '',
+    },
   } as Outcome;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        QuestionMisconceptionEditorComponent
-      ],
-      providers: [
-        StateEditorService,
-        ExternalSaveService
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      declarations: [QuestionMisconceptionEditorComponent],
+      providers: [StateEditorService, ExternalSaveService],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -72,10 +79,20 @@ describe('Question Misconception Editor Component', () => {
     mockMisconceptionObject = {
       abc: [
         misconceptionObjectFactory.create(
-          1, 'misc1', 'notes1', 'feedback1', true),
+          1,
+          'misc1',
+          'notes1',
+          'feedback1',
+          true
+        ),
         misconceptionObjectFactory.create(
-          2, 'misc2', 'notes2', 'feedback1', true)
-      ]
+          2,
+          'misc2',
+          'notes2',
+          'feedback1',
+          true
+        ),
+      ],
     };
     spyOn(stateEditorService, 'getMisconceptionsBySkill').and.callFake(() => {
       return mockMisconceptionObject;
@@ -85,22 +102,22 @@ describe('Question Misconception Editor Component', () => {
     fixture.detectChanges();
   });
 
-  it(
-    'should initialize correctly when tagged misconception is provided',
-    () => {
-      expect(component.misconceptionEditorIsOpen).toBeFalse();
-      expect(component.misconceptionName).toEqual('misc1');
-      expect(component.selectedMisconception).toEqual(
-        mockMisconceptionObject.abc[0]);
-      expect(component.selectedMisconceptionSkillId).toEqual('abc');
-      expect(component.feedbackIsUsed).toBeTrue();
-    });
+  it('should initialize correctly when tagged misconception is provided', () => {
+    expect(component.misconceptionEditorIsOpen).toBeFalse();
+    expect(component.misconceptionName).toEqual('misc1');
+    expect(component.selectedMisconception).toEqual(
+      mockMisconceptionObject.abc[0]
+    );
+    expect(component.selectedMisconceptionSkillId).toEqual('abc');
+    expect(component.feedbackIsUsed).toBeTrue();
+  });
 
   it('should throw an error if tagged misconception id is invalid', () => {
     component.taggedSkillMisconceptionId = 'invalidId';
 
     expect(() => component.ngOnInit()).toThrowError(
-      'Expected skillMisconceptionId to be <skillId>-<misconceptionId>.');
+      'Expected skillMisconceptionId to be <skillId>-<misconceptionId>.'
+    );
   });
 
   it('should use feedback by default', () => {
@@ -128,18 +145,19 @@ describe('Question Misconception Editor Component', () => {
     let mockResultObject = {
       misconception: mockMisconceptionObject.abc[1],
       misconceptionSkillId: 'abc',
-      feedbackIsUsed: false
+      feedbackIsUsed: false,
     };
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.resolve(mockResultObject)
-        }) as NgbModalRef;
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(mockResultObject),
+      } as NgbModalRef;
     });
 
     expect(component.misconceptionName).toEqual('misc1');
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.abc[0]);
+      mockMisconceptionObject.abc[0]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('abc');
     expect(component.feedbackIsUsed).toBeTrue();
 
@@ -148,7 +166,8 @@ describe('Question Misconception Editor Component', () => {
 
     expect(component.misconceptionName).toEqual('misc2');
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.abc[1]);
+      mockMisconceptionObject.abc[1]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('abc');
     expect(component.feedbackIsUsed).toBeFalse();
     expect(component.misconceptionEditorIsOpen).toBeFalse();
@@ -156,15 +175,16 @@ describe('Question Misconception Editor Component', () => {
 
   it('should not tag a misconception if the modal was dismissed', () => {
     spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
-      return (
-        { componentInstance: MockNgbModalRef,
-          result: Promise.reject()
-        }) as NgbModalRef;
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.reject(),
+      } as NgbModalRef;
     });
 
     expect(component.misconceptionName).toEqual('misc1');
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.abc[0]);
+      mockMisconceptionObject.abc[0]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('abc');
     expect(component.feedbackIsUsed).toBeTrue();
 
@@ -172,7 +192,8 @@ describe('Question Misconception Editor Component', () => {
 
     expect(component.misconceptionName).toEqual('misc1');
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.abc[0]);
+      mockMisconceptionObject.abc[0]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('abc');
     expect(component.feedbackIsUsed).toBeTrue();
   });
@@ -201,14 +222,16 @@ describe('Question Misconception Editor Component', () => {
     };
 
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.abc[0]);
+      mockMisconceptionObject.abc[0]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('abc');
     expect(component.feedbackIsUsed).toBeTrue();
 
     component.updateValues(updatedValues);
 
     expect(component.selectedMisconception).toEqual(
-      mockMisconceptionObject.abc[1]);
+      mockMisconceptionObject.abc[1]
+    );
     expect(component.selectedMisconceptionSkillId).toEqual('id');
     expect(component.feedbackIsUsed).toBeFalse();
   });

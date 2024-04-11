@@ -16,10 +16,9 @@
  * @fileoverview Tests for ReplaceInputsWithEllipses pipe for Oppia.
  */
 
-import { ReplaceInputsWithEllipsesPipe } from
-  'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
+import {ReplaceInputsWithEllipsesPipe} from 'filters/string-utility-filters/replace-inputs-with-ellipses.pipe';
 
-describe('Testing filters', function() {
+describe('Testing filters', function () {
   let pipe: ReplaceInputsWithEllipsesPipe;
   beforeEach(() => {
     pipe = new ReplaceInputsWithEllipsesPipe();

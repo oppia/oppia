@@ -16,19 +16,16 @@
  * @fileoverview Component for transfer exploration ownership modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-transfer-exploration-ownership-modal',
-  templateUrl: './transfer-exploration-ownership-modal.component.html'
+  templateUrl: './transfer-exploration-ownership-modal.component.html',
 })
-export class TransferExplorationOwnershipModalComponent
-  extends ConfirmOrCancelModal {
-  constructor(
-    private ngbActiveModal: NgbActiveModal,
-  ) {
+export class TransferExplorationOwnershipModalComponent extends ConfirmOrCancelModal {
+  constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 }

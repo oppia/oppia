@@ -16,12 +16,12 @@
  * @fileoverview Factory for creating instances of Units domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { createUnit, unit } from 'mathjs';
-import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants';
-import { Unit } from 'interactions/answer-defs';
+import {createUnit, unit} from 'mathjs';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
+import {Unit} from 'interactions/answer-defs';
 
 interface UnitsBackendDict {
   units: Unit[];
@@ -31,8 +31,7 @@ interface UnitsDict {
   [unit: string]: number;
 }
 
-type CurrencyUnitsKeys = (
-  keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
 
 export class Units {
   units: Unit[];
@@ -42,7 +41,7 @@ export class Units {
 
   toDict(): UnitsBackendDict {
     return {
-      units: this.units
+      units: this.units,
     };
   }
 
@@ -61,17 +60,16 @@ export class Units {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UnitsObjectFactory {
   isunit(unit: string): boolean {
-    return !('/*() '.includes(unit));
+    return !'/*() '.includes(unit);
   }
 
   isLastElementUnit(unitList: string[]): boolean {
     return (
-      unitList.length > 0 &&
-      this.isunit(unitList.slice(-1).pop() as string)
+      unitList.length > 0 && this.isunit(unitList.slice(-1).pop() as string)
     );
   }
 
@@ -88,7 +86,7 @@ export class UnitsObjectFactory {
           unitList.push(unit);
           unit = '';
         }
-        if (!('# '.includes(units[i]))) {
+        if (!'# '.includes(units[i])) {
           unitList.push(units[i]);
         }
       } else if (units[i] === ' ' && unit === 'per') {
@@ -142,7 +140,7 @@ export class UnitsObjectFactory {
   convertUnitDictToList(unitDict: UnitsDict): Unit[] {
     var unitList: Unit[] = [];
     for (var key in unitDict) {
-      unitList.push({ unit: key, exponent: unitDict[key] });
+      unitList.push({unit: key, exponent: unitDict[key]});
     }
     return unitList;
   }
@@ -176,16 +174,17 @@ export class UnitsObjectFactory {
 
   fromStringToList(unitsString: string): Unit[] {
     return this.unitToList(
-      this.unitWithMultiplier(this.stringToLexical(unitsString)));
+      this.unitWithMultiplier(this.stringToLexical(unitsString))
+    );
   }
 
   createCurrencyUnits(): void {
-    var keys = (
-      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
-    );
+    var keys = Object.keys(
+      ObjectsDomainConstants.CURRENCY_UNITS
+    ) as CurrencyUnitsKeys;
     for (var i = 0; i < keys.length; i++) {
-      let baseUnitValue = (
-        ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit);
+      let baseUnitValue =
+        ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit;
       if (baseUnitValue !== null) {
         // Sub unit (like: paise, cents etc.).
         createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
@@ -212,19 +211,24 @@ export class UnitsObjectFactory {
     // Special symbols need to be replaced as math.js doesn't support custom
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
-    var keys = (
-      Object.keys(ObjectsDomainConstants.CURRENCY_UNITS) as CurrencyUnitsKeys
-    );
+    var keys = Object.keys(
+      ObjectsDomainConstants.CURRENCY_UNITS
+    ) as CurrencyUnitsKeys;
     for (var i = 0; i < keys.length; i++) {
       for (
         var j = 0;
         j < ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units.length;
-        j++) {
+        j++
+      ) {
         if (
           units.includes(
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j])) {
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j]
+          )
+        ) {
           units = units.replace(
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j], '');
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].front_units[j],
+            ''
+          );
           units = ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name + units;
         }
       }
@@ -232,13 +236,17 @@ export class UnitsObjectFactory {
       for (
         var j = 0;
         j < ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases.length;
-        j++) {
+        j++
+      ) {
         if (
           units.includes(
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases[j])) {
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases[j]
+          )
+        ) {
           units = units.replace(
             ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases[j],
-            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name);
+            ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name
+          );
         }
       }
     }
@@ -258,5 +266,6 @@ export class UnitsObjectFactory {
   }
 }
 
-angular.module('oppia').factory(
-  'UnitsObjectFactory', downgradeInjectable(UnitsObjectFactory));
+angular
+  .module('oppia')
+  .factory('UnitsObjectFactory', downgradeInjectable(UnitsObjectFactory));

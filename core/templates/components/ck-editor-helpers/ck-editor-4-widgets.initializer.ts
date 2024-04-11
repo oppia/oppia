@@ -17,15 +17,17 @@
  * text components.
  */
 
-import { NgZone } from '@angular/core';
-import { ContextService } from 'services/context.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {NgZone} from '@angular/core';
+import {ContextService} from 'services/context.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 export interface RteComponentSpecs {
   backendId: string;
   customizationArgSpecs: {
-    name: string; value: string; 'default_value': string;
-    'default_value_obtainable_from_highlight': boolean;
+    name: string;
+    value: string;
+    default_value: string;
+    default_value_obtainable_from_highlight: boolean;
   }[];
   id: string;
   iconDataUrl: string;
@@ -40,28 +42,33 @@ export interface RteHelperService {
   getRichTextComponents: () => RteComponentSpecs[];
   isInlineComponent: (string) => boolean;
   openCustomizationModal: (
-    componentIsNewlyCreated, customizationArgSpecs, attrsCustomizationArgsDict,
-    onSubmitCallback, onDismissCallback
+    componentIsNewlyCreated,
+    customizationArgSpecs,
+    attrsCustomizationArgsDict,
+    onSubmitCallback,
+    onDismissCallback
   ) => void;
 }
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CkEditorInitializerService {
   static initialized = true;
   static ckEditorInitializer(
-      rteHelperService: RteHelperService,
-      htmlEscaperService: HtmlEscaperService,
-      contextService: ContextService, ngZone: NgZone): void {
+    rteHelperService: RteHelperService,
+    htmlEscaperService: HtmlEscaperService,
+    contextService: ContextService,
+    ngZone: NgZone
+  ): void {
     if (rteHelperService === undefined) {
       return;
     }
     ngZone.runOutsideAngular(() => {
       var _RICH_TEXT_COMPONENTS = rteHelperService.getRichTextComponents();
-      _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+      _RICH_TEXT_COMPONENTS.forEach(function (componentDefn) {
         // The name of the CKEditor widget corresponding to this component.
         var ckName = 'oppia' + componentDefn.id;
 
@@ -76,40 +83,54 @@ export class CkEditorInitializerService {
         // Inline components will be wrapped in a span, while block components
         // will be wrapped in a div.
         if (isInline) {
-          var componentTemplate = '<span type="' + tagName + '">' +
-            '<' + tagName + '></' + tagName + '>' +
+          var componentTemplate =
+            '<span type="' +
+            tagName +
+            '">' +
+            '<' +
+            tagName +
+            '></' +
+            tagName +
+            '>' +
             '</span>';
         } else {
-          var componentTemplate = '<div class="oppia-rte-component-container"' +
-            ' type="' + tagName + '">' +
-            '<' + tagName + '></' + tagName + '>' +
+          var componentTemplate =
+            '<div class="oppia-rte-component-container"' +
+            ' type="' +
+            tagName +
+            '">' +
+            '<' +
+            tagName +
+            '></' +
+            tagName +
+            '>' +
             '<div class="component-overlay"></div>' +
             '</div>';
         }
         CKEDITOR.plugins.add(ckName, {
-          init: function(editor) {
+          init: function (editor) {
             // Create the widget itself.
             editor.widgets.add(ckName, {
               button: componentDefn.tooltip,
               inline: isInline,
               template: componentTemplate,
               draggable: false,
-              edit: function() {
+              edit: function () {
                 // The following check allows the editing of the RTE components
                 // only in editor pages.
                 if (!contextService.canAddOrEditComponents()) {
                   return;
                 }
                 editor.fire('lockSnapshot', {
-                  dontUpdate: true
+                  dontUpdate: true,
                 });
                 // Save this for creating the widget later.
                 var container = this.wrapper.getParent(true);
                 var that = this;
                 var customizationArgs = {};
-                customizationArgSpecs.forEach(function(spec) {
-                  customizationArgs[spec.name] = that.data[spec.name] ||
-                    spec.default_value;
+                customizationArgSpecs.forEach(function (spec) {
+                  customizationArgs[spec.name] =
+                    that.data[spec.name] || spec.default_value;
                 });
 
                 const componentIsNewlyCreated: boolean = !that.isReady();
@@ -118,7 +139,7 @@ export class CkEditorInitializerService {
                   componentIsNewlyCreated,
                   customizationArgSpecs,
                   customizationArgs,
-                  function(customizationArgsDict) {
+                  function (customizationArgsDict) {
                     that.data.isCopied = false;
                     for (var arg in customizationArgsDict) {
                       if (customizationArgsDict.hasOwnProperty(arg)) {
@@ -126,11 +147,11 @@ export class CkEditorInitializerService {
                       }
                     }
                     /**
-                    * This checks whether the widget has already been inited
-                    * and set up before (if we are editing a widget that
-                    * has already been inserted into the RTE, we do not
-                    * need to finalizeCreation again).
-                    */
+                     * This checks whether the widget has already been inited
+                     * and set up before (if we are editing a widget that
+                     * has already been inserted into the RTE, we do not
+                     * need to finalizeCreation again).
+                     */
                     if (componentIsNewlyCreated) {
                       // Actually create the widget, if we have not already.
                       editor.widgets.finalizeCreation(container);
@@ -140,11 +161,13 @@ export class CkEditorInitializerService {
                       var range = editor.createRange();
                       var widgetContainer = that.element.getParent();
                       range.moveToPosition(
-                        widgetContainer, CKEDITOR.POSITION_AFTER_END);
+                        widgetContainer,
+                        CKEDITOR.POSITION_AFTER_END
+                      );
                       editor.getSelection().selectRanges([range]);
                       // Another timeout needed so the undo snapshot is
                       // not taken until the caret is in the right place.
-                      setTimeout(function() {
+                      setTimeout(function () {
                         editor.fire('unlockSnapshot');
                         editor.fire('saveSnapshot');
                       });
@@ -153,22 +176,22 @@ export class CkEditorInitializerService {
                       editor.fire('saveSnapshot');
                     }
                   },
-                  function(widgetShouldBeRemoved) {
+                  function (widgetShouldBeRemoved) {
                     if (widgetShouldBeRemoved || that.data.isCopied) {
-                      const defaultValueObtainableFromHighlight = (
-                        customizationArgSpecs
-                          .some(function(spec) {
-                            return spec.default_value_obtainable_from_highlight;
-                          }));
+                      const defaultValueObtainableFromHighlight =
+                        customizationArgSpecs.some(function (spec) {
+                          return spec.default_value_obtainable_from_highlight;
+                        });
 
                       that.data.isCopied = false;
-                      var newWidgetSelector = (
-                        '[data-cke-widget-id="' + that.id + '"]');
+                      var newWidgetSelector =
+                        '[data-cke-widget-id="' + that.id + '"]';
                       if (newWidgetSelector === null) {
                         return;
                       }
-                      var widgetElement = editor.editable().findOne(
-                        newWidgetSelector);
+                      var widgetElement = editor
+                        .editable()
+                        .findOne(newWidgetSelector);
 
                       if (!widgetElement) {
                         return;
@@ -179,9 +202,11 @@ export class CkEditorInitializerService {
                        * a highlighted text or was not newly created, then
                        * simply remove the component. Otherwise, load the
                        * initial snapshot to revert back to the original text.
-                      */
-                      if (!defaultValueObtainableFromHighlight ||
-                          !componentIsNewlyCreated) {
+                       */
+                      if (
+                        !defaultValueObtainableFromHighlight ||
+                        !componentIsNewlyCreated
+                      ) {
                         widgetElement.remove();
                         editor.fire('change');
                       } else {
@@ -189,18 +214,19 @@ export class CkEditorInitializerService {
                         editor.fire('change');
                       }
                     }
-                  });
+                  }
+                );
               },
               /**
                * This is how the widget will be represented in the outputs
                * source, so it is called when we call editor.getData().
                */
-              downcast: function(element) {
+              downcast: function (element) {
                 // Clear the angular rendering content, which we don't
                 // want in the output.
-                (
-                  element.children[0] as CKEDITOR.htmlParser.element
-                ).setHtml('');
+                (element.children[0] as CKEDITOR.htmlParser.element).setHtml(
+                  ''
+                );
                 // Return just the rich text component, without its wrapper.
                 return element.children[0];
               },
@@ -209,24 +235,25 @@ export class CkEditorInitializerService {
                * when we first load data in. Returns a boolean,
                * true iff "element" is an instance of this widget.
                */
-              upcast: function(element) {
+              upcast: function (element) {
                 return (
                   element.name !== 'p' &&
                   element.children.length > 0 &&
-                  (
-                    element.children[0] as CKEDITOR.htmlParser.element
-                  ).name === tagName);
+                  (element.children[0] as CKEDITOR.htmlParser.element).name ===
+                    tagName
+                );
               },
-              data: function() {
+              data: function () {
                 var that = this;
                 // Set attributes of component according to data values.
-                customizationArgSpecs.forEach(function(spec) {
+                customizationArgSpecs.forEach(function (spec) {
                   let arr = spec.name.split('_');
-                  let capital = arr.map((
-                      item, index
-                  ) =>
+                  let capital = arr.map((item, index) =>
                     // eslint-disable-next-line max-len
-                    index ? item.charAt(0).toUpperCase() + item.slice(1).toLowerCase() : item.toLowerCase()
+                    index
+                      ? item.charAt(0).toUpperCase() +
+                        item.slice(1).toLowerCase()
+                      : item.toLowerCase()
                   );
 
                   /**
@@ -234,50 +261,63 @@ export class CkEditorInitializerService {
                    * then set the default value or highlighted value as the
                    * component's data.
                    */
-                  const selection = that.editor.getSelection()
+                  const selection = that.editor
+                    .getSelection()
                     .getSelectedText();
                   if (!that.data[spec.name]) {
-                    if (spec.default_value_obtainable_from_highlight &&
-                        selection) {
+                    if (
+                      spec.default_value_obtainable_from_highlight &&
+                      selection
+                    ) {
                       that.setData(spec.name, selection);
                     }
                   }
 
                   capital.join('');
                   const customEl = that.element.getChild(0).$;
-                  customEl[capital.join('') + 'WithValue'] = (
+                  customEl[capital.join('') + 'WithValue'] =
                     htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] !== undefined ?
-                      that.data[spec.name] : ''));
-                  that.element.getChild(0).setAttribute(
-                    spec.name + '-with-value',
-                    htmlEscaperService.objToEscapedJson(
-                      that.data[spec.name] !== undefined ?
-                      that.data[spec.name] : ''));
+                      that.data[spec.name] !== undefined
+                        ? that.data[spec.name]
+                        : ''
+                    );
+                  that.element
+                    .getChild(0)
+                    .setAttribute(
+                      spec.name + '-with-value',
+                      htmlEscaperService.objToEscapedJson(
+                        that.data[spec.name] !== undefined
+                          ? that.data[spec.name]
+                          : ''
+                      )
+                    );
                 });
               },
-              init: function() {
+              init: function () {
                 editor.fire('lockSnapshot', {
-                  dontUpdate: true
+                  dontUpdate: true,
                 });
                 var that = this;
                 that.initialSnapshot = editor.getSnapshot();
                 // On init, read values from component attributes and save them.
-                customizationArgSpecs.forEach(function(spec) {
-                  var value = that.element.getChild(0).getAttribute(
-                    spec.name + '-with-value');
+                customizationArgSpecs.forEach(function (spec) {
+                  var value = that.element
+                    .getChild(0)
+                    .getAttribute(spec.name + '-with-value');
                   if (value) {
                     that.setData(
-                      spec.name, htmlEscaperService.escapedJsonToObj(value));
+                      spec.name,
+                      htmlEscaperService.escapedJsonToObj(value)
+                    );
                   }
                 });
                 setTimeout(() => {
                   editor.fire('unlockSnapshot');
                   editor.fire('saveSnapshot');
                 });
-              }
+              },
             });
-          }
+          },
         });
       });
     });

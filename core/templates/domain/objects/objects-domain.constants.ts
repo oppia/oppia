@@ -21,7 +21,7 @@ export const ObjectsDomainConstants = {
     INVALID_CHARS_LENGTH: 'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS_LENGTH',
     INVALID_CHARS: 'I18N_INTERACTIONS_FRACTIONS_INVALID_CHARS',
     INVALID_FORMAT: 'I18N_INTERACTIONS_FRACTIONS_INVALID_FORMAT',
-    DIVISION_BY_ZERO: 'I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO'
+    DIVISION_BY_ZERO: 'I18N_INTERACTIONS_FRACTIONS_DIVISION_BY_ZERO',
   },
 
   NUMBER_WITH_UNITS_PARSING_ERROR_I18N_KEYS: {
@@ -29,7 +29,8 @@ export const ObjectsDomainConstants = {
     INVALID_CURRENCY: 'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY',
     INVALID_CURRENCY_FORMAT:
       'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_CURRENCY_FORMAT',
-    INVALID_UNIT_CHARS: 'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS'
+    INVALID_UNIT_CHARS:
+      'I18N_INTERACTIONS_NUMBER_WITH_UNITS_INVALID_UNIT_CHARS',
   },
 
   CURRENCY_UNITS: {
@@ -37,26 +38,26 @@ export const ObjectsDomainConstants = {
       name: 'dollar',
       aliases: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],
       front_units: ['$'],
-      base_unit: null
+      base_unit: null,
     },
     rupee: {
       name: 'rupee',
       aliases: ['Rs', 'rupees', '₹', 'Rupees', 'Rupee'],
       front_units: ['Rs ', '₹'],
-      base_unit: null
+      base_unit: null,
     },
     cent: {
       name: 'cent',
       aliases: ['cents', 'Cents', 'Cent'],
       front_units: [],
-      base_unit: '0.01 dollar'
+      base_unit: '0.01 dollar',
     },
     paise: {
       name: 'paise',
       aliases: ['paisa', 'Paise', 'Paisa'],
       front_units: [],
-      base_unit: '0.01 rupee'
-    }
+      base_unit: '0.01 rupee',
+    },
   },
 
   RATIO_PARSING_ERROR_I18N_KEYS: {
@@ -66,5 +67,5 @@ export const ObjectsDomainConstants = {
     NON_INTEGER_ELEMENTS: 'I18N_INTERACTIONS_RATIO_NON_INTEGER_ELEMENTS',
     INCLUDES_ZERO: 'I18N_INTERACTIONS_RATIO_INCLUDES_ZERO',
     EMPTY_STRING: 'I18N_INTERACTIONS_RATIO_EMPTY_STRING',
-  }
+  },
 } as const;

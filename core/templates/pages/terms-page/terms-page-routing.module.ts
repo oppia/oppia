@@ -16,24 +16,19 @@
  * @fileoverview Routing module for terms page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { TermsPageRootComponent } from './terms-page-root.component';
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {TermsPageRootComponent} from './terms-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: TermsPageRootComponent
-  }
+    component: TermsPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class TermsPageRoutingModule {}

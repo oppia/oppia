@@ -20,31 +20,32 @@
  * followed by the name of the arg.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-text-input',
-  templateUrl: './text-input-short-response.component.html'
+  templateUrl: './text-input-short-response.component.html',
 })
-
 export class ShortResponseTextInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() answer!: string;
   escapedAnswer!: string;
-  constructor(private htmlEscaperService: HtmlEscaperService) { }
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
     this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer) as string;
+      this.answer
+    ) as string;
   }
 }
 
 angular.module('oppia').directive(
   'oppiaShortResponseTextInput',
   downgradeComponent({
-    component: ShortResponseTextInputComponent
-  }));
+    component: ShortResponseTextInputComponent,
+  })
+);

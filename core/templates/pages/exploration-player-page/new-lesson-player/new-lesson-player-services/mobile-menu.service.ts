@@ -16,11 +16,11 @@
  * @fileoverview Mobile menu service for new lesson player.
  */
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MobileMenuService {
   private menuVisibleSubject = new BehaviorSubject<boolean>(false);

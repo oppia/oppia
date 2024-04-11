@@ -12,40 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 /**
  * @fileoverview Component for the interaction editor section in the state
  * editor.
  */
 
-import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild, ElementRef } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
-import { DeleteInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { EditabilityService } from 'services/editability.service';
-import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
-import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
-import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
-import { StateContentService } from '../state-editor-properties-services/state-content.service';
-import { ContextService } from 'services/context.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { InteractionCustomizationArgs, InteractionData } from 'interactions/customization-args-defs';
-import { Solution } from 'domain/exploration/SolutionObjectFactory';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {
+  Component,
+  EventEmitter,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
+import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import {CustomizeInteractionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
+import {DeleteInteractionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {EditabilityService} from 'services/editability.service';
+import {StateCustomizationArgsService} from '../state-editor-properties-services/state-customization-args.service';
+import {StateEditorService} from '../state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
+import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
+import {StateContentService} from '../state-editor-properties-services/state-content.service';
+import {ContextService} from 'services/context.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {
+  InteractionCustomizationArgs,
+  InteractionData,
+} from 'interactions/customization-args-defs';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { State } from 'domain/state/StateObjectFactory';
-import { AnswerGroup } from 'domain/exploration/AnswerGroupObjectFactory';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
+import {State} from 'domain/state/StateObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 export interface InitializeAnswerGroups {
   interactionId: string;
@@ -56,12 +66,12 @@ export interface InitializeAnswerGroups {
 
 @Component({
   selector: 'oppia-state-interaction-editor',
-  templateUrl: './state-interaction-editor.component.html'
+  templateUrl: './state-interaction-editor.component.html',
 })
-export class StateInteractionEditorComponent
-  implements OnInit, OnDestroy {
-  @Output() markAllAudioAsNeedingUpdateModalIfRequired =
-    new EventEmitter<string[]>();
+export class StateInteractionEditorComponent implements OnInit, OnDestroy {
+  @Output() markAllAudioAsNeedingUpdateModalIfRequired = new EventEmitter<
+    string[]
+  >();
 
   @Output() onSaveInteractionData = new EventEmitter<InteractionData>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
@@ -70,10 +80,10 @@ export class StateInteractionEditorComponent
   @Output() recomputeGraph = new EventEmitter<void>();
 
   @ViewChild('customizeInteractionButton')
-    customizeInteractionButton!: ElementRef;
+  customizeInteractionButton!: ElementRef;
 
   @ViewChild('collapseAnswersAndResponsesButton')
-    collapseAnswersAndResponsesButton!: ElementRef;
+  collapseAnswersAndResponsesButton!: ElementRef;
 
   customizationModalReopened: boolean;
   DEFAULT_TERMINAL_STATE_CONTENT: string;
@@ -100,25 +110,29 @@ export class StateInteractionEditorComponent
     private generateContentIdService: GenerateContentIdService,
     private stateSolutionService: StateSolutionService,
     private urlInterpolationService: UrlInterpolationService,
-    private windowDimensionsService: WindowDimensionsService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   getCurrentInteractionName(): string {
-    return (
-      this.stateInteractionIdService.savedMemento ?
-        INTERACTION_SPECS[this.stateInteractionIdService.savedMemento].name :
-        '');
+    return this.stateInteractionIdService.savedMemento
+      ? INTERACTION_SPECS[this.stateInteractionIdService.savedMemento].name
+      : '';
   }
 
   _getInteractionPreviewTag(
-      interactionCustomizationArgs: InteractionCustomizationArgs): string {
+    interactionCustomizationArgs: InteractionCustomizationArgs
+  ): string {
     if (!this.stateInteractionIdService.savedMemento) {
       return '';
     }
 
     return this.explorationHtmlFormatterService.getInteractionHtml(
       this.stateInteractionIdService.savedMemento,
-      interactionCustomizationArgs, false, null, null);
+      interactionCustomizationArgs,
+      false,
+      null,
+      null
+    );
   }
 
   _updateInteractionPreview(): void {
@@ -127,17 +141,20 @@ export class StateInteractionEditorComponent
     let currentCustomizationArgs =
       this.stateCustomizationArgsService.savedMemento;
     this.interactionPreviewHtml = this._getInteractionPreviewTag(
-      currentCustomizationArgs);
-    this.interactionIsDisabled = (
+      currentCustomizationArgs
+    );
+    this.interactionIsDisabled =
       this.interactionId === 'EndExploration' &&
-      this.contextService.isExplorationLinkedToStory());
+      this.contextService.isExplorationLinkedToStory();
   }
 
   _updateAnswerChoices(): void {
     this.stateEditorService.onUpdateAnswerChoices.emit(
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
-        this.stateCustomizationArgsService.savedMemento));
+        this.stateCustomizationArgsService.savedMemento
+      )
+    );
   }
 
   // If a terminal interaction is selected for a state with no content,
@@ -155,13 +172,14 @@ export class StateInteractionEditorComponent
     this.stateContentService.displayed.html =
       this.DEFAULT_TERMINAL_STATE_CONTENT;
     this.stateContentService.saveDisplayedValue();
-    this.onSaveStateContent.emit(
-      this.stateContentService.displayed);
+    this.onSaveStateContent.emit(this.stateContentService.displayed);
   }
 
   focusOnCustomizeInteraction(event: KeyboardEvent): void {
-    if (this.getCurrentInteractionName() !== '' &&
-      this.interactionEditorIsShown) {
+    if (
+      this.getCurrentInteractionName() !== '' &&
+      this.interactionEditorIsShown
+    ) {
       event.preventDefault();
       this.customizeInteractionButton.nativeElement.focus();
     }
@@ -179,12 +197,13 @@ export class StateInteractionEditorComponent
   }
 
   onCustomizationModalSavePostHook(): void {
-    let hasInteractionIdChanged = (
+    let hasInteractionIdChanged =
       this.stateInteractionIdService.displayed !==
-      this.stateInteractionIdService.savedMemento);
+      this.stateInteractionIdService.savedMemento;
     if (hasInteractionIdChanged) {
-      if (INTERACTION_SPECS[this.stateInteractionIdService.displayed]
-        .is_terminal) {
+      if (
+        INTERACTION_SPECS[this.stateInteractionIdService.displayed].is_terminal
+      ) {
         this.updateDefaultTerminalStateContentIfEmpty();
       }
       this.stateInteractionIdService.saveDisplayedValue();
@@ -193,14 +212,15 @@ export class StateInteractionEditorComponent
 
     let interactionData: InteractionData = {
       interactionId: this.stateInteractionIdService.displayed,
-      customizationArgs: this.stateCustomizationArgsService.displayed
+      customizationArgs: this.stateCustomizationArgsService.displayed,
     };
     this.onSaveInteractionData.emit(interactionData);
 
     this.onSaveNextContentIdIndex.emit();
     this.interactionDetailsCacheService.set(
       this.stateInteractionIdService.savedMemento,
-      this.stateCustomizationArgsService.savedMemento);
+      this.stateCustomizationArgsService.savedMemento
+    );
 
     // This must be called here so that the rules are updated before the
     // state graph is recomputed.
@@ -215,7 +235,8 @@ export class StateInteractionEditorComponent
     this.stateEditorService.onHandleCustomArgsUpdate.emit(
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
-        this.stateCustomizationArgsService.savedMemento)
+        this.stateCustomizationArgsService.savedMemento
+      )
     );
   }
 
@@ -226,12 +247,11 @@ export class StateInteractionEditorComponent
     if (this.editabilityService.isEditable()) {
       this.alertsService.clearWarnings();
 
-      const modalRef = this.ngbModal
-        .open(CustomizeInteractionModalComponent, {
-          keyboard: false,
-          backdrop: 'static',
-          windowClass: 'customize-interaction-modal'
-        });
+      const modalRef = this.ngbModal.open(CustomizeInteractionModalComponent, {
+        keyboard: false,
+        backdrop: 'static',
+        windowClass: 'customize-interaction-modal',
+      });
 
       modalRef.result.then(
         () => {
@@ -241,41 +261,48 @@ export class StateInteractionEditorComponent
           this.stateInteractionIdService.restoreFromMemento();
           this.stateCustomizationArgsService.restoreFromMemento();
           this.generateContentIdService.revertUnusedContentIdIndex();
-        });
+        }
+      );
     }
   }
 
   deleteInteraction(): void {
     this.alertsService.clearWarnings();
-    this.ngbModal.open(DeleteInteractionModalComponent, {
-      backdrop: true,
-    }).result.then(() => {
-      this.stateInteractionIdService.displayed = null;
-      this.stateCustomizationArgsService.displayed = {};
-      this.stateSolutionService.displayed = null;
-      this.interactionDetailsCacheService.removeDetails(
-        this.stateInteractionIdService.savedMemento);
-      this.stateInteractionIdService.saveDisplayedValue();
-      this.stateCustomizationArgsService.saveDisplayedValue();
+    this.ngbModal
+      .open(DeleteInteractionModalComponent, {
+        backdrop: true,
+      })
+      .result.then(
+        () => {
+          this.stateInteractionIdService.displayed = null;
+          this.stateCustomizationArgsService.displayed = {};
+          this.stateSolutionService.displayed = null;
+          this.interactionDetailsCacheService.removeDetails(
+            this.stateInteractionIdService.savedMemento
+          );
+          this.stateInteractionIdService.saveDisplayedValue();
+          this.stateCustomizationArgsService.saveDisplayedValue();
 
-      let interactionData: InteractionData = {
-        interactionId: this.stateInteractionIdService.displayed,
-        customizationArgs: this.stateCustomizationArgsService.displayed
-      };
-      this.onSaveInteractionData.emit(interactionData);
+          let interactionData: InteractionData = {
+            interactionId: this.stateInteractionIdService.displayed,
+            customizationArgs: this.stateCustomizationArgsService.displayed,
+          };
+          this.onSaveInteractionData.emit(interactionData);
 
-      this.stateSolutionService.saveDisplayedValue();
-      this.onSaveSolution.emit(this.stateSolutionService.displayed);
+          this.stateSolutionService.saveDisplayedValue();
+          this.onSaveSolution.emit(this.stateSolutionService.displayed);
 
-      this.stateInteractionIdService.onInteractionIdChanged.emit(
-        this.stateInteractionIdService.savedMemento
+          this.stateInteractionIdService.onInteractionIdChanged.emit(
+            this.stateInteractionIdService.savedMemento
+          );
+          this.recomputeGraph.emit();
+          this._updateInteractionPreview();
+          this._updateAnswerChoices();
+        },
+        () => {
+          this.alertsService.clearWarnings();
+        }
       );
-      this.recomputeGraph.emit();
-      this._updateInteractionPreview();
-      this._updateAnswerChoices();
-    }, () => {
-      this.alertsService.clearWarnings();
-    });
   }
 
   toggleInteractionEditor(): void {
@@ -288,42 +315,39 @@ export class StateInteractionEditorComponent
 
   throwError(stateData: State): void {
     throw new Error(
-      'Expected stateData to be defined but ' +
-      'received ' + stateData);
+      'Expected stateData to be defined but ' + 'received ' + stateData
+    );
   }
 
   ngOnInit(): void {
     this.interactionIsDisabled = false;
-    this.DEFAULT_TERMINAL_STATE_CONTENT =
-    'Congratulations, you have finished!';
+    this.DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionEditorIsShown = true;
     this.hasLoaded = false;
     this.customizationModalReopened = false;
     this.directiveSubscriptions.add(
-      this.stateEditorService.onStateEditorInitialized.subscribe(
-        (stateData) => {
-          if (stateData === undefined || Object.keys(stateData).length === 0) {
-            this.throwError(stateData);
-            return;
-          }
-
-          this.hasLoaded = false;
-          this.interactionDetailsCacheService.reset();
-          this.responsesService.onInitializeAnswerGroups.emit({
-            interactionId: stateData.interaction.id,
-            answerGroups: stateData.interaction.answerGroups,
-            defaultOutcome: stateData.interaction.defaultOutcome,
-            confirmedUnclassifiedAnswers: (
-              stateData.interaction.confirmedUnclassifiedAnswers),
-          });
-
-          this._updateInteractionPreview();
-          this._updateAnswerChoices();
-          this.hasLoaded = true;
+      this.stateEditorService.onStateEditorInitialized.subscribe(stateData => {
+        if (stateData === undefined || Object.keys(stateData).length === 0) {
+          this.throwError(stateData);
+          return;
         }
-      )
+
+        this.hasLoaded = false;
+        this.interactionDetailsCacheService.reset();
+        this.responsesService.onInitializeAnswerGroups.emit({
+          interactionId: stateData.interaction.id,
+          answerGroups: stateData.interaction.answerGroups,
+          defaultOutcome: stateData.interaction.defaultOutcome,
+          confirmedUnclassifiedAnswers:
+            stateData.interaction.confirmedUnclassifiedAnswers,
+        });
+
+        this._updateInteractionPreview();
+        this._updateAnswerChoices();
+        this.hasLoaded = true;
+      })
     );
 
     this.stateEditorService.onInteractionEditorInitialized.emit();
@@ -335,7 +359,9 @@ export class StateInteractionEditorComponent
   }
 }
 
-angular.module('oppia').directive('oppiaStateInteractionEditor',
-downgradeComponent({
-  component: StateInteractionEditorComponent
-}) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaStateInteractionEditor',
+  downgradeComponent({
+    component: StateInteractionEditorComponent,
+  }) as angular.IDirectiveFactory
+);

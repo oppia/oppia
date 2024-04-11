@@ -24,28 +24,28 @@ module.exports = {
   meta: {
     type: 'suggestion',
     docs: {
-      description: (
+      description:
         'Lint check to ensure that  the line breaks between the dependencies' +
         ' listed in the controller of a directive or service exactly' +
-        ' match those between the arguments of the controller function'),
+        ' match those between the arguments of the controller function',
       category: 'Stylistic Issues',
       recommended: true,
     },
     fixable: null,
     schema: [],
     messages: {
-      matchLineBreak: (
+      matchLineBreak:
         'Please ensure that the line breaks pattern between the dependencies' +
         ' mentioned as strings and the dependencies mentioned as function' +
-        ' parameters for the corresponding controller should exactly match.')
+        ' parameters for the corresponding controller should exactly match.',
     },
   },
 
-  create: function(context) {
-    var getDependenciesLiteralLines = function(controllerArg, nameIn) {
+  create: function (context) {
+    var getDependenciesLiteralLines = function (controllerArg, nameIn) {
       var dependencyToLineIndex = {};
       var startLine = 1000000;
-      controllerArg.forEach(function(Literal) {
+      controllerArg.forEach(function (Literal) {
         var lineNo = Literal.loc.start.line;
         if (startLine > lineNo) {
           startLine = lineNo;
@@ -56,7 +56,7 @@ module.exports = {
     };
 
     return {
-      'CallExpression[callee.property.name=directive]': function(node) {
+      'CallExpression[callee.property.name=directive]': function (node) {
         var arg = node.arguments;
         // In angular, components function take 2 arguments and type of last
         // arguments is an ArrayExpression, if arguments doesn't follow this
@@ -66,32 +66,43 @@ module.exports = {
         }
         var lengthOfElements = arg[1].elements.length;
         var functionNode = arg[1].elements[lengthOfElements - 1];
-        if ((functionNode.body.body[0].type !== 'ReturnStatement') || (
-          functionNode.body.body[0].argument.type !== 'ObjectExpression')) {
+        if (
+          functionNode.body.body[0].type !== 'ReturnStatement' ||
+          functionNode.body.body[0].argument.type !== 'ObjectExpression'
+        ) {
           return;
         }
         var returnDictProp = functionNode.body.body[0].argument.properties;
-        returnDictProp.forEach(function(property) {
-          if (property.key.name === 'controller' && (
-            property.value.type === 'ArrayExpression')) {
+        returnDictProp.forEach(function (property) {
+          if (
+            property.key.name === 'controller' &&
+            property.value.type === 'ArrayExpression'
+          ) {
             var lenPropElements = property.value.elements.length;
             var controllerFun = property.value.elements[lenPropElements - 1];
-            var controllerArg = (
-              property.value.elements.slice(0, lenPropElements - 1));
-            var literalLines = (
-              getDependenciesLiteralLines(controllerArg, 'value'));
-            var funcParamsLine = (
-              getDependenciesLiteralLines(controllerFun.params, 'name'));
+            var controllerArg = property.value.elements.slice(
+              0,
+              lenPropElements - 1
+            );
+            var literalLines = getDependenciesLiteralLines(
+              controllerArg,
+              'value'
+            );
+            var funcParamsLine = getDependenciesLiteralLines(
+              controllerFun.params,
+              'name'
+            );
             if (
-              JSON.stringify(literalLines) !== JSON.stringify(funcParamsLine)) {
+              JSON.stringify(literalLines) !== JSON.stringify(funcParamsLine)
+            ) {
               context.report({
                 node: property,
-                messageId: 'matchLineBreak'
+                messageId: 'matchLineBreak',
               });
             }
           }
         });
-      }
+      },
     };
-  }
+  },
 };

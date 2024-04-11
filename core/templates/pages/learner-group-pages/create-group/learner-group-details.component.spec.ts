@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for adding learner group details.
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerGroupDetailsComponent } from './learner-group-details.component';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerGroupDetailsComponent} from './learner-group-details.component';
 
 describe('LearnerGroupDetailsComponent', () => {
   let component: LearnerGroupDetailsComponent;
@@ -29,12 +29,9 @@ describe('LearnerGroupDetailsComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        LearnerGroupDetailsComponent,
-        MockTranslatePipe
-      ],
+      declarations: [LearnerGroupDetailsComponent, MockTranslatePipe],
       providers: [],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 

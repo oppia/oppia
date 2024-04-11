@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for the SubtitledUnicode object factory.
  */
 
-import { SubtitledUnicodeObjectFactory, SubtitledUnicode } from
-  'domain/exploration/SubtitledUnicodeObjectFactory';
+import {
+  SubtitledUnicodeObjectFactory,
+  SubtitledUnicode,
+} from 'domain/exploration/SubtitledUnicodeObjectFactory';
 
 describe('SubtitledUnicode object factory', () => {
   let suof: SubtitledUnicodeObjectFactory, subtitledUnicode: SubtitledUnicode;
@@ -27,7 +29,7 @@ describe('SubtitledUnicode object factory', () => {
 
     subtitledUnicode = suof.createFromBackendDict({
       content_id: 'content_id',
-      unicode_str: 'some string'
+      unicode_str: 'some string',
     });
   });
 
@@ -56,13 +58,15 @@ describe('SubtitledUnicode object factory', () => {
   it('should convert to backend dict correctly', () => {
     expect(subtitledUnicode.toBackendDict()).toEqual({
       content_id: 'content_id',
-      unicode_str: 'some string'
+      unicode_str: 'some string',
     });
   });
 
   it('should create default object', () => {
-    const defaultSubtitledUnicode = suof
-      .createDefault('test string', 'content_id');
+    const defaultSubtitledUnicode = suof.createDefault(
+      'test string',
+      'content_id'
+    );
     expect(defaultSubtitledUnicode.unicode).toEqual('test string');
     expect(defaultSubtitledUnicode.contentId).toEqual('content_id');
   });

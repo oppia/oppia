@@ -19,14 +19,14 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-import { Component, Input, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { HtmlEscaperService } from 'services/html-escaper.service';
+import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 
 @Component({
   selector: 'oppia-short-response-algebraic-expression-input',
   templateUrl: './algebraic-expression-input-response.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class ShortResponseAlgebraicExpressionInputComponent implements OnInit {
   @Input() answer: string = '';
@@ -35,12 +35,15 @@ export class ShortResponseAlgebraicExpressionInputComponent implements OnInit {
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    this.escapedAnswer = (
-      this.htmlEscaperService.escapedJsonToObj(this.answer) as string);
+    this.escapedAnswer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as string;
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaShortResponseAlgebraicExpressionInput', downgradeComponent({
-    component: ShortResponseAlgebraicExpressionInputComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaShortResponseAlgebraicExpressionInput',
+  downgradeComponent({
+    component: ShortResponseAlgebraicExpressionInputComponent,
+  }) as angular.IDirectiveFactory
+);

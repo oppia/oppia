@@ -31,7 +31,7 @@ export class ExplorationSearchResult {
   ) {}
 
   static createFromBackendDict(
-      explorationSearchResultBackendDict: ExplorationSearchResultBackendDict
+    explorationSearchResultBackendDict: ExplorationSearchResultBackendDict
   ): ExplorationSearchResult {
     return new ExplorationSearchResult(
       explorationSearchResultBackendDict.id,

@@ -23,7 +23,7 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import config_domain
+from core.domain import classroom_config_services
 from core.domain import exp_fetchers
 from core.domain import opportunity_domain
 from core.domain import opportunity_services
@@ -134,7 +134,7 @@ class ContributionOpportunitiesHandler(
             opportunity_type: str. The opportunity type.
 
         Raises:
-            PageNotFoundException. The opportunity type is invalid.
+            NotFoundException. The opportunity type is invalid.
             InvalidInputException. The language_code is invalid.
                 This happens when the opportunity type is of type
                 constant.OPPORTUNITY_TYPE_TRANSLATION and the
@@ -157,7 +157,7 @@ class ContributionOpportunitiesHandler(
                 self._get_translation_opportunity_dicts(
                     language_code, topic_name, search_cursor))
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         self.values = {
             'opportunities': (
@@ -196,9 +196,10 @@ class ContributionOpportunitiesHandler(
         """
         # We want to focus attention on lessons that are part of a classroom.
         # See issue #12221.
-        classroom_topic_ids = []
-        for classroom_dict in config_domain.CLASSROOM_PAGES_DATA.value:
-            classroom_topic_ids.extend(classroom_dict['topic_ids'])
+        classroom_topic_ids: List[str] = []
+        classrooms = classroom_config_services.get_all_classrooms()
+        for classroom in classrooms:
+            classroom_topic_ids.extend(classroom.get_topic_ids())
         classroom_topics = topic_fetchers.get_topics_by_ids(classroom_topic_ids)
         # Associate each skill with one classroom topic name.
         # TODO(#8912): Associate each skill/skill opportunity with all linked
@@ -763,7 +764,7 @@ class MachineTranslationStateTextsHandler(
         Raises:
             400 (Bad Request): InvalidInputException. At least one input is
                 missing or improperly formatted.
-            404 (Not Found): PageNotFoundException. At least one identifier does
+            404 (Not Found): NotFoundException. At least one identifier does
                 not correspond to an entry in the datastore.
         """
         assert self.normalized_request is not None
@@ -784,7 +785,7 @@ class MachineTranslationStateTextsHandler(
 
         exp = exp_fetchers.get_exploration_by_id(exp_id, strict=False)
         if exp is None:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
         state_names_to_content_id_mapping: (
             Dict[str, Dict[str, translation_domain.TranslatableContent]]
         ) = (
@@ -792,7 +793,7 @@ class MachineTranslationStateTextsHandler(
                 exp, target_language_code)
         )
         if state_name not in state_names_to_content_id_mapping:
-            raise self.PageNotFoundException()
+            raise self.NotFoundException()
         content_id_to_translatable_item_mapping = (
             state_names_to_content_id_mapping[state_name])
         translated_texts: Dict[str, Optional[str]] = {}

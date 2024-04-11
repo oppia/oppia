@@ -16,24 +16,30 @@
  * @fileoverview Module for the about page.
  */
 
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
+import {APP_INITIALIZER, NgModule} from '@angular/core';
 
 // Modules.
-import { BrowserModule, HAMMER_GESTURE_CONFIG, HammerGestureConfig } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppRoutingModule } from './routing/app.routing.module';
+import {
+  BrowserModule,
+  HAMMER_GESTURE_CONFIG,
+  HammerGestureConfig,
+} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {AppRoutingModule} from './routing/app.routing.module';
 
 // Components.
-import { LightweightOppiaRootComponent } from './lightweight-oppia-root.component';
+import {LightweightOppiaRootComponent} from './lightweight-oppia-root.component';
 
 // Miscellaneous.
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { CookieModule } from 'ngx-cookie';
-import { ToastrModule } from 'ngx-toastr';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
+import {
+  platformFeatureInitFactory,
+  PlatformFeatureService,
+} from 'services/platform-feature.service';
+import {RequestInterceptor} from 'services/request-interceptor.service';
+import {CookieModule} from 'ngx-cookie';
+import {ToastrModule} from 'ngx-toastr';
+import {AppErrorHandlerProvider} from 'pages/oppia-root/app-error-handler';
 // This throws "TS2307". We need to
 // suppress this error because hammer come from hammerjs
 // dependency. We can't import it directly.
@@ -47,26 +53,26 @@ export const toastrConfig = {
     error: 'toast-error',
     info: 'toast-info',
     success: 'toast-success',
-    warning: 'toast-warning'
+    warning: 'toast-warning',
   },
   positionClass: 'toast-bottom-right',
   messageClass: 'toast-message e2e-test-toast-message',
   progressBar: false,
   tapToDismiss: true,
-  titleClass: 'toast-title'
+  titleClass: 'toast-title',
 };
 
 export class HammerConfig extends HammerGestureConfig {
   overrides = {
-    swipe: { direction: hammer.DIRECTION_HORIZONTAL },
-    pinch: { enable: false },
-    rotate: { enable: false },
+    swipe: {direction: hammer.DIRECTION_HORIZONTAL},
+    pinch: {enable: false},
+    rotate: {enable: false},
   };
 
   options = {
     cssProps: {
-      userSelect: true
-    }
+      userSelect: true,
+    },
   };
 }
 
@@ -77,32 +83,28 @@ export class HammerConfig extends HammerGestureConfig {
     CookieModule.forRoot(),
     HttpClientModule,
     AppRoutingModule,
-    ToastrModule.forRoot(toastrConfig)
+    ToastrModule.forRoot(toastrConfig),
   ],
-  declarations: [
-    LightweightOppiaRootComponent,
-  ],
-  entryComponents: [
-    LightweightOppiaRootComponent,
-  ],
+  declarations: [LightweightOppiaRootComponent],
+  entryComponents: [LightweightOppiaRootComponent],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: RequestInterceptor,
-      multi: true
+      multi: true,
     },
     AppErrorHandlerProvider,
     {
       provide: APP_INITIALIZER,
       useFactory: platformFeatureInitFactory,
       deps: [PlatformFeatureService],
-      multi: true
+      multi: true,
     },
     {
       provide: HAMMER_GESTURE_CONFIG,
-      useClass: HammerConfig
-    }
+      useClass: HammerConfig,
+    },
   ],
-  bootstrap: [LightweightOppiaRootComponent]
+  bootstrap: [LightweightOppiaRootComponent],
 })
 export class LighweightAppModule {}

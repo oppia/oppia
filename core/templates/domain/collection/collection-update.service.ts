@@ -19,43 +19,55 @@
  * undo/redo service.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
-import { CollectionDomainConstants } from
-  'domain/collection/collection-domain.constants';
-import { Collection } from 'domain/collection/collection.model';
-import { CollectionNode } from './collection-node.model';
-import { BackendChangeObject, Change, CollectionChange, DomainObject } from 'domain/editor/undo_redo/change.model';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { LearnerExplorationSummaryBackendDict } from 'domain/summary/learner-exploration-summary.model';
-import { Params } from '@angular/router';
+import {CollectionDomainConstants} from 'domain/collection/collection-domain.constants';
+import {Collection} from 'domain/collection/collection.model';
+import {CollectionNode} from './collection-node.model';
+import {
+  BackendChangeObject,
+  Change,
+  CollectionChange,
+  DomainObject,
+} from 'domain/editor/undo_redo/change.model';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {Params} from '@angular/router';
 
 type CollectionUpdateApply = (
-  collectionChange: CollectionChange, collection: Collection) => void;
+  collectionChange: CollectionChange,
+  collection: Collection
+) => void;
 type CollectionUpdateReverse = (
-  collectionChange: CollectionChange, collection: Collection) => void;
+  collectionChange: CollectionChange,
+  collection: Collection
+) => void;
 type ChangeBackendDict = (
   backendChangeObject: BackendChangeObject,
   domainObject: DomainObject
 ) => void;
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CollectionUpdateService {
   constructor(private undoRedoService: UndoRedoService) {}
 
   private _applyChange(
-      collection: Collection,
-      command: string, params: Params | BackendChangeObject,
-      apply: CollectionUpdateApply,
-      reverse: CollectionUpdateReverse): void {
+    collection: Collection,
+    command: string,
+    params: Params | BackendChangeObject,
+    apply: CollectionUpdateApply,
+    reverse: CollectionUpdateReverse
+  ): void {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
     let changeObj = new Change(
-      changeDict as BackendChangeObject, apply as ChangeBackendDict,
-      reverse as ChangeBackendDict);
+      changeDict as BackendChangeObject,
+      apply as ChangeBackendDict,
+      reverse as ChangeBackendDict
+    );
     this.undoRedoService.applyChange(changeObj, collection);
   }
 
@@ -66,21 +78,26 @@ export class CollectionUpdateService {
   // Applies a collection property change, specifically. See _applyChange()
   // for details on the other behavior of this function.
   private _applyPropertyChange(
-      collection: Collection,
-      propertyName: string,
-      // New value can be set to null.
-      newValue: string|string[] | null,
-      // Old value is null until the user provides it.
-      oldValue: string|string[] | null,
-      apply: CollectionUpdateApply,
-      reverse: CollectionUpdateReverse) {
+    collection: Collection,
+    propertyName: string,
+    // New value can be set to null.
+    newValue: string | string[] | null,
+    // Old value is null until the user provides it.
+    oldValue: string | string[] | null,
+    apply: CollectionUpdateApply,
+    reverse: CollectionUpdateReverse
+  ) {
     this._applyChange(
       collection,
-      CollectionDomainConstants.CMD_EDIT_COLLECTION_PROPERTY, {
+      CollectionDomainConstants.CMD_EDIT_COLLECTION_PROPERTY,
+      {
         property_name: propertyName,
         new_value: cloneDeep(newValue),
-        old_value: cloneDeep(oldValue)
-      }, apply, reverse);
+        old_value: cloneDeep(oldValue),
+      },
+      apply,
+      reverse
+    );
   }
 
   private _getNewPropertyValueFromChangeDict(changeDict: Params) {
@@ -100,75 +117,85 @@ export class CollectionUpdateService {
   }
 
   addCollectionNode(
-      collection: Collection,
-      explorationId: string,
-      explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict
+    collection: Collection,
+    explorationId: string,
+    explorationSummaryBackendObject: LearnerExplorationSummaryBackendDict
   ): void {
     let oldSummaryBackendObject = cloneDeep(explorationSummaryBackendObject);
     this._applyChange(
       collection,
-      CollectionDomainConstants.CMD_ADD_COLLECTION_NODE, {
-        exploration_id: explorationId
-      }, (changeDict, collection) => {
+      CollectionDomainConstants.CMD_ADD_COLLECTION_NODE,
+      {
+        exploration_id: explorationId,
+      },
+      (changeDict, collection) => {
         // Apply.
         let explorationId = this._getExplorationIdFromChangeDict(changeDict);
-        let collectionNode = (
-          CollectionNode.createFromExplorationId(
-            explorationId));
+        let collectionNode =
+          CollectionNode.createFromExplorationId(explorationId);
         collectionNode.setExplorationSummaryObject(oldSummaryBackendObject);
         collection.addCollectionNode(collectionNode);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // Undo.
         let explorationId = this._getExplorationIdFromChangeDict(changeDict);
         collection.deleteCollectionNode(explorationId);
-      });
+      }
+    );
   }
 
   swapNodes(
-      collection: Collection,
-      firstIndex: number,
-      secondIndex: number): void {
+    collection: Collection,
+    firstIndex: number,
+    secondIndex: number
+  ): void {
     this._applyChange(
       collection,
-      CollectionDomainConstants.CMD_SWAP_COLLECTION_NODES, {
+      CollectionDomainConstants.CMD_SWAP_COLLECTION_NODES,
+      {
         first_index: firstIndex,
-        second_index: secondIndex
-      }, (changeDict, collection) => {
+        second_index: secondIndex,
+      },
+      (changeDict, collection) => {
         // Apply.
         let firstIndex = this._getFirstIndexFromChangeDict(changeDict);
         let secondIndex = this._getSecondIndexFromChangeDict(changeDict);
 
         collection.swapCollectionNodes(firstIndex, secondIndex);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // Undo.
         let firstIndex = this._getFirstIndexFromChangeDict(changeDict);
         let secondIndex = this._getSecondIndexFromChangeDict(changeDict);
 
         collection.swapCollectionNodes(firstIndex, secondIndex);
-      });
+      }
+    );
   }
 
   /**
    * Removes an exploration from a collection and records the change in
    * the undo/redo service.
    */
-  deleteCollectionNode(
-      collection: Collection,
-      explorationId: string): void {
-    let oldCollectionNode = collection.getCollectionNodeByExplorationId(
-      explorationId);
+  deleteCollectionNode(collection: Collection, explorationId: string): void {
+    let oldCollectionNode =
+      collection.getCollectionNodeByExplorationId(explorationId);
     this._applyChange(
       collection,
-      CollectionDomainConstants.CMD_DELETE_COLLECTION_NODE, {
-        exploration_id: explorationId
-      }, (changeDict, collection) => {
+      CollectionDomainConstants.CMD_DELETE_COLLECTION_NODE,
+      {
+        exploration_id: explorationId,
+      },
+      (changeDict, collection) => {
         // Apply.
         let explorationId = this._getExplorationIdFromChangeDict(changeDict);
         collection.deleteCollectionNode(explorationId);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // Undo.
         collection.addCollectionNode(oldCollectionNode);
-      });
+      }
+    );
   }
 
   /**
@@ -176,21 +203,23 @@ export class CollectionUpdateService {
    * undo/redo service.
    */
   // Collection title is null for the default collection.
-  setCollectionTitle(
-      collection: Collection,
-      title: string | null): void {
+  setCollectionTitle(collection: Collection, title: string | null): void {
     const oldTitle = collection.getTitle();
     this._applyPropertyChange(
       collection,
-      CollectionDomainConstants.COLLECTION_PROPERTY_TITLE, title, oldTitle,
+      CollectionDomainConstants.COLLECTION_PROPERTY_TITLE,
+      title,
+      oldTitle,
       (changeDict, collection) => {
         // ---- Apply ----
         let title = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setTitle(title);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // ---- Undo ----
         collection.setTitle(oldTitle);
-      });
+      }
+    );
   }
 
   /**
@@ -198,21 +227,23 @@ export class CollectionUpdateService {
    * undo/redo service.
    */
   // Collection category is null for the default collection.
-  setCollectionCategory(
-      collection: Collection,
-      category: string | null): void {
+  setCollectionCategory(collection: Collection, category: string | null): void {
     let oldCategory = collection.getCategory();
     this._applyPropertyChange(
       collection,
-      CollectionDomainConstants.COLLECTION_PROPERTY_CATEGORY, category,
-      oldCategory, (changeDict, collection) => {
+      CollectionDomainConstants.COLLECTION_PROPERTY_CATEGORY,
+      category,
+      oldCategory,
+      (changeDict, collection) => {
         // Apply.
         const newCategory = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setCategory(newCategory);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // Undo.
         collection.setCategory(oldCategory);
-      });
+      }
+    );
   }
 
   /**
@@ -221,20 +252,25 @@ export class CollectionUpdateService {
    */
   // Collection objective is null for the default collection.
   setCollectionObjective(
-      collection: Collection,
-      objective: string | null
+    collection: Collection,
+    objective: string | null
   ): void {
     let oldObjective = collection.getObjective();
     this._applyPropertyChange(
-      collection, CollectionDomainConstants.COLLECTION_PROPERTY_OBJECTIVE,
-      objective, oldObjective, (changeDict, collection) => {
+      collection,
+      CollectionDomainConstants.COLLECTION_PROPERTY_OBJECTIVE,
+      objective,
+      oldObjective,
+      (changeDict, collection) => {
         // Apply.
         let objective = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setObjective(objective);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // Undo.
         collection.setObjective(oldObjective);
-      });
+      }
+    );
   }
 
   /**
@@ -243,19 +279,25 @@ export class CollectionUpdateService {
    */
   // Collection language code is null for the default collection.
   setCollectionLanguageCode(
-      collection: Collection,
-      languageCode: string | null): void {
+    collection: Collection,
+    languageCode: string | null
+  ): void {
     let oldLanguageCode = collection.getLanguageCode();
     this._applyPropertyChange(
-      collection, CollectionDomainConstants.COLLECTION_PROPERTY_LANGUAGE_CODE,
-      languageCode, oldLanguageCode, (changeDict, collection) => {
+      collection,
+      CollectionDomainConstants.COLLECTION_PROPERTY_LANGUAGE_CODE,
+      languageCode,
+      oldLanguageCode,
+      (changeDict, collection) => {
         // Apply.
         let languageCode = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setLanguageCode(languageCode);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // Undo.
         collection.setLanguageCode(oldLanguageCode);
-      });
+      }
+    );
   }
 
   /**
@@ -265,15 +307,20 @@ export class CollectionUpdateService {
   setCollectionTags(collection: Collection, tags: string[]): void {
     const oldTags = collection.getTags();
     this._applyPropertyChange(
-      collection, CollectionDomainConstants.COLLECTION_PROPERTY_TAGS,
-      tags, oldTags, (changeDict, collection) => {
+      collection,
+      CollectionDomainConstants.COLLECTION_PROPERTY_TAGS,
+      tags,
+      oldTags,
+      (changeDict, collection) => {
         // Apply.
         let tags = this._getNewPropertyValueFromChangeDict(changeDict);
         collection.setTags(tags);
-      }, (changeDict, collection) => {
+      },
+      (changeDict, collection) => {
         // Undo.
         collection.setTags(oldTags);
-      });
+      }
+    );
   }
 
   /**
@@ -282,8 +329,10 @@ export class CollectionUpdateService {
    */
   isAddingCollectionNode(changeObject: Change): boolean {
     let backendChangeObject = changeObject.getBackendChangeObject();
-    return backendChangeObject.cmd === (
-      CollectionDomainConstants.CMD_ADD_COLLECTION_NODE);
+    return (
+      backendChangeObject.cmd ===
+      CollectionDomainConstants.CMD_ADD_COLLECTION_NODE
+    );
   }
 
   /**
@@ -294,8 +343,13 @@ export class CollectionUpdateService {
    */
   getExplorationIdFromChangeObject(changeObject: Change): string {
     return this._getExplorationIdFromChangeDict(
-      changeObject.getBackendChangeObject());
+      changeObject.getBackendChangeObject()
+    );
   }
 }
-angular.module('oppia').factory('CollectionUpdateService',
-  downgradeInjectable(CollectionUpdateService));
+angular
+  .module('oppia')
+  .factory(
+    'CollectionUpdateService',
+    downgradeInjectable(CollectionUpdateService)
+  );

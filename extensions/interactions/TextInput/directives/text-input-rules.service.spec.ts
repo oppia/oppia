@@ -16,13 +16,11 @@
  * @fileoverview Unit tests for Text Input rules.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
-import { TextInputRuleInputs } from 'interactions/rule-input-defs';
-import { TextInputRulesService } from
-  'interactions/TextInput/directives/text-input-rules.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {TextInputRuleInputs} from 'interactions/rule-input-defs';
+import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
 
 describe('Text Input rules service', () => {
   let tirs: TextInputRulesService;
@@ -33,36 +31,36 @@ describe('Text Input rules service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [NormalizeWhitespacePipe]
+      providers: [NormalizeWhitespacePipe],
     });
     tirs = TestBed.get(TextInputRulesService);
 
     RULE_INPUT = {
       x: {
         contentId: 'rule_input',
-        normalizedStrSet: ['abc def']
+        normalizedStrSet: ['abc def'],
       },
-      contentId: null
+      contentId: null,
     };
 
     RULE_INPUT_PLURAL = {
       x: {
         contentId: 'rule_input',
-        normalizedStrSet: ['testing', 'abc def']
+        normalizedStrSet: ['testing', 'abc def'],
       },
-      contentId: null
+      contentId: null,
     };
 
     RULE_INPUT_EMPTY = {
       x: {
         contentId: 'rule_input',
-        normalizedStrSet: []
+        normalizedStrSet: [],
       },
-      contentId: null
+      contentId: null,
     };
   });
 
-  it('should have a correct \'equals\' rule', () => {
+  it("should have a correct 'equals' rule", () => {
     expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
 
     expect(tirs.Equals('abc def', RULE_INPUT)).toBe(true);
@@ -80,7 +78,7 @@ describe('Text Input rules service', () => {
     expect(tirs.Equals('abc', RULE_INPUT_PLURAL)).toBe(false);
   });
 
-  it('should have a correct \'fuzzy equals\' rule', () => {
+  it("should have a correct 'fuzzy equals' rule", () => {
     expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
 
     expect(tirs.FuzzyEquals('ABC DEF', RULE_INPUT)).toBe(true);
@@ -112,7 +110,7 @@ describe('Text Input rules service', () => {
     expect(tirs.FuzzyEquals('ghi jkl', RULE_INPUT_PLURAL)).toBe(false);
   });
 
-  it('should have a correct \'starts with\' rule', () => {
+  it("should have a correct 'starts with' rule", () => {
     expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
 
     expect(tirs.StartsWith('  ABC  DEFGHI', RULE_INPUT)).toBe(true);
@@ -130,7 +128,7 @@ describe('Text Input rules service', () => {
     expect(tirs.StartsWith('cde', RULE_INPUT_PLURAL)).toBe(false);
   });
 
-  it('should have a correct \'contains\' rule', () => {
+  it("should have a correct 'contains' rule", () => {
     expect(tirs.Equals('abc def', RULE_INPUT_EMPTY)).toBe(false);
 
     expect(tirs.Contains(' abc  def', RULE_INPUT)).toBe(true);

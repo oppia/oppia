@@ -17,38 +17,36 @@
  * page.
  */
 
-import { Component, Input } from '@angular/core';
-import { LearnerDashboardActivityBackendApiService } from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
-import { LearnerDashboardPageConstants } from './learner-dashboard-page.constants';
-import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { AppConstants } from 'app.constants';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { Subscription } from 'rxjs';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { UserService } from 'services/user.service';
+import {Component, Input} from '@angular/core';
+import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
+import {LearnerDashboardPageConstants} from './learner-dashboard-page.constants';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {ProfileSummary} from 'domain/user/profile-summary.model';
+import {AppConstants} from 'app.constants';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {Subscription} from 'rxjs';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {UserService} from 'services/user.service';
 
 import './community-lessons-tab.component.css';
-
 
 interface ShowMoreInSectionDict {
   [section: string]: boolean;
 }
 
- @Component({
-   selector: 'oppia-community-lessons-tab',
-   templateUrl: './community-lessons-tab.component.html',
-   styleUrls: ['./community-lessons-tab.component.css']
- })
+@Component({
+  selector: 'oppia-community-lessons-tab',
+  templateUrl: './community-lessons-tab.component.html',
+  styleUrls: ['./community-lessons-tab.component.css'],
+})
 export class CommunityLessonsTabComponent {
   constructor(
-    private learnerDashboardActivityBackendApiService:
-      LearnerDashboardActivityBackendApiService,
+    private learnerDashboardActivityBackendApiService: LearnerDashboardActivityBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowDimensionService: WindowDimensionsService,
-    private userService: UserService) {
-  }
+    private userService: UserService
+  ) {}
 
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -65,28 +63,33 @@ export class CommunityLessonsTabComponent {
   noCommunityLessonActivity: boolean = false;
   noPlaylistActivity: boolean = false;
   totalIncompleteLessonsList: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+    | LearnerExplorationSummary
+    | CollectionSummary
+  )[] = [];
 
-  totalCompletedLessonsList: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+  totalCompletedLessonsList: (LearnerExplorationSummary | CollectionSummary)[] =
+    [];
 
-  totalLessonsInPlaylist: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+  totalLessonsInPlaylist: (LearnerExplorationSummary | CollectionSummary)[] =
+    [];
 
-  allCommunityLessons: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+  allCommunityLessons: (LearnerExplorationSummary | CollectionSummary)[] = [];
 
   displayIncompleteLessonsList: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+    | LearnerExplorationSummary
+    | CollectionSummary
+  )[] = [];
 
   displayCompletedLessonsList: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+    | LearnerExplorationSummary
+    | CollectionSummary
+  )[] = [];
 
-  displayLessonsInPlaylist: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+  displayLessonsInPlaylist: (LearnerExplorationSummary | CollectionSummary)[] =
+    [];
 
-  displayInCommunityLessons: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
+  displayInCommunityLessons: (LearnerExplorationSummary | CollectionSummary)[] =
+    [];
 
   completed: string = 'Completed';
   incomplete: string = 'Incomplete';
@@ -98,7 +101,7 @@ export class CommunityLessonsTabComponent {
     incomplete: false,
     completed: false,
     playlist: false,
-    subscriptions: false
+    subscriptions: false,
   };
 
   pageNumberInCommunityLessons: number = 1;
@@ -108,40 +111,57 @@ export class CommunityLessonsTabComponent {
   pageNumberInPlaylist: number = 1;
   startIndexInPlaylist: number = 0;
   endIndexInPlaylist: number = 3;
-  communityLibraryUrl = (
-    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE);
+  communityLibraryUrl =
+    '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
 
   windowIsNarrow: boolean = false;
   directiveSubscriptions = new Subscription();
 
   ngOnInit(): void {
     var tempIncompleteLessonsList: (
-      LearnerExplorationSummary | CollectionSummary)[] = [];
+      | LearnerExplorationSummary
+      | CollectionSummary
+    )[] = [];
     var tempCompletedLessonsList: (
-    LearnerExplorationSummary | CollectionSummary)[] = [];
-    this.noCommunityLessonActivity = (
-      (this.incompleteExplorationsList.length === 0) &&
-        (this.completedExplorationsList.length === 0) &&
-        (this.incompleteCollectionsList.length === 0) &&
-        (this.completedCollectionsList.length === 0));
-    this.noPlaylistActivity = (
-      (this.explorationPlaylist.length === 0) &&
-      (this.collectionPlaylist.length === 0));
+      | LearnerExplorationSummary
+      | CollectionSummary
+    )[] = [];
+    this.noCommunityLessonActivity =
+      this.incompleteExplorationsList.length === 0 &&
+      this.completedExplorationsList.length === 0 &&
+      this.incompleteCollectionsList.length === 0 &&
+      this.completedCollectionsList.length === 0;
+    this.noPlaylistActivity =
+      this.explorationPlaylist.length === 0 &&
+      this.collectionPlaylist.length === 0;
     tempIncompleteLessonsList.push(
-      ...this.incompleteExplorationsList, ...this.incompleteCollectionsList);
+      ...this.incompleteExplorationsList,
+      ...this.incompleteCollectionsList
+    );
     this.totalIncompleteLessonsList = tempIncompleteLessonsList.reverse();
     tempCompletedLessonsList.push(
-      ...this.completedExplorationsList, ...this.completedCollectionsList);
+      ...this.completedExplorationsList,
+      ...this.completedCollectionsList
+    );
     this.totalCompletedLessonsList = tempCompletedLessonsList.reverse();
     this.totalLessonsInPlaylist.push(
-      ...this.explorationPlaylist, ...this.collectionPlaylist);
+      ...this.explorationPlaylist,
+      ...this.collectionPlaylist
+    );
     this.allCommunityLessons.push(
-      ...this.incompleteExplorationsList, ...this.incompleteCollectionsList,
-      ...this.completedCollectionsList, ...this.completedExplorationsList);
+      ...this.incompleteExplorationsList,
+      ...this.incompleteCollectionsList,
+      ...this.completedCollectionsList,
+      ...this.completedExplorationsList
+    );
     this.displayIncompleteLessonsList = this.totalIncompleteLessonsList.slice(
-      0, 3);
+      0,
+      3
+    );
     this.displayCompletedLessonsList = this.totalCompletedLessonsList.slice(
-      0, 3);
+      0,
+      3
+    );
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.setDisplayLessonsInPlaylist();
@@ -150,7 +170,8 @@ export class CommunityLessonsTabComponent {
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
         this.setDisplayLessonsInPlaylist();
-      }));
+      })
+    );
 
     this.displayInCommunityLessons = this.allCommunityLessons;
     this.selectedSection = this.all;
@@ -158,14 +179,12 @@ export class CommunityLessonsTabComponent {
   }
 
   getProfileImagePngDataUrl(username: string): string {
-    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(
-      username);
+    let [pngImageUrl, _] = this.userService.getProfileImageDataUrl(username);
     return pngImageUrl;
   }
 
   getProfileImageWebpDataUrl(username: string): string {
-    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(
-      username);
+    let [_, webpImageUrl] = this.userService.getProfileImageDataUrl(username);
     return webpImageUrl;
   }
 
@@ -195,7 +214,9 @@ export class CommunityLessonsTabComponent {
     } else if (section === this.all) {
       this.displayInCommunityLessons = [];
       this.displayInCommunityLessons.push(
-        ...this.totalIncompleteLessonsList, ...this.totalCompletedLessonsList);
+        ...this.totalIncompleteLessonsList,
+        ...this.totalCompletedLessonsList
+      );
     }
     this.pageNumberInCommunityLessons = 1;
     this.startIndexInCommunityLessons = 0;
@@ -228,26 +249,42 @@ export class CommunityLessonsTabComponent {
   handleShowMore(section: string): void {
     this.showMoreInSection[section] = !this.showMoreInSection[section];
     if (
-      section === 'incomplete' && this.showMoreInSection.incomplete === true) {
+      section === 'incomplete' &&
+      this.showMoreInSection.incomplete === true
+    ) {
       this.displayIncompleteLessonsList = this.totalIncompleteLessonsList;
     } else if (
-      section === 'incomplete' && this.showMoreInSection.incomplete === false) {
+      section === 'incomplete' &&
+      this.showMoreInSection.incomplete === false
+    ) {
       this.displayIncompleteLessonsList = this.totalIncompleteLessonsList.slice(
-        0, 3);
+        0,
+        3
+      );
     } else if (
-      section === 'completed' && this.showMoreInSection.completed === true) {
+      section === 'completed' &&
+      this.showMoreInSection.completed === true
+    ) {
       this.displayCompletedLessonsList = this.totalCompletedLessonsList;
     } else if (
-      section === 'completed' && this.showMoreInSection.completed === false) {
+      section === 'completed' &&
+      this.showMoreInSection.completed === false
+    ) {
       this.displayCompletedLessonsList = this.totalCompletedLessonsList.slice(
-        0, 3);
+        0,
+        3
+      );
     } else if (
-      section === 'playlist' && this.showMoreInSection.playlist === true) {
+      section === 'playlist' &&
+      this.showMoreInSection.playlist === true
+    ) {
       this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.totalLessonsInPlaylist.length;
     } else if (
-      section === 'playlist' && this.showMoreInSection.playlist === false) {
+      section === 'playlist' &&
+      this.showMoreInSection.playlist === false
+    ) {
       this.startIndexInPlaylist = 0;
       this.endIndexInPlaylist = this.pageSize;
     }
@@ -263,126 +300,168 @@ export class CommunityLessonsTabComponent {
   changePageByOne(direction: string, section: string): void {
     if (section === 'communityLessons') {
       let totalPages = this.displayInCommunityLessons.length / this.pageSize;
-      if (direction === this.moveToPrevPage &&
-        this.pageNumberInCommunityLessons > 1) {
+      if (
+        direction === this.moveToPrevPage &&
+        this.pageNumberInCommunityLessons > 1
+      ) {
         this.pageNumberInCommunityLessons -= 1;
       }
       if (totalPages > Math.floor(totalPages)) {
         totalPages = Math.floor(totalPages) + 1;
       }
-      if (direction === this.moveToNextPage &&
-        this.pageNumberInCommunityLessons < totalPages) {
+      if (
+        direction === this.moveToNextPage &&
+        this.pageNumberInCommunityLessons < totalPages
+      ) {
         this.pageNumberInCommunityLessons += 1;
       }
-      this.startIndexInCommunityLessons = (
-        this.pageNumberInCommunityLessons - 1) * this.pageSize;
+      this.startIndexInCommunityLessons =
+        (this.pageNumberInCommunityLessons - 1) * this.pageSize;
       this.endIndexInCommunityLessons = Math.min(
         this.startIndexInCommunityLessons + this.pageSize,
-        this.displayInCommunityLessons.length);
+        this.displayInCommunityLessons.length
+      );
     } else if (section === 'playlist') {
       let totalPages = this.displayLessonsInPlaylist.length / this.pageSize;
-      if (direction === this.moveToPrevPage &&
-        this.pageNumberInPlaylist > 1) {
+      if (direction === this.moveToPrevPage && this.pageNumberInPlaylist > 1) {
         this.pageNumberInPlaylist -= 1;
       }
       if (totalPages > Math.floor(totalPages)) {
         totalPages = Math.floor(totalPages) + 1;
       }
-      if (direction === this.moveToNextPage &&
-        this.pageNumberInPlaylist < totalPages) {
+      if (
+        direction === this.moveToNextPage &&
+        this.pageNumberInPlaylist < totalPages
+      ) {
         this.pageNumberInPlaylist += 1;
       }
-      this.startIndexInPlaylist = (
-        this.pageNumberInPlaylist - 1) * this.pageSize;
+      this.startIndexInPlaylist =
+        (this.pageNumberInPlaylist - 1) * this.pageSize;
       this.endIndexInPlaylist = Math.min(
         this.startIndexInPlaylist + this.pageSize,
-        this.displayLessonsInPlaylist.length);
+        this.displayLessonsInPlaylist.length
+      );
     }
   }
 
   openRemoveActivityModal(
-      sectionNameI18nId: string, subsectionName: string,
-      activity: LearnerExplorationSummary | CollectionSummary): void {
-    this.learnerDashboardActivityBackendApiService.removeActivityModalAsync(
-      sectionNameI18nId, subsectionName,
-      activity.id, activity.title)
+    sectionNameI18nId: string,
+    subsectionName: string,
+    activity: LearnerExplorationSummary | CollectionSummary
+  ): void {
+    this.learnerDashboardActivityBackendApiService
+      .removeActivityModalAsync(
+        sectionNameI18nId,
+        subsectionName,
+        activity.id,
+        activity.title
+      )
       .then(() => {
-        if (sectionNameI18nId ===
-          LearnerDashboardPageConstants
-            .LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-          if (subsectionName ===
-            LearnerDashboardPageConstants
-              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+        if (
+          sectionNameI18nId ===
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+            .INCOMPLETE
+        ) {
+          if (
+            subsectionName ===
+            LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+              .EXPLORATIONS
+          ) {
             let index = this.totalIncompleteLessonsList.findIndex(
-              exp => exp.id === activity.id);
+              exp => exp.id === activity.id
+            );
             if (index !== -1) {
               this.totalIncompleteLessonsList.splice(index, 1);
             }
-          } else if (subsectionName ===
-            LearnerDashboardPageConstants
-              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+          } else if (
+            subsectionName ===
+            LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+              .COLLECTIONS
+          ) {
             let index = this.totalIncompleteLessonsList.findIndex(
-              collection => collection.id === activity.id);
+              collection => collection.id === activity.id
+            );
             if (index !== -1) {
               this.totalIncompleteLessonsList.splice(index, 1);
             }
-          } if (this.showMoreInSection.incomplete === true) {
-            this.displayIncompleteLessonsList = (
-              this.totalIncompleteLessonsList);
+          }
+          if (this.showMoreInSection.incomplete === true) {
+            this.displayIncompleteLessonsList = this.totalIncompleteLessonsList;
           } else if (this.showMoreInSection.incomplete === false) {
-            this.displayIncompleteLessonsList = (
-              this.totalIncompleteLessonsList.slice(0, 3));
-          } if (this.selectedSection === this.all) {
+            this.displayIncompleteLessonsList =
+              this.totalIncompleteLessonsList.slice(0, 3);
+          }
+          if (this.selectedSection === this.all) {
             this.displayInCommunityLessons = [];
             this.displayInCommunityLessons.push(
               ...this.totalIncompleteLessonsList,
-              ...this.totalCompletedLessonsList);
-          } if (this.displayInCommunityLessons.slice(
-            this.startIndexInCommunityLessons,
-            this.endIndexInCommunityLessons).length === 0) {
+              ...this.totalCompletedLessonsList
+            );
+          }
+          if (
+            this.displayInCommunityLessons.slice(
+              this.startIndexInCommunityLessons,
+              this.endIndexInCommunityLessons
+            ).length === 0
+          ) {
             this.pageNumberInCommunityLessons = 1;
             this.startIndexInCommunityLessons = 0;
             this.endIndexInCommunityLessons = 3;
           }
-        } else if (sectionNameI18nId ===
-          LearnerDashboardPageConstants
-            .LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-          if (subsectionName ===
-            LearnerDashboardPageConstants
-              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+        } else if (
+          sectionNameI18nId ===
+          LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
+            .PLAYLIST
+        ) {
+          if (
+            subsectionName ===
+            LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+              .EXPLORATIONS
+          ) {
             let index = this.totalLessonsInPlaylist.findIndex(
-              exp => exp.id === activity.id);
+              exp => exp.id === activity.id
+            );
             if (index !== -1) {
               this.totalLessonsInPlaylist.splice(index, 1);
             }
-          } else if (subsectionName ===
-            LearnerDashboardPageConstants
-              .LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+          } else if (
+            subsectionName ===
+            LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+              .COLLECTIONS
+          ) {
             let index = this.totalLessonsInPlaylist.findIndex(
-              collection => collection.id === activity.id);
+              collection => collection.id === activity.id
+            );
             if (index !== -1) {
               this.totalLessonsInPlaylist.splice(index, 1);
             }
-          } if (this.showMoreInSection.playlist === true) {
+          }
+          if (this.showMoreInSection.playlist === true) {
             this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
           } else if (this.showMoreInSection.playlist === false) {
-            this.displayLessonsInPlaylist = (
-              this.totalLessonsInPlaylist.slice(0, 3));
-          } if (this.windowIsNarrow) {
+            this.displayLessonsInPlaylist = this.totalLessonsInPlaylist.slice(
+              0,
+              3
+            );
+          }
+          if (this.windowIsNarrow) {
             this.displayLessonsInPlaylist = this.totalLessonsInPlaylist;
-          } if (this.displayLessonsInPlaylist.slice(
-            this.startIndexInPlaylist,
-            this.endIndexInPlaylist).length === 0) {
+          }
+          if (
+            this.displayLessonsInPlaylist.slice(
+              this.startIndexInPlaylist,
+              this.endIndexInPlaylist
+            ).length === 0
+          ) {
             this.pageNumberInPlaylist = 1;
             this.startIndexInPlaylist = 0;
             this.endIndexInPlaylist = 3;
           }
         }
-        this.noCommunityLessonActivity = (
-          (this.totalIncompleteLessonsList.length === 0) &&
-          (this.totalCompletedLessonsList.length === 0));
-        this.noPlaylistActivity = (
-          (this.totalLessonsInPlaylist.length === 0));
+        this.noCommunityLessonActivity =
+          this.totalIncompleteLessonsList.length === 0 &&
+          this.totalCompletedLessonsList.length === 0;
+        this.noPlaylistActivity = this.totalLessonsInPlaylist.length === 0;
       });
   }
 }

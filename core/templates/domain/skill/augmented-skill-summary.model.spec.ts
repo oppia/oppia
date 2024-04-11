@@ -16,8 +16,7 @@
  * @fileoverview Unit tests for AugmentedSkillSummary.
  */
 
-import { AugmentedSkillSummary } from
-  'domain/skill/augmented-skill-summary.model';
+import {AugmentedSkillSummary} from 'domain/skill/augmented-skill-summary.model';
 
 describe('Augmented Skill Summary Model', () => {
   it('should correctly convert backend dict to domain object.', () => {
@@ -31,7 +30,7 @@ describe('Augmented Skill Summary Model', () => {
       misconception_count: 0,
       version: 1,
       classroom_names: ['classroom'],
-      topic_names: ['topic']
+      topic_names: ['topic'],
     };
 
     let skillSummary = AugmentedSkillSummary.createFromBackendDict(backendDict);
