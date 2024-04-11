@@ -17,9 +17,11 @@
  */
 
 import {
+  discardPeriodicTasks,
   ComponentFixture,
   TestBed,
   fakeAsync,
+  flush,
   waitForAsync,
   tick,
 } from '@angular/core/testing';
@@ -78,13 +80,17 @@ describe('Add accent to voiceover', () => {
       voiceoverBackendApiService,
       'fetchFilenamesForVoiceArtistAsync'
     ).and.returnValue(Promise.resolve(explorationIdToFilenames));
+    spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
 
     componentInstance.ngOnInit();
-    tick();
+    tick(3000);
 
     expect(
       voiceoverBackendApiService.fetchFilenamesForVoiceArtistAsync
     ).toHaveBeenCalled();
+
+    flush();
+    discardPeriodicTasks();
   }));
 
   it('should be able to close modal', () => {
@@ -97,6 +103,12 @@ describe('Add accent to voiceover', () => {
     componentInstance.languageAccentCode = languageAccentCode;
     componentInstance.update();
     expect(closeSpy).toHaveBeenCalledWith(languageAccentCode);
+  });
+
+  it('should be able to remove language accent code', () => {
+    componentInstance.languageAccentCode = 'en-US';
+    componentInstance.removeSelectedAccent();
+    expect(componentInstance.languageAccentCode).toEqual('');
   });
 
   it('should be able to add language accent code', () => {
@@ -116,4 +128,24 @@ describe('Add accent to voiceover', () => {
 
     expect(audioPlayerService.loadAsync).toHaveBeenCalled();
   });
+
+  it('should remove current filename when audio is not playing', fakeAsync(() => {
+    let explorationIdToFilenames = {
+      expId: ['filename1.mp3', 'filename2.mp3'],
+    };
+    spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchFilenamesForVoiceArtistAsync'
+    ).and.returnValue(Promise.resolve(explorationIdToFilenames));
+    componentInstance.currentFilename = 'random.mp3';
+
+    componentInstance.ngOnInit();
+    tick(3000);
+
+    expect(componentInstance.currentFilename).toEqual('');
+
+    flush();
+    discardPeriodicTasks();
+  }));
 });
