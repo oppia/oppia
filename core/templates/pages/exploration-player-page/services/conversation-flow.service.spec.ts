@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for common conversation skin service.
+ * @fileoverview Unit tests for conversation flow service.
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
