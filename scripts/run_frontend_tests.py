@@ -89,7 +89,7 @@ def run_dtslint_type_tests() -> None:
            DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
            '--localTs',
            TYPESCRIPT_DIR_RELATIVE_PATH]
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE)  # pylint: disable=consider-using-with
     output_lines = []
     # The value of `process.stdout` should not be None since we passed
     # the `stdout=subprocess.PIPE` argument to `Popen`.
@@ -147,7 +147,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     for attempt in range(MAX_ATTEMPTS):
         print(f'Attempt {attempt + 1} of {MAX_ATTEMPTS}')
-        task = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        task = subprocess.Popen(cmd, stdout=subprocess.PIPE)  # pylint: disable=consider-using-with
         output_lines = []
         # The value of `process.stdout` should not be None since we passed
         # the `stdout=subprocess.PIPE` argument to `Popen`.
@@ -174,7 +174,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             if ('Executed' in line.decode('utf-8') and
                 not combined_spec_file_started_downloading and
                 parsed_args.download_combined_frontend_spec_file):
-                download_task = subprocess.Popen(
+                download_task = subprocess.Popen(  # pylint: disable=consider-using-with
                     ['wget',
                     'http://localhost:9876/base/core/templates/' +
                     'combined-tests.spec.js',

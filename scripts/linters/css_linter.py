@@ -85,7 +85,7 @@ class ThirdPartyCSSLintChecksManager(linter_utils.BaseLinter):
         stylelint_cmd_args = [
             node_path, stylelint_path, '--config=' + STYLELINT_CONFIG]
         proc_args = stylelint_cmd_args + self.all_filepaths
-        proc = subprocess.Popen(
+        proc = subprocess.Popen(  # pylint: disable=consider-using-with
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()

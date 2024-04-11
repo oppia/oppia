@@ -142,7 +142,7 @@ def compile_all_ts_files() -> None:
     """
     cmd = ('./node_modules/typescript/bin/tsc -p %s -outDir %s') % (
         './tsconfig-lint.json', COMPILED_TYPESCRIPT_TMP_PATH)
-    proc = subprocess.Popen(
+    proc = subprocess.Popen(  # pylint: disable=consider-using-with
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
     _, encoded_stderr = proc.communicate()
@@ -554,7 +554,7 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
 
         eslint_cmd_args = [node_path, eslint_path, '--quiet']
         proc_args = eslint_cmd_args + files_to_lint
-        proc = subprocess.Popen(
+        proc = subprocess.Popen(  # pylint: disable=consider-using-with
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, encoded_linter_stderr = proc.communicate()

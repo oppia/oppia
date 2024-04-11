@@ -429,7 +429,7 @@ class ThirdPartyHTMLLintChecksManager(linter_utils.BaseLinter):
         full_error_messages = []
         htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
         proc_args = htmllint_cmd_args + self.html_filepaths
-        proc = subprocess.Popen(
+        proc = subprocess.Popen(  # pylint: disable=consider-using-with
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         encoded_linter_stdout, _ = proc.communicate()

@@ -141,7 +141,7 @@ def run_shell_cmd(
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)
+    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=env)  # pylint: disable=consider-using-with
     last_stdout_bytes, last_stderr_bytes = p.communicate()
     # Standard and error output is in bytes, we need to decode them to be
     # compatible with rest of the code. Sometimes we get invalid bytes, in which

@@ -103,8 +103,7 @@ def install_hook() -> None:
 
 def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     """Starts subprocess and returns (stdout, stderr)."""
-    task = subprocess.Popen(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # pylint: disable=consider-using-with
     out, err = task.communicate()
     return out, err
 

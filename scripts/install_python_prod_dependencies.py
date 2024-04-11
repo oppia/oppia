@@ -485,7 +485,7 @@ def _run_pip_command(cmd_parts: List[str]) -> None:
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
     command = [sys.executable, '-m', 'pip'] + cmd_parts
-    process = subprocess.Popen(
+    process = subprocess.Popen(  # pylint: disable=consider-using-with
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         encoding='utf-8')
     stdout, stderr = process.communicate()

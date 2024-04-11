@@ -64,7 +64,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         self.oppia_is_dockerized_swap = self.swap(
             feconf, 'OPPIA_IS_DOCKERIZED', False)
 
-        process_success = subprocess.Popen(
+        process_success = subprocess.Popen(  # pylint: disable=consider-using-with
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_success(
             unused_cmd: str,
@@ -75,7 +75,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_success
 
-        process_failure = subprocess.Popen(
+        process_failure = subprocess.Popen(  # pylint: disable=consider-using-with
             ['test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen_failure(
             unused_cmd: str,
@@ -207,14 +207,14 @@ class MypyScriptChecks(test_utils.GenericTestBase):
 
     def test_running_script_without_mypy_errors(self) -> None:
         with self.popen_swap_success:
-            process = subprocess.Popen(
+            process = subprocess.Popen(  # pylint: disable=consider-using-with
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
             output = process.communicate()
             self.assertEqual(output[0], b'test\n')
 
     def test_running_script_with_mypy_errors(self) -> None:
         with self.popen_swap_failure:
-            process = subprocess.Popen(
+            process = subprocess.Popen(  # pylint: disable=consider-using-with
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE)
             output = process.communicate()
             self.assertEqual(output[0], b'')

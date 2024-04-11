@@ -85,7 +85,7 @@ def compile_test_ts_files() -> None:
     cmd = (
         './node_modules/typescript/bin/tsc -p %s' %
         './tsconfig.puppeteer-acceptance-tests.json')
-    proc = subprocess.Popen(
+    proc = subprocess.Popen(  # pylint: disable=consider-using-with
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
     _, encoded_stderr = proc.communicate()

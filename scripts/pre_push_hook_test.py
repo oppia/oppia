@@ -40,7 +40,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        process = subprocess.Popen(
+        process = subprocess.Popen(  # pylint: disable=consider-using-with
             ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen(  # pylint: disable=unused-argument
             unused_cmd_tokens: List[str],
@@ -132,13 +132,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 (b'test\n', b''))
 
     def test_get_remote_name_without_errors(self) -> None:
-        process_for_remote = subprocess.Popen(
+        process_for_remote = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        process_for_upstream_url = subprocess.Popen(
+        process_for_upstream_url = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        process_for_origin_url = subprocess.Popen(
+        process_for_origin_url = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         def mock_popen(
@@ -157,7 +157,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_get_remote_name_with_error_in_obtaining_remote(self) -> None:
         def mock_communicate() -> Tuple[bytes, bytes]:
             return (b'test', b'test_oppia_error')
-        process = subprocess.Popen(
+        process = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         # Here we use MyPy ignore because here we are assigning a value to the
         # 'communicate' method, and according to MyPy, assignment to a method
@@ -175,10 +175,10 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_get_remote_name_with_error_in_obtaining_remote_url(self) -> None:
         def mock_communicate() -> Tuple[str, str]:
             return ('test', 'test_oppia_error')
-        process_for_remote = subprocess.Popen(
+        process_for_remote = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        process_for_remote_url = subprocess.Popen(
+        process_for_remote_url = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         def mock_popen(
             cmd_tokens: List[bytes], stdout: int, stderr: int  # pylint: disable=unused-argument
@@ -198,13 +198,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
                     pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_no_remote_set(self) -> None:
-        process_for_remote = subprocess.Popen(
+        process_for_remote = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        process_for_upstream_url = subprocess.Popen(
+        process_for_upstream_url = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        process_for_origin_url = subprocess.Popen(
+        process_for_origin_url = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'url.other/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         def mock_popen(
@@ -231,13 +231,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.get_remote_name()
 
     def test_get_remote_name_with_multiple_remotes_set(self) -> None:
-        process_for_remote = subprocess.Popen(
+        process_for_remote = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'origin\nupstream'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        process_for_upstream_url = subprocess.Popen(
+        process_for_upstream_url = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-        process_for_origin_url = subprocess.Popen(
+        process_for_origin_url = subprocess.Popen(  # pylint: disable=consider-using-with
             [b'echo', b'url.oppia/oppia.git'], stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         def mock_popen(
@@ -443,18 +443,20 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 {'branch1': (['A:file1', 'M:file2'], ['file1', 'file2'])})
 
     def test_get_refs(self) -> None:
-        temp_stdin_file = tempfile.NamedTemporaryFile().name
-        with utils.open_file(temp_stdin_file, 'w') as f:
-            f.write('local_ref local_sha1 remote_ref remote_sha1')
-        with utils.open_file(temp_stdin_file, 'r') as f:
-            with self.swap(sys, 'stdin', f):
-                self.assertEqual(
-                    pre_push_hook.get_refs(),
-                    [
-                        pre_push_hook.GitRef(
-                            local_ref='local_ref', local_sha1='local_sha1',
-                            remote_ref='remote_ref', remote_sha1='remote_sha1'
-                        )])
+        with tempfile.NamedTemporaryFile() as temp_stdin_file:
+            with utils.open_file(temp_stdin_file.name, 'w') as f:
+                f.write('local_ref local_sha1 remote_ref remote_sha1')
+            with utils.open_file(temp_stdin_file.name, 'r') as f:
+                with self.swap(sys, 'stdin', f):
+                    self.assertEqual(
+                        pre_push_hook.get_refs(),
+                        [
+                            pre_push_hook.GitRef(
+                                local_ref='local_ref',
+                                local_sha1='local_sha1',
+                                remote_ref='remote_ref',
+                                remote_sha1='remote_sha1'
+                            )])
 
     def test_start_linter(self) -> None:
         with self.popen_swap:

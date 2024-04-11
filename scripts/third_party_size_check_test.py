@@ -54,7 +54,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
 
         os.symlink('/dummy_dir/file1.py', 'dummy_dir/symlink_file.py')
 
-        self.dummy_file_object = open(
+        self.dummy_file_object = open(  # pylint: disable=consider-using-with
             'dummy_dir/file1.py', 'r', encoding='utf-8')
 
     def tearDown(self) -> None:

@@ -101,7 +101,7 @@ def run_lighthouse_puppeteer_script(record: bool = False) -> None:
         print('Starting LHCI Puppeteer script with recording.')
         print('Video Path:' + video_path)
 
-    process = subprocess.Popen(
+    process = subprocess.Popen(  # pylint: disable=consider-using-with
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode == 0:
@@ -185,7 +185,7 @@ def run_lighthouse_checks(lighthouse_mode: str, shard: str) -> None:
         '--max-old-space-size=4096'
     ]
 
-    process = subprocess.Popen(
+    process = subprocess.Popen(  # pylint: disable=consider-using-with
         bash_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
     if process.returncode == 0:

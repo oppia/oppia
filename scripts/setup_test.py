@@ -245,7 +245,7 @@ class SetupTests(test_utils.GenericTestBase):
         }
         def mock_url_retrieve(unused_url: str, filename: str) -> None:  # pylint: disable=unused-argument
             check_function_calls['url_retrieve_is_called'] = True
-        temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)
+        temp_file = tarfile.open(name=MOCK_TMP_UNTAR_PATH)  # pylint: disable=consider-using-with
         def mock_open(name: str) -> tarfile.TarFile:  # pylint: disable=unused-argument
             check_function_calls['open_is_called'] = True
             return temp_file

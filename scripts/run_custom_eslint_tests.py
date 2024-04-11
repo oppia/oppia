@@ -34,7 +34,7 @@ def main() -> None:
     filepath = 'scripts/linters/custom_eslint_checks/rules/'
     proc_args = [node_path, nyc_path, mocha_path, filepath]
 
-    proc = subprocess.Popen(
+    proc = subprocess.Popen(  # pylint: disable=consider-using-with
         proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     encoded_tests_stdout, encoded_tests_stderr = proc.communicate()

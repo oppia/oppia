@@ -190,7 +190,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.validate(lint_task_report, expected_messages, 1)
 
     def test_third_party_linter_with_stderr(self) -> None:
-        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)  # pylint: disable=consider-using-with
         def mock_popen(
             unused_cmd: str, stdout: int, stderr: int  # pylint: disable=unused-argument
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object

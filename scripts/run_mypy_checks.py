@@ -149,12 +149,12 @@ def install_mypy_prerequisites(install_globally: bool) -> Tuple[int, str]:
             MYPY_REQUIREMENTS_FILE_PATH, '--target', MYPY_TOOLS_DIR,
             '--upgrade'
         ]
-    process = subprocess.Popen(
+    process = subprocess.Popen(  # pylint: disable=consider-using-with
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output = process.communicate()
     if b'can\'t combine user with prefix' in output[1]:
         uextention_text = ['--user', '--prefix=', '--system']
-        new_process = subprocess.Popen(
+        new_process = subprocess.Popen(  # pylint: disable=consider-using-with
             cmd + uextention_text, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
         new_process.communicate()
@@ -204,7 +204,7 @@ def main(args: Optional[List[str]] = None) -> int:
         env['PATH'] = '%s%s' % (path, os.pathsep) + env['PATH']
     env['PYTHONPATH'] = MYPY_TOOLS_DIR
 
-    process = subprocess.Popen(
+    process = subprocess.Popen(  # pylint: disable=consider-using-with
         cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
     stdout, stderr = process.communicate()
     # Standard and error output is in bytes, we need to decode the line to
