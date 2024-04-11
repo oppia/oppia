@@ -172,7 +172,7 @@ class DiagnosticTestPlayerAccessValidationHandler(
             self.user_id,
             feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
         ):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
 
 class ReleaseCoordinatorAccessValidationHandler(
