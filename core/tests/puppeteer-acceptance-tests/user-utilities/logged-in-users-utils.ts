@@ -932,9 +932,7 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToDonatePageViaFooter(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"Donate")])');
-
     const [link] = await this.page.$x('(//a[contains(text(),"Donate")])');
-
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(donateUrl);
@@ -945,9 +943,7 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToVolunteerPageViaFooter(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"volunteer")])');
-
     const [link] = await this.page.$x('(//a[contains(text(),"volunteer")])');
-
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(volunteerUrl);
@@ -968,6 +964,7 @@ export class LoggedInUser extends BaseUser {
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
+
     expect(newTabPage).toBeDefined();
     expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
     await newTabPage?.close();
@@ -985,6 +982,7 @@ export class LoggedInUser extends BaseUser {
     );
     const newTabPage = await newTarget.page();
     await newTabPage?.waitForNetworkIdle();
+
     expect(newTabPage?.url()).toContain(
       'https://accounts.google.com/lifecycle/steps/signup/name'
     );
@@ -1042,7 +1040,6 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForXPath(
       '//a[contains(text(),"discover more ways to get involved")]'
     );
-
     await Promise.all([
       this.page.waitForNavigation(),
       await this.clickOn('discover more ways to get involved'),
@@ -1057,8 +1054,8 @@ export class LoggedInUser extends BaseUser {
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
     await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
-
     await this.page.waitForNetworkIdle();
+
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
 
@@ -1175,9 +1172,7 @@ export class LoggedInUser extends BaseUser {
    */
   async clickLinkToLicenseOnTermsPage(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"here")])[1]');
-
     const [link] = await this.page.$x('(//a[contains(text(),"here")])[1]');
-
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(
@@ -1190,9 +1185,7 @@ export class LoggedInUser extends BaseUser {
    */
   async clickLinkToGoogleGroupOnTermsPage(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"here")])[2]');
-
     const [link] = await this.page.$x('(//a[contains(text(),"here")])[2]');
-
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
 
     expect(this.page.url()).toBe(googleGroupsOppiaAnnouceUrl);
@@ -1272,7 +1265,6 @@ export class LoggedInUser extends BaseUser {
     expect(newTabPage).toBeDefined();
     expect(newTabPage?.url()).toContain(expectedDestinationDomain);
     expect(newTabPage?.url()).toContain(expectedAccountId);
-
     await newTabPage?.close();
   }
 
