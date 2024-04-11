@@ -19,7 +19,9 @@
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
+import {element} from 'angular';
 
+const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
@@ -113,6 +115,27 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-donate-button';
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
+
+const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
+const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const textStateEditSelector = 'div.e2e-test-state-edit-content';
+const richTextAreaField = 'div.e2e-test-rte';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const interactionEndExplorationInputButton =
+  'div.e2e-test-interaction-tile-EndExploration';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
+const saveChangesButton = 'button.e2e-test-save-changes';
+const saveDraftButton = 'button.e2e-test-save-draft-button';
+const publishExplorationButton = 'button.e2e-test-publish-exploration';
+const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
+const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
+const explorationCategoryDropdown =
+  'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
+const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
+const explorationIdElement = 'span.oppia-unique-progress-id';
+const saveContentButton = 'button.e2e-test-save-state-content';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the home page.
@@ -710,6 +733,59 @@ export class LoggedInUser extends BaseUser {
     } else {
       showMessage('The Read Our Blog button opens the Blog page.');
     }
+  }
+
+  /**
+   * Function for navigating to the creator dashboard page.
+   */
+  async navigateToCreatorDashboardPage(): Promise<void> {
+    await this.goto(creatorDashboardUrl);
+  }
+
+  /**
+   * Function for creating an exploration with only EndExploration interaction.
+   */
+  async createEndExploration(): Promise<string | null> {
+    await this.navigateToCreatorDashboardPage();
+    await this.clickOn(createExplorationButton);
+    await this.page.waitForSelector(
+      `${dismissWelcomeModalSelector}:not([disabled])`
+    );
+    await this.clickOn(dismissWelcomeModalSelector);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
+    await this.clickOn(textStateEditSelector);
+    await this.page.keyboard.press('Tab');
+    await this.type(richTextAreaField, 'Test Exploration');
+    await this.clickOn(saveContentButton);
+
+    await this.clickOn(addInteractionButton);
+    await this.page.waitForSelector('oppia-customize-interaction', {
+      visible: true,
+    });
+    await this.clickOn(interactionEndExplorationInputButton);
+    await this.clickOn(saveInteractionButton);
+    await this.clickOn(saveChangesButton);
+    await this.clickOn(saveDraftButton);
+
+    await this.page.waitForSelector(
+      `${publishExplorationButton}:not([disabled])`
+    );
+    await this.clickOn(publishExplorationButton);
+    await this.type(explorationTitleInput, 'Test Exploration');
+    await this.type(explorationGoalInput, 'Test Exploration');
+    await this.clickOn(explorationCategoryDropdown);
+    await this.clickOn('Algebra');
+    await this.clickOn(saveExplorationChangesButton);
+    await this.clickOn(explorationConfirmPublishButton);
+    await this.page.waitForSelector(explorationIdElement);
+    await this.page.click('.e2e-test-share-publish-close');
+    const explorationIdUrl = await this.page.$eval(
+      explorationIdElement,
+      element => element.textContent
+    );
+    return explorationIdUrl;
   }
 
   /**
