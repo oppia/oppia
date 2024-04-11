@@ -1861,7 +1861,7 @@ def get_all_published_story_exploration_ids(
             ]
             for topic in topics_without_mapping if topic is not None
         ]
-        accumulative_published_story_counts_by_topic = list(
+        cumulative_published_story_counts_by_topic = list(
             itertools.accumulate([0] + [
                 len(topic_published_story_ids)
                 for topic_published_story_ids
@@ -1881,7 +1881,7 @@ def get_all_published_story_exploration_ids(
         published_stories_grouped_by_topic = [
             [
                 published_stories_in_all_topics_without_mapping[
-                    accumulative_published_story_counts_by_topic[i] + j
+                    cumulative_published_story_counts_by_topic[i] + j
                 ]
                 for j in range(len(published_story_ids_grouped_by_topic[i]))
             ]
