@@ -663,13 +663,13 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
     def test_no_user_can_access_unpublished_story_review_sessions_page(
         self
     ) -> None:
-        self.get_html_response(
+        self.get_json(
             '%s/can_access_review_tests_page/staging/topic/%s'
             % (ACCESS_VALIDATION_HANDLER_PREFIX, self.story_url_fragment_2),
             expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self) -> None:
-        self.get_html_response(
+        self.get_json(
             '%s/can_access_review_tests_page/staging/topic/%s'
             % (ACCESS_VALIDATION_HANDLER_PREFIX, 'non-existent-story'),
-            expected_status_int=302)
+            expected_status_int=404)
