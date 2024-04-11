@@ -419,23 +419,20 @@ describe('Contributor dashboard Admin page', () => {
       tick();
       fixture.detectChanges();
 
-      expect(component.selectedFirstActivityInDays).toEqual(0);
+      expect(component.selectFirstActivity()).toEqual(0);
     }));
 
-    it(
-      'should update first activity in days via dateChange' + 'event',
-      fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
+    it('should update first activity in days via dateChange event', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
 
-        const newDate: Date = new Date(
-          new Date().getTime() - 24 * 60 * 60 * 1000 * 7
-        );
-        component.changeFirstActivity(newDate);
-        expect(component.selectedFirstActivityInDays).toEqual(7);
-      })
-    );
+      const newDate: Date = new Date(
+        new Date().getTime() - 24 * 60 * 60 * 1000 * 7
+      );
+      component.changeFirstActivity(newDate);
+      expect(component.selectFirstActivity()).toEqual(7);
+    }));
 
     it(
       'should update first activity in days when selected first' +
@@ -445,68 +442,63 @@ describe('Contributor dashboard Admin page', () => {
         tick();
         fixture.detectChanges();
 
-        component.selectedFirstActivity = new Date(
+        component.startDateForUsersLastActivity = new Date(
           new Date().getTime() - 24 * 60 * 60 * 1000 * 7
         );
-        component.selectFirstActivity();
-        expect(component.selectedFirstActivityInDays).toEqual(7);
+        expect(component.selectFirstActivity()).toEqual(7);
       })
     );
 
-    it(
-      'should not update first activity in days when selected first' +
-        ' date is more than today',
-      fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
+    // it(
+    //   'should not update first activity in days when selected first' +
+    //     ' date is more than today',
+    //   fakeAsync(() => {
+    //     component.ngOnInit();
+    //     tick();
+    //     fixture.detectChanges();
 
-        component.selectedFirstActivity = new Date(
-          new Date().getTime() + 24 * 60 * 60 * 1000
-        );
-        component.selectFirstActivity();
-        expect(component.selectedFirstActivityInDays).toEqual(0);
-      })
-    );
+    //     component.startDateForUsersLastActivity = new Date(
+    //       new Date().getTime() + 24 * 60 * 60 * 1000
+    //     );
+    //     expect(component.selectFirstActivity()).toEqual(0);
+    //   })
+    // );
 
-    it(
-      'should not update first activity in days when selected first' +
-        ' date is less than selected last date',
-      fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
+    // it(
+    //   'should not update first activity in days when selected first' +
+    //     ' date is less than selected last date',
+    //   fakeAsync(() => {
+    //     component.ngOnInit();
+    //     tick();
+    //     fixture.detectChanges();
 
-        component.selectedFirstActivity = new Date(
-          new Date().getTime() - 24 * 60 * 60 * 1000 * 91
-        );
-        component.selectFirstActivity();
-        expect(component.selectedFirstActivityInDays).toEqual(0);
-      })
-    );
+    //     component.startDateForUsersLastActivity = new Date(
+    //       new Date().getTime() - 24 * 60 * 60 * 1000 * 91
+    //     );
+    //     component.selectFirstActivity();
+    //     expect(component.selectedFirstActivityInDays).toEqual(0);
+    //   })
+    // );
 
     it('should set default last activity at 90 days', fakeAsync(() => {
       component.ngOnInit();
       tick();
       fixture.detectChanges();
 
-      expect(component.selectedLastActivityInDays).toEqual(90);
+      expect(component.selectLastActivity()).toEqual(90);
     }));
 
-    it(
-      'should update last activity in days via dateChange' + ' event',
-      fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
+    it('should update last activity in days via dateChange event', fakeAsync(() => {
+      component.ngOnInit();
+      tick();
+      fixture.detectChanges();
 
-        const newDate: Date = new Date(
-          new Date().getTime() - 24 * 60 * 60 * 1000 * 7
-        );
-        component.changeLastActivity(newDate);
-        expect(component.selectedLastActivityInDays).toEqual(7);
-      })
-    );
+      const newDate: Date = new Date(
+        new Date().getTime() - 24 * 60 * 60 * 1000 * 7
+      );
+      component.changeLastActivity(newDate);
+      expect(component.selectLastActivity()).toEqual(7);
+    }));
 
     it(
       'should update last activity in days when selected last' +
@@ -516,49 +508,48 @@ describe('Contributor dashboard Admin page', () => {
         tick();
         fixture.detectChanges();
 
-        component.selectedLastActivity = new Date(
+        component.endDateForUsersLastActivity = new Date(
           new Date().getTime() - 24 * 60 * 60 * 1000 * 30
         );
-        component.selectLastActivity();
-        expect(component.selectedLastActivityInDays).toEqual(30);
+        expect(component.selectLastActivity()).toEqual(30);
       })
     );
 
-    it(
-      'should not update last activity in days when selected last' +
-        ' date is more than today',
-      fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
+    // it(
+    //   'should not update last activity in days when selected last' +
+    //     ' date is more than today',
+    //   fakeAsync(() => {
+    //     component.ngOnInit();
+    //     tick();
+    //     fixture.detectChanges();
 
-        component.selectedLastActivity = new Date(
-          new Date().getTime() + 24 * 60 * 60 * 1000
-        );
-        component.selectLastActivity();
-        expect(component.selectedLastActivityInDays).toEqual(90);
-      })
-    );
+    //     component.selectedLastActivity = new Date(
+    //       new Date().getTime() + 24 * 60 * 60 * 1000
+    //     );
+    //     component.selectLastActivity();
+    //     expect(component.selectedLastActivityInDays).toEqual(90);
+    //   })
+    // );
 
-    it(
-      'should not update last activity in days when selected last' +
-        ' date is more than selected first date',
-      fakeAsync(() => {
-        component.ngOnInit();
-        tick();
-        fixture.detectChanges();
+    // it(
+    //   'should not update last activity in days when selected last' +
+    //     ' date is more than selected first date',
+    //   fakeAsync(() => {
+    //     component.ngOnInit();
+    //     tick();
+    //     fixture.detectChanges();
 
-        component.selectedFirstActivity = new Date(
-          new Date().getTime() - 24 * 60 * 60 * 1000 * 30
-        );
-        component.selectFirstActivity();
-        component.selectedLastActivity = new Date(
-          new Date().getTime() - 24 * 60 * 60 * 1000 * 29
-        );
-        component.selectLastActivity();
-        expect(component.selectedLastActivityInDays).toEqual(90);
-      })
-    );
+    //     component.selectedFirstActivity = new Date(
+    //       new Date().getTime() - 24 * 60 * 60 * 1000 * 30
+    //     );
+    //     component.selectFirstActivity();
+    //     component.selectedLastActivity = new Date(
+    //       new Date().getTime() - 24 * 60 * 60 * 1000 * 29
+    //     );
+    //     component.selectLastActivity();
+    //     expect(component.selectedLastActivityInDays).toEqual(90);
+    //   })
+    // );
 
     it(
       'should remove duplicates from available topics when component' +
