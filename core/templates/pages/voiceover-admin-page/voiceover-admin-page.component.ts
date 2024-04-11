@@ -34,6 +34,10 @@ interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
 }
 
+export interface LanguageAccentDescriptionToCode {
+  [languageAccentDescription: string]: string;
+}
+
 @Component({
   selector: 'oppia-voiceover-admin-page',
   templateUrl: './voiceover-admin-page.component.html',
@@ -49,7 +53,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
   supportedLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
-  availableLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
+  availableLanguageAccentDescriptionsToCodes!: LanguageAccentDescriptionToCode;
   languageAccentCodesToDescriptionsMasterList!: LanguageAccentToDescription;
   languageCodesMapping!: LanguageCodesMapping;
   pageIsInitialized: boolean = false;
@@ -75,8 +79,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageCodesMapping = response.languageCodesMapping;
         this.languageAccentCodeToLanguageCode = {};
         this.supportedLanguageAccentCodesToDescriptions = {};
-        this.availableLanguageAccentCodesToDescriptions = {};
         this.languageAccentCodesToDescriptionsMasterList = {};
+        this.availableLanguageAccentDescriptionsToCodes = {};
         this.initializeLanguageAccentCodesFields(
           response.languageAccentMasterList
         );
@@ -182,8 +186,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
       if (
         !(languageAccentCode in this.supportedLanguageAccentCodesToDescriptions)
       ) {
-        this.availableLanguageAccentCodesToDescriptions[languageAccentCode] =
-          languageAccentDescription;
+        this.availableLanguageAccentDescriptionsToCodes[
+          languageAccentDescription
+        ] = languageAccentCode;
       }
     }
 
@@ -199,8 +204,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
     this.supportedLanguageAccentCodesToDescriptions[languageAccentCodeToAdd] =
       languageAccentDescription;
-    delete this.availableLanguageAccentCodesToDescriptions[
-      languageAccentCodeToAdd
+    delete this.availableLanguageAccentDescriptionsToCodes[
+      languageAccentDescription
     ];
 
     if (!(languageCode in this.languageCodesMapping)) {
@@ -237,9 +242,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
         delete this.supportedLanguageAccentCodesToDescriptions[
           languageAccentCodeToRemove
         ];
-        this.availableLanguageAccentCodesToDescriptions[
-          languageAccentCodeToRemove
-        ] = languageAccentDescription;
+        this.availableLanguageAccentDescriptionsToCodes[
+          languageAccentDescription
+        ] = languageAccentCodeToRemove;
 
         delete this.languageCodesMapping[languageCode][
           languageAccentCodeToRemove

@@ -1,5 +1,5 @@
 <mat-card class="oppia-editor-card-with-avatar oppia-page-card oppia-long-text-card">
-  <h3>Update language/accent pairs available for learners and voice artists</h3>
+  <h3>Update language/accent pairs that learners and voice artists can select</h3>
   <div class="card-content">
     <div *ngIf="!pageIsInitialized">
       <p>Loading ...</p>
@@ -38,10 +38,10 @@
         <mat-form-field class="oppia-language-accent-dropdown-selector">
           <mat-label>Language Accent pair</mat-label>
           <mat-select (selectionChange)="addLanguageAccentCodeSupport($event.value)">
-            <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
-                        [value]="languageAccentCodeToDescription.key">
+            <mat-option *ngFor="let languageAccentDescriptionToCode of availableLanguageAccentDescriptionsToCodes | keyvalue"
+                        [value]="languageAccentDescriptionToCode.value">
               <span>
-                {{languageAccentCodeToDescription.value}}
+                {{languageAccentDescriptionToCode.key}}
               </span>
             </mat-option>
           </mat-select>

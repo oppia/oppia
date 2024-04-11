@@ -89,7 +89,7 @@ describe('Voiceover Admin Page component ', () => {
         'en-US': true,
       },
     };
-    component.availableLanguageAccentCodesToDescriptions = {};
+    component.availableLanguageAccentDescriptionsToCodes = {};
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
@@ -131,16 +131,16 @@ describe('Voiceover Admin Page component ', () => {
     expect(
       voiceoverBackendApiService.fetchVoiceArtistMetadataAsync
     ).toHaveBeenCalled();
-    expect(component.availableLanguageAccentCodesToDescriptions).toEqual({
-      'hi-IN': 'Hindi (India)',
+    expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
+      'Hindi (India)': 'hi-IN',
     });
     expect(component.pageIsInitialized).toBeTrue();
   }));
 
   it('should be able to add language accent pair', fakeAsync(() => {
-    component.availableLanguageAccentCodesToDescriptions = {
-      'en-US': 'English (United States)',
-      'hi-IN': 'Hindi (India)',
+    component.availableLanguageAccentDescriptionsToCodes = {
+      'English (United States)': 'en-US',
+      'Hindi (India)': 'hi-IN',
     };
     component.languageAccentCodesToDescriptionsMasterList = {
       'en-US': 'English (United States)',
@@ -162,14 +162,14 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({
       'en-US': 'English (United States)',
     });
-    expect(component.availableLanguageAccentCodesToDescriptions).toEqual({
-      'hi-IN': 'Hindi (India)',
+    expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
+      'Hindi (India)': 'hi-IN',
     });
   }));
 
   it('should be able to remove language accent pair', fakeAsync(() => {
-    component.availableLanguageAccentCodesToDescriptions = {
-      'hi-IN': 'Hindi (India)',
+    component.availableLanguageAccentDescriptionsToCodes = {
+      'Hindi (India)': 'hi-IN',
     };
     component.languageAccentCodesToDescriptionsMasterList = {
       'en-US': 'English (United States)',
@@ -201,15 +201,15 @@ describe('Voiceover Admin Page component ', () => {
 
     expect(ngbModal.open).toHaveBeenCalled();
     expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({});
-    expect(component.availableLanguageAccentCodesToDescriptions).toEqual({
-      'hi-IN': 'Hindi (India)',
-      'en-US': 'English (United States)',
+    expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
+      'Hindi (India)': 'hi-IN',
+      'English (United States)': 'en-US',
     });
   }));
 
   it('should not remove language accent pair when confirm modal is cancelled', fakeAsync(() => {
-    component.availableLanguageAccentCodesToDescriptions = {
-      'hi-IN': 'Hindi (India)',
+    component.availableLanguageAccentDescriptionsToCodes = {
+      'Hindi (India)': 'hi-IN',
     };
     component.languageAccentCodesToDescriptionsMasterList = {
       'en-US': 'English (United States)',
@@ -239,8 +239,8 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.supportedLanguageAccentCodesToDescriptions).toEqual({
       'en-US': 'English (United States)',
     });
-    expect(component.availableLanguageAccentCodesToDescriptions).toEqual({
-      'hi-IN': 'Hindi (India)',
+    expect(component.availableLanguageAccentDescriptionsToCodes).toEqual({
+      'Hindi (India)': 'hi-IN',
     });
   }));
 

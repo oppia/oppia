@@ -362,7 +362,7 @@ def get_voiceover_filenames(
     # method instead.
     # https://github.com/python/mypy/issues/9590
     k = lambda voiceover: voiceover['duration_secs']
-    contributed_voiceovers.sort(key=k)
+    contributed_voiceovers.sort(key=k, reverse=True)
 
     if (
         len(contributed_voiceovers) >
