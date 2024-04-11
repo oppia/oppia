@@ -902,7 +902,7 @@ export class ConversationSkinComponent {
   }
 
   private _addNewCard(newCard): void {
-    this.conversationSkinService.handleNewCardAddition(newCard);
+    this.conversationSkinService.addAndDisplayNewCard(newCard);
 
     if (this.displayedCard && this.displayedCard.isTerminal()) {
       this.isRefresherExploration = false;

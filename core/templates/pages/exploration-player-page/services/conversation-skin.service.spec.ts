@@ -126,15 +126,15 @@ describe('Conversation skin service', () => {
     );
     spyOn(conversationSkinService, 'animateToTwoCards');
 
-    conversationSkinService.handleNewCardAddition(displayedCard);
+    conversationSkinService.addAndDisplayNewCard(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
     expect(conversationSkinService.animateToTwoCards).toHaveBeenCalled();
 
-    conversationSkinService.handleNewCardAddition(displayedCard);
+    conversationSkinService.addAndDisplayNewCard(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
 
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    conversationSkinService.handleNewCardAddition(displayedCard);
+    conversationSkinService.addAndDisplayNewCard(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(0);
     expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalledWith(0);
   });

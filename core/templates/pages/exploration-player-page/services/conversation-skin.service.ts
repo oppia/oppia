@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Common service for the exploration conversation skin,
- * extracting functionalities from the old skin to utilize in the new skin
- * and minimize duplication of code.
+ * @fileoverview Service to manage the conversation flow of the exploration player,
+ * controlling behaviours such as adding cards to the stack and displaying them, or
+ * submitting the answer to progress further.
  */
 
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -33,14 +33,12 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
   providedIn: 'root',
 })
 export class ConversationSkinService {
-  // The minimum width, in pixels, needed to be able to show two cards
-  // side-by-side.
   TIME_PADDING_MSEC = 250;
   TIME_FADEIN_MSEC = 100;
   TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
-  isAnimatingToTwoCards!: boolean;
-  isAnimatingToOneCard!: boolean;
+  playerIsAnimatingToTwoCards!: boolean;
+  playerIsAnimatingToOneCard!: boolean;
 
   constructor(
     private contentTranslationLanguageService: ContentTranslationLanguageService,
@@ -51,7 +49,7 @@ export class ConversationSkinService {
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
-  handleNewCardAddition(newCard: StateCard): void {
+  addAndDisplayNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
     const explorationLanguageCode =
       this.explorationPlayerStateService.getLanguageCode();
@@ -110,18 +108,18 @@ export class ConversationSkinService {
   }
 
   isPlayerAnimatingToOneCard(): boolean {
-    return this.isAnimatingToOneCard;
+    return this.playerIsAnimatingToOneCard;
   }
 
   isPlayerAnimatingToTwoCards(): boolean {
-    return this.isAnimatingToTwoCards;
+    return this.playerIsAnimatingToTwoCards;
   }
 
   animateToTwoCards(doneCallback: () => void): void {
-    this.isAnimatingToTwoCards = true;
+    this.playerIsAnimatingToTwoCards = true;
     setTimeout(
       () => {
-        this.isAnimatingToTwoCards = false;
+        this.playerIsAnimatingToTwoCards = false;
         if (doneCallback) {
           doneCallback();
         }
@@ -133,9 +131,9 @@ export class ConversationSkinService {
   }
 
   animateToOneCard(doneCallback: () => void): void {
-    this.isAnimatingToOneCard = true;
+    this.playerIsAnimatingToOneCard = true;
     setTimeout(() => {
-      this.isAnimatingToOneCard = false;
+      this.playerIsAnimatingToOneCard = false;
       if (doneCallback) {
         doneCallback();
       }
