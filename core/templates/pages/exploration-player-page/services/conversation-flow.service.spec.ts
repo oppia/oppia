@@ -20,13 +20,13 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 
-import {ConversationSkinService} from './conversation-skin.service';
+import {ConversationFlowService} from './conversation-flow.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
-import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
-import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
-import {PlayerPositionService} from '../services/player-position.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {ContentTranslationLanguageService} from './content-translation-language.service';
+import {ContentTranslationManagerService} from './content-translation-manager.service';
+import {ExplorationPlayerStateService} from './exploration-player-state.service';
+import {PlayerPositionService} from './player-position.service';
+import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
@@ -51,7 +51,7 @@ class MockWindowRef {
 describe('Conversation skin service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
-  let conversationSkinService: ConversationSkinService;
+  let conversationFlowService: ConversationFlowService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
@@ -72,7 +72,7 @@ describe('Conversation skin service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        ConversationSkinService,
+        ConversationFlowService,
         {
           provide: TranslateService,
           useClass: MockTranslateService,
@@ -91,7 +91,7 @@ describe('Conversation skin service', () => {
     contentTranslationManagerService = TestBed.inject(
       ContentTranslationManagerService
     );
-    conversationSkinService = TestBed.inject(ConversationSkinService);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
     );
@@ -118,23 +118,23 @@ describe('Conversation skin service', () => {
     spyOn(playerPositionService, 'changeCurrentQuestion');
 
     spyOn(
-      conversationSkinService,
+      conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(false, true);
-    spyOn(conversationSkinService, 'canWindowShowTwoCards').and.returnValue(
+    spyOn(conversationFlowService, 'canWindowShowTwoCards').and.returnValue(
       true
     );
-    spyOn(conversationSkinService, 'animateToTwoCards');
+    spyOn(conversationFlowService, 'animateToTwoCards');
 
-    conversationSkinService.addAndDisplayNewCard(displayedCard);
+    conversationFlowService.addAndDisplayNewCard(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
-    expect(conversationSkinService.animateToTwoCards).toHaveBeenCalled();
+    expect(conversationFlowService.animateToTwoCards).toHaveBeenCalled();
 
-    conversationSkinService.addAndDisplayNewCard(displayedCard);
+    conversationFlowService.addAndDisplayNewCard(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
 
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    conversationSkinService.addAndDisplayNewCard(displayedCard);
+    conversationFlowService.addAndDisplayNewCard(displayedCard);
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(0);
     expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalledWith(0);
   });
@@ -144,30 +144,30 @@ describe('Conversation skin service', () => {
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
     );
 
-    expect(conversationSkinService.canWindowShowTwoCards()).toBeTrue();
+    expect(conversationFlowService.canWindowShowTwoCards()).toBeTrue();
   });
 
   it('should tell if supplemental card is non empty', () => {
     expect(
-      conversationSkinService.isSupplementalCardNonempty(displayedCard)
+      conversationFlowService.isSupplementalCardNonempty(displayedCard)
     ).toBeFalse();
   });
 
   it('should animate to one card', fakeAsync(() => {
     let doneCallbackSpy = jasmine.createSpy('done callback');
-    conversationSkinService.animateToOneCard(doneCallbackSpy);
+    conversationFlowService.animateToOneCard(doneCallbackSpy);
 
     tick(600);
-    expect(conversationSkinService.playerIsAnimatingToOneCard).toBeFalse();
+    expect(conversationFlowService.playerIsAnimatingToOneCard).toBeFalse();
     expect(doneCallbackSpy).toHaveBeenCalled();
   }));
 
   it('should animate to two cards', fakeAsync(() => {
     let doneCallbackSpy = jasmine.createSpy('done callback');
-    conversationSkinService.animateToTwoCards(doneCallbackSpy);
+    conversationFlowService.animateToTwoCards(doneCallbackSpy);
 
     tick(1000);
-    expect(conversationSkinService.playerIsAnimatingToTwoCards).toBeFalse();
+    expect(conversationFlowService.playerIsAnimatingToTwoCards).toBeFalse();
     expect(doneCallbackSpy).toHaveBeenCalled();
   }));
 });

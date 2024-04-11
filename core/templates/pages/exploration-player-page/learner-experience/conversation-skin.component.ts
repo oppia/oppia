@@ -75,7 +75,7 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import {ConversationSkinService} from '../services/conversation-skin.service';
+import {ConversationFlowService} from '../services/conversation-flow.service';
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
@@ -217,7 +217,7 @@ export class ConversationSkinComponent {
     private platformFeatureService: PlatformFeatureService,
     private translateService: TranslateService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
-    private conversationSkinService: ConversationSkinService
+    private conversationFlowService: ConversationFlowService
   ) {}
 
   adjustPageHeightOnresize(): void {
@@ -736,7 +736,7 @@ export class ConversationSkinComponent {
   isCurrentSupplementalCardNonempty(): boolean {
     return (
       this.displayedCard &&
-      this.conversationSkinService.isSupplementalCardNonempty(
+      this.conversationFlowService.isSupplementalCardNonempty(
         this.displayedCard
       )
     );
@@ -902,7 +902,7 @@ export class ConversationSkinComponent {
   }
 
   private _addNewCard(newCard): void {
-    this.conversationSkinService.addAndDisplayNewCard(newCard);
+    this.conversationFlowService.addAndDisplayNewCard(newCard);
 
     if (this.displayedCard && this.displayedCard.isTerminal()) {
       this.isRefresherExploration = false;
@@ -1505,7 +1505,7 @@ export class ConversationSkinComponent {
       },
       0.1 * TIME_FADEOUT_MSEC +
         TIME_HEIGHT_CHANGE_MSEC +
-        0.5 * this.conversationSkinService.TIME_FADEIN_MSEC
+        0.5 * this.conversationFlowService.TIME_FADEIN_MSEC
     );
 
     setTimeout(
@@ -1514,8 +1514,8 @@ export class ConversationSkinComponent {
       },
       0.1 * TIME_FADEOUT_MSEC +
         TIME_HEIGHT_CHANGE_MSEC +
-        this.conversationSkinService.TIME_FADEIN_MSEC +
-        this.conversationSkinService.TIME_PADDING_MSEC
+        this.conversationFlowService.TIME_FADEIN_MSEC +
+        this.conversationFlowService.TIME_PADDING_MSEC
     );
 
     this.playerPositionService.onNewCardOpened.emit(this.nextCard);
@@ -1668,12 +1668,16 @@ export class ConversationSkinComponent {
     return this.showProgressClearanceMessage;
   }
 
+  canWindowShowTwoCards(): boolean {
+    return this.conversationFlowService.canWindowShowTwoCards();
+  }
+
   isPlayerAnimatingToOneCard(): boolean {
-    return this.conversationSkinService.playerIsAnimatingToOneCard;
+    return this.conversationFlowService.playerIsAnimatingToOneCard;
   }
 
   isPlayerAnimatingToTwoCards(): boolean {
-    return this.conversationSkinService.playerIsAnimatingToTwoCards;
+    return this.conversationFlowService.playerIsAnimatingToTwoCards;
   }
 }
 

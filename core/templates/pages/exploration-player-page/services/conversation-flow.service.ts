@@ -21,18 +21,18 @@
 import {StateCard} from 'domain/state_card/state-card.model';
 import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
-import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
-import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
-import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
-import {PlayerPositionService} from '../services/player-position.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {ContentTranslationLanguageService} from './content-translation-language.service';
+import {ContentTranslationManagerService} from './content-translation-manager.service';
+import {ExplorationPlayerStateService} from './exploration-player-state.service';
+import {PlayerPositionService} from './player-position.service';
+import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ConversationSkinService {
+export class ConversationFlowService {
   TIME_PADDING_MSEC = 250;
   TIME_FADEIN_MSEC = 100;
   TIME_NUM_CARDS_CHANGE_MSEC = 500;
@@ -144,6 +144,6 @@ export class ConversationSkinService {
 angular
   .module('oppia')
   .factory(
-    'ConversationSkinService',
-    downgradeInjectable(ConversationSkinService)
+    'ConversationFlowService',
+    downgradeInjectable(ConversationFlowService)
   );

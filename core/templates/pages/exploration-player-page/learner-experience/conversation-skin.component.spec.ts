@@ -99,7 +99,7 @@ import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page
 import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
-import {ConversationSkinService} from '../services/conversation-skin.service';
+import {ConversationFlowService} from '../services/conversation-flow.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -135,7 +135,7 @@ describe('Conversation skin component', () => {
   let conceptCardBackendApiService: ConceptCardBackendApiService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let contextService: ContextService;
-  let conversationSkinService: ConversationSkinService;
+  let conversationFlowService: ConversationFlowService;
   let currentInteractionService: CurrentInteractionService;
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let explorationEngineService: ExplorationEngineService;
@@ -523,7 +523,7 @@ describe('Conversation skin component', () => {
       ContentTranslationManagerService
     );
     contextService = TestBed.inject(ContextService);
-    conversationSkinService = TestBed.inject(ConversationSkinService);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
@@ -1583,7 +1583,7 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(contentTranslationManagerService, 'displayTranslations');
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    spyOn(conversationSkinService, 'canWindowShowTwoCards').and.returnValue(
+    spyOn(conversationFlowService, 'canWindowShowTwoCards').and.returnValue(
       true
     );
     spyOn(playerPositionService, 'setDisplayedCardIndex');
@@ -1658,10 +1658,10 @@ describe('Conversation skin component', () => {
     );
     componentInstance.isLoggedIn = true;
     spyOn(
-      conversationSkinService,
+      conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(false, true, true, false);
-    spyOn(conversationSkinService, 'animateToOneCard').and.callFake(callb => {
+    spyOn(conversationFlowService, 'animateToOneCard').and.callFake(callb => {
       callb();
     });
 
@@ -2135,7 +2135,7 @@ describe('Conversation skin component', () => {
   it('should tell if current supplemental card is non empty', () => {
     componentInstance.displayedCard = displayedCard;
     spyOn(
-      conversationSkinService,
+      conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(true, false);
 
@@ -2173,7 +2173,7 @@ describe('Conversation skin component', () => {
     spyOn(explorationPlayerStateService, 'getLanguageCode').and.returnValue(
       'en'
     );
-    spyOn(conversationSkinService, 'addAndDisplayNewCard');
+    spyOn(conversationFlowService, 'addAndDisplayNewCard');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
@@ -2242,10 +2242,10 @@ describe('Conversation skin component', () => {
     );
     componentInstance.isLoggedIn = true;
     spyOn(
-      conversationSkinService,
+      conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(false, true, true, false);
-    spyOn(conversationSkinService, 'animateToOneCard').and.callFake(callb => {
+    spyOn(conversationFlowService, 'animateToOneCard').and.callFake(callb => {
       callb();
     });
 
@@ -2365,7 +2365,7 @@ describe('Conversation skin component', () => {
       null
     );
     spyOn(explorationPlayerStateService, 'recordNewCardAdded');
-    spyOn(conversationSkinService, 'addAndDisplayNewCard');
+    spyOn(conversationFlowService, 'addAndDisplayNewCard');
     spyOn(componentInstance, 'showPendingCard');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
     spyOn(
@@ -2704,7 +2704,7 @@ describe('Conversation skin component', () => {
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(componentInstance, 'scrollToTop');
     spyOn(playerPositionService.onNewCardOpened, 'emit');
-    spyOn(conversationSkinService, 'addAndDisplayNewCard');
+    spyOn(conversationFlowService, 'addAndDisplayNewCard');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
     spyOn(
       explorationEngineService,
