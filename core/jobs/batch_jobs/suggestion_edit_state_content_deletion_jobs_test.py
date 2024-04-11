@@ -55,7 +55,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             author_id: str,
             final_reviewer_id: str,
             language_code: None | str
-            ) -> suggestion_models.GeneralSuggestionModel:
+            ) -> suggestion_model:
         """creates new suggestion.
 
         Args:
@@ -75,7 +75,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
         """
 
         return self.create_model(
-            suggestion_models.GeneralSuggestionModel,
+            suggestion_model,
             suggestion_type=suggestion_type,
             target_type=target_type,
             target_id=target_id,
@@ -138,7 +138,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
         self.edit_state_content_suggestion_model_2.update_timestamps()
         self.create_translation_suggestion_model.update_timestamps()
         self.add_question_suggestion_model.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([
+        suggestion_model.put_multi([
             self.edit_state_content_suggestion_model_1,
             self.edit_state_content_suggestion_model_2,
             self.create_translation_suggestion_model,
@@ -149,7 +149,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+            len(suggestion_model.query_suggestions(
                 queries)), 2)
 
         self.assert_job_output_is([
@@ -158,7 +158,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
         ])
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+            len(suggestion_model.query_suggestions(
                 queries)), 0)
 
 
@@ -179,7 +179,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             author_id: str,
             final_reviewer_id: str,
             language_code: None | str
-            ) -> suggestion_models.GeneralSuggestionModel:
+            ) -> suggestion_model:
         """creates new suggestion.
 
         Args:
@@ -199,7 +199,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             """
 
         return self.create_model(
-            suggestion_models.GeneralSuggestionModel,
+            suggestion_model,
             suggestion_type=suggestion_type,
             target_type=target_type,
             target_id=target_id,
@@ -262,7 +262,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
         self.edit_state_content_suggestion_model_2.update_timestamps()
         self.create_translation_suggestion_model.update_timestamps()
         self.add_question_suggestion_model.update_timestamps()
-        suggestion_models.GeneralSuggestionModel.put_multi([
+        suggestion_model.put_multi([
             self.edit_state_content_suggestion_model_1,
             self.edit_state_content_suggestion_model_2,
             self.create_translation_suggestion_model,
@@ -273,7 +273,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+            len(suggestion_model.query_suggestions(
                 queries)), 2)
 
         self.assert_job_output_is([
@@ -282,5 +282,5 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
         ])
 
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+            len(suggestion_model.query_suggestions(
                 queries)), 2)
