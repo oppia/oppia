@@ -73,6 +73,8 @@ export class ConversationSkinService {
       this.playerTranscriptService.getLastCard()
     );
 
+    // Check if next card is supplemental and previous card isn't, indicating
+    // we need to animate player to two cards if the window can show two cards.
     if (
       totalNumCards > 1 &&
       this.canWindowShowTwoCards() &&
@@ -82,6 +84,8 @@ export class ConversationSkinService {
       this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
       this.animateToTwoCards(function () {});
     } else if (
+      // Check if next card isn't supplemental and previous card is, and if the player
+      // is animated to two cards, indicating that the player should now animate to one card.
       totalNumCards > 1 &&
       this.canWindowShowTwoCards() &&
       previousSupplementalCardIsNonempty &&
