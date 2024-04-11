@@ -906,6 +906,7 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.type(explorationNameInput, explorationName);
     await this.page.keyboard.press('Enter');
+    await this.page.waitForNavigation();
     await this.page.waitForSelector(communityExplorationCard);
   }
   /**
