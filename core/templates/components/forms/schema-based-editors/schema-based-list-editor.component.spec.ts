@@ -356,4 +356,10 @@ describe('Schema Based List Editor Component', () => {
     const expectedValue = ['item1', 'item2', 'item3'];
     expect(component.localValue).toEqual(expectedValue);
   });
+
+  it('should return the correct index when tracking by index', () => {
+    const index = 5;
+    const result = component.trackByIndex(index);
+    expect(result).toBe(index);
+  });
 });
