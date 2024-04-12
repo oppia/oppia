@@ -142,7 +142,6 @@ export class QuestionSuggestionReviewModalComponent
   questionId: string | null = null;
   isFirstItem: boolean = true;
   isLastItem: boolean = true;
-  stateContentShouldStayVisibleOnScroll: boolean = true;
 
   constructor(
     private contextService: ContextService,
