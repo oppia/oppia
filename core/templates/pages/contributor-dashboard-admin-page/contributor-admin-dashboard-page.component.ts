@@ -158,8 +158,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             this.startDateForUsersLastActivity = new Date();
             this.endDateForUsersLastActivity =
               this.getDateThatIsDaysBeforeToday(90);
-            this.selectFirstActivity();
-            this.selectLastActivity();
             this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
             this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
 
@@ -257,39 +255,53 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     );
   }
 
+  isValidStartDate(selectedStartDate: Date): boolean {
+    if (
+      this.today.getTime() >= selectedStartDate.getTime() &&
+      this.endDateForUsersLastActivity &&
+      selectedStartDate.getTime() >=
+        new Date(this.endDateForUsersLastActivity).getTime()
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  isValidEndDate(selectedEndDate: Date): boolean {
+    if (
+      this.today.getTime() >= selectedEndDate.getTime() &&
+      this.startDateForUsersLastActivity &&
+      selectedEndDate.getTime() <=
+        new Date(this.startDateForUsersLastActivity).getTime()
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   selectFirstActivity(): number {
     this.today = new Date();
-    if (this.today.getTime() >= this.startDateForUsersLastActivity.getTime()) {
-      if (
-        this.endDateForUsersLastActivity &&
-        this.startDateForUsersLastActivity.getTime() >=
-          new Date(this.endDateForUsersLastActivity).getTime()
-      ) {
-        const oneDay = 24 * 60 * 60 * 1000;
-        return Math.floor(
-          Math.abs(
-            this.today.getTime() - this.startDateForUsersLastActivity.getTime()
-          ) / oneDay
-        );
-      }
+    if (this.isValidStartDate(this.startDateForUsersLastActivity)) {
+      const oneDay = 24 * 60 * 60 * 1000;
+      return Math.floor(
+        Math.abs(
+          this.today.getTime() - this.startDateForUsersLastActivity.getTime()
+        ) / oneDay
+      );
     }
   }
 
   selectLastActivity(): number {
     this.today = new Date();
-    if (this.today.getTime() >= this.endDateForUsersLastActivity.getTime()) {
-      if (
-        this.startDateForUsersLastActivity &&
-        this.endDateForUsersLastActivity.getTime() <=
-          new Date(this.startDateForUsersLastActivity).getTime()
-      ) {
-        const oneDay = 24 * 60 * 60 * 1000;
-        return Math.floor(
-          Math.abs(
-            this.today.getTime() - this.endDateForUsersLastActivity.getTime()
-          ) / oneDay
-        );
-      }
+    if (this.isValidEndDate(this.endDateForUsersLastActivity)) {
+      const oneDay = 24 * 60 * 60 * 1000;
+      return Math.floor(
+        Math.abs(
+          this.today.getTime() - this.endDateForUsersLastActivity.getTime()
+        ) / oneDay
+      );
     }
   }
 

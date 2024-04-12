@@ -30,10 +30,6 @@ describe('CustomDatepickerAdapter', () => {
     cda = TestBed.inject(CustomDatepickerAdapter);
   });
 
-  it('should be created', () => {
-    expect(cda).toBeTruthy();
-  });
-
   it('should format date for input display', () => {
     const date = new Date('2024-03-16');
     const formattedDate = cda.format(date, 'input');
