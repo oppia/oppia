@@ -72,8 +72,6 @@ start-devserver: ## Starts the development server
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
 
-init: install_hooks build run-devserver ## Initializes the build and runs dev-server.
-
 install_hooks:  ## Install required hooks
 	bash ./docker/pre_push_hook.sh --install
 	bash ./docker/pre_commit_hook.sh --install
