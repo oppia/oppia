@@ -43,7 +43,20 @@ describe('Logged-in User', function () {
   it(
     'should subscribe to a creator and view all explorations created by that creator',
     async function () {
-      explorationCreator.navigateToCreatorDashboardPage();
+      await explorationCreator.navigateToCreatorDashboardPage();
+      await explorationCreator.expectNumberOfSubscribersToBe(0);
+
+      await testLearner.navigateToProfilePage('explorationCreator');
+      await testLearner.subscribeToCreator('explorationCreator');
+
+      await explorationCreator.refreshPage();
+      await explorationCreator.expectNumberOfSubscribersToBe(1);
+      await explorationCreator.openSubscribersTab();
+      await explorationCreator.expectUserToBeASubscriber('testLearner');
+
+      await testLearner.expectExplorationWithTitleToBePresentInProfilePage(
+        'Test Exploration'
+      );
     },
     DEFAULT_SPEC_TIMEOUT
   );

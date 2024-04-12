@@ -22,6 +22,7 @@ import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 import {element} from 'angular';
 
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
 const mathClassroomUrl = testConstants.URLs.MathClassroom;
@@ -135,6 +136,12 @@ const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const saveContentButton = 'button.e2e-test-save-state-content';
+
+const subscribeButton = 'button.oppia-subscription-button';
+const unsubscribeLabel = '.e2e-test-unsubscribe-label';
+const subscriberTabButton = '.e2e-test-subscription-tab';
+const subscriberCard = '.e2e-test-subscription-card';
+const explorationCard = '.e2e-test-exploration-dashboard-card';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -786,6 +793,119 @@ export class LoggedInUser extends BaseUser {
       element => element.textContent
     );
     return explorationIdUrl;
+  }
+
+  /**
+   * Function for navigating to the profile page.
+   */
+  async navigateToProfilePage(username: string): Promise<void> {
+    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
+
+    if (this.page.url() !== profilePageUrl) {
+      await this.goto(profilePageUrl);
+    }
+    return;
+  }
+
+  /**
+   * Function for subscribing to a creator.
+   */
+  async subscribeToCreator(username: string): Promise<void> {
+    await this.navigateToProfilePage(username);
+
+    await this.clickOn(subscribeButton);
+    await this.page.waitForSelector(unsubscribeLabel);
+    showMessage(`Subscribed to the creator with username ${username}`);
+  }
+
+  /**
+   * This function checks if the number of subscribers equal to.
+   */
+  async expectNumberOfSubscribersToBe(number: number): Promise<void> {
+    const subscriberCount = await this.page.$eval(
+      '.e2e-test-oppia-total-subscribers',
+      element => element.textContent
+    );
+
+    if (parseInt(subscriberCount!) === number) {
+      showMessage(`Number of subscribers is equal to ${number}`);
+    } else {
+      throw new Error(`Number of subscribers is not equal to ${number}`);
+    }
+  }
+
+  /**
+   * Function for refreshing the page.
+   */
+  async refreshPage(): Promise<void> {
+    await this.page.reload();
+  }
+
+  /**
+   * Function for opening the subscribers tab.
+   */
+  async openSubscribersTab(): Promise<void> {
+    if (this.page.url() !== creatorDashboardUrl) {
+      await this.navigateToCreatorDashboardPage();
+    }
+
+    await this.page.click(subscriberTabButton);
+    await this.page.waitForSelector('.e2e-test-subscription-card');
+  }
+
+  /**
+   * This function checks whether given user is a subscriber or not.
+   */
+  async expectUserToBeASubscriber(username: string): Promise<void> {
+    let truncatedUsername = username;
+    if (username.length > 10) {
+      const ellipsis = '...';
+      truncatedUsername =
+        username.substring(0, 10 - ellipsis.length) + ellipsis;
+    }
+
+    const subscribers = await this.page.$$(subscriberCard);
+
+    if (subscribers.length === 0) {
+      throw new Error(`User "${username}" is not subscribed.`);
+    }
+
+    const subscriberUsername = await subscribers[0].$eval(
+      '.e2e-test-subscription-name',
+      element => (element as HTMLElement).textContent?.trim()
+    );
+
+    showMessage(`username ${subscriberUsername}`);
+
+    if (truncatedUsername === subscriberUsername) {
+      showMessage(`User ${username} is a subscriber`);
+    } else {
+      throw new Error(`User ${username} is not a subscriber`);
+    }
+  }
+
+  /**
+   * This function checks whether the exploration is authored by the creator.
+   */
+  async expectExplorationWithTitleToBePresentInProfilePage(
+    title: string
+  ): Promise<void> {
+    const explorations = await this.page.$$(explorationCard);
+
+    if (explorations.length === 0) {
+      throw new Error(`There are no explorations authored by the creator`);
+    }
+
+    const explorationTitle = await explorations[0].$eval(
+      '.e2e-test-exp-summary-tile-title span',
+      element => (element as HTMLElement).textContent
+    );
+
+    if (explorationTitle === explorationTitle) {
+      showMessage(`Exploration with title ${title} is present`);
+    } else {
+      throw new Error(`Exploration with title ${title} is not present`);
+    }
   }
 
   /**
