@@ -1,78 +1,102 @@
 <div class="splash-page">
   <div class="oppia-splash-section-one" dir="auto">
-    <div class="oppia-splash-section-one-left" tabindex="0">
-      <h1 class="oppia-splash-h1" [innerHTML]="'I18N_SPLASH_TITLE' | translate"></h1>
-      <div class="oppia-splash-h2-container">
-        <h2 class="oppia-splash-h2 oppia-splash-h2-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></h2>
-      </div>
-      <div class="oppia-splash-button-container">
-        <button type="submit" (click)="onClickBrowseLessonsButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
-          {{ 'I18N_ACTION_BROWSE_LESSONS' | translate }}
-        </button>
-      </div>
-      <div class="oppia-splash-button-container">
-        <button type="submit" (click)="onClickAccessAndroidButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
-          {{ 'I18N_ACTION_ACCESS_ANDROID_APP' | translate }}
-        </button>
-      </div>
+    <div class="oppia-splash-section-one-header">
+      <h2 class="oppia-splash-title oppia-splash-indigo-text">Learn through story based-lessons!</h2>
     </div>
-    <div class="oppia-splash-section-one-right">
-      <picture class="oppia-splash-main-image" *ngIf="!isWindowNarrow">
-        <source type="image/webp" [srcset]="getImageSet('/splash/splashMainDesktop', 'webp')">
-        <source type="image/png" [srcset]="getImageSet('/splash/splashMainDesktop', 'png')">
-        <img [src]="getStaticImageUrl('/splash/splashMainDesktop1x.png')"
-             width="800"
-             height="663"
-             alt="Photo of two kids and a tutor">
-      </picture>
-      <picture class="oppia-splash-main-image" *ngIf="isWindowNarrow">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/splashMainMobile.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/splashMainMobile.png')">
-        <img [src]="getStaticImageUrl('/splash/splashMainMobile.png')"
-             width="629"
-             height="415"
-             alt="Photo of a girl in front of computer">
-      </picture>
+    <div class="oppia-splash-section-one-hero"> 
+      <div class="oppia-splash-section-one-top">
+        <div class="oppia-splash-section-one-top-right">
+          <img class="splash-matthew-image"
+                loading="lazy" 
+                alt="Illustration of a young person in front of part of Oppia fraction lesson" 
+                [src]="getStaticImageUrl('/splash/matthew_fractions.svg')">
+        </div>
+        <div class="oppia-splash-section-one-top-left">
+          <p class="oppia-splash-section-one-top-text" >Oppia is a <b>free</b> educational platform that students can use to learn anything, anywhere.</p>
+          <button type="submit" (click)="onClickBrowseLessonsButton()"
+                  class="btn oppia-splash-button oppia-splash-learn-button oppia-transition-200">
+            Start Learning
+          </button>
+          <button class="oppia-splash-button oppia-splash-top-account-button">
+            Create an account 
+          </button>
+        </div>
+      </div>
+      <h2 class="oppia-splash-title oppia-splash-orange-text">Learn more about Oppia!</h2>
+      <div class="oppia-splash-section-one-bottom">
+        <div class="oppia-splash-section-one-card">
+          <picture class="oppia-splash-section-one-card-img">
+            <source type="image/webp" [srcset]="getImageSet('/splash/exploration', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/splash/exploration', 'png')">
+            <img [src]="getStaticImageUrl('/splash/exploration.svg')"
+                 loading="lazy"
+                 alt="Image of a sample exploraiton of Oppia">
+          </picture>
+          <h2 class="oppia-splash-section-one-card-h2"> Fun and free </h2>
+          <p> Learn for free through playful characters and stories.</p>
+        </div>
+        <div class="oppia-splash-section-one-card">
+          <picture class="oppia-splash-section-one-card-img">
+            <source type="image/webp" [srcset]="getImageSet('/splash/laptopKid', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/splash/laptopKid', 'png')">
+            <img [src]="getStaticImageUrl('/splash/laptopKid.svg')"
+                 loading="lazy"
+                 alt="Illustration of a school kid infront of laptop learning online">
+          </picture>
+          <h2 class="oppia-splash-section-one-card-h2">Learn by yourself</h2>
+          <p>Understand why you answered incorrectly and get personalized feedback to find the right answer!</p>
+        </div>
+        <div class="oppia-splash-section-one-card">
+          <picture class="oppia-splash-section-one-card-img">
+            <source type="image/webp" [srcset]="getImageSet('/splash/splashBook', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/splash/splashBook', 'png')">
+            <img [src]="getStaticImageUrl('/splash/splashBook.svg')"
+                 loading="lazy"
+                 alt="Image of a brown color book">
+          </picture>
+          <h2 class="oppia-splash-section-one-card-h2">Diversity of subject</h2>
+          <p>We offer hundreds of lessons in multiple topics.</p>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="oppia-splash-section-two">
-    <div class="oppia-splash-icon-1-container">
-      <img [src]="getStaticImageUrl('/splash/userIcon.svg')"
-           class="oppia-splash-icon-1"
-           width="35"
-           height="35"
-           alt="">
-      <div class="splash-icon-text-container">
-        <span class="splash-icon-text"
-              [innerHTML]="'I18N_SPLASH_ICON_ONE_TEXT' | translate">
-        </span>
+    <h2 class="oppia-splash-title oppia-splash-section-two-title">
+      What Does Oppia have to offer?
+    </h2>
+    <div class="oppia-splash-section-two-products">
+      <div class="oppia-splash-section-two-product">
+        <h2 class="oppia-splash-h2 oppia-splash-classroom-h2">Oppia's Classroom</h2>
+        <picture class="oppia-splash-section-two-product-image">
+          <source type="image/webp" [srcset]="getImageSet('/splash/classroomIllustration', 'webp')">
+          <source type="image/png" [srcset]="getImageSet('/splash/classroomIllustration', 'png')">
+          <img [src]="getStaticImageUrl('/splash/classroomIllustration1x.png')"
+               width="380"
+               height="222"
+               loading="lazy"
+               alt="Image illustrating Mathematics classroom">
+        </picture>
+        <p class="oppia-splash-text oppia-splash-section-three-text">Discover over 70 Math lessons in different languages, created by our team of educators!</p>
+        <button class="oppia-splash-button oppia-splash-classroom-button">
+          Explore Oppia's Classroom
+        </button>
       </div>
-    </div>
-    <div class="oppia-splash-icon-2-container">
-      <img [src]="getStaticImageUrl('/splash/languageIcon.svg')"
-           class="oppia-splash-icon-2"
-           width="35"
-           height="35"
-           alt="">
-      <div class="splash-icon-text-container">
-        <span class="splash-icon-text"
-              [innerHTML]="'I18N_SPLASH_ICON_TWO_TEXT' | translate:{languageCount: 4}">
-        </span>
-      </div>
-    </div>
-    <div class="oppia-splash-icon-3-container">
-      <img [src]="getStaticImageUrl('/splash/lessonIcon.svg')"
-           class="oppia-splash-icon-3"
-           width="35"
-           height="35"
-           alt="">
-      <div class="splash-icon-text-container">
-        <span class="splash-icon-text"
-              [innerHTML]="'I18N_SPLASH_ICON_THREE_TEXT' | translate:{lessonCount: 40}">
-        </span>
+      <div class="oppia-splash-section-two-product">
+        <h2 class="oppia-splash-h2 oppia-splash-orange-text">Community Lessons</h2>
+        <picture class="oppia-splash-section-two-product-image">
+          <source type="image/webp" [srcset]="getImageSet('/splash/lessonsIllustration', 'webp')">
+          <source type="image/png" [srcset]="getImageSet('/splash/lessonsIllustration', 'png')">
+          <img [src]="getStaticImageUrl('/splash/lessonsIllustration1x.png')"
+                width="500"
+                height="520"
+                loading="lazy"
+                alt="Image illustrating playful lessons of Oppia">
+        </picture>
+        <p class="oppia-splash-text">Dive into lessons of multiple subjects, created by volunteers all over the world in 50+ languages.</p>
+        <button class="oppia-splash-button oppia-splash-lessons-button">
+          Explore Community lessons
+        </button>
       </div>
     </div>
   </div>
@@ -80,68 +104,11 @@
 
   <div class="oppia-splash-section-three">
     <div class="oppia-splash-section-three-left">
-      <h3 *ngIf="isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
-      <img class="splash-matthew-image"
-           [src]="getStaticImageUrl('/splash/matthew_fractions.svg')"
-           width="600"
-           height="340"
-           loading="lazy"
-           alt="Illustration of a young person in front of part of Oppia fraction lesson">
+      <h2 class="oppia-splash-title oppia-splash-indigo-text">Have your own account</h2>
+      <p class="oppia-splash-text oppia-splash-section-two-text">You don't need to register to start using Oppia, but having your account allows you to track your progress, save lessons, set goals, and master skills in your favorite subjects!</p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-account-button" >Create an account</button>
     </div>
     <div class="oppia-splash-section-three-right">
-      <h3 *ngIf="!isWindowNarrow" [innerHTML]="'I18N_SPLASH_BENEFITS_TITLE' | translate"></h3>
-      <div class="splash-benefits-list">
-        <div class="splash-benefit-bullets-column">
-          <img [src]="getStaticImageUrl('/splash/bullet1.svg')"
-               width="17"
-               height="33"
-               loading="lazy"
-               alt="">
-          <img [src]="getStaticImageUrl('/splash/bullet2.svg')"
-               width="25"
-               height="33"
-               loading="lazy"
-               alt="">
-          <img [src]="getStaticImageUrl('/splash/bullet3.svg')"
-               width="39"
-               height="33"
-               loading="lazy"
-               alt="">
-        </div>
-        <div class="splash-benefit-text-items-column">
-          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_ONE' | translate" class="splash-benefits"></h2>
-          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_TWO' | translate" class="splash-benefits"></h2>
-          <h2 [innerHTML]="'I18N_SPLASH_BENEFITS_THREE' | translate" class="splash-benefits"></h2>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="oppia-splash-section-four">
-    <div class="oppia-splash-section-four-image-mobile" *ngIf="isWindowNarrow">
-      <picture class="splash-student-desk-image">
-        <source type="image/webp" [srcset]="getStaticImageUrl('/splash/student_desk_mobile.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/splash/student_desk_mobile.png')">
-        <img [src]="getStaticImageUrl('/splash/student_desk_mobile.png')"
-             width="500"
-             height="520"
-             loading="lazy"
-             alt="">
-      </picture>
-    </div>
-    <div class="oppia-splash-section-four-left" tabindex="0">
-      <h2 [innerHTML]="'I18N_SPLASH_FOR_STUDENTS' | translate"></h2>
-      <h3 [innerHTML]="'I18N_SPLASH_STUDENTS_TITLE' | translate"></h3>
-      <p [innerHTML]="'I18N_SPLASH_STUDENTS_CONTENT' | translate"></p>
-      <div class="oppia-splash-button-container">
-        <button type="submit"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_LEARNING' | translate"
-                (click)="onClickStartLearningButton()">
-        </button>
-      </div>
-    </div>
-    <div class="oppia-splash-section-four-right" *ngIf="!isWindowNarrow">
       <picture class="splash-student-desk-image">
         <source type="image/webp" [srcset]="getImageSet('/splash/student_desk', 'webp')">
         <source type="image/png" [srcset]="getImageSet('/splash/student_desk', 'png')">
@@ -152,104 +119,58 @@
              alt="Photo of a kid thinking about fractions">
       </picture>
     </div>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-account-button" >Create an account</button>
   </div>
 
-  <div class="oppia-splash-section-five" [ngStyle]="{'background-image': 'getTestimonialBackgroundUrl()'}">
-    <div class="oppia-splash-section-five-image" *ngIf="isWindowNarrow">
-      <picture class="splash-student-image">
-        <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
-        <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
-             ng-class="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
-             width="350"
-             height="350"
-             loading="lazy"
-             alt="">
+  <div class="oppia-splash-section-four">
+    <div class="oppia-splash-section-four-right">
+      <h2 class="oppia-splash-title oppia-splash-section-four-title">For Teachers</h2>
+      <p class="oppia-splash-text oppia-splash-section-four-text">Oppia provides students with access to a variety of lessons and different styles of learning to keep them engaged and interested. Through our Learner Groups feature you can assign lessons and follow your student's progress.</p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-teach-button" >Start teaching</button>
+    </div>
+    <div class="oppia-splash-section-four-left">
+      <picture class="oppia-splash-teaching-image">
+        <source type="image/webp" [srcset]="getImageSet('/splash/splashTeaching', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/splashTeaching', 'png')">
+        <img [src]="getStaticImageUrl('/splash/splashTeaching1x.png')"
+             alt="Photo of two kids and a tutor">
       </picture>
     </div>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-teach-button">Start teaching</button>
+  </div>
+
+  <div class="oppia-splash-section-five">
     <div class="oppia-splash-section-five-left">
-      <div>
-        <p class="testimonial-quote-details" [innerHTML]="testimonials[displayedTestimonialId].quote | translate"></p>
-        <p class="testimonial-student-details" [innerHTML]="testimonials[displayedTestimonialId].studentDetails | translate"></p>
-      </div>
-      <div dir="ltr" class="splash-arrows-container">
-        <span (click)="decrementDisplayedTestimonialId()" class="fas fa-angle-left oppia-splash-testimonial-arrow">
-        </span>
-        <span (click)="incrementDisplayedTestimonialId()" class="fas fa-angle-right oppia-splash-testimonial-arrow">
-        </span>
-      </div>
+      <h2 class="oppia-splash-title oppia-splash-section-five-title">For Parents</h2>
+      <p class="oppia-splash-text oppia-splash-section-two-text">Oppia is a free tool that makes learning fun through age-appropriate, ad-free lessons! You can also see your child's progress through our Learner Group feature.</p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-explore-button" >Start exploring</button>
     </div>
-    <div class="oppia-splash-section-five-right" *ngIf="!isWindowNarrow">
-      <picture class="splash-student-image">
-        <source type="image/webp" [srcset]="testimonials[displayedTestimonialId].imageUrlWebp">
-        <source type="image/png" [srcset]="testimonials[displayedTestimonialId].imageUrl">
-        <img [src]="testimonials[displayedTestimonialId].imageUrlPng"
-             [ngClass]="{'image-with-border': testimonials[displayedTestimonialId].borderPresent}"
-             width="350"
-             height="350"
+    <div class="oppia-splash-section-five-right">
+      <picture class="oppia-splash-students-image">
+        <source type="image/webp" [srcset]="getImageSet('/splash/splashStudents', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/splashStudents', 'png')">
+        <img [src]="getStaticImageUrl('/splash/splashStudents1x.png')"
              loading="lazy"
-             alt="">
+             alt="Image of school students in their school dress">
       </picture>
     </div>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-explore-button" >Start exploring</button>
   </div>
 
   <div class="oppia-splash-section-six">
+    <div class="oppia-splash-section-six-right">
+      <h2 class="oppia-splash-title oppia-splash-section-six-title">For Volunteers</h2>
+      <p class="oppia-splash-text oppia-splash-section-six-text">Oppia is a non-profit project built by volunteers around the world.  We always need more people to create, improve and translate lessons, contributing graphics and more!</p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-volunteer-button" >Start contributing</button>
+    </div>
     <div class="oppia-splash-section-six-left">
-      <img class="splash-books-image"
-           [src]="getStaticImageUrl('/splash/books_dsk.svg')"
-           width="500"
-           height="390"
-           loading="lazy"
-           alt="Illustration of a book">
-    </div>
-    <div class="oppia-splash-section-six-right" tabindex="0">
-      <h2 [innerHTML]="'I18N_SPLASH_FOR_TEACHERS' | translate"></h2>
-      <h3 [innerHTML]="'I18N_SPLASH_TEACHERS_TITLE' | translate"></h3>
-      <p [innerHTML]="'I18N_SPLASH_TEACHERS_CONTENT' | translate"></p>
-      <div class="oppia-splash-button-container">
-        <button type="submit"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_TEACHING' | translate"
-                (click)="onClickStartTeachingButton()">
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="oppia-splash-section-seven" [ngStyle]="{'background-image': 'getCommunityBackgroundUrl()'}">
-    <div class="oppia-splash-section-seven-image" *ngIf="isWindowNarrow">
-      <picture class="splash-vol-image">
+      <picture class="splash-volunteer-image">
         <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
         <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
         <img [src]="getStaticImageUrl('/splash/volunteer_section1x.png')"
-             width="400"
-             height="428"
-             loading="lazy"
              alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
-    <div class="oppia-splash-section-seven-left" tabindex="0">
-      <h2 [innerHTML]="'I18N_SPLASH_FOR_VOLUNTEERS' | translate"></h2>
-      <h3 [innerHTML]="'I18N_SPLASH_VOLUNTEERS_TITLE' | translate"></h3>
-      <p [innerHTML]="'I18N_SPLASH_VOLUNTEERS_CONTENT' | translate"></p>
-      <div class="oppia-splash-button-container">
-        <button type="submit"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200"
-                [innerHTML]="'I18N_SPLASH_START_CONTRIBUTING' | translate"
-                (click)="onClickStartContributingButton()">
-        </button>
-      </div>
-    </div>
-    <div class="oppia-splash-section-seven-right" *ngIf="!isWindowNarrow">
-      <picture class="splash-vol-image">
-        <source type="image/webp" [srcset]="getImageSet('/splash/volunteer_section', 'webp')">
-        <source type="image/png" [srcset]="getImageSet('/splash/volunteer_section', 'png')">
-        <img [src]="getStaticImageUrl('/splash/volunteer_section1x.png')"
-             width="400"
-             height="428"
-             loading="lazy"
-             alt="Logo of Oppia containing photos of contributors">
-      </picture>
-    </div>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-volunteer-button">Start contributing</button>
   </div>
 </div>
