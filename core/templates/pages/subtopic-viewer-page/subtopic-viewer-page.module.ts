@@ -19,7 +19,7 @@
 import {NgModule} from '@angular/core';
 import {HttpClientModule} from '@angular/common/http';
 import {RouterModule} from '@angular/router';
-import { ToastrModule } from 'ngx-toastr';
+import {ToastrModule} from 'ngx-toastr';
 
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {SubtopicViewerNavbarBreadcrumbComponent} from './navbar-breadcrumb/subtopic-viewer-navbar-breadcrumb.component';

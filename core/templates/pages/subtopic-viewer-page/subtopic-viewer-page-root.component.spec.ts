@@ -43,8 +43,8 @@ describe('AdminPageRootComponent', () => {
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.TITLE);
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.META);
   });
 });

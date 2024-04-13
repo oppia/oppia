@@ -22,7 +22,7 @@ import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page-root',
-  templateUrl: './subtopic-viewer-page-page-root.component.html',
+  templateUrl: './subtopic-viewer-page-root.component.html',
 })
 export class SubtopicViewerPageRootComponent extends BaseRootComponent {
   title: string = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.TITLE;

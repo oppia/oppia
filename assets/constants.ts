@@ -6586,7 +6586,7 @@ export default {
   "PAGES_REGISTERED_WITH_FRONTEND": {
     "ADMIN": {
       "ROUTE": "admin",
-      "TITLE": "Oppia Admin Panel",
+      "TITLE": "Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
