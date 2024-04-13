@@ -400,10 +400,12 @@ class BlogAuthorProfilePageAccessValidationHandler(
                 'User with given username is not a blog post author.'
             )
 
+
 class SubTopicViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """ Validates access to the Subtopic Viewer Page """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {

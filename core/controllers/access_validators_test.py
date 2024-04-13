@@ -25,6 +25,7 @@ from core.domain import classroom_config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
+from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
 from core.storage.blog import gae_models as blog_models
@@ -80,8 +81,9 @@ class ClassroomPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             (ACCESS_VALIDATION_HANDLER_PREFIX, 'not_valid'),
             expected_status_int=404)
 
+
 class SubtopicViewerPageAccessValidationHandlerTests(
-    test_utils.GenericEmailTestBase):
+    test_utils.GenericEmailTestBase, test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -93,10 +95,12 @@ class SubtopicViewerPageAccessValidationHandlerTests(
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        subtopic = test_utils.GenericTestBase.save_new_subtopic(
-            "s1", "o1", "t1")
-        test_utils.GenericTestBase.save_new_topic(
-            "t1", "o1", subtopics = [subtopic])
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            subtopic_id=1, title='1', url_frag='1'
+        )
+
+        self.save_new_topic(
+            topic_id='t1', owner_id='o1', subtopics=[subtopic])
 
         math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
@@ -118,7 +122,7 @@ class SubtopicViewerPageAccessValidationHandlerTests(
             {
                 'classroom_url_fragment': 'math',
                 'topic_url_fragment': 't1',
-                'subtopic_url_fragment': 's1'
+                'subtopic_url_fragment': '1'
             },
             expected_status_int=200
         )
@@ -134,7 +138,7 @@ class SubtopicViewerPageAccessValidationHandlerTests(
             },
             expected_status_int=404
         )
-        
+
     def test_failed_validation_on_length(self) -> None:
         self.get_html_response(
             '%s/can_access_subtopic_viewer_page?' %
@@ -142,10 +146,11 @@ class SubtopicViewerPageAccessValidationHandlerTests(
             {
                 'classroom_url_fragment': 'math',
                 'topic_url_fragment': 't1',
-                'subtopic_url_fragment': 'a'*100
+                'subtopic_url_fragment': 'a' * 100
             },
             expected_status_int=400
         )
+
 
 class CollectionViewerPageAccessValidationHandlerTests(
         test_utils.GenericTestBase):

@@ -7100,8 +7100,8 @@ export default {
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": []
     },
-    "SUBTOPIC_VIEWER" : {
-      "ROUTE" : "learn/:classroom_url_fragment/:topic_url_fragment/revision/:subtopic_url_fragment",
+    "SUBTOPIC_VIEWER": {
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/revision/:subtopic_url_fragment",
       "TITLE": "Oppia",
       "META": [
         {

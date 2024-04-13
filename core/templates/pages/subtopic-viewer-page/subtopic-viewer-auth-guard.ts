@@ -24,7 +24,6 @@ import {
   providedIn: 'root'
 })
 export class SubtopicViewerAuthGuard implements CanActivate {
-
     async canActivate(): Promise<boolean> {
     return true;
   }
