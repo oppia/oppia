@@ -1,7 +1,9 @@
 <div class="splash-page">
   <div class="oppia-splash-section-one" dir="auto">
     <div class="oppia-splash-section-one-header">
-      <h2 class="oppia-splash-title oppia-splash-indigo-text">Learn through story based-lessons!</h2>
+      <h2 class="oppia-splash-title oppia-splash-indigo-text"> 
+        {{ 'I18N_SPLASH_TITLE' | translate }} 
+      </h2>
     </div>
     <div class="oppia-splash-section-one-hero"> 
       <div class="oppia-splash-section-one-top">
@@ -12,17 +14,19 @@
                 [src]="getStaticImageUrl('/splash/matthew_fractions.svg')">
         </div>
         <div class="oppia-splash-section-one-top-left">
-          <p class="oppia-splash-section-one-top-text" >Oppia is a <b>free</b> educational platform that students can use to learn anything, anywhere.</p>
+          <p class="oppia-splash-section-one-top-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></p>
           <button type="submit" (click)="onClickBrowseLessonsButton()"
                   class="btn oppia-splash-button oppia-splash-learn-button oppia-transition-200">
-            Start Learning
+            {{ 'I18N_SPLASH_START_LEARNING' | translate }}
           </button>
           <button class="oppia-splash-button oppia-splash-top-account-button">
-            Create an account 
+            {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
           </button>
         </div>
       </div>
-      <h2 class="oppia-splash-title oppia-splash-orange-text">Learn more about Oppia!</h2>
+      <h2 class="oppia-splash-title oppia-splash-orange-text"> 
+        {{ 'I18N_SPLASH_LEARN_MORE_ABOUT_OPPIA' | translate }}  
+      </h2>
       <div class="oppia-splash-section-one-bottom">
         <div class="oppia-splash-section-one-card">
           <picture class="oppia-splash-section-one-card-img">
@@ -32,8 +36,10 @@
                  loading="lazy"
                  alt="Image of a sample exploraiton of Oppia">
           </picture>
-          <h2 class="oppia-splash-section-one-card-h2"> Fun and free </h2>
-          <p> Learn for free through playful characters and stories.</p>
+          <h2 class="oppia-splash-section-one-card-h2"> 
+            {{ 'I18N_SPLASH_FEATURE_ONE_TITLE' | translate }} 
+          </h2>
+          <p> {{ 'I18N_SPLASH_FEATURE_ONE_TEXT' | translate }} </p>
         </div>
         <div class="oppia-splash-section-one-card">
           <picture class="oppia-splash-section-one-card-img">
@@ -43,8 +49,10 @@
                  loading="lazy"
                  alt="Illustration of a school kid infront of laptop learning online">
           </picture>
-          <h2 class="oppia-splash-section-one-card-h2">Learn by yourself</h2>
-          <p>Understand why you answered incorrectly and get personalized feedback to find the right answer!</p>
+          <h2 class="oppia-splash-section-one-card-h2"> 
+            {{ 'I18N_SPLASH_FEATURE_TWO_TITLE' | translate }} 
+          </h2>
+          <p> {{ 'I18N_SPLASH_FEATURE_TWO_TEXT' | translate }} </p>
         </div>
         <div class="oppia-splash-section-one-card">
           <picture class="oppia-splash-section-one-card-img">
@@ -54,8 +62,10 @@
                  loading="lazy"
                  alt="Image of a brown color book">
           </picture>
-          <h2 class="oppia-splash-section-one-card-h2">Diversity of subject</h2>
-          <p>We offer hundreds of lessons in multiple topics.</p>
+          <h2 class="oppia-splash-section-one-card-h2"> 
+            {{ 'I18N_SPLASH_FEATURE_THREE_TITLE' | translate }} 
+          </h2>
+          <p> {{ 'I18N_SPLASH_FEATURE_THREE_TEXT' | translate }} </p>
         </div>
       </div>
     </div>
@@ -63,11 +73,13 @@
 
   <div class="oppia-splash-section-two">
     <h2 class="oppia-splash-title oppia-splash-section-two-title">
-      What Does Oppia have to offer?
+      {{ 'I18N_SPLASH_SECTION_TWO_TITLE' | translate }}
     </h2>
     <div class="oppia-splash-section-two-products">
       <div class="oppia-splash-section-two-product">
-        <h2 class="oppia-splash-h2 oppia-splash-classroom-h2">Oppia's Classroom</h2>
+        <h2 class="oppia-splash-h2 oppia-splash-classroom-h2"> 
+          {{ 'I18N_SPLASH_CLASSROOM_TITLE' | translate }} 
+        </h2>
         <picture class="oppia-splash-section-two-product-image">
           <source type="image/webp" [srcset]="getImageSet('/splash/classroomIllustration', 'webp')">
           <source type="image/png" [srcset]="getImageSet('/splash/classroomIllustration', 'png')">
@@ -77,13 +89,15 @@
                loading="lazy"
                alt="Image illustrating Mathematics classroom">
         </picture>
-        <p class="oppia-splash-text oppia-splash-section-three-text">Discover over 70 Math lessons in different languages, created by our team of educators!</p>
+        <p class="oppia-splash-text" [innerHTML]="'I18N_SPLASH_CLASSROOM_TEXT' | translate:{lessonCount: 70}"></p>
         <button class="oppia-splash-button oppia-splash-classroom-button">
-          Explore Oppia's Classroom
+          {{ 'I18N_SPLASH_CLASSROOM_BUTTON_TEXT' | translate }} 
         </button>
       </div>
       <div class="oppia-splash-section-two-product">
-        <h2 class="oppia-splash-h2 oppia-splash-orange-text">Community Lessons</h2>
+        <h2 class="oppia-splash-h2 oppia-splash-orange-text"> 
+          {{ 'I18N_SPLASH_LESSONS_TITLE' | translate }} 
+        </h2>
         <picture class="oppia-splash-section-two-product-image">
           <source type="image/webp" [srcset]="getImageSet('/splash/lessonsIllustration', 'webp')">
           <source type="image/png" [srcset]="getImageSet('/splash/lessonsIllustration', 'png')">
@@ -93,20 +107,25 @@
                 loading="lazy"
                 alt="Image illustrating playful lessons of Oppia">
         </picture>
-        <p class="oppia-splash-text">Dive into lessons of multiple subjects, created by volunteers all over the world in 50+ languages.</p>
+        <p class="oppia-splash-text" [innerHTML]="'I18N_SPLASH_LESSONS_TEXT' | translate:{languageCount: 50}"></p>
         <button class="oppia-splash-button oppia-splash-lessons-button">
-          Explore Community lessons
+          {{ 'I18N_SPLASH_LESSONS_BUTTON_TEXT' | translate }}
         </button>
       </div>
     </div>
   </div>
 
-
   <div class="oppia-splash-section-three">
     <div class="oppia-splash-section-three-left">
-      <h2 class="oppia-splash-title oppia-splash-indigo-text">Have your own account</h2>
-      <p class="oppia-splash-text oppia-splash-section-two-text">You don't need to register to start using Oppia, but having your account allows you to track your progress, save lessons, set goals, and master skills in your favorite subjects!</p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-account-button" >Create an account</button>
+      <h2 class="oppia-splash-title oppia-splash-indigo-text">
+        {{ 'I18N_SPLASH_STUDENTS_TITLE' | translate }}
+      </h2>
+      <p class="oppia-splash-text oppia-splash-section-two-text">
+        {{ 'I18N_SPLASH_STUDENTS_CONTENT' | translate }}
+      </p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-account-button">
+        {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
+      </button>
     </div>
     <div class="oppia-splash-section-three-right">
       <picture class="splash-student-desk-image">
@@ -119,14 +138,22 @@
              alt="Photo of a kid thinking about fractions">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-account-button" >Create an account</button>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-account-button">
+      {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
+    </button>
   </div>
 
   <div class="oppia-splash-section-four">
     <div class="oppia-splash-section-four-right">
-      <h2 class="oppia-splash-title oppia-splash-section-four-title">For Teachers</h2>
-      <p class="oppia-splash-text oppia-splash-section-four-text">Oppia provides students with access to a variety of lessons and different styles of learning to keep them engaged and interested. Through our Learner Groups feature you can assign lessons and follow your student's progress.</p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-teach-button" >Start teaching</button>
+      <h2 class="oppia-splash-title oppia-splash-section-four-title">
+        {{ 'I18N_SPLASH_FOR_TEACHERS' | translate }}
+      </h2>
+      <p class="oppia-splash-text oppia-splash-section-four-text">
+        {{ 'I18N_SPLASH_TEACHERS_CONTENT' | translate }}
+      </p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-teach-button">
+        {{ 'I18N_SPLASH_START_TEACHING' | translate }}
+      </button>
     </div>
     <div class="oppia-splash-section-four-left">
       <picture class="oppia-splash-teaching-image">
@@ -136,14 +163,22 @@
              alt="Photo of two kids and a tutor">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-teach-button">Start teaching</button>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-teach-button">
+      {{ 'I18N_SPLASH_START_TEACHING' | translate }}
+    </button>
   </div>
 
   <div class="oppia-splash-section-five">
     <div class="oppia-splash-section-five-left">
-      <h2 class="oppia-splash-title oppia-splash-section-five-title">For Parents</h2>
-      <p class="oppia-splash-text oppia-splash-section-two-text">Oppia is a free tool that makes learning fun through age-appropriate, ad-free lessons! You can also see your child's progress through our Learner Group feature.</p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-explore-button" >Start exploring</button>
+      <h2 class="oppia-splash-title oppia-splash-section-five-title">
+        {{ 'I18N_SPLASH_FOR_PARENTS' | translate }}
+      </h2>
+      <p class="oppia-splash-text oppia-splash-section-two-text">
+        {{ 'I18N_SPLASH_PARENTS_CONTENT' | translate }}
+      </p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-explore-button">
+        {{ 'I18N_SPLASH_START_EXPLORING' | translate }}
+      </button>
     </div>
     <div class="oppia-splash-section-five-right">
       <picture class="oppia-splash-students-image">
@@ -154,14 +189,22 @@
              alt="Image of school students in their school dress">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-explore-button" >Start exploring</button>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-explore-button">
+      {{ 'I18N_SPLASH_START_EXPLORING' | translate }}
+    </button>
   </div>
 
   <div class="oppia-splash-section-six">
     <div class="oppia-splash-section-six-right">
-      <h2 class="oppia-splash-title oppia-splash-section-six-title">For Volunteers</h2>
-      <p class="oppia-splash-text oppia-splash-section-six-text">Oppia is a non-profit project built by volunteers around the world.  We always need more people to create, improve and translate lessons, contributing graphics and more!</p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-volunteer-button" >Start contributing</button>
+      <h2 class="oppia-splash-title oppia-splash-section-six-title">
+        {{ 'I18N_SPLASH_FOR_VOLUNTEERS' | translate }}
+      </h2>
+      <p class="oppia-splash-text oppia-splash-section-six-text">
+        {{ 'I18N_SPLASH_VOLUNTEERS_CONTENT' | translate }}
+      </p>
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-volunteer-button">
+        {{ 'I18N_SPLASH_START_CONTRIBUTING' | translate }}
+      </button>
     </div>
     <div class="oppia-splash-section-six-left">
       <picture class="splash-volunteer-image">
@@ -171,6 +214,8 @@
              alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-volunteer-button">Start contributing</button>
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-volunteer-button">
+      {{ 'I18N_SPLASH_START_CONTRIBUTING' | translate }}
+    </button>
   </div>
 </div>
