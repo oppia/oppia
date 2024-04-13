@@ -19,10 +19,10 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 
-const DEFAULT_SPEC_TIMEOUT: number = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS: number =
+  testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRODUCTION_CARD_CONTENT: string =
   'Test exploration to question negative numbers';
-const NEW_CARD: string = '/';
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = ' Continue Button ',
   NUMERIC_INPUT = ' Number Input ',
@@ -30,9 +30,10 @@ enum INTERACTION_TYPES {
 }
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
-  TEST_QUESTION = 'Test Question ',
-  RECAP = 'Recap ',
+  TEST_QUESTION = 'Test Question',
+  FINAL_CARD = 'Final Card',
 }
+const cardNames = Object.values(CARD_NAME);
 
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
@@ -40,57 +41,59 @@ describe('Exploration Editor', function () {
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_creator@example.com'
+      'exploration_editor@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+    // Navigate to the creator dashboard and create a new exploration.
+    await explorationEditor.navigateToCreatorDashboard();
+    await explorationEditor.clickCreateExplorationButton();
+    await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+
+    // Add a new card with a question.
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard('Test Question');
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the new card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION, cardNames);
+    await explorationEditor.updateCardContent(
+      'Enter a negative number greater than -100.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMERIC_INPUT,
+      '-99',
+      'Prefect!',
+      'Final Card',
+      'correct'
+    );
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the final card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD, cardNames);
+    await explorationEditor.updateCardContent(
+      'We have practiced negative numbers.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    // Navigate back to the introduction card and save the draft.
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION, cardNames);
+    await explorationEditor.saveExplorationDraft();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to load, complete and restart an exploration preview',
     async function () {
-      // Navigate to the creator dashboard and create a new exploration.
-      await explorationEditor.navigateToCreatorDashboard();
-      await explorationEditor.createExploration();
-      await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
-      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-
-      // Add a new card with a question.
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.oppiaDirectlearnersTo(NEW_CARD);
-      await explorationEditor.nameNewCard('Test Question');
-      await explorationEditor.saveExplorationDraft();
-
-      // Navigate to the new card and update its content.
-      await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
-      await explorationEditor.updateCardContent(
-        'Enter a negative number greater than -100.'
-      );
-      await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-      await explorationEditor.addResponseToTheInteraction('-99');
-
-      // Add a final card with an 'End' interaction.
-      await explorationEditor.oppiaDirectlearnersTo(NEW_CARD);
-      await explorationEditor.nameNewCard('Recap');
-      await explorationEditor.saveExplorationDraft();
-
-      // Navigate to the final card and update its content.
-      await explorationEditor.navigateToCard(CARD_NAME.RECAP);
-      await explorationEditor.updateCardContent(
-        'We have practiced negative numbers.'
-      );
-      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-      // Navigate back to the introduction card and save the draft.
-      await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-      await explorationEditor.saveExplorationDraft();
-
       // Navigate to the preview tab and check the content of the first card.
       await explorationEditor.navigateToPreviewTab();
-      await explorationEditor.expectCardContentToBe(INTRODUCTION_CARD_CONTENT);
+      await explorationEditor.expectPreviewCardContentToBe(
+        CARD_NAME.INTRODUCTION,
+        INTRODUCTION_CARD_CONTENT
+      );
 
       // Continue to the next card, enter an answer, and submit it.
       await explorationEditor.continueToNextCard();
-      await explorationEditor.enterAnswer('-40');
-      await explorationEditor.submitAnswer();
+      await explorationEditor.submitAnswer('-40');
       await explorationEditor.continueToNextCard();
 
       // Check the completion message and restart the exploration.
@@ -98,9 +101,12 @@ describe('Exploration Editor', function () {
         'Congratulations for completing this lesson!'
       );
       await explorationEditor.restartPreview();
-      await explorationEditor.expectCardContentToBe(INTRODUCTION_CARD_CONTENT);
+      await explorationEditor.expectPreviewCardContentToBe(
+        CARD_NAME.INTRODUCTION,
+        INTRODUCTION_CARD_CONTENT
+      );
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {

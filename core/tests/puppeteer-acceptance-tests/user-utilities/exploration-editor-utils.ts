@@ -25,18 +25,18 @@ const previewTabButton = '.e2e-test-preview-tab';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 
 // Elements in exploration creator.
-const createExplorationButton = 'button.e2e-test-create-activity';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const stateEditSelector = 'div.e2e-test-state-edit-content';
-const stateContentInputField = 'div.oppia-rte';
-const saveContentButton = 'button.e2e-test-save-state-content';
-const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const saveInteractionButton = 'button.e2e-test-save-interaction';
-const saveChangesButton = 'button.e2e-test-save-changes';
-const saveDraftButton = 'button.e2e-test-save-draft-button';
+const createExplorationButton = '.e2e-test-create-activity';
+const dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
+const stateEditSelector = '.e2e-test-state-edit-content';
+const stateContentInputField = '.oppia-rte';
+const saveContentButton = '.e2e-test-save-state-content';
+const addInteractionButton = '.e2e-test-open-add-interaction-modal';
+const saveInteractionButton = '.e2e-test-save-interaction';
+const saveChangesButton = '.e2e-test-save-changes';
+const saveDraftButton = '.e2e-test-save-draft-button';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
-const floatFormInput = 'input.e2e-test-float-form-input';
+const floatFormInput = '.e2e-test-float-form-input';
 
 const stateNodeSelector = '.e2e-test-node';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
@@ -45,9 +45,8 @@ const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 const stateResponsesSelector = '.oppia-response-header';
 const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
-const resonseModalHeaderSelector = '.e2e-test-add-response-modal-header';
-const mobileStateGraphResizeButton =
-  '.e2e-test-oppia-mobile-graph-resize-button';
+const responseModalHeaderSelector = '.e2e-test-add-response-modal-header';
+const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
 const mobileNavbarDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
@@ -73,7 +72,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to create an exploration in the Exploration Editor.
    */
-  async createExploration(): Promise<void> {
+  async clickCreateExplorationButton(): Promise<void> {
     await this.clickOn(createExplorationButton);
     await this.clickOn(dismissWelcomeModalSelector);
   }
@@ -85,8 +84,6 @@ export class ExplorationEditor extends BaseUser {
   async updateCardContent(questionText: string): Promise<void> {
     await this.clickOn(stateEditSelector);
     await this.waitForElementToBeClickable(stateContentInputField);
-    await this.page.click(stateContentInputField, {clickCount: 3});
-    await this.page.keyboard.press('Backspace');
     await this.type(stateContentInputField, `${questionText}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
@@ -113,19 +110,12 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to select the card that learners will be directed to from the current card.
    */
-  async oppiaDirectlearnersTo(card: string): Promise<void> {
+  async directLearnersToNewCard(cardName: string): Promise<void> {
     await this.clickOn(openOutcomeDestButton);
     await this.waitForElementToBeClickable(destinationCardSelector);
-    await this.page.select(destinationCardSelector, card);
-  }
-
-  /**
-   * Function to name a new card in the exploration.
-   */
-  async nameNewCard(cardName: string): Promise<void> {
+    await this.page.select(destinationCardSelector, '/');
     await this.page.type(addStateInput, cardName);
-    await this.waitForElementToBeClickable(saveOutcomeDestButton);
-    await this.page.click(saveOutcomeDestButton);
+    await this.clickOn(saveOutcomeDestButton);
   }
 
   /**
@@ -138,56 +128,75 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(mobileOptionsButton);
       }
       await this.clickOn(mobileSaveChangesButton);
-      await this.clickOn(saveDraftButton);
-      await this.page.waitForNetworkIdle();
     } else {
       await this.clickOn(saveChangesButton);
-      await this.clickOn(saveDraftButton);
-      await this.page.waitForNetworkIdle();
     }
+    await this.clickOn(saveDraftButton);
+    await this.page.waitForNetworkIdle();
   }
 
   /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    */
-  async navigateToCard(cardName: string): Promise<void> {
-    if (cardName === 'Introduction' && this.isViewportAtMobileWidth()) {
+  async navigateToCard(cardName: string, cardNames: string[]): Promise<void> {
+    const cardIndex = cardNames.indexOf(cardName);
+    if (cardIndex === -1) {
+      throw new Error(`Card name ${cardName} not found in the graph.`);
+    }
+
+    if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileStateGraphResizeButton);
       await this.page.waitForSelector(mobileStateNodeSelector);
       const elements = await this.page.$$(mobileStateNodeSelector);
-      await elements[3].click();
-    } else if (cardName === 'Introduction') {
+      await elements[cardIndex + elements.length / 2].click();
+    } else {
       await this.page.waitForSelector(stateNodeSelector);
       const elements = await this.page.$$(stateNodeSelector);
-      await elements[0].click();
-    } else if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStateGraphResizeButton);
-      await this.page.waitForSelector(mobileStateNodeSelector);
-      const elements = await this.page.$$(mobileStateNodeSelector);
-      if (cardName === 'Test Question ') {
-        await elements[3].click();
-      } else {
-        await elements[5].click();
-      }
-      await this.page.waitForNetworkIdle({idleTime: 700});
-    } else {
-      await this.clickOn(cardName);
-      await this.page.waitForNetworkIdle({idleTime: 700});
+      await elements[cardIndex].click();
     }
+
+    await this.page.waitForNetworkIdle({idleTime: 700});
   }
 
   /**
    * Function to add responses to the interactions.
-   * @param {string} response - response to be added.
+   * @param {string} interactionType - The type of the interaction.
+   * @param {string} answer - The response to be added.
+   * @param {string} feedback - The feedback for the response.
+   * @param {string} destination - The destination state for the response.
+   * @param {string} correctness - Whether the response is marked as correct.
    */
-  async addResponseToTheInteraction(response: string): Promise<void> {
-    await this.type(floatFormInput, response);
+  async addResponsesToTheInteraction(
+    interactionType: string,
+    answer: string,
+    feedback: string,
+    destination: string,
+    correctness: string
+  ): Promise<void> {
+    switch (interactionType) {
+      case ' Number Input ':
+        await this.type(floatFormInput, answer);
+        break;
+      // Add cases for other interaction types here
+      // case 'otherInteractionType':
+      //   await this.type(otherFormInput, answer);
+      //   break;
+      default:
+        throw new Error(`Unsupported interaction type: ${interactionType}`);
+    }
+
     await this.clickOn(feedbackEditorSelector);
-    await this.type(stateContentInputField, 'Correct Answer, You got that!');
-    await this.clickOn(correctAnswerInTheGroupSelector);
+    await this.type(stateContentInputField, feedback);
+    await this.page.select(destinationCardSelector, '/');
+    await this.page.type(addStateInput, destination);
+    if (correctness === 'correct') {
+      await this.clickOn(correctAnswerInTheGroupSelector);
+    }
     await this.clickOn(addNewResponseButton);
-    await this.page.waitForSelector(resonseModalHeaderSelector, {hidden: true});
+    await this.page.waitForSelector(responseModalHeaderSelector, {
+      hidden: true,
+    });
   }
 
   /**
@@ -198,11 +207,10 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobilePreviewTabButton);
-      await this.page.waitForNavigation();
     } else {
       await this.clickOn(previewTabButton);
-      await this.page.waitForNavigation();
     }
+    await this.page.waitForNavigation();
   }
 
   /**
@@ -210,24 +218,24 @@ export class ExplorationEditor extends BaseUser {
    * the preview tab or not via checking the content of the Introduction(first) card.
    * @param {string} text - The expected introduction card text.
    */
-  async expectCardContentToBe(text: string): Promise<void> {
+  async expectPreviewCardContentToBe(
+    cardName: string,
+    text: string
+  ): Promise<void> {
     await this.page.waitForSelector(stateConversationContent, {
       visible: true,
     });
     const element = await this.page.$(stateConversationContent);
-    const introMessage = await this.page.evaluate(
+    const cardContent = await this.page.evaluate(
       element => element.textContent,
       element
     );
-    if (introMessage === text) {
-      showMessage(
-        'Preview is on the Introduction card and is loading correctly.'
-      );
-    } else {
+    if (cardContent !== text) {
       throw new Error(
-        'Preview is not on the Introduction card or is not loading correctly.'
+        `Preview is not on the ${cardName} card or is not loading correctly.`
       );
     }
+    showMessage(`Preview is on the ${cardName} card and is loading correctly.`);
   }
 
   /**
@@ -237,12 +245,44 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(nextCardButton);
   }
 
-  async enterAnswer(answer: string): Promise<void> {
-    await this.type(floatFormInput, answer);
+  /**
+   * Function to submit an answer to a form input field.
+   *
+   * This function first determines the type of the input field in the DOM using the getInputType function.
+   * If the type is 'text', 'number', or 'float', it types the answer into the input field.
+   * If the type is anything else, it throws an error.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitAnswer(answer: string): Promise<void> {
+    await this.waitForElementToBeClickable(floatFormInput);
+    const inputType = await this.getInputType(floatFormInput);
+
+    switch (inputType) {
+      case 'text':
+      case 'number':
+      case 'float':
+        await this.type(floatFormInput, answer);
+        break;
+      default:
+        throw new Error(`Unsupported input type: ${inputType}`);
+    }
+
+    await this.clickOn(submitAnswerButton);
   }
 
-  async submitAnswer(): Promise<void> {
-    await this.clickOn(submitAnswerButton);
+  /**
+   * Function to Get the type of an input field in the DOM.
+   * @param {string} selector - The CSS selector for the input field.
+   */
+  async getInputType(selector: string): Promise<string> {
+    const inputField = await this.page.$(selector);
+    if (!inputField) {
+      throw new Error(`Input field not found for selector: ${selector}`);
+    }
+    const inputType = (await (
+      await inputField.getProperty('type')
+    ).jsonValue()) as string;
+    return inputType;
   }
 
   /**
@@ -258,11 +298,10 @@ export class ExplorationEditor extends BaseUser {
       element => element.textContent,
       element
     );
-    if (toastMessage && toastMessage.includes(message)) {
-      showMessage('Exploration has completed successfully');
-    } else {
+    if (!toastMessage || !toastMessage.includes(message)) {
       throw new Error('Exploration did not complete successfully');
     }
+    showMessage('Exploration has completed successfully');
     await this.page.waitForSelector(explorationCompletionToastMessage, {
       hidden: true,
     });
@@ -273,14 +312,14 @@ export class ExplorationEditor extends BaseUser {
    */
   async restartPreview(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      // If the mobile navigation bar is expanded, it can overlap with the restart button,
+      // making it unclickable. So, we check for its presence and collapse it.
       const element = await this.page.$(mobileNavbarOptions);
       if (element) {
         await this.clickOn(mobileOptionsButton);
       }
-      await this.clickOn(previewRestartButton);
-    } else {
-      await this.clickOn(previewRestartButton);
     }
+    await this.clickOn(previewRestartButton);
   }
 }
 
