@@ -1377,7 +1377,7 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400)
 
         self.assertIn(
-            'Missing key in handler args: target_language_code.'
+            'Missing key in handler args: target_language_code.',
             output['error'],
         )
 
