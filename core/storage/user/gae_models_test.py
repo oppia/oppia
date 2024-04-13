@@ -2608,7 +2608,7 @@ class UserGroupModelTests(test_utils.GenericTestBase):
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
             user_models.UserGroupModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
@@ -2620,9 +2620,7 @@ class UserGroupModelTests(test_utils.GenericTestBase):
             user_models.UserGroupModel.get_export_policy(), {
                 'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'users': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'id':
-                    base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT,
+                'users': base_models.EXPORT_POLICY.EXPORTED,
                 'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE
             }
         )

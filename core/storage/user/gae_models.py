@@ -2384,15 +2384,18 @@ class UserGroupModel(base_models.BaseModel):
     ID for this model is the name of the user-group.
     """
 
+    # We use the model id as a key in the Takeout dict.
+    ID_IS_USED_AS_TAKEOUT_KEY: Literal[True] = True
+
     # The user ids of the users.
     users = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model contains data to delete corresponding to a user:
-        user present in users field.
+        """Model contains data corresponding to a user: user present
+        in the 'users' field.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @staticmethod
     def get_model_association_to_user(
@@ -2406,8 +2409,7 @@ class UserGroupModel(base_models.BaseModel):
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model contains data to export corresponding to a user."""
         return dict(super(cls, cls).get_export_policy(), **{
-            'users': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'id': base_models.EXPORT_POLICY.EXPORTED_AS_KEY_FOR_TAKEOUT_DICT
+            'users': base_models.EXPORT_POLICY.EXPORTED
         })
 
     @classmethod
