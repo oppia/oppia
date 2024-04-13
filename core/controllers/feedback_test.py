@@ -537,11 +537,9 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 'updated_status': None
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: text.',
             response['error'],
-            'At \'http://localhost/threadhandler/exploration.exp_id.'
-            'WzE3MTI2MTY5NjUzOTBdWzY1NjFd\' these errors are happening:\n'
-            'Missing key in handler args: text.'
         )
 
         self.logout()
