@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Deletion Jobs for edit state content suggestion models"""
+"""Deletion Jobs for edit state content suggestion models."""
 
 from __future__ import annotations
 
@@ -58,9 +58,7 @@ class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type: ig
                 beam.Filter(
                     lambda model: ((
                         model.suggestion_type == (
-                            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)) and (
-                                model.target_type == (
-                                    feconf.ENTITY_TYPE_EXPLORATION)))
+                            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)))
                 ))
         )
 
@@ -72,8 +70,8 @@ class GetDeprecatedSuggestionEditStateContentModels(beam.PTransform): # type: ig
         )
 
         return (
-                suggestion_edit_state_content_model_to_delete,
-                suggestion_edit_state_content_model_to_delete_count,
+            suggestion_edit_state_content_model_to_delete,
+            suggestion_edit_state_content_model_to_delete_count,
         )
 
 
@@ -92,19 +90,12 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
         )
 
         unused_models_deletion = (
-            (
-                suggestion_edit_state_content_model_to_delete
-            )
+            suggestion_edit_state_content_model_to_delete
             | 'Extract keys' >> beam.Map(lambda model: model.key)
             | 'Delete models' >> ndb_io.DeleteModels()
         )
 
-        return (
-            (
-                suggestion_edit_state_content_model_to_delete_result,
-            )
-            | 'Merge results' >> beam.Flatten()
-        )
+        return suggestion_edit_state_content_model_to_delete_result
 
 
 class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(

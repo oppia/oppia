@@ -56,7 +56,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             final_reviewer_id: str,
             language_code: None | str
             ) -> suggestion_model:
-        """creates new suggestion.
+        """Creates new suggestion.
 
         Args:
             suggestion_type: str. Type of the suggestion that is being
@@ -149,17 +149,14 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(
-            len(suggestion_model.query_suggestions(
-                queries)), 2)
+            len(suggestion_model.query_suggestions(queries)), 2)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')
-        ])
+                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')])
 
         self.assertEqual(
-            len(suggestion_model.query_suggestions(
-                queries)), 0)
+            len(suggestion_model.query_suggestions(queries)), 0)
 
 
 class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
@@ -180,7 +177,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             final_reviewer_id: str,
             language_code: None | str
             ) -> suggestion_model:
-        """creates new suggestion.
+        """Creates new suggestion.
 
         Args:
             suggestion_type: str. Type of the suggestion that is being
@@ -196,7 +193,7 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
         Returns:
             GeneralSuggestionModel. Returns newly created
             GeneralSuggestionModel.
-            """
+        """
 
         return self.create_model(
             suggestion_model,
@@ -273,14 +270,11 @@ class AuditDeleteDeprecatedSuggestionEditStateContentModelsJobTests(
             feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
 
         self.assertEqual(
-            len(suggestion_model.query_suggestions(
-                queries)), 2)
+            len(suggestion_model.query_suggestions(queries)), 2)
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')
-        ])
+                stdout='EDIT STATE CONTENT SUGGESTION SUCCESS: 2')])
 
         self.assertEqual(
-            len(suggestion_model.query_suggestions(
-                queries)), 2)
+            len(suggestion_model.query_suggestions(queries)), 2)
