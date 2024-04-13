@@ -195,7 +195,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/threadlisthandler/0\ '
+            'At \'http://localhost/threadlisthandler/0\' '
             'these errors are happening:\n'
             'Missing key in handler args: text.'
         )
