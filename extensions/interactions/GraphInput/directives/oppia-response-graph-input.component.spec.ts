@@ -138,18 +138,18 @@ describe('ResponseGraphInput', () => {
     expect(component.getEdgeCenter(0)).toEqual({x: 175, y: 50});
   });
 
-  it('should return svg border', ()=>{
+  it('should return svg border', () => {
     const svgElement = fixture.nativeElement.querySelector('svg');
     expect(svgElement).toBeTruthy();
 
     const rectElement = svgElement.querySelector(
       'rect[x="0"]' +
-      '[y="0"]' +
-      '[width="100%"]' +
-      '[height="100%"]' +
-      '[fill="none"]' +
-      '[stroke="black"]' +
-      '[stroke-width="2"]'
+        '[y="0"]' +
+        '[width="100%"]' +
+        '[height="100%"]' +
+        '[fill="none"]' +
+        '[stroke="black"]' +
+        '[stroke-width="2"]'
     );
     expect(rectElement).toBeTruthy();
   });
