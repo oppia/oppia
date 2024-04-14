@@ -243,7 +243,7 @@ export class BaseUser {
   /**
    * The function coordinates user interactions with the selected modal.
    */
-  async withinModal({
+  async doWithinModal({
     selector,
     beforeOpened = async (_this, container) => {
       await _this.page.waitForSelector(container, {visible: true});
