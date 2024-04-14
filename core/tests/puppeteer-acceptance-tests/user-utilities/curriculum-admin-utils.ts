@@ -83,7 +83,7 @@ const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 
 const topicsTab = 'a.e2e-test-topics-tab';
-const topic = 'a.e2e-test-topic-name';
+const desktopTopicSelector = 'a.e2e-test-topic-name';
 const addTopicButton = 'button.e2e-test-create-topic-button';
 const topicNameField = 'input.e2e-test-new-topic-name-field';
 const topicUrlFragmentField = 'input.e2e-test-new-topic-url-fragment-field';
@@ -105,14 +105,14 @@ const subtopicReassignHeader = '.subtopic-reassign-header';
 const assignSubtopicButton = '.e2e-test-assign-subtopic';
 
 const skillsTab = 'a.e2e-test-skills-tab';
-const skill = 'a.e2e-test-open-skill-editor';
+const desktopSkillSelector = '.e2e-test-skill-description';
 const skillDescriptionField = 'input.e2e-test-new-skill-description-field';
 const skillReviewMaterialHeader = 'div.e2e-test-open-concept-card';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const confirmSkillCreationButton =
   'button.e2e-test-confirm-skill-creation-button';
 
-const assignSkillButton = 'i.e2e-test-skill-item-edit-btn';
+const editSkillItemSelector = 'i.e2e-test-skill-item-edit-btn';
 const confirmSkillAssignationButton =
   'button.e2e-test-skill-assign-subtopic-confirm';
 
@@ -147,7 +147,7 @@ const mobileSaveChangesDropdown = '.e2e-test-mobile-changes-dropdown';
 const mobilePublishButton = '.e2e-test-mobile-publish-button';
 
 const mobileTopicSelector = '.e2e-test-mobile-topic-name';
-const mobileSkillsTab = '.e2e-test-mobile-skills-tab';
+const mobileSkillSelector = '.e2e-test-mobile-skills-tab';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
@@ -169,12 +169,13 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating a skill in the topics and skills dashboard.
-   * We need to generate at least 3 questions for the skill as a
-   * pre-requisite for publishing the topic later.
+   * Function to create a skill for a particular topic.
    */
-  async createSkill(description: string, questionCount: number): Promise<void> {
-    await this.openTopicEditor();
+  async createSkillForTopic(
+    description: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
@@ -192,18 +193,19 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.clickOn(confirmSkillCreationButton);
     await this.page.bringToFront();
+  }
 
+  async createQuestionsForSkill(skillName: string, questionCount: number) {
     for (let i = 0; i < questionCount; i++) {
-      await this.createQuestion();
+      await this.addBasicAlgebraQuestion(skillName);
     }
-    await this.assignSkillToSubtopic();
   }
 
   /**
-   * Function for creating a question in the skill editor page.
+   * Function for creating a basic algebra question in the skill editor page.
    */
-  async createQuestion(): Promise<void> {
-    await this.openSkillEditor();
+  async addBasicAlgebraQuestion(skillName: string): Promise<void> {
+    await this.openSkillEditor(skillName);
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
@@ -264,7 +266,11 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating an exploration as a curriculum admin.
    */
-  async createExploration(state: string, title: string): Promise<string> {
+  async createExploration(
+    title: string,
+    initialContentText: string
+  ): Promise<string> {
+    await this.navigateToCreatorDashboardPage();
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
       `${dismissWelcomeModalSelector}:not([disabled])`
@@ -275,7 +281,7 @@ export class CurriculumAdmin extends BaseUser {
     });
     await this.clickOn(textStateEditSelector);
     await this.page.keyboard.press('Tab');
-    await this.type(richTextAreaField, state);
+    await this.type(richTextAreaField, initialContentText);
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
@@ -325,6 +331,7 @@ export class CurriculumAdmin extends BaseUser {
    * Function for creating a topic in the topics-and-skills dashboard.
    */
   async createTopic(name: string, urlFragment: string): Promise<void> {
+    await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(addTopicButton);
     await this.type(topicNameField, name);
     await this.type(topicUrlFragmentField, urlFragment);
@@ -350,42 +357,78 @@ export class CurriculumAdmin extends BaseUser {
     const newTab = await target.page();
     await newTab?.close();
 
-    await this.openTopicEditor();
+    await this.openTopicEditor(name);
     await this.page.waitForSelector(topicMetaTagInput);
     await this.page.focus(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, 'meta');
     await this.page.keyboard.press('Tab');
-    await this.saveTopicDraft();
+    await this.saveTopicDraft(name);
   }
 
   /**
    * Function that opens the topic editor page for the topic created.
    */
-  async openTopicEditor(): Promise<void> {
+  async openTopicEditor(topicName: string): Promise<void> {
+    const topicSelector = this.isViewportAtMobileWidth()
+      ? mobileTopicSelector
+      : desktopTopicSelector;
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(topicsTab);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileTopicSelector);
-    } else {
-      await this.clickOn(topic);
-    }
+    await this.page.waitForSelector(topicSelector, {visible: true});
+
+    await Promise.all([
+      this.page.evaluate(
+        (topicSelector, topicName) => {
+          const topics = Array.from(document.querySelectorAll(topicSelector));
+          const element = topics.find(
+            element => element?.textContent.trim() === topicName
+          ) as HTMLElement;
+          if (element) {
+            element.click();
+          } else {
+            throw new Error('Cannot open topic editor page.');
+          }
+        },
+        topicSelector,
+        topicName
+      ),
+      this.page.waitForNavigation(),
+    ]);
   }
 
   /**
    * Function that opens the skill editor page for the topic created.
    */
-  async openSkillEditor(): Promise<void> {
+  async openSkillEditor(skillName: string): Promise<void> {
+    const skillSelector = this.isViewportAtMobileWidth()
+      ? mobileSkillSelector
+      : desktopSkillSelector;
     await this.page.bringToFront();
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(skillsTab);
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileSkillsTab);
-    } else {
-      await this.clickOn(skill);
-    }
+    await this.page.waitForSelector(skillSelector, {visible: true});
+
+    await Promise.all([
+      this.page.evaluate(
+        (skillSelector, skillName) => {
+          const skills = Array.from(document.querySelectorAll(skillSelector));
+          const element = skills.find(
+            element => element?.textContent.trim() === skillName
+          ) as HTMLElement;
+          if (element) {
+            element.click();
+          } else {
+            throw new Error('Cannot open skill editor page.');
+          }
+        },
+        skillSelector,
+        skillName
+      ),
+      this.page.waitForNavigation(),
+    ]);
   }
 
-  async saveTopicDraft(): Promise<void> {
+  async saveTopicDraft(topicName: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
@@ -404,7 +447,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.waitForSelector('oppia-topic-editor-save-modal', {
         hidden: true,
       });
-      await this.openTopicEditor();
+      await this.openTopicEditor(topicName);
     } else {
       await this.clickOn(saveTopicButton);
       await this.page.waitForSelector(modalDiv, {visible: true});
@@ -416,8 +459,12 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating a subtopic as a curriculum admin.
    */
-  async createSubtopic(title: string, urlFragment: string): Promise<void> {
-    await this.openTopicEditor();
+  async createSubtopicForTopic(
+    title: string,
+    urlFragment: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
@@ -440,30 +487,78 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createSubtopicButton);
-    await this.saveTopicDraft();
+    await this.saveTopicDraft(topicName);
   }
 
   /**
    * Function for assigning a skill to a subtopic in the topic editor page.
    */
-  async assignSkillToSubtopic(): Promise<void> {
-    await this.openTopicEditor();
+  async assignSkillToSubtopicInTopicEditor(
+    skillName: string,
+    subtopicName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
-    await this.clickOn(assignSkillButton);
+
+    await this.page.evaluate(
+      (skillName, topicName, editSkillItemSelector) => {
+        const skillItemDivs = Array.from(
+          document.querySelectorAll('div.e2e-test-skill-item')
+        );
+        const element = skillItemDivs.find(
+          element => element.textContent?.trim() === skillName
+        ) as HTMLElement;
+        if (element) {
+          const assignSkillButton = element.querySelector(
+            editSkillItemSelector
+          ) as HTMLElement;
+          assignSkillButton.click();
+        } else {
+          throw new Error(
+            `Cannot find skill called "${skillName}" in ${topicName}.`
+          );
+        }
+      },
+      skillName,
+      topicName,
+      editSkillItemSelector
+    );
+
     await this.page.waitForSelector(assignSubtopicButton, {
       visible: true,
     });
     await this.clickOn('Assign to Subtopic');
+
     await this.page.waitForSelector(subtopicNameSelector, {visible: true});
-    await this.clickOn(subtopicNameSelector);
+    await this.page.evaluate(
+      (subtopicName, subtopicNameSelector) => {
+        const subtopicDivs = Array.from(
+          document.querySelectorAll(subtopicNameSelector)
+        );
+        const element = subtopicDivs.find(
+          element => element.textContent?.trim() === subtopicName
+        ) as HTMLElement;
+        if (element) {
+          element.click();
+        } else {
+          throw new Error(
+            `Cannot find subtopic called "${subtopicName}" to assign to skill.`
+          );
+        }
+      },
+      subtopicName,
+      subtopicNameSelector
+    );
+
     await this.page.waitForSelector(
       `${confirmSkillAssignationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillAssignationButton);
     await this.page.waitForSelector(modalDiv, {hidden: true});
-    await this.saveTopicDraft();
+    await this.saveTopicDraft(topicName);
   }
 
   /**
@@ -471,9 +566,10 @@ export class CurriculumAdmin extends BaseUser {
    * Adding a skill to diagnostic tests is necessary for publishing the topic.
    */
   async addDiagnosticTestSkillAndPublishTopic(
-    skillDescription: string
+    skillName: string,
+    topicName: string
   ): Promise<void> {
-    await this.openTopicEditor();
+    await this.openTopicEditor(topicName);
     await this.clickOn(addDiagnosticTestSkillButton);
     await this.page.waitForSelector(diagnosticTestSkillSelector, {
       visible: true,
@@ -506,11 +602,11 @@ export class CurriculumAdmin extends BaseUser {
         const event = new Event('change', {bubbles: true});
         selectElem.dispatchEvent(event);
       },
-      skillDescription,
+      skillName,
       diagnosticTestSkillSelector
     );
 
-    await this.saveTopicDraft();
+    await this.saveTopicDraft(topicName);
 
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
@@ -535,9 +631,10 @@ export class CurriculumAdmin extends BaseUser {
   async createAndPublishStoryWithChapter(
     storyTitle: string,
     storyUrlFragment: string,
-    explorationId: string
+    explorationId: string,
+    topicName: string
   ): Promise<void> {
-    await this.openTopicEditor();
+    await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileStoryDropdown);
     }
