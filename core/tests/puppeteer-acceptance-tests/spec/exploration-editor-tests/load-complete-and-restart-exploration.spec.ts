@@ -22,11 +22,11 @@ import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRODUCTION_CARD_CONTENT: string =
-  'Test exploration to question negative numbers';
+  'This exploration will test your understanding of negative numbers.';
 enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = ' Continue Button ',
-  NUMERIC_INPUT = ' Number Input ',
-  END_EXPLORATION = ' End Exploration ',
+  CONTINUE_BUTTON = 'Continue Button',
+  NUMERIC_INPUT = 'Number Input',
+  END_EXPLORATION = 'End Exploration',
 }
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',

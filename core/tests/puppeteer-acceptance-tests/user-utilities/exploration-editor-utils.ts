@@ -43,7 +43,7 @@ const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
 const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
-const stateResponsesSelector = '.oppia-response-header';
+const stateResponsesSelector = '.e2e-test-default-response-tab';
 const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
 const responseModalHeaderSelector = '.e2e-test-add-response-modal-header';
 const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
@@ -70,7 +70,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to create an exploration in the Exploration Editor.
+   * Function to click on the 'Create Exploration' button.
    */
   async clickCreateExplorationButton(): Promise<void> {
     await this.clickOn(createExplorationButton);
@@ -79,12 +79,12 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to add content to a card.
-   * @param {string} questionText - The content to be added to the card.
+   * @param {string} text - The content to be added to the card.
    */
-  async updateCardContent(questionText: string): Promise<void> {
+  async updateCardContent(text: string): Promise<void> {
     await this.clickOn(stateEditSelector);
     await this.waitForElementToBeClickable(stateContentInputField);
-    await this.type(stateContentInputField, `${questionText}`);
+    await this.type(stateContentInputField, `${text}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
   }
@@ -92,29 +92,32 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
+   * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(interactionToAdd: string): Promise<void> {
     await this.clickOn(addInteractionButton);
-    await this.clickOn(interactionToAdd);
+    await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(saveInteractionButton, {hidden: true});
   }
 
   /**
    * Function to display the Oppia responses section.
    */
   async viewOppiaResponses(): Promise<void> {
-    await this.page.waitForSelector(stateResponsesSelector, {visible: true});
-    await this.page.click(stateResponsesSelector);
+    await this.clickOn(stateResponsesSelector);
   }
 
   /**
    * Function to select the card that learners will be directed to from the current card.
+   * @param {string} cardName - The name of the card to which learners will be directed.
    */
   async directLearnersToNewCard(cardName: string): Promise<void> {
     await this.clickOn(openOutcomeDestButton);
     await this.waitForElementToBeClickable(destinationCardSelector);
-    await this.page.select(destinationCardSelector, '/');
-    await this.page.type(addStateInput, cardName);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, cardName);
     await this.clickOn(saveOutcomeDestButton);
   }
 
@@ -138,6 +141,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
+   * @param {string[]} cardNames - An array of all card names in the exploration.
    */
   async navigateToCard(cardName: string, cardNames: string[]): Promise<void> {
     const cardIndex = cardNames.indexOf(cardName);
@@ -160,7 +164,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to add responses to the interactions.
+   * Function to add responses to the interactions. Currently, it only handles 'Number Input' interaction type.
    * @param {string} interactionType - The type of the interaction.
    * @param {string} answer - The response to be added.
    * @param {string} feedback - The feedback for the response.
@@ -175,7 +179,7 @@ export class ExplorationEditor extends BaseUser {
     correctness: string
   ): Promise<void> {
     switch (interactionType) {
-      case ' Number Input ':
+      case 'Number Input':
         await this.type(floatFormInput, answer);
         break;
       // Add cases for other interaction types here
@@ -188,8 +192,9 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
-    await this.page.select(destinationCardSelector, '/');
-    await this.page.type(addStateInput, destination);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
+    await this.select(destinationCardSelector, '/');
+    await this.type(addStateInput, destination);
     if (correctness === 'correct') {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
@@ -214,9 +219,9 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to verify if the exploration is loading correctly in
-   * the preview tab or not via checking the content of the Introduction(first) card.
-   * @param {string} text - The expected introduction card text.
+   * Function to verify if the preview is on a particular card by checking the content of the card.
+   * @param {string} cardName - The name of the card to check.
+   * @param {string} text - The expected text content of the card.
    */
   async expectPreviewCardContentToBe(
     cardName: string,
@@ -239,7 +244,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Functions to complete the exploration in the preview tab.
+   * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {
     await this.clickOn(nextCardButton);
@@ -249,8 +254,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to submit an answer to a form input field.
    *
    * This function first determines the type of the input field in the DOM using the getInputType function.
-   * If the type is 'text', 'number', or 'float', it types the answer into the input field.
-   * If the type is anything else, it throws an error.
+   * Currently, it only supports 'text', 'number', and 'float' input types. If the input type is anything else, it throws an error.
    * @param {string} answer - The answer to submit.
    */
   async submitAnswer(answer: string): Promise<void> {
