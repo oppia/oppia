@@ -23,7 +23,6 @@ export const AboutPageConstants = {
   // updated in update_changelog_and_credits.py file. If the patterns do
   // not match, update_changelog_and_credits_test will fail.
   CREDITS_CONSTANTS: [
-    "Eric L'Heureux",
     'Aadya Mishra',
     'Aakanksha Bhende',
     'Aakash Jakhmola',
@@ -202,6 +201,7 @@ export const AboutPageConstants = {
     'Elizabeth Kemp',
     'Emil Brynielsson',
     'Emily Glue',
+    "Eric L'Heureux",
     'Eric Lou',
     'Eric Yang',
     'Eshaan Aggarwal',
@@ -217,8 +217,8 @@ export const AboutPageConstants = {
     'Gabriel Fuentes',
     'Gagan Suneja',
     'Gangavarapu Praneeth',
+    'Gautam Suri',
     'Gautam Verma',
-    'Gautam',
     'Geet Choudhary',
     'Geo Jolly',
     'Gopi Vaibhav',
@@ -288,7 +288,7 @@ export const AboutPageConstants = {
     'Jian Fu',
     'Jiazhi Chen',
     'Jim Zhan',
-    'joaomanita',
+    'Joao Manuel Carvalho Manita',
     'Joel Lau',
     'Jogendra Singh',
     'John Glennon',
@@ -362,7 +362,7 @@ export const AboutPageConstants = {
     'Luis Ulloa',
     'Luiz D. M. Mainart',
     'Lunrong Chen',
-    'LuyaoJ',
+    'Luyao Jin',
     'Madhav Sainanee',
     'Madhavaram Rishitha',
     'Madiyar Aitbayev',
