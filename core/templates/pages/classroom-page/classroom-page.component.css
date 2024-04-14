@@ -107,6 +107,7 @@
 .oppia-classroom-page-guidance-tile {
   border: 1px solid;
   border-radius: 10px;
+  margin: 10px;
   padding: 20px;
 }
 .oppia-classroom-page-tile-button-text {

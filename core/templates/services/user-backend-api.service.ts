@@ -16,31 +16,31 @@
  * @fileoverview Service for user data.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { UserInfo, UserInfoBackendDict } from 'domain/user/user-info.model';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {UserInfo, UserInfoBackendDict} from 'domain/user/user-info.model';
 
 export interface SubscriptionSummary {
-  'creator_username': string;
-  'creator_impact': number;
+  creator_username: string;
+  creator_impact: number;
 }
 
 export interface EmailPreferencesBackendDict {
-  'can_receive_email_updates': boolean;
-  'can_receive_editor_role_email': boolean;
-  'can_receive_feedback_message_email': boolean;
-  'can_receive_subscription_email': boolean;
+  can_receive_email_updates: boolean;
+  can_receive_editor_role_email: boolean;
+  can_receive_feedback_message_email: boolean;
+  can_receive_subscription_email: boolean;
 }
 
 interface NonEmailPreferencesBackendDict {
-  'preferred_language_codes': string[];
-  'preferred_site_language_code': string;
-  'preferred_audio_language_code': string;
-  'default_dashboard': string;
-  'user_bio': string;
-  'subject_interests': string;
-  'subscription_list': SubscriptionSummary[];
+  preferred_language_codes: string[];
+  preferred_site_language_code: string;
+  preferred_audio_language_code: string;
+  default_dashboard: string;
+  user_bio: string;
+  subject_interests: string;
+  subscription_list: SubscriptionSummary[];
 }
 
 // The following type is an intersection of EmailPreferencesBackendDict
@@ -51,96 +51,127 @@ interface NonEmailPreferencesBackendDict {
 // are the same in both the interfaces whereas the former includes all the
 // properties from both the interfaces. For more information, check
 // https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html#intersection-types
-export type PreferencesBackendDict = (
-  NonEmailPreferencesBackendDict &
-  EmailPreferencesBackendDict
-);
+export type PreferencesBackendDict = NonEmailPreferencesBackendDict &
+  EmailPreferencesBackendDict;
 
 export interface UpdatePreferencesResponse {
-  'bulk_email_signup_message_should_be_shown': boolean;
+  bulk_email_signup_message_should_be_shown: boolean;
 }
 
 interface LoginUrlResponseDict {
-  'login_url': string;
+  login_url: string;
+}
+
+export type BackendPreferenceUpdateType =
+  | 'profile_picture_data_url'
+  | 'user_bio'
+  | 'subject_interests'
+  | 'default_dashboard'
+  | 'preferred_language_codes'
+  | 'preferred_site_language_code'
+  | 'preferred_audio_language_code'
+  | 'email_preferences';
+
+type DataType<UpdateType extends BackendPreferenceUpdateType> =
+  UpdateType extends 'email_preferences'
+    ? EmailPreferencesBackendDict
+    : UpdateType extends 'preferred_language_codes'
+      ? string[]
+      : string;
+
+export interface UpdatePreferenceDict {
+  update_type: BackendPreferenceUpdateType;
+  data: DataType<BackendPreferenceUpdateType>;
 }
 
 export interface UserContributionRightsDataBackendDict {
-  'can_review_translation_for_language_codes': string[];
-  'can_review_voiceover_for_language_codes': string[];
-  'can_review_questions': boolean;
-  'can_suggest_questions': boolean;
+  can_review_translation_for_language_codes: string[];
+  can_review_voiceover_for_language_codes: string[];
+  can_review_questions: boolean;
+  can_suggest_questions: boolean;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserBackendApiService {
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
   private USER_INFO_URL = '/userinfohandler';
   private PREFERENCES_DATA_URL = '/preferenceshandler/data';
-  private USER_CONTRIBUTION_RIGHTS_DATA_URL = (
-    '/usercontributionrightsdatahandler');
+  private USER_CONTRIBUTION_RIGHTS_DATA_URL =
+    '/usercontributionrightsdatahandler';
 
   private SITE_LANGUAGE_URL = '/save_site_language';
 
   async getUserInfoAsync(): Promise<UserInfo> {
-    return this.http.get<UserInfoBackendDict>(
-      this.USER_INFO_URL).toPromise().then(
-      (backendDict) => {
-        return backendDict.user_is_logged_in ? UserInfo.createFromBackendDict(
-          backendDict) : UserInfo.createDefault();
+    return this.http
+      .get<UserInfoBackendDict>(this.USER_INFO_URL)
+      .toPromise()
+      .then(backendDict => {
+        return backendDict.user_is_logged_in
+          ? UserInfo.createFromBackendDict(backendDict)
+          : UserInfo.createDefault();
       });
   }
 
   async setProfileImageDataUrlAsync(
-      newProfileImageDataUrl: string): Promise<UpdatePreferencesResponse> {
-    return this.updatePreferencesDataAsync(
-      'profile_picture_data_url', newProfileImageDataUrl);
+    newProfileImageDataUrl: string
+  ): Promise<UpdatePreferencesResponse> {
+    return this.updateMultiplePreferencesDataAsync([
+      {
+        update_type: 'profile_picture_data_url',
+        data: newProfileImageDataUrl,
+      },
+    ]);
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {
     const urlParameters = {
-      current_url: currentUrl
+      current_url: currentUrl,
     };
-    return this.http.get<LoginUrlResponseDict>(
-      '/url_handler', { params: urlParameters }).toPromise().then(
-      (backendDict) => {
+    return this.http
+      .get<LoginUrlResponseDict>('/url_handler', {params: urlParameters})
+      .toPromise()
+      .then(backendDict => {
         return backendDict.login_url;
       });
   }
 
-  async getUserContributionRightsDataAsync():
-    Promise<UserContributionRightsDataBackendDict> {
-    return this.http.get<UserContributionRightsDataBackendDict>(
-      this.USER_CONTRIBUTION_RIGHTS_DATA_URL).toPromise();
-  }
-
-  async updatePreferredSiteLanguageAsync(
-      currentLanguageCode: string
-  ): Promise<Object> {
-    return this.http.put(this.SITE_LANGUAGE_URL, {
-      site_language_code: currentLanguageCode
-    }).toPromise();
-  }
-
-  async getPreferencesAsync(): Promise<PreferencesBackendDict> {
-    return this.http.get<PreferencesBackendDict>(this.PREFERENCES_DATA_URL)
+  async getUserContributionRightsDataAsync(): Promise<UserContributionRightsDataBackendDict> {
+    return this.http
+      .get<UserContributionRightsDataBackendDict>(
+        this.USER_CONTRIBUTION_RIGHTS_DATA_URL
+      )
       .toPromise();
   }
 
-  async updatePreferencesDataAsync(
-      updateType: string,
-      data: boolean | string | string[] | EmailPreferencesBackendDict
+  async updatePreferredSiteLanguageAsync(
+    currentLanguageCode: string
+  ): Promise<Object> {
+    return this.http
+      .put(this.SITE_LANGUAGE_URL, {
+        site_language_code: currentLanguageCode,
+      })
+      .toPromise();
+  }
+
+  async getPreferencesAsync(): Promise<PreferencesBackendDict> {
+    return this.http
+      .get<PreferencesBackendDict>(this.PREFERENCES_DATA_URL)
+      .toPromise();
+  }
+
+  async updateMultiplePreferencesDataAsync(
+    updates: UpdatePreferenceDict[]
   ): Promise<UpdatePreferencesResponse> {
-    return this.http.put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
-      update_type: updateType,
-      data: data
-    }).toPromise();
+    return this.http
+      .put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
+        updates: updates,
+      })
+      .toPromise();
   }
 }
-angular.module('oppia').factory(
-  'UserBackendApiService',
-  downgradeInjectable(UserBackendApiService));
+angular
+  .module('oppia')
+  .factory('UserBackendApiService', downgradeInjectable(UserBackendApiService));

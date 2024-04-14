@@ -16,36 +16,42 @@
  * @fileoverview Tests for BlogAdminDataService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { BlogAdminDataService } from 'pages/blog-admin-page/services/blog-admin-data.service';
-import { BlogAdminPageData, BlogAdminPageDataBackendDict } from 'domain/blog-admin/blog-admin-backend-api.service';
+import {BlogAdminDataService} from 'pages/blog-admin-page/services/blog-admin-data.service';
+import {
+  BlogAdminPageData,
+  BlogAdminPageDataBackendDict,
+} from 'domain/blog-admin/blog-admin-backend-api.service';
 
 describe('Blog Admin Data Service', () => {
   let blogAdminDataService: BlogAdminDataService;
   let httpTestingController: HttpTestingController;
   let sampleBlogAdminData: BlogAdminPageDataBackendDict = {
     role_to_actions: {
-      blog_post_editor: ['action for editor']
+      blog_post_editor: ['action for editor'],
     },
     platform_parameters: {
       max_number_of_tags_assigned_to_blog_post: {
         description: 'Max number of tags.',
         value: 10,
-        schema: {type: 'number'}
-      }
+        schema: {type: 'number'},
+      },
     },
     updatable_roles: {
-      blog_post_editor: 'blog_post_editor'
-    }
+      blog_post_editor: 'blog_post_editor',
+    },
   };
   let blogAdminDataResponse: BlogAdminPageData;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [BlogAdminDataService]
+      providers: [BlogAdminDataService],
     });
     blogAdminDataService = TestBed.inject(BlogAdminDataService);
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -61,12 +67,11 @@ describe('Blog Admin Data Service', () => {
   });
 
   it('should return the correct blog admin data', fakeAsync(() => {
-    blogAdminDataService.getDataAsync().then((response) => {
+    blogAdminDataService.getDataAsync().then(response => {
       expect(response).toEqual(blogAdminDataResponse);
     });
 
-    var req = httpTestingController.expectOne(
-      '/blogadminhandler');
+    var req = httpTestingController.expectOne('/blogadminhandler');
     expect(req.request.method).toEqual('GET');
     req.flush(sampleBlogAdminData);
 

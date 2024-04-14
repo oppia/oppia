@@ -16,22 +16,34 @@
  * @fileoverview Tag filter component for the blog home page.
  */
 
-import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter} from '@angular/core';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { BlogPostSearchService } from 'services/blog-search.service';
-import { BlogHomePageConstants } from '../blog-home-page.constants';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  Input,
+  Output,
+  EventEmitter,
+} from '@angular/core';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {FormControl} from '@angular/forms';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  startWith,
+} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {BlogPostSearchService} from 'services/blog-search.service';
+import {BlogHomePageConstants} from '../blog-home-page.constants';
 import isEqual from 'lodash/isEqual';
 
 import '../blog-home-page.component.css';
 @Component({
   selector: 'oppia-tag-filter',
-  templateUrl: './tag-filter.component.html'
+  templateUrl: './tag-filter.component.html',
 })
-
 export class TagFilterComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -39,8 +51,7 @@ export class TagFilterComponent implements OnInit {
   @Input() listOfDefaultTags!: string[];
   @Input() smallScreenViewIsActive: boolean = false;
   @Input() selectedTags: string[] = [];
-  @Output() selectionsChange: EventEmitter<string[]> = (
-    new EventEmitter());
+  @Output() selectionsChange: EventEmitter<string[]> = new EventEmitter();
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   tagFilter = new FormControl('');
@@ -50,21 +61,21 @@ export class TagFilterComponent implements OnInit {
   @ViewChild('tagFilterInput') tagFilterInput!: ElementRef<HTMLInputElement>;
   @ViewChild('trigger') autoTrigger!: MatAutocompleteTrigger;
 
-  constructor(
-    private blogPostSearchService: BlogPostSearchService
-  ) {
+  constructor(private blogPostSearchService: BlogPostSearchService) {
     this.filteredTags = this.tagFilter.valueChanges.pipe(
       startWith(null),
-      map((tag: string | null) => (
-        tag ? this.filter(tag) : this.searchDropDownTags.slice())),
+      map((tag: string | null) =>
+        tag ? this.filter(tag) : this.searchDropDownTags.slice()
+      )
     );
   }
 
   filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.searchDropDownTags.filter(
-      tag => tag.toLowerCase().includes(filterValue));
+    return this.searchDropDownTags.filter(tag =>
+      tag.toLowerCase().includes(filterValue)
+    );
   }
 
   removeTag(tag: string, tagsList: string[]): void {
@@ -80,7 +91,7 @@ export class TagFilterComponent implements OnInit {
     this.tagFilter.setValue(null);
   }
 
-  selectTag(event: { option: { viewValue: string}}): void {
+  selectTag(event: {option: {viewValue: string}}): void {
     this.selectedTags.push(event.option.viewValue);
     this.refreshSearchDropDownTags();
     this.tagFilterInput.nativeElement.value = '';
@@ -98,15 +109,21 @@ export class TagFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshSearchDropDownTags();
-    this.filteredTags.pipe(
-      debounceTime(BlogHomePageConstants.DEBOUNCE_TIME), distinctUntilChanged()
-    ).subscribe(() => {
-      if (!isEqual(
-        this.blogPostSearchService.lastSelectedTags, this.selectedTags
-      )) {
-        this.autoTrigger.closePanel();
-        this.selectionsChange.emit(this.selectedTags);
-      }
-    });
+    this.filteredTags
+      .pipe(
+        debounceTime(BlogHomePageConstants.DEBOUNCE_TIME),
+        distinctUntilChanged()
+      )
+      .subscribe(() => {
+        if (
+          !isEqual(
+            this.blogPostSearchService.lastSelectedTags,
+            this.selectedTags
+          )
+        ) {
+          this.autoTrigger.closePanel();
+          this.selectionsChange.emit(this.selectedTags);
+        }
+      });
   }
 }

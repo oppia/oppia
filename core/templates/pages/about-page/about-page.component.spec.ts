@@ -16,16 +16,15 @@
  * @fileoverview Unit tests for the about page.
  */
 
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { AboutPageComponent } from './about-page.component';
-import { SiteAnalyticsService } from 'services/site-analytics.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-import { PrimaryButtonComponent } from '../../components/button-directives/primary-button.component';
+import {AboutPageComponent} from './about-page.component';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 
 class MockWindowRef {
   nativeWindow = {
@@ -34,9 +33,9 @@ class MockWindowRef {
     },
     sessionStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {}
+      removeItem: (name: string) => {},
     },
-    gtag: () => {}
+    gtag: () => {},
   };
 }
 
@@ -46,22 +45,22 @@ describe('About Page', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
-  beforeEach(async() => {
+  beforeEach(async () => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [
         AboutPageComponent,
         MockTranslatePipe,
-        PrimaryButtonComponent
+        PrimaryButtonComponent,
       ],
       providers: [
         SiteAnalyticsService,
         UrlInterpolationService,
         {
           provide: WindowRef,
-          useValue: windowRef
-        }
-      ]
+          useValue: windowRef,
+        },
+      ],
     }).compileComponents();
     const aboutPageComponent = TestBed.createComponent(AboutPageComponent);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
@@ -69,52 +68,59 @@ describe('About Page', () => {
     component = aboutPageComponent.componentInstance;
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
-      true);
+      true
+    );
   });
   beforeEach(angular.mock.module('oppia'));
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
-
-  it('should return correct static image url when calling getStaticImageUrl',
-    () => {
-      expect(component.getStaticImageUrl('/path/to/image')).toBe(
-        '/assets/images/path/to/image');
-    });
-
-  it('should redirect guest user to the login page when they click' +
-  'create lesson button', () => {
-    spyOn(
-      siteAnalyticsService, 'registerCreateLessonButtonEvent')
-      .and.callThrough();
-    component.onClickCreateLessonButton();
-
-    expect(siteAnalyticsService.registerCreateLessonButtonEvent)
-      .toHaveBeenCalledWith();
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
   });
 
-  it('should register correct event on calling onClickVisitClassroomButton',
+  it('should return correct static image url when calling getStaticImageUrl', () => {
+    expect(component.getStaticImageUrl('/path/to/image')).toBe(
+      '/assets/images/path/to/image'
+    );
+  });
+
+  it(
+    'should redirect guest user to the login page when they click' +
+      'create lesson button',
     () => {
       spyOn(
-        siteAnalyticsService, 'registerClickVisitClassroomButtonEvent')
-        .and.callThrough();
-      component.onClickVisitClassroomButton();
+        siteAnalyticsService,
+        'registerCreateLessonButtonEvent'
+      ).and.callThrough();
+      component.onClickCreateLessonButton();
 
-      expect(siteAnalyticsService.registerClickVisitClassroomButtonEvent)
-        .toHaveBeenCalledWith();
-    });
+      expect(
+        siteAnalyticsService.registerCreateLessonButtonEvent
+      ).toHaveBeenCalledWith();
+    }
+  );
 
-  it('should register correct event on calling onClickBrowseLibraryButton',
-    () => {
-      spyOn(
-        siteAnalyticsService, 'registerClickBrowseLibraryButtonEvent')
-        .and.callThrough();
+  it('should register correct event on calling onClickVisitClassroomButton', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickVisitClassroomButtonEvent'
+    ).and.callThrough();
+    component.onClickVisitClassroomButton();
 
-      component.onClickBrowseLibraryButton();
+    expect(
+      siteAnalyticsService.registerClickVisitClassroomButtonEvent
+    ).toHaveBeenCalledWith();
+  });
 
-      expect(siteAnalyticsService.registerClickBrowseLibraryButtonEvent)
-        .toHaveBeenCalledWith();
-    });
+  it('should register correct event on calling onClickBrowseLibraryButton', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickBrowseLibraryButtonEvent'
+    ).and.callThrough();
+
+    component.onClickBrowseLibraryButton();
+
+    expect(
+      siteAnalyticsService.registerClickBrowseLibraryButtonEvent
+    ).toHaveBeenCalledWith();
+  });
 });

@@ -16,21 +16,21 @@
  * @fileoverview Directive for the "frequency table" visualization.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 import './oppia-visualization-frequency-table.directive.css';
 
 @Component({
   selector: 'oppia-visualization-frequency-table',
-  templateUrl: './oppia-visualization-frequency-table.directive.html'
+  templateUrl: './oppia-visualization-frequency-table.directive.html',
 })
 export class OppiaVisualizationFrequencyTableComponent {
   @Input() data: {
     answer: string;
     frequency: string;
     isAddressed: boolean;
-  } [] = [];
+  }[] = [];
 
   @Input() options: {
     title: string;
@@ -42,7 +42,9 @@ export class OppiaVisualizationFrequencyTableComponent {
   constructor() {}
 }
 
-angular.module('oppia').directive('oppiaVisualizationFrequencyTable',
-   downgradeComponent({
-     component: OppiaVisualizationFrequencyTableComponent
-   }) as angular.IDirectiveFactory);
+angular.module('oppia').directive(
+  'oppiaVisualizationFrequencyTable',
+  downgradeComponent({
+    component: OppiaVisualizationFrequencyTableComponent,
+  }) as angular.IDirectiveFactory
+);

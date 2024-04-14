@@ -16,31 +16,31 @@
  * @fileoverview The component for the maintenance page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { DocumentAttributeCustomizationService } from
-  'services/contextual/document-attribute-customization.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {DocumentAttributeCustomizationService} from 'services/contextual/document-attribute-customization.service';
 
 @Component({
   selector: 'oppia-maintenance-page',
   templateUrl: './maintenance-page.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class MaintenancePageComponent implements OnInit {
   currentLang: string = 'en';
 
   constructor(
-    private documentAttributeCustomizationService:
-      DocumentAttributeCustomizationService,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private documentAttributeCustomizationService: DocumentAttributeCustomizationService,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   ngOnInit(): void {
     this.currentLang = 'en';
     this.documentAttributeCustomizationService.addAttribute(
-      'lang', this.currentLang);
+      'lang',
+      this.currentLang
+    );
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -48,5 +48,9 @@ export class MaintenancePageComponent implements OnInit {
   }
 }
 
-angular.module('oppia').directive('maintenancePage', downgradeComponent(
-  {component: MaintenancePageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'maintenancePage',
+    downgradeComponent({component: MaintenancePageComponent})
+  );

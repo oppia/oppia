@@ -17,13 +17,10 @@
  * panel.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { UserService } from 'services/user.service';
-
+import {Component, OnInit} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UserService} from 'services/user.service';
 
 @Component({
   selector: 'oppia-voiceover-admin-navbar',
@@ -39,22 +36,21 @@ export class VoiceoverAdminNavbarComponent implements OnInit {
   username!: string | null;
   logoWebpImageSrc!: string;
   logoPngImageSrc!: string;
-  PAGES_REGISTERED_WITH_FRONTEND = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND);
+  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   profileDropdownIsActive: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   activateProfileDropdown(): boolean {
-    return this.profileDropdownIsActive = true;
+    return (this.profileDropdownIsActive = true);
   }
 
   deactivateProfileDropdown(): boolean {
-    return this.profileDropdownIsActive = false;
+    return (this.profileDropdownIsActive = false);
   }
 
   async getUserInfoAsync(): Promise<void> {
@@ -64,25 +60,24 @@ export class VoiceoverAdminNavbarComponent implements OnInit {
     if (this.username === null) {
       throw new Error('Cannot fetch username.');
     }
-    this.profileUrl = (
-      this.urlInterpolationService.interpolateUrl(
-        '/profile/<username>', {
-          username: this.username
-        }));
-    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] = (
-      this.userService.getProfileImageDataUrl(this.username));
+    this.profileUrl = this.urlInterpolationService.interpolateUrl(
+      '/profile/<username>',
+      {
+        username: this.username,
+      }
+    );
+    [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
+      this.userService.getProfileImageDataUrl(this.username);
   }
 
   ngOnInit(): void {
     this.getUserInfoAsync();
 
     this.logoPngImageSrc = this.urlInterpolationService.getStaticImageUrl(
-      '/logo/288x128_logo_white.png');
+      '/logo/288x128_logo_white.png'
+    );
     this.logoWebpImageSrc = this.urlInterpolationService.getStaticImageUrl(
-      '/logo/288x128_logo_white.webp');
+      '/logo/288x128_logo_white.webp'
+    );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaVoiceoverAdminNavbar', downgradeComponent(
-    {component: VoiceoverAdminNavbarComponent}));

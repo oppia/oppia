@@ -16,18 +16,18 @@
  * @fileoverview Root component for Feedback-Updates Page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { AccessValidationBackendApiService } from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import { LoaderService } from 'services/loader.service';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {LoaderService} from 'services/loader.service';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-feedback-updates-page-root',
-  templateUrl: './feedback-updates-page-root.component.html'
+  templateUrl: './feedback-updates-page-root.component.html',
 })
 export class FeedbackUpdatesPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -35,8 +35,7 @@ export class FeedbackUpdatesPageRootComponent implements OnDestroy {
   errorPageIsShown: boolean = false;
 
   constructor(
-    private accessValidationBackendApiService:
-      AccessValidationBackendApiService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
     private translateService: TranslateService
@@ -44,10 +43,12 @@ export class FeedbackUpdatesPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.META
+    );
   }
 
   ngOnInit(): void {
@@ -57,12 +58,17 @@ export class FeedbackUpdatesPageRootComponent implements OnDestroy {
       })
     );
     this.loaderService.showLoadingScreen('Loading');
-    this.accessValidationBackendApiService.validateCanManageOwnAccount()
-      .then(() => {
-        this.pageIsShown = true;
-      }, (err) => {
-        this.errorPageIsShown = true;
-      }).finally(() => {
+    this.accessValidationBackendApiService
+      .validateCanManageOwnAccount()
+      .then(
+        () => {
+          this.pageIsShown = true;
+        },
+        err => {
+          this.errorPageIsShown = true;
+        }
+      )
+      .finally(() => {
         this.loaderService.hideLoadingScreen();
       });
   }

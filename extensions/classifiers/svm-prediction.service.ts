@@ -26,19 +26,21 @@
  * https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2481
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { PredictionResult } from 'domain/classifier/prediction-result.model';
+import {PredictionResult} from 'domain/classifier/prediction-result.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SVMPredictionService {
   constructor() {}
   kernel(
-      kernelParams: KernelParams, supportVectors: number[][],
-      input: number[]): number[] {
+    kernelParams: KernelParams,
+    supportVectors: number[][],
+    input: number[]
+  ): number[] {
     let kernel = kernelParams.kernel;
     let kvalues = [];
 
@@ -47,7 +49,7 @@ export class SVMPredictionService {
       for (let i = 0; i < supportVectors.length; i++) {
         let sum = 0;
         for (let j = 0; j < input.length; j++) {
-          sum += Math.pow((supportVectors[i][j] - input[j]), 2);
+          sum += Math.pow(supportVectors[i][j] - input[j], 2);
         }
         kvalues.push(Math.exp(-gamma * sum));
       }
@@ -70,7 +72,9 @@ export class SVMPredictionService {
   // Also take a look at implementation by LibSVM:
   // https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L1829
   calculateMulticlassProbabilities(
-      nClasses: number, pairwiseProb: number[][]): number[] {
+    nClasses: number,
+    pairwiseProb: number[][]
+  ): number[] {
     let Q: number[][] = [];
     for (let i = 0; i < nClasses; i++) {
       Q.push([]);
@@ -133,12 +137,11 @@ export class SVMPredictionService {
       for (let t = 0; t < nClasses; t++) {
         let diff = (-Qp[t] + pQp) / Q[t][t];
         P[t] += diff;
-        pQp = (
-          (pQp + diff * (diff * Q[t][t] + 2 * Qp[t])) /
-          (1 + diff) / (1 + diff));
+        pQp =
+          (pQp + diff * (diff * Q[t][t] + 2 * Qp[t])) / (1 + diff) / (1 + diff);
         for (let j = 0; j < nClasses; j++) {
           Qp[j] = (Qp[j] + diff * Q[t][j]) / (1 + diff);
-          P[j] /= (1 + diff);
+          P[j] /= 1 + diff;
         }
       }
     }
@@ -146,8 +149,7 @@ export class SVMPredictionService {
     return P;
   }
 
-  predict(
-      classifierData: SVM, input: number[]): PredictionResult {
+  predict(classifierData: SVM, input: number[]): PredictionResult {
     let nSupport = classifierData.n_support;
     let supportVectors = classifierData.support_vectors;
     let dualCoef = classifierData.dual_coef;
@@ -166,7 +168,8 @@ export class SVMPredictionService {
     if (supportVectors[0].length !== input.length) {
       // Support vector and input dimensions do not match.
       console.error(
-        'Dimension of support vectors and given input is different.');
+        'Dimension of support vectors and given input is different.'
+      );
     }
 
     // Find kernel values for supportVectors and given input. Assumes that
@@ -235,7 +238,9 @@ export class SVMPredictionService {
     }
 
     let probabilities = this.calculateMulticlassProbabilities(
-      classes.length, pairwiseProb);
+      classes.length,
+      pairwiseProb
+    );
 
     let maxProbIdx = 0;
     for (let i = 1; i < classes.length; i++) {
@@ -246,10 +251,13 @@ export class SVMPredictionService {
 
     let predictedLabel = classes[maxProbIdx];
     let prediction = new PredictionResult(
-      predictedLabel, probabilities[maxProbIdx]);
+      predictedLabel,
+      probabilities[maxProbIdx]
+    );
     return prediction;
   }
 }
 
-angular.module('oppia').factory(
-  'SVMPredictionService', downgradeInjectable(SVMPredictionService));
+angular
+  .module('oppia')
+  .factory('SVMPredictionService', downgradeInjectable(SVMPredictionService));

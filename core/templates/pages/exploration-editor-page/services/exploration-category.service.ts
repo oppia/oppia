@@ -17,18 +17,18 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationPropertyService } from './exploration-property.service';
-import { ExplorationRightsService } from './exploration-rights.service';
-import { ValidatorsService } from 'services/validators.service';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
-import { AlertsService } from 'services/alerts.service';
-import { ChangeListService } from './change-list.service';
-import { LoggerService } from 'services/contextual/logger.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationPropertyService} from './exploration-property.service';
+import {ExplorationRightsService} from './exploration-rights.service';
+import {ValidatorsService} from 'services/validators.service';
+import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import {AlertsService} from 'services/alerts.service';
+import {ChangeListService} from './change-list.service';
+import {LoggerService} from 'services/contextual/logger.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationCategoryService extends ExplorationPropertyService {
   constructor(
@@ -37,7 +37,7 @@ export class ExplorationCategoryService extends ExplorationPropertyService {
     private whitespaceNormalize: NormalizeWhitespacePipe,
     protected alertsService: AlertsService,
     protected changeListService: ChangeListService,
-    protected loggerService: LoggerService,
+    protected loggerService: LoggerService
   ) {
     super(alertsService, changeListService, loggerService);
   }
@@ -50,9 +50,16 @@ export class ExplorationCategoryService extends ExplorationPropertyService {
 
   _isValid(value: string): boolean {
     return this.validatorsService.isValidEntityName(
-      value, true, this.explorationRightsService.isPrivate());
+      value,
+      true,
+      this.explorationRightsService.isPrivate()
+    );
   }
 }
 
-angular.module('oppia').factory('ExplorationCategoryService',
-  downgradeInjectable(ExplorationCategoryService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationCategoryService',
+    downgradeInjectable(ExplorationCategoryService)
+  );

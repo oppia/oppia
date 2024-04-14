@@ -16,50 +16,51 @@
  * @fileoverview Unit tests for "enumerated frequency table" visualization.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { AnswerStats } from 'domain/exploration/answer-stats.model';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
 // This throws "TS2307". We need to
 // suppress this error because rte-text-components are not strictly typed yet.
 // @ts-ignore
-import { RichTextComponentsModule } from 'rich_text_components/rich-text-components.module';
-import { OppiaVisualizationEnumeratedFrequencyTableComponent } from './oppia-visualization-enumerated-frequency-table.directive';
+import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {OppiaVisualizationEnumeratedFrequencyTableComponent} from './oppia-visualization-enumerated-frequency-table.directive';
 
 describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
   let component: OppiaVisualizationEnumeratedFrequencyTableComponent;
-  let fixture: ComponentFixture<
-  OppiaVisualizationEnumeratedFrequencyTableComponent>;
+  let fixture: ComponentFixture<OppiaVisualizationEnumeratedFrequencyTableComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        RichTextComponentsModule
-      ],
-      declarations: [
-        OppiaVisualizationEnumeratedFrequencyTableComponent,
-      ],
-      providers: [
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      imports: [HttpClientTestingModule, RichTextComponentsModule],
+      declarations: [OppiaVisualizationEnumeratedFrequencyTableComponent],
+      providers: [],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      OppiaVisualizationEnumeratedFrequencyTableComponent);
+      OppiaVisualizationEnumeratedFrequencyTableComponent
+    );
     component = fixture.componentInstance;
     component.answerVisible = [true, false];
     let data = [
       {answer: ['foo'], frequency: 3},
-      {answer: ['bar'], frequency: 1}];
+      {answer: ['bar'], frequency: 1},
+    ];
     component.options = {
       title: 'title',
       column_headers: 'column_headers',
     };
     component.addressedInfoIsSupported = ['addressedInfoIsSupported'];
-    component.data = (data.map(d => AnswerStats.createFromBackendDict(d)));
+    component.data = data.map(d => AnswerStats.createFromBackendDict(d));
     fixture.detectChanges();
   });
 
@@ -67,11 +68,11 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
     const bannerDe = fixture.debugElement;
     const bannerEl = bannerDe.nativeElement;
     const answersList: string[] = [];
-    bannerEl.querySelectorAll('.answer-rank').forEach(
-      (el: { textContent: string }) => {
+    bannerEl
+      .querySelectorAll('.answer-rank')
+      .forEach((el: {textContent: string}) => {
         answersList.push(el.textContent);
-      }
-    );
+      });
 
     tick();
     expect(answersList).toEqual(['Answer Set #1', 'Answer Set #2']);
@@ -86,11 +87,9 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
     component.toggleAnswerVisibility(2);
 
     const hiddenRows: boolean[] = [];
-    bannerEl.querySelectorAll(
-      '.item-table'
-    ).forEach(
-      (el: { hidden: boolean }) => hiddenRows.push(el.hidden)
-    );
+    bannerEl
+      .querySelectorAll('.item-table')
+      .forEach((el: {hidden: boolean}) => hiddenRows.push(el.hidden));
     tick();
 
     expect(hiddenRows).toEqual([false, true]);
@@ -105,11 +104,9 @@ describe('oppiaVisualizationEnumeratedFrequencyTable', () => {
     tick();
 
     const hiddenRows: boolean[] = [];
-    bannerEl.querySelectorAll(
-      '.item-table'
-    ).forEach(
-      (el: { hidden: boolean }) => hiddenRows.push(el.hidden)
-    );
+    bannerEl
+      .querySelectorAll('.item-table')
+      .forEach((el: {hidden: boolean}) => hiddenRows.push(el.hidden));
     tick();
 
     expect(hiddenRows).toEqual([false, false]);

@@ -20,7 +20,6 @@ from core import feconf
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import config_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -83,24 +82,6 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         public_topic.skill_ids_for_diagnostic_test = ['skill_id_1']
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
-
-        csrf_token = self.get_new_csrf_token()
-        new_config_value = [{
-            'name': 'math',
-            'topic_ids': [topic_id_1, topic_id_2, topic_id_3],
-            'course_details': 'Course details for classroom.',
-            'topic_list_intro': 'Topics covered for classroom',
-            'url_fragment': 'math',
-        }]
-
-        payload = {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_domain.CLASSROOM_PAGES_DATA.name: (
-                    new_config_value),
-            }
-        }
-        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
 
         math_classroom_dict: classroom_config_domain.ClassroomDict = {
             'classroom_id': 'math_classroom_id',
@@ -383,7 +364,7 @@ class UnusedTopicsHandlerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.used_topic1 = topic_domain.Topic.create_default_topic(
             'used_topic_1', 'used_topic1_name',
-            'frag-used-topic-one', 'description', 'fragm')        
+            'frag-used-topic-one', 'description', 'fragm')
         topic_services.save_new_topic(self.owner_id, self.used_topic1)
 
         self.physics_classroom_id = (

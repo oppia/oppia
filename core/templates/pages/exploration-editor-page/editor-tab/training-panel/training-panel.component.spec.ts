@@ -16,24 +16,24 @@
  * @fileoverview Unit tests for trainingPanel.
  */
 
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { Outcome } from 'domain/exploration/OutcomeObjectFactory';
-import { TrainingPanelComponent } from './training-panel.component';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
-import { TrainingDataService } from './training-data.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { ResponsesService } from '../services/responses.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {TrainingPanelComponent} from './training-panel.component';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {TrainingDataService} from './training-data.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {ResponsesService} from '../services/responses.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 class MockNgbModal {
   open() {
     return {
-      result: Promise.resolve()
+      result: Promise.resolve(),
     };
   }
 }
@@ -66,30 +66,28 @@ describe('Training Panel Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        TrainingPanelComponent
-      ],
+      declarations: [TrainingPanelComponent],
       providers: [
         {
           provide: NgbModal,
-          useClass: MockNgbModal
+          useClass: MockNgbModal,
         },
         {
           provide: StateEditorService,
-          useClass: MockStateEditorService
+          useClass: MockStateEditorService,
         },
         {
           provide: ExplorationStatesService,
-          useClass: MockExplorationStatesService
+          useClass: MockExplorationStatesService,
         },
         {
           provide: TrainingDataService,
-          useClass: MockTrainingDataService
+          useClass: MockTrainingDataService,
         },
         ExplorationHtmlFormatterService,
-        ResponsesService
+        ResponsesService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -97,19 +95,30 @@ describe('Training Panel Component', () => {
     fixture = TestBed.createComponent(TrainingPanelComponent);
     component = fixture.componentInstance;
 
-    explorationHtmlFormatterService =
-      TestBed.inject(ExplorationHtmlFormatterService);
+    explorationHtmlFormatterService = TestBed.inject(
+      ExplorationHtmlFormatterService
+    );
     responsesService = TestBed.inject(ResponsesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    generateContentIdService.init(() => 0, () => { });
-    spyOn(explorationHtmlFormatterService, 'getAnswerHtml')
-      .and.returnValue('answerTemplate');
+    generateContentIdService.init(
+      () => 0,
+      () => {}
+    );
+    spyOn(explorationHtmlFormatterService, 'getAnswerHtml').and.returnValue(
+      'answerTemplate'
+    );
 
     component.classification = {
       answerGroupIndex: 0,
       newOutcome: new Outcome(
-        'dest', '', new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
-        true, [], '', '')
+        'dest',
+        '',
+        new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+        true,
+        [],
+        '',
+        ''
+      ),
     };
     component.addingNewResponse = false;
     // This throws "Argument of type 'null' is not assignable to parameter of
@@ -123,14 +132,12 @@ describe('Training Panel Component', () => {
     fixture.detectChanges();
   });
 
-
-  it('should initialize $scope properties after controller is initialized',
-    () => {
-      expect(component.addingNewResponse).toBe(false);
-      expect(component.allOutcomes.length).toBe(0);
-      expect(component.selectedAnswerGroupIndex).toBe(0);
-      expect(component.answerTemplate).toBe('answerTemplate');
-    });
+  it('should initialize $scope properties after controller is initialized', () => {
+    expect(component.addingNewResponse).toBe(false);
+    expect(component.allOutcomes.length).toBe(0);
+    expect(component.selectedAnswerGroupIndex).toBe(0);
+    expect(component.answerTemplate).toBe('answerTemplate');
+  });
 
   it('should get name from current state', () => {
     expect(component.getCurrentStateName()).toBe('activeState');
@@ -139,11 +146,23 @@ describe('Training Panel Component', () => {
   it('should add new feedback and select it', () => {
     component.allOutcomes = [
       new Outcome(
-        'dest', '', new SubtitledHtml('<p>Saved Outcome</p>', 'Id'), true,
-        [], '', ''),
+        'dest',
+        '',
+        new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+        true,
+        [],
+        '',
+        ''
+      ),
       new Outcome(
-        'dest', '', new SubtitledHtml('<p>Saved Outcome</p>', 'Id'), true,
-        [], '', '')
+        'dest',
+        '',
+        new SubtitledHtml('<p>Saved Outcome</p>', 'Id'),
+        true,
+        [],
+        '',
+        ''
+      ),
     ];
     spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(0);
     expect(component.allOutcomes.length).toBe(2);

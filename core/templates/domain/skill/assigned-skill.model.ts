@@ -17,10 +17,10 @@
  */
 
 export interface AssignedSkillBackendDict {
-  'topic_id': string;
-  'topic_name': string;
-  'topic_version': number;
-  'subtopic_id': number;
+  topic_id: string;
+  topic_name: string;
+  topic_version: number;
+  subtopic_id: number;
 }
 
 export class AssignedSkill {
@@ -28,14 +28,17 @@ export class AssignedSkill {
     public topicId: string,
     public topicName: string,
     public topicVersion: number,
-    public subtopicId: number) {}
+    public subtopicId: number
+  ) {}
 
   static createFromBackendDict(
-      backendDict: AssignedSkillBackendDict): AssignedSkill {
+    backendDict: AssignedSkillBackendDict
+  ): AssignedSkill {
     return new AssignedSkill(
       backendDict.topic_id,
       backendDict.topic_name,
       backendDict.topic_version,
-      backendDict.subtopic_id);
+      backendDict.subtopic_id
+    );
   }
 }

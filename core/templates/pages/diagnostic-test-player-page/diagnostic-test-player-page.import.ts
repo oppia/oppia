@@ -22,16 +22,20 @@ import 'zone.js';
 import 'angular-ui-validate';
 
 angular.module('oppia', [
-  require('angular-cookies'), 'ngAnimate',
-  'ngMaterial', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'ui.bootstrap', 'ui.validate'
+  require('angular-cookies'),
+  'ngAnimate',
+  'ngMaterial',
+  'ngSanitize',
+  'ngTouch',
+  'pascalprecht.translate',
+  'ui.bootstrap',
+  'ui.validate',
 ]);
 
 require('Polyfills.ts');
 
 // The module needs to be loaded directly after jquery since it defines the
 // main module the elements are attached to.
-require(
-  'pages/diagnostic-test-player-page/diagnostic-test-player-page.module.ts');
+require('pages/diagnostic-test-player-page/diagnostic-test-player-page.module.ts');
 require('App.ts');
 require('base-components/oppia-root.directive.ts');

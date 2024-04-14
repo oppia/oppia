@@ -16,15 +16,21 @@
  * @fileoverview Unit tests for Schema Based Float Editor Component
  */
 
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { FormControl, FormsModule } from '@angular/forms';
-import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
-import { SchemaFormSubmittedService } from 'services/schema-form-submitted.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { SchemaBasedFloatEditorComponent } from './schema-based-float-editor.component';
-import { NumberConversionService } from 'services/number-conversion.service';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+} from '@angular/core/testing';
+import {FormControl, FormsModule} from '@angular/forms';
+import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
+import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SchemaBasedFloatEditorComponent} from './schema-based-float-editor.component';
+import {NumberConversionService} from 'services/number-conversion.service';
 
 class MockFocusManagerService {
   setFocusWithoutScroll(value: string) {}
@@ -36,7 +42,7 @@ class MockFocusManagerService {
   setFocus(value: string) {}
 }
 
-describe('Schema based float editor component', function() {
+describe('Schema based float editor component', function () {
   let component: SchemaBasedFloatEditorComponent;
   let fixture: ComponentFixture<SchemaBasedFloatEditorComponent>;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
@@ -47,19 +53,16 @@ describe('Schema based float editor component', function() {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [
-        SchemaBasedFloatEditorComponent,
-        MockTranslatePipe
-      ],
+      declarations: [SchemaBasedFloatEditorComponent, MockTranslatePipe],
       providers: [
         {
           provide: FocusManagerService,
-          useClass: MockFocusManagerService
+          useClass: MockFocusManagerService,
         },
         NumericInputValidationService,
-        SchemaFormSubmittedService
+        SchemaFormSubmittedService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -71,17 +74,18 @@ describe('Schema based float editor component', function() {
       {
         id: 'is_at_least',
         min_value: 1.1,
-        max_value: 2.2
+        max_value: 2.2,
       },
       {
         id: 'is_at_most',
         max_value: 3.5,
-        min_value: 4.4
-      }
+        min_value: 4.4,
+      },
     ];
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
-    numericInputValidationService =
-      TestBed.inject(NumericInputValidationService);
+    numericInputValidationService = TestBed.inject(
+      NumericInputValidationService
+    );
     numberConversionService = TestBed.inject(NumberConversionService);
     validator = TestBed.inject(NumericInputValidationService);
     fixture.detectChanges();
@@ -105,7 +109,7 @@ describe('Schema based float editor component', function() {
     expect(component.minValue).toBe(0);
 
     tick();
-    let mockFunction = function(value: number | null) {};
+    let mockFunction = function (value: number | null) {};
     component.registerOnChange(mockFunction);
     component.writeValue(2);
     component.registerOnTouched(null);
@@ -143,7 +147,7 @@ describe('Schema based float editor component', function() {
 
   it('should register that the user is typing on keypress', fakeAsync(() => {
     let evt = new KeyboardEvent('', {
-      keyCode: 14
+      keyCode: 14,
     });
 
     component.userIsCurrentlyTyping = false;
@@ -155,7 +159,7 @@ describe('Schema based float editor component', function() {
 
   it('should not submit form if there is an error', fakeAsync(() => {
     let evt = new KeyboardEvent('', {
-      keyCode: 13
+      keyCode: 13,
     });
 
     let formvalue = new FormControl(null);
@@ -169,10 +173,12 @@ describe('Schema based float editor component', function() {
   }));
 
   it('should not submit form if there is an error', fakeAsync(() => {
-    spyOn(schemaFormSubmittedService.onSubmittedSchemaBasedForm, 'emit')
-      .and.stub();
+    spyOn(
+      schemaFormSubmittedService.onSubmittedSchemaBasedForm,
+      'emit'
+    ).and.stub();
     let evt = new KeyboardEvent('', {
-      keyCode: 13
+      keyCode: 13,
     });
 
     let formvalue = new FormControl(null);
@@ -183,43 +189,48 @@ describe('Schema based float editor component', function() {
     component.onKeypress(evt);
 
     expect(component.userIsCurrentlyTyping).toBe(true);
-    expect(schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit)
-      .toHaveBeenCalled();
+    expect(
+      schemaFormSubmittedService.onSubmittedSchemaBasedForm.emit
+    ).toHaveBeenCalled();
   }));
 
   it('should generate error for wrong input', fakeAsync(() => {
     expect(component.errorStringI18nKey).toBe(null);
-    spyOn(numericInputValidationService, 'validateNumber')
-      .and.returnValue('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
+    spyOn(numericInputValidationService, 'validateNumber').and.returnValue(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER'
+    );
     component.localValue = null;
     component.generateErrors();
 
-    expect(component.errorStringI18nKey)
-      .toBe('I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER');
+    expect(component.errorStringI18nKey).toBe(
+      'I18N_INTERACTIONS_NUMERIC_INPUT_INVALID_NUMBER'
+    );
   }));
 
   it('should validate value', () => {
     component.uiConfig = {checkRequireNonnegativeInput: false};
 
-    expect(component.validate(new FormControl(null)))
-      .toEqual({error: 'invalid'});
-    expect(component.validate(new FormControl(undefined)))
-      .toEqual({error: 'invalid'});
-    expect(component.validate(new FormControl('')))
-      .toEqual({error: 'invalid'});
+    expect(component.validate(new FormControl(null))).toEqual({
+      error: 'invalid',
+    });
+    expect(component.validate(new FormControl(undefined))).toEqual({
+      error: 'invalid',
+    });
+    expect(component.validate(new FormControl(''))).toEqual({error: 'invalid'});
 
     const numericInputValidationServiceSpy = spyOn(
-      numericInputValidationService, 'validateNumber');
-    expect(component.validate(new FormControl(2)))
-      .toEqual({});
-    expect(numericInputValidationServiceSpy).toHaveBeenCalledWith(
-      2, false
+      numericInputValidationService,
+      'validateNumber'
     );
+    expect(component.validate(new FormControl(2))).toEqual({});
+    expect(numericInputValidationServiceSpy).toHaveBeenCalledWith(2, false);
   });
 
   it('should get current decimal separator', () => {
-    spyOn(numberConversionService, 'currentDecimalSeparator')
-      .and.returnValues('.', ',');
+    spyOn(numberConversionService, 'currentDecimalSeparator').and.returnValues(
+      '.',
+      ','
+    );
 
     expect(component.getCurrentDecimalSeparator()).toEqual('.');
     expect(component.getCurrentDecimalSeparator()).toEqual(',');
@@ -248,5 +259,39 @@ describe('Schema based float editor component', function() {
     component.parseInput();
     expect(component.localValue).toEqual(null);
     expect(component.errorStringI18nKey).toEqual('Error');
+  });
+
+  it('should not show error for different decimal points', () => {
+    let spyOnComponentCDS = spyOn(
+      component,
+      'getCurrentDecimalSeparator'
+    ).and.returnValue(',');
+    let spyOnServiceCDS = spyOn(
+      numberConversionService,
+      'currentDecimalSeparator'
+    ).and.returnValue(',');
+
+    component.localStringValue = '12,5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
+
+    component.localStringValue = '12.5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
+
+    spyOnComponentCDS.and.returnValue('.');
+    spyOnServiceCDS.and.returnValue('.');
+
+    component.localStringValue = '12,5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
+
+    component.localStringValue = '12.5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
   });
 });

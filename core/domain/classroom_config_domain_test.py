@@ -76,6 +76,10 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
                 'topic_id_3': []
             }
         )
+        self.assertListEqual(
+            self.classroom.get_topic_ids(),
+            ['topic_id_1', 'topic_id_2', 'topic_id_3']
+        )
         self.classroom.validate()
 
     def test_from_dict_method(self) -> None:

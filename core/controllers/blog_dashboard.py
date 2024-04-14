@@ -257,13 +257,13 @@ class BlogPostHandler(
             blog_post_id: str. The ID of the blog post.
 
         Raises:
-            PageNotFoundException. The blog post with the given id
+            NotFoundException. The blog post with the given id
                 or url doesn't exist.
         """
         blog_post = (
             blog_services.get_blog_post_by_id(blog_post_id, strict=False))
         if blog_post is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The blog post with the given id or url doesn\'t exist.')
 
         author_details = blog_services.get_blog_author_details(

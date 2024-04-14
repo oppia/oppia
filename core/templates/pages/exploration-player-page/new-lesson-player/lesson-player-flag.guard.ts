@@ -17,7 +17,7 @@
  * "NewLessonPlayer" flag is enabled by the user.
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivate,
@@ -25,12 +25,12 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { Location } from '@angular/common';
-import { PlatformFeatureService } from 'services/platform-feature.service';
+import {AppConstants} from 'app.constants';
+import {Location} from '@angular/common';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class IsNewLessonPlayerGuard implements CanActivate {
   constructor(
@@ -40,18 +40,20 @@ export class IsNewLessonPlayerGuard implements CanActivate {
   ) {}
 
   async canActivate(
-      route: ActivatedRouteSnapshot,
-      state: RouterStateSnapshot
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
   ): Promise<boolean> {
     if (this.platformFeatureService.status.NewLessonPlayer.isEnabled) {
       return true;
     }
 
-    this.router.navigate(
-      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .ERROR.ROUTE}/404`]).then(() => {
-      this.location.replaceState(state.url);
-    });
+    this.router
+      .navigate([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+      ])
+      .then(() => {
+        this.location.replaceState(state.url);
+      });
     return false;
   }
 }

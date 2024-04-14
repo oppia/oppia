@@ -190,6 +190,8 @@
 /.gitattributes @oppia/dev-workflow-reviewers
 /.gitignore @oppia/dev-workflow-reviewers
 /.isort.cfg @oppia/dev-workflow-reviewers
+/.prettierignore @oppia/dev-workflow-reviewers
+/.prettierrc.json @oppia/dev-workflow-reviewers
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
@@ -201,13 +203,11 @@
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_e2e_tests_are_captured_in_ci*.py @oppia/dev-workflow-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/dev-workflow-reviewers
-/scripts/create_topological_sort_of_all_services*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
 /scripts/linters/ @oppia/dev-workflow-reviewers
 /scripts/linters/codeowner_linter*.py @oppia/dev-workflow-reviewers
 /scripts/linters/pylint_extensions*.py @oppia/dev-workflow-reviewers
 /scripts/linters/python_linter*.py @oppia/dev-workflow-reviewers
-/ubuntu_dockerfile @oppia/dev-workflow-reviewers
 
 
 # Exploration project.
@@ -297,6 +297,7 @@
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component.html @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @oppia/lace-frontend-reviewers
+/core/templates/components/custom-snackbar/ @oppia/lace-frontend-reviewers
 /core/templates/components/profile-link-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/summary-tile/ @oppia/lace-frontend-reviewers
 /core/templates/directives/angular-html-bind.directive*.ts @oppia/lace-frontend-reviewers
@@ -423,7 +424,6 @@
 /core/controllers/review_tests*.py @oppia/lace-backend-reviewers
 /core/domain/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/diagnostic_test_player*.py @oppia/lace-backend-reviewers
-/core/domain/classroom_services*.py @oppia/lace-backend-reviewers
 /core/domain/question*.py @oppia/lace-backend-reviewers
 /core/domain/rights_domain*.py @oppia/lace-backend-reviewers
 /core/templates/components/concept-card/ @oppia/lace-frontend-reviewers
@@ -543,7 +543,6 @@
 /core/__init__.py @oppia/lace-backend-reviewers
 /core/controllers/__init__.py @oppia/lace-backend-reviewers
 /core/domain/__init__.py @oppia/lace-backend-reviewers
-/core/domain/config*.py @oppia/lace-backend-reviewers
 /core/domain/change_domain*.py @oppia/lace-backend-reviewers
 /core/templates/tests/ @oppia/lace-frontend-reviewers
 /core/templates/domain/utilities/ @oppia/lace-frontend-reviewers
@@ -583,7 +582,6 @@
 /core/templates/pages/release-coordinator-page/ @oppia/release-workflow-reviewers
 /scripts/release_scripts/ @oppia/release-workflow-reviewers
 /assets/release_constants.json @oppia/release-workflow-reviewers
-
 
 # Rich text editor team.
 /core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.html @oppia/lace-frontend-reviewers
@@ -716,7 +714,6 @@
 /extensions/rich_text_components/webdriverio.js @oppia/dev-workflow-reviewers
 /extensions/objects/webdriverio.js @oppia/dev-workflow-reviewers
 /scripts/backend_test_shards.json @oppia/dev-workflow-reviewers
-/scripts/backend_tests_incomplete_coverage.txt @oppia/dev-workflow-reviewers
 /.github/actions @oppia/dev-workflow-reviewers
 
 

@@ -16,9 +16,11 @@
  * @fileoverview Unit tests for the ExplorationImprovementsBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {
   ExplorationImprovementsConfig,
@@ -33,18 +35,18 @@ import {
   ExplorationImprovementsHistoryResponse,
   ExplorationImprovementsHistoryResponseBackendDict,
   ExplorationImprovementsResponse,
-  ExplorationImprovementsResponseBackendDict
+  ExplorationImprovementsResponseBackendDict,
 } from 'services/exploration-improvements-backend-api.service';
 
 describe('Exploration stats back-end API service', () => {
   let httpTestingController: HttpTestingController;
-  let explorationImprovementsBackendApiService:
-    ExplorationImprovementsBackendApiService;
+  let explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
-    explorationImprovementsBackendApiService = (
-      TestBed.get(ExplorationImprovementsBackendApiService));
+    explorationImprovementsBackendApiService = TestBed.get(
+      ExplorationImprovementsBackendApiService
+    );
     httpTestingController = TestBed.get(HttpTestingController);
   });
 
@@ -52,7 +54,7 @@ describe('Exploration stats back-end API service', () => {
     httpTestingController.verify();
   });
 
-  it('should return an ExplorationImprovementsResponse', fakeAsync(async() => {
+  it('should return an ExplorationImprovementsResponse', fakeAsync(async () => {
     const taskDict: ExplorationTaskBackendDict = {
       entity_type: 'exploration',
       entity_id: 'eid',
@@ -66,11 +68,12 @@ describe('Exploration stats back-end API service', () => {
       resolved_on_msecs: 123456789,
     };
 
-    const response = (
-      explorationImprovementsBackendApiService.getTasksAsync('eid'));
+    const response =
+      explorationImprovementsBackendApiService.getTasksAsync('eid');
 
-    const req = (
-      httpTestingController.expectOne('/improvements/exploration/eid'));
+    const req = httpTestingController.expectOne(
+      '/improvements/exploration/eid'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({
       open_tasks: [taskDict],
@@ -81,11 +84,52 @@ describe('Exploration stats back-end API service', () => {
     expect(await response).toEqual(
       new ExplorationImprovementsResponse(
         [ExplorationTaskModel.createFromBackendDict(taskDict)],
-        new Map([['Introduction', ['high_bounce_rate']]])));
+        new Map([['Introduction', ['high_bounce_rate']]])
+      )
+    );
   }));
 
-  it('should return an ExplorationImprovementsHistoryResponse',
-    fakeAsync(async() => {
+  it('should return an ExplorationImprovementsHistoryResponse', fakeAsync(async () => {
+    const taskDict: ExplorationTaskBackendDict = {
+      entity_type: 'exploration',
+      entity_id: 'eid',
+      entity_version: 1,
+      task_type: 'high_bounce_rate',
+      target_type: 'state',
+      target_id: 'Introduction',
+      issue_description: '20% of learners dropped at this state',
+      status: 'resolved',
+      resolver_username: 'test_user',
+      resolved_on_msecs: 123456789,
+    };
+
+    const response =
+      explorationImprovementsBackendApiService.getHistoryPageAsync('eid');
+
+    const req = httpTestingController.expectOne(
+      '/improvements/history/exploration/eid'
+    );
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      results: [taskDict],
+      cursor: 'cursor123',
+      more: true,
+    } as ExplorationImprovementsHistoryResponseBackendDict);
+    flushMicrotasks();
+
+    expect(await response).toEqual(
+      new ExplorationImprovementsHistoryResponse(
+        [ExplorationTaskModel.createFromBackendDict(taskDict)],
+        'cursor123',
+        true
+      )
+    );
+  }));
+
+  it(
+    'should return an ExplorationImprovementsHistoryResponse when given a ' +
+      'cursor',
+    fakeAsync(async () => {
       const taskDict: ExplorationTaskBackendDict = {
         entity_type: 'exploration',
         entity_id: 'eid',
@@ -99,63 +143,34 @@ describe('Exploration stats back-end API service', () => {
         resolved_on_msecs: 123456789,
       };
 
-      const response = (
-        explorationImprovementsBackendApiService.getHistoryPageAsync('eid'));
+      const response =
+        explorationImprovementsBackendApiService.getHistoryPageAsync(
+          'eid',
+          'cursor123'
+        );
 
       const req = httpTestingController.expectOne(
-        '/improvements/history/exploration/eid');
+        '/improvements/history/exploration/eid?cursor=cursor123'
+      );
       expect(req.request.method).toEqual('GET');
       req.flush({
         results: [taskDict],
-        cursor: 'cursor123',
-        more: true,
+        cursor: 'cursor456',
+        more: false,
       } as ExplorationImprovementsHistoryResponseBackendDict);
       flushMicrotasks();
 
       expect(await response).toEqual(
         new ExplorationImprovementsHistoryResponse(
           [ExplorationTaskModel.createFromBackendDict(taskDict)],
-          'cursor123',
-          true));
-    }));
+          'cursor456',
+          false
+        )
+      );
+    })
+  );
 
-  it('should return an ExplorationImprovementsHistoryResponse when given a ' +
-    'cursor', fakeAsync(async() => {
-    const taskDict: ExplorationTaskBackendDict = {
-      entity_type: 'exploration',
-      entity_id: 'eid',
-      entity_version: 1,
-      task_type: 'high_bounce_rate',
-      target_type: 'state',
-      target_id: 'Introduction',
-      issue_description: '20% of learners dropped at this state',
-      status: 'resolved',
-      resolver_username: 'test_user',
-      resolved_on_msecs: 123456789,
-    };
-
-    const response = (
-      explorationImprovementsBackendApiService.getHistoryPageAsync(
-        'eid', 'cursor123'));
-
-    const req = httpTestingController.expectOne(
-      '/improvements/history/exploration/eid?cursor=cursor123');
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      results: [taskDict],
-      cursor: 'cursor456',
-      more: false,
-    } as ExplorationImprovementsHistoryResponseBackendDict);
-    flushMicrotasks();
-
-    expect(await response).toEqual(
-      new ExplorationImprovementsHistoryResponse(
-        [ExplorationTaskModel.createFromBackendDict(taskDict)],
-        'cursor456',
-        false));
-  }));
-
-  it('should try to post a task dict to the back-end', fakeAsync(async() => {
+  it('should try to post a task dict to the back-end', fakeAsync(async () => {
     const task = ExplorationTaskModel.createFromBackendDict({
       entity_type: 'exploration',
       entity_id: 'eid',
@@ -171,14 +186,16 @@ describe('Exploration stats back-end API service', () => {
 
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
-    explorationImprovementsBackendApiService.postTasksAsync('eid', [task])
+    explorationImprovementsBackendApiService
+      .postTasksAsync('eid', [task])
       .then(onSuccess, onFailure);
 
-    const req = (
-      httpTestingController.expectOne('/improvements/exploration/eid'));
+    const req = httpTestingController.expectOne(
+      '/improvements/exploration/eid'
+    );
     expect(req.request.method).toEqual('POST');
     expect(req.request.body).toEqual({
-      task_entries: [task.toPayloadDict()]
+      task_entries: [task.toPayloadDict()],
     });
     req.flush({});
     flushMicrotasks();
@@ -187,10 +204,11 @@ describe('Exploration stats back-end API service', () => {
     expect(onFailure).not.toHaveBeenCalled();
   }));
 
-  it('should not make HTTP call when posting empty list', fakeAsync(async() => {
+  it('should not make HTTP call when posting empty list', fakeAsync(async () => {
     const onSuccess = jasmine.createSpy('onSuccess');
     const onFailure = jasmine.createSpy('onFailure');
-    explorationImprovementsBackendApiService.postTasksAsync('eid', [])
+    explorationImprovementsBackendApiService
+      .postTasksAsync('eid', [])
       .then(onSuccess, onFailure);
 
     httpTestingController.expectNone('/improvements/exploration/eid');
@@ -200,24 +218,26 @@ describe('Exploration stats back-end API service', () => {
     expect(onFailure).not.toHaveBeenCalled();
   }));
 
-  it('should return an ExplorationImprovementsConfig', fakeAsync(async() => {
-    const response = (
-      explorationImprovementsBackendApiService.getConfigAsync('eid'));
+  it('should return an ExplorationImprovementsConfig', fakeAsync(async () => {
+    const response =
+      explorationImprovementsBackendApiService.getConfigAsync('eid');
 
-    const req = (
-      httpTestingController.expectOne('/improvements/config/exploration/eid'));
+    const req = httpTestingController.expectOne(
+      '/improvements/config/exploration/eid'
+    );
     expect(req.request.method).toEqual('GET');
     req.flush({
       exploration_id: 'eid',
       exploration_version: 1,
       is_improvements_tab_enabled: true,
       high_bounce_rate_task_state_bounce_rate_creation_threshold: 0.25,
-      high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.20,
+      high_bounce_rate_task_state_bounce_rate_obsoletion_threshold: 0.2,
       high_bounce_rate_task_minimum_exploration_starts: 100,
     } as ExplorationImprovementsConfigBackendDict);
     flushMicrotasks();
 
     expect(await response).toEqual(
-      new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.20, 100));
+      new ExplorationImprovementsConfig('eid', 1, true, 0.25, 0.2, 100)
+    );
   }));
 });

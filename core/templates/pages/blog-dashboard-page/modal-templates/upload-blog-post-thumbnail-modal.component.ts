@@ -16,22 +16,19 @@
  * @fileoverview Component for uploading thumbnail image modal.
  */
 
-import { Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AppConstants } from 'app.constants';
+import {Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'oppia-blog-post-thumbnail-upload-modal',
-  templateUrl: './upload-blog-post-thumbnail-modal.component.html'
+  templateUrl: './upload-blog-post-thumbnail-modal.component.html',
 })
-export class UploadBlogPostThumbnailModalComponent
-  extends ConfirmOrCancelModal {
+export class UploadBlogPostThumbnailModalComponent extends ConfirmOrCancelModal {
   ALLOWED_IMAGE_EXTENSIONS = AppConstants.ALLOWED_IMAGE_FORMATS;
   ALLOWED_IMAGE_SIZE_IN_KB = AppConstants.MAX_ALLOWED_IMAGE_SIZE_IN_KB_FOR_BLOG;
-  constructor(
-      ngbActiveModal: NgbActiveModal,
-  ) {
+  constructor(ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }
 

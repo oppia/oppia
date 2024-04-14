@@ -16,8 +16,8 @@
  * @fileoverview Player service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
 export interface Note {
   midiValue: number;
@@ -26,7 +26,7 @@ export interface Note {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MusicPhrasePlayerService {
   _MIDI_CHANNEL: number = 0;
@@ -34,12 +34,13 @@ export class MusicPhrasePlayerService {
   _SECS_TO_MILLISECS: number = 1000.0;
 
   _playNote(
-      midiValues: number[], durationInSecs: number, delayInSecs: number): void {
+    midiValues: number[],
+    durationInSecs: number,
+    delayInSecs: number
+  ): void {
     setTimeout(() => {
-      MIDI.chordOn(
-        this._MIDI_CHANNEL, midiValues, this._MIDI_VELOCITY, 0);
-      MIDI.chordOff(
-        this._MIDI_CHANNEL, midiValues, durationInSecs);
+      MIDI.chordOn(this._MIDI_CHANNEL, midiValues, this._MIDI_VELOCITY, 0);
+      MIDI.chordOff(this._MIDI_CHANNEL, midiValues, durationInSecs);
     }, delayInSecs * this._SECS_TO_MILLISECS);
   }
 
@@ -56,8 +57,7 @@ export class MusicPhrasePlayerService {
     MIDI.Player.stop();
 
     for (var i: number = 0; i < notes.length; i++) {
-      this._playNote(
-        [notes[i].midiValue], notes[i].duration, notes[i].start);
+      this._playNote([notes[i].midiValue], notes[i].duration, notes[i].start);
     }
   }
 
@@ -66,5 +66,9 @@ export class MusicPhrasePlayerService {
   }
 }
 
-angular.module('oppia').factory(
-  'MusicPhrasePlayerService', downgradeInjectable(MusicPhrasePlayerService));
+angular
+  .module('oppia')
+  .factory(
+    'MusicPhrasePlayerService',
+    downgradeInjectable(MusicPhrasePlayerService)
+  );

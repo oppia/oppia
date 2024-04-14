@@ -17,16 +17,16 @@
  * in the learner view.
  */
 
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { ExplorationEngineService } from './exploration-engine.service';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {ExplorationEngineService} from './exploration-engine.service';
 
 interface LearnerViewRatingBackendResponse {
-  'user_rating': number;
+  user_rating: number;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LearnerViewRatingBackendApiService {
   explorationId: string;
@@ -41,15 +41,18 @@ export class LearnerViewRatingBackendApiService {
   }
 
   async getUserRatingAsync(): Promise<LearnerViewRatingBackendResponse> {
-    return this.httpClient.get<LearnerViewRatingBackendResponse>(
-      this.ratingsUrl).toPromise();
+    return this.httpClient
+      .get<LearnerViewRatingBackendResponse>(this.ratingsUrl)
+      .toPromise();
   }
 
-  async submitUserRatingAsync(ratingValue: number):
-  Promise<LearnerViewRatingBackendResponse> {
-    return this.httpClient.put<LearnerViewRatingBackendResponse>(
-      this.ratingsUrl, {
-        user_rating: ratingValue
-      }).toPromise();
+  async submitUserRatingAsync(
+    ratingValue: number
+  ): Promise<LearnerViewRatingBackendResponse> {
+    return this.httpClient
+      .put<LearnerViewRatingBackendResponse>(this.ratingsUrl, {
+        user_rating: ratingValue,
+      })
+      .toPromise();
   }
 }

@@ -16,15 +16,13 @@
  * @fileoverview Base validation service for interactions.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { AnswerGroup } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { Outcome } from
-  'domain/exploration/OutcomeObjectFactory';
+import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 
 export interface Warning {
   type: string;
@@ -32,14 +30,16 @@ export interface Warning {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class baseInteractionValidationService {
   // 'argNames' is an array of top-level customization argument names (such
   // as 'chocies') used to verify the basic structure of the input
   // customization arguments object.
   requireCustomizationArguments(
-      customizationArguments: {}, argNames: string[]): void {
+    customizationArguments: {},
+    argNames: string[]
+  ): void {
     var missingArgs = [];
 
     for (var i = 0; i < argNames.length; i++) {
@@ -50,18 +50,21 @@ export class baseInteractionValidationService {
     if (missingArgs.length > 0) {
       if (missingArgs.length === 1) {
         throw new Error(
-          'Expected customization arguments to have property: ' +
-          missingArgs[0]);
+          'Expected customization arguments to have property: ' + missingArgs[0]
+        );
       } else {
         throw new Error(
           'Expected customization arguments to have properties: ' +
-          missingArgs.join(', '));
+            missingArgs.join(', ')
+        );
       }
     }
   }
 
   getAnswerGroupWarnings(
-      answerGroups: AnswerGroup[], stateName: string): Warning[] {
+    answerGroups: AnswerGroup[],
+    stateName: string
+  ): Warning[] {
     var partialWarningsList = [];
 
     // This does not check the default outcome.
@@ -71,28 +74,32 @@ export class baseInteractionValidationService {
       if (answerGroup.outcome.isConfusing(stateName)) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
+          message:
             'Please specify what Oppia should do in Oppia response ' +
-            `${groupId}.`)
+            `${groupId}.`,
         });
       }
-      if (answerGroup.outcome.dest === stateName &&
-          answerGroup.outcome.labelledAsCorrect) {
+      if (
+        answerGroup.outcome.dest === stateName &&
+        answerGroup.outcome.labelledAsCorrect
+      ) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
+          message:
             `In answer group ${groupId}, self-loops should ` +
-            'not be labelled as correct.')
+            'not be labelled as correct.',
         });
       }
-      if (answerGroup.outcome.labelledAsCorrect &&
-        answerGroup.outcome.destIfReallyStuck !== null) {
+      if (
+        answerGroup.outcome.labelledAsCorrect &&
+        answerGroup.outcome.destIfReallyStuck !== null
+      ) {
         partialWarningsList.push({
           type: AppConstants.WARNING_TYPES.ERROR,
-          message: (
+          message:
             `The answer group ${groupId} is labelled as 'correct', ` +
-            'but includes a \'destination for really stuck learners\'. ' +
-            'The latter is unnecessary and should be removed.')
+            "but includes a 'destination for really stuck learners'. " +
+            'The latter is unnecessary and should be removed.',
         });
       }
     }
@@ -100,34 +107,41 @@ export class baseInteractionValidationService {
   }
 
   getDefaultOutcomeWarnings(
-      defaultOutcome: Outcome | null, stateName: string): Warning[] {
+    defaultOutcome: Outcome | null,
+    stateName: string
+  ): Warning[] {
     var partialWarningsList = [];
     if (defaultOutcome && defaultOutcome.isConfusing(stateName)) {
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: (
+        message:
           'Please add feedback for the user in the [All other answers] ' +
-          'rule.')
+          'rule.',
       });
     }
-    if (defaultOutcome && defaultOutcome.dest === stateName &&
-        defaultOutcome.labelledAsCorrect) {
+    if (
+      defaultOutcome &&
+      defaultOutcome.dest === stateName &&
+      defaultOutcome.labelledAsCorrect
+    ) {
       partialWarningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
-        message: (
+        message:
           'In the [All other answers] group, self-loops should not be ' +
-          'labelled as correct.')
+          'labelled as correct.',
       });
     }
     return partialWarningsList;
   }
 
   getAllOutcomeWarnings(
-      answerGroups: AnswerGroup[], defaultOutcome: Outcome | null,
-      stateName: string): Warning[] {
-    return (
-      this.getAnswerGroupWarnings(answerGroups, stateName).concat(
-        this.getDefaultOutcomeWarnings(defaultOutcome, stateName)));
+    answerGroups: AnswerGroup[],
+    defaultOutcome: Outcome | null,
+    stateName: string
+  ): Warning[] {
+    return this.getAnswerGroupWarnings(answerGroups, stateName).concat(
+      this.getDefaultOutcomeWarnings(defaultOutcome, stateName)
+    );
   }
 
   isHTMLEmpty(html: string): boolean {
@@ -143,9 +157,22 @@ export class baseInteractionValidationService {
     // the string and check if the remaining stripped string is empty.
 
     const tagsToRemove = [
-      'strong', 'em', 'p', 'ul', 'ol', 'li',
-      'i', 'b', 'br', 'span',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+      'strong',
+      'em',
+      'p',
+      'ul',
+      'ol',
+      'li',
+      'i',
+      'b',
+      'br',
+      'span',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
     ];
 
     for (const tag of tagsToRemove) {
@@ -167,6 +194,9 @@ export class baseInteractionValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'baseInteractionValidationService',
-  downgradeInjectable(baseInteractionValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'baseInteractionValidationService',
+    downgradeInjectable(baseInteractionValidationService)
+  );
