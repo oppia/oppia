@@ -98,7 +98,7 @@ export class BlogPostEditor extends BaseUser {
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
         await this.doWithinModal({
           selector: 'div.modal-dialog',
-          afterOpened: _this => {
+          whenOpened: async (_this: BaseUser, container: string) => {
             _this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
           },
         });

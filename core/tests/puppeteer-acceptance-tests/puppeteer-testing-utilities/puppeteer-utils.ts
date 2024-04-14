@@ -35,7 +35,7 @@ const acceptedBrowserAlerts = [
 
 interface ClickDetails {
   position: {x: number; y: number};
-  time: number;
+  timeInMilliseconds: number;
 }
 
 declare global {
@@ -55,7 +55,7 @@ export class BaseUser {
   userHasAcceptedCookies: boolean = false;
   email: string = '';
   username: string = '';
-  startTime: number = -1;
+  startTimeInMilliseconds: number = -1;
 
   constructor() {}
 
@@ -89,7 +89,7 @@ export class BaseUser {
         defaultViewport: null,
       })
       .then(async browser => {
-        this.startTime = Date.now();
+        this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
         this.page = await browser.newPage();
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
@@ -142,7 +142,7 @@ export class BaseUser {
   private async setupClickLogger(): Promise<void> {
     await this.page.exposeFunction(
       'logClick',
-      ({position: {x, y}, time}: ClickDetails) => {
+      ({position: {x, y}, timeInMilliseconds}: ClickDetails) => {
         // eslint-disable-next-line no-console
         console.log(
           `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
@@ -150,7 +150,9 @@ export class BaseUser {
         );
         // eslint-disable-next-line no-console
         console.log(
-          `- Click occurred ${time - this.startTime} ms into the test`
+          '- Click occurred ' +
+            `${timeInMilliseconds - this.startTimeInMilliseconds} ms ` +
+            'into the test'
         );
       }
     );
@@ -177,7 +179,7 @@ export class BaseUser {
             console.log(`DEBUG: User clicked on ${selector}:`);
             window.logClick({
               position: {x: mouseEvent.clientX, y: mouseEvent.clientY},
-              time: Date.now(),
+              timeInMilliseconds: Date.now(),
             });
           });
         }
