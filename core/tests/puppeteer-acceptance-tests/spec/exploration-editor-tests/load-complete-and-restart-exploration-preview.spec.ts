@@ -15,9 +15,9 @@
 /**
  * @fileoverview Acceptance Test for preview tab in exploration editor.
  */
-import {UserFactory} from '../../../puppeteer-testing-utilities/user-factory';
-import testConstants from '../../../puppeteer-testing-utilities/test-constants';
-import {ExplorationEditor} from '../../../user-utilities/exploration-editor-utils';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
