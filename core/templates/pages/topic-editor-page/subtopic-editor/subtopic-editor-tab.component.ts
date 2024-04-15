@@ -66,6 +66,8 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   skillsListIsShown: boolean;
   subtopicEditorCardIsShown: boolean;
   selectedSkillEditOptionsIndex: number;
+  maxCharsInSubtopicTitle!: number;
+  maxCharsInSubtopicUrlFragment!: number;
   SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
 
   constructor(
@@ -337,6 +339,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     if (this.topicEditorStateService.hasLoadedTopic()) {
       this.initEditor();
     }
+    this.maxCharsInSubtopicTitle = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
+    this.maxCharsInSubtopicUrlFragment =
+      AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
   }
 
   ngOnDestroy(): void {
