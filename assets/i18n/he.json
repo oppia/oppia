@@ -1,5 +1,6 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "על אודות קרן Oppia",
+	"I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT": "מתוך <a href=\"http://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education\" class=\"inline-links\">61 מיליון ילדים</a> ברחבי העולם שאינם יכולים ללמוד בבית־ספר יסודי, 17 מיליון לעולם לא ייכנסו לבית־ספר אם המגמות הנוכחיות יימשכו. למרבה הצער, <a href=\"https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf\" class=\"inline-links\">אפילו אלה שלומדים בבית־ספר</a> עשויים שלא לקבל את החינוך היעיל שהם צריכים.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "על נושא שמעניין אותך.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "קבלת משוב",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "על אודות Oppia",
@@ -267,6 +268,7 @@
 	"I18N_PREFERENCES_CHANGE_PICTURE": "החלפת תמונת פרופיל",
 	"I18N_PREFERENCES_EMAIL": "דוא״ל",
 	"I18N_PREFERENCES_EXPORT_ACCOUNT": "ייצוא חשבון",
+	"I18N_PREFERENCES_SAVE_CHANGES": "שמירת השינויים",
 	"I18N_PREFERENCES_SEARCH_LABEL": "חיפוש",
 	"I18N_SHOW_LESS": "הצג פחות",
 	"I18N_SHOW_MORE": "הצג עוד",
