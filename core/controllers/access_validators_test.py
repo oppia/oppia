@@ -615,13 +615,13 @@ class CollectionEditorPageAccessValidationHandler(test_utils.GenericTestBase):
         )
         self.logout()
 
-    def test_validation_returns_false_if_given_user_is_not_collection_editor(
+    def test_validation_returns_true_for_guest_user(
         self) -> None:
         self.login(self.guest_email)
         self.get_html_response(
             '%s/can_access_collection_editor_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
-            ), expected_status_int=401
+            )
         )
         self.logout()
 

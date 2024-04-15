@@ -555,7 +555,8 @@ def can_edit_collection(
         if collection_rights is None:
             raise base.UserFacingExceptions.NotFoundException
 
-        if role_services.ACTION_CREATE_COLLECTION in self.user.actions:
+        if rights_manager.check_can_edit_activity(
+                self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
 
         else:

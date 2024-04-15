@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for Collection editor Root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-import { CollectionEditorPageRootComponent } from './collection-editor-page-root.component';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {CollectionEditorPageRootComponent} from './collection-editor-page-root.component';
 
 describe('CollectionEditorPageRootComponent', () => {
   let fixture: ComponentFixture<CollectionEditorPageRootComponent>;
@@ -43,8 +43,10 @@ describe('CollectionEditorPageRootComponent', () => {
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.TITLE
+    );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.META
+    );
   });
 });

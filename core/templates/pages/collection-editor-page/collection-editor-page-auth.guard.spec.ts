@@ -15,14 +15,18 @@
 /**
  * @fileoverview Tests for EditLearnerGroupPageAuthGuard
  */
-import { Location } from '@angular/common';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
+import {Location} from '@angular/common';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
 
-import { AppConstants } from 'app.constants';
-import { CollectionEditorPageAuthGuard } from './collection-editor-page-auth.guard';
-import { AccessValidationBackendApiService } from '../oppia-root/routing/access-validation-backend-api.service';
+import {AppConstants} from 'app.constants';
+import {CollectionEditorPageAuthGuard} from './collection-editor-page-auth.guard';
+import {AccessValidationBackendApiService} from '../oppia-root/routing/access-validation-backend-api.service';
 
 class MockAccessValidationBackendApiService {
   validateAccessCollectionEditorPage(collectionId: string) {
@@ -46,9 +50,11 @@ describe('CollectionEditorPageAuthGuard', () => {
       imports: [RouterTestingModule],
       providers: [
         CollectionEditorPageAuthGuard,
-        { provide: AccessValidationBackendApiService,
-          useClass: MockAccessValidationBackendApiService },
-        { provide: Router, useClass: MockRouter },
+        {
+          provide: AccessValidationBackendApiService,
+          useClass: MockAccessValidationBackendApiService,
+        },
+        {provide: Router, useClass: MockRouter},
         Location,
       ],
     });
@@ -63,15 +69,17 @@ describe('CollectionEditorPageAuthGuard', () => {
   it('should allow access if validation succeeds', fakeAsync(() => {
     const validateAccessSpy = spyOn(
       accessValidationBackendApiService,
-      'validateAccessCollectionEditorPage')
-      .and.returnValue(Promise.resolve());
-    const navigateSpy = spyOn(router, 'navigate')
-      .and.returnValue(Promise.resolve(true));
+      'validateAccessCollectionEditorPage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
 
     let canActivateResult: boolean | null = null;
 
-    guard.canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then((result) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
         canActivateResult = result;
       });
 
@@ -85,23 +93,25 @@ describe('CollectionEditorPageAuthGuard', () => {
   it('should redirect to 401 page if validation fails', fakeAsync(() => {
     spyOn(
       accessValidationBackendApiService,
-      'validateAccessCollectionEditorPage')
-      .and.returnValue(Promise.reject());
-    const navigateSpy = spyOn(router, 'navigate')
-      .and.returnValue(Promise.resolve(true));
+      'validateAccessCollectionEditorPage'
+    ).and.returnValue(Promise.reject());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
 
     let canActivateResult: boolean | null = null;
 
-    guard.canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
-      .then((result) => {
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
         canActivateResult = result;
       });
 
     tick();
 
     expect(canActivateResult).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith(
-      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]
-    );
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+    ]);
   }));
 });
