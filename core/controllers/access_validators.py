@@ -435,6 +435,6 @@ class TopicEditorPageAccessValidationHandler(
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The topic with the given id doesn\'t exist.'
             )
