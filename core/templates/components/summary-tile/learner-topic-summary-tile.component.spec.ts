@@ -24,6 +24,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerTopicSummaryTileComponent} from './learner-topic-summary-tile.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 describe('Learner Topic Summary Tile Component', () => {
   let component: LearnerTopicSummaryTileComponent;
@@ -32,8 +34,13 @@ describe('Learner Topic Summary Tile Component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [MaterialModule, FormsModule, HttpClientTestingModule],
-      declarations: [LearnerTopicSummaryTileComponent],
+      imports: [
+        MaterialModule,
+        FormsModule,
+        SmartRouterModule,
+        HttpClientTestingModule,
+      ],
+      declarations: [LearnerTopicSummaryTileComponent, MockTranslatePipe],
       providers: [UrlInterpolationService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();

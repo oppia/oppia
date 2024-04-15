@@ -341,6 +341,10 @@ describe('Learner dashboard page', () => {
             provide: PlatformFeatureService,
             useClass: MockPlatformFeatureService,
           },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
+          },
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
