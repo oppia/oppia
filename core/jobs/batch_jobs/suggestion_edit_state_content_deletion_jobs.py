@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Deletion Jobs for edit state content suggestion models."""
+"""Deletion jobs for edit state content suggestion models."""
 
 from __future__ import annotations
 
@@ -89,7 +89,7 @@ class DeleteDeprecatedSuggestionEditStateContentModelsJob(base_jobs.JobBase):
                 GetDeprecatedSuggestionEditStateContentModels())
         )
 
-        unused_models_deletion = (
+        unused_models_deletion_result = (
             suggestion_edit_state_content_model_to_delete
             | 'Extract keys' >> beam.Map(lambda model: model.key)
             | 'Delete models' >> ndb_io.DeleteModels()
