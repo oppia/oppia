@@ -276,3 +276,53 @@ class EntityVoiceoversHandler(
             'voiceover_type_to_voiceovers': voiceover_type_to_voiceovers
         })
         self.render_json(self.values)
+
+
+class EntityVoiceoversBulkHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """"""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_version': {
+            'schema': {
+                'type': 'int'
+            }
+        },
+        'language_code': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        language_code: str,
+    ):
+        entity_voiceovers_list = (
+            voiceover_services.
+            get_entity_voiceovers_for_given_language_code_of_exploration(
+                entity_id, entity_type, entity_version, language_code)
+        )
+        print(entity_voiceovers_list)
+
+        self.values.update({
+            'entity_voiceovers_list': entity_voiceovers_list
+        })
+        self.render_json(self.values)

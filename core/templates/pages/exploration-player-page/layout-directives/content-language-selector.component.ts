@@ -32,6 +32,9 @@ import {
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -47,7 +50,10 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private playerTranscriptService: PlayerTranscriptService,
     private ngbModal: NgbModal,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private contextService: ContextService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -97,6 +103,21 @@ export class ContentLanguageSelectorComponent implements OnInit {
       this.selectedLanguageCode = newLanguageCode;
       this.changeDetectorRef.detectChanges();
     }
+    let explorationId = this.contextService.getExplorationId();
+    let explorationVersion = this.contextService.getExplorationVersion();
+    let entityType = 'exploration';
+
+    this.voiceoverBackendApiService
+      .fetchEntityVoiceoversForGivenLanguageCodeAsync(
+        entityType,
+        explorationId,
+        explorationVersion,
+        newLanguageCode
+      )
+      .then(response => {
+        this.entityVoiceoversService.setEntityVoiceovers(response);
+        console.log(response);
+      });
   }
 
   shouldDisplaySelector(): boolean {

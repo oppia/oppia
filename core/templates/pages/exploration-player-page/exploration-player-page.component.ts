@@ -67,6 +67,7 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
         // manually, and the onLangChange subscription is added after
         // the exploration is fetch from the backend.
         this.setPageTitle();
+        this.contextService.setExplorationVersion(response.version);
         this.subscribeToOnLangChange();
         this.metaTagCustomizationService.addOrReplaceMetaTags([
           {

@@ -121,6 +121,32 @@ def get_entity_voiceovers_for_given_exploration(
     return entity_voiceovers_objects
 
 
+def get_entity_voiceovers_for_given_language_code_of_exploration(
+    entity_id, entity_type, entity_version, language_code
+):
+    entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(
+        entity_id, entity_type, entity_version)
+
+    language_codes_mapping = get_all_language_accent_codes_for_voiceovers()
+    supported_language_accent_codes = (
+        language_codes_mapping.get(language_code, {}))
+
+    entity_voiceovers_list = []
+
+    for entity_voiceovers in entity_voiceovers_for_exp:
+        if entity_voiceovers.language_accent_code not in (
+                supported_language_accent_codes
+        ):
+            continue
+        # Checks if voiceovers are present or not.
+        if not bool(entity_voiceovers.voiceovers):
+            continue
+
+        entity_voiceovers_list.append(entity_voiceovers.to_dict())
+
+    return entity_voiceovers_list
+
+
 def compute_voiceover_related_change(
     updated_exploration: exp_domain.Exploration,
     voiceover_changes: List[exp_domain.ExplorationChange]

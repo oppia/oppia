@@ -27,6 +27,12 @@ import {
   Voiceover,
   VoiceoverBackendDict,
 } from 'domain/exploration/voiceover.model';
+import {List} from 'lodash';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from './entity-voiceovers.model';
+import {resolve} from 'path';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -263,6 +269,39 @@ export class VoiceoverBackendApiService {
           resolve({
             manualVoiceover: manualVoiceover,
           });
+        });
+    });
+  }
+
+  async fetchEntityVoiceoversForGivenLanguageCodeAsync(
+    entityType: string,
+    entitytId: string,
+    entityVersion: number,
+    languageCode: string
+  ): Promise<EntityVoiceovers[]> {
+    let entityVoiceoversBulkHandlerUrl =
+      this.urlInterpolationService.interpolateUrl(
+        VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS_BULK,
+        {
+          entity_type: entityType,
+          entity_id: entitytId,
+          entity_version: String(entityVersion),
+          language_code: languageCode,
+        }
+      );
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<EntityVoiceoversBackendDict[]>(entityVoiceoversBulkHandlerUrl)
+        .toPromise()
+        .then(response => {
+          let entityVoiceoversList = [];
+          for (let entityVoiceoverBackendDict of response) {
+            entityVoiceoversList.push(
+              EntityVoiceovers.createFromBackendDict(entityVoiceoverBackendDict)
+            );
+          }
+          resolve(entityVoiceoversList);
         });
     });
   }
