@@ -311,7 +311,7 @@
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Bevestiging vereist",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_RESET_CODE": "Code opnieuw instellen",
 	"I18N_INTERACTIONS_SET_INPUT_ADD_ITEM": "Item toevoegen",
-	"I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Het lijkt erop dat je set duplicaten heeft!",
+	"I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR": "Het lijkt erop dat je antwoord duplicaten heeft!",
 	"I18N_INTERACTIONS_SET_INPUT_EMPTY_SET": "(Voeg één item per regel toe)",
 	"I18N_INTERACTIONS_SET_INPUT_NO_ANSWER": "Geen antwoord gegeven.",
 	"I18N_INTERACTIONS_SUBMIT": "Opslaan",
