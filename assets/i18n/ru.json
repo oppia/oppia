@@ -1,5 +1,6 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "О Фонде Oppia",
+	"I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT": "Из <a href=\"http://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education\" class=\"inline-links\">61 миллиона детей</a> во всем мире, которые не могут посещать начальную школу, 17 миллионов никогда не войдут в школу, если эта тенденция сохранится. К сожалению, <a href=\"https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf\" class=\"inline-links\">даже те, кто учатся в школе,</a> могут не получить необходимого им эффективного образования.",
 	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "О Фонде Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Создать исследование",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "о теме, о которой вы заботитесь.",
@@ -321,6 +322,7 @@
 	"I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN": "Это язык, на котором показано место.",
 	"I18N_PREFERENCES_PROFILE_PICTURE_ADD": "Добавить изображение профиля",
 	"I18N_PREFERENCES_PROFILE_PICTURE_DRAG": "Перетащите, чтобы обрезать и изменить размер:",
+	"I18N_PREFERENCES_SAVE_CHANGES": "Записать изменения",
 	"I18N_PREFERENCES_SEARCH_LABEL": "Поиск",
 	"I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "Выберите предпочитаемые языки...",
 	"I18N_PREFERENCES_USERNAME": "Имя участника",
