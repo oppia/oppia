@@ -19,6 +19,7 @@
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {VoiceoverAdmin} from '../../user-utilities/voiceover-admin-utils';
+import {ExplorationEditor} from '../../user-utilities/exploration-creator-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
@@ -26,6 +27,11 @@ const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 const ROLES = testConstants.Roles;
 const invalidIdErrorToastMessage =
   'Sorry, we could not find the specified user.';
+
+// The backend 400 error is a known consequence of adding an invalid user ID.
+// By ignoring it, we prevent noise in the test output and focus on other unexpected errors.
+//
+// The frontend toast message is directly asserted by test case, ensuring it is displayed correctly.
 
 ConsoleReporter.setConsoleErrorsToIgnore([
   new RegExp(
@@ -35,12 +41,12 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 ]);
 
 describe('Voiceover Admin', function () {
-  let voiceoverAdm: VoiceoverAdmin;
-  let explorationEditor: VoiceoverAdmin;
+  let voiceoverAdmin: VoiceoverAdmin;
+  let explorationEditor: ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
-    voiceoverAdm = await UserFactory.createNewUser(
+    voiceoverAdmin = await UserFactory.createNewUser(
       'voiceoverAdm',
       'voiceover_admin@example.com',
       [ROLES.VOICEOVER_ADMIN]
@@ -63,18 +69,23 @@ describe('Voiceover Admin', function () {
       explorationId =
         await explorationEditor.publishExplorationWithTitle('Exploration one');
 
-      await voiceoverAdm.navigateToExplorationEditor(explorationId);
-      await voiceoverAdm.dismissWelcomeModal();
+      await voiceoverAdmin.navigateToExplorationEditor(explorationId);
+      await voiceoverAdmin.dismissWelcomeModal();
 
-      await voiceoverAdm.navigateToExplorationSettingsTab();
+      await voiceoverAdmin.navigateToExplorationSettingsTab();
 
-      await voiceoverAdm.expectVoiceoverArtistNotExists('invalidUserId');
-      await voiceoverAdm.addVoiceoverArtistToExploration('invalidUserId');
+      await voiceoverAdmin.expectToBeOmittedFromVoiceoverArtistList(
+        'invalidUserId'
+      );
+      await voiceoverAdmin.addVoiceoverArtistToExploration('invalidUserId');
 
-      await voiceoverAdm.expectToSeeErrorToastMessage(
+      await voiceoverAdmin.expectToSeeErrorToastMessage(
         invalidIdErrorToastMessage
       );
-      await voiceoverAdm.closeToastMessage();
+      await voiceoverAdmin.closeToastMessage();
+      await voiceoverAdmin.expectToBeOmittedFromVoiceoverArtistList(
+        'invalidUserId'
+      );
     },
     DEFAULT_SPEC_TIMEOUT
   );
@@ -93,13 +104,17 @@ describe('Voiceover Admin', function () {
       explorationId =
         await explorationEditor.publishExplorationWithTitle('Exploration two');
 
-      await voiceoverAdm.navigateToExplorationEditor(explorationId);
-      await voiceoverAdm.navigateToExplorationSettingsTab();
+      await voiceoverAdmin.navigateToExplorationEditor(explorationId);
+      await voiceoverAdmin.navigateToExplorationSettingsTab();
 
-      await voiceoverAdm.expectVoiceoverArtistNotExists('voiceoverartist');
-      await voiceoverAdm.addVoiceoverArtistToExploration('voiceoverartist');
+      await voiceoverAdmin.expectToBeOmittedFromVoiceoverArtistList(
+        'voiceoverartist'
+      );
+      await voiceoverAdmin.addVoiceoverArtistToExploration('voiceoverartist');
 
-      await voiceoverAdm.expectVoiceoverArtistsListContains('voiceoverartist');
+      await voiceoverAdmin.expectVoiceoverArtistsListContains(
+        'voiceoverartist'
+      );
     },
     DEFAULT_SPEC_TIMEOUT
   );

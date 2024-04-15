@@ -20,30 +20,9 @@ import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
-const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
-const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const textStateEditSelector = 'div.e2e-test-state-edit-content';
-const richTextAreaField = 'div.e2e-test-rte';
-const saveContentButton = 'button.e2e-test-save-state-content';
-const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const interactionEndExplorationInputButton =
-  'div.e2e-test-interaction-tile-EndExploration';
-const saveInteractionButton = 'button.e2e-test-save-interaction';
-const saveChangesButton = 'button.e2e-test-save-changes';
-const saveDraftButton = 'button.e2e-test-save-draft-button';
-
-const publishExplorationButton = 'button.e2e-test-publish-exploration';
-const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
-const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
-const explorationCategoryDropdown =
-  'mat-form-field.e2e-test-exploration-category-metadata-modal';
-const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
-const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
-const explorationIdElement = 'span.oppia-unique-progress-id';
-const closeShareModalButton = 'button.e2e-test-share-publish-close';
 
 const explorationSettingsTab = '.e2e-test-settings-tab';
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
@@ -58,23 +37,12 @@ const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
 const mobileNavToggelbutton = '.e2e-test-mobile-options';
-const mobileChangesDropdown = '.e2e-test-mobile-changes-dropdown';
 const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
-const mobileSaveChangesButton =
-  'button.e2e-test-save-changes-for-small-screens';
-const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
 
 export class VoiceoverAdmin extends BaseUser {
-  /**
-   * Function to navigate to creator dashboard page
-   */
-  async navigateToCreatorDashboardPage(): Promise<void> {
-    await this.page.goto(creatorDashboardPage);
-  }
-
   /**
    * Function to navigate to exploration settings tab
    */
@@ -90,13 +58,6 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to navigate to exploration editor
-   */
-  async navigateToExplorationEditorPage(): Promise<void> {
-    await this.clickOn(createExplorationButton);
-  }
-
-  /**
    * Function to dismiss welcome modal
    */
   async dismissWelcomeModal(): Promise<void> {
@@ -107,76 +68,6 @@ export class VoiceoverAdmin extends BaseUser {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
     });
-  }
-
-  /**
-   * Function to create exploration with title
-   * @param explorationTitle - title of the exploration
-   */
-  async createExplorationWithTitle(explorationTitle: string): Promise<void> {
-    await this.page.waitForFunction('document.readyState === "complete"');
-    await this.page.waitForSelector(textStateEditSelector, {
-      visible: true,
-    });
-    await this.clickOn(textStateEditSelector);
-    await this.page.waitForSelector(richTextAreaField, {visible: true});
-    await this.type(richTextAreaField, `${explorationTitle}`);
-    await this.clickOn(saveContentButton);
-
-    await this.clickOn(addInteractionButton);
-    await this.clickOn(interactionEndExplorationInputButton);
-    await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector('.customize-interaction-body-container', {
-      hidden: true,
-    });
-
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavToggelbutton);
-      await this.clickOn(mobileSaveChangesButton);
-    } else {
-      await this.page.waitForSelector(`${saveChangesButton}:not([disabled])`);
-      await this.clickOn(saveChangesButton);
-    }
-
-    await this.page.waitForFunction('document.readyState === "complete"');
-    await this.page.waitForSelector(saveDraftButton, {visible: true});
-    await this.clickOn(saveDraftButton);
-    await this.page.waitForSelector(saveDraftButton, {hidden: true});
-    await this.page.waitForFunction('document.readyState === "complete"');
-  }
-
-  /**
-   * Function to publish exploration
-   */
-  async publishExplorationWithTitle(
-    explorationTitle: string
-  ): Promise<string | null> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileChangesDropdown);
-      await this.clickOn(mobilePublishButton);
-    } else {
-      await this.page.waitForSelector(
-        `${publishExplorationButton}:not([disabled])`
-      );
-      await this.clickOn(publishExplorationButton);
-    }
-    await this.clickOn(explorationTitleInput);
-    await this.type(explorationTitleInput, `${explorationTitle}`);
-    await this.clickOn(explorationGoalInput);
-    await this.type(explorationGoalInput, `${explorationTitle}`);
-    await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn('Algebra');
-    await this.clickOn(saveExplorationChangesButton);
-    await this.clickOn(explorationConfirmPublishButton);
-    await this.page.waitForSelector(explorationIdElement);
-    const explorationIdUrl = await this.page.$eval(
-      explorationIdElement,
-      element => (element as HTMLElement).innerText
-    );
-    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
-
-    await this.clickOn(closeShareModalButton);
-    return explorationId;
   }
 
   /**
@@ -197,7 +88,9 @@ export class VoiceoverAdmin extends BaseUser {
    * Asserts that a voiceover artist does not exist in the list.
    * @param artistUsername - The username of the voiceover artist to check for
    */
-  async expectVoiceoverArtistNotExists(artistUsername: string): Promise<void> {
+  async expectToBeOmittedFromVoiceoverArtistList(
+    artistUsername: string
+  ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileVoiceoverArtistsHeader);
     }
