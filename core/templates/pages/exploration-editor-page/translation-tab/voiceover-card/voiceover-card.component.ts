@@ -16,44 +16,21 @@
  * @fileoverview Component for the audio translation bar.
  */
 
-import {
-  Component,
-  ElementRef,
-  Input,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {downgradeComponent} from '@angular/upgrade/static';
-import WaveSurfer from 'wavesurfer.js';
 import {Subscription} from 'rxjs';
-import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
-import {DeleteAudioTranslationModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/delete-audio-translation-modal.component';
-import {TranslationTabBusyModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/translation-tab-busy-modal.component';
 import {AddAudioTranslationModalComponent} from '../modal-templates/add-audio-translation-modal.component';
-import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import {UserService} from 'services/user.service';
-import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
-import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {AlertsService} from 'services/alerts.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {ContextService} from 'services/context.service';
-import {EditabilityService} from 'services/editability.service';
-import {ExternalSaveService} from 'services/external-save.service';
 import {IdGenerationService} from 'services/id-generation.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
-import {TranslationStatusService} from '../services/translation-status.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
 import {Voiceover} from 'domain/exploration/voiceover.model';
-import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import {VoiceoverRecordingService} from '../services/voiceover-recording.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
+import {VoiceoverRemovalConfirmModalComponent} from './modals/voiceover-removal-confirm-modal.component';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -145,15 +122,12 @@ export class VoiceoverCardComponent implements OnInit {
 
     this.voiceoversAreLoaded = true;
   }
+
   calculateVoiceoverProgress(currentDuration, totalDuration) {
-    console.log(currentDuration);
-    console.log(totalDuration);
     let progressValue = (currentDuration / totalDuration) * 100;
-    console.log(progressValue);
   }
 
-  playAndPauseVoiceover(filename) {
-    console.log('Playing' + filename);
+  playAndPauseVoiceover(filename: string): void {
     if (this.audioPlayerService.isPlaying()) {
       this.audioPlayerService.pause();
       return;
@@ -168,8 +142,8 @@ export class VoiceoverCardComponent implements OnInit {
     }
   }
 
-  deleteManualVoiceover() {
-    const modalRef = this.ngbModal.open(AddAudioTranslationModalComponent, {
+  deleteManualVoiceover(): void {
+    const modalRef = this.ngbModal.open(VoiceoverRemovalConfirmModalComponent, {
       backdrop: 'static',
     });
     modalRef.result.then(
@@ -189,11 +163,8 @@ export class VoiceoverCardComponent implements OnInit {
     );
   }
 
-  toggleAudioNeedsUpdate() {
-    console.log('Marking audio!');
-    console.log(this.manualVoiceover.needsUpdate);
+  toggleAudioNeedsUpdate(): void {
     this.manualVoiceover.needsUpdate = !this.manualVoiceover.needsUpdate;
-    console.log(this.manualVoiceover.needsUpdate);
     this.changeListService.editVoiceovers(
       this.contentId,
       this.languageAccentCode,
@@ -203,7 +174,7 @@ export class VoiceoverCardComponent implements OnInit {
     );
   }
 
-  addManualVoiceover() {
+  addManualVoiceover(): void {
     const modalRef = this.ngbModal.open(AddAudioTranslationModalComponent, {
       backdrop: 'static',
     });
@@ -239,7 +210,7 @@ export class VoiceoverCardComponent implements OnInit {
     );
   }
 
-  generateNewFilename() {
+  generateNewFilename(): string {
     return (
       this.contentId +
       '-' +

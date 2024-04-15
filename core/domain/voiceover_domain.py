@@ -209,6 +209,8 @@ class EntityVoiceovers:
                 voiceover.
         """
         del self.voiceovers[content_id][voiceover_type]
+        if not bool(self.voiceovers[content_id]):
+            del self.voiceovers[content_id]
 
     @classmethod
     def create_empty(

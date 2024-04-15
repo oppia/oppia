@@ -29,7 +29,7 @@ from core.domain import user_services
 from core.domain import voiceover_domain
 from core.platform import models
 
-from typing import Dict, List, Sequence, cast
+from typing import Dict, List, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -107,9 +107,23 @@ def get_voiceovers_for_given_language_accent_code(
 
 
 def get_entity_voiceovers_for_given_exploration(
-    entity_id, entity_type, entity_version
-):
-    entity_voiceovers_objects = []
+    entity_id: str, entity_type: str, entity_version: int
+) -> List[voiceover_domain.EntityVoiceovers]:
+    """Retrieve voiceover models for the specified exploration and version.
+
+    Args:
+        entity_id: str. The entity ID for which entity voiceovers need to be
+            fetched.
+        entity_type: str. The entity type for which entity voiceovers need to be
+            fetched.
+        entity_version: int. The entity version of the given exploration for
+            which entity voiceovers need to be fetched.
+
+    Returns:
+        list(EntityVoiceovers). Returns a list of voiceover models for the
+        specified exploration and version.
+    """
+    entity_voiceovers_objects: List[voiceover_domain.EntityVoiceovers] = []
     entity_voiceover_models = (
         voiceover_models.EntityVoiceoversModel.
         get_entity_voiceovers_for_given_exploration(
@@ -124,7 +138,7 @@ def get_entity_voiceovers_for_given_exploration(
 def compute_voiceover_related_change(
     updated_exploration: exp_domain.Exploration,
     voiceover_changes: List[exp_domain.ExplorationChange]
-) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
+) -> List[voiceover_models.EntityVoiceoversModel]:
     """Cretase new EntityVoiceovers models corresponding to voiceover related
     changes.
 
@@ -149,10 +163,10 @@ def compute_voiceover_related_change(
         entity_id, entity_type, entity_version)
 
     for entity_voiceovers in entity_voiceovers_objects:
-        entity_voiceovers_id = (
-            entity_voiceovers.entity_type +
-            entity_voiceovers.entity_id +
-            str(entity_voiceovers.entity_version) +
+        entity_voiceovers_id = generate_id_method(
+            entity_voiceovers.entity_type,
+            entity_voiceovers.entity_id,
+            str(entity_voiceovers.entity_version),
             entity_voiceovers.language_accent_code
         )
         entity_voiceover_id_to_entity_voiceovers[entity_voiceovers_id] = (
@@ -167,18 +181,33 @@ def compute_voiceover_related_change(
 
         if entity_voiceover_id in entity_voiceover_id_to_entity_voiceovers:
             entity_voiceovers = (
-                entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id])
+                entity_voiceover_id_to_entity_voiceovers.get(
+                    entity_voiceover_id)
+            )
         else:
             entity_voiceovers = voiceover_domain.EntityVoiceovers.create_empty(
                 entity_id, entity_type, entity_version, language_accent_code)
 
-        manual_voiceover = state_domain.Voiceover.from_dict(
-            change.voiceovers['manual'])
-        entity_voiceovers.add_voiceover(
-            content_id,
-            feconf.VoiceoverType.MANUAL,
-            manual_voiceover
-        )
+        if content_id not in entity_voiceovers.voiceovers:
+            manual_voiceover = state_domain.Voiceover.from_dict(
+                change.voiceovers['manual'])
+            entity_voiceovers.add_voiceover(
+                content_id,
+                feconf.VoiceoverType.MANUAL,
+                manual_voiceover
+            )
+        else:
+            if 'manual' not in change.voiceovers:
+                entity_voiceovers.remove_voiceover(
+                    content_id,
+                    feconf.VoiceoverType.MANUAL
+                )
+            else:
+                manual_voiceover = state_domain.Voiceover.from_dict(
+                    change.voiceovers['manual'])
+                entity_voiceovers.voiceovers[content_id][
+                    feconf.VoiceoverType.MANUAL] = manual_voiceover
+
         entity_voiceovers.validate()
 
         entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
