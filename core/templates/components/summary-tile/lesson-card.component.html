@@ -6,8 +6,8 @@
     </div>
   </div>
   <div class="bg-white d-flex flex-column lesson-card-info justify-content-between">
-    <div class="d-flex flex-column flex-grow"> 
-      <div class="lesson-card-title-container mt-1"> 
+    <div class="d-flex flex-column flex-grow">
+      <div class="lesson-card-title-container mt-1">
         <p class="lesson-card-title mb-0"> {{ title }} </p>
       </div>
       <p class="lesson-card-topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
@@ -16,9 +16,9 @@
     <div class="align-items-center d-flex justify-content-between mt-2">
       <div class="align-items-center border border-light d-flex justify-content-center lesson-card-progress-border relative rounded-circle"
            [ngStyle]="{'background': getProgress(progress)}"
-      > 
-        <div class="align-items-center d-flex justify-content-center lesson-card-progress rounded-circle"> 
-          {{ progress }}% 
+      >
+        <div class="align-items-center d-flex justify-content-center lesson-card-progress rounded-circle">
+          {{ progress }}%
         </div>
       </div>
       <a class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none" [href]="lessonUrl" target="_self">
@@ -85,10 +85,10 @@
 
   .lesson-card-title {
     color: #00645c;
-    font-family: Capriola;
+    font-family: Capriola, Roboto, Arial, sans-serif;
     font-size: 15px;
-    line-height: 20px;
     -webkit-line-clamp: 2;
+    line-height: 20px;
   }
 
   .lesson-card-title-container {

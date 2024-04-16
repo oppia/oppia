@@ -357,7 +357,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  /* tbd 1 - extract logic from setActiveSection to only run once and pass */
   setActiveSection(newActiveSectionName: string): void {
     this.activeSection = newActiveSectionName;
     if (

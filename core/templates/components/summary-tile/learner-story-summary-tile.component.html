@@ -1,4 +1,4 @@
-<ng-container> 
+<ng-container>
   <div class="learner-story-summary-tile" *ngIf="!featureFlag; else redesign">
     <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
       {{nextIncompleteNodeTitle}}
@@ -33,11 +33,8 @@
       </a>
     </mat-card>
   </div>
-  <ng-template #redesign> 
-    <lesson-card
-      [story]="storySummary"
-      [topic]="topicName"
-    >
+  <ng-template #redesign>
+    <lesson-card [story]="storySummary" [topic]="topicName">
     </lesson-card>
   </ng-template>
 </ng-container>

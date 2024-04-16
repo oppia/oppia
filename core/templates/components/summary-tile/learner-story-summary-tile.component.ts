@@ -63,7 +63,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     if (classroomUrlFragment === undefined || topicUrlFragment === undefined) {
       return '#';
     }
-    /* redesign - delete */
     if (this.isDisplayAreaHome()) {
       var allNodes = this.storySummary.getAllNodes();
       var node = allNodes[this.completedNodeCount];
@@ -134,10 +133,8 @@ export class LearnerStorySummaryTileComponent implements OnInit {
       this.nextIncompleteNodeTitle = `Chapter ${this.completedNodeCount + 1}: ${nextIncompleteNode}`;
     }
     this.starImageUrl = this.getStaticImageUrl('/learner_dashboard/star.svg');
-
   }
 
-  /* redesign - delete */
   isDisplayAreaHome(): boolean {
     if (this.displayArea === 'homeTab') {
       return true;
@@ -149,7 +146,6 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  /* redesign - delete */
   isCardHovered(): string {
     if (this.displayArea === 'homeTab' && this.cardIsHovered) {
       return '-webkit-filter: blur(2px); filter: blur(2px);';

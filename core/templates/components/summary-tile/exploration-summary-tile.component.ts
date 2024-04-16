@@ -190,8 +190,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
 
   // Function will return null when the property 'lastUpdatedMsecs' is null
   // or undefined.
-
-   /* redesign - delete */
   getLastUpdatedDatetime(): string | null {
     if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getLocaleAbbreviatedDatetimeString(
@@ -201,7 +199,6 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
     return null;
   }
 
-   /* redesign - delete */
   getRelativeLastUpdatedDateTime(): string | null {
     if (this.lastUpdatedMsec) {
       return this.dateTimeFormatService.getRelativeTimeFromNow(
