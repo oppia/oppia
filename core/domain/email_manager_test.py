@@ -6675,7 +6675,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.signup(self.RECIPIENT_EMAIL, self.RECIPIENT_USERNAME)
         self.recipient_id = self.get_user_id_from_email(
             self.RECIPIENT_EMAIL)
-        self.can_send_email_moderator_action_ctx = (
+        self.can_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -6691,7 +6691,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         )
 
     def test_exception_raised_if_can_send_emails_is_false(self) -> None:
-        with self.can_send_email_moderator_action_ctx, self.assertRaisesRegex(
+        with self.assertRaisesRegex(
             Exception,
             'For moderator emails to be sent, please ensure that '
             'CAN_SEND_EMAILS is set to True.'):
@@ -6703,7 +6703,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         expected_draft_text_body = (
             'I\'m writing to inform you that '
             'I have unpublished the above exploration.')
-        with self.can_send_emails_ctx, self.can_send_email_moderator_action_ctx:
+        with self.can_send_emails_ctx:
             d_text = email_manager.get_moderator_unpublish_exploration_email()
             self.assertEqual(d_text, expected_draft_text_body)
 
@@ -6719,8 +6719,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         email_intent = 'unpublish_exploration'
         exploration_title = 'Title'
         email_html_body = 'Dummy email body.<br>'
-        with self.can_send_emails_ctx, (
-            self.can_send_email_moderator_action_ctx):
+        with self.can_send_emails_ctx:
             email_manager.send_moderator_action_email(
                 self.moderator_id, self.recipient_id,
                 email_intent, exploration_title, email_html_body)
