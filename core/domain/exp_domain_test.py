@@ -18511,14 +18511,10 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
         rights_manager.publish_exploration(self.owner, self.EXP_0_ID)
         self.exploration_rights = (
           rights_manager.get_exploration_rights(
-            self.EXP_0_ID).to_dict()
+            self.EXP_0_ID)
           )
-        self.states = {}
-        for state_name in self.exploration.states:
-            state_dict = self.exploration.states[state_name].to_dict()
-            self.states[state_name] = state_dict
         self.user_exploration_data = exp_domain.UserExplorationData(
-          self.exploration, self.states, self.exploration_rights
+          self.exploration, self.exploration_rights
         )
 
     def test_initialization(self) -> None:
@@ -18541,7 +18537,7 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
             'mute_feedback_notifications': False,
             'mute_suggestion_notifications': False
         })
-        self.assertEqual(self.user_exploration_data.states, self.states)
+        self.assertEqual(self.user_exploration_data.states, self.exploration.states)
         self.assertEqual(
           self.user_exploration_data.exploration, self.exploration)
 
@@ -18554,7 +18550,7 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
           'language_code': self.exploration.language_code,
           'tags': self.exploration.tags,
           'init_state_name': self.exploration.init_state_name,
-          'states': self.states,
+          'states': self.exploration.states,
           'param_changes': self.exploration.param_change_dicts,
           'param_specs': self.exploration.param_specs_dict,
           'version': self.exploration.version,

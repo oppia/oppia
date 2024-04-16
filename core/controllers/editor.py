@@ -199,14 +199,10 @@ class ExplorationHandler(
                 exploration = exp_fetchers.get_exploration_by_id(exploration_id)
                 exploration_rights = (
                     rights_manager.get_exploration_rights(
-                        exploration_id).to_dict()
+                        exploration_id)
                 )
-                states = {}
-                for state_name in exploration.states:
-                    state_dict = exploration.states[state_name].to_dict()
-                    states[state_name] = state_dict
                 exploration_data = exp_domain.UserExplorationData(
-                    exploration, states, exploration_rights
+                    exploration, exploration_rights
                 ).to_dict()
             else:
                 exploration_data = exp_services.get_user_exploration_data(

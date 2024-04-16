@@ -2990,10 +2990,6 @@ def get_user_exploration_data(
         exploration = exp_fetchers.get_exploration_by_id(
             exploration_id, version=version)
 
-    states = {}
-    for state_name in exploration.states:
-        state_dict = exploration.states[state_name].to_dict()
-        states[state_name] = state_dict
     draft_changes = (
         exp_user_data.draft_change_list if exp_user_data
         and exp_user_data.draft_change_list else None)
@@ -3007,8 +3003,8 @@ def get_user_exploration_data(
     ).to_dict()
 
     editor_dict = exp_domain.UserExplorationData(
-        exploration, states,
-        rights_manager.get_exploration_rights(exploration_id).to_dict(),
+        exploration,
+        rights_manager.get_exploration_rights(exploration_id),
         exploration_email_preferences, draft_change_list_id,
         is_valid_draft_version, draft_changes
     ).to_dict()

@@ -57,7 +57,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     # rights_domain and user_domain are imported under the
     # `if MYPY` clause only for type checking purposes
-    # and to avoid circular import and they are not expected to be executed
+    # and to avoid circular imports. They are not expected to be executed
     # at runtime.
     from core.domain import rights_domain
     from core.domain import user_domain
@@ -5825,8 +5825,7 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
     def __init__(
         self,
         exploration: Exploration,
-        states: Dict[str, state_domain.StateDict],
-        rights: rights_domain.ActivityRightsDict,
+        rights: rights_domain.ActivityRights,
         exploration_email_preferences: Optional[
             user_domain.UserExplorationPrefsDict] = None,
         draft_change_list_id: int = 0,
@@ -5837,14 +5836,12 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
 
         Args:
             exploration: Exploration. The exploration domain object.
-            states: Dict[str, state_domain.StateDict]. Dictionary representing
-                the State object.
-            rights: rights_domain.ActivityRightsDict. Dictionary
+            rights: rights_domain.ActivityRights. Domain object
                 representation of activity rights.
             exploration_email_preferences: Optional[user_domain.
                 UserExplorationPrefsDict]. Dictionary
                 representing feedback and suggestion email settings.
-            draft_change_list_id: int. The id of draf change list.
+            draft_change_list_id: int. The id of draft change list.
             is_valid_draft_version: Optional[bool]. Whether the given draft
                 version is valid or not.
             draft_changes: Optional[Dict[str, str]]. A dict of draft changes.
@@ -5854,7 +5851,7 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         self.show_state_editor_tutorial_on_load = False
         self.show_state_translation_tutorial_on_load = False
         self.draft_changes = draft_changes
-        self.states = states
+        self.states = exploration.states
         self.rights = rights
         self.is_valid_draft_version = is_valid_draft_version
         if exploration_email_preferences is None:
@@ -5875,6 +5872,11 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
             domain object.
         """
 
+        states = {}
+        for state_name in self.states:
+            state_dict = self.states[state_name].to_dict()
+            states[state_name] = state_dict
+
         return {
             'exploration_id': self.exploration.id,
             'title': self.exploration.title,
@@ -5883,14 +5885,14 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
             'language_code': self.exploration.language_code,
             'tags': self.exploration.tags,
             'init_state_name': self.exploration.init_state_name,
-            'states': self.states,
+            'states': states,
             'param_changes': self.exploration.param_change_dicts,
             'param_specs': self.exploration.param_specs_dict,
             'version': self.exploration.version,
             'auto_tts_enabled': self.exploration.auto_tts_enabled,
             'edits_allowed': self.exploration.edits_allowed,
             'draft_change_list_id': self.draft_change_list_id,
-            'rights': self.rights,
+            'rights': self.rights.to_dict(),
             'show_state_editor_tutorial_on_load':
                 self.show_state_editor_tutorial_on_load,
             'show_state_translation_tutorial_on_load':
