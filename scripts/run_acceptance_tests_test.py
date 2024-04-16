@@ -1,4 +1,4 @@
-# Copyright 2023 The Oppia Authors. All Rights Reserved.
+# Copyright 2024 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import contextlib
+import os
 import subprocess
 import sys
 
@@ -349,3 +350,17 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         with self.swap_mock_set_constants_to_default:
             with self.swap(constants, 'EMULATOR_MODE', True):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
+
+    def test_print_test_output(self) -> None:
+        test_data = [b'Test case 1 passed',
+          b'Test case 2 failed', b'Test case 3 skipped']
+
+        run_acceptance_tests.print_test_output(test_data)
+
+        with open('test_output.log', 'r', encoding='utf-8') as output_file:
+            lines = output_file.readlines()
+            self.assertEqual(len(lines), 2)
+            self.assertEqual(lines[0].strip(), 'Test case 1 passed')
+            self.assertEqual(lines[1].strip(), 'Test case 2 failed')
+
+        os.remove('test_output.log')

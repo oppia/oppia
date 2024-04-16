@@ -1,4 +1,4 @@
-# Copyright 2023 The Oppia Authors. All Rights Reserved.
+# Copyright 2024 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
@@ -99,6 +99,15 @@ def compile_test_ts_files() -> None:
         os.path.join(build_dir_path, 'images'))
 
 
+def print_test_output(output_lines: List[bytes]) -> None:
+    """Print the test output lines to a separate file."""
+    with open('test_output.log', 'w', encoding='utf-8') as output_file:
+        for line in output_lines:
+            line_text = line.decode('utf-8')
+            if 'passed' in line_text.lower() or 'failed' in line_text.lower():
+                output_file.write(line_text + '\n')
+
+
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
@@ -166,6 +175,8 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
             if proc.poll() is not None:
                 break
 
+        print_test_output(output_lines)
+
         return_value = output_lines, proc.returncode
     return return_value
 
@@ -176,6 +187,9 @@ def main(args: Optional[List[str]] = None) -> None:
 
     with servers.managed_portserver():
         _, return_code = run_tests(parsed_args)
+
+    with open('test_output.log', 'r', encoding='utf-8') as output_file:
+        print(output_file.read())
 
     sys.exit(return_code)
 
