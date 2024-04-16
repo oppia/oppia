@@ -18537,7 +18537,8 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
             'mute_feedback_notifications': False,
             'mute_suggestion_notifications': False
         })
-        self.assertEqual(self.user_exploration_data.states, self.exploration.states)
+        self.assertEqual(self.user_exploration_data.states
+                         , self.exploration.states)
         self.assertEqual(
           self.user_exploration_data.exploration, self.exploration)
 
