@@ -29,6 +29,8 @@ import {
 import {BlogAdminFactory, BlogAdmin} from '../user-utilities/blog-admin-utils';
 import {QuestionAdminFactory} from '../user-utilities/question-admin-utils';
 import {BlogPostEditorFactory} from '../user-utilities/blog-post-editor-utils';
+import {VoiceoverAdminFactory} from '../user-utilities/voiceover-admin-utils';
+import {ExplorationEditorFactory} from '../user-utilities/exploration-creator-utils';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -42,6 +44,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
+  [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
 } as const;
 
 /**
@@ -141,6 +144,7 @@ export class UserFactory {
   ): Promise<LoggedInUser & MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedInUserFactory(),
+      ExplorationEditorFactory(),
     ]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);

@@ -321,6 +321,7 @@ jobs:
             - practice-question-admin-tests/add-and-remove-contribution-rights
             - translation-admin-tests/add-translation-rights
             - translation-admin-tests/remove-translation-rights
+            - voiceover-admin-tests/add-voiceover-artist-to-an-exploration
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3

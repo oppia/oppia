@@ -377,7 +377,7 @@
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
         <h3 tabindex="0">Voice Artists</h3>
-        <i class="fa fa-caret-down"
+        <i class="fa fa-caret-down e2e-test-voice-artist-collapsible-card-header"
            *ngIf="!voiceArtistsCardIsShown"
            aria-hidden="true">
         </i>
@@ -386,7 +386,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="voiceArtistsCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content e2e-test-voice-artist-card" *ngIf="voiceArtistsCardIsShown">
         <div>
           <div [hidden]="isVoiceoverFormOpen" tabindex="0" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
@@ -399,9 +399,9 @@
         </div>
 
         <div [hidden]="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length > 0)">
-          <ul>
+          <ul class="e2e-test-voiceArtist-list">
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
-              <div class="oppia-user-list-item .e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
+              <div class="oppia-user-list-item e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
                 <span tabindex="0">{{voiceArtistName}}</span>
                 <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" tabindex="0" aria-label="remove user" role="button" (keydown.enter)="removeVoiceArtist(voiceArtistName)" (click)="removeVoiceArtist(voiceArtistName)">
                 </span>

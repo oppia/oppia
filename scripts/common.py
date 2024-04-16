@@ -222,7 +222,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/click-all-links-on-get-started-page',
     'practice-question-admin-tests/add-and-remove-contribution-rights',
     'translation-admin-tests/add-translation-rights',
-    'translation-admin-tests/remove-translation-rights'
+    'translation-admin-tests/remove-translation-rights',
+    'voiceover-admin-tests/add-voiceover-artist-to-an-exploration'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
