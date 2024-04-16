@@ -52,7 +52,6 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButton = '.e2e-test-mobile-options';
 const mobileSaveChangesButton = '.e2e-test-save-changes-for-small-screens';
-const mobileStateNodeSelector = '.e2e-test-node-background';
 
 // Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';

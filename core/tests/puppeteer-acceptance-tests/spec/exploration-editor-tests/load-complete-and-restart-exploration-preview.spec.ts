@@ -33,7 +33,6 @@ enum CARD_NAME {
   TEST_QUESTION = 'Test Question',
   FINAL_CARD = 'Final Card',
 }
-const cardNames = Object.values(CARD_NAME);
 
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
