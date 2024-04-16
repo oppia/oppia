@@ -5245,7 +5245,7 @@ export default {
     "ariaLabelInEnglish": "German"
   }, {
     "code": "el",
-    "description": "ελληνικά (Greek)",
+    "description": "Ελληνικά (Greek)",
     "direction": "ltr",
     "decimal_separator": ",",
     "ariaLabelInEnglish": "Greek"
@@ -5568,6 +5568,12 @@ export default {
     "direction": "ltr",
     "decimal_separator": ".",
     "ariaLabelInEnglish": "Traditional Chinese"
+  }, {
+    "id": "el",
+    "text": "Ελληνικά",
+    "direction": "ltr",
+    "decimal_separator": ",",
+    "ariaLabelInEnglish": "Greek"
   }],
 
   // List of supported audio languages in which we have audio and translations
