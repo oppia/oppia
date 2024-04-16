@@ -172,8 +172,8 @@ def send_bulk_mail(
             (signifying API returned bad status code).
     """
     can_send_emails = (
-        email_services.get_platform_parameter_value(
-            feconf.PLATFORM_PARAMETER_CAN_SEND_EMAILS
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
         )
     )
     if not can_send_emails:

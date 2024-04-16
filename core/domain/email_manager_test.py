@@ -2898,7 +2898,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                 True
             )
         )
-        self.can_not_send_emails_ctx = (
+        self.cannot_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -4491,7 +4491,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                 True
             )
         )
-        self.can_not_send_emails_ctx = (
+        self.cannot_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -5178,7 +5178,7 @@ class NotifyReviewersNewSuggestionsTests(
                 True
             )
         )
-        self.can_not_send_emails_ctx = (
+        self.cannot_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -5577,7 +5577,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 True
             )
         )
-        self.can_not_send_emails_ctx = (
+        self.cannot_send_emails_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
@@ -6675,7 +6675,7 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         self.signup(self.RECIPIENT_EMAIL, self.RECIPIENT_USERNAME)
         self.recipient_id = self.get_user_id_from_email(
             self.RECIPIENT_EMAIL)
-        self.can_send_emails_ctx = (
+        self.can_send_email_moderator_action_ctx = (
             self.swap_to_always_return(
                 platform_parameter_services,
                 'get_platform_parameter_value',
