@@ -18545,8 +18545,8 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
     def test_to_dict(self) -> None:
         states = {}
         for state_name in self.exploration.states:
-          state_dict = self.exploration.states[state_name].to_dict()
-          states[state_name] = state_dict
+            state_dict = self.exploration.states[state_name].to_dict()
+            states[state_name] = state_dict
 
         user_exploration_data_dict = {
           'exploration_id': self.exploration.id,
