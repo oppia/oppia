@@ -18543,6 +18543,11 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
           self.user_exploration_data.exploration, self.exploration)
 
     def test_to_dict(self) -> None:
+        states = {}
+        for state_name in self.exploration.states:
+          state_dict = self.exploration.states[state_name].to_dict()
+          states[state_name] = state_dict
+
         user_exploration_data_dict = {
           'exploration_id': self.exploration.id,
           'title': self.exploration.title,
@@ -18551,14 +18556,14 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
           'language_code': self.exploration.language_code,
           'tags': self.exploration.tags,
           'init_state_name': self.exploration.init_state_name,
-          'states': self.exploration.states,
+          'states': states,
           'param_changes': self.exploration.param_change_dicts,
           'param_specs': self.exploration.param_specs_dict,
           'version': self.exploration.version,
           'auto_tts_enabled': self.exploration.auto_tts_enabled,
           'edits_allowed': self.exploration.edits_allowed,
           'draft_change_list_id': 0,
-          'rights': self.exploration_rights,
+          'rights': self.exploration_rights.to_dict(),
           'show_state_editor_tutorial_on_load': False,
           'show_state_translation_tutorial_on_load': False,
           'draft_changes': None,
