@@ -73,7 +73,7 @@ export class LessonCardComponent implements OnInit {
         completedStories === this.story.getAllNodes().length
           ? completedStories - 1
           : completedStories;
-      // Last completed story index works because if 1 is completed, 1 index is 2nd item
+      /* Last completed story index works because if 1 is completed, 1 index is 2nd item */
       let lessonArgs = {
         classroom: this.story.getClassroomUrlFragment(),
         topic: this.story.getTopicUrlFragment(),
