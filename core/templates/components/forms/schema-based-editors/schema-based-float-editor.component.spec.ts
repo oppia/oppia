@@ -260,4 +260,38 @@ describe('Schema based float editor component', function () {
     expect(component.localValue).toEqual(null);
     expect(component.errorStringI18nKey).toEqual('Error');
   });
+
+  it('should not show error for different decimal points', () => {
+    let spyOnComponentCDS = spyOn(
+      component,
+      'getCurrentDecimalSeparator'
+    ).and.returnValue(',');
+    let spyOnServiceCDS = spyOn(
+      numberConversionService,
+      'currentDecimalSeparator'
+    ).and.returnValue(',');
+
+    component.localStringValue = '12,5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
+
+    component.localStringValue = '12.5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
+
+    spyOnComponentCDS.and.returnValue('.');
+    spyOnServiceCDS.and.returnValue('.');
+
+    component.localStringValue = '12,5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
+
+    component.localStringValue = '12.5';
+    component.parseInput();
+    expect(component.localValue).toEqual(12.5);
+    expect(component.errorStringI18nKey).toEqual(null);
+  });
 });

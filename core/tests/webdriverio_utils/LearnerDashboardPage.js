@@ -114,6 +114,37 @@ var LearnerDashboardPage = function () {
     expect(titleOfExplorationSummary).toMatch(title);
   };
 
+  this.removeExplorationSummaryTileFromPlaylist = async function (title) {
+    let removeTile = await $(`.e2e-test-exp-summary-tile-title=${title}`);
+    await removeTile.moveTo();
+
+    let removeFromPlayLaterListButton = $('.e2e-test-remove-from-playlist-btn');
+    await removeFromPlayLaterListButton.waitForClickable({timeout: 5000});
+    await action.click(
+      'Remove from playlist button',
+      removeFromPlayLaterListButton,
+      false
+    );
+    let confirmDeleteInteractionButton = $(
+      '.e2e-test-confirm-delete-interaction'
+    );
+    await confirmDeleteInteractionButton.waitForClickable({timeout: 5000});
+    await action.click(
+      'Confirm Delete Interaction button',
+      confirmDeleteInteractionButton
+    );
+    await waitFor.invisibilityOf(
+      confirmDeleteInteractionButton,
+      'Delete Interaction modal takes too long to close'
+    );
+  };
+
+  this.expectExplorationTileToBeRemovedFromPlaylist = async function (title) {
+    let removeTile = await $(`.e2e-test-exp-summary-tile-title=${title}`);
+    await removeTile.waitForDisplayed({timeout: 5000, reverse: true});
+    expect(await removeTile.isDisplayed()).toBe(false);
+  };
+
   this.expectNameOfTopicInEditGoalsToMatch = async function (name) {
     await waitFor.visibilityOf(
       editGoalsTopicName,
