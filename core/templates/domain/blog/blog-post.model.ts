@@ -17,17 +17,17 @@
  * blog post domain objects.
  */
 
-import { AppConstants } from 'app.constants';
+import {AppConstants} from 'app.constants';
 export interface BlogPostBackendDict {
-  'id': string ;
-  'displayed_author_name': string;
-  'title': string;
-  'content': string;
-  'thumbnail_filename': string | null;
-  'tags': string[];
-  'url_fragment': string;
-  'last_updated'?: string;
-  'published_on'?: string;
+  id: string;
+  displayed_author_name: string;
+  title: string;
+  content: string;
+  thumbnail_filename: string | null;
+  tags: string[];
+  url_fragment: string;
+  last_updated?: string;
+  published_on?: string;
 }
 export class BlogPostData {
   _id: string;
@@ -41,15 +41,16 @@ export class BlogPostData {
   _publishedOn?: string;
   _titleIsDuplicate: boolean;
   constructor(
-      id: string,
-      displayedAuthorName: string,
-      title: string,
-      content: string,
-      tags: string[],
-      thumbnailFilename: string | null,
-      urlFragment: string,
-      lastUpdated?: string,
-      publishedOn?: string) {
+    id: string,
+    displayedAuthorName: string,
+    title: string,
+    content: string,
+    tags: string[],
+    thumbnailFilename: string | null,
+    urlFragment: string,
+    lastUpdated?: string,
+    publishedOn?: string
+  ) {
     this._id = id;
     this._displayedAuthorName = displayedAuthorName;
     this._title = title;
@@ -137,29 +138,24 @@ export class BlogPostData {
       AppConstants.VALID_BLOG_POST_TITLE_REGEX
     );
     if (this._titleIsDuplicate) {
-      issues.push(
-        'Blog Post with the given title already exists.');
+      issues.push('Blog Post with the given title already exists.');
     } else if (this._title === '') {
-      issues.push(
-        'Blog Post title should not be empty.');
+      issues.push('Blog Post title should not be empty.');
     } else if (!validTitleRegex.test(this._title)) {
-      issues.push(
-        'Blog Post title contains invalid characters.'
-      );
+      issues.push('Blog Post title contains invalid characters.');
     } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be less than ' +
-        `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
+          `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be more than ' +
-        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
+          `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (this._content === '') {
-      issues.push(
-        'Blog Post content should not be empty.');
+      issues.push('Blog Post content should not be empty.');
     }
     return issues;
   }
@@ -170,48 +166,43 @@ export class BlogPostData {
       AppConstants.VALID_BLOG_POST_TITLE_REGEX
     );
     if (this._titleIsDuplicate) {
-      issues.push(
-        'Blog Post with the given title already exists.');
+      issues.push('Blog Post with the given title already exists.');
     } else if (this._title === '') {
-      issues.push(
-        'Blog Post title should not be empty.');
+      issues.push('Blog Post title should not be empty.');
     } else if (!validTitleRegex.test(this._title)) {
-      issues.push(
-        'Blog Post title contains invalid characters.'
-      );
+      issues.push('Blog Post title contains invalid characters.');
     } else if (this._title.length > AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not exceed ' +
-        `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
+          `${AppConstants.MAX_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     } else if (this._title.length < AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE) {
       issues.push(
         'Blog Post title should not be less than ' +
-        `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
+          `${AppConstants.MIN_CHARS_IN_BLOG_POST_TITLE} characters.`
       );
     }
     if (!this._thumbnailFilename) {
-      issues.push(
-        'Blog Post should have a thumbnail.');
+      issues.push('Blog Post should have a thumbnail.');
     }
     if (this._tags.length === 0) {
-      issues.push(
-        'Blog Post should have atleast one tag linked to it.');
+      issues.push('Blog Post should have atleast one tag linked to it.');
     }
     if (this._tags.length > maxTags) {
       issues.push(
-        `Blog Post should atmost have ${maxTags} tag(s) linked to it.`);
+        `Blog Post should atmost have ${maxTags} tag(s) linked to it.`
+      );
     }
     if (this._content === '') {
-      issues.push(
-        'Blog Post content should not be empty.');
+      issues.push('Blog Post content should not be empty.');
     }
     return issues;
   }
 
   static createFromBackendDict(
-      blogPostBackendDict: BlogPostBackendDict): BlogPostData {
-    return new BlogPostData (
+    blogPostBackendDict: BlogPostBackendDict
+  ): BlogPostData {
+    return new BlogPostData(
       blogPostBackendDict.id,
       blogPostBackendDict.displayed_author_name,
       blogPostBackendDict.title,
@@ -220,6 +211,7 @@ export class BlogPostData {
       blogPostBackendDict.thumbnail_filename,
       blogPostBackendDict.url_fragment,
       blogPostBackendDict.last_updated,
-      blogPostBackendDict.published_on);
+      blogPostBackendDict.published_on
+    );
   }
 }

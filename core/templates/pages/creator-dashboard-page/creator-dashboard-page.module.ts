@@ -16,16 +16,15 @@
  * @fileoverview Module for the creator dashboard page.
  */
 
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {RouterModule} from '@angular/router';
 
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { ToastrModule } from 'ngx-toastr';
-import { InteractionExtensionsModule } from 'interactions/interactions.module';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
-import { CreatorDashboardPageRootComponent } from './creator-dashboard-page-root.component';
-
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ToastrModule} from 'ngx-toastr';
+import {InteractionExtensionsModule} from 'interactions/interactions.module';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {CreatorDashboardPageComponent} from './creator-dashboard-page.component';
+import {CreatorDashboardPageRootComponent} from './creator-dashboard-page-root.component';
 
 @NgModule({
   imports: [
@@ -35,16 +34,14 @@ import { CreatorDashboardPageRootComponent } from './creator-dashboard-page-root
     RouterModule.forChild([
       {
         path: '',
-        component: CreatorDashboardPageRootComponent
-      }
-    ])
+        component: CreatorDashboardPageRootComponent,
+      },
+    ]),
   ],
   declarations: [
     CreatorDashboardPageComponent,
-    CreatorDashboardPageRootComponent
+    CreatorDashboardPageRootComponent,
   ],
-  entryComponents: [
-    CreatorDashboardPageComponent
-  ]
+  entryComponents: [CreatorDashboardPageComponent],
 })
 export class CreatorDashboardPageModule {}

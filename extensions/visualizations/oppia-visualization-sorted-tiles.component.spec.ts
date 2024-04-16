@@ -17,16 +17,22 @@
  * visualization.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, waitForAsync, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { AnswerContentModalComponent } from 'components/common-layout-directives/common-elements/answer-content-modal.component';
-import { AnswerStats } from 'domain/exploration/answer-stats.model';
-import { UtilsService } from 'services/utils.service';
-import { VisualizationSortedTilesComponent } from './oppia-visualization-sorted-tiles.component';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {AnswerContentModalComponent} from 'components/common-layout-directives/common-elements/answer-content-modal.component';
+import {AnswerStats} from 'domain/exploration/answer-stats.model';
+import {UtilsService} from 'services/utils.service';
+import {VisualizationSortedTilesComponent} from './oppia-visualization-sorted-tiles.component';
 
-describe('Oppia sorted tiles visualization', function() {
+describe('Oppia sorted tiles visualization', function () {
   let component: VisualizationSortedTilesComponent;
   let fixture: ComponentFixture<VisualizationSortedTilesComponent>;
   let utilsService: UtilsService;
@@ -37,11 +43,10 @@ describe('Oppia sorted tiles visualization', function() {
       imports: [HttpClientTestingModule],
       declarations: [
         VisualizationSortedTilesComponent,
-        AnswerContentModalComponent
+        AnswerContentModalComponent,
       ],
-      providers: [
-      ],
-      schemas: [NO_ERRORS_SCHEMA]
+      providers: [],
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -52,16 +57,15 @@ describe('Oppia sorted tiles visualization', function() {
     utilsService = TestBed.inject(UtilsService);
     ngbModal = TestBed.inject(NgbModal);
 
-    spyOn(ngbModal, 'open').and.returnValue(
-      {
-        componentInstance: {
-          answerHtml: null,
-        },
-        result: Promise.resolve()
-      } as NgbModalRef);
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {
+        answerHtml: null,
+      },
+      result: Promise.resolve(),
+    } as NgbModalRef);
 
     component.options = {
-      use_percentages: true
+      use_percentages: true,
     };
     // This throws "Type 'null' is not assignable to type
     // 'InteractionAnswer'." We need to suppress this error
@@ -87,10 +91,11 @@ describe('Oppia sorted tiles visualization', function() {
     component.isAnswerTooLong(null);
 
     tick();
-    expect(component.isAnswerTooLong(
-      {
-        innerHTML: 'inner-html'
-      } as HTMLElement)).toBe(true);
+    expect(
+      component.isAnswerTooLong({
+        innerHTML: 'inner-html',
+      } as HTMLElement)
+    ).toBe(true);
     expect(component.isSelected).toEqual([true, false]);
 
     component.openAnswerContentModal(0);

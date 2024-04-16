@@ -16,11 +16,11 @@
  * @fileoverview Root component for topic landing psage.
  */
 
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'oppia-topic-landing-page-root',
-  templateUrl: './topic-landing-page-root.component.html'
+  templateUrl: './topic-landing-page-root.component.html',
 })
 export class TopicLandingPageRootComponent {
   // Page title and meta tags are not required to be updated here

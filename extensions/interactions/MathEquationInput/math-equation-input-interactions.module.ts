@@ -18,33 +18,29 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { MaterialModule } from 'modules/material.module';
-import { InteractiveMathEquationInput } from './directives/oppia-interactive-math-equation-input.component';
-import { ResponseMathEquationInput } from './directives/oppia-response-math-equation-input.component';
-import { ShortResponseMathEquationInput } from './directives/oppia-short-response-math-equation-input.component';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {MaterialModule} from 'modules/material.module';
+import {InteractiveMathEquationInput} from './directives/oppia-interactive-math-equation-input.component';
+import {ResponseMathEquationInput} from './directives/oppia-response-math-equation-input.component';
+import {ShortResponseMathEquationInput} from './directives/oppia-short-response-math-equation-input.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MaterialModule
-  ],
+  imports: [CommonModule, MaterialModule],
   declarations: [
     InteractiveMathEquationInput,
     ResponseMathEquationInput,
-    ShortResponseMathEquationInput
+    ShortResponseMathEquationInput,
   ],
   entryComponents: [
     InteractiveMathEquationInput,
     ResponseMathEquationInput,
-    ShortResponseMathEquationInput
+    ShortResponseMathEquationInput,
   ],
   exports: [
     InteractiveMathEquationInput,
     ResponseMathEquationInput,
-    ShortResponseMathEquationInput
+    ShortResponseMathEquationInput,
   ],
 })
-
 export class MathEquationInputModule {}

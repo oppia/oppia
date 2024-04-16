@@ -16,93 +16,56 @@
  * @fileoverview Module for the voicover-admin page.
  */
 
-
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { APP_INITIALIZER, DoBootstrap, NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { BrowserModule, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { downgradeComponent, downgradeModule } from '@angular/upgrade/static';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-
-
-import { OppiaAngularRootComponent } from 'components/oppia-angular-root.component';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { platformFeatureInitFactory, PlatformFeatureService } from 'services/platform-feature.service';
-import { RequestInterceptor } from 'services/request-interceptor.service';
-import { ToastrModule } from 'ngx-toastr';
-import { MyHammerConfig, toastrConfig } from 'pages/oppia-root/app.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { AppErrorHandlerProvider } from 'pages/oppia-root/app-error-handler';
-import { VoiceoverAdminPageComponent } from './voiceover-admin-page.component';
-import { VoiceoverAdminNavbarComponent } from './navbar/voiceover-admin-navbar.component';
-import { VoiceoverRemovalConfirmModalComponent } from './modals/language-accent-removal-confirm-modal.component';
-
-
-declare var angular: ng.IAngularStatic;
+import {NgModule} from '@angular/core';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {RouterModule} from '@angular/router';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatTableModule} from '@angular/material/table';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {VoiceoverAdminPageComponent} from './voiceover-admin-page.component';
+import {VoiceoverAdminNavbarComponent} from './navbar/voiceover-admin-navbar.component';
+import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
+import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
+import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {VoiceoverAdminPageRootComponent} from './voiceover-admin-page-root.component';
+import {VoiceoverAdminAuthGuard} from './voiceover-admin-page-auth.guard';
 
 @NgModule({
   imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
     FormsModule,
-    HttpClientModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
-    RouterModule.forRoot([]),
     MatCardModule,
     MatTooltipModule,
     ReactiveFormsModule,
     SharedComponentsModule,
-    ToastrModule.forRoot(toastrConfig)
+    MatPaginatorModule,
+    MatTableModule,
+    ToastrModule.forRoot(toastrConfig),
+    SharedFormsModule,
+    RouterModule.forChild([
+      {
+        path: '',
+        component: VoiceoverAdminPageRootComponent,
+        canActivate: [VoiceoverAdminAuthGuard],
+      },
+    ]),
   ],
   declarations: [
+    VoiceoverAdminPageRootComponent,
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
-    VoiceoverRemovalConfirmModalComponent
+    VoiceoverRemovalConfirmModalComponent,
+    AddAccentToVoiceoverLanguageModalComponent,
   ],
   entryComponents: [
+    VoiceoverAdminPageRootComponent,
     VoiceoverAdminPageComponent,
     VoiceoverAdminNavbarComponent,
-    VoiceoverRemovalConfirmModalComponent
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: RequestInterceptor,
-      multi: true,
-    },
-    {
-      provide: APP_INITIALIZER,
-      useFactory: platformFeatureInitFactory,
-      deps: [PlatformFeatureService],
-      multi: true,
-    },
-    {
-      provide: HAMMER_GESTURE_CONFIG,
-      useClass: MyHammerConfig
-    },
-    AppErrorHandlerProvider,
-    {
-      provide: APP_BASE_HREF,
-      useValue: '/'
-    }
+    VoiceoverRemovalConfirmModalComponent,
+    AddAccentToVoiceoverLanguageModalComponent,
   ],
 })
-class VoiceoverAdminPageModule implements DoBootstrap {
-  ngDoBootstrap() {}
-}
-
-angular.module('oppia').requires.push(downgradeModule(extraProviders => {
-  const platformRef = platformBrowserDynamic(extraProviders);
-  return platformRef.bootstrapModule(VoiceoverAdminPageModule);
-}));
-
-angular.module('oppia').directive('oppiaAngularRoot', downgradeComponent({
-  component: OppiaAngularRootComponent,
-}));
+export class VoiceoverAdminPageModule {}

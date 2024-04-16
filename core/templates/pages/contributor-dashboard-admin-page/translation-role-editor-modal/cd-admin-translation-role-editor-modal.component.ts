@@ -16,18 +16,17 @@
  * @fileoverview Component for editing a user's translation contribution rights.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, OnInit, Input} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { ContributorDashboardAdminBackendApiService } from '../services/contributor-dashboard-admin-backend-api.service';
-import { AlertsService } from 'services/alerts.service';
+import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 import constants from 'assets/constants';
 
 @Component({
   selector: 'cd-admin-translation-role-editor-modal',
   templateUrl: './cd-admin-translation-role-editor-modal.component.html',
 })
-
 export class CdAdminTranslationRoleEditorModal implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -44,14 +43,14 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
 
   constructor(
     private activeModal: NgbActiveModal,
-    private contributorDashboardAdminBackendApiService:
-      ContributorDashboardAdminBackendApiService,
+    private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
     private alertsService: AlertsService
   ) {}
 
   private updateLanguageIdsForSelection(): void {
     this.languageIdsForSelection = Object.keys(this.languageIdToName).filter(
-      languageId => !this.assignedLanguageIds.includes(languageId));
+      languageId => !this.assignedLanguageIds.includes(languageId)
+    );
     this.selectedLanguageId = this.languageIdsForSelection[0];
   }
 
@@ -65,36 +64,49 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
         constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-        this.username, this.languageIdInUpdate).then(()=> {
-        this.languageIdInUpdate = null;
-        this.updateLanguageIdsForSelection();
-      }, errorMessage => {
-        if (this.languageIdInUpdate !== null) {
-          let languageIdIndex = this.assignedLanguageIds.indexOf(
-            this.languageIdInUpdate);
-          this.assignedLanguageIds.splice(languageIdIndex, 1);
+        this.username,
+        this.languageIdInUpdate
+      )
+      .then(
+        () => {
+          this.languageIdInUpdate = null;
+          this.updateLanguageIdsForSelection();
+        },
+        errorMessage => {
+          if (this.languageIdInUpdate !== null) {
+            let languageIdIndex = this.assignedLanguageIds.indexOf(
+              this.languageIdInUpdate
+            );
+            this.assignedLanguageIds.splice(languageIdIndex, 1);
+          }
+          this.alertsService.addWarning(
+            errorMessage || 'Error communicating with server.'
+          );
         }
-        this.alertsService.addWarning(
-          errorMessage || 'Error communicating with server.');
-      });
+      );
   }
 
   removeLanguageId(languageIdToRemove: string): void {
-    let languageIdIndex = this.assignedLanguageIds.indexOf(
-      languageIdToRemove);
+    let languageIdIndex = this.assignedLanguageIds.indexOf(languageIdToRemove);
     this.languageIdInUpdate = languageIdToRemove;
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        this.username,
         constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-        languageIdToRemove).then(() => {
-        this.assignedLanguageIds.splice(languageIdIndex, 1);
-        this.languageIdInUpdate = null;
-        this.updateLanguageIdsForSelection();
-      }, errorMessage => {
-        this.alertsService.addWarning(
-          errorMessage || 'Error communicating with server.');
-      });
+        this.username,
+        languageIdToRemove
+      )
+      .then(
+        () => {
+          this.assignedLanguageIds.splice(languageIdIndex, 1);
+          this.languageIdInUpdate = null;
+          this.updateLanguageIdsForSelection();
+        },
+        errorMessage => {
+          this.alertsService.addWarning(
+            errorMessage || 'Error communicating with server.'
+          );
+        }
+      );
   }
 
   close(): void {

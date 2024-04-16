@@ -16,11 +16,11 @@
  * @fileoverview Tests for the donation box modal component
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
-import { DonationBoxModalComponent } from './donation-box-modal.component';
+import {DonationBoxModalComponent} from './donation-box-modal.component';
 
 class MockActiveModal {
   dismiss(): void {
@@ -43,10 +43,10 @@ describe('Donation box modal', () => {
       providers: [
         {
           provide: NgbActiveModal,
-          useClass: MockActiveModal
-        }
+          useClass: MockActiveModal,
+        },
       ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
     fixture = TestBed.createComponent(DonationBoxModalComponent);
     component = fixture.componentInstance;

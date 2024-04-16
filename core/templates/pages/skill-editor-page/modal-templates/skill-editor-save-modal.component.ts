@@ -16,14 +16,14 @@
  * @fileoverview Component for skill editor save modal.
  */
 
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { AppConstants } from 'app.constants';
+import {ChangeDetectorRef, Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'skill-editor-save-modal',
-  templateUrl: './skill-editor-save-modal.component.html'
+  templateUrl: './skill-editor-save-modal.component.html',
 })
 export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
@@ -34,7 +34,7 @@ export class SkillEditorSaveModalComponent extends ConfirmOrCancelModal {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private changeDetectorRef: ChangeDetectorRef,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
     super(ngbActiveModal);
   }

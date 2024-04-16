@@ -17,20 +17,20 @@
  * backend.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
 
-import { ReviewTestDomainConstants } from
-  'domain/review_test/review-test-domain.constants';
-import { ReviewTestBackendDict, ReviewTest } from
-  'domain/review_test/review-test.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ReviewTestDomainConstants} from 'domain/review_test/review-test-domain.constants';
+import {
+  ReviewTestBackendDict,
+  ReviewTest,
+} from 'domain/review_test/review-test.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ReviewTestBackendApiService {
   constructor(
@@ -39,33 +39,43 @@ export class ReviewTestBackendApiService {
     private urlService: UrlService
   ) {}
 
-  async _fetchReviewTestDataAsync(storyUrlFragment: string):
-    Promise<ReviewTest> {
-    return this.http.get<ReviewTestBackendDict>(
-      this.urlInterpolationService.interpolateUrl(
-        ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
-        {
-          topic_url_fragment: (
-            this.urlService.getTopicUrlFragmentFromLearnerUrl()),
-          classroom_url_fragment: (
-            this.urlService.getClassroomUrlFragmentFromLearnerUrl()),
-          story_url_fragment: storyUrlFragment
-        }
+  async _fetchReviewTestDataAsync(
+    storyUrlFragment: string
+  ): Promise<ReviewTest> {
+    return this.http
+      .get<ReviewTestBackendDict>(
+        this.urlInterpolationService.interpolateUrl(
+          ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
+          {
+            topic_url_fragment:
+              this.urlService.getTopicUrlFragmentFromLearnerUrl(),
+            classroom_url_fragment:
+              this.urlService.getClassroomUrlFragmentFromLearnerUrl(),
+            story_url_fragment: storyUrlFragment,
+          }
+        )
       )
-    ).toPromise().then(backendResponse => {
-      return ReviewTest.createFromBackendDict(
-        backendResponse);
-    }, errorResponse => {
-      throw new Error(errorResponse.error.error);
-    });
+      .toPromise()
+      .then(
+        backendResponse => {
+          return ReviewTest.createFromBackendDict(backendResponse);
+        },
+        errorResponse => {
+          throw new Error(errorResponse.error.error);
+        }
+      );
   }
 
-  async fetchReviewTestDataAsync(storyUrlFragment: string):
-    Promise<ReviewTest> {
+  async fetchReviewTestDataAsync(
+    storyUrlFragment: string
+  ): Promise<ReviewTest> {
     return this._fetchReviewTestDataAsync(storyUrlFragment);
   }
 }
 
-angular.module('oppia').factory(
-  'ReviewTestBackendApiService',
-  downgradeInjectable(ReviewTestBackendApiService));
+angular
+  .module('oppia')
+  .factory(
+    'ReviewTestBackendApiService',
+    downgradeInjectable(ReviewTestBackendApiService)
+  );

@@ -34,17 +34,26 @@
  * value.
  */
 
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { HtmlEscaperService } from 'services/html-escaper.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { AppConstants } from 'app.constants';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { SafeResourceUrl } from '@angular/platform-browser';
+import {
+  Component,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+} from '@angular/core';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {
+  ImageDimensions,
+  ImagePreloaderService,
+} from 'pages/exploration-player-page/services/image-preloader.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {AppConstants} from 'app.constants';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {SafeResourceUrl} from '@angular/platform-browser';
 
 interface Dimension {
   height: string;
@@ -53,7 +62,7 @@ interface Dimension {
 @Component({
   selector: 'oppia-noninteractive-image',
   templateUrl: './image.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class NoninteractiveImage implements OnInit, OnChanges {
   @Input() altTextIsDisplayed: boolean = false;
@@ -86,26 +95,31 @@ export class NoninteractiveImage implements OnInit, OnChanges {
 
   private _updateViewOnNewImage(): void {
     if (
-      !this.filepathWithValue || !this.altWithValue || !this.captionWithValue
+      !this.filepathWithValue ||
+      !this.altWithValue ||
+      !this.captionWithValue
     ) {
       return;
     }
     this.filepath = this.htmlEscaperService.escapedJsonToObj(
-      this.filepathWithValue) as string;
+      this.filepathWithValue
+    ) as string;
     if (!this.filepath) {
       return;
     }
     this.loadingIndicatorUrl = this.urlInterpolationService.getStaticImageUrl(
-      AppConstants.LOADING_INDICATOR_URL);
+      AppConstants.LOADING_INDICATOR_URL
+    );
     this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
-      this.filepath);
+      this.filepath
+    );
     this.imageContainerStyle = {
       height: this.dimensions.height + 'px',
-      width: this.dimensions.width + 'px'
+      width: this.dimensions.width + 'px',
     };
     this.miniatureImageContainerStyle = {
       height: '50px',
-      width: '50px'
+      width: '50px',
     };
     // If viewing a concept card in the exploration player, don't use the
     // preloader service. Since, in that service, the image file names are
@@ -121,7 +135,7 @@ export class NoninteractiveImage implements OnInit, OnChanges {
       const loadingIndicatorSize = this.dimensions.height < 124 ? 24 : 120;
       this.loadingIndicatorStyle = {
         height: loadingIndicatorSize + 'px',
-        width: loadingIndicatorSize + 'px'
+        width: loadingIndicatorSize + 'px',
       };
 
       this.loadImage();
@@ -138,15 +152,17 @@ export class NoninteractiveImage implements OnInit, OnChanges {
         // to be fetched from the server.
         if (
           this.contextService.getImageSaveDestination() ===
-                AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE && (
-            this.imageLocalStorageService.isInStorage(this.filepath))) {
+            AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+          this.imageLocalStorageService.isInStorage(this.filepath)
+        ) {
           const base64Url = this.imageLocalStorageService.getRawImageData(
-            this.filepath);
+            this.filepath
+          );
           if (base64Url) {
             const mimeType = base64Url.split(';')[0];
             if (mimeType === AppConstants.SVG_MIME_TYPE) {
-              const svgResourceUrl = (
-                this.svgSanitizerService.getTrustedSvgResourceUrl(base64Url));
+              const svgResourceUrl =
+                this.svgSanitizerService.getTrustedSvgResourceUrl(base64Url);
               if (svgResourceUrl) {
                 this.imageUrl = svgResourceUrl;
               }
@@ -158,18 +174,24 @@ export class NoninteractiveImage implements OnInit, OnChanges {
           const entityType = this.contextService.getEntityType();
           if (entityType) {
             this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-              entityType, this.contextService.getEntityId(), this.filepath);
+              entityType,
+              this.contextService.getEntityId(),
+              this.filepath
+            );
           }
         }
-      // Unknown type is used because we don't know which type of error is
-      // thrown.
+        // Unknown type is used because we don't know which type of error is
+        // thrown.
       } catch (e: unknown) {
         const entityType = this.contextService.getEntityType();
         if (entityType) {
-          const additionalInfo = (
-            '\nEntity type: ' + entityType +
-            '\nEntity ID: ' + this.contextService.getEntityId() +
-            '\nFilepath: ' + this.filepath);
+          const additionalInfo =
+            '\nEntity type: ' +
+            entityType +
+            '\nEntity ID: ' +
+            this.contextService.getEntityId() +
+            '\nFilepath: ' +
+            this.filepath;
           if (e instanceof Error) {
             e.message += additionalInfo;
           }
@@ -182,12 +204,14 @@ export class NoninteractiveImage implements OnInit, OnChanges {
     this.imageAltText = '';
     if (this.altWithValue) {
       this.imageAltText = this.htmlEscaperService.escapedJsonToObj(
-        this.altWithValue) as string;
+        this.altWithValue
+      ) as string;
     }
     this.imageCaption = '';
     if (this.captionWithValue) {
       this.imageCaption = this.htmlEscaperService.escapedJsonToObj(
-        this.captionWithValue) as string;
+        this.captionWithValue
+      ) as string;
     }
   }
 
@@ -198,18 +222,20 @@ export class NoninteractiveImage implements OnInit, OnChanges {
   loadImage(): void {
     this.isLoadingIndicatorShown = true;
     this.isTryAgainShown = false;
-    this.imagePreloaderService.getImageUrlAsync(
-      this.filepath).then(objectUrl => {
-      this.isTryAgainShown = false;
-      this.isLoadingIndicatorShown = false;
-      if (objectUrl === null) {
-        throw new Error('Object url is null');
+    this.imagePreloaderService.getImageUrlAsync(this.filepath).then(
+      objectUrl => {
+        this.isTryAgainShown = false;
+        this.isLoadingIndicatorShown = false;
+        if (objectUrl === null) {
+          throw new Error('Object url is null');
+        }
+        this.imageUrl = objectUrl;
+      },
+      () => {
+        this.isTryAgainShown = true;
+        this.isLoadingIndicatorShown = false;
       }
-      this.imageUrl = objectUrl;
-    }, () => {
-      this.isTryAgainShown = true;
-      this.isLoadingIndicatorShown = false;
-    });
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -223,7 +249,9 @@ export class NoninteractiveImage implements OnInit, OnChanges {
   }
 }
 
-angular.module('oppia').directive('oppiaNoninteractiveImage',
+angular.module('oppia').directive(
+  'oppiaNoninteractiveImage',
   downgradeComponent({
-    component: NoninteractiveImage
-  }) as angular.IDirectiveFactory);
+    component: NoninteractiveImage,
+  }) as angular.IDirectiveFactory
+);

@@ -16,19 +16,17 @@
  * @fileoverview Component for the local navigation in the collection view.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, OnInit, OnDestroy} from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import {Subscription} from 'rxjs';
 
-import { ReadOnlyCollectionBackendApiService } from
-  'domain/collection/read-only-collection-backend-api.service';
-import { UrlService } from 'services/contextual/url.service';
+import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'collection-local-nav',
   templateUrl: './collection-local-nav.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class CollectionLocalNavComponent implements OnInit, OnDestroy {
   canEdit: boolean = false;
@@ -36,9 +34,8 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   constructor(
-      private readOnlyCollectionBackendApiService:
-       ReadOnlyCollectionBackendApiService,
-      private urlService: UrlService,
+    private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
+    private urlService: UrlService
   ) {}
 
   ngOnInit(): void {
@@ -46,9 +43,10 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.readOnlyCollectionBackendApiService.onCollectionLoad.subscribe(
         () => {
-          var collectionDetails = (
+          var collectionDetails =
             this.readOnlyCollectionBackendApiService.getCollectionDetails(
-              this.collectionId));
+              this.collectionId
+            );
           this.canEdit = collectionDetails.canEdit;
         }
       )
@@ -59,6 +57,3 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-angular.module('oppia').directive(
-  'collectionLocalNav',
-  downgradeComponent({component: CollectionLocalNavComponent}));

@@ -16,15 +16,15 @@
  * @fileoverview Unit tests for the terms page root component.
  */
 
-import { NO_ERRORS_SCHEMA, EventEmitter } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
+import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateService} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { TermsPageRootComponent } from './terms-page-root.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {TermsPageRootComponent} from './terms-page-root.component';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -41,18 +41,15 @@ describe('Terms Page Root', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        TermsPageRootComponent,
-        MockTranslatePipe
-      ],
+      declarations: [TermsPageRootComponent, MockTranslatePipe],
       providers: [
         PageHeadService,
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
 
@@ -63,10 +60,9 @@ describe('Terms Page Root', () => {
     translateService = TestBed.inject(TranslateService);
   });
 
-  it('should successfully instantiate the component',
-    () => {
-      expect(component).toBeDefined();
-    });
+  it('should successfully instantiate the component', () => {
+    expect(component).toBeDefined();
+  });
 
   it('should initialize and subscribe to onLangChange', () => {
     spyOn(translateService.onLangChange, 'subscribe');
@@ -92,10 +88,12 @@ describe('Terms Page Root', () => {
     component.setPageTitleAndMetaTags();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.TITLE
+    );
     expect(pageHeadService.updateTitleAndMetaTags).toHaveBeenCalledWith(
       AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.TITLE,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TERMS.META
+    );
   });
 
   it('should unsubscribe on component destruction', () => {

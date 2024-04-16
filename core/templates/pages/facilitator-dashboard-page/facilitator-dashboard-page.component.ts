@@ -16,29 +16,24 @@
  * @fileoverview Component for the facilitator dashboard page.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { LoaderService } from 'services/loader.service';
-import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupPagesConstants } from
-  'pages/learner-group-pages/learner-group-pages.constants';
-import { ShortLearnerGroupSummary } from
-  'domain/learner_group/short-learner-group-summary.model';
-import { FacilitatorDashboardBackendApiService } from
-  'domain/learner_group/facilitator-dashboard-backend-api.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {LoaderService} from 'services/loader.service';
+import {PageTitleService} from 'services/page-title.service';
+import {LearnerGroupPagesConstants} from 'pages/learner-group-pages/learner-group-pages.constants';
+import {ShortLearnerGroupSummary} from 'domain/learner_group/short-learner-group-summary.model';
+import {FacilitatorDashboardBackendApiService} from 'domain/learner_group/facilitator-dashboard-backend-api.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 import './facilitator-dashboard-page.component.css';
-
 
 @Component({
   selector: 'oppia-facilitator-dashboard-page',
   templateUrl: './facilitator-dashboard-page.component.html',
-  styleUrls: ['./facilitator-dashboard-page.component.css']
+  styleUrls: ['./facilitator-dashboard-page.component.css'],
 })
 export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -48,8 +43,7 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   constructor(
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
-    private facilitatorDashboardBackendApiService:
-      FacilitatorDashboardBackendApiService,
+    private facilitatorDashboardBackendApiService: FacilitatorDashboardBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private loaderService: LoaderService
   ) {}
@@ -64,32 +58,30 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE');
+      'I18N_FACILITATOR_DASHBOARD_PAGE_TITLE'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
   getLearnerGroupPageUrl(learnerGroupId: string): string {
-    return (
-      this.urlInterpolationService.interpolateUrl(
-        '/edit-learner-group/<groupId>', {
-          groupId: learnerGroupId
-        }
-      )
+    return this.urlInterpolationService.interpolateUrl(
+      '/edit-learner-group/<groupId>',
+      {
+        groupId: learnerGroupId,
+      }
     );
   }
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading your learner groups');
-    this.createLearnerGroupPageUrl = (
-      LearnerGroupPagesConstants.CREATE_LEARNER_GROUP_PAGE_URL
-    );
+    this.createLearnerGroupPageUrl =
+      LearnerGroupPagesConstants.CREATE_LEARNER_GROUP_PAGE_URL;
     this.facilitatorDashboardBackendApiService
-      .fetchTeacherDashboardLearnerGroupsAsync().then(
-        (shortGroupSummaries) => {
-          this.shortLearnerGroupSummaries = shortGroupSummaries;
-          this.loaderService.hideLoadingScreen();
-        }
-      );
+      .fetchTeacherDashboardLearnerGroupsAsync()
+      .then(shortGroupSummaries => {
+        this.shortLearnerGroupSummaries = shortGroupSummaries;
+        this.loaderService.hideLoadingScreen();
+      });
     this.subscribeToOnLangChange();
   }
 
@@ -98,6 +90,9 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive(
-  'oppiaFacilitatorDashboardPage',
-  downgradeComponent({component: FacilitatorDashboardPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'oppiaFacilitatorDashboardPage',
+    downgradeComponent({component: FacilitatorDashboardPageComponent})
+  );

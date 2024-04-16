@@ -16,24 +16,27 @@
  * @fileoverview Component for the exploration player page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationPermissionsBackendApiService } from 'domain/exploration/exploration-permissions-backend-api.service';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { MetaTagCustomizationService } from 'services/contextual/meta-tag-customization.service';
-import { UrlService } from 'services/contextual/url.service';
-import { KeyboardShortcutService } from 'services/keyboard-shortcut.service';
-import { PageTitleService } from 'services/page-title.service';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
+import {UrlService} from 'services/contextual/url.service';
+import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
+import {PageTitleService} from 'services/page-title.service';
 
 require('interactions/interactionsRequires.ts');
 
 @Component({
   selector: 'oppia-exploration-player-page',
-  templateUrl: './exploration-player-page.component.html'
+  templateUrl: './exploration-player-page.component.html',
 })
 export class ExplorationPlayerPageComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -44,61 +47,60 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
 
   constructor(
     private contextService: ContextService,
-    private explorationPermissionsBackendApiService:
-    ExplorationPermissionsBackendApiService,
+    private explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService,
     private keyboardShortcutService: KeyboardShortcutService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private pageTitleService: PageTitleService,
-    private readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
     private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
     let explorationId = this.contextService.getExplorationId();
-    this.readOnlyExplorationBackendApiService.fetchExplorationAsync(
-      explorationId, null
-    ).then((response: FetchExplorationBackendResponse) => {
-      this.explorationTitle = response.exploration.title;
-      // The onLangChange event is initially fired before the exploration is
-      // loaded. Hence the first setpageTitle() call needs to made
-      // manually, and the onLangChange subscription is added after
-      // the exploration is fetch from the backend.
-      this.setPageTitle();
-      this.subscribeToOnLangChange();
-      this.metaTagCustomizationService.addOrReplaceMetaTags([
-        {
-          propertyType: 'itemprop',
-          propertyValue: 'name',
-          content: response.exploration.title
-        },
-        {
-          propertyType: 'itemprop',
-          propertyValue: 'description',
-          content: response.exploration.objective
-        },
-        {
-          propertyType: 'property',
-          propertyValue: 'og:title',
-          content: response.exploration.title
-        },
-        {
-          propertyType: 'property',
-          propertyValue: 'og:description',
-          content: response.exploration.objective
-        }
-      ]);
-    }).finally(() => {
-      this.isLoadingExploration = false;
-    }
-    );
+    this.readOnlyExplorationBackendApiService
+      .fetchExplorationAsync(explorationId, null)
+      .then((response: FetchExplorationBackendResponse) => {
+        this.explorationTitle = response.exploration.title;
+        // The onLangChange event is initially fired before the exploration is
+        // loaded. Hence the first setpageTitle() call needs to made
+        // manually, and the onLangChange subscription is added after
+        // the exploration is fetch from the backend.
+        this.setPageTitle();
+        this.subscribeToOnLangChange();
+        this.metaTagCustomizationService.addOrReplaceMetaTags([
+          {
+            propertyType: 'itemprop',
+            propertyValue: 'name',
+            content: response.exploration.title,
+          },
+          {
+            propertyType: 'itemprop',
+            propertyValue: 'description',
+            content: response.exploration.objective,
+          },
+          {
+            propertyType: 'property',
+            propertyValue: 'og:title',
+            content: response.exploration.title,
+          },
+          {
+            propertyType: 'property',
+            propertyValue: 'og:description',
+            content: response.exploration.objective,
+          },
+        ]);
+      })
+      .finally(() => {
+        this.isLoadingExploration = false;
+      });
 
     this.pageIsIframed = this.urlService.isIframed();
     this.keyboardShortcutService.bindExplorationPlayerShortcuts();
 
-    this.explorationPermissionsBackendApiService.getPermissionsAsync()
-      .then((response) => {
+    this.explorationPermissionsBackendApiService
+      .getPermissionsAsync()
+      .then(response => {
         this.explorationIsUnpublished = response.canPublish;
       });
   }
@@ -113,9 +115,11 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_EXPLORATION_PLAYER_PAGE_TITLE', {
-        explorationTitle: this.explorationTitle
-      });
+      'I18N_EXPLORATION_PLAYER_PAGE_TITLE',
+      {
+        explorationTitle: this.explorationTitle,
+      }
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -124,8 +128,9 @@ export class ExplorationPlayerPageComponent implements OnDestroy {
   }
 }
 
-angular.module('oppia').directive('oppiaExplorationPlayerPage',
+angular.module('oppia').directive(
+  'oppiaExplorationPlayerPage',
   downgradeComponent({
-    component: ExplorationPlayerPageComponent
+    component: ExplorationPlayerPageComponent,
   }) as angular.IDirectiveFactory
 );

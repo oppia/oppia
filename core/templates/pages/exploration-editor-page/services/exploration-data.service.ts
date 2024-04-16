@@ -17,28 +17,31 @@
  * with the exploration editor backend.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
-import { ExplorationBackendDict } from 'domain/exploration/ExplorationObjectFactory';
-import { ReadOnlyExplorationBackendApiService, ReadOnlyExplorationBackendDict } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { tap } from 'rxjs/operators';
-import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { UrlService } from 'services/contextual/url.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LocalStorageService } from 'services/local-storage.service';
-import { ExplorationDataBackendApiService } from './exploration-data-backend-api.service';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {
+  ReadOnlyExplorationBackendApiService,
+  ReadOnlyExplorationBackendDict,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {tap} from 'rxjs/operators';
+import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {UrlService} from 'services/contextual/url.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LocalStorageService} from 'services/local-storage.service';
+import {ExplorationDataBackendApiService} from './exploration-data-backend-api.service';
 
 export interface DraftAutoSaveResponse {
-  'draft_change_list_id': number;
-  'is_version_of_draft_valid': boolean;
-  'changes_are_mergeable': boolean;
+  draft_change_list_id: number;
+  is_version_of_draft_valid: boolean;
+  changes_are_mergeable: boolean;
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationDataService {
   // These properties are initialized using Angular lifecycle hooks
@@ -52,13 +55,11 @@ export class ExplorationDataService {
 
   constructor(
     private alertsService: AlertsService,
-    private editableExplorationBackendApiService:
-      EditableExplorationBackendApiService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private explorationDataBackendApiService: ExplorationDataBackendApiService,
     private localStorageService: LocalStorageService,
     private loggerService: LoggerService,
-    private readOnlyExplorationBackendApiService:
-      ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
     private windowRef: WindowRef
   ) {
@@ -75,45 +76,54 @@ export class ExplorationDataService {
 
     if (!explorationId) {
       this.loggerService.error(
-        'Unexpected call to ExplorationDataService for pathname: ' + pathname);
+        'Unexpected call to ExplorationDataService for pathname: ' + pathname
+      );
     } else {
       this.explorationId = explorationId;
-      this.resolvedAnswersUrlPrefix = (
-        '/createhandler/resolved_answers/' + explorationId);
-      this.explorationDraftAutosaveUrl = (
-        '/createhandler/autosave_draft/' + explorationId);
+      this.resolvedAnswersUrlPrefix =
+        '/createhandler/resolved_answers/' + explorationId;
+      this.explorationDraftAutosaveUrl =
+        '/createhandler/autosave_draft/' + explorationId;
     }
   }
 
   private async _autosaveChangeListAsync(
-      changeList: ExplorationChange[]): Promise<DraftAutoSaveResponse> {
+    changeList: ExplorationChange[]
+  ): Promise<DraftAutoSaveResponse> {
     this.localStorageService.saveExplorationDraft(
-      this.explorationId, changeList, this.draftChangeListId);
+      this.explorationId,
+      changeList,
+      this.draftChangeListId
+    );
     if (!this.data.version) {
       throw new Error('Version cannot be undefined');
     }
-    return this.explorationDataBackendApiService.saveChangeList(
-      this.explorationDraftAutosaveUrl,
-      changeList,
-      this.data.version,
-    ).pipe(
-      tap(response => {
-        this.draftChangeListId = response.draft_change_list_id;
-        // We can safely remove the locally saved draft copy if it was saved
-        // to the backend.
-        this.localStorageService.removeExplorationDraft(this.explorationId);
-      })).toPromise();
+    return this.explorationDataBackendApiService
+      .saveChangeList(
+        this.explorationDraftAutosaveUrl,
+        changeList,
+        this.data.version
+      )
+      .pipe(
+        tap(response => {
+          this.draftChangeListId = response.draft_change_list_id;
+          // We can safely remove the locally saved draft copy if it was saved
+          // to the backend.
+          this.localStorageService.removeExplorationDraft(this.explorationId);
+        })
+      )
+      .toPromise();
   }
 
   // Note that the changeList is the full changeList since the last
   // committed version (as opposed to the most recent autosave).
   async autosaveChangeListAsync(
-      changeList: ExplorationChange[],
-      successCallback: (response: DraftAutoSaveResponse) => void,
-      errorCallback: () => void
+    changeList: ExplorationChange[],
+    successCallback: (response: DraftAutoSaveResponse) => void,
+    errorCallback: () => void
   ): Promise<void> {
     return this._autosaveChangeListAsync(changeList).then(
-      (response) => {
+      response => {
         if (successCallback) {
           successCallback(response);
         }
@@ -127,13 +137,16 @@ export class ExplorationDataService {
   }
 
   async discardDraftAsync(): Promise<void> {
-    return this.explorationDataBackendApiService.discardDraft(
-      this.explorationDraftAutosaveUrl).toPromise();
+    return this.explorationDataBackendApiService
+      .discardDraft(this.explorationDraftAutosaveUrl)
+      .toPromise();
   }
 
-  async getDataAsync(errorCallback: (
-    explorationId: string,
-    lostChanges: ExplorationChange[]) => void | undefined
+  async getDataAsync(
+    errorCallback: (
+      explorationId: string,
+      lostChanges: ExplorationChange[]
+    ) => void | undefined
   ): Promise<ExplorationBackendDict> {
     if (this.data) {
       this.loggerService.info('Found exploration data in cache.');
@@ -146,13 +159,14 @@ export class ExplorationDataService {
       // (which is cached here) will be reused.
       return new Promise((resolve, reject) => {
         this.editableExplorationBackendApiService
-          .fetchApplyDraftExplorationAsync(
-            this.explorationId).then((response) => {
+          .fetchApplyDraftExplorationAsync(this.explorationId)
+          .then(response => {
             this.loggerService.info('Retrieved exploration data.');
             this.draftChangeListId = response.draft_change_list_id;
             this.data = response;
             const draft = this.localStorageService.getExplorationDraft(
-              this.explorationId);
+              this.explorationId
+            );
             if (draft) {
               if (draft.isValid(this.draftChangeListId)) {
                 var changeList = draft.getChanges();
@@ -181,11 +195,12 @@ export class ExplorationDataService {
   // Returns a promise supplying the last saved version for the current
   // exploration.
   async getLastSavedDataAsync(): Promise<ReadOnlyExplorationBackendDict> {
-    return this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
-      this.explorationId).then(response => {
-      this.loggerService.info('Retrieved saved exploration data.');
-      return response.exploration;
-    });
+    return this.readOnlyExplorationBackendApiService
+      .loadLatestExplorationAsync(this.explorationId)
+      .then(response => {
+        this.loggerService.info('Retrieved saved exploration data.');
+        return response.exploration;
+      });
   }
 
   /**
@@ -199,35 +214,48 @@ export class ExplorationDataService {
    *   this save operation.
    */
   save(
-      changeList: ExplorationChange[],
-      commitMessage: string,
-      successCallback: (
-        isDraftVersionvalid: boolean,
-        draftChanges: ExplorationChange[]) => void,
-      errorCallback: (errorResponse?: object) => void): void {
+    changeList: ExplorationChange[],
+    commitMessage: string,
+    successCallback: (
+      isDraftVersionvalid: boolean,
+      draftChanges: ExplorationChange[]
+    ) => void,
+    errorCallback: (errorResponse?: object) => void
+  ): void {
     let dataVersion = 1;
     if (this.data && this.data.version !== undefined) {
       dataVersion = this.data.version;
     }
-    this.editableExplorationBackendApiService.updateExplorationAsync(
-      this.explorationId,
-      dataVersion, commitMessage, changeList
-    ).then(response => {
-      this.alertsService.clearWarnings();
-      this.data = response;
-      if (successCallback) {
-        successCallback(
-          response.is_version_of_draft_valid,
-          response.draft_changes);
-      }
-    }, (response) => {
-      if (errorCallback) {
-        errorCallback(response);
-      }
-    }
-    );
+    this.editableExplorationBackendApiService
+      .updateExplorationAsync(
+        this.explorationId,
+        dataVersion,
+        commitMessage,
+        changeList
+      )
+      .then(
+        response => {
+          this.alertsService.clearWarnings();
+          this.data = response;
+          if (successCallback) {
+            successCallback(
+              response.is_version_of_draft_valid,
+              response.draft_changes
+            );
+          }
+        },
+        response => {
+          if (errorCallback) {
+            errorCallback(response);
+          }
+        }
+      );
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationDataService', downgradeInjectable(ExplorationDataService));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationDataService',
+    downgradeInjectable(ExplorationDataService)
+  );

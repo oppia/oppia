@@ -19,12 +19,12 @@
  * be attempted due to cross-domain security issues.)
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
-import { LoggerService } from 'services/contextual/logger.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ServicesConstants } from 'services/services.constants';
+import {LoggerService} from 'services/contextual/logger.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ServicesConstants} from 'services/services.constants';
 
 interface HeightChangeData {
   height: number;
@@ -64,20 +64,19 @@ interface GetPayloadType {
   explorationLoaded: (data: ExplorationLoadedData) => ExplorationLoadedData;
   stateTransition: (data: StateTransitionData) => StateTransitionData;
   explorationCompleted: (
-    data: ExplorationCompletedData) => ExplorationCompletedData;
+    data: ExplorationCompletedData
+  ) => ExplorationCompletedData;
   explorationReset: (data: string) => ExplorationResetData;
 }
 
-type MessageTitles = typeof ServicesConstants.MESSENGER_PAYLOAD[
-  keyof typeof ServicesConstants.MESSENGER_PAYLOAD
-];
+type MessageTitles =
+  (typeof ServicesConstants.MESSENGER_PAYLOAD)[keyof typeof ServicesConstants.MESSENGER_PAYLOAD];
 
-type PayloadType = (
-  HeightChangeData |
-  ExplorationCompletedData |
-  StateTransitionData |
-  ExplorationResetData
-);
+type PayloadType =
+  | HeightChangeData
+  | ExplorationCompletedData
+  | StateTransitionData
+  | ExplorationResetData;
 
 // The 'secret' and 'tagId' sent to the parent will be 'null' if the supported
 // hash version is not '0.0.0'. They are used to ensure backwards-compatibility.
@@ -88,20 +87,27 @@ interface HashDict {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MessengerService {
   constructor(
-    private loggerService: LoggerService, private windowRef: WindowRef) {}
+    private loggerService: LoggerService,
+    private windowRef: WindowRef
+  ) {}
 
-  SUPPORTED_HASHDICT_VERSIONS: Set<string> = (
-    new Set(['0.0.0', '0.0.1', '0.0.2', '0.0.3']));
+  SUPPORTED_HASHDICT_VERSIONS: Set<string> = new Set([
+    '0.0.0',
+    '0.0.1',
+    '0.0.2',
+    '0.0.3',
+  ]);
 
   MESSAGE_VALIDATORS: MessageValidatorsType = {
     heightChange(payload: HeightChangeData): boolean {
       const {height, scroll} = payload;
       return (
-        Number.isInteger(height) && height > 0 && typeof scroll === 'boolean');
+        Number.isInteger(height) && height > 0 && typeof scroll === 'boolean'
+      );
     },
     explorationLoaded(): boolean {
       return true;
@@ -114,20 +120,20 @@ export class MessengerService {
     },
     explorationCompleted(): boolean {
       return true;
-    }
+    },
   };
 
   getPayload: GetPayloadType = {
     heightChange(data: HeightChangeData): HeightChangeData {
       return {
         height: data.height,
-        scroll: data.scroll
+        scroll: data.scroll,
       };
     },
     explorationLoaded(data: ExplorationLoadedData): ExplorationLoadedData {
       return {
         explorationVersion: data.explorationVersion,
-        explorationTitle: data.explorationTitle
+        explorationTitle: data.explorationTitle,
       };
     },
     stateTransition(data: StateTransitionData): StateTransitionData {
@@ -135,21 +141,22 @@ export class MessengerService {
         explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
         jsonAnswer: data.jsonAnswer,
-        newStateName: data.newStateName
+        newStateName: data.newStateName,
       };
     },
     explorationCompleted(
-        data: ExplorationCompletedData): ExplorationCompletedData {
+      data: ExplorationCompletedData
+    ): ExplorationCompletedData {
       return {
-        explorationVersion: data.explorationVersion
+        explorationVersion: data.explorationVersion,
       };
     },
     // ---- DEPRECATED ----
     explorationReset(data: string): ExplorationResetData {
       return {
-        stateName: data
+        stateName: data,
       };
-    }
+    },
   };
 
   /**
@@ -169,16 +176,18 @@ export class MessengerService {
     // a hash is passed in.
     let window = this.windowRef.nativeWindow;
     let rawHash = window.location.hash.substring(1);
-    if (window.parent !== window && rawHash &&
-        this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
+    if (
+      window.parent !== window &&
+      rawHash &&
+      this.MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)
+    ) {
       // Protractor tests may prepend a / to this hash, which we remove.
-      let hash =
-        (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
+      let hash = rawHash.charAt(0) === '/' ? rawHash.substring(1) : rawHash;
       let hashParts = hash.split('&');
       let hashDict: HashDict = {
         version: '',
         secret: null,
-        tagid: null
+        tagid: null,
       };
       for (let i = 0; i < hashParts.length; i++) {
         if (hashParts[i].indexOf('=') === -1) {
@@ -187,10 +196,11 @@ export class MessengerService {
         }
 
         let separatorLocation = hashParts[i].indexOf('=');
-        const _hashProp = (
-          hashParts[i].substring(0, separatorLocation) as keyof HashDict);
-        hashDict[_hashProp] = (
-          hashParts[i].substring(separatorLocation + 1));
+        const _hashProp = hashParts[i].substring(
+          0,
+          separatorLocation
+        ) as keyof HashDict;
+        hashDict[_hashProp] = hashParts[i].substring(separatorLocation + 1);
       }
 
       if (!hashDict.version || !hashDict.secret) {
@@ -199,41 +209,39 @@ export class MessengerService {
       }
 
       if (this.SUPPORTED_HASHDICT_VERSIONS.has(hashDict.version)) {
-        this.loggerService.info(
-          'Posting message to parent: ' + messageTitle);
+        this.loggerService.info('Posting message to parent: ' + messageTitle);
         let payload: PayloadType;
         let isValidMessage: boolean;
         switch (messageTitle) {
           case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_COMPLETED:
             payload = this.getPayload.explorationCompleted(
-              messageData as ExplorationCompletedData);
-            isValidMessage = (
-              this.MESSAGE_VALIDATORS.explorationCompleted());
+              messageData as ExplorationCompletedData
+            );
+            isValidMessage = this.MESSAGE_VALIDATORS.explorationCompleted();
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_LOADED:
             payload = this.getPayload.explorationLoaded(
-              messageData as ExplorationLoadedData);
-            isValidMessage = (
-              this.MESSAGE_VALIDATORS.explorationLoaded());
+              messageData as ExplorationLoadedData
+            );
+            isValidMessage = this.MESSAGE_VALIDATORS.explorationLoaded();
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.EXPLORATION_RESET:
-            payload = this.getPayload.explorationReset(
-              messageData as string);
-            isValidMessage = (
-              this.MESSAGE_VALIDATORS.explorationReset(payload));
+            payload = this.getPayload.explorationReset(messageData as string);
+            isValidMessage = this.MESSAGE_VALIDATORS.explorationReset(payload);
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE:
             payload = this.getPayload.heightChange(
-              messageData as HeightChangeData);
-            isValidMessage = (
-              this.MESSAGE_VALIDATORS.heightChange(payload));
+              messageData as HeightChangeData
+            );
+            isValidMessage = this.MESSAGE_VALIDATORS.heightChange(payload);
             break;
           case ServicesConstants.MESSENGER_PAYLOAD.STATE_TRANSITION:
             payload = this.getPayload.stateTransition(
-              messageData as StateTransitionData);
-            isValidMessage = (
-              this.MESSAGE_VALIDATORS.stateTransition(
-                payload as StateTransitionData));
+              messageData as StateTransitionData
+            );
+            isValidMessage = this.MESSAGE_VALIDATORS.stateTransition(
+              payload as StateTransitionData
+            );
             break;
         }
 
@@ -253,7 +261,7 @@ export class MessengerService {
           title: messageTitle,
           payload: payload,
           sourceTagId: null,
-          secret: null
+          secret: null,
         };
         if (hashDict.version === '0.0.0') {
           // Ensure backwards-compatibility.
@@ -266,11 +274,13 @@ export class MessengerService {
         window.parent.postMessage(JSON.stringify(objToSendToParent), '*');
       } else {
         this.loggerService.error(
-          'Unknown version for embedding: ' + hashDict.version);
+          'Unknown version for embedding: ' + hashDict.version
+        );
         return;
       }
     }
   }
 }
-angular.module('oppia').factory('MessengerService',
-  downgradeInjectable(MessengerService));
+angular
+  .module('oppia')
+  .factory('MessengerService', downgradeInjectable(MessengerService));

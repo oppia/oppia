@@ -16,15 +16,13 @@
  * @fileoverview Component for the partnerships page.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { PageTitleService } from 'services/page-title.service';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-
+import {PageTitleService} from 'services/page-title.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Component({
   selector: 'partnerships-page',
@@ -64,7 +62,8 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
 
   setPageTitle(): void {
     let translatedTitle = this.translateService.instant(
-      'I18N_PARTNERSHIPS_PAGE_TITLE');
+      'I18N_PARTNERSHIPS_PAGE_TITLE'
+    );
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -74,7 +73,7 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
       this.formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
     } else {
-      let interpolatedLanguage = (userLang === 'pt-br') ? 'pt' : userLang;
+      let interpolatedLanguage = userLang === 'pt-br' ? 'pt' : userLang;
       this.formLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${interpolatedLanguage}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
     }
   }
@@ -87,45 +86,65 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
       })
     );
     this.partnershipsImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/partnerships_hero_image.png');
+      '/general/partnerships_hero_image.png'
+    );
     this.formIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_form.png');
+      '/icons/icon_form.png'
+    );
     this.callIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_call.png');
+      '/icons/icon_call.png'
+    );
     this.changeIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_change.png');
+      '/icons/icon_change.png'
+    );
     this.peopleIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_people.png');
+      '/icons/icon_people.png'
+    );
     this.agreeIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_agree.png');
+      '/icons/icon_agree.png'
+    );
     this.serviceIconUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/icons/icon_service.png');
+      '/icons/icon_service.png'
+    );
     this.partneringImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/general/partnering_image.png');
+      '/general/partnering_image.png'
+    );
     this.org1Url = this.urlInterpolationService.getStaticImageUrl(
-      '/partner_logos/movimentoAmplia.png');
+      '/partner_logos/movimentoAmplia.png'
+    );
     this.org2Url = this.urlInterpolationService.getStaticImageUrl(
-      '/partner_logos/digitalCitizen.png');
+      '/partner_logos/digitalCitizen.png'
+    );
     this.org3Url = this.urlInterpolationService.getStaticImageUrl(
-      '/partner_logos/injazPalestine.png');
+      '/partner_logos/injazPalestine.png'
+    );
     this.org4Url = this.urlInterpolationService.getStaticImageUrl(
-      '/partner_logos/nairobits.png');
+      '/partner_logos/nairobits.png'
+    );
     this.org5Url = this.urlInterpolationService.getStaticImageUrl(
-      '/partner_logos/edri.png');
+      '/partner_logos/edri.png'
+    );
     this.org6Url = this.urlInterpolationService.getStaticImageUrl(
-      '/partner_logos/globalCommunities.png');
+      '/partner_logos/globalCommunities.png'
+    );
     this.partner1 = this.urlInterpolationService.getStaticImageUrl(
-      '/general/partner1.png');
+      '/general/partner1.png'
+    );
     this.partner2 = this.urlInterpolationService.getStaticImageUrl(
-      '/general/partner2.png');
+      '/general/partner2.png'
+    );
     this.partner3 = this.urlInterpolationService.getStaticImageUrl(
-      '/general/partner3.png');
+      '/general/partner3.png'
+    );
     this.learner1 = this.urlInterpolationService.getStaticImageUrl(
-      '/general/learner1.png');
+      '/general/learner1.png'
+    );
     this.learner2 = this.urlInterpolationService.getStaticImageUrl(
-      '/general/learner2.png');
+      '/general/learner2.png'
+    );
     this.learner3 = this.urlInterpolationService.getStaticImageUrl(
-      '/general/learner3.png');
+      '/general/learner3.png'
+    );
   }
 
   ngOnDestroy(): void {
@@ -133,6 +152,9 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
   }
 }
 
-angular.module('oppia').directive(
-  'partnershipsPage',
-  downgradeComponent({component: PartnershipsPageComponent}));
+angular
+  .module('oppia')
+  .directive(
+    'partnershipsPage',
+    downgradeComponent({component: PartnershipsPageComponent})
+  );

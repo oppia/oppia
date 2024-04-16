@@ -16,30 +16,30 @@
  * @fileoverview Module for the story viewer page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { RouterModule } from '@angular/router';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {RouterModule} from '@angular/router';
 
-import { SelectTopicsComponent } from './topic-selector/select-topics.component';
-import { SkillsListComponent } from './skills-list/skills-list.component';
-import { DeleteSkillModalComponent } from './modals/delete-skill-modal.component';
-import { UnassignSkillFromTopicsModalComponent } from './modals/unassign-skill-from-topics-modal.component';
-import { TopicsListComponent } from './topics-list/topics-list.component';
-import { DeleteTopicModalComponent } from './modals/delete-topic-modal.component';
-import { AssignSkillToTopicModalComponent } from './modals/assign-skill-to-topic-modal.component';
-import { MergeSkillModalComponent } from 'components/skill-selector/merge-skill-modal.component';
-import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
-import { TopicsAndSkillsDashboardPageComponent } from './topics-and-skills-dashboard-page.component';
-import { FormsModule } from '@angular/forms';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {SelectTopicsComponent} from './topic-selector/select-topics.component';
+import {SkillsListComponent} from './skills-list/skills-list.component';
+import {DeleteSkillModalComponent} from './modals/delete-skill-modal.component';
+import {UnassignSkillFromTopicsModalComponent} from './modals/unassign-skill-from-topics-modal.component';
+import {TopicsListComponent} from './topics-list/topics-list.component';
+import {DeleteTopicModalComponent} from './modals/delete-topic-modal.component';
+import {AssignSkillToTopicModalComponent} from './modals/assign-skill-to-topic-modal.component';
+import {MergeSkillModalComponent} from 'components/skill-selector/merge-skill-modal.component';
+import {DynamicContentModule} from 'components/interaction-display/dynamic-content.module';
+import {TopicsAndSkillsDashboardPageComponent} from './topics-and-skills-dashboard-page.component';
+import {FormsModule} from '@angular/forms';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
-import { CreateNewTopicModalComponent } from './modals/create-new-topic-modal.component';
-import { ToastrModule } from 'ngx-toastr';
-import { toastrConfig } from 'pages/oppia-root/app.module';
-import { TopicsAndSkillsDashboardPageRootComponent } from './topics-and-skills-dashboard-page-root.component';
-import { TopicsAndSkillsDashboardAuthGuard } from './topics-and-skills-dashboard-auth.guard';
-import { TopicCreationService } from 'components/entity-creation-services/topic-creation.service';
-import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/create-new-skill-modal.service';
+import {CreateNewTopicModalComponent} from './modals/create-new-topic-modal.component';
+import {ToastrModule} from 'ngx-toastr';
+import {toastrConfig} from 'pages/oppia-root/app.module';
+import {TopicsAndSkillsDashboardPageRootComponent} from './topics-and-skills-dashboard-page-root.component';
+import {TopicsAndSkillsDashboardAuthGuard} from './topics-and-skills-dashboard-auth.guard';
+import {TopicCreationService} from 'components/entity-creation-services/topic-creation.service';
+import {CreateNewSkillModalService} from 'pages/topic-editor-page/services/create-new-skill-modal.service';
 
 @NgModule({
   imports: [
@@ -52,8 +52,8 @@ import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/cre
       {
         path: '',
         component: TopicsAndSkillsDashboardPageRootComponent,
-        canActivate: [TopicsAndSkillsDashboardAuthGuard]
-      }
+        canActivate: [TopicsAndSkillsDashboardAuthGuard],
+      },
     ]),
   ],
   declarations: [
@@ -69,7 +69,7 @@ import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/cre
     TopicsAndSkillsDashboardPageComponent,
     CreateNewTopicModalComponent,
     DeleteTopicModalComponent,
-    TopicsAndSkillsDashboardPageRootComponent
+    TopicsAndSkillsDashboardPageRootComponent,
   ],
   entryComponents: [
     SkillsListComponent,
@@ -82,11 +82,8 @@ import { CreateNewSkillModalService } from 'pages/topic-editor-page/services/cre
     DeleteTopicModalComponent,
     SelectTopicsComponent,
     TopicsAndSkillsDashboardPageComponent,
-    CreateNewTopicModalComponent
+    CreateNewTopicModalComponent,
   ],
-  providers: [
-    TopicCreationService,
-    CreateNewSkillModalService
-  ]
+  providers: [TopicCreationService, CreateNewSkillModalService],
 })
 export class TopicsAndSkillsDashboardPageModule {}

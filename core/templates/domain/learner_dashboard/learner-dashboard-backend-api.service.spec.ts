@@ -16,18 +16,18 @@
  * @fileoverview Unit tests for LearnerDashboardBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { LearnerDashboardBackendApiService } from
-  'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { ShortLearnerGroupSummary } from 'domain/learner_group/short-learner-group-summary.model';
-import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {ShortLearnerGroupSummary} from 'domain/learner_group/short-learner-group-summary.model';
+import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 
 describe('Learner Dashboard Backend API Service', () => {
-  let learnerDashboardBackendApiService:
-    LearnerDashboardBackendApiService;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let httpTestingController: HttpTestingController;
 
   let nodeDict = {
@@ -41,7 +41,7 @@ describe('Learner Dashboard Backend API Service', () => {
     outline: 'Outline',
     exploration_id: null,
     outline_is_finalized: false,
-    thumbnail_bg_color: '#a33f40'
+    thumbnail_bg_color: '#a33f40',
   };
   let subtopic = {
     skill_ids: ['skill_id_2'],
@@ -49,283 +49,314 @@ describe('Learner Dashboard Backend API Service', () => {
     title: 'subtopic_name',
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#F8BF74',
-    url_fragment: 'subtopic-name'
+    url_fragment: 'subtopic-name',
   };
 
   const sampleTopicsAndStoriesDataResults = {
-    completed_stories_list: [{
-      id: 'sample_story_id',
-      title: 'Story title',
-      node_titles: ['Chapter 1', 'Chapter 2'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#F8BF74',
-      description: 'Description',
-      story_is_published: true,
-      completed_node_titles: ['Chapter 1', 'Chapter 2'],
-      url_fragment: 'story-url-fragment',
-      all_node_dicts: [nodeDict]
-    }],
-    learnt_topics_list: [{
-      id: 'sample_topic_id',
-      name: 'Topic Name',
-      language_code: 'en',
-      description: 'description',
-      version: 1,
-      story_titles: ['Story 1'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
-      practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
+    completed_stories_list: [
+      {
+        id: 'sample_story_id',
+        title: 'Story title',
+        node_titles: ['Chapter 1', 'Chapter 2'],
         thumbnail_filename: 'image.svg',
         thumbnail_bg_color: '#F8BF74',
+        description: 'Description',
         story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
-      url_fragment: 'topic-name',
-      subtopics: [subtopic],
-      degrees_of_mastery: {
-        skill_id_1: 0.5,
-        skill_id_2: 0.3
+        completed_node_titles: ['Chapter 1', 'Chapter 2'],
+        url_fragment: 'story-url-fragment',
+        all_node_dicts: [nodeDict],
       },
-      skill_descriptions: {
-        skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
-    }],
-    partially_learnt_topics_list: [{
-      id: 'sample_topic_id',
-      name: 'Topic Name',
-      language_code: 'en',
-      description: 'description',
-      version: 1,
-      story_titles: ['Story 1'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
-      practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
+    ],
+    learnt_topics_list: [
+      {
+        id: 'sample_topic_id',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
-      url_fragment: 'topic-name',
-      subtopics: [subtopic],
-      degrees_of_mastery: {
-        skill_id_1: 0.5,
-        skill_id_2: 0.3
+        thumbnail_bg_color: '#C6DCDA',
+        classroom: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Chapter 1'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: ['Chapter 1'],
+            url_fragment: 'story-title',
+            all_node_dicts: [nodeDict],
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [subtopic],
+        degrees_of_mastery: {
+          skill_id_1: 0.5,
+          skill_id_2: 0.3,
+        },
+        skill_descriptions: {
+          skill_id_1: 'Skill Description 1',
+          skill_id_2: 'Skill Description 2',
+        },
       },
-      skill_descriptions: {
-        skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
-    }],
-    topics_to_learn_list: [{
-      id: 'sample_topic_id',
-      name: 'Topic Name',
-      language_code: 'en',
-      description: 'description',
-      version: 1,
-      story_titles: ['Story 1'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
-      practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
+    ],
+    partially_learnt_topics_list: [
+      {
+        id: 'sample_topic_id',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
-      url_fragment: 'topic-name',
-      subtopics: [subtopic],
-      degrees_of_mastery: {
-        skill_id_1: 0.5,
-        skill_id_2: 0.3
+        thumbnail_bg_color: '#C6DCDA',
+        classroom: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Chapter 1'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: ['Chapter 1'],
+            url_fragment: 'story-title',
+            all_node_dicts: [nodeDict],
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [subtopic],
+        degrees_of_mastery: {
+          skill_id_1: 0.5,
+          skill_id_2: 0.3,
+        },
+        skill_descriptions: {
+          skill_id_1: 'Skill Description 1',
+          skill_id_2: 'Skill Description 2',
+        },
       },
-      skill_descriptions: {
-        skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
-    }],
-    all_topics_list: [{
-      id: 'sample_topic_id',
-      name: 'Topic Name',
-      language_code: 'en',
-      description: 'description',
-      version: 1,
-      story_titles: ['Story 1'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
-      practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
+    ],
+    topics_to_learn_list: [
+      {
+        id: 'sample_topic_id',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
-      url_fragment: 'topic-name',
-      subtopics: [subtopic],
-      degrees_of_mastery: {
-        skill_id_1: 0.5,
-        skill_id_2: 0.3
+        thumbnail_bg_color: '#C6DCDA',
+        classroom: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Chapter 1'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: ['Chapter 1'],
+            url_fragment: 'story-title',
+            all_node_dicts: [nodeDict],
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [subtopic],
+        degrees_of_mastery: {
+          skill_id_1: 0.5,
+          skill_id_2: 0.3,
+        },
+        skill_descriptions: {
+          skill_id_1: 'Skill Description 1',
+          skill_id_2: 'Skill Description 2',
+        },
       },
-      skill_descriptions: {
-        skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
-    }],
-    untracked_topics_list: [{
-      id: 'sample_topic_id',
-      name: 'Topic Name',
-      language_code: 'en',
-      description: 'description',
-      version: 1,
-      story_titles: ['Story 1'],
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
-      practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
+    ],
+    all_topics_list: [
+      {
+        id: 'sample_topic_id',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
-      url_fragment: 'topic-name',
-      subtopics: [subtopic],
-      degrees_of_mastery: {
-        skill_id_1: 0.5,
-        skill_id_2: 0.3
+        thumbnail_bg_color: '#C6DCDA',
+        classroom: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Chapter 1'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: ['Chapter 1'],
+            url_fragment: 'story-title',
+            all_node_dicts: [nodeDict],
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [subtopic],
+        degrees_of_mastery: {
+          skill_id_1: 0.5,
+          skill_id_2: 0.3,
+        },
+        skill_descriptions: {
+          skill_id_1: 'Skill Description 1',
+          skill_id_2: 'Skill Description 2',
+        },
       },
-      skill_descriptions: {
-        skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
-    }],
-    topics_to_learn: [{
-      id: 'fyuy4GrevTqJ',
-      name: 'Sample Name',
-      classroom: 'Math',
-      language_code: 'en',
-      version: 1,
-      canonical_story_count: 3,
-      additional_story_count: 0,
-      uncategorized_skill_count: 1,
-      subtopic_count: 1,
-      topic_model_created_on: 1466178691847.67,
-      topic_model_last_updated: 1466178759209.839,
-      description: 'description',
-      total_skill_count: 2,
-      total_published_node_count: 3,
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#C6DCDA',
-      url_fragment: 'sample-name',
-      subtopics: [{
-        skill_ids: ['skill_id_2'],
-        id: 1,
-        title: 'subtopic_name',
+    ],
+    untracked_topics_list: [
+      {
+        id: 'sample_topic_id',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
         thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        url_fragment: 'subtopic-name'
-      }],
-      degrees_of_mastery: {
-        skill_id_1: 0.5,
-        skill_id_2: 0.3
+        thumbnail_bg_color: '#C6DCDA',
+        classroom: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Chapter 1'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: ['Chapter 1'],
+            url_fragment: 'story-title',
+            all_node_dicts: [nodeDict],
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [subtopic],
+        degrees_of_mastery: {
+          skill_id_1: 0.5,
+          skill_id_2: 0.3,
+        },
+        skill_descriptions: {
+          skill_id_1: 'Skill Description 1',
+          skill_id_2: 'Skill Description 2',
+        },
       },
-      skill_descriptions: {
-        skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
-    }],
+    ],
+    topics_to_learn: [
+      {
+        id: 'fyuy4GrevTqJ',
+        name: 'Sample Name',
+        classroom: 'Math',
+        language_code: 'en',
+        version: 1,
+        canonical_story_count: 3,
+        additional_story_count: 0,
+        uncategorized_skill_count: 1,
+        subtopic_count: 1,
+        topic_model_created_on: 1466178691847.67,
+        topic_model_last_updated: 1466178759209.839,
+        description: 'description',
+        total_skill_count: 2,
+        total_published_node_count: 3,
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        url_fragment: 'sample-name',
+        subtopics: [
+          {
+            skill_ids: ['skill_id_2'],
+            id: 1,
+            title: 'subtopic_name',
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            url_fragment: 'subtopic-name',
+          },
+        ],
+        degrees_of_mastery: {
+          skill_id_1: 0.5,
+          skill_id_2: 0.3,
+        },
+        skill_descriptions: {
+          skill_id_1: 'Skill Description 1',
+          skill_id_2: 'Skill Description 2',
+        },
+      },
+    ],
     number_of_nonexistent_topics_and_stories: {
       incomplete_stories: 0,
       learnt_topics: 0,
       partially_learnt_topics: 0,
-      topics_to_learn: 0
+      topics_to_learn: 0,
     },
     user_email: 'user@example.com',
     completed_to_incomplete_stories: [],
-    learnt_to_partially_learnt_topics: []
+    learnt_to_partially_learnt_topics: [],
   };
 
-
   const sampleCollectionsDataResults = {
-    completed_collections_list: [{
-      status: 'public',
-      thumbnail_bg_color: '#ae511b',
-      community_owned: false,
-      created_on: 1558593739415.726,
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      language_code: 'en',
-      id: 'GdYIgsfRZwG7',
-      category: 'Arithmetic',
-      title: 'Negative Numbers',
-      last_updated_msec: 1558593926486.329,
-      objective: 'Learn what negative numbers are, and how to use them.',
-      node_count: 5
-    }],
-    collection_playlist: [{
-      status: 'public',
-      thumbnail_bg_color: '#ae511b',
-      community_owned: false,
-      created_on: 1558593739415.726,
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      language_code: 'en',
-      id: 'GdYIgsfRZwG7',
-      category: 'Arithmetic',
-      title: 'Negative Numbers',
-      last_updated_msec: 1558593926486.329,
-      objective: 'Learn what negative numbers are, and how to use them.',
-      node_count: 5
-    }],
-    incomplete_collections_list: [{
-      status: 'public',
-      thumbnail_bg_color: '#ae511b',
-      community_owned: false,
-      created_on: 1491118537846.88,
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      language_code: 'en',
-      id: '4UgTQUc1tala',
-      category: 'Arithmetic',
-      title: 'Fractions',
-      last_updated_msec: 1527227142150.33,
-      objective:
-        'Learn the basics of fractions with Matthew as he explores a bakery.',
-      node_count: 12
-    }],
+    completed_collections_list: [
+      {
+        status: 'public',
+        thumbnail_bg_color: '#ae511b',
+        community_owned: false,
+        created_on: 1558593739415.726,
+        thumbnail_icon_url: '/subjects/Arithmetic.svg',
+        language_code: 'en',
+        id: 'GdYIgsfRZwG7',
+        category: 'Arithmetic',
+        title: 'Negative Numbers',
+        last_updated_msec: 1558593926486.329,
+        objective: 'Learn what negative numbers are, and how to use them.',
+        node_count: 5,
+      },
+    ],
+    collection_playlist: [
+      {
+        status: 'public',
+        thumbnail_bg_color: '#ae511b',
+        community_owned: false,
+        created_on: 1558593739415.726,
+        thumbnail_icon_url: '/subjects/Arithmetic.svg',
+        language_code: 'en',
+        id: 'GdYIgsfRZwG7',
+        category: 'Arithmetic',
+        title: 'Negative Numbers',
+        last_updated_msec: 1558593926486.329,
+        objective: 'Learn what negative numbers are, and how to use them.',
+        node_count: 5,
+      },
+    ],
+    incomplete_collections_list: [
+      {
+        status: 'public',
+        thumbnail_bg_color: '#ae511b',
+        community_owned: false,
+        created_on: 1491118537846.88,
+        thumbnail_icon_url: '/subjects/Arithmetic.svg',
+        language_code: 'en',
+        id: '4UgTQUc1tala',
+        category: 'Arithmetic',
+        title: 'Fractions',
+        last_updated_msec: 1527227142150.33,
+        objective:
+          'Learn the basics of fractions with Matthew as he explores a bakery.',
+        node_count: 12,
+      },
+    ],
     number_of_nonexistent_collections: {
       completed_collections: 0,
       incomplete_collections: 0,
@@ -336,95 +367,103 @@ describe('Learner Dashboard Backend API Service', () => {
   };
 
   const sampleExplorationDataResults = {
-    incomplete_explorations_list: [{
-      category: 'Arithmetic',
-      created_on_msec: 1515553584276.8,
-      community_owned: false,
-      thumbnail_bg_color: '#ae511b',
-      title: 'Equality of Fractions (Recap)',
-      num_views: 760,
-      tags: [
-        'recap',
-        'fractions',
-        'mixed numbers',
-        'improper fractions',
-        'equivalent fractions',
-        'fractions of a group'
-      ],
-      last_updated_msec: 1593864269236.194,
-      human_readable_contributors_summary: {},
-      status: 'public',
-      language_code: 'en',
-      objective: 'Practice the skills from lessons 1-7.',
-      thumbnail_icon_url: '/subjects/Arithmetic.svg',
-      ratings: {
-        1: 0,
-        2: 1,
-        3: 0,
-        4: 0,
-        5: 5
+    incomplete_explorations_list: [
+      {
+        category: 'Arithmetic',
+        created_on_msec: 1515553584276.8,
+        community_owned: false,
+        thumbnail_bg_color: '#ae511b',
+        title: 'Equality of Fractions (Recap)',
+        num_views: 760,
+        tags: [
+          'recap',
+          'fractions',
+          'mixed numbers',
+          'improper fractions',
+          'equivalent fractions',
+          'fractions of a group',
+        ],
+        last_updated_msec: 1593864269236.194,
+        human_readable_contributors_summary: {},
+        status: 'public',
+        language_code: 'en',
+        objective: 'Practice the skills from lessons 1-7.',
+        thumbnail_icon_url: '/subjects/Arithmetic.svg',
+        ratings: {
+          1: 0,
+          2: 1,
+          3: 0,
+          4: 0,
+          5: 5,
+        },
+        id: '-tMgcP1i_4au',
+        activity_type: 'exploration',
       },
-      id: '-tMgcP1i_4au',
-      activity_type: 'exploration'
-    }],
-    exploration_playlist: [{
-      category: 'Welcome',
-      created_on_msec: 1564183471833.675,
-      community_owned: true,
-      thumbnail_bg_color: '#992a2b',
-      title: 'Welcome to Oppia!',
-      num_views: 14897,
-      tags: [],
-      last_updated_msec: 1571653541705.924,
-      human_readable_contributors_summary: {},
-      status: 'public',
-      language_code: 'en',
-      objective: "become familiar with Oppia's capabilities",
-      thumbnail_icon_url: '/subjects/Welcome.svg',
-      ratings: {
-        1: 1,
-        2: 1,
-        3: 3,
-        4: 24,
-        5: 46
+    ],
+    exploration_playlist: [
+      {
+        category: 'Welcome',
+        created_on_msec: 1564183471833.675,
+        community_owned: true,
+        thumbnail_bg_color: '#992a2b',
+        title: 'Welcome to Oppia!',
+        num_views: 14897,
+        tags: [],
+        last_updated_msec: 1571653541705.924,
+        human_readable_contributors_summary: {},
+        status: 'public',
+        language_code: 'en',
+        objective: "become familiar with Oppia's capabilities",
+        thumbnail_icon_url: '/subjects/Welcome.svg',
+        ratings: {
+          1: 1,
+          2: 1,
+          3: 3,
+          4: 24,
+          5: 46,
+        },
+        id: '0',
+        activity_type: 'exploration',
       },
-      id: '0',
-      activity_type: 'exploration'
-    }],
+    ],
     number_of_nonexistent_explorations: {
       incomplete_explorations: 0,
       exploration_playlist: 0,
       completed_explorations: 0,
     },
-    completed_explorations_list: [{
-      category: 'Welcome',
-      created_on_msec: 1564183471833.675,
-      community_owned: true,
-      thumbnail_bg_color: '#992a2b',
-      title: 'Welcome to Oppia!',
-      num_views: 14897,
-      tags: [],
-      last_updated_msec: 1571653541705.924,
-      human_readable_contributors_summary: {},
-      status: 'public',
-      language_code: 'en',
-      objective: "become familiar with Oppia's capabilities",
-      thumbnail_icon_url: '/subjects/Welcome.svg',
-      ratings: {
-        1: 1,
-        2: 1,
-        3: 3,
-        4: 24,
-        5: 46
+    completed_explorations_list: [
+      {
+        category: 'Welcome',
+        created_on_msec: 1564183471833.675,
+        community_owned: true,
+        thumbnail_bg_color: '#992a2b',
+        title: 'Welcome to Oppia!',
+        num_views: 14897,
+        tags: [],
+        last_updated_msec: 1571653541705.924,
+        human_readable_contributors_summary: {},
+        status: 'public',
+        language_code: 'en',
+        objective: "become familiar with Oppia's capabilities",
+        thumbnail_icon_url: '/subjects/Welcome.svg',
+        ratings: {
+          1: 1,
+          2: 1,
+          3: 3,
+          4: 24,
+          5: 46,
+        },
+        id: '0',
+        activity_type: 'exploration',
       },
-      id: '0',
-      activity_type: 'exploration'
-    }],
-    subscription_list: [{
-      creator_username: 'user',
-      creator_impact: 0,
-    }],
-    user_email: 'user@example.com'
+    ],
+    subscription_list: [
+      {
+        creator_username: 'user',
+        creator_impact: 0,
+      },
+    ],
+    user_email: 'user@example.com',
   };
 
   const sampleCompletedChaptersCountDataResults = {
@@ -433,27 +472,28 @@ describe('Learner Dashboard Backend API Service', () => {
 
   const sampleSubtopicMastery = {
     topic_id: {
-      1: 0
-    }
+      1: 0,
+    },
   };
 
-  const LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL = (
-    '/learnerdashboardtopicsandstoriesprogresshandler/data');
-  const LEARNER_DASHBOARD_COLLECTION_DATA_URL = (
-    '/learnerdashboardcollectionsprogresshandler/data');
-  const LEARNER_DASHBOARD_EXPLORATION_DATA_URL = (
-    '/learnerdashboardexplorationsprogresshandler/data');
-  const LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL = (
-    '/learnercompletedchapterscounthandler/data');
+  const LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL =
+    '/learnerdashboardtopicsandstoriesprogresshandler/data';
+  const LEARNER_DASHBOARD_COLLECTION_DATA_URL =
+    '/learnerdashboardcollectionsprogresshandler/data';
+  const LEARNER_DASHBOARD_EXPLORATION_DATA_URL =
+    '/learnerdashboardexplorationsprogresshandler/data';
+  const LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL =
+    '/learnercompletedchapterscounthandler/data';
   const ERROR_STATUS_CODE = 400;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [LearnerDashboardBackendApiService]
+      providers: [LearnerDashboardBackendApiService],
     });
     learnerDashboardBackendApiService = TestBed.get(
-      LearnerDashboardBackendApiService);
+      LearnerDashboardBackendApiService
+    );
 
     httpTestingController = TestBed.get(HttpTestingController);
   });
@@ -462,70 +502,258 @@ describe('Learner Dashboard Backend API Service', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch learner dashboard topics and stories data ' +
-    'from the backend', fakeAsync(() => {
+  it(
+    'should successfully fetch learner dashboard topics and stories data ' +
+      'from the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardTopicsAndStoriesDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleTopicsAndStoriesDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should successfully fetch learner dashboard collections data ' +
+      'from the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardCollectionsDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_DASHBOARD_COLLECTION_DATA_URL
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleCollectionsDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should successfully fetch learner dashboard explorations data ' +
+      'from the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardExplorationsDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleExplorationDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it("should successfully fetch learner's completed chapters count data", fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
     learnerDashboardBackendApiService
-      .fetchLearnerDashboardTopicsAndStoriesDataAsync()
+      .fetchLearnerCompletedChaptersCountDataAsync()
       .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL);
+      LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL
+    );
     expect(req.request.method).toEqual('GET');
-    req.flush(sampleTopicsAndStoriesDataResults);
+    req.flush(sampleCompletedChaptersCountDataResults);
 
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+  }));
 
-  it('should successfully fetch learner dashboard collections data ' +
-    'from the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should successfully fetch subtopic mastery data from the' + ' backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      var topicIds = ['topic_id1', 'topic_id2'];
 
-    learnerDashboardBackendApiService
-      .fetchLearnerDashboardCollectionsDataAsync()
-      .then(successHandler, failHandler);
+      learnerDashboardBackendApiService
+        .fetchSubtopicMastery(topicIds)
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      LEARNER_DASHBOARD_COLLECTION_DATA_URL);
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleCollectionsDataResults);
+      let req = httpTestingController.expectOne(
+        '/subtopic_mastery_handler/data?' +
+          'selected_topic_ids=' +
+          encodeURI(JSON.stringify(topicIds))
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleSubtopicMastery);
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should successfully fetch learner dashboard explorations data ' +
-    'from the backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
+  it(
+    'should use rejection handler if subtopic mastery data' +
+      ' backend request failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      var topicIds = ['topic_id1', 'topic_id2'];
 
-    learnerDashboardBackendApiService
-      .fetchLearnerDashboardExplorationsDataAsync()
-      .then(successHandler, failHandler);
+      learnerDashboardBackendApiService
+        .fetchSubtopicMastery(topicIds)
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      LEARNER_DASHBOARD_EXPLORATION_DATA_URL);
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleExplorationDataResults);
+      let req = httpTestingController.expectOne(
+        '/subtopic_mastery_handler/data?' +
+          'selected_topic_ids=' +
+          encodeURI(JSON.stringify(topicIds))
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 400,
+        },
+        {
+          status: ERROR_STATUS_CODE,
+          statusText: 'Invalid Request',
+        }
+      );
 
-    flushMicrotasks();
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(400);
+    })
+  );
 
-  it('should successfully fetch learner\'s completed chapters count data',
+  it(
+    'should use rejection handler if learner dashboard topics and stories ' +
+      'data backend request failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardTopicsAndStoriesDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 'Error loading dashboard data.',
+        },
+        {
+          status: ERROR_STATUS_CODE,
+          statusText: 'Invalid Request',
+        }
+      );
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(400);
+    })
+  );
+
+  it(
+    'should use rejection handler if learner dashboard collections ' +
+      'data backend request failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardCollectionsDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_DASHBOARD_COLLECTION_DATA_URL
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 'Error loading dashboard data.',
+        },
+        {
+          status: ERROR_STATUS_CODE,
+          statusText: 'Invalid Request',
+        }
+      );
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(400);
+    })
+  );
+
+  it(
+    'should use rejection handler if learner dashboard explorations ' +
+      'data backend request failed',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+
+      learnerDashboardBackendApiService
+        .fetchLearnerDashboardExplorationsDataAsync()
+        .then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+      );
+      expect(req.request.method).toEqual('GET');
+      req.flush(
+        {
+          error: 'Error loading dashboard data.',
+        },
+        {
+          status: ERROR_STATUS_CODE,
+          statusText: 'Invalid Request',
+        }
+      );
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(400);
+    })
+  );
+
+  it(
+    'should use rejection handler if learner completed chapters count ' +
+      'data backend request failed',
     fakeAsync(() => {
       let successHandler = jasmine.createSpy('success');
       let failHandler = jasmine.createSpy('fail');
@@ -535,164 +763,25 @@ describe('Learner Dashboard Backend API Service', () => {
         .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL);
+        LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL
+      );
       expect(req.request.method).toEqual('GET');
-      req.flush(sampleCompletedChaptersCountDataResults);
+      req.flush(
+        {
+          error: 'Error loading dashboard data.',
+        },
+        {
+          status: ERROR_STATUS_CODE,
+          statusText: 'Invalid Request',
+        }
+      );
 
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-    ));
-
-  it('should successfully fetch subtopic mastery data from the' +
-    ' backend', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    var topicIds = ['topic_id1', 'topic_id2'];
-
-    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?' +
-      'selected_topic_ids=' + encodeURI(JSON.stringify(topicIds)));
-    expect(req.request.method).toEqual('GET');
-    req.flush(sampleSubtopicMastery);
-
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }
-  ));
-
-  it('should use rejection handler if subtopic mastery data' +
-    ' backend request failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-    var topicIds = ['topic_id1', 'topic_id2'];
-
-    learnerDashboardBackendApiService.fetchSubtopicMastery(topicIds)
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      '/subtopic_mastery_handler/data?' +
-      'selected_topic_ids=' + encodeURI(JSON.stringify(topicIds)));
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 400
-    }, {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(400);
-  }
-  ));
-
-  it('should use rejection handler if learner dashboard topics and stories ' +
-    'data backend request failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    learnerDashboardBackendApiService
-      .fetchLearnerDashboardTopicsAndStoriesDataAsync()
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL);
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Error loading dashboard data.'
-    }, {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(400);
-  }
-  ));
-
-  it('should use rejection handler if learner dashboard collections ' +
-    'data backend request failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    learnerDashboardBackendApiService
-      .fetchLearnerDashboardCollectionsDataAsync()
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      LEARNER_DASHBOARD_COLLECTION_DATA_URL);
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Error loading dashboard data.'
-    }, {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(400);
-  }
-  ));
-
-  it('should use rejection handler if learner dashboard explorations ' +
-    'data backend request failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    learnerDashboardBackendApiService
-      .fetchLearnerDashboardExplorationsDataAsync()
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      LEARNER_DASHBOARD_EXPLORATION_DATA_URL);
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Error loading dashboard data.'
-    }, {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(400);
-  }
-  ));
-
-  it('should use rejection handler if learner completed chapters count ' +
-    'data backend request failed', fakeAsync(() => {
-    let successHandler = jasmine.createSpy('success');
-    let failHandler = jasmine.createSpy('fail');
-
-    learnerDashboardBackendApiService
-      .fetchLearnerCompletedChaptersCountDataAsync()
-      .then(successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      LEARNER_COMPLETED_CHAPTERS_COUNT_DATA_URL);
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      error: 'Error loading dashboard data.'
-    }, {
-      status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
-    });
-
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(400);
-  }
-  ));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(400);
+    })
+  );
 
   it('should get untracked topics', () => {
     let subtopic = {
@@ -701,7 +790,7 @@ describe('Learner Dashboard Backend API Service', () => {
       title: 'subtopic_name',
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#F8BF74',
-      url_fragment: 'subtopic-name'
+      url_fragment: 'subtopic-name',
     };
 
     let nodeDict = {
@@ -720,7 +809,7 @@ describe('Learner Dashboard Backend API Service', () => {
       planned_publication_date_msecs: 100,
       last_modified_msecs: 100,
       first_publication_date_msecs: 200,
-      unpublishing_reason: null
+      unpublishing_reason: null,
     };
 
     let sampleLearnerTopicSummaryBackendDict = {
@@ -735,88 +824,94 @@ describe('Learner Dashboard Backend API Service', () => {
       thumbnail_bg_color: '#C6DCDA',
       classroom: 'math',
       practice_tab_is_displayed: false,
-      canonical_story_summary_dict: [{
-        id: '0',
-        title: 'Story Title',
-        description: 'Story Description',
-        node_titles: ['Chapter 1'],
-        thumbnail_filename: 'image.svg',
-        thumbnail_bg_color: '#F8BF74',
-        story_is_published: true,
-        completed_node_titles: ['Chapter 1'],
-        url_fragment: 'story-title',
-        all_node_dicts: [nodeDict]
-      }],
+      canonical_story_summary_dict: [
+        {
+          id: '0',
+          title: 'Story Title',
+          description: 'Story Description',
+          node_titles: ['Chapter 1'],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Chapter 1'],
+          url_fragment: 'story-title',
+          all_node_dicts: [nodeDict],
+        },
+      ],
       url_fragment: 'topic-name',
       subtopics: [subtopic],
       degrees_of_mastery: {
         skill_id_1: 0.5,
-        skill_id_2: 0.3
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',
-        skill_id_2: 'Skill Description 2'
-      }
+        skill_id_2: 'Skill Description 2',
+      },
     };
     let untrackedTopics = {
-      math: [sampleLearnerTopicSummaryBackendDict]
+      math: [sampleLearnerTopicSummaryBackendDict],
     };
-    expect(learnerDashboardBackendApiService.getUntrackedTopics(
-      untrackedTopics)).toEqual(
-      {
-        math: [LearnerTopicSummary.createFromBackendDict(
-          sampleLearnerTopicSummaryBackendDict)]});
+    expect(
+      learnerDashboardBackendApiService.getUntrackedTopics(untrackedTopics)
+    ).toEqual({
+      math: [
+        LearnerTopicSummary.createFromBackendDict(
+          sampleLearnerTopicSummaryBackendDict
+        ),
+      ],
+    });
   });
 
-  it('should fetch learner groups to show on learner dashboard successfully',
-    fakeAsync(() => {
-      let successHandler = jasmine.createSpy('success');
-      let failHandler = jasmine.createSpy('fail');
+  it('should fetch learner groups to show on learner dashboard successfully', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
 
-      const sampleShortLearnerGroupSummaryDict1 = {
-        id: 'sampleId1',
-        title: 'sampleTitle',
-        description: 'sampleDescription',
-        facilitator_usernames: ['username1'],
-        learners_count: 5
-      };
-      const sampleShortLearnerGroupSummaryDict2 = {
-        id: 'sampleId2',
-        title: 'sampleTitle 2',
-        description: 'sampleDescription 2',
-        facilitator_usernames: ['username1'],
-        learners_count: 7
-      };
-      const sampleShortLearnerGroupSummary1 = (
-        ShortLearnerGroupSummary.createFromBackendDict(
-          sampleShortLearnerGroupSummaryDict1)
+    const sampleShortLearnerGroupSummaryDict1 = {
+      id: 'sampleId1',
+      title: 'sampleTitle',
+      description: 'sampleDescription',
+      facilitator_usernames: ['username1'],
+      learners_count: 5,
+    };
+    const sampleShortLearnerGroupSummaryDict2 = {
+      id: 'sampleId2',
+      title: 'sampleTitle 2',
+      description: 'sampleDescription 2',
+      facilitator_usernames: ['username1'],
+      learners_count: 7,
+    };
+    const sampleShortLearnerGroupSummary1 =
+      ShortLearnerGroupSummary.createFromBackendDict(
+        sampleShortLearnerGroupSummaryDict1
       );
-      const sampleShortLearnerGroupSummary2 = (
-        ShortLearnerGroupSummary.createFromBackendDict(
-          sampleShortLearnerGroupSummaryDict2)
+    const sampleShortLearnerGroupSummary2 =
+      ShortLearnerGroupSummary.createFromBackendDict(
+        sampleShortLearnerGroupSummaryDict2
       );
 
-      learnerDashboardBackendApiService
-        .fetchLearnerDashboardLearnerGroupsAsync()
-        .then(successHandler, failHandler);
+    learnerDashboardBackendApiService
+      .fetchLearnerDashboardLearnerGroupsAsync()
+      .then(successHandler, failHandler);
 
-      let req = httpTestingController.expectOne(
-        '/learner_dashboard_learner_groups_handler');
-      expect(req.request.method).toEqual('GET');
+    let req = httpTestingController.expectOne(
+      '/learner_dashboard_learner_groups_handler'
+    );
+    expect(req.request.method).toEqual('GET');
 
-      req.flush({
-        learner_groups_joined: [sampleShortLearnerGroupSummaryDict1],
-        invited_to_learner_groups: [sampleShortLearnerGroupSummaryDict2]
-      });
-      flushMicrotasks();
+    req.flush({
+      learner_groups_joined: [sampleShortLearnerGroupSummaryDict1],
+      invited_to_learner_groups: [sampleShortLearnerGroupSummaryDict2],
+    });
+    flushMicrotasks();
 
-      const learnerDashboardLearnerGroupsData = {
-        learnerGroupsJoined: [sampleShortLearnerGroupSummary1],
-        invitedToLearnerGroups: [sampleShortLearnerGroupSummary2]
-      };
-      expect(successHandler).toHaveBeenCalledWith(
-        learnerDashboardLearnerGroupsData);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    const learnerDashboardLearnerGroupsData = {
+      learnerGroupsJoined: [sampleShortLearnerGroupSummary1],
+      invitedToLearnerGroups: [sampleShortLearnerGroupSummary2],
+    };
+    expect(successHandler).toHaveBeenCalledWith(
+      learnerDashboardLearnerGroupsData
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

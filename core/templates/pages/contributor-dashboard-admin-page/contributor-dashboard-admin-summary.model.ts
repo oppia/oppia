@@ -16,29 +16,47 @@
  * @fileoverview Frontend model for contributor admin dashboard domain objects.
  */
 
-import { TranslationSubmitterBackendDict, TranslationReviewerBackendDict,
-  QuestionSubmitterBackendDict, QuestionReviewerBackendDict
+import {
+  TranslationSubmitterBackendDict,
+  TranslationReviewerBackendDict,
+  QuestionSubmitterBackendDict,
+  QuestionReviewerBackendDict,
 } from './services/contributor-dashboard-admin-stats-backend-api.service';
+import {
+  ContributorAttribute,
+  FormatContributorAttributesService,
+} from './services/format-contributor-attributes.service';
+
+export type ContributorStats =
+  | TranslationSubmitterStats
+  | TranslationReviewerStats
+  | QuestionSubmitterStats
+  | QuestionReviewerStats;
+
+let formatContributorAttributesService: FormatContributorAttributesService =
+  new FormatContributorAttributesService();
 
 export class TranslationSubmitterStats {
   constructor(
-        public contributorName: string,
-        public languageCode: string,
-        public topicsWithTranslationSubmissions: string[],
-        public recentPerformance: number,
-        public overallAccuracy: number,
-        public submittedTranslationsCount: number,
-        public submittedTranslationWordCount: number,
-        public acceptedTranslationsCount: number,
-        public acceptedTranslationsWithoutReviewerEditsCount: number,
-        public acceptedTranslationWordCount: number,
-        public rejectedTranslationsCount: number,
-        public rejectedTranslationWordCount: number,
-        public firstContributionDate: string,
-        public lastContributedInDays: number) { }
+    public contributorName: string,
+    public languageCode: string,
+    public topicsWithTranslationSubmissions: string[],
+    public recentPerformance: number,
+    public overallAccuracy: number,
+    public submittedTranslationsCount: number,
+    public submittedTranslationWordCount: number,
+    public acceptedTranslationsCount: number,
+    public acceptedTranslationsWithoutReviewerEditsCount: number,
+    public acceptedTranslationWordCount: number,
+    public rejectedTranslationsCount: number,
+    public rejectedTranslationWordCount: number,
+    public firstContributionDate: string,
+    public lastContributedInDays: number
+  ) {}
 
-  static createFromBackendDict(summaryDict: TranslationSubmitterBackendDict):
-    TranslationSubmitterStats {
+  static createFromBackendDict(
+    summaryDict: TranslationSubmitterBackendDict
+  ): TranslationSubmitterStats {
     return new TranslationSubmitterStats(
       summaryDict.contributor_name,
       summaryDict.language_code,
@@ -56,23 +74,33 @@ export class TranslationSubmitterStats {
       summaryDict.last_contributed_in_days
     );
   }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getTranslationSubmitterContributorAttributes(
+      contributorStats as TranslationSubmitterStats
+    );
+  }
 }
 
 export class TranslationReviewerStats {
   constructor(
-        public contributorName: string,
-        public languageCode: string,
-        public topicsWithTranslationReviews: string[],
-        public reviewedTranslationsCount: number,
-        public acceptedTranslationsCount: number,
-        public acceptedTranslationsWithReviewerEditsCount: number,
-        public acceptedTranslationWordCount: number,
-        public rejectedTranslationsCount: number,
-        public firstContributionDate: string,
-        public lastContributedInDays: number) { }
+    public contributorName: string,
+    public languageCode: string,
+    public topicsWithTranslationReviews: string[],
+    public reviewedTranslationsCount: number,
+    public acceptedTranslationsCount: number,
+    public acceptedTranslationsWithReviewerEditsCount: number,
+    public acceptedTranslationWordCount: number,
+    public rejectedTranslationsCount: number,
+    public firstContributionDate: string,
+    public lastContributedInDays: number
+  ) {}
 
-  static createFromBackendDict(summaryDict: TranslationReviewerBackendDict):
-    TranslationReviewerStats {
+  static createFromBackendDict(
+    summaryDict: TranslationReviewerBackendDict
+  ): TranslationReviewerStats {
     return new TranslationReviewerStats(
       summaryDict.contributor_name,
       summaryDict.language_code,
@@ -86,23 +114,33 @@ export class TranslationReviewerStats {
       summaryDict.last_contributed_in_days
     );
   }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getTranslationReviewerContributorAttributes(
+      contributorStats as TranslationReviewerStats
+    );
+  }
 }
 
 export class QuestionSubmitterStats {
   constructor(
-        public contributorName: string,
-        public topicsWithQuestionSubmissions: string[],
-        public recentPerformance: number,
-        public overallAccuracy: number,
-        public submittedQuestionsCount: number,
-        public acceptedQuestionsCount: number,
-        public acceptedQuestionsWithoutReviewerEditsCount: number,
-        public rejectedQuestionsCount: number,
-        public firstContributionDate: string,
-        public lastContributedInDays: number) { }
+    public contributorName: string,
+    public topicsWithQuestionSubmissions: string[],
+    public recentPerformance: number,
+    public overallAccuracy: number,
+    public submittedQuestionsCount: number,
+    public acceptedQuestionsCount: number,
+    public acceptedQuestionsWithoutReviewerEditsCount: number,
+    public rejectedQuestionsCount: number,
+    public firstContributionDate: string,
+    public lastContributedInDays: number
+  ) {}
 
-  static createFromBackendDict(summaryDict: QuestionSubmitterBackendDict):
-    QuestionSubmitterStats {
+  static createFromBackendDict(
+    summaryDict: QuestionSubmitterBackendDict
+  ): QuestionSubmitterStats {
     return new QuestionSubmitterStats(
       summaryDict.contributor_name,
       summaryDict.topic_names,
@@ -116,21 +154,31 @@ export class QuestionSubmitterStats {
       summaryDict.last_contributed_in_days
     );
   }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getQuestionSubmitterContributorAttributes(
+      contributorStats as QuestionSubmitterStats
+    );
+  }
 }
 
 export class QuestionReviewerStats {
   constructor(
-        public contributorName: string,
-        public topicsWithQuestionReviews: string[],
-        public reviewedQuestionsCount: number,
-        public acceptedQuestionsCount: number,
-        public acceptedQuestionsWithReviewerEditsCount: number,
-        public rejectedQuestionsCount: number,
-        public firstContributionDate: string,
-        public lastContributedInDays: number) { }
+    public contributorName: string,
+    public topicsWithQuestionReviews: string[],
+    public reviewedQuestionsCount: number,
+    public acceptedQuestionsCount: number,
+    public acceptedQuestionsWithReviewerEditsCount: number,
+    public rejectedQuestionsCount: number,
+    public firstContributionDate: string,
+    public lastContributedInDays: number
+  ) {}
 
-  static createFromBackendDict(summaryDict: QuestionReviewerBackendDict):
-    QuestionReviewerStats {
+  static createFromBackendDict(
+    summaryDict: QuestionReviewerBackendDict
+  ): QuestionReviewerStats {
     return new QuestionReviewerStats(
       summaryDict.contributor_name,
       summaryDict.topic_names,
@@ -140,6 +188,14 @@ export class QuestionReviewerStats {
       summaryDict.rejected_questions_count,
       summaryDict.first_contribution_date,
       summaryDict.last_contributed_in_days
+    );
+  }
+
+  getContributorAttributes(
+    contributorStats: ContributorStats
+  ): ContributorAttribute[] {
+    return formatContributorAttributesService.getQuestionReviewerContributorAttributes(
+      contributorStats as QuestionReviewerStats
     );
   }
 }

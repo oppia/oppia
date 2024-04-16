@@ -16,12 +16,12 @@
  * @fileoverview Component for copier value generator.
  */
 
-import { Component, Input } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
+import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'copier',
-  templateUrl: './Copier.component.html'
+  templateUrl: './Copier.component.html',
 })
 export class CopierComponent {
   // These properties below are initialized using Angular lifecycle hooks
@@ -41,5 +41,8 @@ export class CopierComponent {
 }
 
 angular.module('oppia').directive(
-  'copier', downgradeComponent({
-    component: CopierComponent}));
+  'copier',
+  downgradeComponent({
+    component: CopierComponent,
+  })
+);

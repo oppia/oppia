@@ -16,17 +16,17 @@
  * @fileoverview Component for an infinitely-scrollable view of activity tiles
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationSummaryDict } from 'domain/summary/exploration-summary-backend-api.service';
-import { Subscription } from 'rxjs';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
-import { LoaderService } from 'services/loader.service';
-import { SearchService } from 'services/search.service';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {ExplorationSummaryDict} from 'domain/summary/exploration-summary-backend-api.service';
+import {Subscription} from 'rxjs';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {LoaderService} from 'services/loader.service';
+import {SearchService} from 'services/search.service';
 
 @Component({
   selector: 'oppia-activity-tiles-infinity-grid',
-  templateUrl: './activity-tiles-infinity-grid.component.html'
+  templateUrl: './activity-tiles-infinity-grid.component.html',
 })
 export class ActivityTilesInfinityGridComponent {
   // This property is initialized using Angular lifecycle hooks
@@ -48,22 +48,26 @@ export class ActivityTilesInfinityGridComponent {
   showMoreActivities(): void {
     if (!this.loadingMessage && !this.endOfPageIsReached) {
       this.searchResultsAreLoading = true;
-      this.searchService.loadMoreData((data, endOfPageIsReached) => {
-        this.allActivitiesInOrder = (
-          this.allActivitiesInOrder.concat(data.activity_list));
-        this.endOfPageIsReached = endOfPageIsReached;
-        this.searchResultsAreLoading = false;
-      }, (endOfPageIsReached) => {
-        this.endOfPageIsReached = endOfPageIsReached;
-        this.searchResultsAreLoading = false;
-      });
+      this.searchService.loadMoreData(
+        (data, endOfPageIsReached) => {
+          this.allActivitiesInOrder = this.allActivitiesInOrder.concat(
+            data.activity_list
+          );
+          this.endOfPageIsReached = endOfPageIsReached;
+          this.searchResultsAreLoading = false;
+        },
+        endOfPageIsReached => {
+          this.endOfPageIsReached = endOfPageIsReached;
+          this.searchResultsAreLoading = false;
+        }
+      );
     }
   }
 
   ngOnInit(): void {
     this.directiveSubscriptions.add(
       this.loaderService.onLoadingMessageChange.subscribe(
-        (message: string) => this.loadingMessage = message
+        (message: string) => (this.loadingMessage = message)
       )
     );
 
@@ -71,27 +75,30 @@ export class ActivityTilesInfinityGridComponent {
     // the server.
     this.directiveSubscriptions.add(
       this.searchService.onInitialSearchResultsLoaded.subscribe(
-        (activityList) => {
+        activityList => {
           this.allActivitiesInOrder = activityList;
           this.endOfPageIsReached = false;
-        })
+        }
+      )
     );
     this.endOfPageIsReached = false;
     this.allActivitiesInOrder = [];
     var libraryWindowCutoffPx = 530;
-    this.libraryWindowIsNarrow = (
-      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+    this.libraryWindowIsNarrow =
+      this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
 
     this.directiveSubscriptions.add(
       this.windowDimensionsService.getResizeEvent().subscribe(evt => {
-        this.libraryWindowIsNarrow = (
-          this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+        this.libraryWindowIsNarrow =
+          this.windowDimensionsService.getWidth() <= libraryWindowCutoffPx;
       })
     );
   }
 }
 
-angular.module('oppia').directive('oppiaActivityTilesInfinityGrid',
+angular.module('oppia').directive(
+  'oppiaActivityTilesInfinityGrid',
   downgradeComponent({
-    component: ActivityTilesInfinityGridComponent
-  }) as angular.IDirectiveFactory);
+    component: ActivityTilesInfinityGridComponent,
+  }) as angular.IDirectiveFactory
+);

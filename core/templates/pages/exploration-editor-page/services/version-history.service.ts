@@ -16,10 +16,10 @@
  * @fileoverview Service for the exploration states version history.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { ExplorationMetadata } from 'domain/exploration/ExplorationMetadataObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {State} from 'domain/state/StateObjectFactory';
 
 export interface StateDiffData {
   oldState: State | null;
@@ -38,7 +38,7 @@ export interface MetadataDiffData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class VersionHistoryService {
   // The following value is null when the service is not initialized i.e.
@@ -53,10 +53,10 @@ export class VersionHistoryService {
   // fetching the 'previously edited versions' of a state or exploration
   // metadata, the backend returns the version number as 'None' when we
   // reach the end of the version history.
-  fetchedStateVersionNumbers: (number | null) [] = [];
-  fetchedMetadataVersionNumbers: (number | null) [] = [];
-  fetchedStateData: (State | null) [] = [];
-  fetchedMetadata: (ExplorationMetadata | null) [] = [];
+  fetchedStateVersionNumbers: (number | null)[] = [];
+  fetchedMetadataVersionNumbers: (number | null)[] = [];
+  fetchedStateData: (State | null)[] = [];
+  fetchedMetadata: (ExplorationMetadata | null)[] = [];
 
   fetchedCommitterUsernames: string[] = [];
 
@@ -94,7 +94,7 @@ export class VersionHistoryService {
   shouldFetchNewStateVersionHistory(): boolean {
     if (
       this.currentPositionInStateVersionHistoryList <
-        this.fetchedStateVersionNumbers.length - 2
+      this.fetchedStateVersionNumbers.length - 2
     ) {
       return false;
     }
@@ -104,7 +104,7 @@ export class VersionHistoryService {
   shouldFetchNewMetadataVersionHistory(): boolean {
     if (
       this.currentPositionInMetadataVersionHistoryList <
-        this.fetchedMetadataVersionNumbers.length - 2
+      this.fetchedMetadataVersionNumbers.length - 2
     ) {
       return false;
     }
@@ -112,9 +112,9 @@ export class VersionHistoryService {
   }
 
   insertMetadataVersionHistoryData(
-      versionNumber: number | null,
-      metadata: ExplorationMetadata | null,
-      committerUsername: string
+    versionNumber: number | null,
+    metadata: ExplorationMetadata | null,
+    committerUsername: string
   ): void {
     // If the version number already exists, then don't update the list.
     if (this.fetchedMetadataVersionNumbers.at(-1) === versionNumber) {
@@ -126,9 +126,9 @@ export class VersionHistoryService {
   }
 
   insertStateVersionHistoryData(
-      versionNumber: number | null,
-      stateData: State | null,
-      committerUsername: string
+    versionNumber: number | null,
+    stateData: State | null,
+    committerUsername: string
   ): void {
     // If the version number already exists, then don't update the list.
     if (this.fetchedStateVersionNumbers.at(-1) === versionNumber) {
@@ -145,9 +145,11 @@ export class VersionHistoryService {
       this.currentPositionInStateVersionHistoryList <
         this.fetchedStateVersionNumbers.length - 1 &&
       this.fetchedStateVersionNumbers[
-        this.currentPositionInStateVersionHistoryList + 1] !== null &&
+        this.currentPositionInStateVersionHistoryList + 1
+      ] !== null &&
       this.fetchedStateData[
-        this.currentPositionInStateVersionHistoryList + 1] !== null
+        this.currentPositionInStateVersionHistoryList + 1
+      ] !== null
     );
   }
 
@@ -157,49 +159,65 @@ export class VersionHistoryService {
       this.currentPositionInStateVersionHistoryList <
         this.fetchedStateVersionNumbers.length &&
       this.fetchedStateVersionNumbers[
-        this.currentPositionInStateVersionHistoryList - 1] !== null &&
+        this.currentPositionInStateVersionHistoryList - 1
+      ] !== null &&
       this.fetchedStateVersionNumbers[
-        this.currentPositionInStateVersionHistoryList - 2] !== null &&
+        this.currentPositionInStateVersionHistoryList - 2
+      ] !== null &&
       this.fetchedStateData[
-        this.currentPositionInStateVersionHistoryList - 1] !== null &&
+        this.currentPositionInStateVersionHistoryList - 1
+      ] !== null &&
       this.fetchedStateData[
-        this.currentPositionInStateVersionHistoryList - 2] !== null
+        this.currentPositionInStateVersionHistoryList - 2
+      ] !== null
     );
   }
 
   getBackwardStateDiffData(): StateDiffData {
     return {
-      oldState: this.fetchedStateData[
-        this.currentPositionInStateVersionHistoryList + 1],
-      newState: this.fetchedStateData[
-        this.currentPositionInStateVersionHistoryList],
-      oldVersionNumber: (
+      oldState:
+        this.fetchedStateData[
+          this.currentPositionInStateVersionHistoryList + 1
+        ],
+      newState:
+        this.fetchedStateData[this.currentPositionInStateVersionHistoryList],
+      oldVersionNumber:
         this.fetchedStateVersionNumbers[
-          this.currentPositionInStateVersionHistoryList + 1]),
-      newVersionNumber: (
+          this.currentPositionInStateVersionHistoryList + 1
+        ],
+      newVersionNumber:
         this.fetchedStateVersionNumbers[
-          this.currentPositionInStateVersionHistoryList]),
-      committerUsername: (
+          this.currentPositionInStateVersionHistoryList
+        ],
+      committerUsername:
         this.fetchedCommitterUsernames[
-          this.currentPositionInStateVersionHistoryList + 1])
+          this.currentPositionInStateVersionHistoryList + 1
+        ],
     };
   }
 
   getForwardStateDiffData(): StateDiffData {
     return {
-      oldState: this.fetchedStateData[
-        this.currentPositionInStateVersionHistoryList - 1],
-      newState: this.fetchedStateData[
-        this.currentPositionInStateVersionHistoryList - 2],
-      oldVersionNumber: (
+      oldState:
+        this.fetchedStateData[
+          this.currentPositionInStateVersionHistoryList - 1
+        ],
+      newState:
+        this.fetchedStateData[
+          this.currentPositionInStateVersionHistoryList - 2
+        ],
+      oldVersionNumber:
         this.fetchedStateVersionNumbers[
-          this.currentPositionInStateVersionHistoryList - 1]),
-      newVersionNumber: (
+          this.currentPositionInStateVersionHistoryList - 1
+        ],
+      newVersionNumber:
         this.fetchedStateVersionNumbers[
-          this.currentPositionInStateVersionHistoryList - 2]),
-      committerUsername: (
+          this.currentPositionInStateVersionHistoryList - 2
+        ],
+      committerUsername:
         this.fetchedCommitterUsernames[
-          this.currentPositionInStateVersionHistoryList - 1])
+          this.currentPositionInStateVersionHistoryList - 1
+        ],
     };
   }
 
@@ -209,9 +227,11 @@ export class VersionHistoryService {
       this.currentPositionInMetadataVersionHistoryList <
         this.fetchedMetadataVersionNumbers.length - 1 &&
       this.fetchedMetadataVersionNumbers[
-        this.currentPositionInMetadataVersionHistoryList + 1] !== null &&
+        this.currentPositionInMetadataVersionHistoryList + 1
+      ] !== null &&
       this.fetchedMetadata[
-        this.currentPositionInMetadataVersionHistoryList + 1] !== null
+        this.currentPositionInMetadataVersionHistoryList + 1
+      ] !== null
     );
   }
 
@@ -221,49 +241,65 @@ export class VersionHistoryService {
       this.currentPositionInMetadataVersionHistoryList <
         this.fetchedMetadataVersionNumbers.length &&
       this.fetchedMetadataVersionNumbers[
-        this.currentPositionInMetadataVersionHistoryList - 1] !== null &&
+        this.currentPositionInMetadataVersionHistoryList - 1
+      ] !== null &&
       this.fetchedMetadataVersionNumbers[
-        this.currentPositionInMetadataVersionHistoryList - 2] !== null &&
+        this.currentPositionInMetadataVersionHistoryList - 2
+      ] !== null &&
       this.fetchedMetadata[
-        this.currentPositionInMetadataVersionHistoryList - 1] !== null &&
+        this.currentPositionInMetadataVersionHistoryList - 1
+      ] !== null &&
       this.fetchedMetadata[
-        this.currentPositionInMetadataVersionHistoryList - 2] !== null
+        this.currentPositionInMetadataVersionHistoryList - 2
+      ] !== null
     );
   }
 
   getBackwardMetadataDiffData(): MetadataDiffData {
     return {
-      oldMetadata: this.fetchedMetadata[
-        this.currentPositionInMetadataVersionHistoryList + 1],
-      newMetadata: this.fetchedMetadata[
-        this.currentPositionInMetadataVersionHistoryList],
-      oldVersionNumber: (
+      oldMetadata:
+        this.fetchedMetadata[
+          this.currentPositionInMetadataVersionHistoryList + 1
+        ],
+      newMetadata:
+        this.fetchedMetadata[this.currentPositionInMetadataVersionHistoryList],
+      oldVersionNumber:
         this.fetchedMetadataVersionNumbers[
-          this.currentPositionInMetadataVersionHistoryList + 1]),
-      newVersionNumber: (
+          this.currentPositionInMetadataVersionHistoryList + 1
+        ],
+      newVersionNumber:
         this.fetchedMetadataVersionNumbers[
-          this.currentPositionInMetadataVersionHistoryList]),
-      committerUsername: (
+          this.currentPositionInMetadataVersionHistoryList
+        ],
+      committerUsername:
         this.fetchedCommitterUsernames[
-          this.currentPositionInMetadataVersionHistoryList + 1])
+          this.currentPositionInMetadataVersionHistoryList + 1
+        ],
     };
   }
 
   getForwardMetadataDiffData(): MetadataDiffData {
     return {
-      oldMetadata: this.fetchedMetadata[
-        this.currentPositionInMetadataVersionHistoryList - 1],
-      newMetadata: this.fetchedMetadata[
-        this.currentPositionInMetadataVersionHistoryList - 2],
-      oldVersionNumber: (
+      oldMetadata:
+        this.fetchedMetadata[
+          this.currentPositionInMetadataVersionHistoryList - 1
+        ],
+      newMetadata:
+        this.fetchedMetadata[
+          this.currentPositionInMetadataVersionHistoryList - 2
+        ],
+      oldVersionNumber:
         this.fetchedMetadataVersionNumbers[
-          this.currentPositionInMetadataVersionHistoryList - 1]),
-      newVersionNumber: (
+          this.currentPositionInMetadataVersionHistoryList - 1
+        ],
+      newVersionNumber:
         this.fetchedMetadataVersionNumbers[
-          this.currentPositionInMetadataVersionHistoryList - 2]),
-      committerUsername: (
+          this.currentPositionInMetadataVersionHistoryList - 2
+        ],
+      committerUsername:
         this.fetchedCommitterUsernames[
-          this.currentPositionInMetadataVersionHistoryList - 1])
+          this.currentPositionInMetadataVersionHistoryList - 1
+        ],
     };
   }
 
@@ -280,20 +316,20 @@ export class VersionHistoryService {
   }
 
   setCurrentPositionInStateVersionHistoryList(
-      currentPositionInVersionHistoryList: number
+    currentPositionInVersionHistoryList: number
   ): void {
-    this.currentPositionInStateVersionHistoryList = (
-      currentPositionInVersionHistoryList);
+    this.currentPositionInStateVersionHistoryList =
+      currentPositionInVersionHistoryList;
   }
 
   decrementCurrentPositionInStateVersionHistoryList(): void {
-    this.currentPositionInStateVersionHistoryList = (
-      this.currentPositionInStateVersionHistoryList - 1);
+    this.currentPositionInStateVersionHistoryList =
+      this.currentPositionInStateVersionHistoryList - 1;
   }
 
   incrementCurrentPositionInStateVersionHistoryList(): void {
-    this.currentPositionInStateVersionHistoryList = (
-      this.currentPositionInStateVersionHistoryList + 1);
+    this.currentPositionInStateVersionHistoryList =
+      this.currentPositionInStateVersionHistoryList + 1;
   }
 
   getCurrentPositionInMetadataVersionHistoryList(): number {
@@ -301,23 +337,23 @@ export class VersionHistoryService {
   }
 
   setCurrentPositionInMetadataVersionHistoryList(
-      currentPositionInVersionHistoryList: number
+    currentPositionInVersionHistoryList: number
   ): void {
-    this.currentPositionInMetadataVersionHistoryList = (
-      currentPositionInVersionHistoryList);
+    this.currentPositionInMetadataVersionHistoryList =
+      currentPositionInVersionHistoryList;
   }
 
   decrementCurrentPositionInMetadataVersionHistoryList(): void {
-    this.currentPositionInMetadataVersionHistoryList = (
-      this.currentPositionInMetadataVersionHistoryList - 1);
+    this.currentPositionInMetadataVersionHistoryList =
+      this.currentPositionInMetadataVersionHistoryList - 1;
   }
 
   incrementCurrentPositionInMetadataVersionHistoryList(): void {
-    this.currentPositionInMetadataVersionHistoryList = (
-      this.currentPositionInMetadataVersionHistoryList + 1);
+    this.currentPositionInMetadataVersionHistoryList =
+      this.currentPositionInMetadataVersionHistoryList + 1;
   }
 }
 
-angular.module('oppia').factory(
-  'VersionHistoryService',
-  downgradeInjectable(VersionHistoryService));
+angular
+  .module('oppia')
+  .factory('VersionHistoryService', downgradeInjectable(VersionHistoryService));

@@ -16,14 +16,14 @@
  * @fileoverview Module for the search bar component.
  */
 
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
+import {TranslateModule} from '@ngx-translate/core';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
-import { SearchBarComponent } from 'pages/library-page/search-bar/search-bar.component';
-import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-utility-pipes.module';
+import {SearchBarComponent} from 'pages/library-page/search-bar/search-bar.component';
+import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
 
 @NgModule({
   imports: [
@@ -31,16 +31,10 @@ import { StringUtilityPipesModule } from 'filters/string-utility-filters/string-
     FormsModule,
     NgbModule,
     StringUtilityPipesModule,
-    TranslateModule
+    TranslateModule,
   ],
-  declarations: [
-    SearchBarComponent
-  ],
-  entryComponents: [
-    SearchBarComponent
-  ],
-  exports: [
-    SearchBarComponent
-  ]
+  declarations: [SearchBarComponent],
+  entryComponents: [SearchBarComponent],
+  exports: [SearchBarComponent],
 })
 export class SearchBarModule {}

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillSummary.
  */
 
-import { SkillSummary } from 'domain/skill/skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 
 describe('Skill Summary Model', () => {
   it('should correctly convert backend dict to domain object.', () => {
@@ -28,7 +28,7 @@ describe('Skill Summary Model', () => {
       worked_examples_count: 0,
       description: 'Dummy Skill 1',
       misconception_count: 0,
-      version: 1
+      version: 1,
     };
 
     let skillSummary = SkillSummary.createFromBackendDict(backendDict);

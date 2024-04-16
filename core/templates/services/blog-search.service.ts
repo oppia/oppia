@@ -16,10 +16,13 @@
  * @fileoverview Search service for Blog Posts.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable, EventEmitter } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable, EventEmitter} from '@angular/core';
 
-import { BlogHomePageBackendApiService, SearchResponseData } from 'domain/blog/blog-homepage-backend-api.service';
+import {
+  BlogHomePageBackendApiService,
+  SearchResponseData,
+} from 'domain/blog/blog-homepage-backend-api.service';
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface UrlSearchQuery {
@@ -28,7 +31,7 @@ export interface UrlSearchQuery {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BlogPostSearchService {
   // These properties are initialized using functions
@@ -45,7 +48,7 @@ export class BlogPostSearchService {
   public numSearchesInProgress = 0;
 
   constructor(
-    private _blogHomePageBackendApiService: BlogHomePageBackendApiService,
+    private _blogHomePageBackendApiService: BlogHomePageBackendApiService
   ) {}
 
   private _getSuffixForQuery(selectedTags: string[]): string {
@@ -76,64 +79,73 @@ export class BlogPostSearchService {
     const EXPECTED_PREFIX = '=("';
     const EXPECTED_SUFFIX = '")';
 
-    if (!itemCodes ||
-        itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
-        itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
-          itemCodes.length - EXPECTED_SUFFIX.length ||
-          itemCodes.lastIndexOf(EXPECTED_SUFFIX) === -1) {
+    if (
+      !itemCodes ||
+      itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
+      itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
+        itemCodes.length - EXPECTED_SUFFIX.length ||
+      itemCodes.lastIndexOf(EXPECTED_SUFFIX) === -1
+    ) {
       throw new Error(
         'Invalid search query url fragment for ' +
-        itemsType + ': ' + urlComponent);
+          itemsType +
+          ': ' +
+          urlComponent
+      );
     }
 
-    const items = itemCodes.substring(
-      EXPECTED_PREFIX.length, itemCodes.length - EXPECTED_SUFFIX.length
-    ).split('" OR "');
+    const items = itemCodes
+      .substring(
+        EXPECTED_PREFIX.length,
+        itemCodes.length - EXPECTED_SUFFIX.length
+      )
+      .split('" OR "');
 
     return items;
   }
-
 
   getQueryUrl(searchUrlQueryString: string): string {
     return '?q=' + searchUrlQueryString;
   }
 
-  getSearchUrlQueryString(
-      searchQuery: string,
-      selectedTags: string[]
-  ): string {
-    return encodeURIComponent(searchQuery) +
-      this._getSuffixForQuery(selectedTags);
+  getSearchUrlQueryString(searchQuery: string, selectedTags: string[]): string {
+    return (
+      encodeURIComponent(searchQuery) + this._getSuffixForQuery(selectedTags)
+    );
   }
-
 
   // Note that an empty query results in all blog posts being shown.
   executeSearchQuery(
-      searchQuery: string,
-      selectedTags: string[],
-      successCallback: () => void,
-      errorCallback?: (reason: string) => void): void {
+    searchQuery: string,
+    selectedTags: string[],
+    successCallback: () => void,
+    errorCallback?: (reason: string) => void
+  ): void {
     const queryUrl = this.getQueryUrl(
-      this.getSearchUrlQueryString(searchQuery, selectedTags));
+      this.getSearchUrlQueryString(searchQuery, selectedTags)
+    );
     this._isCurrentlyFetchingResults = true;
     this.numSearchesInProgress++;
-    this._blogHomePageBackendApiService.fetchBlogPostSearchResultAsync(
-      queryUrl
-    ).then((response: SearchResponseData) => {
-      this._lastQuery = searchQuery;
-      this._lastSelectedTags = cloneDeep(selectedTags);
-      this._searchOffset = response.searchOffset;
-      this.numSearchesInProgress--;
+    this._blogHomePageBackendApiService
+      .fetchBlogPostSearchResultAsync(queryUrl)
+      .then(
+        (response: SearchResponseData) => {
+          this._lastQuery = searchQuery;
+          this._lastSelectedTags = cloneDeep(selectedTags);
+          this._searchOffset = response.searchOffset;
+          this.numSearchesInProgress--;
 
-      this._initialSearchResultsLoadedEventEmitter.emit(response);
+          this._initialSearchResultsLoadedEventEmitter.emit(response);
 
-      this._isCurrentlyFetchingResults = false;
-    }, (error) => {
-      this.numSearchesInProgress--;
-      if (errorCallback) {
-        errorCallback(error.error.error);
-      }
-    });
+          this._isCurrentlyFetchingResults = false;
+        },
+        error => {
+          this.numSearchesInProgress--;
+          if (errorCallback) {
+            errorCallback(error.error.error);
+          }
+        }
+      );
 
     if (successCallback) {
       successCallback();
@@ -144,8 +156,7 @@ export class BlogPostSearchService {
     return this.numSearchesInProgress > 0;
   }
 
-  updateSearchFieldsBasedOnUrlQuery(
-      urlComponent: string): UrlSearchQuery {
+  updateSearchFieldsBasedOnUrlQuery(urlComponent: string): UrlSearchQuery {
     let newSearchQuery: UrlSearchQuery = {
       searchQuery: '',
       selectedTags: [],
@@ -178,17 +189,15 @@ export class BlogPostSearchService {
   getCurrentUrlQueryString(): string {
     return this.getSearchUrlQueryString(
       this._lastQuery,
-      this._lastSelectedTags,
+      this._lastSelectedTags
     );
   }
 
   // Here failure callback is optional so that it gets invoked
   // only when the end of page has reached and return void otherwise.
   loadMoreData(
-      successCallback: (
-        SearchResponseData: SearchResponseData
-      ) => void,
-      failureCallback?: (arg0: boolean) => void
+    successCallback: (SearchResponseData: SearchResponseData) => void,
+    failureCallback?: (arg0: boolean) => void
   ): void {
     // If a new query is still being sent, or the last page has been
     // reached, do not fetch more results.
@@ -206,24 +215,23 @@ export class BlogPostSearchService {
     }
 
     this._isCurrentlyFetchingResults = true;
-    this._blogHomePageBackendApiService.fetchBlogPostSearchResultAsync(
-      queryUrl
-    ).then((data: SearchResponseData) => {
-      this._searchOffset = data.searchOffset;
-      this._isCurrentlyFetchingResults = false;
+    this._blogHomePageBackendApiService
+      .fetchBlogPostSearchResultAsync(queryUrl)
+      .then((data: SearchResponseData) => {
+        this._searchOffset = data.searchOffset;
+        this._isCurrentlyFetchingResults = false;
 
-      if (successCallback) {
-        successCallback(data);
-      }
-    });
+        if (successCallback) {
+          successCallback(data);
+        }
+      });
   }
 
   get onSearchBarLoaded(): EventEmitter<string> {
     return this._searchBarLoadedEventEmitter;
   }
 
-  get onInitialSearchResultsLoaded():
-    EventEmitter<SearchResponseData> {
+  get onInitialSearchResultsLoaded(): EventEmitter<SearchResponseData> {
     return this._initialSearchResultsLoadedEventEmitter;
   }
 
@@ -232,7 +240,6 @@ export class BlogPostSearchService {
   }
 }
 
-angular.module('oppia').factory(
-  'BlogPostSearchService',
-  downgradeInjectable(BlogPostSearchService)
-);
+angular
+  .module('oppia')
+  .factory('BlogPostSearchService', downgradeInjectable(BlogPostSearchService));
