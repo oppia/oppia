@@ -88,7 +88,7 @@ export class VoiceoverAdmin extends BaseUser {
    * Asserts that a voiceover artist does not exist in the list.
    * @param artistUsername - The username of the voiceover artist to check for
    */
-  async expectToBeOmittedFromVoiceoverArtistList(
+  async expectVoiceoverArtistsListDoesNotContain(
     artistUsername: string
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {

@@ -74,7 +74,7 @@ describe('Voiceover Admin', function () {
 
       await voiceoverAdmin.navigateToExplorationSettingsTab();
 
-      await voiceoverAdmin.expectToBeOmittedFromVoiceoverArtistList(
+      await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'invalidUserId'
       );
       await voiceoverAdmin.addVoiceoverArtistToExploration('invalidUserId');
@@ -105,7 +105,7 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.navigateToExplorationSettingsTab();
 
-      await voiceoverAdmin.expectToBeOmittedFromVoiceoverArtistList(
+      await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'voiceoverartist'
       );
       await voiceoverAdmin.addVoiceoverArtistToExploration('voiceoverartist');
