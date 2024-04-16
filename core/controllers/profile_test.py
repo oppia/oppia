@@ -1101,7 +1101,7 @@ class SignupTests(test_utils.GenericTestBase):
                 True
             )
         )
-        with allow_emailing
+        with allow_emailing:
             response = self.get_json(feconf.SIGNUP_DATA_URL)
             self.assertDictEqual(values_dict, response)
 

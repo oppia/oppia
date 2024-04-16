@@ -147,7 +147,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         email_exception = self.assertRaisesRegex(
             ValueError, 'Malformed recipient email address: %s'
             % malformed_recipient_email)
-            
+
         with allow_emailing, email_exception:
             email_services.send_mail(
                 'sender@example.com', malformed_recipient_email,
