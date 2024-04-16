@@ -55,7 +55,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the new card and update its content.
-    await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION, cardNames);
+    await explorationEditor.navigateToCard(CARD_NAME.TEST_QUESTION);
     await explorationEditor.updateCardContent(
       'Enter a negative number greater than -100.'
     );
@@ -64,20 +64,20 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-99',
       'Prefect!',
-      'Final Card',
-      'correct'
+      CARD_NAME.FINAL_CARD,
+      true
     );
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
-    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD, cardNames);
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
       'We have practiced negative numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
     // Navigate back to the introduction card and save the draft.
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION, cardNames);
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 

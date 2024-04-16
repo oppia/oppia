@@ -38,7 +38,7 @@ const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
 
-const stateNodeSelector = '.e2e-test-node';
+const stateNodeSelector = '.e2e-test-node-label';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
 const destinationCardSelector = 'select.e2e-test-destination-selector-dropdown';
 const addStateInput = '.e2e-test-add-state-input';
@@ -75,16 +75,19 @@ export class ExplorationEditor extends BaseUser {
   async clickCreateExplorationButton(): Promise<void> {
     await this.clickOn(createExplorationButton);
     await this.clickOn(dismissWelcomeModalSelector);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
   }
 
   /**
    * Function to add content to a card.
-   * @param {string} text - The content to be added to the card.
+   * @param {string} content - The content to be added to the card.
    */
-  async updateCardContent(text: string): Promise<void> {
+  async updateCardContent(content: string): Promise<void> {
     await this.clickOn(stateEditSelector);
     await this.waitForElementToBeClickable(stateContentInputField);
-    await this.type(stateContentInputField, `${text}`);
+    await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
   }
@@ -127,6 +130,9 @@ export class ExplorationEditor extends BaseUser {
   async saveExplorationDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes in mobile width, appears only after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
       if (!element) {
         await this.clickOn(mobileOptionsButton);
       }
@@ -141,22 +147,31 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
-   * @param {string[]} cardNames - An array of all card names in the exploration.
    */
-  async navigateToCard(cardName: string, cardNames: string[]): Promise<void> {
-    const cardIndex = cardNames.indexOf(cardName);
+  async navigateToCard(cardName: string): Promise<void> {
+    let elements;
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileStateGraphResizeButton);
+      await this.page.waitForSelector(stateNodeSelector);
+      elements = await this.page.$$(stateNodeSelector);
+    } else {
+      await this.page.waitForSelector(stateNodeSelector);
+      elements = await this.page.$$(stateNodeSelector);
+    }
+
+    const cardNames = await Promise.all(
+      elements.map(element => element.$eval('tspan', node => node.textContent))
+    );
+    // The card name is suffixed with a space to match the format in the UI.
+    const cardIndex = cardNames.indexOf(cardName + ' ');
+
     if (cardIndex === -1) {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileStateGraphResizeButton);
-      await this.page.waitForSelector(mobileStateNodeSelector);
-      const elements = await this.page.$$(mobileStateNodeSelector);
       await elements[cardIndex + elements.length / 2].click();
     } else {
-      await this.page.waitForSelector(stateNodeSelector);
-      const elements = await this.page.$$(stateNodeSelector);
       await elements[cardIndex].click();
     }
 
@@ -169,14 +184,14 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} answer - The response to be added.
    * @param {string} feedback - The feedback for the response.
    * @param {string} destination - The destination state for the response.
-   * @param {string} correctness - Whether the response is marked as correct.
+   * @param {boolean} correctness - Whether the response is marked as correct.
    */
   async addResponsesToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
     destination: string,
-    correctness: string
+    correctness: boolean
   ): Promise<void> {
     switch (interactionType) {
       case 'Number Input':
@@ -195,7 +210,7 @@ export class ExplorationEditor extends BaseUser {
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.type(addStateInput, destination);
-    if (correctness === 'correct') {
+    if (correctness) {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
     await this.clickOn(addNewResponseButton);
@@ -221,11 +236,11 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to verify if the preview is on a particular card by checking the content of the card.
    * @param {string} cardName - The name of the card to check.
-   * @param {string} text - The expected text content of the card.
+   * @param {string} expectedCardContent - The expected text content of the card.
    */
   async expectPreviewCardContentToBe(
     cardName: string,
-    text: string
+    expectedCardContent: string
   ): Promise<void> {
     await this.page.waitForSelector(stateConversationContent, {
       visible: true,
@@ -235,7 +250,7 @@ export class ExplorationEditor extends BaseUser {
       element => element.textContent,
       element
     );
-    if (cardContent !== text) {
+    if (cardContent !== expectedCardContent) {
       throw new Error(
         `Preview is not on the ${cardName} card or is not loading correctly.`
       );
