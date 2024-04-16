@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs used for fetching and saving voice artist names from curated
-exploration models."""
+"""Jobs used for migrating voiceovers from exploration models to entity
+voiceover models."""
 
 from __future__ import annotations
 
@@ -50,17 +50,6 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
     """
 
     DATASTORE_UPDATES_ALLOWED = True
-
-    @classmethod
-    def get_accent_code_for_given_voice_artist(
-        cls,
-        voice_artist_id: str,
-        language_code: str
-    ) -> str:
-        with datastore_services.get_ndb_context():
-            accent_code = voiceover_services.get_voice_artist_metadata_model(
-                voice_artist_id, language_code)
-        return accent_code
 
     @classmethod
     def update_entity_voiceover_for_given_id(
@@ -103,14 +92,25 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
     @classmethod
     def generate_entity_voiceover_model(
         cls,
-        entity_voice_artists_link_model
+        element,
+        voice_artist_metadata_models_list
     ):
-        content_id_to_voiceovers_mapping = (
-            entity_voice_artists_link_model.content_id_to_voiceovers_mapping)
+        exploration_model = element[1]['exploration_model'][0]
+        voice_artist_link = element[1]['voice_artist_link'][0]
 
+        voice_artist_id_to_language_code_mapping = {}
+
+        content_id_to_voiceovers_mapping = (
+            voice_artist_link.content_id_to_voiceovers_mapping)
+
+        for voice_artist_metadata_model in voice_artist_metadata_models_list:
+            voice_artist_id_to_language_code_mapping[
+                voice_artist_metadata_model.id] = (
+                    voice_artist_metadata_model.language_code_to_accent)
+
+        entity_id = voice_artist_link.id
         entity_type = 'exploration'
-        entity_version = 0 # get latest exploration version
-        entity_id = entity_voice_artists_link_model.id
+        entity_version = exploration_model.version
 
         entity_voiceover_id_to_entity_voiceovers = (
             collections.defaultdict(dict))
@@ -122,8 +122,8 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 voice_artist_id = voiceover_mapping[0]
                 voiceover_dict = voiceover_mapping[1]
 
-                accent_code = cls.get_accent_code_for_given_voice_artist(
-                    voice_artist_id, lang_code)
+                accent_code = voice_artist_id_to_language_code_mapping[
+                    voice_artist_id][lang_code]
 
                 entity_voiceover_id_to_entity_voiceovers = (
                     cls.update_entity_voiceover_for_given_id(
@@ -132,11 +132,12 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                         entity_version,
                         accent_code,
                         content_id,
-                        voiceover_dict
+                        voiceover_dict,
+                        entity_voiceover_id_to_entity_voiceovers
                     )
                 )
-        # Either return this or yield each item of the list.
-        return entity_voiceover_id_to_entity_voiceovers.values()
+        # return list(entity_voiceover_id_to_entity_voiceovers.values())
+        return []
 
     def get_exploration_from_model(
         self, exploration_model: exp_models.ExplorationModel
@@ -167,6 +168,19 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             PCollection. A PCollection of results for the exploration for which
             an exploration voiceover migration has been done.
         """
+        exploration_models = (
+            self.pipeline
+            | 'Get exploration models' >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all())
+        )
+
+        # Pair each exploration model with its exploration ID and create
+        # key-value pairs.
+        paired_exploration_models = (
+            exploration_models
+            | 'Pair Exploration ID to model' >> beam.Map(
+                lambda model: (model.id, model))
+        )
 
         exploration_voice_artists_link_models = (
             self.pipeline
@@ -177,13 +191,49 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             )
         )
 
-        entity_voiceover_models = (
+        # Pair each exploration voice artist model with its exploration ID and
+        # create key-value pairs.
+        paired_exploration_voice_artists_link_models = (
             exploration_voice_artists_link_models
-            | 'Get entity voiceover models' >> beam.Map(
-                PopulateManualVoiceoversToEntityVoiceoverModelJob.
-                generate_entity_voiceover_model
+            | 'Pair Exploration ID to voice artist link model' >> beam.Map(
+                lambda model: (model.id, model))
+        )
+
+        # Group the key-value pairs from both PCollections by the
+        # Exploration ID.
+        grouped_models = {
+            'exploration_model': paired_exploration_models,
+            'voice_artist_link': paired_exploration_voice_artists_link_models,
+        } | 'Group by Exploration ID' >> beam.CoGroupByKey()
+
+        voice_artist_metadata_models = (
+            self.pipeline
+            | 'Get voice artist metadata model' >> (
+                ndb_io.GetModels(
+                    voiceover_models.VoiceArtistMetadataModel.get_all()
+                )
             )
         )
+
+        entity_voiceover_models = (
+            grouped_models
+            | 'Get entity voiceover models' >> beam.Map(
+                PopulateManualVoiceoversToEntityVoiceoverModelJob.
+                generate_entity_voiceover_model,
+                beam.pvalue.AsList(voice_artist_metadata_models)
+            )
+        )
+
+        exploration_voice_artist_link_result = (
+            exploration_voice_artists_link_models
+            | 'Get the exploration IDs for generated models' >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    'Generated exploration voice artist link model for '
+                    'exploration %s.' % model.id
+                )
+            )
+        )
+        return exploration_voice_artist_link_result
 
 
 class AuditEntityVoiceoverModelJob(

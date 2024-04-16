@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.manual_voice_artist_name_job."""
+"""Unit tests for jobs.batch_jobs.voiceover_migration_job."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import voiceover_services
 from core.jobs import job_test_utils
-from core.jobs.batch_jobs import manual_voice_artist_name_job
+from core.jobs.batch_jobs import voiceover_migration_job
 from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
@@ -126,12 +126,6 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             'file_size_bytes': 3000,
             'needs_update': False,
             'duration_secs': 42.43
-        }
-        self.voiceover_dict_8: state_domain.VoiceoverDict = {
-            'filename': 'filename8.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 40.43
         }
 
     def _create_curated_explorations(self) -> None:
@@ -432,7 +426,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 'old_value': None,
                 'new_value': self.CURATED_EXPLORATION_ID_2
             })], 'Changes.')
-        
+
     def _create_exp_voice_artists_link(self) -> None:
         content_id_to_voiceovers_mapping_1 = {
             'content_0': {
@@ -471,14 +465,42 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         )
         exp_voice_artist_link_model_2.put()
 
+    def _create_voice_artist_metadata(self) -> None:
+        language_code_to_accent_1 = {
+            'en': 'en-US'
+        }
+        language_code_to_accent_2 = {
+            'hi': 'hi-IN'
+        }
+        language_code_to_accent_3 = {
+            'en': 'en-IN'
+        }
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=self.editor_id_1,
+            language_code_to_accent=language_code_to_accent_1)
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=self.editor_id_2,
+            language_code_to_accent=language_code_to_accent_2)
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=self.editor_id_3,
+            language_code_to_accent=language_code_to_accent_3)
+
 
 class CreateExplorationVoiceArtistLinkModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
 
+    JOB_CLASS: Type[
+        voiceover_migration_job.
+        PopulateManualVoiceoversToEntityVoiceoverModelJob
+    ] = (
+        voiceover_migration_job.
+        PopulateManualVoiceoversToEntityVoiceoverModelJob
+    )
+
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_exp_voice_artists_link()
-        model1 = voiceover_models.ExplorationVoiceArtistsLinkModel.get(self.CURATED_EXPLORATION_ID_1)
-        print(model1)
+        self._create_voice_artist_metadata()
 
-        
+        self.assert_job_output_is([])
+
