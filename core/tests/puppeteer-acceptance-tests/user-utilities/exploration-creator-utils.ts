@@ -107,6 +107,9 @@ export class ExplorationEditor extends BaseUser {
     explorationTitle: string
   ): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        hidden: true,
+      });
       await this.clickOn(mobileChangesDropdown);
       await this.clickOn(mobilePublishButton);
     } else {

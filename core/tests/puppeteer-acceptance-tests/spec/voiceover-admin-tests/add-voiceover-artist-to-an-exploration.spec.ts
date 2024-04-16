@@ -83,9 +83,7 @@ describe('Voiceover Admin', function () {
         invalidIdErrorToastMessage
       );
       await voiceoverAdmin.closeToastMessage();
-      await voiceoverAdmin.expectToBeOmittedFromVoiceoverArtistList(
-        'invalidUserId'
-      );
+      await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
     },
     DEFAULT_SPEC_TIMEOUT
   );

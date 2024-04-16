@@ -176,6 +176,25 @@ export class VoiceoverAdmin extends BaseUser {
     );
     return voiceoverArtists;
   }
+
+  /**
+   * Function to verify voiceover artist is still omitted
+   * @param artistUsername - artist username
+   */
+  async verifyVoiceoverArtistStillOmitted(
+    artistUsername: string
+  ): Promise<void> {
+    const allVoiceoverArtists = await this.getAllVoiceoverArtists();
+    if (allVoiceoverArtists.includes(artistUsername)) {
+      throw new Error(
+        `Error: User '${artistUsername}' is unexpectedly listed as a voiceover artist for this exploration.`
+      );
+    } else {
+      showMessage(
+        `Confirmed: Voiceover artist '${artistUsername}' is still not listed.`
+      );
+    }
+  }
 }
 
 export let VoiceoverAdminFactory = (): VoiceoverAdmin => new VoiceoverAdmin();
