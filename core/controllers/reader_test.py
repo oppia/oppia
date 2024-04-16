@@ -27,6 +27,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import learner_progress_services
 from core.domain import param_domain
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -1210,8 +1211,13 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             title='Welcome to Oppia!',
             category='This is just a spam category',
             objective='Test a spam exploration.')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         self.logout()
 

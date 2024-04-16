@@ -24,6 +24,8 @@ import itertools
 from core import feconf
 from core.domain import email_manager
 from core.domain import feedback_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import taskqueue_services
@@ -379,8 +381,13 @@ def create_messages(
     suggestion_models.GeneralSuggestionModel.put_multi(
         suggestion_models_to_update)
 
-    if (feconf.CAN_SEND_EMAILS and (
-            feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
+    can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+        )
+    )
+    if (can_send_emails and (
+            feconf.CAN_SEND_TRANSACTIONAL_EMAILS and
             author_id is not None and
             user_services.is_user_registered(author_id)) and
             # TODO(#12079): Figure out a better way to avoid sending feedback

@@ -20,6 +20,7 @@ from core import feconf
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import platform_parameter_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import taskqueue_services
@@ -55,10 +56,15 @@ class TasksTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
         self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
         self.THREAD_ID = 'exploration.exp1.thread_1'
 
     def test_email_sent_when_feedback_in_thread(self) -> None:

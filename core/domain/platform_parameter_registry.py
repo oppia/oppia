@@ -443,3 +443,22 @@ Registry.create_platform_parameter(
     platform_parameter_domain.DataTypes.NUMBER,
     default=0.2
 )
+
+# Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
+# correspond to owners of the app before setting this to True. If
+# SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
+# address cannot be sent. If True then emails can be sent to any user.
+Registry.create_platform_parameter(
+    ParamName.CAN_SEND_EMAILS,
+    (
+        'Whether the application can send emails.'
+        'This should be set to True only in production environment.'
+        'Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both '
+        'valid and correspond to owners of the app before setting this to True.'
+        'If SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages '
+        'from this address cannot be sent. If True then emails can be sent '
+        'to any user.'
+    ),
+    platform_parameter_domain.DataTypes.BOOL,
+    default=False
+)

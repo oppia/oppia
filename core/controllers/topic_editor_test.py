@@ -24,6 +24,7 @@ from core import utils
 from core.constants import constants
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
+from core.domain import platform_parameter_services
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -584,7 +585,14 @@ class TopicEditorTests(
 
         # Check that admins can access the editable topic data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with allow_emailing:
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -755,7 +763,14 @@ class TopicEditorTests(
         csrf_token = self.get_new_csrf_token()
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with allow_emailing:
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -1043,7 +1058,14 @@ class TopicPublishSendMailHandlerTests(
     def test_send_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with allow_emailing:
             self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),

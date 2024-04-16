@@ -32,6 +32,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import suggestion_services
@@ -742,7 +743,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'info', _mock_logging_function)
-        send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        send_mail_swap = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
         with logging_swap, send_mail_swap:
             user_services.update_email_preferences(
                 user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
@@ -766,7 +773,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """Mocks bulk_email_services.add_or_update_user_status()."""
             return not can_receive_email_updates
 
-        send_mail_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        send_mail_swap = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
         bulk_email_swap = self.swap(
             bulk_email_services, 'add_or_update_user_status',
             _mock_add_or_update_user_status)

@@ -21,6 +21,7 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import feedback_domain
 from core.domain import feedback_services
+from core.domain import platform_parameter_services
 from core.domain import subscription_services
 from core.domain import suggestion_services
 from core.domain import taskqueue_services
@@ -887,10 +888,15 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
         self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
     def test_pop_feedback_message_references(self) -> None:
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
@@ -1119,10 +1125,15 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
 
     def test_that_emails_are_not_sent_if_service_is_disabled(self) -> None:
-        cannot_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', False)
+        cannot_send_emails_ctx = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
         cannot_send_feedback_message_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', False)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False)
         with cannot_send_emails_ctx, cannot_send_feedback_message_email_ctx:
             feedback_services.create_thread(
                 'exploration', self.exploration.id,
@@ -1247,10 +1258,15 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
         self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
     def test_that_emails_are_sent(self) -> None:
         expected_email_html_body = (
@@ -1403,10 +1419,15 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
-        self.can_send_emails_ctx = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
         self.can_send_feedback_email_ctx = self.swap(
-            feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+            feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True)
 
     def test_that_emails_are_sent_for_feedback_message(self) -> None:
         expected_email_html_body = (

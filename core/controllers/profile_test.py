@@ -29,6 +29,7 @@ from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -659,7 +660,14 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
         csrf_token = self.get_new_csrf_token()
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with allow_emailing:
             with self.swap_to_always_return(
                 user_services, 'has_ever_registered', False
             ):
@@ -1086,7 +1094,14 @@ class SignupTests(test_utils.GenericTestBase):
             'has_ever_registered': True,
             'username': 'owner',
         }
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with allow_emailing
             response = self.get_json(feconf.SIGNUP_DATA_URL)
             self.assertDictEqual(values_dict, response)
 

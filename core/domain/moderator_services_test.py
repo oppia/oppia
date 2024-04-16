@@ -18,8 +18,8 @@
 
 from __future__ import annotations
 
-from core import feconf
 from core.domain import moderator_services
+from core.domain import platform_parameter_services
 from core.tests import test_utils
 
 
@@ -47,7 +47,13 @@ class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
 
         self.report_text = 'AD'
 
-        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_send_emails_ctx = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
 
     def test_that_flag_exploration_emails_are_correct(self) -> None:
 

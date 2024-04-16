@@ -33,6 +33,7 @@ from core.domain import opportunity_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import question_fetchers
 from core.domain import recommendations_services
 from core.domain import rights_manager
@@ -2397,13 +2398,27 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        swap_can_send_email_platform_parameter_value = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with swap_can_send_email_platform_parameter_value:
             generated_response = self.post_json(
                 '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=200)
             self.assertEqual(generated_response, {})
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
+        swap_can_send_email_platform_parameter_value = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
+        with swap_can_send_email_platform_parameter_value:
             generated_response = self.post_json(
                 '/senddummymailtoadminhandler', {},
                 csrf_token=csrf_token, expected_status_int=400)

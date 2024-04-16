@@ -352,8 +352,20 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        self.cannot_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -552,8 +564,20 @@ class CronMailReviewerNewSuggestionsHandlerTests(
             .create_reviewable_suggestion_email_info_from_suggestion(
                 translation_suggestion))
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        self.cannot_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -820,8 +844,20 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION: set()
         }
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        self.cannot_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 
@@ -1037,8 +1073,20 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
             story_domain.StoryPublicationTimeliness(
             'story_2', 'Story 2', 'Topic', ['Chapter 3'], ['Chapter 4']))
 
-        self.can_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_emails = self.swap(feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        self.cannot_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
         self.testapp_swap = self.swap(
             self, 'testapp', webtest.TestApp(main.app_without_context))
 

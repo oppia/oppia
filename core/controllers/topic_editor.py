@@ -29,6 +29,8 @@ from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
@@ -511,7 +513,12 @@ class EditableTopicDataHandler(
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id)
                 )
-                if feconf.CAN_SEND_EMAILS:
+                can_send_emails = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+                    )
+                )
+                if can_send_emails:
                     email_manager.send_mail_to_admin(
                         'Deleted skills present in topic',
                         'The deleted skills: %s are still present in '
@@ -604,7 +611,12 @@ class EditableTopicDataHandler(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic_id)
             )
-            if feconf.CAN_SEND_EMAILS:
+            can_send_emails = (
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+                )
+            )
+            if can_send_emails:
                 email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
                     'The deleted skills: %s are still present in topic with '
@@ -737,7 +749,12 @@ class TopicPublishSendMailHandler(
         """
         assert self.normalized_payload is not None
         topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
-        if feconf.CAN_SEND_EMAILS:
+        can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.CAN_SEND_EMAILS.value
+            )
+        )
+        if can_send_emails:
             email_manager.send_mail_to_admin(
                 'Request to review and publish a topic',
                 '%s wants to publish topic: %s at URL %s, please review'

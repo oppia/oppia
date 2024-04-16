@@ -35,6 +35,7 @@ from core.domain import fs_services
 from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rights_domain
 from core.domain import rights_manager
@@ -2529,10 +2530,14 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         )
 
     def test_error_cases_for_email_sending(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', False):
+        disallow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
+        with disallow_emailing:
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -2572,7 +2577,14 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
                 valid_payload, csrf_token=csrf_token,
                 expected_status_int=500)
 
-            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            allow_emailing = (
+                self.swap_to_always_return(
+                    platform_parameter_services,
+                    'get_platform_parameter_value',
+                    True
+                )
+            )
+            with allow_emailing:
                 # Now the email gets sent with no error.
                 self.put_json(
                     '/createhandler/moderatorrights/%s' % self.EXP_ID,
@@ -2582,10 +2594,14 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.logout()
 
     def test_email_is_sent_correctly_when_unpublishing(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+                self.swap_to_always_return(
+                    platform_parameter_services,
+                    'get_platform_parameter_value',
+                    True
+                )
+            )
+        with allow_emailing:
             # Log in as a moderator.
             self.login(self.MODERATOR_EMAIL)
 
@@ -2642,10 +2658,14 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
             self.logout()
 
     def test_email_functionality_cannot_be_used_by_non_moderators(self) -> None:
-        with self.swap(
-            feconf, 'REQUIRE_EMAIL_ON_MODERATOR_ACTION', True
-            ), self.swap(
-                feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+                self.swap_to_always_return(
+                    platform_parameter_services,
+                    'get_platform_parameter_value',
+                    True
+                )
+            )
+        with allow_emailing:
             # Log in as a non-moderator.
             self.login(self.EDITOR_EMAIL)
 

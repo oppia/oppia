@@ -27,6 +27,7 @@ from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -695,7 +696,14 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             )]
         )
 
-        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with send_email_swap, allow_emailing:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -738,7 +746,14 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             expected_args=[('WIPEOUT: Account deletion failed', email_content)]
         )
 
-        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with send_email_swap, allow_emailing:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -769,7 +784,14 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             called=False
         )
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
+        disallow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
+        with disallow_emailing, send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -5630,10 +5652,20 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-        self.can_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_email_swap = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        self.cannot_send_email_swap = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
 
     def test_repeated_deletion_is_successful_when_emails_enabled(
         self
@@ -5741,10 +5773,20 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-        self.can_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', False)
+        self.can_send_email_swap = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        self.cannot_send_email_swap = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                False
+            )
+        )
 
     def test_verification_when_user_is_not_deleted_emails_enabled(
         self

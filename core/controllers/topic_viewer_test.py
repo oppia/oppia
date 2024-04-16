@@ -18,6 +18,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_domain
@@ -179,7 +180,14 @@ class TopicPageDataHandlerTests(
     def test_get_with_user_logged_in(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
         self.login(self.NEW_USER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        swap_can_send_emails = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with swap_can_send_emails:
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)

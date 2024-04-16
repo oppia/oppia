@@ -29,6 +29,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import param_domain
+from core.domain import platform_parameter_services
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import translation_domain
@@ -17873,7 +17874,14 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with allow_emailing:
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)
@@ -18208,7 +18216,14 @@ class ExplorationChangesMergeabilityUnitTests(
         self
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+            self.swap_to_always_return(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                True
+            )
+        )
+        with allow_emailing:
             messages = self._get_sent_email_messages(
                 feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(len(messages), 0)

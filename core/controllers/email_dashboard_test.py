@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 from core import feconf
+from core.domain import platform_parameter_services
 from core.domain import user_query_services
 from core.domain import user_services
 from core.platform import models
@@ -243,7 +244,14 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
         )
         query_model.put()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+                self.swap_to_always_return(
+                    platform_parameter_services,
+                    'get_platform_parameter_value',
+                    True
+                )
+            )
+        with allow_emailing:
             # Send email from email dashboard result page.
             self.login(self.SUBMITTER_EMAIL, is_super_admin=True)
             csrf_token = self.get_new_csrf_token()
@@ -365,7 +373,14 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             user_ids=[self.user_a_id, self.user_b_id]
         ).put()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+                self.swap_to_always_return(
+                    platform_parameter_services,
+                    'get_platform_parameter_value',
+                    True
+                )
+            )
+        with allow_emailing:
             csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/emaildashboardcancelresult/%s' % query_id, {},
@@ -439,7 +454,14 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             user_ids=[self.user_a_id, self.user_b_id]
         ).put()
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        allow_emailing = (
+                self.swap_to_always_return(
+                    platform_parameter_services,
+                    'get_platform_parameter_value',
+                    True
+                )
+            )
+        with allow_emailing:
             email_subject = 'email_subject'
             email_body = 'email_body'
 
