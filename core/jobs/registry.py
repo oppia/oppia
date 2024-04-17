@@ -58,6 +58,8 @@ from core.jobs.batch_jobs import skill_migration_jobs                # pylint: d
 from core.jobs.batch_jobs import story_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import subtopic_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import topic_migration_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import (                                    # pylint: disable=unused-import  # isort: skip
+    suggestion_edit_state_content_deletion_jobs)
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import suggestion_migration_jobs   # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import translation_migration_jobs         # pylint: disable=unused-import  # isort: skip
