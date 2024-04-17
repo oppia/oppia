@@ -28,7 +28,7 @@ import {StoryNode} from 'domain/story/story-node.model';
 
 interface LessonUrl {
   classroom: string;
-  topic: string;
+  topicFragment: string;
   story: string;
   currentStory: StoryNode;
 }
@@ -42,8 +42,8 @@ interface ThumbnailUrl {
   templateUrl: './lesson-card.component.html',
 })
 export class LessonCardComponent implements OnInit {
-  @Input() story: StorySummary | LearnerExplorationSummary | CollectionSummary;
-  @Input() topic: string;
+  @Input() story!: StorySummary | LearnerExplorationSummary | CollectionSummary;
+  @Input() topic!: string;
 
   desc!: string;
   imgColor!: string;
@@ -76,7 +76,7 @@ export class LessonCardComponent implements OnInit {
       /* Last completed story index works because if 1 is completed, 1 index is 2nd item */
       let lessonArgs = {
         classroom: this.story.getClassroomUrlFragment(),
-        topic: this.story.getTopicUrlFragment(),
+        topicFragment: this.story.getTopicUrlFragment(),
         currentStory: this.story.getAllNodes()[nextStory],
         story: this.story.getUrlFragment(),
       };
@@ -122,19 +122,20 @@ export class LessonCardComponent implements OnInit {
         filename
       );
     }
+    return null;
   }
 
   getStorySummaryLessonUrl({
     classroom,
-    topic,
+    topicFragment,
     story,
     currentStory,
   }: LessonUrl): string {
-    return classroom === undefined || topic === undefined
+    return classroom === undefined || topicFragment === undefined
       ? '#'
       : `/explore/${currentStory.getExplorationId()}?` +
           Object.entries({
-            topic_url_fragment: topic,
+            topic_url_fragment: topicFrag,
             classroom_url_fragment: classroom,
             story_url_fragment: story,
             node_id: currentStory.getId(),
