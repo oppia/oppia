@@ -323,6 +323,7 @@ jobs:
             - translation-admin-tests/remove-translation-rights
             - exploration-creator-tests/create-exploration-and-change-basic-settings
             - exploration-creator-tests/savedraft-publish-and-discard-the-changes
+            - voiceover-admin-tests/add-voiceover-artist-to-an-exploration
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3

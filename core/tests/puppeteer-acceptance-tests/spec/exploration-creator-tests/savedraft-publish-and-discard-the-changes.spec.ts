@@ -16,6 +16,7 @@
  * @fileoverview Acceptance Test for Exploration Creator and Exploration Manager
  */
 
+import {showMessage} from '../../puppeteer-testing-utilities/show-message-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
@@ -27,19 +28,23 @@ describe('Exploration Creator', function () {
   let explorationVisitor: ExplorationCreator;
   beforeAll(async function () {
     explorationCreator = await UserFactory.createNewUser(
-      'explorationAdm',
+      'explorationCreator',
       'exploration_creator@example.com'
     );
+    showMessage('explorationCreator is signed up successfully.');
+
     explorationVisitor = await UserFactory.createNewUser(
-      'explorationSeeker',
+      'explorationVisitor',
       'exploration_visitor@example.com'
     );
+    showMessage('explorationVisitor is signed up successfully.');
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
     'should draft, discard and publish the changes',
     async function () {
       await explorationCreator.openCreatorDashboardPage();
+      await explorationCreator.createNewExploration();
       await explorationCreator.switchToEditorTab();
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text'
@@ -48,27 +53,23 @@ describe('Exploration Creator', function () {
       await explorationCreator.addEndInteraction();
 
       await explorationCreator.goToSettingsTab();
-      await explorationCreator.addTitle('Old Title');
+      await explorationCreator.updateTitleTo('Old Title');
       await explorationCreator.updateGoalTo('OppiaAcceptanceTestsCheck');
-      await explorationCreator.selectACategory('Algebra');
-      await explorationCreator.selectALanguage('Arabic');
+      await explorationCreator.selectCategory('Algebra');
+      await explorationCreator.selectLanguage('Arabic');
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
 
       await explorationCreator.publishExploration();
 
-      await explorationCreator.addTitle('New Title');
+      await explorationCreator.updateTitleTo('New Title');
       await explorationCreator.discardCurrentChanges();
       await explorationCreator.expectTitleToBe('Old Title');
 
-      await explorationCreator.addTitle('New Title');
+      await explorationCreator.updateTitleTo('New Title');
       await explorationCreator.saveDraftExploration();
-      /**
-       * We are expecting title to be 'Old TitleNew Title'.
-       * Because we are adding in old title without deleting.
-       */
-      await explorationCreator.expectTitleToBe('Old TitleNew Title');
+      await explorationCreator.expectTitleToBe('New Title');
 
-      await explorationVisitor.expectInteractionOnCreatorDashboard();
+      await explorationVisitor.expectExplorationToBeAccessibleWithTheUrl('Yes');
     },
     DEFAULT_SPEC_TIMEOUT
   );

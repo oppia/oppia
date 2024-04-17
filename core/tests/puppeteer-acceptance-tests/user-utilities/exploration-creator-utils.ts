@@ -24,50 +24,54 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
-const takeMeToEditorButton = 'button.e2e-test-dismiss-welcome-modal';
-const addCardName = '.e2e-test-state-name-text';
+const tutorialTakeMeToEditorButton = 'button.e2e-test-dismiss-welcome-modal';
+const explorationIntroBoxOpenerSection = 'div.e2e-test-state-edit-content';
+const editCardNameButton = '.e2e-test-state-name-text';
+const editCardNameBox = '.e2e-test-state-name-input';
 const explorationIntroBox = 'div.e2e-test-rte';
 const introSubmitButton = 'button.e2e-test-state-name-submit';
-const forButtonToBeEnabled =
-  'button.e2e-test-state-name-submit:not([disabled])';
 const introTitleSubmitButton = 'button.e2e-test-save-state-content';
-const interactionAddbutton = 'button.e2e-test-open-add-interaction-modal';
-const endInteractionTab = '.e2e-test-interaction-tile-EndExploration';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const endExplorationInteractionOption =
+  '.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
-const settingsTab = '.nav-link[aria-label="Exploration Setting Button"]';
+const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
-const addGoal = '.e2e-test-exploration-objective-input';
+const addGoalButton = '.e2e-test-exploration-objective-input';
 const categoryDropDown = 'mat-select.e2e-test-exploration-category-dropdown';
-const languageUpdateBar = 'mat-select.e2e-test-exploration-language-select';
-const addTags = 'input.e2e-test-chip-list-tags';
+const languageUpdateDropDown =
+  'mat-select.e2e-test-exploration-language-select';
+const addTagsInputBox = 'input.e2e-test-chip-list-tags';
 const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
 const dismissPreviewButton = 'button.e2e-test-close-preview-summary-modal';
-const textToSpeechToggle = 'label[for="text-speech-switch"]';
-const feedbackToggleOff = 'label[for="feedback-switch"]';
+const textToSpeechToggle = 'label.e2e-test-on-off-switch';
+const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 
-const editbutton = '.e2e-test-edit-roles';
-const addUserName = '#newMemberUsername';
-const addRoleBar = 'mat-select.e2e-test-role-select';
-const collaborator = 'Collaborator (can make changes)';
-const playtester = 'Playtester (can give feedback)';
-const saveRole = 'button.e2e-test-save-role';
+const editRolebutton = '.e2e-test-edit-roles';
+const addUserNameInputBox = '#newMemberUsername';
+const addRoleDropDown = 'mat-select.e2e-test-role-select';
+const collaboratorRoleOption = 'Collaborator (can make changes)';
+const playtesterRoleOption = 'Playtester (can give feedback)';
+const saveRoleButton = 'button.e2e-test-save-role';
 const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
-const saveDraftButton = 'button.e2e-test-save-changes';
-const publishButton = 'button.e2e-test-publish-exploration';
-const discardDraftButton = 'a.e2e-test-discard-changes';
+const desktopSaveDraftButton = 'button.e2e-test-save-changes';
+const saveDraftConfirmButton = '.e2e-test-save-draft-button';
+const desktopPublishButton = 'button.e2e-test-publish-exploration';
+const discardDraftDropDown = 'button.e2e-test-save-discard-toggle';
+const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
 const discardConfirmButton = 'button.e2e-test-confirm-discard-changes';
 const deleteConfirmButton = 'button.e2e-test-really-delete-exploration-button';
 const voiceArtistEditButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistSaveButton = 'button.e2e-test-add-voice-artist-role-button';
-const publishConfirmButton = 'button.e2e-test-confirm-publish';
+const confirmPublishButton = 'button.e2e-test-confirm-publish';
 const commitMessage = 'textarea.e2e-test-commit-message-input';
-const closePublishedPopUp = 'button.e2e-test-share-publish-close';
-const addVoiceArtistUserName = 'input#newVoicAartistUsername';
+const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
+const voiceArtistUserNameInputBox = 'input#newVoicAartistUsername';
 
 /**
  * For mobile.
  */
-const navBarOpener = 'i.e2e-test-mobile-options';
+const navBarOpenerIcon = 'i.e2e-test-mobile-options';
 const optionsDropDown = 'div.e2e-test-mobile-options-dropdown';
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const basicSettingsDropDown = 'h3.e2e-test-settings-container';
@@ -86,68 +90,76 @@ const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
 
 let explorationUrlAfterPublished = '';
 export class ExplorationCreator extends BaseUser {
-  /**
-   * This function helps in reaching dashboard Url.
-   */
   async openCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardUrl);
+    showMessage('Creator dashboard page is opened successfully.');
   }
 
   /**
-   * This function helps in reaching editor section.
+   * This function clicks on new exploration button.
+   */
+  async createNewExploration(): Promise<void> {
+    await this.clickOn(createNewExplorationButton);
+  }
+
+  /**
+   * This function closes the tutorial popup before a new exploration.
    */
   async switchToEditorTab(): Promise<void> {
-    await this.clickOn(createNewExplorationButton);
-    await this.clickOn(takeMeToEditorButton);
+    await this.clickOn(tutorialTakeMeToEditorButton);
+    showMessage('Tutorial popup closed successfully.');
   }
 
   /**
-   * This function helps in updating Card Name.
+   * This function clears previous card name and
+   * add a new card name.
    */
   async updateCardName(cardName: string): Promise<void> {
-    await this.clickOn(addCardName);
-    await this.type('.e2e-test-state-name-input', cardName);
-    await this.page.waitForSelector(forButtonToBeEnabled);
+    await this.clickOn(editCardNameButton);
+    await this.waitForElementToBeClickable(editCardNameBox);
+    await this.page.click(editCardNameBox, {clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.type(editCardNameBox, cardName);
     await this.clickOn(introSubmitButton);
     showMessage('Card name updated successfully.');
   }
 
   /**
-   * This function helps in updating exploration intro text.
+   * This function clears previous intro text and
+   * add a new intro text.
    */
-  async updateExplorationIntroText(Introtext: string): Promise<void> {
-    await this.clickOn('div.e2e-test-state-edit-content');
+  async updateExplorationIntroText(introtext: string): Promise<void> {
+    await this.clickOn(explorationIntroBoxOpenerSection);
     await this.clickOn(explorationIntroBox);
-    await this.type(explorationIntroBox, Introtext);
+    await this.waitForElementToBeClickable(explorationIntroBox);
+    await this.page.click(explorationIntroBox, {clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.type(explorationIntroBox, introtext);
     await this.clickOn(introTitleSubmitButton);
     showMessage('Intro text updated successfully.');
   }
 
-  /**
-   * This function helps in adding interaction.
-   */
   async addEndInteraction(): Promise<void> {
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    await this.clickOn(interactionAddbutton);
-    await this.clickOn(endInteractionTab);
+    await this.clickOn(addInteractionButton);
+    await this.clickOn(endExplorationInteractionOption);
     await this.clickOn(saveInteractionButton);
-    showMessage(
-      'End Exploration has been added and' +
-        'successfully created an exploration.'
-    );
+    showMessage('End interaction has been added successfully.');
   }
-
   /**
-   * This function helps in reaching setting tab successfully.
+   * This function open settings tab.
+   * Note->It also opens all the dropdowns present
+   * in the setting tab for mobile view port.
    */
   async goToSettingsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(navBarOpener, {visible: true});
-      await this.clickOn(navBarOpener);
+      await this.page.waitForSelector(navBarOpenerIcon, {visible: true});
+      await this.clickOn(navBarOpenerIcon);
       await this.clickOn(optionsDropDown);
       await this.clickOn(mobileSettingsBar);
       /**
-       * Open all dropdowns.
+       * Open all dropdowns because by default
+       * all dropdowns are closed.
        */
       await this.clickOn(basicSettingsDropDown);
       await this.clickOn(advanceSettingsDropDown);
@@ -159,50 +171,57 @@ export class ExplorationCreator extends BaseUser {
     } else {
       await this.clickOn(settingsTab);
     }
+    showMessage('Settings tab is opened successfully.');
   }
 
   /**
-   * This function helps in updating Title.
+   * This function deletes the previous written
+   * title and updates the new title.
    */
-  async addTitle(Title: string): Promise<void> {
-    await this.page.waitForSelector(`${addTitleBar}:not([disabled])`);
-    await this.type(addTitleBar, Title);
-    showMessage('Title has been updated to ' + Title);
+  async updateTitleTo(title: string): Promise<void> {
+    await this.waitForElementToBeClickable(addTitleBar);
+    await this.page.click(addTitleBar, {clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.type(addTitleBar, title);
+    await this.page.keyboard.press('Tab');
+    showMessage(`Title has been updated to ${title}`);
   }
 
   /**
    * This function checks length of title bar at basic settings tab.
    */
-  async expectTitleToHaveMaxLength(maxLength: number): Promise<void> {
-    const titleInput = await this.page.$('.e2e-test-exploration-title-input');
+  async expectTruncatedTitleWhenMaxLengthExceeded(
+    maxLength: number
+  ): Promise<void> {
+    const titleInput = await this.page.$(addTitleBar);
     const title = await this.page.evaluate(input => input.value, titleInput);
     const titleLength = title.length;
 
-    if (titleLength <= maxLength) {
-      showMessage(
-        'Title length is within the' +
-          ` allowed limit of ${maxLength} characters.`
-      );
+    if (titleLength === maxLength) {
+      showMessage(`Title is properly truncated to ${maxLength} characters.`);
     } else {
-      throw new Error(
-        'Title length exceeds the allowed' +
-          ` limit of ${maxLength} characters.`
-      );
+      throw new Error(`Title is not properly truncated.
+          Expected length: ${maxLength}, Actual length: ${title.length}`);
     }
   }
 
   /**
-   * This function helps in adding a goal.
+   * This function clears previous goal and
+   * adds a new goal in the exploration.
    */
   async updateGoalTo(goal: string): Promise<void> {
-    await this.clickOn(addGoal);
-    await this.type(addGoal, goal);
+    await this.clickOn(addGoalButton);
+    await this.waitForElementToBeClickable(addGoalButton);
+    await this.page.click(addGoalButton, {clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+    await this.type(addGoalButton, goal);
+    await this.page.keyboard.press('Tab');
   }
 
   /**
-   * This function checks if the goal has been set in the exploration.
+   * This function matches the goal with expected goal.
    */
-  async expectGoalToEqual(expectedGoal: string): Promise<void> {
+  async expectGoalToBe(expectedGoal: string): Promise<void> {
     try {
       const goalInput = await this.page.$('#explorationObjective');
       if (!goalInput) {
@@ -223,15 +242,17 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function helps in selecting a category from dropdown.
+   * This function selects a category from dropdown.
+   * For Eg. Algebra, Biology, Chemistry etc.
    */
-  async selectACategory(category: string): Promise<void> {
+  async selectCategory(category: string): Promise<void> {
     await this.clickOn(categoryDropDown);
     await this.clickOn(category);
   }
 
   /**
-   * This function checks if a category has been selected for the exploration.
+   * The function is checking if the category
+   * matches the expected category.
    */
   async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
     await this.page.waitForSelector('.mat-select-value');
@@ -242,31 +263,36 @@ export class ExplorationCreator extends BaseUser {
     });
     if (selectedCategory === expectedCategory) {
       showMessage(
-        `The category ${selectedCategory}` + ' is same as expectedCategory.'
+        `The category ${selectedCategory} is same as expectedCategory.`
       );
     } else {
       throw new Error('Category is not correct.');
     }
   }
 
-  /**
-   * This function helps in selecting language from dropdown.
-   */
-  async selectALanguage(language: string): Promise<void> {
+  async selectLanguage(language: string): Promise<void> {
+    /**
+     * Language dropdown was visible, but when we click on that then options
+     * appear at wrong place which requires to click more than one time also it
+     * added some type of flake.So, to avoid that we are scrolling the page.
+     * We can use 300 - 500px to move the language dropdown to the upper
+     * part of the page.
+     */
     await this.page.evaluate(() => {
       window.scrollTo(0, 350);
     });
 
-    await this.clickOn(languageUpdateBar);
+    await this.clickOn(languageUpdateDropDown);
     await this.clickOn(language);
   }
 
   /**
-   *  This function verifies that the selected language is displayed correctly.
+   *  This function verifies that the selected language matches the
+   *  expected language.
    */
   async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
-    await this.page.waitForSelector(languageUpdateBar);
-    const languageDropdown = await this.page.$(languageUpdateBar);
+    await this.page.waitForSelector(languageUpdateDropDown);
+    const languageDropdown = await this.page.$(languageUpdateDropDown);
     if (!languageDropdown) {
       throw new Error('Category dropdown not found.');
     }
@@ -279,24 +305,12 @@ export class ExplorationCreator extends BaseUser {
       if (!matOption) {
         throw new Error('Selected language option not found.');
       }
-      const selectedLanguageText = matOption.innerText.trim();
-
-      /**
-       * Extract words within parentheses using regex العربية (Arabic) -> Arabic
-       */
-      const matches = selectedLanguageText.match(/\(([^)]+)\)/);
-      if (matches && matches.length >= 2) {
-        return matches[1].trim();
-      } else {
-        // If no parentheses found, assume the whole text is the language.
-        // For eg : English.
-        return selectedLanguageText.trim();
-      }
+      return matOption.innerText.trim();
     });
 
-    if (selectedLanguage === expectedLanguage) {
+    if (selectedLanguage.includes(expectedLanguage)) {
       showMessage(
-        `The language ${selectedLanguage}` + ' is same as expectedLanguage.'
+        `The language ${selectedLanguage} contains the expected language.`
       );
     } else {
       throw new Error('Language is not correct.');
@@ -304,24 +318,21 @@ export class ExplorationCreator extends BaseUser {
     await this.page.keyboard.press('Enter');
   }
 
-  /**
-   * This function helps in adding tags.
-   */
-  async addTags(TagNames: string[]): Promise<void> {
-    for (let i = 0; i < TagNames.length; i++) {
-      await this.clickOn(addTags);
-      await this.type(addTags, TagNames[i].toLowerCase());
+  async addTags(tagNames: string[]): Promise<void> {
+    for (let i = 0; i < tagNames.length; i++) {
+      await this.clickOn(addTagsInputBox);
+      await this.type(addTagsInputBox, tagNames[i].toLowerCase());
       await this.page.keyboard.press('Tab');
     }
   }
 
-  /**
-   * This function checks if tags are successfully added.
-   */
-  async expectTagsToBeAdded(expectedTags: string[]): Promise<void> {
+  async expectTagsToMatch(expectedTags: string[]): Promise<void> {
+    /**
+     * Converting tags to lowercase because while accessing added tags with
+     * `document.querySelectorAll('mat-chip')` we get tags converted in lowercase.
+     */
     const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
     await this.page.waitForSelector('mat-chip-list');
-
     const addedTags = await this.page.evaluate(() => {
       const tagElements = Array.from(document.querySelectorAll('mat-chip'));
       return tagElements
@@ -343,25 +354,20 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function allows you to preview the exploration.
+   * This function allows you to preview the summary of exploration.
    */
   async previewSummary(): Promise<void> {
-    await this.page.waitForSelector(
-      '.e2e-test-open-preview-summary-modal:not([disabled])'
-    );
     await this.clickOn(previewSummaryButton);
-    await this.clickOn(dismissPreviewButton);
     await this.expectPreviewSummaryToBeVisible();
+    await this.clickOn(dismissPreviewButton);
   }
 
   /**
    * This function verifies that the preview summary is visible.
    */
   async expectPreviewSummaryToBeVisible(): Promise<void> {
-    await this.page.waitForSelector('.e2e-test-open-preview-summary-modal');
-    const previewSummary = await this.page.$(
-      '.e2e-test-open-preview-summary-modal'
-    );
+    await this.page.waitForSelector(dismissPreviewButton);
+    const previewSummary = await this.page.$(dismissPreviewButton);
 
     if (previewSummary) {
       showMessage('Preview summary is visible.');
@@ -371,22 +377,24 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function helps in updating advanced settings
+   * This function enables Automatic Text-to-Speech
+   * switch present in settings tab.
    */
   async enableAutomaticTextToSpeech(): Promise<void> {
     await this.clickOn(textToSpeechToggle);
+    await this.expectAutomaticTextToSpeechToBeEnable();
   }
 
   /**
    * This function checks whether the Automatic Text-to-Speech
    * setting is enabled or disabled.
    */
-  async expectAutomaticTextToSpeechToBeEnabled(): Promise<void> {
+  async expectAutomaticTextToSpeechToBeEnable(): Promise<void> {
     await this.page.waitForSelector('#text-speech-switch');
-    const autoTTSwitch = await this.page.$('#text-speech-switch');
+    const autoTTSswitch = await this.page.$('#text-speech-switch');
     const isAutoTTSwitchOn = await this.page.evaluate(
       switchElement => switchElement.checked,
-      autoTTSwitch
+      autoTTSswitch
     );
     if (isAutoTTSwitchOn) {
       showMessage('Automatic Text-to-Speech is enabled.');
@@ -396,91 +404,86 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function helps in assigning role of collaborator to any guest user.
+   * This function assigns a role of collaborator to any guest user.
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
-    await this.clickOn(editbutton);
-    await this.clickOn(addUserName);
-    await this.type(addUserName, username);
-    await this.clickOn(addRoleBar);
-    await this.clickOn(collaborator);
-    await this.clickOn(saveRole);
-    showMessage(`${username} has been added as collaborator.`);
+    await this.clickOn(editRolebutton);
+    await this.clickOn(addUserNameInputBox);
+    await this.type(addUserNameInputBox, username);
+    await this.clickOn(addRoleDropDown);
+    await this.clickOn(collaboratorRoleOption);
+    await this.clickOn(saveRoleButton);
+    showMessage(`${username} has been added as collaboratorRoleOption.`);
   }
 
   /**
-   * This function helps in assigning role of Playtester to guest user.
+   * This function assigns a role of Playtester to any guest user.
    */
   async assignUserToPlaytesterRole(username: string): Promise<void> {
-    await this.clickOn(editbutton);
+    await this.clickOn(editRolebutton);
     await this.page.waitForSelector('.e2e-test-editor-role-names', {
       visible: true,
     });
-    await this.clickOn(addUserName);
-    await this.type(addUserName, username);
-    await this.clickOn(addRoleBar);
-    await this.clickOn(playtester);
-    await this.clickOn(saveRole);
+    await this.clickOn(addUserNameInputBox);
+    await this.type(addUserNameInputBox, username);
+    await this.clickOn(addRoleDropDown);
+    await this.clickOn(playtesterRoleOption);
+    await this.clickOn(saveRoleButton);
     showMessage(`${username} has been added as playtester.`);
   }
 
   /**
-   *Exception function to verify the setting
-   *of the exploration to Public/Private
+   * Exception function to verify the setting
+   * of the exploration to Public/Private.
    */
-  async expectExplorationToBePublished(): Promise<void> {
+  async expectExplorationToBePublish(): Promise<void> {
+    let publishButtonSelector = '.e2e-test-publish-exploration';
     if (this.isViewportAtMobileWidth()) {
+      publishButtonSelector = mobilePublishButton;
       await this.clickOn(publishButtonDropDown);
-      const publishButton = await this.page.$(mobilePublishButton);
-      if (!publishButton) {
-        showMessage(
-          'Exploration is set to Public and is accessible to Oppia users.'
-        );
-      } else {
-        throw new Error(
-          'Exploration is set to Private and is not' +
-            ' accessible to Oppia users.'
-        );
-      }
+    }
+    const publishButton = await this.page.$(publishButtonSelector);
+    if (!publishButton) {
+      showMessage(
+        'Exploration is set to Public and is accessible to Oppia users.'
+      );
     } else {
-      const publishButton = await this.page.$('.e2e-test-publish-exploration');
-      if (!publishButton) {
-        showMessage(
-          'Exploration is set to Public and is accessible to Oppia users.'
-        );
-      } else {
-        throw new Error(
-          'Exploration is set to Private and is not' +
-            ' accessible to Oppia users.'
-        );
-      }
+      throw new Error(
+        'Exploration is set to Private and is not accessible to Oppia users.'
+      );
     }
   }
 
   /**
-   * This function helps in adding voice artist.
+   * This function add voice artists in the exploration.
    */
   async addVoiceArtists(voiceArtists: string[]): Promise<void> {
     for (let i = 0; i < voiceArtists.length; i++) {
       await this.clickOn(voiceArtistEditButton);
-      await this.clickOn(addVoiceArtistUserName);
-      await this.page.waitForSelector(
-        `${addVoiceArtistUserName}:not([disabled])`
-      );
-      await this.page.click(addVoiceArtistUserName, {clickCount: 3});
+      await this.clickOn(voiceArtistUserNameInputBox);
+      await this.page.waitForSelector(voiceArtistUserNameInputBox, {
+        visible: true,
+      });
+      await this.page.click(voiceArtistUserNameInputBox, {clickCount: 3});
       await this.page.keyboard.press('Backspace');
-      await this.type(addVoiceArtistUserName, voiceArtists[i]);
+      await this.type(voiceArtistUserNameInputBox, voiceArtists[i]);
       await this.clickOn(voiceArtistSaveButton);
+      await this.page.waitForSelector(
+        `div.e2e-test-voice-artist-${voiceArtists[i]}`,
+        {visible: true}
+      );
 
-      showMessage(voiceArtists[i] + ' has been added successfully.');
+      showMessage(voiceArtists[i] + ' has been added as a voice artist.');
     }
   }
 
   /**
-   * This function helps to choose notification type.
+   * This function helps to choose notification type by enabling/disabling
+   * the feedback toggle.
    */
   async optInToEmailNotifications(): Promise<void> {
-    await this.clickOn(feedbackToggleOff);
+    await this.clickOn(feedbackToggle);
+    await this.expectEmailNotificationsToBeActivated();
   }
 
   /**
@@ -494,126 +497,109 @@ export class ExplorationCreator extends BaseUser {
     if (!input) {
       throw new Error('Feedback switch input element not found.');
     }
-    const isChecked = await input.evaluate(
+    const feedbackSwitchIsActive = await input.evaluate(
       input => (input as HTMLInputElement).checked
     );
 
-    if (!isChecked) {
-      showMessage('suggestions notifications via email are enabled.');
+    if (!feedbackSwitchIsActive) {
+      showMessage('suggestion notifications via email are enabled.');
     } else {
-      throw new Error('suggestions notifications via email are disabled.');
+      throw new Error('suggestion notifications via email are disabled.');
     }
   }
 
   /**
-   * This funciton helps in deleting the exploration successfully.
+   * This function deletes the exploration permanently.
+   * Note: This action requires Curriculum Admin role.
    */
   async deleteExploration(): Promise<void> {
-    await this.page.waitForSelector(
-      `${deleteExplorationButton}:not([disabled]`
-    );
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(deleteConfirmButton);
   }
 
   /**
-   * This function helps in verifying, if exploration is
-   * deleted successfully or not.
-   */
-  async expectExplorationToBeDeletedSuccessfullyFromCreatorDashboard(): Promise<void> {
-    try {
-      await this.goto(explorationUrlAfterPublished);
-      throw new Error('Exploration is not deleted successfully.');
-    } catch (error) {
-      showMessage('Exploration is successfully deleted.');
-    }
-  }
-
-  /**
-   * This function helps in drafting the exploration.
+   * This function save the changes of the exploration.
    */
   async saveDraftExploration(): Promise<void> {
-    await this.page.keyboard.press('Tab');
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileSaveDraftButton);
     } else {
-      await this.clickOn(saveDraftButton);
+      await this.clickOn(desktopSaveDraftButton);
     }
 
     await this.clickOn(commitMessage);
     await this.type(commitMessage, 'Testing Testing');
-    await this.clickOn('.e2e-test-save-draft-button');
+    await this.clickOn(saveDraftConfirmButton);
+    await this.page.waitForFunction('document.readyState === "complete"');
+    showMessage('Exploration is saved successfully.');
   }
 
-  /**
-   * This function checks whether changes has been drafted or not.
-   */
-  async expectExplorationToBeDraftedSuccessfully(): Promise<void> {
-    await this.page.waitForSelector('#tutorialSaveButton');
-    const button = await this.page.$('#tutorialSaveButton');
-
-    if (!button) {
-      throw new Error('Save button not found.');
-    }
-
-    const isDraftButtonDisabled = await button.evaluate(
-      button => (button as HTMLButtonElement).disabled
-    );
-
-    if (isDraftButtonDisabled) {
-      showMessage('Changes have been successfully drafted.');
-    } else {
-      throw new Error('Failed to draft changes.');
-    }
-  }
-
-  /**
-   * This function helps in publishing the exploration
-   */
-  async publishExploration(): Promise<void> {
+  async publishExploration(): Promise<string | null> {
     await this.saveDraftExploration();
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        visible: true,
+      });
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        hidden: true,
+      });
       await this.clickOn(publishButtonDropDown);
       await this.clickOn(mobilePublishButton);
     } else {
-      await this.page.waitForSelector(`${publishButton}:not([disabled])`);
-      await this.clickOn(publishButton);
+      await this.clickOn(desktopPublishButton);
     }
-    await this.page.waitForSelector(`${publishConfirmButton}:not([disabled])`);
-    await this.clickOn(publishConfirmButton);
-    await this.page.waitForSelector(closePublishedPopUp, {visible: true});
-    await this.clickOn(closePublishedPopUp);
+    await this.clickOn(confirmPublishButton);
+    await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
 
     explorationUrlAfterPublished = await this.page.url();
+    const explorationId = explorationUrlAfterPublished
+      .replace(/^.*\/create\//, '')
+      .replace(/#\/.*/, '');
+
+    await this.clickOn(closePublishedPopUpButton);
+    await this.expectExplorationToBePublish();
+
+    return explorationId;
   }
 
-  /**
-   * This function checks whether the exploration
-   * is published successfully or not.
-   */
-  async expectInteractionOnCreatorDashboard(): Promise<void> {
-    try {
-      await this.page.goto(explorationUrlAfterPublished);
-      showMessage('Exploration is available on creator dashboard.');
-    } catch (error) {
-      throw new Error('Failed to navigate to the exploration URL.');
+  async expectExplorationToBeAccessibleWithTheUrl(
+    expression: string
+  ): Promise<void> {
+    if (expression === 'Yes') {
+      try {
+        await this.page.goto(explorationUrlAfterPublished);
+        showMessage('Exploration is accessible with the URL i.e Published');
+      } catch (error) {
+        throw new Error('The exploration is not public.');
+      }
+    } else {
+      try {
+        await this.page.goto(explorationUrlAfterPublished);
+        throw new Error('The exploration is still public.');
+      } catch (error) {
+        showMessage(
+          'The exploration is not accessible with the URL i.e Deleted'
+        );
+      }
     }
   }
 
   /**
-   * This function is discarding the current changes.
+   * This function discards the current changes.
    */
   async discardCurrentChanges(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(publishButtonDropDown);
       await this.clickOn(mobileDiscardButton);
     } else {
-      await this.clickOn(basicSettingsDropDown);
-      await this.clickOn('button.e2e-test-save-discard-toggle');
-      await this.page.waitForSelector(discardDraftButton, {visible: true});
-      await this.clickOn(discardDraftButton);
+      await this.page.keyboard.press('Tab');
+      await this.clickOn(discardDraftDropDown);
+      await this.page.waitForSelector(desktopDiscardDraftButton, {
+        visible: true,
+      });
+      await this.clickOn(desktopDiscardDraftButton);
     }
-    await this.page.waitForSelector('.e2e-test-confirm-discard-changes', {
+    await this.page.waitForSelector(discardConfirmButton, {
       visible: true,
     });
     await Promise.all([
@@ -621,24 +607,24 @@ export class ExplorationCreator extends BaseUser {
       this.page.waitForNavigation(),
     ]);
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(navBarOpener);
+      await this.clickOn(navBarOpenerIcon);
       await this.clickOn(basicSettingsDropDown);
     }
   }
 
   /**
-   *This function checks whether changes has discarded successfully or not.
+   * This function matches the expected title with current title.
    */
   async expectTitleToBe(expectedTitle: string): Promise<void> {
     await this.page.waitForSelector('.e2e-test-exploration-title-input');
     const titleInput = await this.page.$('.e2e-test-exploration-title-input');
-    const titlePresent = await this.page.evaluate(
+    const currentTitle = await this.page.evaluate(
       input => input.value,
       titleInput
     );
 
-    if (expectedTitle === titlePresent) {
-      showMessage('Changes have been updated successfully.');
+    if (expectedTitle === currentTitle) {
+      showMessage('Title matches the expected title.');
     } else {
       throw new Error('Failed to update changes.');
     }
