@@ -34,6 +34,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /HttpErrorResponse:.*404 Not Found/,
   /Error: Could not find the resource http:\/\/localhost:8181\/explorehandler\/features\/[a-zA-Z0-9]+\.?/,
   /Could not find the resource http:\/\/localhost:8181\/createhandler\/permissions\/[a-zA-Z0-9]+\.?/,
+  /http:\/\/localhost:8181\/build\/webpack_bundles\/exploration_editor\.[a-f0-9]+\.bundle\.js/,
 ]);
 
 describe('Exploration Creator', function () {
