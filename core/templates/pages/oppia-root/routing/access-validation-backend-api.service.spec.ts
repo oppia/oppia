@@ -196,14 +196,13 @@ describe('Access validation backend api service', () => {
 
   it('should validate access to collection editor page', fakeAsync(() => {
     let collectionId = 'collection_id';
-
     avbas
       .validateAccessCollectionEditorPage(collectionId)
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
       '/access_validation_handler/' +
-        'can_access_collection_editor_page/<collection_id>'
+        'can_access_collection_editor_page/collection_id'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});

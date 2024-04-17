@@ -44,14 +44,14 @@ export class CollectionEditorPageAuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     return new Promise<boolean>(resolve => {
-      const collectionId = route.paramMap.get('collection_id') || '';
+      let collectionId = route.paramMap.get('collection_id') || '';
       this.accessValidationBackendApiService
         .validateAccessCollectionEditorPage(collectionId)
         .then(() => {
           resolve(true);
         })
         .catch(err => {
-          let statusCode = err.error.status_code;
+          let statusCode = err ? err.error.status_code : 401;
           this.router
             .navigate([
               `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,
