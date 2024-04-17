@@ -39,8 +39,8 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
-from core.domain import user_services
 from core.domain import user_domain
+from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
 

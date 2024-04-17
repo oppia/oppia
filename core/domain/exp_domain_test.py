@@ -18535,7 +18535,8 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
         self.assertEqual(
             self.user_exploration_data.rights, self.exploration_rights)
         self.assertEqual(
-            self.user_exploration_data.exploration_email_preferences.to_dict(), {
+            self.user_exploration_data.exploration_email_preferences.to_dict(),
+            {
             'mute_feedback_notifications': False,
             'mute_suggestion_notifications': False
         })
