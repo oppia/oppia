@@ -47,7 +47,7 @@ export class LessonCardComponent implements OnInit {
 
   desc!: string;
   imgColor!: string;
-  imgUrl: string | null = null;
+  imgUrl!: string;
   lessonUrl!: string;
   progress!: number;
   title!: string;
@@ -122,7 +122,7 @@ export class LessonCardComponent implements OnInit {
         filename
       );
     }
-    return null;
+    return '';
   }
 
   getStorySummaryLessonUrl({
