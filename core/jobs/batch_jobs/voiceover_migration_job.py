@@ -73,16 +73,14 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
 
         if entity_voiceover_id not in entity_voiceover_id_to_entity_voiceovers:
             entity_voiceovers_object = (
-                voiceover_domain.EntityVoiceovers.create_empty(
+                voiceover_services.create_entity_voiceovers_model_instance(
                     entity_id, entity_type, entity_version, accent_code))
         else:
             entity_voiceovers_object = (
                 entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id])
 
-        entity_voiceovers_object.voiceovers = {
-            content_id: {
-                'manual': voiceover_dict
-            }
+        entity_voiceovers_object.voiceovers[content_id] =  {
+            'manual': voiceover_dict
         }
 
         entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id] = (
@@ -136,8 +134,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                         entity_voiceover_id_to_entity_voiceovers
                     )
                 )
-        # return list(entity_voiceover_id_to_entity_voiceovers.values())
-        return []
+        return list(entity_voiceover_id_to_entity_voiceovers.values())
 
     def get_exploration_from_model(
         self, exploration_model: exp_models.ExplorationModel
@@ -159,6 +156,18 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             return exploration
         except Exception:
             return None
+
+    @classmethod
+    def count_voiceovers(
+        cls,
+        entity_voiceovers_model
+    ) -> int:
+        total_voiceovers = 0
+        for voiceover_type_to_voiceovers in (
+                entity_voiceovers_model.voiceovers.values()):
+            if 'manual' in voiceover_type_to_voiceovers:
+                total_voiceovers += 1
+        return total_voiceovers
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results for the exploration for which an
@@ -217,23 +226,45 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
 
         entity_voiceover_models = (
             grouped_models
+            | 'Filter invalid exploration and voice artist link models' >> (
+                beam.Filter(
+                    lambda element: (
+                        element[0] != '' and
+                        len(element[1]['exploration_model']) > 0 and
+                        len(element[1]['voice_artist_link']) > 0
+                    )
+                )
+            )
             | 'Get entity voiceover models' >> beam.Map(
                 PopulateManualVoiceoversToEntityVoiceoverModelJob.
                 generate_entity_voiceover_model,
                 beam.pvalue.AsList(voice_artist_metadata_models)
             )
+            | 'Merge all entity voiceovers model' >> beam.FlatMap(
+                lambda entity_voiceovers_model: entity_voiceovers_model)
         )
 
-        exploration_voice_artist_link_result = (
-            exploration_voice_artists_link_models
+        entity_voiceover_models_result = (
+            entity_voiceover_models
             | 'Get the exploration IDs for generated models' >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'Generated exploration voice artist link model for '
-                    'exploration %s.' % model.id
+                    'Migrated %s voiceovers for exploration: %s, in language '
+                    'accent code %s.' % (
+                        PopulateManualVoiceoversToEntityVoiceoverModelJob.
+                        count_voiceovers(model), model.entity_id,
+                        model.language_accent_code)
                 )
             )
         )
-        return exploration_voice_artist_link_result
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                entity_voiceover_models
+                | 'Put models into datastore' >> ndb_io.PutModels()
+            )
+            pass
+
+        return entity_voiceover_models_result
 
 
 class AuditEntityVoiceoverModelJob(

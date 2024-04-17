@@ -243,7 +243,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             'old_value': old_voiceover_dict
         })]
         exp_services.update_exploration(
-            self.editor_id_3, self.CURATED_EXPLORATION_ID_1,
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1,
             change_list, 'Translation commits3')
 
         topic_1 = topic_domain.Topic.create_default_topic(
@@ -434,7 +434,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
                 'hi': [self.editor_id_2, self.voiceover_dict_2]
             },
             'ca_placeholder_2': {
-                'en': [self.editor_id_3, self.voiceover_dict_3]
+                'en': [self.editor_id_1, self.voiceover_dict_3]
             }
         }
         content_id_to_voiceovers_mapping_2 = {
@@ -497,10 +497,114 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
         PopulateManualVoiceoversToEntityVoiceoverModelJob
     )
 
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
     def test_version_is_added_after_running_job(self) -> None:
         self._create_curated_explorations()
         self._create_exp_voice_artists_link()
         self._create_voice_artist_metadata()
 
-        self.assert_job_output_is([])
+        job_result_template = (
+            'Migrated %s voiceovers for exploration: %s, in language '
+            'accent code %s.'
+        )
 
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(2), self.CURATED_EXPLORATION_ID_1, 'en-US'), stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(1), self.CURATED_EXPLORATION_ID_1, 'hi-IN'), stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(2), self.CURATED_EXPLORATION_ID_2, 'en-US'), stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(2), self.CURATED_EXPLORATION_ID_2, 'hi-IN'), stderr=''),
+        ])
+
+        entity_voiceovers_models = (
+            voiceover_models.EntityVoiceoversModel.get_all().fetch())
+        expected_entity_voiceover_id_to_model = {
+            'exploration-exploration_id_1-5-en-US': {
+                'content_0': {
+                    'manual': self.voiceover_dict_1
+                },
+                'ca_placeholder_2': {
+                    'manual': self.voiceover_dict_3}
+            },
+            'exploration-exploration_id_1-5-hi-IN': {
+                'content_0': {
+                    'manual': self.voiceover_dict_2
+                }
+            },
+            'exploration-exploration_id_2-4-en-US': {
+                'content_0': {
+                    'manual': self.voiceover_dict_5
+                },
+                'ca_placeholder_2': {
+                    'manual': self.voiceover_dict_4
+                }
+            },
+            'exploration-exploration_id_2-4-hi-IN': {
+                'content_0': {
+                    'manual': self.voiceover_dict_6
+                },
+                'ca_placeholder_2': {
+                    'manual': self.voiceover_dict_7
+                }
+            }
+        }
+
+        self.assertEqual(len(entity_voiceovers_models), 4)
+
+        for model in entity_voiceovers_models:
+            self.assertDictEqual(
+                expected_entity_voiceover_id_to_model[model.id],
+                model.voiceovers
+            )
+
+
+class AuditExplorationVoiceArtistLinkModelsJobTests(
+    VoiceArtistMetadataModelsTestsBaseClass):
+
+    JOB_CLASS: Type[
+        voiceover_migration_job.AuditEntityVoiceoverModelJob
+    ] = (
+        voiceover_migration_job.AuditEntityVoiceoverModelJob
+    )
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_version_is_added_after_running_job(self) -> None:
+        self._create_curated_explorations()
+        self._create_exp_voice_artists_link()
+        self._create_voice_artist_metadata()
+
+        job_result_template = (
+            'Migrated %s voiceovers for exploration: %s, in language '
+            'accent code %s.'
+        )
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(2), self.CURATED_EXPLORATION_ID_1, 'en-US'), stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(1), self.CURATED_EXPLORATION_ID_1, 'hi-IN'), stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(2), self.CURATED_EXPLORATION_ID_2, 'en-US'), stderr=''),
+            job_run_result.JobRunResult(
+                stdout=job_result_template % (
+                    str(2), self.CURATED_EXPLORATION_ID_2, 'hi-IN'), stderr=''),
+        ])
+
+        entity_voiceovers_models = (
+            voiceover_models.EntityVoiceoversModel.get_all().fetch())
+
+        self.assertEqual(len(entity_voiceovers_models), 0)

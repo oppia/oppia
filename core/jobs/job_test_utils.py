@@ -229,8 +229,7 @@ class JobTestBase(PipelinedTestBase):
         Args:
             expected: PCollection. A PCollection with the expected values.
         """
-        self.run_job()
-        # self.assert_pcoll_equal(self.run_job(), expected)
+        self.assert_pcoll_equal(self.run_job(), expected)
 
     def assert_job_output_is_empty(self) -> None:
         """Asserts that the output of self.JOB_CLASS is an empty PCollection."""
