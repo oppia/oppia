@@ -16,10 +16,12 @@
         <div class="oppia-splash-section-one-top-left">
           <p class="oppia-splash-section-one-top-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></p>
           <button type="submit" (click)="onClickBrowseLessonsButton()"
-                  class="btn oppia-splash-button oppia-splash-learn-button oppia-transition-200">
+                  class="btn oppia-splash-button oppia-splash-learn-button oppia-transition-200"
+                  tabindex="0">
             {{ 'I18N_SPLASH_START_LEARNING' | translate }}
           </button>
-          <button class="oppia-splash-button oppia-splash-top-account-button">
+          <button class="oppia-splash-button oppia-splash-top-account-button"
+                  tabindex="0">
             {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
           </button>
         </div>
@@ -90,7 +92,8 @@
                alt="Image illustrating Mathematics classroom">
         </picture>
         <p class="oppia-splash-text" [innerHTML]="'I18N_SPLASH_CLASSROOM_TEXT' | translate:{lessonCount: 70}"></p>
-        <button class="oppia-splash-button oppia-splash-classroom-button">
+        <button class="oppia-splash-button oppia-splash-classroom-button"
+                tabindex="0">
           {{ 'I18N_SPLASH_CLASSROOM_BUTTON_TEXT' | translate }} 
         </button>
       </div>
@@ -108,7 +111,8 @@
                 alt="Image illustrating playful lessons of Oppia">
         </picture>
         <p class="oppia-splash-text" [innerHTML]="'I18N_SPLASH_LESSONS_TEXT' | translate:{languageCount: 50}"></p>
-        <button class="oppia-splash-button oppia-splash-lessons-button">
+        <button class="oppia-splash-button oppia-splash-lessons-button"
+x                tabindex="0">
           {{ 'I18N_SPLASH_LESSONS_BUTTON_TEXT' | translate }}
         </button>
       </div>
@@ -123,7 +127,8 @@
       <p class="oppia-splash-text oppia-splash-section-two-text">
         {{ 'I18N_SPLASH_STUDENTS_CONTENT' | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-account-button">
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-account-button"
+              tabindex="0">
         {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
       </button>
     </div>
@@ -138,7 +143,8 @@
              alt="Photo of a kid thinking about fractions">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-account-button">
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-account-button"
+            tabindex="0">
       {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
     </button>
   </div>
@@ -151,7 +157,8 @@
       <p class="oppia-splash-text oppia-splash-section-four-text">
         {{ 'I18N_SPLASH_TEACHERS_CONTENT' | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-teach-button">
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-teach-button"
+              tabindex="0">
         {{ 'I18N_SPLASH_START_TEACHING' | translate }}
       </button>
     </div>
@@ -163,7 +170,8 @@
              alt="Photo of two kids and a tutor">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-teach-button">
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-teach-button"
+            tabindex="0">
       {{ 'I18N_SPLASH_START_TEACHING' | translate }}
     </button>
   </div>
@@ -176,7 +184,8 @@
       <p class="oppia-splash-text oppia-splash-section-two-text">
         {{ 'I18N_SPLASH_PARENTS_CONTENT' | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-explore-button">
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-explore-button"
+              tabindex="0">
         {{ 'I18N_SPLASH_START_EXPLORING' | translate }}
       </button>
     </div>
@@ -189,7 +198,8 @@
              alt="Image of school students in their school dress">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-explore-button">
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-explore-button"
+            tabindex="0">
       {{ 'I18N_SPLASH_START_EXPLORING' | translate }}
     </button>
   </div>
@@ -202,7 +212,8 @@
       <p class="oppia-splash-text oppia-splash-section-six-text">
         {{ 'I18N_SPLASH_VOLUNTEERS_CONTENT' | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-volunteer-button">
+      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-volunteer-button"
+              tabindex="0">
         {{ 'I18N_SPLASH_START_CONTRIBUTING' | translate }}
       </button>
     </div>
@@ -214,7 +225,8 @@
              alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-volunteer-button">
+    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-volunteer-button"
+            tabindex="0">
       {{ 'I18N_SPLASH_START_CONTRIBUTING' | translate }}
     </button>
   </div>
