@@ -167,7 +167,7 @@ def compile_protobuf_files(proto_files_paths: List[str]) -> None:
                 r'^import (\w*_pb2 as)', r'from proto_files import \1')
 
 
-def fix_google_module(google_module_path: str) -> None:
+def make_google_module_importable_by_python(google_module_path: str) -> None:
     """Adds an empty __init__.py file to the google module if they do not
     exist. This solves the bug mentioned below where namespace packages
     sometimes install modules without __init__.py files (python requires
@@ -193,6 +193,8 @@ def fix_google_module(google_module_path: str) -> None:
 def main() -> None:
     """Install third-party libraries for Oppia."""
     if feconf.OPPIA_IS_DOCKERIZED:
+        make_google_module_importable_by_python(
+            google_module_path='/app/oppia/third_party/python_libs/google')
         return
 
     setup.main(args=[])
@@ -239,7 +241,7 @@ def main() -> None:
     # __init__.py files (python requires modules to have __init__.py files in
     # in order to recognize them as modules and import them):
     # https://github.com/googleapis/python-ndb/issues/518
-    fix_google_module(correct_google_path)
+    make_google_module_importable_by_python(correct_google_path)
 
     if common.is_windows_os():
         tweak_yarn_executable()
