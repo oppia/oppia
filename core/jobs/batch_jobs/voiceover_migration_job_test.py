@@ -34,7 +34,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Type
+from typing import Dict, Sequence, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -70,7 +70,6 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         self.set_curriculum_admins([
             self.EDITOR_USERNAME_1,
             self.EDITOR_USERNAME_2,
-            self.EDITOR_USERNAME_3,
             self.CURRICULUM_ADMIN_USERNAME])
 
         self.editor_id_1 = self.get_user_id_from_email(self.EDITOR_EMAIL_1)
@@ -426,21 +425,21 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         """
         content_id_to_voiceovers_mapping_1 = {
             'content_0': {
-                'en': [self.editor_id_1, self.voiceover_dict_1],
-                'hi': [self.editor_id_2, self.voiceover_dict_2]
+                'en': (self.editor_id_1, self.voiceover_dict_1),
+                'hi': (self.editor_id_2, self.voiceover_dict_2)
             },
             'ca_placeholder_2': {
-                'en': [self.editor_id_1, self.voiceover_dict_3]
+                'en': (self.editor_id_1, self.voiceover_dict_3)
             }
         }
         content_id_to_voiceovers_mapping_2 = {
             'content_0': {
-                'en': [self.editor_id_1, self.voiceover_dict_5],
-                'hi': [self.editor_id_2, self.voiceover_dict_6]
+                'en': (self.editor_id_1, self.voiceover_dict_5),
+                'hi': (self.editor_id_2, self.voiceover_dict_6)
             },
             'ca_placeholder_2': {
-                'en': [self.editor_id_1, self.voiceover_dict_4],
-                'hi': [self.editor_id_2, self.voiceover_dict_7]
+                'en': (self.editor_id_1, self.voiceover_dict_4),
+                'hi': (self.editor_id_2, self.voiceover_dict_7)
             }
         }
         exp_voice_artist_link_model_1 = (
@@ -516,8 +515,9 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                     str(2), self.CURATED_EXPLORATION_ID_2, 'hi-IN'), stderr=''),
         ])
 
-        entity_voiceovers_models = (
-            voiceover_models.EntityVoiceoversModel.get_all().fetch())
+        entity_voiceovers_models: Sequence[
+            voiceover_models.EntityVoiceoversModel] = (
+                voiceover_models.EntityVoiceoversModel.get_all().fetch())
         expected_entity_voiceover_id_to_model = {
             'exploration-exploration_id_1-5-en-US': {
                 'content_0': {
@@ -595,7 +595,8 @@ class AuditExplorationVoiceArtistLinkModelsJobTests(
                     str(2), self.CURATED_EXPLORATION_ID_2, 'hi-IN'), stderr=''),
         ])
 
-        entity_voiceovers_models = (
-            voiceover_models.EntityVoiceoversModel.get_all().fetch())
+        entity_voiceovers_models: Sequence[
+            voiceover_models.EntityVoiceoversModel] = (
+                voiceover_models.EntityVoiceoversModel.get_all().fetch())
 
         self.assertEqual(len(entity_voiceovers_models), 0)

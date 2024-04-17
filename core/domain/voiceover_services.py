@@ -110,7 +110,7 @@ def create_entity_voiceovers_model_instance(
     entity_id: str,
     entity_version: int,
     language_accent_code: str
-):
+) -> voiceover_models.EntityVoiceoversModel:
     """Returns a unique entity voiceovers domain object.
 
     Args:
@@ -127,6 +127,7 @@ def create_entity_voiceovers_model_instance(
     )
     entity_voiceovers_model.update_timestamps()
     return entity_voiceovers_model
+
 
 # NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
 # model does not contain any data yet. Issue #19590 tracks the changes required
