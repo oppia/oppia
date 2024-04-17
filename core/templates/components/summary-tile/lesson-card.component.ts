@@ -28,7 +28,7 @@ import {StoryNode} from 'domain/story/story-node.model';
 
 interface LessonUrl {
   classroom: string | undefined;
-  topicFragment: string;
+  topicFragment: string | undefined;
   story: string;
   currentStory: StoryNode;
 }
