@@ -697,8 +697,8 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             'exploration_id')
 
         feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.UPDATE_EXP_VOICE_ARTIST_LINK.value,
-            True, 0, [])
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
 
         voiceover_services.update_exploration_voice_artist_link_model(
             'voice_artist_3', change_list, exploration, updated_exploration
@@ -762,8 +762,8 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
         )
 
         feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.UPDATE_EXP_VOICE_ARTIST_LINK.value,
-            True, 0, [])
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
 
         voiceover_services.update_exploration_voice_artist_link_model(
             'voice_artist_3', change_list, exploration, updated_exploration
@@ -832,8 +832,8 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
         )
 
         feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.UPDATE_EXP_VOICE_ARTIST_LINK.value,
-            True, 0, [])
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
 
         voiceover_services.update_exploration_voice_artist_link_model(
             'voice_artist_3', change_list, exploration, updated_exploration
@@ -898,8 +898,8 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
         )
 
         feature_flag_services.update_feature_flag(
-            feature_flag_list.FeatureNames.UPDATE_EXP_VOICE_ARTIST_LINK.value,
-            False, 0, [])
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, False, 0, [])
 
         voiceover_services.update_exploration_voice_artist_link_model(
             'voice_artist_3', change_list, exploration, updated_exploration
