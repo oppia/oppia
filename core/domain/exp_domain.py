@@ -5837,8 +5837,9 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
             exploration: Exploration. The exploration domain object.
             rights: rights_domain.ActivityRights. Domain object
                 representation of activity rights.
-            exploration_email_preferences: user_domain.UserExplorationPrefs. Domain
-                object representing feedback and suggestion email settings.
+            exploration_email_preferences: user_domain.UserExplorationPrefs. (
+                Domain object representing feedback and suggestion email
+                    settings).
             draft_change_list_id: int. The id of draft change list.
             is_valid_draft_version: Optional[bool]. Whether the given draft
                 version is valid or not.
