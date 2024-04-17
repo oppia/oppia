@@ -135,7 +135,7 @@ export class LessonCardComponent implements OnInit {
       ? '#'
       : `/explore/${currentStory.getExplorationId()}?` +
           Object.entries({
-            topic_url_fragment: topicFrag,
+            topic_url_fragment: topicFragment,
             classroom_url_fragment: classroom,
             story_url_fragment: story,
             node_id: currentStory.getId(),
