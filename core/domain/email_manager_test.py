@@ -643,7 +643,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self._set_signup_email_content_platform_parameter(
                 self.new_email_subject_content, self.new_email_body_content)
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -676,7 +676,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
-                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+                self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
                 csrf_token = self.get_new_csrf_token()
 
                 # No user-facing error should surface.
@@ -740,7 +740,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
-                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+                self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
                 csrf_token = self.get_new_csrf_token()
 
                 # No user-facing error should surface.
@@ -785,7 +785,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(log_new_error_counter.times_called, 0)
 
                 self.login(self.EDITOR_EMAIL)
-                self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+                self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
                 csrf_token = self.get_new_csrf_token()
 
                 # No user-facing error should surface.
@@ -857,7 +857,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_subject_content, self.new_email_body_content)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -904,7 +904,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_subject_content, self.new_email_body_content)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -958,7 +958,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 self.new_email_subject_content, self.new_email_body_content)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -1047,7 +1047,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(all_models), 0)
 
             self.login(self.EDITOR_EMAIL)
-            self.get_html_response(feconf.SIGNUP_URL + '?return_url=/')
+            self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
             csrf_token = self.get_new_csrf_token()
 
             self.post_json(
@@ -5161,18 +5161,18 @@ class NotifyReviewersNewSuggestionsTests(
             reviewable_suggestion_email_info.submission_datetime +
             datetime.timedelta(days=review_wait_time))
         expected_email_html_body = (
-            'Hi reviewer1' +
-            ',<br><br>There are new <a href="%s%s">opportunities</a>' +
-            ' to review translations that we think you might be interested' +
-            ' in on the Contributor Dashboard page. Here are some examples' +
+            'Hi reviewer1'
+            ',<br><br>There are new <a href="%s%s">opportunities</a>'
+            ' to review translations that we think you might be interested'
+            ' in on the Contributor Dashboard page. Here are some examples'
             ' of contributions that are waiting for review:'
-            '<br><br>The following suggestions are available for review: ' +
-            '<br><br><ul><li>The following English translation suggestion ' +
-            'was submitted for review 2 days ago:<br>What is the' +
-            ' meaning of life?</li><br></ul><br>Please take some time ' +
+            '<br><br>The following suggestions are available for review: '
+            '<br><br><ul><li>The following English translation suggestion '
+            'was submitted for review 2 days ago:<br>What is the'
+            ' meaning of life?</li><br></ul><br>Please take some time '
             'to review any of the above contributions '
-            '(if they still need a review) or any other contributions ' +
-            'on the dashboard. We appreciate your help!<br><br>Thanks again,' +
+            '(if they still need a review) or any other contributions '
+            'on the dashboard. We appreciate your help!<br><br>Thanks again,'
             ' and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
             )
 
@@ -6672,7 +6672,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         expected_email_html_body = (
             'Hi questionSuggestor,<br><br>'
             'This is to let you know that the Oppia team has added you as a '
-            'contributor to submit question suggestions ' 
+            'contributor to submit question suggestions '
             'for use in lessons.<br><br>'
             'You can now start to submit questions in the '
             '<a href="https://www.oppia.org/contributor-dashboard">'
@@ -7042,8 +7042,9 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             '</ol>'
             'Regards,<br> Oppia Foundation'
         ) % (
-            str(feconf.OPPIA_SITE_URL) + str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/story_1')
+            '%s%s/story_1' % (
+            feconf.OPPIA_SITE_URL, feconf.STORY_EDITOR_URL_PREFIX)
+        )
         expected_email_subject = 'Chapter Publication Notifications'
 
         with self.can_send_emails_ctx:
@@ -7082,8 +7083,8 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
         expected_email_html_body = (
             'Dear Curriculum Admin, <br><br>'
             'The following stories have unpublished chapters which are due for'
-            ' publication in the next ' +
-            str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS) + ' days.'
+            ' publication in the next %s'
+            ' days.'
             ' Please ensure'
             ' they are published on or before the planned date or adjust the '
             'planned publication date.'
@@ -7096,8 +7097,11 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             '</ol>'
             'Regards,<br> Oppia Foundation'
         ) % (
-            str(feconf.OPPIA_SITE_URL) + str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/story_1')
+            str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
+            '%s%s/story_1' % (
+                feconf.OPPIA_SITE_URL,
+                feconf.STORY_EDITOR_URL_PREFIX)
+        )
         expected_email_subject = 'Chapter Publication Notifications'
 
         with self.can_send_emails_ctx:
