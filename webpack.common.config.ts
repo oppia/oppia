@@ -65,10 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    collection_editor:
-      commonPrefix +
-      '/pages/collection-editor-page/' +
-      'collection-editor-page.import.ts',
     collection_player:
       commonPrefix +
       '/pages/collection-player-page/' +

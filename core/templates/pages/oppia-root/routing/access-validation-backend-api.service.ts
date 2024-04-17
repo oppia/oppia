@@ -59,7 +59,8 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
   COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR =
-    '/access_validation_handler/can_access_collection_editor_page/<collection_id>'; // eslint-disable-line max-len
+    '/access_validation_handler/' +
+    'can_access_collection_editor_page/<collection_id>';
 
   constructor(
     private http: HttpClient,

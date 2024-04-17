@@ -22,7 +22,6 @@ from core import feature_flag_list
 from core import feconf
 from core.domain import classroom_config_domain
 from core.domain import classroom_config_services
-from core.domain import collection_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import rights_manager
@@ -567,61 +566,41 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
 
 
 class CollectionEditorPageAccessValidationHandler(test_utils.GenericTestBase):
-    """Checks the access to the collection editor page and its rendering."""
+    """Test for collection editor page access validation"""
 
     COLLECTION_ID: Final = '0'
 
     def setUp(self) -> None:
         super().setUp()
         self.collection_editor_username = 'collectionEditor'
-        self.guest_username = 'guest'
         self.user_email = 'collectionEditor@example.com'
+        self.guest_username = 'guest'
         self.guest_email = 'guest@example.com'
-
-        system_user = user_services.get_system_user()
-        collection_services.load_demo(self.COLLECTION_ID)
-        rights_manager.release_ownership_of_collection(
-            system_user, self.COLLECTION_ID)
 
         self.signup(self.user_email, self.collection_editor_username)
         self.signup(self.guest_email, self.guest_username)
         self.add_user_role(
             self.collection_editor_username, feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.user_id = self.get_user_id_from_email(self.user_email)
+        self.user = user_services.get_user_actions_info(self.user_id)
+        self.save_new_valid_collection(self.COLLECTION_ID, self.user_id)
 
-    def test_collection_editor_page_access_with_logging_in(self) -> None:
-        self.login(self.user_email)
-        self.get_html_response(
-            '%s/can_access_collection_editor_page/%s' % (
-            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
-            ), expected_status_int=200
-        )
-        self.logout()
-
-    def test_collection_editor_page_access_after_logging_in(self) -> None:
-        self.login(self.user_email)
-        self.get_html_response(
-            '%s/can_access_collection_editor_page/%s' % (
-            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
-            ), expected_status_int=200
-        )
-        self.logout()
-
-    def test_collection_editor_page_access_as_collection_editor(self) -> None:
-        self.login(self.user_email)
-        self.get_html_response(
-            '%s/can_access_collection_editor_page/%s' % (
-            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
-            ), expected_status_int=200
-        )
-        self.logout()
-
-    def test_validation_returns_true_for_guest_user(
-        self) -> None:
+    def test_for_logged_in_user_without_rights(self) -> None:
         self.login(self.guest_email)
         self.get_html_response(
             '%s/can_access_collection_editor_page/%s' % (
             ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
-            )
+            ), expected_status_int=401
+        )
+        self.logout()
+
+    def test_for_logged_in_user_with_rights(self) -> None:
+        rights_manager.publish_collection(self.user, self.COLLECTION_ID)
+        self.login(self.user_email)
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/%s' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX, self.COLLECTION_ID
+            ), expected_status_int=200
         )
         self.logout()
 
@@ -634,3 +613,10 @@ class CollectionEditorPageAccessValidationHandler(test_utils.GenericTestBase):
             ), expected_status_int=404
         )
         self.logout()
+
+    def test_should_not_access_for_logged_out_user(self) -> None:
+        self.get_html_response(
+            '%s/can_access_collection_editor_page/' % (
+            ACCESS_VALIDATION_HANDLER_PREFIX,
+            ), expected_status_int=404
+        )

@@ -19,6 +19,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
+
 import {UrlService} from 'services/contextual/url.service';
 import {PageTitleService} from 'services/page-title.service';
 import {CollectionEditorRoutingService} from './services/collection-editor-routing.service';

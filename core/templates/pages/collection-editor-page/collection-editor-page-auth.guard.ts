@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a valid facilitator.
+ * if the user is not a Collection Editor.
  */
 
 import {Location} from '@angular/common';
@@ -43,17 +43,18 @@ export class CollectionEditorPageAuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Promise<boolean> {
-    let collectionId = route.paramMap.get('collection_id') || '';
     return new Promise<boolean>(resolve => {
+      const collectionId = route.paramMap.get('collection_id') || '';
       this.accessValidationBackendApiService
         .validateAccessCollectionEditorPage(collectionId)
         .then(() => {
           resolve(true);
         })
         .catch(err => {
+          let statusCode = err.error.status_code;
           this.router
             .navigate([
-              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,
             ])
             .then(() => {
               this.location.replaceState(state.url);

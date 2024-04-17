@@ -457,7 +457,6 @@ import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/coll
 import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
 
 export const angularServices: [string, Type<{}>][] = [
-  ['CollectionEditorPageAuthGuard', CollectionEditorPageAuthGuard],
   ['AccessValidationBackendApiService', AccessValidationBackendApiService],
   ['AdminAuthGuard', AdminAuthGuard],
   ['AdminBackendApiService', AdminBackendApiService],
@@ -512,6 +511,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['CollectionCreationBackendService', CollectionCreationBackendService],
   ['CollectionCreationService', CollectionCreationService],
   ['CollectionEditorRoutingService', CollectionEditorRoutingService],
+  ['CollectionEditorPageAuthGuard', CollectionEditorPageAuthGuard],
   ['CollectionLinearizerService', CollectionLinearizerService],
   ['CollectionPlayerBackendApiService', CollectionPlayerBackendApiService],
   ['CollectionPlayerAuthGuard', CollectionPlayerAuthGuard],

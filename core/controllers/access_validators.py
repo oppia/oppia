@@ -406,6 +406,8 @@ class CollectionEditorPageAccessValidationHandler(
 ):
     """The editor page for a single collection."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     URL_PATH_ARGS_SCHEMAS = {
         'collection_id': {
             'schema': {

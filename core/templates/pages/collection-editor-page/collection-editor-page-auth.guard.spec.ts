@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for EditLearnerGroupPageAuthGuard
+ * @fileoverview Tests for CollectionEditorPageAuthGuard
  */
 import {Location} from '@angular/common';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';

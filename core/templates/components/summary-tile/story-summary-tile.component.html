@@ -215,7 +215,7 @@
           <div *ngIf="node.getStatus() === 'Published' && storySummary.isNodeCompleted(node.getTitle())" class="fas fa-check completed-icon">
           </div>
           <div [ngClass]="{'pending-chapter': !storySummary.isNodeCompleted(node.getTitle()) && isPreviousChapterCompleted(idx), 'incomplete-chapter': !storySummary.isNodeCompleted(node.getTitle()), 'complete-chapter': storySummary.isNodeCompleted(node.getTitle())}"
-              *ngIf="node.getStatus() === 'PubligetChapterUrlshed'">
+              *ngIf="node.getStatus() === 'Published'">
             <a [href]="getChapterUrl(node.getTitle())" rel="noopener">
               <span class="chapter-identifier" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate">
               </span>&nbsp;<span class="chapter-identifier">{{ idx + 1 }}:</span>&nbsp;<span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">{{ node.getTitle() }}</span>

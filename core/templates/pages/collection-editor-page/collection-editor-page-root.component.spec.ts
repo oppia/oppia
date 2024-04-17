@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for Collection editor Root component.
+ * @fileoverview Unit tests for Collection editor root component.
  */
 
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';

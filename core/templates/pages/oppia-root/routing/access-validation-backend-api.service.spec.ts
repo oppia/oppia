@@ -202,7 +202,8 @@ describe('Access validation backend api service', () => {
       .then(successSpy, failSpy);
 
     const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_collection_editor_page/collection_id' // eslint-disable-line max-len
+      '/access_validation_handler/' +
+        'can_access_collection_editor_page/<collection_id>'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});
@@ -293,23 +294,6 @@ describe('Access validation backend api service', () => {
       expect(failSpy).toHaveBeenCalled();
     })
   );
-
-  it('should validate access to blog author profile page with valid access', fakeAsync(() => {
-    avbas
-      .validateAccessToBlogAuthorProfilePage('username')
-      .then(successSpy, failSpy);
-
-    const req = httpTestingController.expectOne(
-      '/access_validation_handler/can_access_blog_author_profile_page/' +
-        'username'
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush({});
-
-    flushMicrotasks();
-    expect(successSpy).toHaveBeenCalled();
-    expect(failSpy).not.toHaveBeenCalled();
-  }));
 
   it('should validate access to blog author profile page with valid access', fakeAsync(() => {
     avbas
