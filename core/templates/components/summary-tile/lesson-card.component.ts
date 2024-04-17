@@ -27,7 +27,7 @@ import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 
 interface LessonUrl {
-  classroom: string;
+  classroom: string | undefined;
   topicFragment: string;
   story: string;
   currentStory: StoryNode;
@@ -122,7 +122,7 @@ export class LessonCardComponent implements OnInit {
         filename
       );
     }
-    return null;
+    return '';
   }
 
   getStorySummaryLessonUrl({
