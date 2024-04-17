@@ -99,18 +99,23 @@ export class ExplorationEditor extends BaseUser {
    */
   async createExplorationWithTitleAndInteraction(
     explorationTitle: string,
-    Interaction: string
+    interaction: string
   ): Promise<void> {
-    this.updateCardContent(explorationTitle);
-    this.addInteraction(Interaction);
-    this.saveExplorationDraft();
+    await this.updateCardContent(explorationTitle);
+    await this.addInteraction(interaction);
+    await this.saveExplorationDraft();
   }
 
   /**
    * Function to publish exploration
+   * @param {string} title - The title of the exploration.
+   * @param {string} goal - The goal of the exploration.
+   * @param {string} category - The category of the exploration.
    */
-  async publishExplorationWithTitle(
-    explorationTitle: string
+  async publishExploration(
+    title: string,
+    goal: string,
+    category: string
   ): Promise<string | null> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(toastMessage, {
@@ -128,11 +133,11 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(publishExplorationButton);
     }
     await this.clickOn(explorationTitleInput);
-    await this.type(explorationTitleInput, `${explorationTitle}`);
+    await this.type(explorationTitleInput, `${title}`);
     await this.clickOn(explorationGoalInput);
-    await this.type(explorationGoalInput, `${explorationTitle}`);
+    await this.type(explorationGoalInput, `${goal}`);
     await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn('Algebra');
+    await this.clickOn(`${category}`);
     await this.clickOn(saveExplorationChangesButton);
     await this.clickOn(explorationConfirmPublishButton);
     await this.page.waitForSelector(explorationIdElement);
@@ -164,6 +169,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
     await this.clickOn(stateEditSelector);
     await this.waitForElementToBeClickable(stateContentInputField);
     await this.type(stateContentInputField, `${content}`);
@@ -180,7 +189,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addInteractionButton);
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector(saveInteractionButton, {hidden: true});
+    await this.page.waitForSelector('.customize-interaction-body-container', {
+      hidden: true,
+    });
   }
 
   /**

@@ -23,7 +23,7 @@ import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
-const DEFAULT_SPEC_TIMEOUT__MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const invalidIdErrorToastMessage =
   'Sorry, we could not find the specified user.';
@@ -57,9 +57,9 @@ describe('Voiceover Admin', function () {
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_Editor@example.com'
+      'exploration_editor@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT__MSECS);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
@@ -72,8 +72,11 @@ describe('Voiceover Admin', function () {
         'Exploration one',
         INTERACTION_TYPES.END_EXPLORATION
       );
-      explorationId =
-        await explorationEditor.publishExplorationWithTitle('Exploration one');
+      explorationId = await explorationEditor.publishExploration(
+        'Exploration one',
+        'Exploration one',
+        'Algebra'
+      );
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.dismissWelcomeModal();
@@ -91,7 +94,7 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.closeToastMessage();
       await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
     },
-    DEFAULT_SPEC_TIMEOUT__MSECS
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -108,9 +111,11 @@ describe('Voiceover Admin', function () {
         'Exploration two',
         INTERACTION_TYPES.END_EXPLORATION
       );
-      explorationId =
-        await explorationEditor.publishExplorationWithTitle('Exploration two');
-
+      explorationId = await explorationEditor.publishExploration(
+        'Exploration one',
+        'Exploration one',
+        'Algebra'
+      );
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.navigateToExplorationSettingsTab();
 
@@ -123,7 +128,7 @@ describe('Voiceover Admin', function () {
         'voiceoverartist'
       );
     },
-    DEFAULT_SPEC_TIMEOUT__MSECS
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
