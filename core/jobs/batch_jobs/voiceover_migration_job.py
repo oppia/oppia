@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import collections
 
-from core.domain import exp_fetchers
+from core.domain import state_domain
 from core.domain import voiceover_domain
 from core.domain import voiceover_services
 from core.jobs import base_jobs
@@ -30,11 +30,10 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Optional
+from typing import Dict, List, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import voiceover_models
 
@@ -42,6 +41,10 @@ datastore_services = models.Registry.import_datastore_services()
 
 (voiceover_models, exp_models) = models.Registry.import_models([
     models.Names.VOICEOVER, models.Names.EXPLORATION])
+
+ExplorationAndVoiceArtistLinkType = Tuple[str, Dict[str, List[Union[
+    voiceover_models.ExplorationVoiceArtistsLinkModel,
+    exp_models.ExplorationModel]]]]
 
 
 class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
@@ -54,14 +57,40 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
     @classmethod
     def update_entity_voiceover_for_given_id(
         cls,
-        entity_type,
-        entity_id,
-        entity_version,
-        accent_code,
-        content_id,
-        voiceover_dict,
-        entity_voiceover_id_to_entity_voiceovers
-    ):
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        accent_code: str,
+        content_id: str,
+        voiceover_dict: state_domain.VoiceoverDict,
+        entity_voiceover_id_to_entity_voiceovers: Dict[
+            str, voiceover_domain.EntityVoiceovers]
+    ) -> Dict[str, voiceover_domain.EntityVoiceovers]:
+        """Updates the entity voiceover model instance for the given language
+        accent code for a specific content of an exploration.
+
+        Args:
+            entity_type: str. The entity type for the given entity voiceover
+                instance.
+            entity_id: str. The given entity ID.
+            entity_version: int. The version number of the given exploration.
+            accent_code: str. The language accent code for the given entity
+                voiceover instance.
+            content_id: str. The content ID for a specific content in an
+                exploration.
+            voiceover_dict: VoiceoverDict. A voiceover dict that should be
+                added to the entity voiceover instance of the given language
+                accent code of the content.
+            entity_voiceover_id_to_entity_voiceovers:
+                dict(str, EntityVoiceoversModel). A dict with entity voiceover
+                ID as keys and its corresponding EntityVoiceoversModel as
+                values.
+
+        Returns:
+            dict(str, EntityVoiceoversModel). The updated dict with entity
+            voiceover ID as keys and its corresponding EntityVoiceoversModel as
+            values.
+        """
         entity_voiceover_id = (
             voiceover_models.EntityVoiceoversModel.generate_id(
                 entity_type,
@@ -79,7 +108,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             entity_voiceovers_object = (
                 entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id])
 
-        entity_voiceovers_object.voiceovers[content_id] =  {
+        entity_voiceovers_object.voiceovers[content_id] = {
             'manual': voiceover_dict
         }
 
@@ -90,9 +119,29 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
     @classmethod
     def generate_entity_voiceover_model(
         cls,
-        element,
-        voice_artist_metadata_models_list
-    ):
+        element: ExplorationAndVoiceArtistLinkType,
+        voice_artist_metadata_models_list: List[
+            voiceover_models.VoiceArtistMetadataModel]
+    ) -> List[voiceover_domain.EntityVoiceovers]:
+        """Generates an entity voiceovers model using the voiceover data stored
+        in current exploration models.
+
+        Args:
+            element: ExplorationAndVoiceArtistLinkType.
+                A 2-tuple with the following elements:
+                a. A string value representing exploration ID.
+                b. A dict with exploration_model and voice_artist_link as keys
+                and their respective model instances as values. The models are
+                used to fetch voiceover data that will be stored in new entity
+                voiceovers model.
+            voice_artist_metadata_models_list: list(VoiceArtistMetadataModel). A
+                list of VoiceArtistMetadataModel instances. Language accent code
+                for a given voice artist should be fetched from this model.
+
+        Returns:
+            list(EntityVoiceovers). A list of entity voiceovers models used for
+            storing voiceovers from the given exploration data.
+        """
         exploration_model = element[1]['exploration_model'][0]
         voice_artist_link = element[1]['voice_artist_link'][0]
 
@@ -136,33 +185,24 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 )
         return list(entity_voiceover_id_to_entity_voiceovers.values())
 
-    def get_exploration_from_model(
-        self, exploration_model: exp_models.ExplorationModel
-    ) -> Optional[exp_domain.Exploration]:
-        """Gets Exploration domain object from exploration model.
-
-        Args:
-            exploration_model: ExplorationModel. The exploration model which is
-                to be converted into Exploration domain object.
-
-        Returns:
-            Optional[exp_domain.Exploration]. The Exploration domain object
-            for the given exploration model.
-        """
-        try:
-            exploration = exp_fetchers.get_exploration_from_model(
-                exploration_model
-            )
-            return exploration
-        except Exception:
-            return None
-
     @classmethod
     def count_voiceovers(
         cls,
         entity_voiceovers_model
     ) -> int:
-        total_voiceovers = 0
+        """Calculates the number of voiceovers for a given entity
+        voiceover model.
+
+        Args:
+            entity_voiceovers_model: EntityVoiceoversModel. An instance of
+                entity voiceover model from which number of voiceovers will be
+                calculated.
+
+        Returns:
+            int. The number of voiceovers present in the given entity
+            voiceovers model.
+        """
+        total_voiceovers: int = 0
         for voiceover_type_to_voiceovers in (
                 entity_voiceovers_model.voiceovers.values()):
             if 'manual' in voiceover_type_to_voiceovers:

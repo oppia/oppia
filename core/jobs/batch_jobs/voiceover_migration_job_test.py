@@ -22,7 +22,6 @@ from core import feconf
 from core.constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import exp_fetchers
 from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_services
@@ -35,11 +34,10 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Sequence, Type
+from typing import Dict, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
     from mypy_imports import voiceover_models
 
 (voiceover_models, exp_models) = models.Registry.import_models([
@@ -51,11 +49,8 @@ class VoiceArtistMetadataModelsTestsBaseClass(
 
     EDITOR_EMAIL_1 = 'editor1@example.com'
     EDITOR_EMAIL_2 = 'editor2@example.com'
-    EDITOR_EMAIL_3 = 'editor3@example.com'
-    EDITOR_EMAIL_4 = 'editor4@example.com'
     EDITOR_USERNAME_1 = 'editor1'
     EDITOR_USERNAME_2 = 'editor2'
-    EDITOR_USERNAME_3 = 'editor3'
 
     CURATED_EXPLORATION_ID_1 = 'exploration_id_1'
     CURATED_EXPLORATION_ID_2 = 'exploration_id_2'
@@ -69,7 +64,6 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         super().setUp()
         self.signup(self.EDITOR_EMAIL_1, self.EDITOR_USERNAME_1)
         self.signup(self.EDITOR_EMAIL_2, self.EDITOR_USERNAME_2)
-        self.signup(self.EDITOR_EMAIL_3, self.EDITOR_USERNAME_3)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -81,7 +75,6 @@ class VoiceArtistMetadataModelsTestsBaseClass(
 
         self.editor_id_1 = self.get_user_id_from_email(self.EDITOR_EMAIL_1)
         self.editor_id_2 = self.get_user_id_from_email(self.EDITOR_EMAIL_2)
-        self.editor_id_3 = self.get_user_id_from_email(self.EDITOR_EMAIL_3)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -428,6 +421,9 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             })], 'Changes.')
 
     def _create_exp_voice_artists_link(self) -> None:
+        """The method creates two instances of exploration voice artists link
+        model.
+        """
         content_id_to_voiceovers_mapping_1 = {
             'content_0': {
                 'en': [self.editor_id_1, self.voiceover_dict_1],
@@ -466,14 +462,12 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         exp_voice_artist_link_model_2.put()
 
     def _create_voice_artist_metadata(self) -> None:
+        """The method creates two instances of voice artists metadata model."""
         language_code_to_accent_1 = {
             'en': 'en-US'
         }
         language_code_to_accent_2 = {
             'hi': 'hi-IN'
-        }
-        language_code_to_accent_3 = {
-            'en': 'en-IN'
         }
         voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=self.editor_id_1,
@@ -481,9 +475,6 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=self.editor_id_2,
             language_code_to_accent=language_code_to_accent_2)
-        voiceover_models.VoiceArtistMetadataModel.create_model(
-            voice_artist_id=self.editor_id_3,
-            language_code_to_accent=language_code_to_accent_3)
 
 
 class CreateExplorationVoiceArtistLinkModelsJobTests(
