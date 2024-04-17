@@ -5826,8 +5826,7 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         self,
         exploration: Exploration,
         rights: rights_domain.ActivityRights,
-        exploration_email_preferences: Optional[
-            user_domain.UserExplorationPrefsDict] = None,
+        exploration_email_preferences: user_domain.UserExplorationPrefs,
         draft_change_list_id: int = 0,
         is_valid_draft_version: Optional[bool] = False,
         draft_changes: Optional[Dict[str, str]] = None,
@@ -5838,9 +5837,8 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
             exploration: Exploration. The exploration domain object.
             rights: rights_domain.ActivityRights. Domain object
                 representation of activity rights.
-            exploration_email_preferences: Optional[user_domain.
-                UserExplorationPrefsDict]. Dictionary
-                representing feedback and suggestion email settings.
+            exploration_email_preferences: user_domain.UserExplorationPrefsDict. Domain
+            object representing feedback and suggestion email settings.
             draft_change_list_id: int. The id of draft change list.
             is_valid_draft_version: Optional[bool]. Whether the given draft
                 version is valid or not.
@@ -5854,14 +5852,7 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
         self.states = exploration.states
         self.rights = rights
         self.is_valid_draft_version = is_valid_draft_version
-        if exploration_email_preferences is None:
-            self.exploration_email_preferences: (
-                user_domain.UserExplorationPrefsDict) = {
-                'mute_feedback_notifications': False,
-                'mute_suggestion_notifications': False
-            }
-        else:
-            self.exploration_email_preferences = exploration_email_preferences
+        self.exploration_email_preferences = exploration_email_preferences
 
     def to_dict(self) -> UserExplorationDataDict:
         """Gets the dict representation of UserExplorationData
@@ -5899,7 +5890,7 @@ class UserExplorationData(translation_domain.BaseTranslatableObject):
                 self.show_state_editor_tutorial_on_load,
             'draft_changes': self.draft_changes,
             'exploration_metadata': self.exploration.get_metadata().to_dict(),
-            'email_preferences': self.exploration_email_preferences,
+            'email_preferences': self.exploration_email_preferences.to_dict(),
             'next_content_id_index': self.exploration.next_content_id_index,
             'is_version_of_draft_valid': self.is_valid_draft_version
         }

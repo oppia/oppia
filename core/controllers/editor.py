@@ -40,6 +40,7 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
+from core.domain import user_domain
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -202,7 +203,8 @@ class ExplorationHandler(
                         exploration_id)
                 )
                 exploration_data = exp_domain.UserExplorationData(
-                    exploration, exploration_rights
+                    exploration, exploration_rights,
+                    user_domain.UserExplorationPrefs.create_default_prefs()
                 ).to_dict()
             else:
                 exploration_data = exp_services.get_user_exploration_data(

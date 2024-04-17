@@ -32,6 +32,7 @@ from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import state_domain
 from core.domain import translation_domain
+from core.domain import user_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -18514,7 +18515,8 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
             self.EXP_0_ID)
           )
         self.user_exploration_data = exp_domain.UserExplorationData(
-          self.exploration, self.exploration_rights
+          self.exploration, self.exploration_rights,
+          user_domain.UserExplorationPrefs.create_default_prefs()
         )
 
     def test_initialization(self) -> None:
@@ -18533,7 +18535,7 @@ class UserExplorationDataTests(exp_services_test.ExplorationServicesUnitTests):
         self.assertEqual(
             self.user_exploration_data.rights, self.exploration_rights)
         self.assertEqual(
-            self.user_exploration_data.exploration_email_preferences, {
+            self.user_exploration_data.exploration_email_preferences.to_dict(), {
             'mute_feedback_notifications': False,
             'mute_suggestion_notifications': False
         })

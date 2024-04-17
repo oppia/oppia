@@ -3000,7 +3000,7 @@ def get_user_exploration_data(
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id
         )
-    ).to_dict()
+    )
 
     editor_dict = exp_domain.UserExplorationData(
         exploration,
