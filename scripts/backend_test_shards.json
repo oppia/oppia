@@ -396,6 +396,7 @@
         "core.storage.voiceover.gae_models_test",
         "core.domain.voiceover_domain_test",
         "core.domain.voiceover_services_test",
-        "core.controllers.voiceover_test"
+        "core.controllers.voiceover_test",
+        "core.jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs_test"
     ]
 }
