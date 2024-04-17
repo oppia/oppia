@@ -30,7 +30,6 @@ import {BlogAdminFactory, BlogAdmin} from '../user-utilities/blog-admin-utils';
 import {QuestionAdminFactory} from '../user-utilities/question-admin-utils';
 import {BlogPostEditorFactory} from '../user-utilities/blog-post-editor-utils';
 import {VoiceoverAdminFactory} from '../user-utilities/voiceover-admin-utils';
-import {ExplorationEditorFactory} from '../user-utilities/exploration-creator-utils';
 import {
   ExplorationEditorFactory,
   ExplorationEditor,

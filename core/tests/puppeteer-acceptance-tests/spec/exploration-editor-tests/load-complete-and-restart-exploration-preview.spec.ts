@@ -43,8 +43,9 @@ describe('Exploration Editor', function () {
       'exploration_editor@example.com'
     );
     // Navigate to the creator dashboard and create a new exploration.
-    await explorationEditor.navigateToCreatorDashboard();
-    await explorationEditor.clickCreateExplorationButton();
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
@@ -59,7 +60,7 @@ describe('Exploration Editor', function () {
       'Enter a negative number greater than -100.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-    await explorationEditor.addResponsesToTheInteraction(
+    await explorationEditor.addResponseToTheInteraction(
       INTERACTION_TYPES.NUMERIC_INPUT,
       '-99',
       'Prefect!',

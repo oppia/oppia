@@ -1,39 +1,54 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the 'License');
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an 'AS-IS' BASIS,
+// distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 /**
- * @fileoverview exploration admin users utility file.
+ * @fileoverview Utility functions for the Exploration Editor page.
  */
 
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
-const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
+
+const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
+const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const saveContentButton = 'button.e2e-test-save-state-content';
+const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
+const saveInteractionButton = 'button.e2e-test-save-interaction';
+const saveChangesButton = 'button.e2e-test-save-changes';
+const saveDraftButton = 'button.e2e-test-save-draft-button';
+
+const publishExplorationButton = 'button.e2e-test-publish-exploration';
+const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
+const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
+const explorationCategoryDropdown =
+  'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
+const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
+const explorationIdElement = 'span.oppia-unique-progress-id';
+const closeShareModalButton = 'button.e2e-test-share-publish-close';
+
+const mobileChangesDropdown = '.e2e-test-mobile-changes-dropdown';
+const mobileSaveChangesButton =
+  'button.e2e-test-save-changes-for-small-screens';
+const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
+
 const previewTabButton = '.e2e-test-preview-tab';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
-
-// Elements in exploration creator.
-const createExplorationButton = '.e2e-test-create-activity';
-const dismissWelcomeModalSelector = '.e2e-test-dismiss-welcome-modal';
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateContentInputField = '.oppia-rte';
-const saveContentButton = '.e2e-test-save-state-content';
-const addInteractionButton = '.e2e-test-open-add-interaction-modal';
-const saveInteractionButton = '.e2e-test-save-interaction';
-const saveChangesButton = '.e2e-test-save-changes';
-const saveDraftButton = '.e2e-test-save-draft-button';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
@@ -51,7 +66,7 @@ const mobileNavbarDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
 const mobileOptionsButton = '.e2e-test-mobile-options';
-const mobileSaveChangesButton = '.e2e-test-save-changes-for-small-screens';
+const toastMessage = '.e2e-test-toast-message';
 
 // Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';
@@ -62,17 +77,82 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 export class ExplorationEditor extends BaseUser {
   /**
-   * Function to navigate to the creator dashboard page.
+   * Function to navigate to creator dashboard page
    */
-  async navigateToCreatorDashboard(): Promise<void> {
-    await this.page.goto(creatorDashboardUrl);
+  async navigateToCreatorDashboardPage(): Promise<void> {
+    await this.page.goto(creatorDashboardPage);
   }
 
   /**
-   * Function to click on the 'Create Exploration' button.
+   * Function to navigate to exploration editor
    */
-  async clickCreateExplorationButton(): Promise<void> {
+  async navigateToExplorationEditorPage(): Promise<void> {
     await this.clickOn(createExplorationButton);
+  }
+
+  /**
+   * Function to create an exploration with a title and interaction.
+   * This is a composite function that can be used when a straightforward, simple exploration setup is required.
+   *
+   * @param explorationTitle - title of the exploration
+   * @param Interaction - the interaction to be added to the exploration
+   */
+  async createExplorationWithTitleAndInteraction(
+    explorationTitle: string,
+    Interaction: string
+  ): Promise<void> {
+    this.updateCardContent(explorationTitle);
+    this.addInteraction(Interaction);
+    this.saveExplorationDraft();
+  }
+
+  /**
+   * Function to publish exploration
+   */
+  async publishExplorationWithTitle(
+    explorationTitle: string
+  ): Promise<string | null> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(toastMessage, {
+        visible: true,
+      });
+      await this.page.waitForSelector(toastMessage, {
+        hidden: true,
+      });
+      await this.clickOn(mobileChangesDropdown);
+      await this.clickOn(mobilePublishButton);
+    } else {
+      await this.page.waitForSelector(
+        `${publishExplorationButton}:not([disabled])`
+      );
+      await this.clickOn(publishExplorationButton);
+    }
+    await this.clickOn(explorationTitleInput);
+    await this.type(explorationTitleInput, `${explorationTitle}`);
+    await this.clickOn(explorationGoalInput);
+    await this.type(explorationGoalInput, `${explorationTitle}`);
+    await this.clickOn(explorationCategoryDropdown);
+    await this.clickOn('Algebra');
+    await this.clickOn(saveExplorationChangesButton);
+    await this.clickOn(explorationConfirmPublishButton);
+    await this.page.waitForSelector(explorationIdElement);
+    const explorationIdUrl = await this.page.$eval(
+      explorationIdElement,
+      element => (element as HTMLElement).innerText
+    );
+    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+
+    await this.clickOn(closeShareModalButton);
+    return explorationId;
+  }
+
+  /**
+   * Function to dismiss welcome modal
+   */
+  async dismissWelcomeModal(): Promise<void> {
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      visible: true,
+    });
     await this.clickOn(dismissWelcomeModalSelector);
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
@@ -130,7 +210,7 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
-      // The option to save changes in mobile width, appears only after clicking on the mobile options button,
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
       // which expands the mobile navigation bar.
       if (!element) {
         await this.clickOn(mobileOptionsButton);
@@ -140,6 +220,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(saveChangesButton);
     }
     await this.clickOn(saveDraftButton);
+    await this.page.waitForSelector(saveDraftButton, {hidden: true});
     await this.page.waitForNetworkIdle();
   }
 
@@ -151,12 +232,10 @@ export class ExplorationEditor extends BaseUser {
     let elements;
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileStateGraphResizeButton);
-      await this.page.waitForSelector(stateNodeSelector);
-      elements = await this.page.$$(stateNodeSelector);
-    } else {
-      await this.page.waitForSelector(stateNodeSelector);
-      elements = await this.page.$$(stateNodeSelector);
     }
+
+    await this.page.waitForSelector(stateNodeSelector);
+    elements = await this.page.$$(stateNodeSelector);
 
     const cardNames = await Promise.all(
       elements.map(element => element.$eval('tspan', node => node.textContent))
@@ -183,14 +262,14 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} answer - The response to be added.
    * @param {string} feedback - The feedback for the response.
    * @param {string} destination - The destination state for the response.
-   * @param {boolean} correctness - Whether the response is marked as correct.
+   * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
    */
-  async addResponsesToTheInteraction(
+  async addResponseToTheInteraction(
     interactionType: string,
     answer: string,
     feedback: string,
     destination: string,
-    correctness: boolean
+    responseIsCorrect: boolean
   ): Promise<void> {
     switch (interactionType) {
       case 'Number Input':
@@ -209,7 +288,7 @@ export class ExplorationEditor extends BaseUser {
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     await this.select(destinationCardSelector, '/');
     await this.type(addStateInput, destination);
-    if (correctness) {
+    if (responseIsCorrect) {
       await this.clickOn(correctAnswerInTheGroupSelector);
     }
     await this.clickOn(addNewResponseButton);
