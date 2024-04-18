@@ -170,8 +170,10 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.page.waitForFunction('document.readyState === "complete"');
-    await this.goto(topicAndSkillsDashboardUrl);
+    await Promise.all([
+      this.goto(topicAndSkillsDashboardUrl),
+      this.page.waitForNavigation(),
+    ]);
   }
 
   /**
@@ -203,14 +205,14 @@ export class CurriculumAdmin extends BaseUser {
 
   async createQuestionsForSkill(skillName: string, questionCount: number) {
     for (let i = 0; i < questionCount; i++) {
-      await this.addBasicAlgebraQuestion(skillName);
+      await this.addBasicAlgebraQuestionToSkill(skillName);
     }
   }
 
   /**
    * Function for creating a basic algebra question in the skill editor page.
    */
-  async addBasicAlgebraQuestion(skillName: string): Promise<void> {
+  async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
     await this.openSkillEditor(skillName);
     await this.clickOn(createQuestionButton);
     await this.clickOn(textStateEditSelector);
@@ -220,7 +222,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(saveContentButton);
 
     await this.clickOn(addInteractionButton);
-    await this.page.waitForSelector(modalDiv, {visible: true});
+    await this.page.waitForSelector(interactionNumberInputButton, {
+      visible: true,
+    });
     await this.clickOn(interactionNumberInputButton);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector('oppia-add-answer-group-modal-component', {
@@ -266,7 +270,10 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await this.goto(creatorDashboardUrl);
+    await Promise.all([
+      this.goto(creatorDashboardUrl),
+      this.page.waitForNavigation(),
+    ]);
   }
 
   /**
@@ -363,20 +370,22 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function that opens the topic editor page for the topic created.
+   * Function that opens the topic editor page for a topic.
    */
   async openTopicEditor(topicName: string): Promise<void> {
-    const topicSelector = this.isViewportAtMobileWidth()
+    const topicNameSelector = this.isViewportAtMobileWidth()
       ? mobileTopicSelector
       : desktopTopicSelector;
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.clickOn(topicsTab);
-    await this.page.waitForSelector(topicSelector, {visible: true});
+    await this.page.waitForSelector(topicNameSelector, {visible: true});
 
     await Promise.all([
       this.page.evaluate(
-        (topicSelector, topicName) => {
-          const topics = Array.from(document.querySelectorAll(topicSelector));
+        (topicNameSelector, topicName) => {
+          const topics = Array.from(
+            document.querySelectorAll(topicNameSelector)
+          );
           const element = topics.find(
             element => element?.textContent.trim() === topicName
           ) as HTMLElement;
@@ -386,7 +395,7 @@ export class CurriculumAdmin extends BaseUser {
             throw new Error('Cannot open topic editor page.');
           }
         },
-        topicSelector,
+        topicNameSelector,
         topicName
       ),
       this.page.waitForNavigation(),
@@ -394,7 +403,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function that opens the skill editor page for the topic created.
+   * Function that opens the skill editor page for a skill.
    */
   async openSkillEditor(skillName: string): Promise<void> {
     const skillSelector = this.isViewportAtMobileWidth()
