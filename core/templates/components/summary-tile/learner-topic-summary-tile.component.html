@@ -9,10 +9,10 @@
       </div>
       <div class="oppia-summary-section">
         <span class="oppia-topic-title e2e-test-learner-topic-summary-tile-title">
-          {{topicTitle}}
+          {{ topicTitle }}
         </span>
         <div class="oppia-topic-lessons">
-          {{totalPublishedNodeCount}}
+          {{ totalPublishedNodeCount }}
           <div *ngIf="totalPublishedNodeCount === 1" class="lesson-title">
             <span translate="I18N_TOPIC_VIEWER_LESSON"></span>
           </div>
@@ -23,27 +23,20 @@
       </div>
     </a>
   </mat-card>
-<<<<<<< HEAD
-  <!--REDESIGN-->
-  <a *ngIf="featureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card rounded-top text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-    <div class="oppia-class-card_img" [ngStyle]="{'background-color': thumbnailBgColor}">
-=======
   <a *ngIf="featureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-    <div class="oppia-class-card-img rounded-top" [ngStyle]="{'background-color': thumbnailBgColor}">
->>>>>>> 883fca0b03 (Included explorations & collections in beforeach for testing)
+    <div class="oppia-class-card-img" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img alt="" class="oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>
-    <div class="oppia-class-card_info">
-      <p class="mb-2 oppia-class-card_title e2e-test-learner-topic-summary-tile-title">
-        {{topicTitle}}
+    <div class="oppia-class-card-info">
+      <p class="mb-2 oppia-class-card-title e2e-test-learner-topic-summary-tile-title">
+        {{ topicTitle }}
       </p>
-      <p class="oppia-class-card_text">
-        {{totalPublishedNodeCount}}
-        {{(totalPublishedNodeCount === 1 ? 'I18N_TOPIC_VIEWER_LESSON' : 'I18N_TOPIC_VIEWER_LESSONS') | translate }}
+      <p class="oppia-class-card-text">
+        {{ totalPublishedNodeCount }}
+        {{ (totalPublishedNodeCount === 1 ? 'I18N_TOPIC_VIEWER_LESSON' : 'I18N_TOPIC_VIEWER_LESSONS') | translate }}
       </p>
     </div>
   </a>
-  <!------------>
 </ng-container>
 <style>
   .oppia-topic-dashboard-card .oppia-topic-link {
@@ -114,28 +107,27 @@
     margin-right: 16px;
   }
 
-  .oppia-class-card_button {
+  .oppia-class-card-button {
     border: 1px solid #00645c;
     font-size: 14px;
   }
 
-  .oppia-class-card_img {
+  .oppia-class-card-img {
     height: 120px;
   }
 
-  .oppia-class-card_info {
+  .oppia-class-card-info {
     color: #fff;
     height: 100px;
     padding: 8px 16px;
   }
 
-  .oppia-class-card_text {
+  .oppia-class-card-text {
     font-size: 12px;
   }
 
-  .oppia-class-card_title {
+  .oppia-class-card-title {
     font-size: 16px;
     font-weight: 700;
   }
-  /******************/
 </style>
