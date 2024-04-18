@@ -47,6 +47,7 @@
                           [addState]="addState.bind(this)"
                           [interactionIsShown]="interactionIsShown"
                           [explorationIsLinkedToStory]="explorationIsLinkedToStory"
+                          [stateContentShouldStayVisibleOnScroll]="false"
                           (onSaveStateContent)="saveStateContent($event)"
                           (onSaveNextContentIdIndex)="saveNextContentIdIndex()"
                           (onSaveInteractionData)="saveInteractionData($event)"

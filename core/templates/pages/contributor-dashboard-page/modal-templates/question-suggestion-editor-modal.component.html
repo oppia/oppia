@@ -33,7 +33,8 @@
                              [misconceptionsBySkill]="misconceptionsBySkill"
                              [questionStateData]="questionStateData"
                              [question]="question"
-                             [userCanEditQuestion]="canEditQuestion">
+                             [userCanEditQuestion]="canEditQuestion"
+                             [stateContentShouldStayVisibleOnScroll]="false">
       </oppia-question-editor>
     </div>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && getQuestionValidationErrorMessage()">
