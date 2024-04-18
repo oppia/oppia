@@ -16,3 +16,11 @@
     <page-footer></page-footer>
   </oppia-base-content>
 </oppia-angular-root>
+<script>
+  // Use the normal default browser eventlistener without passive
+  // set to false.
+  // TODO(#10749): Remove workaround for passive event listeners when
+  // jQuery supports it.
+  EventTarget.prototype.addEventListener = (
+    EventTarget.prototype.addEventListener._original);
+</script>
