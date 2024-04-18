@@ -280,16 +280,6 @@ export class BaseUser {
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
   }
-
-  getExplorationIdFromUrl = (url: string): string => {
-    const pathArray = url.split('/');
-    const explorationId =
-      pathArray.length > 0 ? pathArray[pathArray.length - 1] : '';
-    if (!explorationId) {
-      throw new Error('Failed to extract exploration ID from URL.');
-    }
-    return explorationId;
-  };
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

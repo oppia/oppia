@@ -101,7 +101,7 @@ const subtopicUrlFragmentField =
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
 const createSubtopicButton = '.e2e-test-confirm-subtopic-creation-button';
 const subtopicNameSelector = '.e2e-test-subtopic-name';
-const subtopicReassignHeader = '.subtopic-reassign-header';
+const subtopicReassignHeader = 'div.subtopic-reassign-header';
 const assignSubtopicButton = '.e2e-test-assign-subtopic';
 
 const skillsTab = 'a.e2e-test-skills-tab';
@@ -146,10 +146,15 @@ const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileSaveChangesDropdown = '.e2e-test-mobile-changes-dropdown';
 const mobilePublishButton = '.e2e-test-mobile-publish-button';
 
-const mobileTopicSelector = '.e2e-test-mobile-topic-name';
-const mobileSkillSelector = '.e2e-test-mobile-skills-tab';
+const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
+const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
+
+const mobileSaveTopicDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown';
 const mobileSaveTopicButton =
   'div.navbar-mobile-options .e2e-test-mobile-save-topic-button';
+const mobilePublishTopicButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button';
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
 const mobileSaveStoryChangesDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
@@ -165,6 +170,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
+    await this.page.waitForFunction('document.readyState === "complete"');
     await this.goto(topicAndSkillsDashboardUrl);
   }
 
@@ -266,7 +272,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Function for creating an exploration as a curriculum admin.
    */
-  async createExploration(
+  async createAndPublishExploration(
     title: string,
     initialContentText: string
   ): Promise<string> {
@@ -319,12 +325,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(explorationIdElement);
     const explorationIdUrl = await this.page.$eval(
       explorationIdElement,
-      element => element.textContent
+      element => (element as HTMLElement).innerText
     );
-    if (!explorationIdUrl) {
-      throw new Error('Failed to fetch newly created exploration URL.');
-    }
-    return this.getExplorationIdFromUrl(explorationIdUrl);
+    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+    return explorationId;
   }
 
   /**
@@ -349,14 +353,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createTopicButton);
 
-    // Creating a topic opens a new tab and brings this.page out of focus,
-    // so we close the newly opened tab.
-    const target = await this.browserObject.waitForTarget(
-      target => target.opener() === this.page.target()
-    );
-    const newTab = await target.page();
-    await newTab?.close();
-
+    await this.page.waitForFunction('document.readyState === "complete"');
     await this.openTopicEditor(name);
     await this.page.waitForSelector(topicMetaTagInput);
     await this.page.focus(topicMetaTagInput);
@@ -565,7 +562,7 @@ export class CurriculumAdmin extends BaseUser {
    * Function for adding a skill for diagnostic tests and then publishing the topic.
    * Adding a skill to diagnostic tests is necessary for publishing the topic.
    */
-  async addDiagnosticTestSkillAndPublishTopic(
+  async addSkillToDiagnostingTestsOfTopic(
     skillName: string,
     topicName: string
   ): Promise<void> {
@@ -605,20 +602,16 @@ export class CurriculumAdmin extends BaseUser {
       skillName,
       diagnosticTestSkillSelector
     );
-
     await this.saveTopicDraft(topicName);
+  }
 
+  async publishDraftTopic(topicName: string) {
+    await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
-      await this.clickOn(
-        'div.navbar-mobile-options .e2e-test-mobile-save-topic-dropdown'
-      );
-      await this.page.waitForSelector(
-        'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button'
-      );
-      await this.clickOn(
-        'div.navbar-mobile-options .e2e-test-mobile-publish-topic-button'
-      );
+      await this.clickOn(mobileSaveTopicDropdown);
+      await this.page.waitForSelector(mobilePublishTopicButton);
+      await this.clickOn(mobilePublishTopicButton);
     } else {
       await this.clickOn(publishTopicButton);
     }
@@ -716,12 +709,17 @@ export class CurriculumAdmin extends BaseUser {
    * This function checks if the topic has been published successfully,
    * by verifying the status and the counts in the topic and skills dashboard.
    */
-  async expectPublishedTopicToBePresent(): Promise<void> {
-    let topicStatusText: string;
+  async expectTopicToBePublishedInTopicAndSkillsDashboard(
+    topicName: string,
+    expectedPublishedStoryCount: number,
+    expectedSubtopicCount: number,
+    expectedSkillsCount: number
+  ): Promise<void> {
     let topicDetails: {
-      publishedStoryCount: string;
-      subtopicCount: string;
-      skillsCount: string;
+      publishedStoryCount: string | null;
+      subtopicCount: string | null;
+      skillsCount: string | null;
+      topicStatus: string | null;
     };
 
     const newPage = await this.browserObject.newPage();
@@ -750,48 +748,63 @@ export class CurriculumAdmin extends BaseUser {
       await newPage.waitForSelector('.e2e-test-mobile-topic-table', {
         visible: true,
       });
-      topicDetails = await newPage.$eval(
-        '.e2e-test-mobile-topic-table .topic-item-entities',
-        element => {
-          let tds = Array.from(element.querySelectorAll('.topic-item-value'));
-          if (!tds || tds.length < 3) {
-            throw new Error('Cannot fetch mobile topic details.');
-          }
-          return {
-            publishedStoryCount: tds[0].textContent || '0',
-            subtopicCount: tds[1].textContent || '0',
-            skillsCount: tds[2].textContent || '0',
-          };
+      topicDetails = await newPage.evaluate(topicName => {
+        let items = Array.from(document.querySelectorAll('div.topic-item'));
+        let expectedTopicItem = items.find(item => {
+          return (
+            item
+              .querySelector('div.e2e-test-mobile-topic-name a')
+              ?.textContent?.trim() === topicName
+          );
+        }) as HTMLElement;
+
+        let tds = Array.from(
+          expectedTopicItem.querySelectorAll('div.topic-item-value')
+        ) as HTMLElement[];
+        if (!tds || tds.length < 4) {
+          throw new Error('Cannot fetch mobile topic details.');
         }
-      );
+
+        return {
+          publishedStoryCount: tds[0].innerText,
+          subtopicCount: tds[1].innerText,
+          skillsCount: tds[2].innerText,
+          topicStatus: tds[3].innerText,
+        };
+      }, topicName);
     } else {
       await newPage.waitForSelector('.e2e-test-topics-table', {visible: true});
-      topicDetails = await newPage.$eval(
-        '.e2e-test-topics-table tr.list-item',
-        element => {
-          let tds = Array.from(element.querySelectorAll('td'));
-          if (!tds || tds.length < 5) {
-            throw new Error('Cannot fetch topic details.');
-          }
-          return {
-            publishedStoryCount:
-              tds[2].textContent?.trim().split(' ')[0] || '0',
-            subtopicCount: tds[3].textContent?.trim().split(' ')[0] || '0',
-            skillsCount: tds[4].textContent?.trim().split(' ')[0] || '0',
-          };
-        }
-      );
-    }
-    await newPage.waitForSelector('span.topic-list-status-text');
-    topicStatusText = await newPage.$eval(
-      'span.topic-list-status-text',
-      element => (element as HTMLElement).innerText.trim()
-    );
+      topicDetails = await newPage.evaluate(topicName => {
+        let items = Array.from(document.querySelectorAll('.list-item'));
+        let expectedTopicItem = items.find(item => {
+          return (
+            item.querySelector('.e2e-test-topic-name')?.textContent?.trim() ===
+            topicName
+          );
+        }) as HTMLElement;
 
-    expect(topicStatusText).toEqual('Published');
-    expect(topicDetails.subtopicCount).toEqual('1');
-    expect(topicDetails.publishedStoryCount).toEqual('1');
-    expect(topicDetails.skillsCount).toEqual('1');
+        let tds = Array.from(expectedTopicItem.querySelectorAll('td'));
+        if (!tds || tds.length < 5) {
+          throw new Error('Cannot fetch topic details.');
+        }
+
+        return {
+          publishedStoryCount: tds[2].innerText,
+          subtopicCount: tds[3].innerText,
+          skillsCount: tds[4].innerText,
+          topicStatus: tds[5].innerText,
+        };
+      }, topicName);
+    }
+
+    expect(topicDetails.topicStatus).toEqual('Published');
+    expect(topicDetails.publishedStoryCount).toEqual(
+      expectedPublishedStoryCount.toString()
+    );
+    expect(topicDetails.subtopicCount).toEqual(
+      expectedSubtopicCount.toString()
+    );
+    expect(topicDetails.skillsCount).toEqual(expectedSkillsCount.toString());
     showMessage('Topic has been published successfully!');
   }
 }

@@ -38,7 +38,7 @@ describe('Curriculum Admin', function () {
   it(
     'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
-      explorationId = await curriculumAdmin.createExploration(
+      explorationId = await curriculumAdmin.createAndPublishExploration(
         'Test Exploration Title 1',
         'Test Exploration'
       );
@@ -49,6 +49,7 @@ describe('Curriculum Admin', function () {
         'test-subtopic-one',
         'Test Topic 1'
       );
+
       await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
       await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
       await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
@@ -56,19 +57,24 @@ describe('Curriculum Admin', function () {
         'Test Subtopic 1',
         'Test Topic 1'
       );
-
-      await curriculumAdmin.addDiagnosticTestSkillAndPublishTopic(
+      await curriculumAdmin.addSkillToDiagnostingTestsOfTopic(
         'Test Skill 1',
         'Test Topic 1'
       );
+
+      await curriculumAdmin.publishDraftTopic('Test Topic 1');
       await curriculumAdmin.createAndPublishStoryWithChapter(
         'Test Story 1',
         'test-story-one',
         explorationId,
         'Test Topic 1'
       );
-
-      await curriculumAdmin.expectPublishedTopicToBePresent();
+      await curriculumAdmin.expectTopicToBePublishedInTopicAndSkillsDashboard(
+        'Test Topic 1',
+        1,
+        1,
+        1
+      );
     },
     DEFAULT_SPEC_TIMEOUT
   );
