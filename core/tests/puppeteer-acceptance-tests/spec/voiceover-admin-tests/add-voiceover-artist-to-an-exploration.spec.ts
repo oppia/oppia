@@ -42,7 +42,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 
 describe('Voiceover Admin', function () {
   let voiceoverAdmin: VoiceoverAdmin;
-  let ExplorationCreator: ExplorationCreator;
+  let explorationCreator: ExplorationCreator;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -52,8 +52,8 @@ describe('Voiceover Admin', function () {
       [ROLES.VOICEOVER_ADMIN]
     );
 
-    ExplorationCreator = await UserFactory.createNewUser(
-      'explorationEditor',
+    explorationCreator = await UserFactory.createNewUser(
+      'explorationCreator',
       'exploration_creator@example.com'
     );
   }, DEFAULT_SPEC_TIMEOUT);
@@ -61,19 +61,23 @@ describe('Voiceover Admin', function () {
   it(
     'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
     async function () {
-      await ExplorationCreator.openCreatorDashboardPage();
-      await ExplorationCreator.createNewExploration();
-      await ExplorationCreator.switchToEditorTab();
-      await ExplorationCreator.updateExplorationIntroText('Exploration one');
-      await ExplorationCreator.updateCardName('Test');
-      await ExplorationCreator.addEndInteraction();
-      await ExplorationCreator.goToSettingsTab();
-      await ExplorationCreator.updateTitleTo('Exploration one');
-      await ExplorationCreator.updateGoalTo('Exploration one');
-      await ExplorationCreator.selectCategory('Algebra');
-      await ExplorationCreator.selectLanguage('Arabic');
-      await ExplorationCreator.addTags(['TagA', 'TagB', 'TagC']);
-      explorationId = await ExplorationCreator.publishExploration();
+      await explorationCreator.openCreatorDashboardPage();
+
+      await explorationCreator.createNewExploration();
+      await explorationCreator.switchToEditorTab();
+      await explorationCreator.updateExplorationIntroText('Exploration one');
+      await explorationCreator.updateCardName('Test');
+      await explorationCreator.addEndInteraction();
+
+      await explorationCreator.goToSettingsTab();
+
+      await explorationCreator.updateTitleTo('Exploration one');
+      await explorationCreator.updateGoalTo('Exploration one');
+      await explorationCreator.selectCategory('Algebra');
+      await explorationCreator.selectLanguage('Arabic');
+      await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
+
+      explorationId = await explorationCreator.publishExploration();
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.dismissWelcomeModal();
@@ -101,18 +105,22 @@ describe('Voiceover Admin', function () {
         'voiceoverartist',
         'voiceoverartist@example.com'
       );
-      await ExplorationCreator.openCreatorDashboardPage();
-      await ExplorationCreator.createNewExploration();
-      await ExplorationCreator.updateExplorationIntroText('Exploration two');
-      await ExplorationCreator.updateCardName('Test');
-      await ExplorationCreator.addEndInteraction();
-      await ExplorationCreator.goToSettingsTab();
-      await ExplorationCreator.updateTitleTo('Exploration two');
-      await ExplorationCreator.updateGoalTo('Exploration two');
-      await ExplorationCreator.selectCategory('Algebra');
-      await ExplorationCreator.selectLanguage('Arabic');
-      await ExplorationCreator.addTags(['TagA', 'TagB', 'TagC']);
-      explorationId = await ExplorationCreator.publishExploration();
+      await explorationCreator.openCreatorDashboardPage();
+
+      await explorationCreator.createNewExploration();
+      await explorationCreator.updateExplorationIntroText('Exploration two');
+      await explorationCreator.updateCardName('Test');
+      await explorationCreator.addEndInteraction();
+
+      await explorationCreator.goToSettingsTab();
+
+      await explorationCreator.updateTitleTo('Exploration two');
+      await explorationCreator.updateGoalTo('Exploration two');
+      await explorationCreator.selectCategory('Algebra');
+      await explorationCreator.selectLanguage('Arabic');
+      await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
+
+      explorationId = await explorationCreator.publishExploration();
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.navigateToExplorationSettingsTab();

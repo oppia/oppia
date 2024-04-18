@@ -108,9 +108,15 @@ describe('Exploration Creator', function () {
       await explorationCreator.goToSettingsTab();
 
       await explorationCreator.updateTitleTo(
-        'We are testing the title' + 'truncation feature'
+        'This title is too long and will be truncated'
       );
-      await explorationCreator.expectTruncatedTitleWhenMaxLengthExceeded(36);
+      /**
+       * Here expecting title to be truncated to 36 characters. It is the default
+       * behavior of title input bar.
+       */
+      await explorationCreator.expectTitleToBe(
+        'This title is too long and will be t'
+      );
 
       await explorationCreator.updateGoalTo('OppiaAcceptanceTestsCheck');
       await explorationCreator.expectGoalToBe('OppiaAcceptanceTestsCheck');
@@ -141,11 +147,11 @@ describe('Exploration Creator', function () {
 
       await explorationCreator.optInToEmailNotifications();
 
-      await explorationVisitor.expectExplorationToBeAccessibleWithTheUrl('Yes');
+      await explorationVisitor.expectExplorationToBeAccessibleByUrl();
       await explorationVisitor.switchToEditorTab();
       await explorationVisitor.goToSettingsTab();
       await explorationVisitor.deleteExploration();
-      await explorationVisitor.expectExplorationToBeAccessibleWithTheUrl('No');
+      await explorationVisitor.expectExplorationToBeNotAccessibleByUrl();
     },
     DEFAULT_SPEC_TIMEOUT
   );

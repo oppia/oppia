@@ -69,7 +69,7 @@ describe('Exploration Creator', function () {
       await explorationCreator.saveDraftExploration();
       await explorationCreator.expectTitleToBe('New Title');
 
-      await explorationVisitor.expectExplorationToBeAccessibleWithTheUrl('Yes');
+      await explorationVisitor.expectExplorationToBeAccessibleByUrl();
     },
     DEFAULT_SPEC_TIMEOUT
   );

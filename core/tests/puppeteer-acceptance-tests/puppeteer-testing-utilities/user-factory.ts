@@ -147,12 +147,10 @@ export class UserFactory {
   ): Promise<
     LoggedInUser & ExplorationCreator & MultipleRoleIntersection<TRoles>
   > {
-    let user = UserFactory.composeUserWithRoles(
-      UserFactory.composeUserWithRoles(BaseUserFactory(), [
-        LoggedInUserFactory(),
-      ]),
-      [ExplorationCreatorFactory()]
-    );
+    let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
+      LoggedInUserFactory(),
+      ExplorationCreatorFactory(),
+    ]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);

@@ -21,6 +21,7 @@ import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 
+const baseURL = testConstants.URLs.BaseURL;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 
 const createNewExplorationButton = '.e2e-test-create-new-exploration-button';
@@ -38,8 +39,8 @@ const saveInteractionButton = 'button.e2e-test-save-interaction';
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const addGoalButton = '.e2e-test-exploration-objective-input';
-const categoryDropDown = 'mat-select.e2e-test-exploration-category-dropdown';
-const languageUpdateDropDown =
+const categoryDropdown = 'mat-select.e2e-test-exploration-category-dropdown';
+const languageUpdateDropdown =
   'mat-select.e2e-test-exploration-language-select';
 const addTagsInputBox = 'input.e2e-test-chip-list-tags';
 const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
@@ -47,9 +48,9 @@ const dismissPreviewButton = 'button.e2e-test-close-preview-summary-modal';
 const textToSpeechToggle = 'label.e2e-test-on-off-switch';
 const feedbackToggle = 'label.e2e-test-enable-fallbacks';
 
-const editRolebutton = '.e2e-test-edit-roles';
-const addUserNameInputBox = '#newMemberUsername';
-const addRoleDropDown = 'mat-select.e2e-test-role-select';
+const editRoleButton = '.e2e-test-edit-roles';
+const addUsernameInputBox = '#newMemberUsername';
+const addRoleDropdown = 'mat-select.e2e-test-role-select';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
@@ -57,7 +58,7 @@ const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
 const desktopSaveDraftButton = 'button.e2e-test-save-changes';
 const saveDraftConfirmButton = '.e2e-test-save-draft-button';
 const desktopPublishButton = 'button.e2e-test-publish-exploration';
-const discardDraftDropDown = 'button.e2e-test-save-discard-toggle';
+const discardDraftDropdown = 'button.e2e-test-save-discard-toggle';
 const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
 const discardConfirmButton = 'button.e2e-test-confirm-discard-changes';
 const deleteConfirmButton = 'button.e2e-test-really-delete-exploration-button';
@@ -66,29 +67,31 @@ const voiceArtistSaveButton = 'button.e2e-test-add-voice-artist-role-button';
 const confirmPublishButton = 'button.e2e-test-confirm-publish';
 const commitMessage = 'textarea.e2e-test-commit-message-input';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
-const voiceArtistUserNameInputBox = 'input#newVoicAartistUsername';
+const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
 
 /**
  * For mobile.
  */
 const navBarOpenerIcon = 'i.e2e-test-mobile-options';
-const optionsDropDown = 'div.e2e-test-mobile-options-dropdown';
+const optionsDropdown = 'div.e2e-test-mobile-options-dropdown';
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
-const basicSettingsDropDown = 'h3.e2e-test-settings-container';
+const basicSettingsDropdown = 'h3.e2e-test-settings-container';
 const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
-const permissionSettingsDropDown = 'h3.e2e-test-permission-settings-container';
-const voiceArtistSettingsDropDown =
+const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
+const voiceArtistSettingsDropdown =
   'h3.e2e-test-voice-artists-settings-container';
-const rolesSettingsDropDown = 'h3.e2e-test-roles-settings-container';
-const advanceSettingsDropDown = 'h3.e2e-test-advanced-settings-container';
-const explorationControlsSettingsDropDown =
+const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
+const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 const mobileSaveDraftButton = 'button.e2e-test-save-changes-for-small-screens';
 const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
-const publishButtonDropDown = 'div.e2e-test-mobile-changes-dropdown';
+const publishButtonDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
 
 let explorationUrlAfterPublished = '';
+let explorationId = '';
+
 export class ExplorationCreator extends BaseUser {
   async openCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardUrl);
@@ -96,14 +99,14 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function clicks on new exploration button.
+   * Clicks on new exploration button.
    */
   async createNewExploration(): Promise<void> {
     await this.clickOn(createNewExplorationButton);
   }
 
   /**
-   * This function closes the tutorial popup before a new exploration.
+   * Closes the tutorial popup before a new exploration.
    */
   async switchToEditorTab(): Promise<void> {
     await this.clickOn(tutorialTakeMeToEditorButton);
@@ -111,8 +114,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function clears previous card name and
-   * add a new card name.
+   * Clears previous card name and adds a new card name.
    */
   async updateCardName(cardName: string): Promise<void> {
     await this.clickOn(editCardNameButton);
@@ -125,8 +127,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function clears previous intro text and
-   * add a new intro text.
+   * Clears previous intro text and adds a new intro text.
    */
   async updateExplorationIntroText(introtext: string): Promise<void> {
     await this.clickOn(explorationIntroBoxOpenerSection);
@@ -147,27 +148,26 @@ export class ExplorationCreator extends BaseUser {
     showMessage('End interaction has been added successfully.');
   }
   /**
-   * This function open settings tab.
-   * Note->It also opens all the dropdowns present
-   * in the setting tab for mobile view port.
+   * Open settings tab.(Note->It also opens all the dropdowns present
+   * in the setting tab for mobile view port.)
    */
   async goToSettingsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(navBarOpenerIcon, {visible: true});
       await this.clickOn(navBarOpenerIcon);
-      await this.clickOn(optionsDropDown);
+      await this.clickOn(optionsDropdown);
       await this.clickOn(mobileSettingsBar);
       /**
        * Open all dropdowns because by default
-       * all dropdowns are closed.
+       * all dropdowns are closed in mobile view.
        */
-      await this.clickOn(basicSettingsDropDown);
-      await this.clickOn(advanceSettingsDropDown);
-      await this.clickOn(rolesSettingsDropDown);
-      await this.clickOn(voiceArtistSettingsDropDown);
-      await this.clickOn(permissionSettingsDropDown);
+      await this.clickOn(basicSettingsDropdown);
+      await this.clickOn(advanceSettingsDropdown);
+      await this.clickOn(rolesSettingsDropdown);
+      await this.clickOn(voiceArtistSettingsDropdown);
+      await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
-      await this.clickOn(explorationControlsSettingsDropDown);
+      await this.clickOn(explorationControlsSettingsDropdown);
     } else {
       await this.clickOn(settingsTab);
     }
@@ -175,8 +175,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function deletes the previous written
-   * title and updates the new title.
+   * Deletes the previous written title and updates the new title.
    */
   async updateTitleTo(title: string): Promise<void> {
     await this.waitForElementToBeClickable(addTitleBar);
@@ -188,26 +187,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function checks length of title bar at basic settings tab.
-   */
-  async expectTruncatedTitleWhenMaxLengthExceeded(
-    maxLength: number
-  ): Promise<void> {
-    const titleInput = await this.page.$(addTitleBar);
-    const title = await this.page.evaluate(input => input.value, titleInput);
-    const titleLength = title.length;
-
-    if (titleLength === maxLength) {
-      showMessage(`Title is properly truncated to ${maxLength} characters.`);
-    } else {
-      throw new Error(`Title is not properly truncated.
-          Expected length: ${maxLength}, Actual length: ${title.length}`);
-    }
-  }
-
-  /**
-   * This function clears previous goal and
-   * adds a new goal in the exploration.
+   * Clears previous goal and adds a new goal in the exploration.
    */
   async updateGoalTo(goal: string): Promise<void> {
     await this.clickOn(addGoalButton);
@@ -219,7 +199,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function matches the goal with expected goal.
+   * Matches the goal with expected goal.
    */
   async expectGoalToBe(expectedGoal: string): Promise<void> {
     try {
@@ -242,17 +222,15 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function selects a category from dropdown.
-   * For Eg. Algebra, Biology, Chemistry etc.
+   * Selects a category from dropdown. For Eg. Algebra, Biology, Chemistry etc.
    */
   async selectCategory(category: string): Promise<void> {
-    await this.clickOn(categoryDropDown);
+    await this.clickOn(categoryDropdown);
     await this.clickOn(category);
   }
 
   /**
-   * The function is checking if the category
-   * matches the expected category.
+   * Checks if the category matches the expected category.
    */
   async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
     await this.page.waitForSelector('.mat-select-value');
@@ -272,27 +250,26 @@ export class ExplorationCreator extends BaseUser {
 
   async selectLanguage(language: string): Promise<void> {
     /**
-     * Language dropdown was visible, but when we click on that then options
-     * appear at wrong place which requires to click more than one time also it
-     * added some type of flake.So, to avoid that we are scrolling the page.
-     * We can use 300 - 500px to move the language dropdown to the upper
-     * part of the page.
+     * The language dropdown was visible, but it was mostly hidden
+     * towards the bottom of the screen. When we clicked on the dropdown,
+     * the options did not fully appear, leading to incorrect selections.
+     * To prevent this, we are now scrolling the page.We can use 300 - 500px
+     * to move the language dropdown to the upper part of the page.
      */
     await this.page.evaluate(() => {
       window.scrollTo(0, 350);
     });
 
-    await this.clickOn(languageUpdateDropDown);
+    await this.clickOn(languageUpdateDropdown);
     await this.clickOn(language);
   }
 
   /**
-   *  This function verifies that the selected language matches the
-   *  expected language.
+   *  Verifies that the selected language matches the expected language.
    */
   async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
-    await this.page.waitForSelector(languageUpdateDropDown);
-    const languageDropdown = await this.page.$(languageUpdateDropDown);
+    await this.page.waitForSelector(languageUpdateDropdown);
+    const languageDropdown = await this.page.$(languageUpdateDropdown);
     if (!languageDropdown) {
       throw new Error('Category dropdown not found.');
     }
@@ -328,12 +305,12 @@ export class ExplorationCreator extends BaseUser {
 
   async expectTagsToMatch(expectedTags: string[]): Promise<void> {
     /**
-     * Converting tags to lowercase because while accessing added tags with
-     * `document.querySelectorAll('mat-chip')` we get tags converted in lowercase.
+     * When adding a tag in the exploration settings UI, it gets
+     * auto-converted to lowercase by the input field.
      */
     const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
     await this.page.waitForSelector('mat-chip-list');
-    const addedTags = await this.page.evaluate(() => {
+    const observedTags = await this.page.evaluate(() => {
       const tagElements = Array.from(document.querySelectorAll('mat-chip'));
       return tagElements
         .map(tag => {
@@ -345,7 +322,7 @@ export class ExplorationCreator extends BaseUser {
     });
 
     for (const expectedTag of lowercaseExpectedTags) {
-      if (!addedTags.includes(expectedTag)) {
+      if (!observedTags.includes(expectedTag)) {
         throw new Error(`Tag "${expectedTag}" was not added.`);
       }
     }
@@ -354,7 +331,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function allows you to preview the summary of exploration.
+   * Allows you to preview the summary of exploration.
    */
   async previewSummary(): Promise<void> {
     await this.clickOn(previewSummaryButton);
@@ -363,7 +340,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function verifies that the preview summary is visible.
+   * Verifies that the preview summary is visible.
    */
   async expectPreviewSummaryToBeVisible(): Promise<void> {
     await this.page.waitForSelector(dismissPreviewButton);
@@ -377,26 +354,24 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function enables Automatic Text-to-Speech
-   * switch present in settings tab.
+   * Enables Automatic Text-to-Speech switch present in settings tab.
    */
   async enableAutomaticTextToSpeech(): Promise<void> {
     await this.clickOn(textToSpeechToggle);
-    await this.expectAutomaticTextToSpeechToBeEnable();
+    await this.expectAutomaticTextToSpeechToBeEnabled();
   }
 
   /**
-   * This function checks whether the Automatic Text-to-Speech
-   * setting is enabled or disabled.
+   * Checks whether the Automatic Text-to-Speech setting is enabled or disabled.
    */
-  async expectAutomaticTextToSpeechToBeEnable(): Promise<void> {
+  async expectAutomaticTextToSpeechToBeEnabled(): Promise<void> {
     await this.page.waitForSelector('#text-speech-switch');
-    const autoTTSswitch = await this.page.$('#text-speech-switch');
-    const isAutoTTSwitchOn = await this.page.evaluate(
+    const autoTtsSwitch = await this.page.$('#text-speech-switch');
+    const autoTtsSwitchIsOn = await this.page.evaluate(
       switchElement => switchElement.checked,
-      autoTTSswitch
+      autoTtsSwitch
     );
-    if (isAutoTTSwitchOn) {
+    if (autoTtsSwitchIsOn) {
       showMessage('Automatic Text-to-Speech is enabled.');
     } else {
       throw error('Automatic Text-to-Speech is disabled.');
@@ -404,43 +379,42 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function assigns a role of collaborator to any guest user.
+   * Assigns a role of collaborator to any guest user.
    */
   async assignUserToCollaboratorRole(username: string): Promise<void> {
-    await this.clickOn(editRolebutton);
-    await this.clickOn(addUserNameInputBox);
-    await this.type(addUserNameInputBox, username);
-    await this.clickOn(addRoleDropDown);
+    await this.clickOn(editRoleButton);
+    await this.clickOn(addUsernameInputBox);
+    await this.type(addUsernameInputBox, username);
+    await this.clickOn(addRoleDropdown);
     await this.clickOn(collaboratorRoleOption);
     await this.clickOn(saveRoleButton);
     showMessage(`${username} has been added as collaboratorRoleOption.`);
   }
 
   /**
-   * This function assigns a role of Playtester to any guest user.
+   * Assigns a role of Playtester to any guest user.
    */
   async assignUserToPlaytesterRole(username: string): Promise<void> {
-    await this.clickOn(editRolebutton);
+    await this.clickOn(editRoleButton);
     await this.page.waitForSelector('.e2e-test-editor-role-names', {
       visible: true,
     });
-    await this.clickOn(addUserNameInputBox);
-    await this.type(addUserNameInputBox, username);
-    await this.clickOn(addRoleDropDown);
+    await this.clickOn(addUsernameInputBox);
+    await this.type(addUsernameInputBox, username);
+    await this.clickOn(addRoleDropdown);
     await this.clickOn(playtesterRoleOption);
     await this.clickOn(saveRoleButton);
     showMessage(`${username} has been added as playtester.`);
   }
 
   /**
-   * Exception function to verify the setting
-   * of the exploration to Public/Private.
+   * Verifies the presence of the publish button.
    */
-  async expectExplorationToBePublish(): Promise<void> {
+  async expectExplorationToBePublished(): Promise<void> {
     let publishButtonSelector = '.e2e-test-publish-exploration';
     if (this.isViewportAtMobileWidth()) {
       publishButtonSelector = mobilePublishButton;
-      await this.clickOn(publishButtonDropDown);
+      await this.clickOn(publishButtonDropdown);
     }
     const publishButton = await this.page.$(publishButtonSelector);
     if (!publishButton) {
@@ -455,18 +429,18 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function add voice artists in the exploration.
+   * Add voice artists in the exploration.
    */
   async addVoiceArtists(voiceArtists: string[]): Promise<void> {
     for (let i = 0; i < voiceArtists.length; i++) {
       await this.clickOn(voiceArtistEditButton);
-      await this.clickOn(voiceArtistUserNameInputBox);
-      await this.page.waitForSelector(voiceArtistUserNameInputBox, {
+      await this.clickOn(voiceArtistUsernameInputBox);
+      await this.page.waitForSelector(voiceArtistUsernameInputBox, {
         visible: true,
       });
-      await this.page.click(voiceArtistUserNameInputBox, {clickCount: 3});
+      await this.page.click(voiceArtistUsernameInputBox, {clickCount: 3});
       await this.page.keyboard.press('Backspace');
-      await this.type(voiceArtistUserNameInputBox, voiceArtists[i]);
+      await this.type(voiceArtistUsernameInputBox, voiceArtists[i]);
       await this.clickOn(voiceArtistSaveButton);
       await this.page.waitForSelector(
         `div.e2e-test-voice-artist-${voiceArtists[i]}`,
@@ -478,8 +452,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function helps to choose notification type by enabling/disabling
-   * the feedback toggle.
+   * Choose notification type by enabling/disabling the feedback toggle.
    */
   async optInToEmailNotifications(): Promise<void> {
     await this.clickOn(feedbackToggle);
@@ -509,7 +482,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function deletes the exploration permanently.
+   * Deletes the exploration permanently.
    * Note: This action requires Curriculum Admin role.
    */
   async deleteExploration(): Promise<void> {
@@ -518,7 +491,7 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * This function save the changes of the exploration.
+   * Save the changes of the exploration.
    */
   async saveDraftExploration(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -543,7 +516,7 @@ export class ExplorationCreator extends BaseUser {
       await this.page.waitForSelector('.e2e-test-toast-message', {
         hidden: true,
       });
-      await this.clickOn(publishButtonDropDown);
+      await this.clickOn(publishButtonDropdown);
       await this.clickOn(mobilePublishButton);
     } else {
       await this.clickOn(desktopPublishButton);
@@ -552,48 +525,51 @@ export class ExplorationCreator extends BaseUser {
     await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
 
     explorationUrlAfterPublished = await this.page.url();
-    const explorationId = explorationUrlAfterPublished
+    explorationId = explorationUrlAfterPublished
       .replace(/^.*\/create\//, '')
       .replace(/#\/.*/, '');
 
     await this.clickOn(closePublishedPopUpButton);
-    await this.expectExplorationToBePublish();
+    await this.expectExplorationToBePublished();
 
     return explorationId;
   }
 
-  async expectExplorationToBeAccessibleWithTheUrl(
-    expression: string
-  ): Promise<void> {
-    if (expression === 'Yes') {
-      try {
-        await this.page.goto(explorationUrlAfterPublished);
-        showMessage('Exploration is accessible with the URL i.e Published');
-      } catch (error) {
-        throw new Error('The exploration is not public.');
-      }
-    } else {
-      try {
-        await this.page.goto(explorationUrlAfterPublished);
-        throw new Error('The exploration is still public.');
-      } catch (error) {
-        showMessage(
-          'The exploration is not accessible with the URL i.e Deleted'
-        );
-      }
+  async expectExplorationToBeAccessibleByUrl(): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
+    }
+  }
+
+  async expectExplorationToBeNotAccessibleByUrl(): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('The exploration is still public.');
+    } catch (error) {
+      showMessage('The exploration is not accessible with the URL.');
     }
   }
 
   /**
-   * This function discards the current changes.
+   * Discards the current changes.
    */
   async discardCurrentChanges(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(publishButtonDropDown);
+      await this.clickOn(publishButtonDropdown);
       await this.clickOn(mobileDiscardButton);
     } else {
-      await this.page.keyboard.press('Tab');
-      await this.clickOn(discardDraftDropDown);
+      await this.clickOn(discardDraftDropdown);
       await this.page.waitForSelector(desktopDiscardDraftButton, {
         visible: true,
       });
@@ -608,12 +584,12 @@ export class ExplorationCreator extends BaseUser {
     ]);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(navBarOpenerIcon);
-      await this.clickOn(basicSettingsDropDown);
+      await this.clickOn(basicSettingsDropdown);
     }
   }
 
   /**
-   * This function matches the expected title with current title.
+   * Matches the expected title with current title.
    */
   async expectTitleToBe(expectedTitle: string): Promise<void> {
     await this.page.waitForSelector('.e2e-test-exploration-title-input');
