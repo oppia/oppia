@@ -170,10 +170,8 @@ export class CurriculumAdmin extends BaseUser {
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await Promise.all([
-      this.goto(topicAndSkillsDashboardUrl),
-      this.page.waitForNavigation(),
-    ]);
+    await this.page.waitForNetworkIdle();
+    await this.goto(topicAndSkillsDashboardUrl);
   }
 
   /**
@@ -203,6 +201,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.bringToFront();
   }
 
+  /**
+   * Function to add any number of questions to a particular skill.
+   */
   async createQuestionsForSkill(
     skillName: string,
     questionCount: number
@@ -269,14 +270,11 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for navigating to the contributor dashboard page.
+   * Function for navigating to the creator dashboard page.
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.page.bringToFront();
-    await Promise.all([
-      this.goto(creatorDashboardUrl),
-      this.page.waitForNavigation(),
-    ]);
+    await this.goto(creatorDashboardUrl);
   }
 
   /**
@@ -363,7 +361,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOn(createTopicButton);
 
-    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.page.waitForSelector('.e2e-test-topics-table');
     await this.openTopicEditor(name);
     await this.page.waitForSelector(topicMetaTagInput);
     await this.page.focus(topicMetaTagInput);
@@ -386,14 +384,14 @@ export class CurriculumAdmin extends BaseUser {
     await Promise.all([
       this.page.evaluate(
         (topicNameSelector, topicName) => {
-          const topics = Array.from(
+          const topicDivs = Array.from(
             document.querySelectorAll(topicNameSelector)
           );
-          const element = topics.find(
+          const topicDivToSelect = topicDivs.find(
             element => element?.textContent.trim() === topicName
           ) as HTMLElement;
-          if (element) {
-            element.click();
+          if (topicDivToSelect) {
+            topicDivToSelect.click();
           } else {
             throw new Error('Cannot open topic editor page.');
           }
@@ -420,12 +418,14 @@ export class CurriculumAdmin extends BaseUser {
     await Promise.all([
       this.page.evaluate(
         (skillSelector, skillName) => {
-          const skills = Array.from(document.querySelectorAll(skillSelector));
-          const element = skills.find(
+          const skillDivs = Array.from(
+            document.querySelectorAll(skillSelector)
+          );
+          const skillDivToSelect = skillDivs.find(
             element => element?.textContent.trim() === skillName
           ) as HTMLElement;
-          if (element) {
-            element.click();
+          if (skillDivToSelect) {
+            skillDivToSelect.click();
           } else {
             throw new Error('Cannot open skill editor page.');
           }
