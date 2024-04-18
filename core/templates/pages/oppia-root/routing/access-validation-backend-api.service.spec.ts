@@ -26,7 +26,7 @@ import {
   flushMicrotasks,
   waitForAsync,
 } from '@angular/core/testing';
-import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AccessValidationBackendApiService} from './access-validation-backend-api.service';
 
 describe('Access validation backend api service', () => {
