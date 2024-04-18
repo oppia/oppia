@@ -203,7 +203,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.bringToFront();
   }
 
-  async createQuestionsForSkill(skillName: string, questionCount: number) {
+  async createQuestionsForSkill(
+    skillName: string,
+    questionCount: number
+  ): Promise<void> {
     for (let i = 0; i < questionCount; i++) {
       await this.addBasicAlgebraQuestionToSkill(skillName);
     }
@@ -614,7 +617,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.saveTopicDraft(topicName);
   }
 
-  async publishDraftTopic(topicName: string) {
+  async publishDraftTopic(topicName: string): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
