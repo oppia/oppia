@@ -303,7 +303,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
 
         entity_voiceover_models_result = (
             entity_voiceover_models
-            | 'Get the exploration IDs for generated models' >> beam.Map(
+            | 'Get result data from migrated models' >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
                     'Migrated %s voiceovers for exploration: %s, in language '
                     'accent code %s.' % (
