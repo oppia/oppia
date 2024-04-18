@@ -156,6 +156,14 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             voice_artist_link.content_id_to_voiceovers_mapping)
 
         for voice_artist_metadata_model in voice_artist_metadata_models_list:
+            for language_code, accent_code in (
+                    voice_artist_metadata_model.language_code_to_accent.items()
+            ):
+                if accent_code == '' or accent_code == None:
+                    raise Exception(
+                        'Please assign all the accents for voice artists in '
+                        'language code %s.' % language_code)
+
             voice_artist_id_to_language_code_mapping[
                 voice_artist_metadata_model.id] = (
                     voice_artist_metadata_model.language_code_to_accent)

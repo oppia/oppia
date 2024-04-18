@@ -475,6 +475,23 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             voice_artist_id=self.editor_id_2,
             language_code_to_accent=language_code_to_accent_2)
 
+    def _create_voice_artist_metadata_with_empty_accent_code(self) -> None:
+        """The method creates two instances of the voice artist metadata model,
+        and one model contains an empty accent code.
+        """
+        language_code_to_accent_1 = {
+            'en': 'en-US'
+        }
+        language_code_to_accent_2 = {
+            'hi': ''
+        }
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=self.editor_id_1,
+            language_code_to_accent=language_code_to_accent_1)
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=self.editor_id_2,
+            language_code_to_accent=language_code_to_accent_2)
+
 
 class CreateExplorationVoiceArtistLinkModelsJobTests(
     VoiceArtistMetadataModelsTestsBaseClass):
@@ -556,6 +573,18 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
                 expected_entity_voiceover_id_to_model[model.id],
                 model.voiceovers
             )
+
+    def test_should_raise_exception_for_empty_accent_code(self) -> None:
+        self._create_curated_explorations()
+        self._create_exp_voice_artists_link()
+        self._create_voice_artist_metadata_with_empty_accent_code()
+
+        error_message = (
+            'Please assign all the accents for voice artists in '
+            'language code hi.')
+
+        with self.assertRaisesRegex(Exception, error_message):
+            self.assert_job_output_is([])
 
 
 class AuditExplorationVoiceArtistLinkModelsJobTests(
