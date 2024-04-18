@@ -97,11 +97,11 @@ export class ExplorationEditor extends BaseUser {
    * @param explorationTitle - title of the exploration
    * @param Interaction - the interaction to be added to the exploration
    */
-  async createExplorationWithTitleAndInteraction(
-    explorationTitle: string,
+  async createExplorationWithContentAndInteraction(
+    content: string,
     interaction: string
   ): Promise<void> {
-    await this.updateCardContent(explorationTitle);
+    await this.updateCardContent(content);
     await this.addInteraction(interaction);
     await this.saveExplorationDraft();
   }
