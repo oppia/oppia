@@ -107,7 +107,7 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorPage();
 
-      await explorationEditor.createExplorationWithTitleAndInteraction(
+      await explorationEditor.createExplorationWithContentAndInteraction(
         'Exploration two',
         INTERACTION_TYPES.END_EXPLORATION
       );

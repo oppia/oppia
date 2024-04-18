@@ -91,11 +91,11 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to create an exploration with a title and interaction.
+   * Function to create an exploration with a content and interaction.
    * This is a composite function that can be used when a straightforward, simple exploration setup is required.
    *
-   * @param explorationTitle - title of the exploration
-   * @param Interaction - the interaction to be added to the exploration
+   * @param content - content of the exploration
+   * @param interaction - the interaction to be added to the exploration
    */
   async createExplorationWithContentAndInteraction(
     content: string,
