@@ -127,9 +127,6 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mobileChangesDropdown);
       await this.clickOn(mobilePublishButton);
     } else {
-      await this.page.waitForSelector(
-        `${publishExplorationButton}:not([disabled])`
-      );
       await this.clickOn(publishExplorationButton);
     }
     await this.clickOn(explorationTitleInput);
