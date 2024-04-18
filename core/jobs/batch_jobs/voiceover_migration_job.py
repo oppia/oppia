@@ -138,6 +138,10 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
         Returns:
             list(EntityVoiceoversModel). A list of entity voiceovers models used
             for storing voiceovers from the given exploration data.
+
+        Raises:
+            Exception. All voice artists are not assigned accents in the
+                VoiceArtistMetadataModel.
         """
         exploration_model = (
             element[1]['exploration_model'][0])
@@ -159,7 +163,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             for language_code, accent_code in (
                     voice_artist_metadata_model.language_code_to_accent.items()
             ):
-                if accent_code == '' or accent_code == None:
+                if accent_code in ('', None):
                     raise Exception(
                         'Please assign all the accents for voice artists in '
                         'language code %s.' % language_code)
