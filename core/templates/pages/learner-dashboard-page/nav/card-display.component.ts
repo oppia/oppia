@@ -21,29 +21,33 @@ export class CardDisplayComponent implements OnInit {
   }
 
   getMaxShifts(width: number): number {
-    return this.numCards - Math.floor((width + 15) / 231);
+    return this.numCards - Math.floor((width + 8) / 224);
   }
 
   nextCard(num: number): void {
     let allCards = this.cards.nativeElement;
+    console.log(this.getMaxShifts(allCards.offsetWidth));
+    console.log(allCards.offsetWidth);
+    console.log(num);
     let lastShift =
-      231 %
-      ((allCards.offsetWidth +
-        15 -
-        115.5 * this.getMaxShifts(allCards.offsetWidth)) %
-        231);
-    console.log(lastShift);
+      224 -
+      (allCards.offsetWidth % 224) +
+      (this.getMaxShifts(allCards.offsetWidth) > 1 ? 24 : 0);
     if (allCards !== null) {
       if (this.shift > num) {
         allCards.scrollLeft -=
           this.shift === this.getMaxShifts(allCards.offsetWidth)
-            ? lastShift + 115.5
-            : 115.5;
+            ? 200
+            : this.shift === 1
+              ? lastShift
+              : 224;
       } else {
         allCards.scrollLeft +=
-          num === this.getMaxShifts(allCards.offsetWidth)
-            ? lastShift + 115.5
-            : 115.5;
+          num === 1
+            ? 200
+            : num === this.getMaxShifts(allCards.offsetWidth)
+              ? lastShift
+              : 224;
       }
     }
     this.shift = num;
