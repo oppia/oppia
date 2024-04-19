@@ -19,7 +19,6 @@
 
 var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
-var waitFor = require('./waitFor.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
@@ -50,7 +49,6 @@ describe('Exploration translation and voiceover tab', function () {
       'release@release.com',
       'releaseCoordinator'
     );
-    await waitFor.pageToFullyLoad();
     await adminPage.get();
     await adminPage.addRole('releaseCoordinator', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();

@@ -20,7 +20,6 @@ var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
-var waitFor = require('./waitFor.js');
 
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
@@ -53,7 +52,6 @@ describe('Voiceover player', function () {
       'testVoiceovers@voiceovers.com',
       'testVoiceovers'
     );
-    await waitFor.pageToFullyLoad();
     await adminPage.get();
     await adminPage.addRole('testVoiceovers', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();
