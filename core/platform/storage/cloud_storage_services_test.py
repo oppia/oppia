@@ -254,12 +254,16 @@ class CloudStorageServicesTests(test_utils.TestBase):
             'image/png'
         )
 
-    def test_raises_exception_when_copying_from_non_existent_file(self) -> None:
+    def test_raises_value_error_when_copying_from_non_existent_file(
+        self
+    ) -> None:
+        non_existent_source_path = 'path/to/file.txt'
+
         with self.get_bucket_swap, self.assertRaisesRegex(
-            Exception, 'Source asset does not exist.'
-        ): 
+            ValueError, 'Source asset does not exist.'
+        ):
             cloud_storage_services.copy(
-                'bucket_1', 'path/to/file.txt', 'other/path/to/file.txt'
+                'bucket_1', non_existent_source_path, 'other/path/to/file.txt'
             )
 
     def test_listdir_lists_files_with_provided_prefix(self) -> None:

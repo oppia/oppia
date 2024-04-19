@@ -994,6 +994,163 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fs.isfile('image/translation_image.png'))
         self.assertTrue(fs.isfile('image/img_compressed.png'))
 
+    def test_raises_exception_if_new_contentless_image_in_translation(
+        self
+    ) -> None:
+        exp_id = '12345678exp1'
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                exp_id, self.editor_id, ['State 1'],
+                ['EndExploration'], category='Algebra'))
+
+        state_content_dict = {
+            'content_id': 'content_0',
+            'html': (
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>')
+        }
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+        self.post_json(
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
+            {'filename': 'img.png'},
+            csrf_token=csrf_token,
+            upload_files=[('image', 'unused_filename', raw_image)])
+        exp_services.update_exploration(
+            self.editor_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'new_value': state_content_dict
+            })], 'Changes content.')
+        rights_manager.publish_exploration(self.editor, exp_id)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        text_to_translate = exploration.states['State 1'].content.html
+        self.logout()
+
+        valid_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        self.login(self.TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': exp_id,
+                'target_version_at_submission': exploration.version,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content_0',
+                    'language_code': 'hi',
+                    'content_html': text_to_translate,
+                    'translation_html': valid_html,
+                    'data_format': 'html'
+                },
+                'files': {'file.svg': None},
+                'description': 'test'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertIn('No image supplied', response_dict['error'])
+        self.logout()
+
+    def test_raises_exception_if_new_image_in_translation_exceeds_file_size_limit( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        exp_id = '12345678exp1'
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                exp_id, self.editor_id, ['State 1'],
+                ['EndExploration'], category='Algebra'))
+
+        state_content_dict = {
+            'content_id': 'content_0',
+            'html': (
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
+                'alt-with-value="&quot;Image&quot;">'
+                '</oppia-noninteractive-image>')
+        }
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        with utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+            'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+        self.post_json(
+            '%s/exploration/%s' % (
+                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
+            {'filename': 'img.png'},
+            csrf_token=csrf_token,
+            upload_files=[('image', 'unused_filename', raw_image)])
+        exp_services.update_exploration(
+            self.editor_id, exp_id, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'new_value': state_content_dict
+            })], 'Changes content.')
+        rights_manager.publish_exploration(self.editor, exp_id)
+
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+        text_to_translate = exploration.states['State 1'].content.html
+        self.logout()
+
+        valid_html = (
+            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
+            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
+            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
+            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
+            'ractive-math>'
+        )
+        large_image = '<svg><path d="%s" /></svg>' % (
+             'M150 0 L75 200 L225 200 Z ' * 4000)
+        self.login(self.TRANSLATOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                'suggestion_type': (
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': exp_id,
+                'target_version_at_submission': exploration.version,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'State 1',
+                    'content_id': 'content_0',
+                    'language_code': 'hi',
+                    'content_html': text_to_translate,
+                    'translation_html': valid_html,
+                    'data_format': 'html'
+                },
+                'description': 'test',
+                'files': {'file.svg': large_image},
+            }, csrf_token=csrf_token, expected_status_int=400,
+        )
+
+        self.assertIn(
+            'Image exceeds file size limit of 100 KB.',
+            response_dict['error'])
+        self.logout()
+
     def test_saves_new_images_in_translation_that_were_copied_from_target_exploration( # pylint: disable=line-too-long
         self
     ) -> None:
@@ -1095,7 +1252,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(fs.isfile('image/img.png'))
 
-    def test_throws_error_if_new_contentless_image_in_translation(
+    def test_raises_exception_if_target_exploration_image_is_not_in_target_exploration_assets( # pylint: disable=line-too-long
         self
     ) -> None:
         exp_id = '12345678exp1'
@@ -1125,7 +1282,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
             {'filename': 'img.png'},
             csrf_token=csrf_token,
-            upload_files=[('image', 'unused_filename', raw_image)])
+            upload_files=[('image', 'unused_filename', raw_image)]
+        )
         exp_services.update_exploration(
             self.editor_id, exp_id, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -1135,122 +1293,72 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             })], 'Changes content.')
         rights_manager.publish_exploration(self.editor, exp_id)
 
+        story = story_domain.Story.create_default_story(
+            'story_123', 'A story', 'Description', self.TOPIC_ID, 'story-a')
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID, 'story_123')
+        topic_services.publish_story(
+            self.TOPIC_ID, 'story_123', self.admin_id)
+
+        story_services.update_story(
+            self.owner_id, 'story_123', [story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_1',
+                'title': 'Node1',
+            }), story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'property_name': 'exploration_id',
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': exp_id
+            })], 'Changes.')
+
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         text_to_translate = exploration.states['State 1'].content.html
         self.logout()
 
-        valid_html = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-            'ractive-math>'
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_EXPLORATION, exp_id
         )
+        fs.delete('image/img.png')
+
         self.login(self.TRANSLATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        response_dict = self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
-                'target_id': exp_id,
-                'target_version_at_submission': exploration.version,
-                'change_cmd': {
-                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                    'state_name': 'State 1',
-                    'content_id': 'content_0',
-                    'language_code': 'hi',
-                    'content_html': text_to_translate,
-                    'translation_html': valid_html,
-                    'data_format': 'html'
-                },
-                'files': {'file.svg': None},
-                'description': 'test'
-            }, csrf_token=csrf_token, expected_status_int=400)
-
-        self.assertIn('No image supplied', response_dict['error'])
-        self.logout()
-
-    def test_throws_error_if_new_image_in_translation_exceeds_file_size_limit(
-        self
-    ) -> None:
-        exp_id = '12345678exp1'
-        exploration = (
-            self.save_new_linear_exp_with_state_names_and_interactions(
-                exp_id, self.editor_id, ['State 1'],
-                ['EndExploration'], category='Algebra'))
-
-        state_content_dict = {
-            'content_id': 'content_0',
-            'html': (
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&quot;img.png&quot;" caption-with-value="&quot;&quot;" '
-                'alt-with-value="&quot;Image&quot;">'
-                '</oppia-noninteractive-image>')
+        request_body = {
+            'suggestion_type': (
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+            'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+            'target_id': exp_id,
+            'target_version_at_submission': exploration.version,
+            'change_cmd': {
+                'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                'state_name': 'State 1',
+                'content_id': 'content_0',
+                'language_code': 'hi',
+                'content_html': text_to_translate,
+                'translation_html': (
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&quot;img.png&quot;" '
+                    'caption-with-value="&quot;&quot;" '
+                    'alt-with-value="&quot;Image&quot;">'
+                    '</oppia-noninteractive-image>'),
+                'data_format': 'html'
+            },
+            'description': 'test',
+            'files': {},
         }
-        self.login(self.EDITOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
-        with utils.open_file(
-            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
-            'rb', encoding=None
-        ) as f:
-            raw_image = f.read()
-        self.post_json(
-            '%s/exploration/%s' % (
-                feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX, exp_id),
-            {'filename': 'img.png'},
-            csrf_token=csrf_token,
-            upload_files=[('image', 'unused_filename', raw_image)])
-        exp_services.update_exploration(
-            self.editor_id, exp_id, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'State 1',
-                'new_value': state_content_dict
-            })], 'Changes content.')
-        rights_manager.publish_exploration(self.editor, exp_id)
-
-        exploration = exp_fetchers.get_exploration_by_id(exp_id)
-        text_to_translate = exploration.states['State 1'].content.html
-        self.logout()
-
-        valid_html = (
-            '<oppia-noninteractive-math math_content-with-value="{&amp;q'
-            'uot;raw_latex&amp;quot;: &amp;quot;(x - a_1)(x - a_2)(x - a'
-            '_3)...(x - a_n-1)(x - a_n)&amp;quot;, &amp;quot;svg_filenam'
-            'e&amp;quot;: &amp;quot;file.svg&amp;quot;}"></oppia-noninte'
-            'ractive-math>'
-        )
-        large_image = '<svg><path d="%s" /></svg>' % (
-             'M150 0 L75 200 L225 200 Z ' * 4000)
-        self.login(self.TRANSLATOR_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        response_dict = self.post_json(
-            '%s/' % feconf.SUGGESTION_URL_PREFIX, {
-                'suggestion_type': (
-                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
-                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
-                'target_id': exp_id,
-                'target_version_at_submission': exploration.version,
-                'change_cmd': {
-                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
-                    'state_name': 'State 1',
-                    'content_id': 'content_0',
-                    'language_code': 'hi',
-                    'content_html': text_to_translate,
-                    'translation_html': valid_html,
-                    'data_format': 'html'
-                },
-                'description': 'test',
-                'files': {'file.svg': large_image},
-            }, csrf_token=csrf_token, expected_status_int=400,
-        )
-
-        self.assertIn(
-            'Image exceeds file size limit of 100 KB.',
-            response_dict['error'])
-        self.logout()
+        with self.assertRaisesRegex(
+            Exception,
+            'There are images in the target exploration that are ' +
+            'not recognized as assets belonging to the target ' +
+            'exploration.'
+        ):
+            self.post_json(
+                '%s/' % feconf.SUGGESTION_URL_PREFIX, request_body,
+                csrf_token=csrf_token
+            )
 
     def test_set_of_strings_translation_suggestion_creation(self) -> None:
         self.login(self.TRANSLATOR_EMAIL)

@@ -124,11 +124,11 @@ def copy(
             assets folder.
 
     Raises:
-        Exception. Source asset does not exist.
+        ValueError. Source asset does not exist.
     """
     src_blob = _get_bucket(bucket_name).get_blob(source_assets_path)
     if src_blob is None:
-        raise Exception('Source asset does not exist.')
+        raise ValueError('Source asset does not exist.')
     _get_bucket(bucket_name).copy_blob(
         src_blob, _get_bucket(bucket_name), new_name=dest_assets_path
     )
