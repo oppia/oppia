@@ -16,7 +16,9 @@ export class CardDisplayComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.numCards);
+  }
 
   getMaxShifts(width: number): number {
     return this.numCards - Math.floor((width + 15) / 231);

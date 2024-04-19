@@ -1,6 +1,5 @@
 <!--go back 3 - title should stay in place when scrolling for small screens -->
-<!--go back 4 - need to handle last card mr-4 -->
-<div #carddisplay class="card-display_container d-flex flex-column overflow-hidden">
+<div #carddisplay class="card-display_container d-flex flex-column overflow-hidden mb-4">
   <div class="d-flex justify-content-between">
      <!--go back 2 - i1qn-->
     <p class="subsection-heading"> {{ heading }} </p>
@@ -18,11 +17,10 @@
       </button>
     </div>
   </div>
-  <hr color="#00645c" class="mt-2" size="2" width="100%">
-  <div class="d-flex mt-4 pb-2 subsection-container" #cards> 
+  <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
+  <div class="d-flex pb-2 subsection-container" #cards> 
     <ng-content></ng-content>
   </div>
-  <!--more or less depending-->
   <button *ngIf="tabType !== 'home'" class="align-self-end">  View more </button>
 </div>
 
@@ -39,10 +37,35 @@
     overflow-x: hidden;
   }
 
-  .subsection-container {
-    display: flex;
-    max-width: 100%;
-    overflow-x: hidden;
+  .subsection-heading {
+    color: #333;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 0;
   }
+
+  .section-nav-button {
+    background-color: #00645c;
+    border-radius: .25em;
+    color: #fff;
+    height: 24px;
+    width: 24px;
+  }
+
+  .section-nav-button:disabled {
+    background-color: #667085;
+  }
+
+  .oppia-learner-dash-section-subheading {
+    color: #333;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+
+  div.subsection-container div.lesson-card-container {
+    margin-right: 4px;
+  }
+
 
 </style>

@@ -96,7 +96,7 @@
         }}
       </p>
       <div class="d-flex w-100" [ngClass]="(continueWhereYouLeftOffList.length + incompleteExplorationsList.length > 5 ? 'flex-wrap' : 'justify-content-between')"> 
-        <card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [heading]="'Lessons in progress'" [numCards]="continueWhereYouLeftOffList.length" [tabType]="'home'">
+        <card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [heading]="'Lessons in progress'" [numCards]="continueWhereYouLeftOffList.length + incompleteExplorationsList.length" [tabType]="'home'">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [displayArea]="'homeTab'"
@@ -104,14 +104,14 @@
               </oppia-learner-story-summary-tile>
             </ng-container>
           </ng-container>
-          <ng-container *ngFor="let lesson of incompleteExplorationsList">
-            <lesson-card [story]="lesson"></lesson-card>
+          <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
+            <lesson-card [story]="lesson" [last]="last"></lesson-card>
           </ng-container>
         </div>
         </card-display>
         <card-display [heading]="'Recommended for you'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
-          <ng-container *ngFor="let lesson of incompleteExplorationsList">
-            <lesson-card [story]="lesson"></lesson-card>
+          <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
+            <lesson-card [story]="lesson" [last]="last"></lesson-card>
           </ng-container>
         </card-display>
       </div>
@@ -148,6 +148,7 @@
   .subsection-container {
     display: flex;
     max-width: 100%;
+    padding: 0 1px;
     overflow-x: hidden;
   }
 </style>
