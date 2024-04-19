@@ -27,13 +27,7 @@ for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
 }
 
 const isValidUnit = (unit: string): boolean => {
-  return (
-    currencyUnits.includes(unit) ||
-    // This throws "TS2551". We need to
-    // suppress this error because mathjs does not have a type defined for Unit.
-    // @ts-ignore
-    math.Unit.isValuelessUnit(unit)
-  );
+  return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
 };
 
 describe('ObjectsDomainConstants', () => {
