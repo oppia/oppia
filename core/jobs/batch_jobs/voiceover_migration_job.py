@@ -31,6 +31,7 @@ from typing import Dict, List, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import datastore_services
     from mypy_imports import exp_models
     from mypy_imports import voiceover_models
 
