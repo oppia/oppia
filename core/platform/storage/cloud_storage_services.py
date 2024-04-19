@@ -122,8 +122,13 @@ def copy(
             folder.
         dest_assets_path: str. The path to the relevant file within the entity's
             assets folder.
+
+    Raises:
+        Exception. Source asset does not exist.
     """
     src_blob = _get_bucket(bucket_name).get_blob(source_assets_path)
+    if src_blob is None:
+        raise Exception('Source asset does not exist.')
     _get_bucket(bucket_name).copy_blob(
         src_blob, _get_bucket(bucket_name), new_name=dest_assets_path
     )
