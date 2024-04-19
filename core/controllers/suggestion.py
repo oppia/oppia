@@ -273,6 +273,16 @@ class SuggestionHandler(
                     files, suggestion, new_image_filenames
                 )
 
+            target_image_filenames = (
+                html_cleaner.get_image_filenames_from_html_strings(
+                    suggestion.get_target_entity_html_strings()
+                )
+            )
+            fs_services.copy_images(
+                suggestion.target_type, suggestion.target_id,
+                suggestion.image_context, suggestion.target_id,
+                target_image_filenames)
+
         self.render_json(self.values)
 
 
@@ -1308,13 +1318,3 @@ def _upload_suggestion_images(
         fs_services.save_original_and_compressed_versions_of_image(
             filename, suggestion_image_context, suggestion.target_id,
             decoded_image, 'image', image_is_compressible)
-
-    target_entity_html_list = suggestion.get_target_entity_html_strings()
-    target_image_filenames = (
-        html_cleaner.get_image_filenames_from_html_strings(
-            target_entity_html_list))
-
-    fs_services.copy_images(
-        suggestion.target_type, suggestion.target_id,
-        suggestion_image_context, suggestion.target_id,
-        target_image_filenames)
