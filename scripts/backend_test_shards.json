@@ -320,6 +320,7 @@
         "core.jobs.batch_jobs.topic_migration_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
+        "core.jobs.batch_jobs.manual_voice_artist_name_job_test",
         "core.jobs.io.cache_io_test",
         "scripts.populate_sample_contributor_data_test",
         "core.platform.secrets.cloud_secrets_services_test",
@@ -367,6 +368,7 @@
         "core.jobs.batch_jobs.blog_validation_jobs_test",
         "core.jobs.transforms.validation.blog_validation_test",
         "core.jobs.transforms.validation.skill_validation_test",
+        "core.jobs.batch_jobs.user_validation_jobs_test",
         "core.jobs.transforms.validation.story_validation_test",
         "core.tests.load_tests.feedback_thread_summaries_test",
         "core.tests.test_utils_test",
@@ -394,6 +396,7 @@
         "core.storage.voiceover.gae_models_test",
         "core.domain.voiceover_domain_test",
         "core.domain.voiceover_services_test",
-        "core.controllers.voiceover_test"
+        "core.controllers.voiceover_test",
+        "core.jobs.batch_jobs.suggestion_edit_state_content_deletion_jobs_test"
     ]
 }
