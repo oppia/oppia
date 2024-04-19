@@ -185,7 +185,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 except Exception as e:
                     raise Exception(
                         'Please assign all the accents for voice artists in '
-                        'language code %s.' % lang_code)
+                        'language code %s.' % lang_code) from e
 
                 entity_voiceover_id_to_entity_voiceovers = (
                     cls.update_entity_voiceover_for_given_id(
