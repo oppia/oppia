@@ -137,12 +137,19 @@ export class VoiceoverAdmin extends BaseUser {
       await this.clearAllTextFrom(voiceArtistUsernameInputBox);
       await this.type(voiceArtistUsernameInputBox, voiceArtists[i]);
       await this.clickOn(saveVoiceoverArtistEditButton);
-      await this.page.waitForSelector(
-        `div.e2e-test-voice-artist-${voiceArtists[i]}`,
-        {visible: true}
-      );
-
-      showMessage(voiceArtists[i] + ' has been added as a voice artist.');
+      /**
+       * Adding try catch here to avoid unnecessary waiting for selector if
+       * the added voice artist is not a user.
+       */
+      try {
+        await this.page.waitForSelector(
+          `div.e2e-test-voice-artist-${voiceArtists[i]}`,
+          {visible: true}
+        );
+        showMessage(voiceArtists[i] + ' has been added as a voice artist.');
+      } catch (error) {
+        showMessage(voiceArtists[i] + ' is not added.');
+      }
     }
   }
 

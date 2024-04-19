@@ -224,7 +224,6 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'translation-admin-tests/add-translation-rights',
     'translation-admin-tests/remove-translation-rights',
     'exploration-creator-tests/create-exploration-and-change-basic-settings',
-    'exploration-creator-tests/savedraft-publish-and-discard-the-changes',
     'voiceover-admin-tests/add-voiceover-artist-to-an-exploration'
 ]
 

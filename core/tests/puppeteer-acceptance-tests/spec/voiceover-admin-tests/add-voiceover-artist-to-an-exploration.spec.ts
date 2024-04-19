@@ -76,6 +76,7 @@ describe('Voiceover Admin', function () {
       await explorationCreator.selectCategory('Algebra');
       await explorationCreator.selectLanguage('Arabic');
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
+      await explorationCreator.saveDraftExploration();
 
       explorationId = await explorationCreator.publishExploration();
 
@@ -119,6 +120,7 @@ describe('Voiceover Admin', function () {
       await explorationCreator.selectCategory('Algebra');
       await explorationCreator.selectLanguage('Arabic');
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
+      await explorationCreator.saveDraftExploration();
 
       explorationId = await explorationCreator.publishExploration();
 
