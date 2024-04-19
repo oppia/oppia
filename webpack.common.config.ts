@@ -82,10 +82,6 @@ module.exports = {
       commonPrefix +
       '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    diagnostic_test_player_page:
-      commonPrefix +
-      '/pages/diagnostic-test-player-page/' +
-      'diagnostic-test-player-page.import.ts',
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
@@ -145,28 +141,6 @@ module.exports = {
       DIFF_EQUAL: ['diff_match_patch/lib/diff_match_patch', 'DIFF_EQUAL'],
       DIFF_INSERT: ['diff_match_patch/lib/diff_match_patch', 'DIFF_INSERT'],
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['diagnostic_test_player_page'],
-      filename: 'diagnostic-test-player-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'With Oppia, you can access free lessons on math, ' +
-          'physics, statistics, chemistry, music, history, and more from ' +
-          'anywhere in the world. Oppia is a nonprofit with the mission of ' +
-          'providing high-quality education to those who lack access to it. ' +
-          'The Learner Diagnostic test page will allow the learner to ' +
-          'test their knowledge and get a set of recommendations for where ' +
-          'they should begin learning.',
-      },
-      template:
-        commonPrefix +
-        '/pages/diagnostic-test-player-page/' +
-        'diagnostic-test-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
