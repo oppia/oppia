@@ -20,10 +20,12 @@ import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporte
 import {showMessage} from '../../puppeteer-testing-utilities/show-message-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
+import {CurriculumAdmin} from '../../user-utilities/curriculum-admin-utils';
 import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
-import {SuperAdmin} from '../../user-utilities/super-admin-utils';
+import {VoiceoverAdmin} from '../../user-utilities/voiceover-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const ROLES = testConstants.Roles;
 
 /**
  * After deleting the exploration if we want to access the exploration with the
@@ -39,8 +41,9 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 
 describe('Exploration Creator', function () {
   let explorationCreator: ExplorationCreator;
-  let explorationVisitor: ExplorationCreator;
-  let superAdmin: SuperAdmin;
+  let voiceoverAdmin: VoiceoverAdmin;
+  let curriculumAdmin: CurriculumAdmin;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     explorationCreator = await UserFactory.createNewUser(
@@ -49,13 +52,19 @@ describe('Exploration Creator', function () {
     );
     showMessage('explorationCreator is signed up successfully');
 
-    explorationVisitor = await UserFactory.createNewUser(
-      'explorationVisitor',
-      'exploration_visitor@example.com'
+    voiceoverAdmin = await UserFactory.createNewUser(
+      'voiceoverAdm',
+      'voiceover_admin@example.com',
+      [ROLES.VOICEOVER_ADMIN]
     );
-    showMessage('explorationVisitor is signed up successfully.');
+    showMessage('Voiceover admin is signed up successfully.');
 
-    superAdmin = await UserFactory.createNewSuperAdmin('Leader');
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+    showMessage('Curriculum admin is signed up successfully.');
 
     const guestUser1 = await UserFactory.createNewUser(
       'guestUser1',
@@ -77,35 +86,21 @@ describe('Exploration Creator', function () {
     );
     showMessage('guestUser3 is signed up successfully.');
     await guestUser3.closeBrowser();
-
-    await superAdmin.assignRoleToUser('explorationVisitor', 'curriculum admin');
-    await superAdmin.expectUserToHaveRole(
-      'explorationVisitor',
-      'curriculum admin'
-    );
-
-    await superAdmin.assignRoleToUser('explorationCreator', 'voiceover admin');
-    await superAdmin.expectUserToHaveRole(
-      'explorationCreator',
-      'voiceover admin'
-    );
-
-    await superAdmin.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
     'should create an exploration and modify it via the Settings tab',
     async function () {
-      await explorationCreator.openCreatorDashboardPage();
+      await explorationCreator.navigateToCreatorDashboardPage();
       await explorationCreator.createNewExploration();
-      await explorationCreator.switchToEditorTab();
+      await explorationCreator.dismissWelcomeModal();
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text'
       );
       await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
 
-      await explorationCreator.goToSettingsTab();
+      await explorationCreator.navigateToSettingsTab();
 
       await explorationCreator.updateTitleTo(
         'This title is too long and will be truncated'
@@ -137,21 +132,27 @@ describe('Exploration Creator', function () {
       await explorationCreator.assignUserToCollaboratorRole('guestUser1');
       await explorationCreator.assignUserToPlaytesterRole('guestUser2');
 
-      await explorationCreator.publishExploration();
+      await explorationCreator.saveDraftExploration();
+      explorationId = await explorationCreator.publishExploration();
+      await explorationCreator.optInToEmailNotifications();
 
-      await explorationCreator.addVoiceArtists([
+      await voiceoverAdmin.navigateToExplorationEditor(explorationId);
+      await voiceoverAdmin.dismissWelcomeModal();
+      await voiceoverAdmin.navigateToExplorationSettingsTab();
+      await voiceoverAdmin.openvoiceArtistDropdown();
+      await voiceoverAdmin.addVoiceoverArtistsToExploration([
         'guestUser1',
         'guestUser2',
         'guestUser3',
       ]);
 
-      await explorationCreator.optInToEmailNotifications();
+      await curriculumAdmin.navigateToExplorationEditor(explorationId);
+      await curriculumAdmin.dismissWelcomeModal();
+      await curriculumAdmin.navigateToExplorationSettingsTab();
+      await curriculumAdmin.openExplorationControlDropdown();
+      await curriculumAdmin.deleteExplorationPermanently();
 
-      await explorationVisitor.expectExplorationToBeAccessibleByUrl();
-      await explorationVisitor.switchToEditorTab();
-      await explorationVisitor.goToSettingsTab();
-      await explorationVisitor.deleteExploration();
-      await explorationVisitor.expectExplorationToBeNotAccessibleByUrl();
+      await explorationCreator.expectExplorationToBeNotAccessibleByUrl();
     },
     DEFAULT_SPEC_TIMEOUT
   );

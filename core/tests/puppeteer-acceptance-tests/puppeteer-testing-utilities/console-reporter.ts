@@ -84,10 +84,6 @@ const CONSOLE_ERRORS_TO_FIX = [
   escapeRegExp(
     'Failed to load resource: the server responded with a status of 500'
   ),
-  // TODO(#18372): KeyError: <state name> when the version history handler is hit.
-  escapeRegExp(
-    'Failed to load resource: the server responded with a status of 404'
-  ),
 ];
 
 export class ConsoleReporter {

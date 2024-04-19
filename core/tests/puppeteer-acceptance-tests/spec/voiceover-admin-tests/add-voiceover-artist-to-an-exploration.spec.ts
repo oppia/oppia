@@ -61,15 +61,15 @@ describe('Voiceover Admin', function () {
   it(
     'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
     async function () {
-      await explorationCreator.openCreatorDashboardPage();
+      await explorationCreator.navigateToCreatorDashboardPage();
 
       await explorationCreator.createNewExploration();
-      await explorationCreator.switchToEditorTab();
+      await explorationCreator.dismissWelcomeModal();
       await explorationCreator.updateExplorationIntroText('Exploration one');
       await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
 
-      await explorationCreator.goToSettingsTab();
+      await explorationCreator.navigateToSettingsTab();
 
       await explorationCreator.updateTitleTo('Exploration one');
       await explorationCreator.updateGoalTo('Exploration one');
@@ -87,7 +87,7 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'invalidUserId'
       );
-      await voiceoverAdmin.addVoiceoverArtistToExploration('invalidUserId');
+      await voiceoverAdmin.addVoiceoverArtistsToExploration(['invalidUserId']);
 
       await voiceoverAdmin.expectToSeeErrorToastMessage(
         invalidIdErrorToastMessage
@@ -105,14 +105,14 @@ describe('Voiceover Admin', function () {
         'voiceoverartist',
         'voiceoverartist@example.com'
       );
-      await explorationCreator.openCreatorDashboardPage();
+      await explorationCreator.navigateToCreatorDashboardPage();
 
       await explorationCreator.createNewExploration();
       await explorationCreator.updateExplorationIntroText('Exploration two');
       await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
 
-      await explorationCreator.goToSettingsTab();
+      await explorationCreator.navigateToSettingsTab();
 
       await explorationCreator.updateTitleTo('Exploration two');
       await explorationCreator.updateGoalTo('Exploration two');
@@ -128,7 +128,9 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'voiceoverartist'
       );
-      await voiceoverAdmin.addVoiceoverArtistToExploration('voiceoverartist');
+      await voiceoverAdmin.addVoiceoverArtistsToExploration([
+        'voiceoverartist',
+      ]);
 
       await voiceoverAdmin.expectVoiceoverArtistsListContains(
         'voiceoverartist'

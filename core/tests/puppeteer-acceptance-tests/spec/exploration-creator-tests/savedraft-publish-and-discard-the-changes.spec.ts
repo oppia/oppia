@@ -43,22 +43,23 @@ describe('Exploration Creator', function () {
   it(
     'should draft, discard and publish the changes',
     async function () {
-      await explorationCreator.openCreatorDashboardPage();
+      await explorationCreator.navigateToCreatorDashboardPage();
       await explorationCreator.createNewExploration();
-      await explorationCreator.switchToEditorTab();
+      await explorationCreator.dismissWelcomeModal();
       await explorationCreator.updateExplorationIntroText(
         'Exploration intro text'
       );
       await explorationCreator.updateCardName('Test');
       await explorationCreator.addEndInteraction();
 
-      await explorationCreator.goToSettingsTab();
+      await explorationCreator.navigateToSettingsTab();
       await explorationCreator.updateTitleTo('Old Title');
       await explorationCreator.updateGoalTo('OppiaAcceptanceTestsCheck');
       await explorationCreator.selectCategory('Algebra');
       await explorationCreator.selectLanguage('Arabic');
       await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
 
+      await explorationCreator.saveDraftExploration();
       await explorationCreator.publishExploration();
 
       await explorationCreator.updateTitleTo('New Title');
