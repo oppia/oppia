@@ -482,9 +482,7 @@ class VoiceArtistMetadataModelsTestsBaseClass(
         language_code_to_accent_1 = {
             'en': 'en-US'
         }
-        language_code_to_accent_2 = {
-            'hi': ''
-        }
+        language_code_to_accent_2 = {}
         voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=self.editor_id_1,
             language_code_to_accent=language_code_to_accent_1)
