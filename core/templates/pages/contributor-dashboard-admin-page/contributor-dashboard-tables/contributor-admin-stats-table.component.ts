@@ -71,11 +71,9 @@ export class ContributorAdminStatsTable implements OnInit {
   };
 
   columnsToDisplay: string[] = [];
-
-  dataSource: ContributorStats[] = [];
-
-  nextOffset: number = 0;
-  more: boolean = true;
+  allStats: ContributorStats[] = [];
+  currentStats: ContributorStats[] = [];
+  hasMoreItems: boolean = true;
 
   expandedElement: ContributorStats[] | null = null;
 
@@ -90,21 +88,23 @@ export class ContributorAdminStatsTable implements OnInit {
   itemsPerPageChoice: number[] = [20, 50, 100];
   itemsPerPage: number = 20;
   statsPageNumber: number = 0;
+  maximumExpectedItems: number = 1000;
+  hasMoreThanMaximumExpectedItems: boolean = false;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
-  firstTimeFetchingData: boolean = true;
 
   constructor(
     private windowRef: WindowRef,
-    private ContributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
+    private contributorDashboardAdminStatsBackendApiService: ContributorDashboardAdminStatsBackendApiService,
     private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
     private modalService: NgbModal
   ) {}
 
   ngOnInit(): void {
+    this.allStats = [];
     this.loadingMessage = 'Loading';
     if (this.inputs.filter) {
-      this.updateColumnsToDisplay();
+      this.displayContributorAdminStats();
     }
   }
 
@@ -232,7 +232,17 @@ export class ContributorAdminStatsTable implements OnInit {
   getUpperLimitValueForPagination(): number {
     return Math.min(
       this.statsPageNumber * this.itemsPerPage + this.itemsPerPage,
-      this.statsPageNumber * this.itemsPerPage + this.dataSource.length
+      this.allStats.length
+    );
+  }
+
+  showMoreThanMaximumExpectedItems(): string {
+    return this.hasMoreThanMaximumExpectedItems ? '+' : '';
+  }
+
+  getOverallItemCount(): string {
+    return (
+      this.allStats.length.toString() + this.showMoreThanMaximumExpectedItems()
     );
   }
 
@@ -336,7 +346,19 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  updateColumnsToDisplay(): void {
+  setCurrentlyDisplayedContributorAdminStats(): void {
+    let nextOffset: number =
+      this.statsPageNumber * this.itemsPerPage + this.itemsPerPage;
+    this.currentStats = this.allStats.slice(
+      this.statsPageNumber * this.itemsPerPage,
+      Math.min(nextOffset, this.allStats.length)
+    );
+    this.hasMoreItems = nextOffset >= this.allStats.length ? false : true;
+    this.loadingMessage = '';
+    this.noDataMessage = '';
+  }
+
+  fetchContributorAdminStats(): void {
     let contributionType: string = this.getContributionType(
       this.inputs.activeTab
     );
@@ -344,39 +366,50 @@ export class ContributorAdminStatsTable implements OnInit {
       this.inputs.activeTab
     );
 
-    this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
-      this.inputs.filter,
-      this.itemsPerPage,
-      this.nextOffset,
-      contributionType,
-      contributionSubType
-    ).then(response => {
-      this.dataSource = response.stats;
-      this.nextOffset = response.nextOffset;
-      this.more = response.more;
-      this.loadingMessage = '';
-      this.noDataMessage = '';
-      if (this.dataSource.length === 0) {
-        this.noDataMessage = 'No statistics to display';
-      } else {
-        this.updateColumns(contributionSubType);
-      }
-    });
+    this.contributorDashboardAdminStatsBackendApiService
+      .fetchContributorAdminStats(
+        this.inputs.filter,
+        this.maximumExpectedItems,
+        0,
+        contributionType,
+        contributionSubType
+      )
+      .then(response => {
+        this.allStats = response.stats;
+        this.hasMoreThanMaximumExpectedItems = response.more;
+        this.setCurrentlyDisplayedContributorAdminStats();
+        if (this.allStats.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        } else {
+          this.updateColumns(contributionSubType);
+        }
+      });
+  }
+
+  displayContributorAdminStats(): void {
+    if (this.allStats.length === 0) {
+      this.fetchContributorAdminStats();
+    } else {
+      this.setCurrentlyDisplayedContributorAdminStats();
+    }
   }
 
   refreshPagination(): void {
     this.loadingMessage = 'Loading';
-    this.nextOffset = 0;
-    this.dataSource = [];
-    this.more = true;
-    this.firstTimeFetchingData = true;
+    this.allStats = [];
     this.goToPageNumber(0);
+  }
+
+  onItemsPerPageChange(value: string): void {
+    // Convert value to a number, as Angular has converted
+    // the numbers in the dropdown that calls this function to strings.
+    this.itemsPerPage = Number(value);
+    this.refreshPagination();
   }
 
   goToPageNumber(pageNumber: number): void {
     this.statsPageNumber = pageNumber;
-    this.nextOffset = pageNumber * this.itemsPerPage;
-    this.updateColumnsToDisplay();
+    this.displayContributorAdminStats();
   }
 
   navigatePage(direction: string): void {
