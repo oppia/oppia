@@ -5097,6 +5097,20 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return states_dict, next_content_id_index
 
     @classmethod
+    def _convert_states_v55_dict_to_v56_dict(
+        cls, states_dict: Dict[str, state_domain.StateDict]
+    ) -> Tuple[Dict[str, state_domain.StateDict], int]:
+        """Converts from v55 to v56. Version 56 removes and RecordedVoiceovers
+        from State.
+        """
+        for _, state_dict in states_dict.items():
+            # Here we use MyPy ignore because the latest schema of state
+            # dict doesn't contains recorded_voiceovers property.
+            del state_dict['recorded_voiceovers'] # type: ignore[misc]
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
         cls,
         versioned_exploration_states: VersionedExplorationStatesDict,
@@ -5501,6 +5515,29 @@ class Exploration(translation_domain.BaseTranslatableObject):
         return exploration_dict
 
     @classmethod
+    def _convert_v60_dict_to_v61_dict(
+        cls, exploration_dict: VersionedExplorationDict
+    ) -> VersionedExplorationDict:
+        """Converts a v60 exploration dict into a v61 exploration dict.
+        Removes recorded_voiceovers field from state property.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v60.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v61.
+        """
+        exploration_dict['schema_version'] = 60
+
+        exploration_dict['states'] = cls._convert_states_v55_dict_to_v56_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 61
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
         cls, yaml_content: str
     ) -> VersionedExplorationDict:
@@ -5611,6 +5648,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             exploration_dict = cls._convert_v59_dict_to_v60_dict(
                 exploration_dict)
             exploration_schema_version = 60
+
+        if exploration_schema_version == 60:
+            exploration_dict = cls._convert_v60_dict_to_v61_dict(
+                exploration_dict)
+            exploration_schema_version = 61
 
         return exploration_dict
 
