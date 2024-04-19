@@ -289,6 +289,12 @@ URLS = [
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CollectionViewerPageAccessValidationHandler),
 
+    get_redirect_route(
+        r'%s/can_access_diagnostic_test_player_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.DiagnosticTestPlayerAccessValidationHandler
+    ),
+
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
@@ -442,10 +448,6 @@ URLS = [
     get_redirect_route(
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
-    get_redirect_route(
-        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-        diagnostic_test_player.DiagnosticTestPlayerPage
-    ),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
         diagnostic_test_player.DiagnosticTestQuestionsHandler

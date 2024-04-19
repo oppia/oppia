@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -138,10 +137,3 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaDiagnosticTestPlayer',
-    downgradeComponent({component: DiagnosticTestPlayerComponent})
-  );

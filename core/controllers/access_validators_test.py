@@ -207,6 +207,28 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
+class DiagnosticTestPlayerPageAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
+    """Test for diagnostic test player access validation."""
+
+    def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
+        self) -> None:
+        self.get_json(
+            '%s/can_access_diagnostic_test_player_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DIAGNOSTIC_TEST])
+    def test_should_access_diagnostic_test_page_when_feature_is_enabled(
+        self) -> None:
+        self.get_html_response(
+           '%s/can_access_diagnostic_test_player_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+            expected_status_int=200
+        )
+
+
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
