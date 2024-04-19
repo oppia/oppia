@@ -98,9 +98,10 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
         )
 
         if entity_voiceover_id not in entity_voiceover_id_to_entity_voiceovers:
-            entity_voiceovers_object = (
-                voiceover_services.create_entity_voiceovers_model_instance(
-                    entity_id, entity_type, entity_version, accent_code))
+            with datastore_services.get_ndb_context():
+                entity_voiceovers_object = (
+                    voiceover_services.create_entity_voiceovers_model_instance(
+                        entity_id, entity_type, entity_version, accent_code))
         else:
             entity_voiceovers_object = (
                 entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id])
@@ -160,14 +161,6 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             voice_artist_link.content_id_to_voiceovers_mapping)
 
         for voice_artist_metadata_model in voice_artist_metadata_models_list:
-            for language_code, accent_code in (
-                    voice_artist_metadata_model.language_code_to_accent.items()
-            ):
-                if accent_code in ('', None):
-                    raise Exception(
-                        'Please assign all the accents for voice artists in '
-                        'language code %s.' % language_code)
-
             voice_artist_id_to_language_code_mapping[
                 voice_artist_metadata_model.id] = (
                     voice_artist_metadata_model.language_code_to_accent)
@@ -186,8 +179,13 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 voice_artist_id = voiceover_mapping[0]
                 voiceover_dict = voiceover_mapping[1]
 
-                accent_code = voice_artist_id_to_language_code_mapping[
-                    voice_artist_id][lang_code]
+                try:
+                    accent_code = voice_artist_id_to_language_code_mapping[
+                        voice_artist_id][lang_code]
+                except Exception as e:
+                    raise Exception(
+                        'Please assign all the accents for voice artists in '
+                        'language code %s.' % lang_code)
 
                 entity_voiceover_id_to_entity_voiceovers = (
                     cls.update_entity_voiceover_for_given_id(
