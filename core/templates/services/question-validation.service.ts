@@ -17,36 +17,40 @@
  *
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { Question } from 'domain/question/QuestionObjectFactory';
-import { MisconceptionSkillMap } from 'domain/skill/MisconceptionObjectFactory';
-import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import { InteractionSpecsConstants, InteractionSpecsKey } from 'pages/interaction-specs.constants';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {Question} from 'domain/question/QuestionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import {
+  InteractionSpecsConstants,
+  InteractionSpecsKey,
+} from 'pages/interaction-specs.constants';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class QuestionValidationService {
   constructor(
     private responsesService: ResponsesService,
     private stateEditorService: StateEditorService
-  ) { }
+  ) {}
 
   isQuestionValid(
-      question: Question | null | undefined,
-      misconceptionsBySkill: MisconceptionSkillMap): boolean {
+    question: Question | null | undefined,
+    misconceptionsBySkill: MisconceptionSkillMap
+  ): boolean {
     if (question === undefined || question === null) {
       return false;
     }
 
     return !(
       this.getValidationErrorMessage(question) ||
-      question.getUnaddressedMisconceptionNames(
-        misconceptionsBySkill
-      ).length > 0 ||
-      !this.stateEditorService.isCurrentSolutionValid());
+      question.getUnaddressedMisconceptionNames(misconceptionsBySkill).length >
+        0 ||
+      !this.stateEditorService.isCurrentSolutionValid()
+    );
   }
 
   // Returns 'null' when the message is valid.
@@ -74,9 +78,8 @@ export class QuestionValidationService {
     }
     if (
       !interaction.solution &&
-      InteractionSpecsConstants.INTERACTION_SPECS[
-        interactionId
-      ].can_have_solution
+      InteractionSpecsConstants.INTERACTION_SPECS[interactionId]
+        .can_have_solution
     ) {
       return 'A solution must be specified';
     }
@@ -95,5 +98,9 @@ export class QuestionValidationService {
   }
 }
 
-angular.module('oppia').factory(
-  'QuestionValidationService', downgradeInjectable(QuestionValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'QuestionValidationService',
+    downgradeInjectable(QuestionValidationService)
+  );

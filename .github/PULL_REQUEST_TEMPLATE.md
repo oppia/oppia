@@ -1,4 +1,5 @@
 ## Overview
+
 <!--
 READ ME FIRST:
 Please answer *all* questions below and check off every point from the Essential Checklist!
@@ -12,11 +13,13 @@ If there is no corresponding issue number, fill in N/A where it says [fill_in_nu
 
 ## Essential Checklist
 
+Please follow the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
+
+- [ ] I have linked the issue that this PR fixes in the "Development" section of the sidebar.
+- [ ] I have checked the "Files Changed" tab and confirmed that the changes are what I want to make.
+- [ ] I have written tests for my code.
 - [ ] The **PR title** starts with "Fix #bugnum: " or "Fix part of #bugnum: ...", followed by a short, clear summary of the changes.
-- [ ] I have followed the [instructions for making a code change](https://github.com/oppia/oppia/wiki/Make-a-pull-request).
-- [ ] I have assigned the correct reviewers to this PR (or will leave a comment with the phrase "@{{reviewer_username}} PTAL" if I don't have permissions to assign reviewers directly).
-- [ ] The linter/Karma presubmit checks pass on my local machine, and my PR follows the [coding style guide](https://github.com/oppia/oppia/wiki/Coding-style-guide)).
-- [ ] "Allow edits from maintainers" is checked. (See [here](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/allowing-changes-to-a-pull-request-branch-created-from-a-fork) for instructions on how to enable it.)
+- [ ] I have assigned the correct reviewers to this PR (or will leave a comment with the phrase "@{{reviewer_username}} PTAL" if I can't assign them directly).
 
 ## Testing doc (for PRs with Beam jobs that modify production server data)
 
@@ -27,18 +30,20 @@ and link to the job request doc here.
 
 Otherwise, please delete this section.
 -->
+
 - [ ] A testing doc has been written: ... (ADD LINK) ...
 - [ ] _(To be confirmed by the server admin)_ All jobs in this PR have been verified on a live server, and the PR is safe to merge.
-
 
 ## Proof that changes are correct
 
 <!--
-Add videos/screenshots of the user-facing interface to demonstrate that the changes
-made in this PR work correctly. If this PR is for a developer-facing feature,
-provide the videos/screenshots of developer-facing interface. Please also include
-videos/screenshots of the developer tools browser console, so that we can be
-sure that there are no console errors.
+Add before-and-after videos/screenshots of the user-facing interface (including
+the browser devtools console) to demonstrate that the changes made in this PR
+work correctly. Make sure the actions taken in the before and after videos are
+the same. (For changes involving responsiveness or adjustment of UI elements,
+this should be a video that gradually resizes the viewport from wide to narrow
+and back again.) If this PR is for a developer-facing feature, provide
+videos/screenshots of the developer-facing interface instead.
 
 When you make updates to the PR, please update these videos/screenshots as well.
 You can drop videos/screenshots from previous versions of the PR.

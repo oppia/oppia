@@ -21,7 +21,8 @@ import unittest.mock
 
 from core import feconf
 from core.constants import constants
-from core.domain import config_services
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -35,6 +36,7 @@ from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -83,7 +85,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         ) for i in range(3)]
 
@@ -112,14 +113,16 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id, self.admin_id, 'story_id_2', self.topic_id_1, '2')
 
         # Add skill opportunity topic to a classroom.
-        config_services.set_property(
-            self.admin_id, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math-one',
-                'topic_ids': [self.topic_id],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
+        self.classroom_id = classroom_config_services.get_new_classroom_id()
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=self.classroom_id,
+            name='math',
+            url_fragment='math-one',
+            course_details='',
+            topic_list_intro='',
+            topic_id_to_prerequisite_topic_ids={self.topic_id: []}
+        )
+        classroom_config_services.update_or_create_classroom_model(classroom)
 
         self.expected_skill_opportunity_dict_0 = {
             'id': self.skill_id_0,
@@ -187,8 +190,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_skill_opportunity_data_does_not_return_non_classroom_topics(
         self
     ) -> None:
-        config_services.revert_property(
-            self.admin_id, 'classroom_pages_data')
+        classroom_config_services.delete_classroom(self.classroom_id)
 
         response = self.get_json(
             '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
@@ -266,7 +268,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self
     ) -> None:
         # Unassign topic 0 from the classroom.
-        config_services.revert_property(self.admin_id, 'classroom_pages_data')
+        classroom_config_services.delete_classroom(self.classroom_id)
 
         # Create a new topic.
         topic_id = '9'
@@ -280,14 +282,15 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             topic, [skill_id_3, skill_id_4, skill_id_5])
 
         # Add new topic to a classroom.
-        config_services.set_property(
-            self.admin_id, 'classroom_pages_data', [{
-                'name': 'math',
-                'url_fragment': 'math-one',
-                'topic_ids': [topic_id],
-                'course_details': '',
-                'topic_list_intro': ''
-            }])
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=self.classroom_id,
+            name='math',
+            url_fragment='math-one',
+            course_details='',
+            topic_list_intro='',
+            topic_id_to_prerequisite_topic_ids={topic_id: []}
+        )
+        classroom_config_services.update_or_create_classroom_model(classroom)
 
         # Opportunities with IDs skill_id_0, skill_id_1, skill_id_2 will be
         # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked
@@ -582,19 +585,50 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         topic_id = 'topic123'
         language_code = 'en'
         opportunity_id = 'opp123'
+        mock_topic = topic_domain.Topic(
+            topic_id='topic123',
+            name='Topic 1',
+            abbreviated_name='abb name',
+            url_fragment='url',
+            description='description',
+            canonical_story_references=[],
+            additional_story_references=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            version=1,
+            story_reference_schema_version=1,
+            meta_tag_content='tag',
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='dummy',
+            skill_ids_for_diagnostic_test=[],
+            thumbnail_filename='svg',
+            thumbnail_bg_color='green',
+            thumbnail_size_in_bytes=3
+        )
 
-        request_dict = {
-            'topic_id': topic_id,
-            'language_code': language_code,
-            'opportunity_id': opportunity_id
-        }
-        csrf_token = self.get_new_csrf_token()
+        # Here we use object because we need to return
+        # a mock topic from method get_topic_by_name.
+        with unittest.mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_name',
+            return_value=mock_topic
+        ):
 
-        _ = self.put_json(
-            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-            request_dict,
-            csrf_token=csrf_token,
-            expected_status_int=200)
+            request_dict = {
+                'topic_id': topic_id,
+                'language_code': language_code,
+                'opportunity_id': opportunity_id
+            }
+            csrf_token = self.get_new_csrf_token()
+
+            _ = self.put_json(
+                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+                request_dict,
+                csrf_token=csrf_token,
+                expected_status_int=200)
 
     def test_unpin_translation_opportunity(self) -> None:
         self.login(self.OWNER_EMAIL)
@@ -602,18 +636,50 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         language_code = 'en'
         opportunity_id = None
 
-        request_dict = {
-            'topic_id': topic_id,
-            'language_code': language_code,
-            'opportunity_id': opportunity_id
-        }
-        csrf_token = self.get_new_csrf_token()
+        mock_topic = topic_domain.Topic(
+            topic_id='topic123',
+            name='Topic 1',
+            abbreviated_name='abb name',
+            url_fragment='url',
+            description='description',
+            canonical_story_references=[],
+            additional_story_references=[],
+            uncategorized_skill_ids=[],
+            subtopics=[],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            version=1,
+            story_reference_schema_version=1,
+            meta_tag_content='tag',
+            practice_tab_is_displayed=False,
+            page_title_fragment_for_web='dummy',
+            skill_ids_for_diagnostic_test=[],
+            thumbnail_filename='svg',
+            thumbnail_bg_color='green',
+            thumbnail_size_in_bytes=3
+        )
 
-        _ = self.put_json(
-            '%s' % feconf.PINNED_OPPORTUNITIES_URL,
-            request_dict,
-            csrf_token=csrf_token,
-            expected_status_int=200)
+        # Here we use object because we need to return
+        # a mock topic from method get_topic_by_name.
+        with unittest.mock.patch.object(
+            topic_fetchers,
+            'get_topic_by_name',
+            return_value=mock_topic
+        ):
+
+            request_dict = {
+                'topic_id': topic_id,
+                'language_code': language_code,
+                'opportunity_id': opportunity_id
+            }
+            csrf_token = self.get_new_csrf_token()
+
+            _ = self.put_json(
+                '%s' % feconf.PINNED_OPPORTUNITIES_URL,
+                request_dict,
+                csrf_token=csrf_token,
+                expected_status_int=200)
 
     def test_raises_error_if_story_contain_none_exploration_id(self) -> None:
         # Create a new exploration and linked story.
@@ -624,7 +690,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -656,7 +721,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True
         )
         self.publish_exploration(self.owner_id, exp_100.id)
         self.create_story_for_translation_opportunity(
@@ -689,7 +753,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
@@ -785,7 +848,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             ['Introduction', continue_state_name, 'End state'],
             ['TextInput', 'Continue'],
             category='Algebra',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_100.id)
@@ -911,7 +973,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 10',
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_10.id)
@@ -920,7 +981,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 20',
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_20.id)
@@ -929,7 +989,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.owner_id,
             title='title 30',
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         )
         self.publish_exploration(self.owner_id, exp_30.id)
@@ -1104,7 +1163,6 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             title='title %d' % i,
             category=constants.ALL_CATEGORIES[i],
             end_state_name='End State',
-            correctness_feedback_enabled=True,
             content_html='Content'
         ) for i in range(2)]
 
@@ -2114,12 +2172,13 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             suggestion_models.SCORE_TYPE_TRANSLATION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
         change_cmd = {
-            'cmd': 'add_translation',
+            'cmd': 'add_written_translation',
             'content_id': 'content',
             'language_code': 'hi',
             'content_html': '',
             'state_name': 'Introduction',
-            'translation_html': '<p>Translation for content.</p>'
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html'
         }
         suggestion_models.GeneralSuggestionModel.create(
             feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,

@@ -20,19 +20,21 @@
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 
-var ClassroomPage = function() {
+var ClassroomPage = function () {
   var topicSummaryTile = $('.e2e-test-topic-summary-tile');
   var launchDiagnosticTestPageButton = $('.e2e-test-take-diagnostic-test');
 
-  this.get = async function(classroomName) {
+  this.get = async function (classroomName) {
     await browser.url('/learn/' + classroomName);
     await waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberOfTopicsToBe = async function(expectedCount) {
+  this.expectNumberOfTopicsToBe = async function (expectedCount) {
     if (expectedCount > 0) {
       await waitFor.visibilityOf(
-        topicSummaryTile, 'Topic summary tile is not visible');
+        topicSummaryTile,
+        'Topic summary tile is not visible'
+      );
       let actualCount = await $$('.e2e-test-topic-summary-tile').length;
       expect(actualCount).toEqual(expectedCount);
     } else {
@@ -41,9 +43,11 @@ var ClassroomPage = function() {
     }
   };
 
-  this.launchDiagnosticTestPage = async function() {
+  this.launchDiagnosticTestPage = async function () {
     await action.click(
-      'Launch diagnostic test page button', launchDiagnosticTestPageButton);
+      'Launch diagnostic test page button',
+      launchDiagnosticTestPageButton
+    );
   };
 };
 

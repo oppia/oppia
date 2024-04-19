@@ -16,26 +16,27 @@
  * @fileoverview Frontend Model for user info.
  */
 
-enum UserRoles {
-  QUESTION_COORDINATOR='QUESTION_COORDINATOR',
-  QUESTION_ADMIN='QUESTION_ADMIN',
-  BLOG_ADMIN='BLOG_ADMIN',
-  BLOG_POST_EDITOR='BLOG_POST_EDITOR',
-  TRANSLATION_ADMIN='TRANSLATION_ADMIN',
-  TRANSLATION_COORDINATOR='TRANSLATION_COORDINATOR',
- }
+export enum UserRoles {
+  QUESTION_COORDINATOR = 'QUESTION_COORDINATOR',
+  QUESTION_ADMIN = 'QUESTION_ADMIN',
+  BLOG_ADMIN = 'BLOG_ADMIN',
+  BLOG_POST_EDITOR = 'BLOG_POST_EDITOR',
+  TRANSLATION_ADMIN = 'TRANSLATION_ADMIN',
+  TRANSLATION_COORDINATOR = 'TRANSLATION_COORDINATOR',
+  VOICEOVER_ADMIN = 'VOICEOVER_ADMIN',
+}
 
 export interface UserInfoBackendDict {
-  'roles': string[];
-  'is_moderator': boolean;
-  'is_curriculum_admin': boolean;
-  'is_super_admin': boolean;
-  'is_topic_manager': boolean;
-  'can_create_collections': boolean;
-  'preferred_site_language_code': string | null;
-  'username': string | null;
-  'email': string | null;
-  'user_is_logged_in': boolean;
+  roles: string[];
+  is_moderator: boolean;
+  is_curriculum_admin: boolean;
+  is_super_admin: boolean;
+  is_topic_manager: boolean;
+  can_create_collections: boolean;
+  preferred_site_language_code: string | null;
+  username: string | null;
+  email: string | null;
+  user_is_logged_in: boolean;
 }
 
 export class UserInfo {
@@ -53,10 +54,17 @@ export class UserInfo {
   _isLoggedIn: boolean;
 
   constructor(
-      roles: string[], isModerator: boolean, isCurriculumAdmin: boolean,
-      isSuperAdmin: boolean, isTopicManager: boolean,
-      canCreateCollections: boolean, preferredSiteLanguageCode: string | null,
-      username: string | null, email: string | null, isLoggedIn: boolean) {
+    roles: string[],
+    isModerator: boolean,
+    isCurriculumAdmin: boolean,
+    isSuperAdmin: boolean,
+    isTopicManager: boolean,
+    canCreateCollections: boolean,
+    preferredSiteLanguageCode: string | null,
+    username: string | null,
+    email: string | null,
+    isLoggedIn: boolean
+  ) {
     this._roles = roles;
     this._isModerator = isModerator;
     this._isCurriculumAdmin = isCurriculumAdmin;
@@ -69,18 +77,34 @@ export class UserInfo {
     this._isLoggedIn = isLoggedIn;
   }
 
-  static createFromBackendDict(
-      data: UserInfoBackendDict): UserInfo {
+  static createFromBackendDict(data: UserInfoBackendDict): UserInfo {
     return new UserInfo(
-      data.roles, data.is_moderator, data.is_curriculum_admin,
-      data.is_super_admin, data.is_topic_manager, data.can_create_collections,
-      data.preferred_site_language_code, data.username,
-      data.email, data.user_is_logged_in);
+      data.roles,
+      data.is_moderator,
+      data.is_curriculum_admin,
+      data.is_super_admin,
+      data.is_topic_manager,
+      data.can_create_collections,
+      data.preferred_site_language_code,
+      data.username,
+      data.email,
+      data.user_is_logged_in
+    );
   }
 
   static createDefault(): UserInfo {
     return new UserInfo(
-      ['GUEST'], false, false, false, false, false, null, null, null, false);
+      ['GUEST'],
+      false,
+      false,
+      false,
+      false,
+      false,
+      null,
+      null,
+      null,
+      false
+    );
   }
 
   isModerator(): boolean {
@@ -88,11 +112,15 @@ export class UserInfo {
   }
 
   isBlogAdmin(): boolean {
-    return (this._roles.includes(UserRoles.BLOG_ADMIN));
+    return this._roles.includes(UserRoles.BLOG_ADMIN);
+  }
+
+  isVoiceoverAdmin(): boolean {
+    return this._roles.includes(UserRoles.VOICEOVER_ADMIN);
   }
 
   isBlogPostEditor(): boolean {
-    return (this._roles.includes(UserRoles.BLOG_POST_EDITOR));
+    return this._roles.includes(UserRoles.BLOG_POST_EDITOR);
   }
 
   isCurriculumAdmin(): boolean {

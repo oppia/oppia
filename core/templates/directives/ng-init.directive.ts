@@ -20,7 +20,7 @@ import {Directive, OnInit, Output, EventEmitter} from '@angular/core';
 
 @Directive({
   // This should be same as the Ouput below. Please change both if changing one.
-  selector: '[oppiaNgInit]'
+  selector: '[oppiaNgInit]',
 })
 export class NgInitDirective implements OnInit {
   // This should be same as the selector. Please change both if changing one.

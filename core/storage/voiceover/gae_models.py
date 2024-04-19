@@ -21,26 +21,26 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
-from typing import Dict, TypedDict
+from typing import Dict, Final
 
 MYPY = False
 if MYPY: # pragma: no cover
+    # Here, 'state_domain' is imported only for type checking.
+    from core.domain import state_domain # pylint: disable=invalid-import # isort:skip
+    # Here, 'voiceover_domain' is imported only for type checking.
+    from core.domain import voiceover_domain # pylint: disable=invalid-import # isort:skip
     from mypy_imports import base_models
     from mypy_imports import datastore_services
+
+    ContentIdToVoiceoverMappingType = (
+        voiceover_domain.ContentIdToVoiceoverMappingType)
 
 (base_models,) = models.Registry.import_models([
     models.Names.BASE_MODEL])
 
 datastore_services = models.Registry.import_datastore_services()
 
-
-class VoiceoverDict(TypedDict):
-    """Dictionary representing Voiceover object."""
-
-    filename: str
-    file_size_bytes: int
-    needs_update: bool
-    duration_secs: float
+VOICEOVER_AUTOGENERATION_POLICY_ID: Final = 'voiceover_policy'
 
 
 class EntityVoiceoversModel(base_models.BaseModel):
@@ -100,7 +100,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
             entity_id: str. The ID of the entity.
             entity_version: int. The version of the entity.
             language_accent_code: str.
-                The language accent code in which the voiceover is stored.
+                The language-accent code in which the voiceover is stored.
 
         Returns:
             str. Returns a unique id of the form
@@ -127,7 +127,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
                 fetched.
             entity_version: int. The version of the entity whose voiceovers
                 are to be fetched.
-            language_accent_code: str. The language accent code of the
+            language_accent_code: str. The language-accent code of the
                 voiceovers.
 
         Returns:
@@ -146,7 +146,7 @@ class EntityVoiceoversModel(base_models.BaseModel):
         entity_id: str,
         entity_version: int,
         language_accent_code: str,
-        voiceovers: Dict[str, Dict[str, VoiceoverDict]]
+        voiceovers: Dict[str, Dict[str, state_domain.VoiceoverDict]]
     ) -> EntityVoiceoversModel:
         """Creates and returns a new EntityVoiceoversModel instance.
 
@@ -172,3 +172,240 @@ class EntityVoiceoversModel(base_models.BaseModel):
             language_accent_code=language_accent_code,
             voiceovers=voiceovers
         )
+
+
+class VoiceoverAutogenerationPolicyModel(base_models.BaseModel):
+    """Model for storing language-accent codes for Oppia supported voiceovers.
+
+    There should only be one instance of this class, and it is keyed by
+    VOICEOVER_AUTOGENERATION_POLICY_ID.
+    """
+
+    # A dict with language_codes as keys and nested dicts as values.
+    # Each nested dict contains language_accent_codes as keys and booleans
+    # indicating whether it's possible to generate automatic voiceovers
+    # for this language-accent code as values.
+    language_codes_mapping = datastore_services.JsonProperty(required=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'language_codes_mapping': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
+class VoiceArtistMetadataModel(base_models.BaseModel):
+    """The model stores manual voice artists' information with their
+    provided voiceovers metadata.
+    Instances of this class are keyed by the user ID.
+    """
+
+    # A dictionary that maps language codes to accent codes. This field
+    # indicates the languages and corresponding accents in which the specified
+    # voice artist has provided voiceovers for curated explorations.
+    language_code_to_accent = datastore_services.JsonProperty(
+        default={}, indexed=False, required=True)
+
+    @classmethod
+    def has_reference_to_user_id(cls, voice_artist_id: str) -> bool:
+        """Check whether VoiceArtistMetadataModel references user.
+
+        Args:
+            voice_artist_id: str. The ID of the user whose data
+                should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get(voice_artist_id, strict=False) is not None
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user to export."""
+        return dict(
+            super(
+                VoiceArtistMetadataModel, cls
+            ).get_export_policy(), **{
+                'language_code_to_accent': (
+                    base_models.EXPORT_POLICY.EXPORTED)
+            }
+        )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """The model contains data corresponding to a user: user_id and their
+        provided language code for in which they contributed to voiceovers. This
+        model is a transient one and is expected to be deleted by June 30, 2024.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """The model contains the user ID of the voice artist and the language
+        code and accent code in which they provided voiceovers.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.ONE_INSTANCE_PER_USER
+
+    @classmethod
+    def create_model(
+        cls,
+        voice_artist_id: str,
+        language_code_to_accent: Dict[str, str]
+    ) -> VoiceArtistMetadataModel:
+        """Creates a new VoiceArtistMetadataModel instance.
+
+        Note that Beam jobs will still be able to modify this model after its
+        creation because they bypass this method.
+
+        Args:
+            voice_artist_id: str. User ID of the voice artist.
+            language_code_to_accent: dict(str, str). A dictionary mapping
+                language codes to its corresponding language accent codes.
+
+        Returns:
+            VoiceArtistMetadataModel. The newly created
+            VoiceArtistMetadataModel instance.
+
+        Raises:
+            Exception. A voice artist metadata model with a given voice
+                artist ID already exists.
+        """
+        if cls.get(voice_artist_id, strict=False):
+            raise Exception(
+                'A voice artist metadata model with a given voice'
+                'artist ID already exists')
+
+        entity = cls(
+            id=voice_artist_id,
+            language_code_to_accent=language_code_to_accent
+        )
+        entity.update_timestamps()
+        entity.put()
+
+        return entity
+
+    @classmethod
+    def export_data(
+        cls, user_id: str
+    ) -> Dict[str, Dict[str, str]]:
+        """Exports the data from VoiceArtistMetadataModel into
+        dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from VoiceArtistMetadataModel.
+        """
+        user_data: Dict[str, Dict[str, str]] = {}
+        voice_artist_metadata_model = cls.get(user_id, strict=False)
+
+        if voice_artist_metadata_model is not None:
+            user_data = {
+                'language_code_to_accent': (
+                    voice_artist_metadata_model.language_code_to_accent)
+            }
+        return user_data
+
+
+class ExplorationVoiceArtistsLinkModel(base_models.BaseModel):
+    """The model links the exploration's latest content IDs and the voice
+    artist ID who contributed voiceovers in the given language code.
+    Instances of this class are keyed by the exploration ID.
+    """
+
+    # A dictionary with content IDs as keys and nested dicts as values. Each
+    # nested dict contains language codes as keys and a 2-tuple as values. The
+    # 2-tuple contains voice artist ID as the first element and VoiceoverDict
+    # as the second element.
+    content_id_to_voiceovers_mapping = (
+        datastore_services.JsonProperty(required=True))
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """The model contains data corresponding to a user, but this isn't
+        exported because the exploration voice artist link model stores the
+        content IDs, language codes, and voiceover dicts for which they have
+        contributed voiceovers and are not relevant to the user for Takeout.
+        """
+        return dict(
+            super(
+                ExplorationVoiceArtistsLinkModel, cls
+            ).get_export_policy(), **{
+                'content_id_to_voiceovers_mapping': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE)
+            }
+        )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user. This
+        model is a transient one and is expected to be deleted by June 30, 2024.
+        """
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """The model contains data corresponding to a user, but this isn't
+        exported because the exploration voice artist link model stores the
+        content IDs, language codes, and voiceover dicts for which they have
+        contributed voiceovers and are not relevant to the user for Takeout.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def create_model(
+        cls,
+        exploration_id: str,
+        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType,
+    ) -> ExplorationVoiceArtistsLinkModel:
+        """Creates a new ExplorationVoiceArtistsLinkModel instance.
+
+        Note that Beam jobs will still be able to modify this model after its
+        creation because they bypass this method.
+
+        Args:
+            exploration_id: str. The ID of the exploration for which new model
+                will be created.
+            content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType.
+                A dictionary with content IDs as keys and nested dicts as
+                values. Each nested dict contains language codes as keys and a
+                2-tuple as values. The 2-tuple contains voice artist ID as the
+                first element and VoiceoverDict as the second element.
+
+        Returns:
+            ExplorationVoiceArtistsLinkModel. The newly created
+            ExplorationVoiceArtistsLinkModel instance.
+
+        Raises:
+            Exception. An exploration voice artist link model with a given
+                exploration ID already exists.
+        """
+
+        if cls.get(exploration_id, strict=False):
+            raise Exception(
+                'An exploration voice artist link model with a given '
+                'exploration ID already exists')
+
+        entity = cls(
+            id=exploration_id,
+            content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping
+        )
+        entity.update_timestamps()
+        entity.put()
+
+        return entity

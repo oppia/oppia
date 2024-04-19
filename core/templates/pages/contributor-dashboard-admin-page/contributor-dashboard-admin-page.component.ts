@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,313 +13,405 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the contributor dashboard admin page.
+ * @fileoverview Contributor dashboard admin page component.
  */
 
-require('domain/utilities/language-util.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require(
-  'pages/contributor-dashboard-admin-page/services/' +
-  'contributor-dashboard-admin-backend-api.service.ts');
-require('services/user.service.ts');
+import {Component, OnInit} from '@angular/core';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
+import {UserService} from 'services/user.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ContributorDashboardAdminBackendApiService} from './services/contributor-dashboard-admin-backend-api.service';
+import {AppConstants} from 'app.constants';
 
-require(
-  'pages/contributor-dashboard-admin-page/navbar/' +
-  'contributor-dashboard-admin-navbar.component.ts');
+interface ViewContributionReviewers {
+  filterCriterion: string;
+  username: string;
+  category: string | null;
+  languageCode: string;
+  isValid: () => boolean;
+}
 
-require('services/platform-feature.service.ts');
+interface AddContributionReviewer {
+  username: string;
+  category: string | null;
+  languageCode: string;
+  isValid: () => boolean;
+}
 
-angular.module('oppia').directive('contributorDashboardAdminPage', [
-  '$rootScope', 'ContributorDashboardAdminBackendApiService',
-  'LanguageUtilService', 'UrlInterpolationService', 'UserService',
-  'PlatformFeatureService',
-  'CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION',
-  'CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION',
-  'CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION',
-  'USER_FILTER_CRITERION_ROLE', 'USER_FILTER_CRITERION_USERNAME',
-  function(
-      $rootScope, ContributorDashboardAdminBackendApiService,
-      LanguageUtilService, UrlInterpolationService, UserService,
-      PlatformFeatureService,
-      CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-      CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-      CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-      USER_FILTER_CRITERION_ROLE, USER_FILTER_CRITERION_USERNAME,) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/contributor-dashboard-admin-page/' +
-        'contributor-dashboard-admin-page.component.html'),
-      controllerAs: '$ctrl',
-      controller: [function() {
-        var ctrl = this;
-        ctrl.taskRunningInBackground = false;
-        ctrl.statusMessage = '';
-        ctrl.UserIsTranslationAdmin = false;
+interface RemoveContributionReviewer {
+  method: string;
+  username: string;
+  category: string | null;
+  languageCode: string;
+  isValid: () => boolean;
+}
 
-        ctrl.isNewUiEnabled = false;
+interface ViewTranslationContributionStats {
+  username: string;
+  isValid: () => boolean;
+}
 
-        var handleErrorResponse = function(errorResponse) {
-          ctrl.statusMessage = 'Server error: ' + errorResponse;
-          // TODO(#8521): Remove the use of $rootScope.$apply()
-          // once the directive is migrated to angular.
-          $rootScope.$apply();
-        };
+interface FormData {
+  viewContributionReviewers: ViewContributionReviewers;
+  addContributionReviewer: AddContributionReviewer;
+  removeContributionReviewer: RemoveContributionReviewer;
+  viewTranslationContributionStats: ViewTranslationContributionStats;
+}
 
-        var getLanguageDescriptions = function(languageCodes) {
-          var languageDescriptions = [];
-          languageCodes.forEach(function(languageCode) {
-            languageDescriptions.push(
-              LanguageUtilService.getAudioLanguageDescription(
-                languageCode));
-          });
-          return languageDescriptions;
-        };
+interface TranslationContributionStat {
+  language: string;
+  topic_name: string;
+  submitted_translations_count: number;
+  submitted_translation_word_count: number;
+  accepted_translations_count: number;
+  accepted_translations_without_reviewer_edits_count: number;
+  accepted_translation_word_count: number;
+  rejected_translations_count: number;
+  rejected_translation_word_count: number;
+  contribution_months: string[];
+}
 
-        ctrl.isLanguageSpecificReviewCategory = function(reviewCategory) {
-          return (
-            reviewCategory === CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION);
-        };
+interface ContributionReviewersResult {
+  usernames?: string[];
+  REVIEW_TRANSLATION?: string[];
+  REVIEW_QUESTION?: boolean;
+  SUBMIT_QUESTION?: boolean;
+}
 
-        ctrl.submitAddContributionRightsForm = function(formResponse) {
-          if (ctrl.taskRunningInBackground) {
-            return;
-          }
-          ctrl.statusMessage = 'Adding contribution rights...';
-          ctrl.taskRunningInBackground = true;
-          ContributorDashboardAdminBackendApiService
-            .addContributionReviewerAsync(
-              formResponse.category, formResponse.username,
-              formResponse.languageCode
-            ).then(() => {
-              ctrl.statusMessage = 'Success.';
-              refreshFormData();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            }, handleErrorResponse);
-          ctrl.taskRunningInBackground = false;
-        };
+interface LanguageCodeDescription {
+  id: string;
+  description: string;
+}
+@Component({
+  selector: 'contributor-dashboard-admin-page',
+  templateUrl: './contributor-dashboard-admin-page.component.html',
+})
+export class ContributorDashboardAdminPageComponent implements OnInit {
+  taskRunningInBackground: boolean = false;
+  statusMessage: string = '';
+  UserIsTranslationAdmin: boolean = false;
+  isNewUiEnabled: boolean = false;
 
-        ctrl.submitViewContributorUsersForm = function(formResponse) {
-          if (ctrl.taskRunningInBackground) {
-            return;
-          }
-          ctrl.statusMessage = 'Processing query...';
-          ctrl.taskRunningInBackground = true;
-          ctrl.contributionReviewersResult = {};
-          if (formResponse.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-            ContributorDashboardAdminBackendApiService
-              .viewContributionReviewersAsync(
-                formResponse.category, formResponse.languageCode
-              ).then((usersObject) => {
-                ctrl.contributionReviewersResult.usernames = (
-                  usersObject.usernames);
-                ctrl.contributionReviewersDataFetched = true;
-                ctrl.statusMessage = 'Success.';
-                refreshFormData();
-                // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular.
-                $rootScope.$apply();
-              }, handleErrorResponse);
-          } else {
-            ContributorDashboardAdminBackendApiService
-              .contributionReviewerRightsAsync(
-                formResponse.username
-              ).then((contributionRights) => {
-                if (
-                  ctrl.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
-                    'REVIEW_TRANSLATION')) {
-                  ctrl.contributionReviewersResult = {
-                    REVIEW_TRANSLATION: getLanguageDescriptions(
-                      contributionRights
-                        .can_review_translation_for_language_codes)
-                  };
-                }
-                if (
-                  ctrl.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
-                    'REVIEW_QUESTION')) {
-                  ctrl.contributionReviewersResult.REVIEW_QUESTION = (
-                    contributionRights.can_review_questions),
-                  ctrl.contributionReviewersResult.SUBMIT_QUESTION = (
-                    contributionRights.can_submit_questions);
-                }
-                ctrl.contributionReviewersDataFetched = true;
-                ctrl.statusMessage = 'Success.';
-                // TODO(#8521): Remove the use of $rootScope.$apply()
-                // once the directive is migrated to angular.
-                $rootScope.$apply();
-                refreshFormData();
-              }, handleErrorResponse);
-          }
-          ctrl.taskRunningInBackground = false;
-        };
+  USER_FILTER_CRITERION_ROLE: string;
+  USER_FILTER_CRITERION_USERNAME: string;
+  CD_USER_RIGHTS_CATEGORIES: Record<string, string>;
 
-        ctrl.submitRemoveContributionRightsForm = function(formResponse) {
-          if (ctrl.taskRunningInBackground) {
-            return;
-          }
-          ctrl.statusMessage = 'Processing query...';
-          ctrl.taskRunningInBackground = true;
-          ContributorDashboardAdminBackendApiService
-            .removeContributionReviewerAsync(
-              formResponse.username, formResponse.category,
-              formResponse.languageCode
-            ).then(() => {
-              ctrl.statusMessage = 'Success.';
-              refreshFormData();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            }, handleErrorResponse);
-          ctrl.taskRunningInBackground = false;
-        };
+  contributionReviewersDataFetched: boolean = false;
+  contributionReviewersResult: ContributionReviewersResult = {};
+  translationContributionStatsFetched: boolean;
+  translationContributionStatsResults: TranslationContributionStat[] = [];
+  languageCodesAndDescriptions: LanguageCodeDescription[] = [];
+  formData!: FormData;
 
-        ctrl.submitViewTranslationContributionStatsForm = function(
-            formResponse) {
-          if (ctrl.taskRunningInBackground) {
-            return;
-          }
-          ctrl.statusMessage = 'Processing query...';
-          ctrl.taskRunningInBackground = true;
-          ContributorDashboardAdminBackendApiService
-            .viewTranslationContributionStatsAsync(
-              formResponse.username
-            ).then(response => {
-              ctrl.translationContributionStatsResults = (
-                response.translation_contribution_stats);
-              ctrl.translationContributionStatsFetched = true;
-              ctrl.statusMessage = 'Success.';
-              refreshFormData();
-              // TODO(#8521): Remove the use of $rootScope.$apply()
-              // once the directive is migrated to angular.
-              $rootScope.$apply();
-            }, handleErrorResponse);
-          ctrl.taskRunningInBackground = false;
-        };
+  constructor(
+    private userService: UserService,
+    private platformFeatureService: PlatformFeatureService,
+    private contributorDashboardAdminBackendApiService: ContributorDashboardAdminBackendApiService,
+    private languageUtilService: LanguageUtilService
+  ) {}
 
-        var refreshFormData = function() {
-          ctrl.formData = {
-            viewContributionReviewers: {
-              filterCriterion: USER_FILTER_CRITERION_ROLE,
-              username: '',
-              category: null,
-              languageCode: null,
-              isValid: function() {
-                if (this.filterCriterion === USER_FILTER_CRITERION_ROLE) {
-                  if (this.category === null) {
-                    return false;
-                  }
-                  if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-                    return Boolean(this.languageCode);
-                  }
-                  return true;
-                }
-
-                if (this.filterCriterion === USER_FILTER_CRITERION_USERNAME) {
-                  return Boolean(this.username);
-                }
-              }
-            },
-            addContributionReviewer: {
-              username: '',
-              category: null,
-              languageCode: null,
-              isValid: function() {
-                if (this.username === '') {
-                  return false;
-                }
-                if (this.category === null) {
-                  return false;
-                }
-                if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-                  return Boolean(this.languageCode);
-                }
-                return true;
-              }
-            },
-            removeContributionReviewer: {
-              username: '',
-              category: null,
-              languageCode: null,
-              isValid: function() {
-                if (this.username === '' || this.category === null) {
-                  return false;
-                }
-                if (ctrl.isLanguageSpecificReviewCategory(this.category)) {
-                  return Boolean(this.languageCode);
-                }
-                return true;
-              }
-            },
-            viewTranslationContributionStats: {
-              username: '',
-              isValid: function() {
-                if (this.username === '') {
-                  return false;
-                }
-                return true;
-              }
+  refreshFormData(): void {
+    this.formData = {
+      viewContributionReviewers: {
+        filterCriterion: AppConstants.USER_FILTER_CRITERION_ROLE,
+        username: '',
+        category: null,
+        languageCode: null,
+        isValid: () => {
+          if (
+            this.formData.viewContributionReviewers.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_ROLE
+          ) {
+            if (this.formData.viewContributionReviewers.category === null) {
+              return false;
             }
-          };
-        };
-
-        ctrl.$onInit = function() {
-          ctrl.isNewUiEnabled = (
-            PlatformFeatureService.status.CdAdminDashboardNewUi.isEnabled);
-          UserService.getUserInfoAsync().then((userInfo) => {
-            let translationCategories = {};
-            let questionCategories = {};
-            if (userInfo.isTranslationAdmin()) {
-              ctrl.UserIsTranslationAdmin = true;
-              translationCategories = {
-                REVIEW_TRANSLATION: (
-                  CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION)
-              };
+            if (
+              this.isLanguageSpecificReviewCategory(
+                this.formData.viewContributionReviewers.category
+              )
+            ) {
+              return Boolean(
+                this.formData.viewContributionReviewers.languageCode
+              );
             }
-            if (userInfo.isQuestionAdmin() ||
-                userInfo.isQuestionCoordinator()) {
-              questionCategories = {
-                REVIEW_QUESTION: CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                SUBMIT_QUESTION: CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
-              };
-            }
-            ctrl.CD_USER_RIGHTS_CATEGORIES = {
-              ...translationCategories,
-              ...questionCategories
-            };
-            $rootScope.$apply();
-          });
+            return true;
+          }
 
-          ctrl.USER_FILTER_CRITERION_USERNAME = USER_FILTER_CRITERION_USERNAME;
-          ctrl.USER_FILTER_CRITERION_ROLE = USER_FILTER_CRITERION_ROLE;
-
-          refreshFormData();
-          ctrl.contributionReviewersDataFetched = false;
-          ctrl.contributionReviewersResult = {};
-          ctrl.translationContributionStatsFetched = false;
-          ctrl.translationContributionStatsResults = [];
-          ctrl.statusMessage = '';
-
-          ctrl.languageCodesAndDescriptions = (
-            LanguageUtilService.getAllVoiceoverLanguageCodes().map(
-              function(languageCode) {
-                return {
-                  id: languageCode,
-                  description: (
-                    LanguageUtilService.getAudioLanguageDescription(
-                      languageCode))
-                };
-              }));
-        };
-
-        ctrl.clearResults = function() {
-          ctrl.contributionReviewersDataFetched = false;
-          ctrl.contributionReviewersResult = {};
-        };
-      }]
+          if (
+            this.formData.viewContributionReviewers.filterCriterion ===
+            AppConstants.USER_FILTER_CRITERION_USERNAME
+          ) {
+            return Boolean(this.formData.viewContributionReviewers.username);
+          }
+        },
+      },
+      addContributionReviewer: {
+        username: '',
+        category: null,
+        languageCode: null,
+        isValid: () => {
+          if (this.formData.addContributionReviewer.username === '') {
+            return false;
+          }
+          if (this.formData.addContributionReviewer.category === null) {
+            return false;
+          }
+          if (
+            this.isLanguageSpecificReviewCategory(
+              this.formData.addContributionReviewer.category
+            )
+          ) {
+            return Boolean(this.formData.addContributionReviewer.languageCode);
+          }
+          return true;
+        },
+      },
+      removeContributionReviewer: {
+        username: '',
+        category: null,
+        languageCode: null,
+        isValid: () => {
+          if (
+            this.formData.removeContributionReviewer.username === '' ||
+            this.formData.removeContributionReviewer.category === null
+          ) {
+            return false;
+          }
+          if (
+            this.isLanguageSpecificReviewCategory(
+              this.formData.removeContributionReviewer.category
+            )
+          ) {
+            return Boolean(
+              this.formData.removeContributionReviewer.languageCode
+            );
+          }
+          return true;
+        },
+        method: '',
+      },
+      viewTranslationContributionStats: {
+        username: '',
+        isValid: () => {
+          if (this.formData.viewTranslationContributionStats.username === '') {
+            return false;
+          }
+          return true;
+        },
+      },
     };
   }
-]);
+
+  ngOnInit(): void {
+    this.isNewUiEnabled =
+      this.platformFeatureService.status.CdAdminDashboardNewUi.isEnabled;
+    this.userService.getUserInfoAsync().then(userInfo => {
+      let translationCategories = {};
+      let questionCategories = {};
+      if (userInfo.isTranslationAdmin()) {
+        this.UserIsTranslationAdmin = true;
+        translationCategories = {
+          REVIEW_TRANSLATION:
+            AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+        };
+      }
+      if (userInfo.isQuestionAdmin() || userInfo.isQuestionCoordinator()) {
+        questionCategories = {
+          REVIEW_QUESTION: AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+          SUBMIT_QUESTION: AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+        };
+      }
+      this.CD_USER_RIGHTS_CATEGORIES = {
+        ...translationCategories,
+        ...questionCategories,
+      };
+    });
+
+    this.USER_FILTER_CRITERION_USERNAME =
+      AppConstants.USER_FILTER_CRITERION_USERNAME;
+    this.USER_FILTER_CRITERION_ROLE = AppConstants.USER_FILTER_CRITERION_ROLE;
+
+    this.refreshFormData();
+    this.contributionReviewersDataFetched = false;
+    this.contributionReviewersResult = {};
+    this.translationContributionStatsFetched = false;
+    this.translationContributionStatsResults = [];
+    this.statusMessage = '';
+
+    this.languageCodesAndDescriptions = this.languageUtilService
+      .getAllVoiceoverLanguageCodes()
+      .map(languageCode => {
+        return {
+          id: languageCode,
+          description:
+            this.languageUtilService.getAudioLanguageDescription(languageCode),
+        };
+      });
+  }
+
+  getLanguageDescriptions(languageCodes: string[]): string[] {
+    const languageDescriptions: string[] = [];
+    languageCodes.forEach(languageCode => {
+      languageDescriptions.push(
+        this.languageUtilService.getAudioLanguageDescription(languageCode)
+      );
+    });
+    return languageDescriptions;
+  }
+
+  isLanguageSpecificReviewCategory(reviewCategory: string): boolean {
+    return (
+      reviewCategory === AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+    );
+  }
+
+  submitAddContributionRightsForm(formResponse: AddContributionReviewer): void {
+    if (this.taskRunningInBackground) {
+      return;
+    }
+    this.statusMessage = 'Adding contribution rights...';
+    this.taskRunningInBackground = true;
+
+    this.contributorDashboardAdminBackendApiService
+      .addContributionReviewerAsync(
+        formResponse.category,
+        formResponse.username,
+        formResponse.languageCode
+      )
+      .then(
+        () => {
+          this.statusMessage = 'Success.';
+          this.refreshFormData();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
+    this.taskRunningInBackground = false;
+  }
+
+  submitViewContributorUsersForm(
+    formResponse: ViewContributionReviewers
+  ): void {
+    if (this.taskRunningInBackground) {
+      return;
+    }
+    this.statusMessage = 'Processing query...';
+    this.taskRunningInBackground = true;
+    this.contributionReviewersResult = {};
+
+    if (
+      formResponse.filterCriterion === AppConstants.USER_FILTER_CRITERION_ROLE
+    ) {
+      this.contributorDashboardAdminBackendApiService
+        .viewContributionReviewersAsync(
+          formResponse.category,
+          formResponse.languageCode
+        )
+        .then(usersObject => {
+          this.contributionReviewersResult.usernames = usersObject.usernames;
+          this.contributionReviewersDataFetched = true;
+          this.statusMessage = 'Success.';
+          const temp = this.formData.viewContributionReviewers.filterCriterion;
+          this.refreshFormData();
+          this.formData.viewContributionReviewers.filterCriterion = temp;
+        });
+    } else {
+      this.contributorDashboardAdminBackendApiService
+        .contributionReviewerRightsAsync(formResponse.username)
+        .then(
+          contributionRights => {
+            if (
+              this.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty(
+                'REVIEW_TRANSLATION'
+              )
+            ) {
+              this.contributionReviewersResult = {
+                REVIEW_TRANSLATION: this.getLanguageDescriptions(
+                  contributionRights.can_review_translation_for_language_codes
+                ),
+              };
+            }
+            if (
+              this.CD_USER_RIGHTS_CATEGORIES.hasOwnProperty('REVIEW_QUESTION')
+            ) {
+              this.contributionReviewersResult.REVIEW_QUESTION =
+                contributionRights.can_review_questions;
+              this.contributionReviewersResult.SUBMIT_QUESTION =
+                contributionRights.can_submit_questions;
+            }
+            this.contributionReviewersDataFetched = true;
+            this.statusMessage = 'Success.';
+            const temp =
+              this.formData.viewContributionReviewers.filterCriterion;
+            this.refreshFormData();
+            this.formData.viewContributionReviewers.filterCriterion = temp;
+          },
+          errorResponse => {
+            this.statusMessage = 'Server error: ' + errorResponse;
+          }
+        );
+    }
+    this.taskRunningInBackground = false;
+  }
+
+  submitRemoveContributionRightsForm(
+    formResponse: RemoveContributionReviewer
+  ): void {
+    if (this.taskRunningInBackground) {
+      return;
+    }
+    this.statusMessage = 'Processing query...';
+    this.taskRunningInBackground = true;
+
+    this.contributorDashboardAdminBackendApiService
+      .removeContributionReviewerAsync(
+        formResponse.category,
+        formResponse.username,
+        formResponse.languageCode
+      )
+      .then(
+        () => {
+          this.statusMessage = 'Success.';
+          this.refreshFormData();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
+
+    this.taskRunningInBackground = false;
+  }
+
+  submitViewTranslationContributionStatsForm(
+    formResponse: ViewTranslationContributionStats
+  ): void {
+    if (this.taskRunningInBackground) {
+      return;
+    }
+    this.statusMessage = 'Processing query...';
+    this.taskRunningInBackground = true;
+
+    this.contributorDashboardAdminBackendApiService
+      .viewTranslationContributionStatsAsync(formResponse.username)
+      .then(
+        response => {
+          this.translationContributionStatsResults =
+            response.translation_contribution_stats;
+          this.translationContributionStatsFetched = true;
+          this.statusMessage = 'Success.';
+          this.refreshFormData();
+        },
+        errorResponse => {
+          this.statusMessage = 'Server error: ' + errorResponse;
+        }
+      );
+
+    this.taskRunningInBackground = false;
+  }
+
+  clearResults(): void {
+    this.contributionReviewersDataFetched = false;
+    this.contributionReviewersResult = {};
+  }
+}

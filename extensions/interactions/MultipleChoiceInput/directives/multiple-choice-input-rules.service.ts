@@ -16,23 +16,27 @@
  * @fileoverview Rules service for the interaction.
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { MultipleChoiceAnswer } from 'interactions/answer-defs';
-import { MultipleChoiceRuleInputs } from 'interactions/rule-input-defs';
+import {MultipleChoiceAnswer} from 'interactions/answer-defs';
+import {MultipleChoiceRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class MultipleChoiceInputRulesService {
   Equals(
-      answer: MultipleChoiceAnswer,
-      inputs: MultipleChoiceRuleInputs): boolean {
+    answer: MultipleChoiceAnswer,
+    inputs: MultipleChoiceRuleInputs
+  ): boolean {
     return answer === inputs.x;
   }
 }
 
-angular.module('oppia').factory(
-  'MultipleChoiceInputRulesService',
-  downgradeInjectable(MultipleChoiceInputRulesService));
+angular
+  .module('oppia')
+  .factory(
+    'MultipleChoiceInputRulesService',
+    downgradeInjectable(MultipleChoiceInputRulesService)
+  );

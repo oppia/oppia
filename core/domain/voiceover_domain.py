@@ -22,10 +22,9 @@ import re
 
 from core import feconf
 from core import utils
-
 from core.domain import state_domain
 
-from typing import Dict, TypedDict
+from typing import Dict, Tuple, TypedDict
 
 
 class EntityVoiceoversDict(TypedDict):
@@ -38,9 +37,14 @@ class EntityVoiceoversDict(TypedDict):
     voiceovers: Dict[str, Dict[str, state_domain.VoiceoverDict]]
 
 
+ContentIdToVoiceoverMappingType = Dict[
+    str, Dict[str, Tuple[str, state_domain.VoiceoverDict]]
+]
+
+
 class EntityVoiceovers:
     """A domain object for the entity voiceovers instance for a given
-    versioned entity in a given language accent pair.
+    versioned entity in a given language-accent pair.
 
     NOTE: This domain object corresponds to EntityVoiceoversModel in the
     storage layer.
@@ -49,7 +53,7 @@ class EntityVoiceovers:
         entity_id: str. The id of the corresponding entity.
         entity_type: str. The type of the corresponding entity.
         entity_version: str. The version of the corresponding entity.
-        language_accent_code: str. The language accent code in which the
+        language_accent_code: str. The language-accent code in which the
             voiceover is stored.
         voiceovers: dict(str, dict(VoiceoverType, VoiceoverDict)). A dict
             containing content IDs as keys and nested dicts as values.
@@ -72,7 +76,7 @@ class EntityVoiceovers:
             entity_id: str. The ID of the entity.
             entity_type: str. The type of the entity.
             entity_version: int. The version of the entity.
-            language_accent_code: str. The language accent code of the
+            language_accent_code: str. The language-accent code of the
                 given voiceover.
             voiceovers: dict(str, dict(VoiceoverType, VoiceoverDict)). A dict
                 containing content IDs as keys and nested dicts as values.

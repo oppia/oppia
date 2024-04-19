@@ -939,7 +939,6 @@ textarea {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: calc(100vw - 930px);
 }
 
 .oppia-navbar-breadcrumb-separator {
@@ -3028,7 +3027,7 @@ oppia-noninteractive-link {
   bottom: 0;
   color: white;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 1.1em;
+  font-size: 1em;
   font-weight: normal;
   -ms-hyphens: auto;
   -moz-hyphens: auto;
@@ -3484,29 +3483,6 @@ oppia-noninteractive-link {
 
 .oppia-static-content h2 {
   text-align: center;
-}
-
-.oppia-about-button {
-  background-color: #00645c;
-  border-radius: 4px;
-  color: rgba(255,255,255,1.0);
-  font-family: "Roboto", Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0.7px;
-  margin: 0 15px 15px 15px;
-  max-width: 90%;
-  min-width: 200px;
-  padding: 15px;
-  text-transform: uppercase;
-  white-space: normal;
-  width: 366px;
-}
-
-.oppia-about-button:hover,
-.oppia-about-button:focus {
-  background-color: #3d9991;
-  color: rgba(255,255,255,1);
 }
 
 .oppia-about-extra-content {

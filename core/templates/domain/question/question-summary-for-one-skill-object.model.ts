@@ -26,10 +26,10 @@ import {
 } from 'domain/question/question-summary-object.model';
 
 export interface QuestionSummaryForOneSkillBackendDict {
-  'skill_id': string;
-  'skill_description': string;
-  'skill_difficulty': number;
-  'summary': QuestionSummaryBackendDict;
+  skill_id: string;
+  skill_description: string;
+  skill_difficulty: number;
+  summary: QuestionSummaryBackendDict;
 }
 
 export class QuestionSummaryForOneSkill {
@@ -39,8 +39,11 @@ export class QuestionSummaryForOneSkill {
   _questionSummary: QuestionSummary;
 
   constructor(
-      skillId: string, skillDescription: string, skillDifficulty: number,
-      questionSummary: QuestionSummary) {
+    skillId: string,
+    skillDescription: string,
+    skillDifficulty: number,
+    questionSummary: QuestionSummary
+  ) {
     this._skillId = skillId;
     this._skillDescription = skillDescription;
     this._skillDifficulty = skillDifficulty;
@@ -64,11 +67,11 @@ export class QuestionSummaryForOneSkill {
   }
 
   static createFromBackendDict(
-      backendDict:
-    QuestionSummaryForOneSkillBackendDict): QuestionSummaryForOneSkill {
-    var questionSummary =
-    QuestionSummary.createFromBackendDict(
-      backendDict.summary);
+    backendDict: QuestionSummaryForOneSkillBackendDict
+  ): QuestionSummaryForOneSkill {
+    var questionSummary = QuestionSummary.createFromBackendDict(
+      backendDict.summary
+    );
     return new QuestionSummaryForOneSkill(
       backendDict.skill_id,
       backendDict.skill_description,

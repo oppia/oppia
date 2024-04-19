@@ -16,15 +16,20 @@
  * @fileoverview Component for the donate page.
  */
 
-import { Component, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import 'popper.js';
 import 'bootstrap';
-import { ThanksForDonatingModalComponent } from './thanks-for-donating-modal.component';
-import { InsertScriptService } from 'services/insert-script.service';
-import { DonationBoxModalComponent } from './donation-box/donation-box-modal.component';
+import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
+import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 
 interface ImpactStat {
   imageUrl: string | null;
@@ -43,12 +48,19 @@ interface Highlight {
   text: string;
 }
 
+interface Learner {
+  name: string;
+  country: string;
+  imageUrl: string;
+  webpUrl: string;
+  text: string;
+}
+
 @Component({
   selector: 'donate-page',
   templateUrl: './donate-page.component.html',
   styleUrls: [],
 })
-
 export class DonatePageComponent implements OnInit {
   donationValues: DonationValue[] = [
     {
@@ -114,26 +126,67 @@ export class DonatePageComponent implements OnInit {
   highlights: Highlight[] = [
     {
       imageUrl: '/donate/highlights-1',
-      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_1',
-      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_1',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_1',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_1',
     },
     {
       imageUrl: '/donate/highlights-2',
-      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_TITLE_2',
-      text: 'I18N_DONATE_PAGE_CONTENT_HIGHTLIGHTS_CONTENT_2',
+      heading: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_TITLE_2',
+      text: 'I18N_DONATE_PAGE_CONTENT_HIGHLIGHTS_CONTENT_2',
     },
   ];
+
+  learners: Learner[] = [
+    {
+      name: 'Abasiekeme',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_1',
+      imageUrl: '/donate/learners-abasiekeme.png',
+      webpUrl: '/donate/learners-abasiekeme.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_1',
+    },
+    {
+      name: 'Sandra Bosso',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_2',
+      imageUrl: '/donate/learners-sandra.png',
+      webpUrl: '/donate/learners-sandra.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_2',
+    },
+    {
+      name: 'Kajal',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_3',
+      imageUrl: '/donate/learners-kajal.png',
+      webpUrl: '/donate/learners-kajal.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_3',
+    },
+    {
+      name: 'Seneen',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_4',
+      imageUrl: '/donate/learners-seneen.png',
+      webpUrl: '/donate/learners-seneen.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_4',
+    },
+    {
+      name: 'Juweria Cabdalla',
+      country: 'I18N_DONATE_PAGE_CONTENT_LEARNER_COUNTRY_5',
+      imageUrl: '/donate/learners-juweria.png',
+      webpUrl: '/donate/learners-juweria.webp',
+      text: 'I18N_DONATE_PAGE_CONTENT_LEARNER_QUOTE_5',
+    },
+  ];
+
+  tileShown: number = 0;
+  @ViewChildren('tiles') tiles!: QueryList<ElementRef>;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private windowRef: WindowRef,
-    private ngbModal: NgbModal,
-    private insertScriptService: InsertScriptService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
     const searchParams = new URLSearchParams(
-      this.windowRef.nativeWindow.location.search);
+      this.windowRef.nativeWindow.location.search
+    );
     const params = Object.fromEntries(searchParams.entries());
     if (params.hasOwnProperty('thanks')) {
       this.ngbModal.open(ThanksForDonatingModalComponent, {
@@ -153,5 +206,18 @@ export class DonatePageComponent implements OnInit {
       size: 'xl',
       windowClass: 'donation-box-modal',
     });
+  }
+
+  nextTile(clickedVal: number): void {
+    let learnerTile = this.tiles.toArray()[clickedVal].nativeElement;
+    this.tileShown = clickedVal;
+
+    if (learnerTile !== null) {
+      learnerTile.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
   }
 }

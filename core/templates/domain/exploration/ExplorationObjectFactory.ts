@@ -17,56 +17,59 @@
  * domain objects.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { Injectable } from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import { AppConstants } from 'app.constants';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ParamChangeBackendDict, ParamChange } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecsBackendDict, ParamSpecs, ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
-import { EndExplorationCustomizationArgs, InteractionCustomizationArgs } from
-  'interactions/customization-args-defs';
-import { Interaction } from
-  'domain/exploration/InteractionObjectFactory';
-import { State } from 'domain/state/StateObjectFactory';
+import {AppConstants} from 'app.constants';
+import {LoggerService} from 'services/contextual/logger.service';
+import {
+  ParamChangeBackendDict,
+  ParamChange,
+} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {
+  ParamSpecsBackendDict,
+  ParamSpecs,
+  ParamSpecsObjectFactory,
+} from 'domain/exploration/ParamSpecsObjectFactory';
+import {
+  EndExplorationCustomizationArgs,
+  InteractionCustomizationArgs,
+} from 'interactions/customization-args-defs';
+import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {State} from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
   States,
   StatesObjectFactory,
-  VoiceoverObjectsDict
+  VoiceoverObjectsDict,
 } from 'domain/exploration/StatesObjectFactory';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { InteractionSpecsKey } from 'pages/interaction-specs.constants';
-import { ExplorationChange } from './exploration-draft.model';
-import { BaseTranslatableObject } from 'domain/objects/BaseTranslatableObject.model';
-import { ExplorationMetadataBackendDict } from './ExplorationMetadataObjectFactory';
+import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {ExplorationChange} from './exploration-draft.model';
+import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
+import {ExplorationMetadataBackendDict} from './ExplorationMetadataObjectFactory';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 
 export interface ExplorationBackendDict {
-  'auto_tts_enabled': boolean;
-  'correctness_feedback_enabled': boolean;
-  'draft_changes': ExplorationChange[];
-  'is_version_of_draft_valid': boolean;
-  'init_state_name': string;
-  'param_changes': ParamChangeBackendDict[];
-  'param_specs': ParamSpecsBackendDict;
-  'states': StateObjectsBackendDict;
-  'title': string;
-  'language_code': string;
-  'draft_change_list_id': number;
-  'version'?: number;
-  'next_content_id_index': number;
-  'edits_allowed'?: boolean;
-  'exploration_metadata': ExplorationMetadataBackendDict;
+  auto_tts_enabled: boolean;
+  draft_changes: ExplorationChange[];
+  is_version_of_draft_valid: boolean;
+  init_state_name: string;
+  param_changes: ParamChangeBackendDict[];
+  param_specs: ParamSpecsBackendDict;
+  states: StateObjectsBackendDict;
+  title: string;
+  language_code: string;
+  draft_change_list_id: number;
+  version?: number;
+  next_content_id_index: number;
+  edits_allowed?: boolean;
+  exploration_metadata: ExplorationMetadataBackendDict;
 }
 
 export class Exploration extends BaseTranslatableObject {
@@ -81,11 +84,16 @@ export class Exploration extends BaseTranslatableObject {
   nextContentIdIndex: number;
 
   constructor(
-      initStateName: string, paramChanges: ParamChange[],
-      paramSpecs: ParamSpecs, states: States, title: string,
-      nextContentIdIndex: number, languageCode: string,
-      loggerService: LoggerService,
-      urlInterpolationService: UrlInterpolationService) {
+    initStateName: string,
+    paramChanges: ParamChange[],
+    paramSpecs: ParamSpecs,
+    states: States,
+    title: string,
+    nextContentIdIndex: number,
+    languageCode: string,
+    loggerService: LoggerService,
+    urlInterpolationService: UrlInterpolationService
+  ) {
     super();
 
     this.initStateName = initStateName;
@@ -117,16 +125,16 @@ export class Exploration extends BaseTranslatableObject {
   getAuthorRecommendedExpIds(stateName: string): string[] | null {
     if (!this.isStateTerminal(stateName)) {
       throw new Error(
-        'Tried to get recommendations for a non-terminal state: ' +
-          stateName);
+        'Tried to get recommendations for a non-terminal state: ' + stateName
+      );
     }
 
-    const customizationArgs = (
-      this.getInteractionCustomizationArgs(
-        stateName
-      ) as EndExplorationCustomizationArgs);
-    return customizationArgs && customizationArgs.recommendedExplorationIds ?
-      customizationArgs.recommendedExplorationIds.value : null;
+    const customizationArgs = this.getInteractionCustomizationArgs(
+      stateName
+    ) as EndExplorationCustomizationArgs;
+    return customizationArgs && customizationArgs.recommendedExplorationIds
+      ? customizationArgs.recommendedExplorationIds.value
+      : null;
   }
 
   // Interaction is null for invalid state name.
@@ -150,7 +158,7 @@ export class Exploration extends BaseTranslatableObject {
 
   // Interaction customization args are null for invalid state name.
   getInteractionCustomizationArgs(
-      stateName: string
+    stateName: string
   ): InteractionCustomizationArgs | null {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
@@ -167,8 +175,9 @@ export class Exploration extends BaseTranslatableObject {
     // possible in the learner view.
     return (
       !interactionId ||
-        INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
-        AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+      INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
+        AppConstants.INTERACTION_DISPLAY_MODE_INLINE
+    );
   }
 
   getStates(): States {
@@ -205,7 +214,7 @@ export class Exploration extends BaseTranslatableObject {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ExplorationObjectFactory {
   constructor(
@@ -213,54 +222,56 @@ export class ExplorationObjectFactory {
     private paramChangesObjectFactory: ParamChangesObjectFactory,
     private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private statesObjectFactory: StatesObjectFactory,
-    private urlInterpolationService: UrlInterpolationService) {}
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
 
   createFromBackendDict(
-      explorationBackendDict: ExplorationBackendDict): Exploration {
+    explorationBackendDict: ExplorationBackendDict
+  ): Exploration {
     return new Exploration(
       explorationBackendDict.init_state_name,
       this.paramChangesObjectFactory.createFromBackendList(
-        explorationBackendDict.param_changes),
+        explorationBackendDict.param_changes
+      ),
       this.paramSpecsObjectFactory.createFromBackendDict(
-        explorationBackendDict.param_specs),
+        explorationBackendDict.param_specs
+      ),
       this.statesObjectFactory.createFromBackendDict(
-        explorationBackendDict.states),
+        explorationBackendDict.states
+      ),
       explorationBackendDict.title,
       explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,
-      this.logger, this.urlInterpolationService);
+      this.logger,
+      this.urlInterpolationService
+    );
   }
 
   createFromExplorationBackendResponse(
-      explorationBackendResponse: FetchExplorationBackendResponse):
-        Exploration {
+    explorationBackendResponse: FetchExplorationBackendResponse
+  ): Exploration {
     const explorationBackendDict: ExplorationBackendDict = {
       auto_tts_enabled: explorationBackendResponse.auto_tts_enabled,
-      correctness_feedback_enabled: explorationBackendResponse.
-        correctness_feedback_enabled,
       draft_changes: [],
-      init_state_name: explorationBackendResponse.exploration.
-        init_state_name,
+      init_state_name: explorationBackendResponse.exploration.init_state_name,
       states: explorationBackendResponse.exploration.states,
-      param_changes: explorationBackendResponse.exploration.
-        param_changes,
-      param_specs: explorationBackendResponse.exploration.
-        param_specs,
+      param_changes: explorationBackendResponse.exploration.param_changes,
+      param_specs: explorationBackendResponse.exploration.param_specs,
       title: explorationBackendResponse.exploration.title,
-      language_code: explorationBackendResponse.exploration.
-        language_code,
-      next_content_id_index: explorationBackendResponse.
-        exploration.next_content_id_index,
-      exploration_metadata: explorationBackendResponse.
-        exploration_metadata,
+      language_code: explorationBackendResponse.exploration.language_code,
+      next_content_id_index:
+        explorationBackendResponse.exploration.next_content_id_index,
+      exploration_metadata: explorationBackendResponse.exploration_metadata,
       is_version_of_draft_valid: false,
-      draft_change_list_id: explorationBackendResponse.
-        draft_change_list_id
+      draft_change_list_id: explorationBackendResponse.draft_change_list_id,
     };
     return this.createFromBackendDict(explorationBackendDict);
   }
 }
 
-angular.module('oppia').factory(
-  'ExplorationObjectFactory',
-  downgradeInjectable(ExplorationObjectFactory));
+angular
+  .module('oppia')
+  .factory(
+    'ExplorationObjectFactory',
+    downgradeInjectable(ExplorationObjectFactory)
+  );

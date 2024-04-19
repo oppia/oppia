@@ -16,26 +16,36 @@
  * @fileoverview Component for the DragAndDropSortInput interaction.
  */
 
-import { Component, Input, OnInit, ElementRef, QueryList, ViewChildren } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { CdkDragDrop, CdkDragExit, moveItemInArray } from '@angular/cdk/drag-drop';
-import { DragAndDropSortInputCustomizationArgs } from 'interactions/customization-args-defs';
+import {
+  Component,
+  Input,
+  OnInit,
+  ElementRef,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {
+  CdkDragDrop,
+  CdkDragExit,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
+import {DragAndDropSortInputCustomizationArgs} from 'interactions/customization-args-defs';
 
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { DragAndDropSortInputRulesService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {DragAndDropSortInputRulesService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-rules.service';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 
-import { InteractionAnswer } from 'interactions/answer-defs';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { DragAndDropAnswer } from 'interactions/answer-defs';
+import {InteractionAnswer} from 'interactions/answer-defs';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {DragAndDropAnswer} from 'interactions/answer-defs';
 
-import { Subscription } from 'rxjs';
-
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'oppia-interactive-drag-and-drop-sort-input',
   templateUrl: './drag-and-drop-sort-input-interaction.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class InteractiveDragAndDropSortInputComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
@@ -63,11 +73,11 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     private currentInteractionService: CurrentInteractionService,
     private dragAndDropSortInputRulesService: DragAndDropSortInputRulesService,
     private el: ElementRef,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService) {}
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService
+  ) {}
 
   ngAfterViewInit(): void {
-    this.listSubscription = this.listItems.changes.subscribe((_) => {
+    this.listSubscription = this.listItems.changes.subscribe(_ => {
       this.setFocus();
     });
   }
@@ -82,7 +92,6 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     }
     this.listItems.toArray()[this.activeItem].nativeElement.focus();
   }
-
 
   resetArray(): void {
     // Resets the array into the correct format.
@@ -129,7 +138,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     moveItemInArray(
       this.multipleItemsInSamePositionArray,
       event.previousIndex,
-      event.currentIndex);
+      event.currentIndex
+    );
     this.resetArray();
   }
 
@@ -158,7 +168,10 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
       for (let i in this.multipleItemsInSamePositionArray) {
         if (this.multipleItemsInSamePositionArray[i] === event.container.data) {
           this.multipleItemsInSamePositionArray[i].splice(
-            event.currentIndex, 0, data);
+            event.currentIndex,
+            0,
+            data
+          );
         }
       }
       this.resetArray();
@@ -170,7 +183,9 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
     // valid, then the list is reset, otherwise the drag is cancelled.
     moveItemInArray(
       this.singleItemInSamePositionArray,
-      event.previousIndex, event.currentIndex);
+      event.previousIndex,
+      event.currentIndex
+    );
     this.activeItem = event.currentIndex;
     this.setFocus();
   }
@@ -184,7 +199,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         moveItemInArray(
           this.singleItemInSamePositionArray,
           currentIndex,
-          newIndex);
+          newIndex
+        );
       }
     }
     if (event.key === 'ArrowUp') {
@@ -194,7 +210,8 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
         moveItemInArray(
           this.singleItemInSamePositionArray,
           currentIndex,
-          newIndex);
+          newIndex
+        );
       }
     }
 
@@ -241,24 +258,22 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const {
-      choices,
-      allowMultipleItemsInSamePosition
-    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'DragAndDropSortInput',
-      {
-        choicesWithValue: this.choicesWithValue,
-        allowMultipleItemsInSamePositionWithValue:
-          this.allowMultipleItemsInSamePositionWithValue,
-      }
-    ) as DragAndDropSortInputCustomizationArgs;
+    const {choices, allowMultipleItemsInSamePosition} =
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        'DragAndDropSortInput',
+        {
+          choicesWithValue: this.choicesWithValue,
+          allowMultipleItemsInSamePositionWithValue:
+            this.allowMultipleItemsInSamePositionWithValue,
+        }
+      ) as DragAndDropSortInputCustomizationArgs;
 
     this.multipleItemsInSamePositionArray = [];
     this.singleItemInSamePositionArray = [];
     this.choicesValue = choices.value;
     this.choices = this.choicesValue.map(choice => choice.html);
-    this.allowMultipleItemsInSamePosition = (
-      allowMultipleItemsInSamePosition.value);
+    this.allowMultipleItemsInSamePosition =
+      allowMultipleItemsInSamePosition.value;
 
     let savedSolution = (
       this.savedSolution !== null ? this.savedSolution : []
@@ -309,7 +324,9 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
 
     const submitAnswerFn = () => this.submitAnswer();
     this.currentInteractionService.registerCurrentInteraction(
-      submitAnswerFn, null);
+      submitAnswerFn,
+      null
+    );
   }
 
   getContentIdOfHtml(html: string): string {
@@ -345,24 +362,32 @@ export class InteractiveDragAndDropSortInputComponent implements OnInit {
             j < this.multipleItemsInSamePositionArray[i].length;
             j++
           ) {
-            items.push(this.getContentIdOfHtml(
-              this.multipleItemsInSamePositionArray[i][j]));
+            items.push(
+              this.getContentIdOfHtml(
+                this.multipleItemsInSamePositionArray[i][j]
+              )
+            );
           }
           answer.push(items);
         }
       }
     } else {
       for (let i = 0; i < this.singleItemInSamePositionArray.length; i++) {
-        answer.push(
-          [this.getContentIdOfHtml(this.singleItemInSamePositionArray[i])]);
+        answer.push([
+          this.getContentIdOfHtml(this.singleItemInSamePositionArray[i]),
+        ]);
       }
     }
     this.currentInteractionService.onSubmit(
-      answer, this.dragAndDropSortInputRulesService);
+      answer,
+      this.dragAndDropSortInputRulesService
+    );
   }
 }
 
 angular.module('oppia').directive(
-  'oppiaInteractiveDragAndDropSortInput', downgradeComponent({
-    component: InteractiveDragAndDropSortInputComponent
-  }) as angular.IDirectiveFactory);
+  'oppiaInteractiveDragAndDropSortInput',
+  downgradeComponent({
+    component: InteractiveDragAndDropSortInputComponent,
+  }) as angular.IDirectiveFactory
+);

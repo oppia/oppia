@@ -134,8 +134,7 @@ class ValidateExplorationsHandlerTests(BaseStoryEditorControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
             '0', self.admin_id, title='Title 1',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         json_response = self.get_json(
             '%s/%s' % (
                 feconf.VALIDATE_STORY_EXPLORATIONS_URL_PREFIX, self.story_id),
@@ -429,8 +428,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         self.save_new_valid_exploration(
             '0', self.admin_id, title='Title 1',
-            category='Mathematics', language_code='en',
-            correctness_feedback_enabled=True)
+            category='Mathematics', language_code='en')
         self.publish_exploration(self.admin_id, '0')
         old_value: List[str] = []
         change_list = [story_domain.StoryChange({

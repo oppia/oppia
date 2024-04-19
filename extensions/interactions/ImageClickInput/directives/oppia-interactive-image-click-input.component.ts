@@ -20,23 +20,30 @@
  * followed by the name of the arg.
  */
 
-import { Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ImageClickAnswer } from 'interactions/answer-defs';
-import { ImageClickInputCustomizationArgs, ImageWithRegions, LabeledRegion } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { ImageDimensions, ImagePreloaderService } from 'pages/exploration-player-page/services/image-preloader.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { Subscription } from 'rxjs';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ServicesConstants } from 'services/services.constants';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { ImageClickInputRulesService } from './image-click-input-rules.service';
+import {Component, ElementRef, Input, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ImageClickAnswer} from 'interactions/answer-defs';
+import {
+  ImageClickInputCustomizationArgs,
+  ImageWithRegions,
+  LabeledRegion,
+} from 'interactions/customization-args-defs';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {
+  ImageDimensions,
+  ImagePreloaderService,
+} from 'pages/exploration-player-page/services/image-preloader.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {Subscription} from 'rxjs';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ServicesConstants} from 'services/services.constants';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {ImageClickInputRulesService} from './image-click-input-rules.service';
 
 interface RectangleRegion extends ImagePoint {
   height: number;
@@ -51,7 +58,7 @@ interface ImagePoint {
 @Component({
   selector: 'oppia-interactive-image-click-input',
   templateUrl: './image-click-input-interaction.component.html',
-  styleUrls: []
+  styleUrls: [],
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
   @Input() imageAndRegionsWithValue: string;
@@ -70,8 +77,8 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   isLoadingIndicatorShown: boolean;
   isTryAgainShown: boolean;
   dimensions: ImageDimensions;
-  imageContainerStyle: { height: string; width?: string };
-  loadingIndicatorStyle: { height: string; width?: string };
+  imageContainerStyle: {height: string; width?: string};
+  loadingIndicatorStyle: {height: string; width?: string};
   allRegions: LabeledRegion[];
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -80,8 +87,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     private el: ElementRef,
     private imageClickInputRulesService: ImageClickInputRulesService,
     private imagePreloaderService: ImagePreloaderService,
-    private interactionAttributesExtractorService:
-      InteractionAttributesExtractorService,
+    private interactionAttributesExtractorService: InteractionAttributesExtractorService,
     private playerPositionService: PlayerPositionService,
     private urlInterpolationService: UrlInterpolationService,
     private imageLocalStorageService: ImageLocalStorageService,
@@ -91,7 +97,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   private _getAttrs() {
     return {
       imageAndRegionsWithValue: this.imageAndRegionsWithValue,
-      highlightRegionsOnHoverWithValue: this.highlightRegionsOnHoverWithValue
+      highlightRegionsOnHoverWithValue: this.highlightRegionsOnHoverWithValue,
     };
   }
 
@@ -105,47 +111,46 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const {
-      imageAndRegions,
-      highlightRegionsOnHover
-    } = this.interactionAttributesExtractorService.getValuesFromAttributes(
-      'ImageClickInput', this._getAttrs()) as ImageClickInputCustomizationArgs;
+    const {imageAndRegions, highlightRegionsOnHover} =
+      this.interactionAttributesExtractorService.getValuesFromAttributes(
+        'ImageClickInput',
+        this._getAttrs()
+      ) as ImageClickInputCustomizationArgs;
     this.imageAndRegions = imageAndRegions.value;
     this.highlightRegionsOnHover = highlightRegionsOnHover.value;
     this.componentSubscriptions.add(
-      this.playerPositionService.onNewCardAvailable.subscribe(
-        () => {
-          this.interactionIsActive = false;
-          this.lastAnswer = {
-            clickPosition: [this.mouseX, this.mouseY],
-            clickedRegions: []
-          };
-        }
-      )
+      this.playerPositionService.onNewCardAvailable.subscribe(() => {
+        this.interactionIsActive = false;
+        this.lastAnswer = {
+          clickPosition: [this.mouseX, this.mouseY],
+          clickedRegions: [],
+        };
+      })
     );
     this.filepath = this.imageAndRegions.imagePath;
     this.imageUrl = '';
-    this.loadingIndicatorUrl = this.urlInterpolationService
-      .getStaticImageUrl(AppConstants.LOADING_INDICATOR_URL);
+    this.loadingIndicatorUrl = this.urlInterpolationService.getStaticImageUrl(
+      AppConstants.LOADING_INDICATOR_URL
+    );
     this.isLoadingIndicatorShown = false;
     this.isTryAgainShown = false;
-    this.dimensions = (
-      this.imagePreloaderService.getDimensionsOfImage(this.filepath));
+    this.dimensions = this.imagePreloaderService.getDimensionsOfImage(
+      this.filepath
+    );
     this.imageContainerStyle = {
       height: this.dimensions.height + 'px',
-      width: this.dimensions.width + 'px'
+      width: this.dimensions.width + 'px',
     };
     if (this.imagePreloaderService.inExplorationPlayer()) {
       this.isLoadingIndicatorShown = true;
       // For aligning the gif to the center of it's container.
-      const loadingIndicatorSize = (
-                (this.dimensions.height < 124) ? 24 : 120);
+      const loadingIndicatorSize = this.dimensions.height < 124 ? 24 : 120;
       this.imageContainerStyle = {
-        height: this.dimensions.height + 'px'
+        height: this.dimensions.height + 'px',
       };
       this.loadingIndicatorStyle = {
         height: loadingIndicatorSize + 'px',
-        width: loadingIndicatorSize + 'px'
+        width: loadingIndicatorSize + 'px',
       };
       this.loadImage();
     } else {
@@ -155,15 +160,17 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       // we directly assign the url to the imageUrl.
       if (
         this.contextService.getImageSaveDestination() ===
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+          AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
         this.imageLocalStorageService.isInStorage(this.filepath)
       ) {
         const base64Url = this.imageLocalStorageService.getRawImageData(
-          this.filepath);
+          this.filepath
+        );
         const mimeType = base64Url.split(';')[0];
         if (mimeType === AppConstants.SVG_MIME_TYPE) {
           this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            base64Url) as string;
+            base64Url
+          ) as string;
         } else {
           this.imageUrl = base64Url;
         }
@@ -171,13 +178,14 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
           this.contextService.getEntityType(),
           this.contextService.getEntityId(),
-          encodeURIComponent(this.filepath));
+          encodeURIComponent(this.filepath)
+        );
       }
     }
 
     this.mouseX = 0;
     this.mouseY = 0;
-    this.interactionIsActive = (this.lastAnswer === null);
+    this.interactionIsActive = this.lastAnswer === null;
 
     this.currentlyHoveredRegions = [];
     this.allRegions = this.imageAndRegions.labeledRegions;
@@ -197,15 +205,17 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   loadImage(): void {
-    this.imagePreloaderService.getImageUrlAsync(this.filepath)
-      .then((objectUrl: string) => {
+    this.imagePreloaderService.getImageUrlAsync(this.filepath).then(
+      (objectUrl: string) => {
         this.isTryAgainShown = false;
         this.isLoadingIndicatorShown = false;
         this.imageUrl = objectUrl;
-      }, () => {
+      },
+      () => {
         this.isTryAgainShown = true;
         this.isLoadingIndicatorShown = false;
-      });
+      }
+    );
   }
 
   updateCurrentlyHoveredRegions(): void {
@@ -220,21 +230,22 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
   getRegionDimensions(index: number): RectangleRegion {
     const images = this.el.nativeElement.querySelectorAll(
-      '.oppia-image-click-img');
+      '.oppia-image-click-img'
+    );
     const image = images[0];
     const labeledRegion = this.imageAndRegions.labeledRegions[index];
     const regionArea = labeledRegion.region.area;
-    const leftDelta = (
+    const leftDelta =
       image.getBoundingClientRect().left -
-      image.parentElement.getBoundingClientRect().left);
-    const topDelta = (
+      image.parentElement.getBoundingClientRect().left;
+    const topDelta =
       image.getBoundingClientRect().top -
-      image.parentElement.getBoundingClientRect().top);
+      image.parentElement.getBoundingClientRect().top;
     const returnValue = {
       left: regionArea[0][0] * image.width + leftDelta,
       top: regionArea[0][1] * image.height + topDelta,
       width: (regionArea[1][0] - regionArea[0][0]) * image.width,
-      height: (regionArea[1][1] - regionArea[0][1]) * image.height
+      height: (regionArea[1][1] - regionArea[0][1]) * image.height,
     };
     return returnValue;
   }
@@ -247,8 +258,10 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   getDotDisplay(): 'none' | 'inline' {
-    if (this.contextService.getEditorTabContext() ===
-        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
+    if (
+      this.contextService.getEditorTabContext() ===
+      ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR
+    ) {
       return 'none';
     }
     return 'inline';
@@ -256,21 +269,24 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
   getDotLocation(): ImagePoint {
     const images = this.el.nativeElement.querySelectorAll(
-      '.oppia-image-click-img');
+      '.oppia-image-click-img'
+    );
     const image: HTMLImageElement = images[0];
     var dotLocation = {
       left: null,
-      top: null
+      top: null,
     };
     if (this.lastAnswer) {
-      dotLocation.left = (
+      dotLocation.left =
         this.lastAnswer.clickPosition[0] * image.width +
         image.getBoundingClientRect().left -
-        image.parentElement.getBoundingClientRect().left - 5);
-      dotLocation.top = (
+        image.parentElement.getBoundingClientRect().left -
+        5;
+      dotLocation.top =
         this.lastAnswer.clickPosition[1] * image.height +
         image.getBoundingClientRect().top -
-        image.parentElement.getBoundingClientRect().top - 5);
+        image.parentElement.getBoundingClientRect().top -
+        5;
     }
     return dotLocation;
   }
@@ -280,12 +296,13 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       return;
     }
     const images = this.el.nativeElement.querySelectorAll(
-      '.oppia-image-click-img');
+      '.oppia-image-click-img'
+    );
     const image: HTMLImageElement = images[0];
-    this.mouseX = (
-      (event.clientX - image.getBoundingClientRect().left) / image.width);
-    this.mouseY = (
-      (event.clientY - image.getBoundingClientRect().top) / image.height);
+    this.mouseX =
+      (event.clientX - image.getBoundingClientRect().left) / image.width;
+    this.mouseY =
+      (event.clientY - image.getBoundingClientRect().top) / image.height;
     this.currentlyHoveredRegions = [];
     this.updateCurrentlyHoveredRegions();
   }
@@ -293,10 +310,12 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   onClickImage(): void {
     const answer: ImageClickAnswer = {
       clickPosition: [this.mouseX, this.mouseY],
-      clickedRegions: this.currentlyHoveredRegions
+      clickedRegions: this.currentlyHoveredRegions,
     };
     this.currentInteractionService.onSubmit(
-      answer, this.imageClickInputRulesService);
+      answer,
+      this.imageClickInputRulesService
+    );
   }
 
   ngOnDestroy(): void {
@@ -305,6 +324,8 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 }
 
 angular.module('oppia').directive(
-  'oppiaInteractiveImageClickInput', downgradeComponent({
-    component: InteractiveImageClickInput
-  }) as angular.IDirectiveFactory);
+  'oppiaInteractiveImageClickInput',
+  downgradeComponent({
+    component: InteractiveImageClickInput,
+  }) as angular.IDirectiveFactory
+);

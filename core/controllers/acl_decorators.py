@@ -23,8 +23,8 @@ import logging
 import re
 
 from core import android_validation_constants
+from core import feature_flag_list
 from core import feconf
-from core import platform_feature_list
 from core import utils
 from core.constants import constants
 from core.controllers import base
@@ -33,8 +33,8 @@ from core.domain import blog_services
 from core.domain import classifier_services
 from core.domain import classroom_config_services
 from core.domain import email_manager
+from core.domain import feature_flag_services
 from core.domain import feedback_services
-from core.domain import platform_feature_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -75,10 +75,10 @@ def _redirect_based_on_return_type(
             in case of errors eg. html, json.
 
     Raises:
-        PageNotFoundException. The page is not found.
+        NotFoundException. The page is not found.
     """
     if expected_return_type == feconf.HANDLER_TYPE_JSON:
-        raise handler.PageNotFoundException
+        raise handler.NotFoundException
 
     handler.redirect(redirection_url)
 
@@ -148,7 +148,7 @@ def is_source_mailchimp(
         """
         if not email_manager.verify_mailchimp_secret(secret):
             logging.error('Received invalid Mailchimp webhook secret')
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         return handler(self, secret, **kwargs)
 
@@ -198,7 +198,7 @@ def does_classroom_exist(
             # router and access validation for such pages should be done using
             # the access validation handler endpoint.
             if self.GET_HANDLER_ERROR_RETURN_TYPE == feconf.HANDLER_TYPE_JSON:
-                raise self.PageNotFoundException
+                raise self.NotFoundException
 
             # As this decorator is not expected to be used with other
             # handler types, raising an error here.
@@ -240,22 +240,22 @@ def can_play_exploration(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_play
 
@@ -290,26 +290,26 @@ def can_play_exploration_as_logged_in_user(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             NotLoggedInException. The user is not logged in.
         """
         if self.user_id is None:
             raise self.NotLoggedInException
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_play
 
@@ -345,7 +345,7 @@ def can_view_skills(
             bool. Whether the user can view the given skills.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
         """
         # This is a temporary check, since a decorator is required for every
         # method. Once skill publishing is done, whether given skill is
@@ -360,7 +360,7 @@ def can_view_skills(
         try:
             skill_fetchers.get_multi_skills(selected_skill_ids)
         except Exception as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         return handler(self, selected_skill_ids, **kwargs)
 
@@ -396,19 +396,19 @@ def can_play_collection(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
 
         if collection_rights is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if rights_manager.check_can_access_activity(
                 self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_play
 
@@ -443,22 +443,22 @@ def can_download_exploration(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_download
 
@@ -493,22 +493,22 @@ def can_view_exploration_stats(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
     return test_can_view_stats
 
@@ -542,7 +542,7 @@ def can_edit_collection(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have
                 credentials to edit the collection.
         """
@@ -552,7 +552,7 @@ def can_edit_collection(
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
         if collection_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_edit_activity(
                 self.user, collection_rights):
@@ -782,7 +782,7 @@ def can_delete_blog_post(
             blog_post_id, strict=False)
 
         if not blog_post_rights:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception('The given blog post id is invalid.'))
 
         if role_services.ACTION_DELETE_ANY_BLOG_POST in self.user.actions:
@@ -837,7 +837,7 @@ def can_edit_blog_post(
             blog_post_id, strict=False)
 
         if not blog_post_rights:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 Exception('The given blog post id is invalid.'))
 
         if role_services.ACTION_EDIT_ANY_BLOG_POST in self.user.actions:
@@ -1243,8 +1243,9 @@ def can_access_contributor_dashboard_admin_page(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        new_dashboard_enabled = platform_feature_services.is_feature_enabled(
-            platform_feature_list.ParamNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
+        new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
+            self.user_id,
+            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
 
         if new_dashboard_enabled and (
             role_services
@@ -1575,12 +1576,12 @@ def can_create_feedback_thread(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 create an exploration feedback.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -1624,7 +1625,7 @@ def can_view_feedback_thread(
 
         Raises:
             InvalidInputException. The thread ID is not valid.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 view an exploration feedback.
         """
@@ -1644,7 +1645,7 @@ def can_view_feedback_thread(
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -1689,7 +1690,7 @@ def can_comment_on_feedback_thread(
         Raises:
             NotLoggedInException. The user is not logged in.
             InvalidInputException. The thread ID is not valid.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 comment on an exploration feedback.
         """
@@ -1706,7 +1707,7 @@ def can_comment_on_feedback_thread(
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -1880,7 +1881,7 @@ def can_edit_exploration(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 edit an exploration.
         """
@@ -1891,7 +1892,7 @@ def can_edit_exploration(
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_edit_activity(
                 self.user, exploration_rights):
@@ -1933,7 +1934,7 @@ def can_voiceover_exploration(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 voiceover an exploration.
         """
@@ -1943,7 +1944,7 @@ def can_voiceover_exploration(
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_voiceover_activity(
                 self.user, exploration_rights):
@@ -1991,7 +1992,7 @@ def can_add_voice_artist(
         Raises:
             NotLoggedInException. The user is not logged in.
             InvalidInputException. The given entity type is not supported.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             InvalidInputException. The given exploration is private.
             UnauthorizedUserException. The user does not have the credentials
                 to manage voice artist.
@@ -2006,7 +2007,7 @@ def can_add_voice_artist(
         exploration_rights = rights_manager.get_exploration_rights(
             entity_id, strict=False)
         if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if exploration_rights.is_private():
             raise base.UserFacingExceptions.InvalidInputException(
@@ -2057,7 +2058,7 @@ def can_remove_voice_artist(
         Raises:
             NotLoggedInException. The user is not logged in.
             InvalidInputException. The given entity type is not supported.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have the credentials
                 to manage voice artist.
         """
@@ -2071,7 +2072,7 @@ def can_remove_voice_artist(
         exploration_rights = rights_manager.get_exploration_rights(
             entity_id, strict=False)
         if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_manage_voice_artist_in_activity(
                 self.user, exploration_rights):
@@ -2115,7 +2116,7 @@ def can_save_exploration(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 save changes to this exploration.
         """
@@ -2126,7 +2127,7 @@ def can_save_exploration(
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
         if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_save_activity(
                 self.user, exploration_rights):
@@ -2345,7 +2346,7 @@ def can_publish_exploration(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 publish an exploration.
         """
@@ -2353,7 +2354,7 @@ def can_publish_exploration(
             exploration_id, strict=False)
 
         if exploration_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_publish_activity(
                 self.user, exploration_rights):
@@ -2394,14 +2395,14 @@ def can_publish_collection(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials to
                 publish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
         if collection_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_publish_activity(
                 self.user, collection_rights):
@@ -2443,14 +2444,14 @@ def can_unpublish_collection(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have credentials
                 to unpublish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
         if collection_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if rights_manager.check_can_unpublish_activity(
                 self.user, collection_rights):
@@ -2847,7 +2848,7 @@ def can_edit_topic(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have
                 credentials to edit a topic.
         """
@@ -2857,12 +2858,12 @@ def can_edit_topic(
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
         except utils.ValidationError as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, topic_id, *args, **kwargs)
@@ -2903,7 +2904,7 @@ def can_edit_question(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have
                 credentials to edit a question.
         """
@@ -2913,7 +2914,7 @@ def can_edit_question(
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:
@@ -2952,12 +2953,12 @@ def can_play_question(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
         """
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
         return handler(self, question_id, **kwargs)
 
     return test_can_play_question
@@ -2993,7 +2994,7 @@ def can_view_question_editor(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have
                 enough rights to access the question editor.
         """
@@ -3003,7 +3004,7 @@ def can_view_question_editor(
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
         if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE in (
                 self.user.actions):
             return handler(self, question_id, **kwargs)
@@ -3095,7 +3096,7 @@ def can_add_new_story_to_topic(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have
                 credentials to add a story to a given topic.
         """
@@ -3105,12 +3106,12 @@ def can_add_new_story_to_topic(
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
         except utils.ValidationError as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, topic_id, **kwargs)
@@ -3153,7 +3154,7 @@ def can_edit_story(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have
                 credentials to edit a story belonging to a
                 given topic.
@@ -3163,17 +3164,17 @@ def can_edit_story(
         story_domain.Story.require_valid_story_id(story_id)
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         topic_id = story.corresponding_topic_id
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic_rights is None or topic is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         canonical_story_ids = topic.get_canonical_story_ids()
         if story_id not in canonical_story_ids:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, story_id, **kwargs)
@@ -3216,7 +3217,7 @@ def can_edit_skill(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
             UnauthorizedUserException. The user does not have the
                 credentials to edit the given skill.
         """
@@ -3262,7 +3263,7 @@ def can_submit_images_to_questions(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
             UnauthorizedUserException. The user does not have the
                 credentials to edit the given skill.
         """
@@ -3311,7 +3312,7 @@ def can_submit_images_to_explorations(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
             UnauthorizedUserException. The user does not have the
                 credentials to edit the target exploration.
         """
@@ -3452,7 +3453,7 @@ def can_delete_story(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The page is not found.
+            NotFoundException. The page is not found.
             UnauthorizedUserException. The user does not have
                 credentials to delete a story.
         """
@@ -3461,12 +3462,12 @@ def can_delete_story(
 
         story = story_fetchers.get_story_by_id(story_id, strict=False)
         if story is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
         topic_id = story.corresponding_topic_id
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_fetchers.get_topic_rights(topic_id, strict=False)
         if topic_rights is None or topic is None:
-            raise base.UserFacingExceptions.PageNotFoundException
+            raise base.UserFacingExceptions.NotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, story_id, **kwargs)
@@ -3516,7 +3517,7 @@ def can_delete_topic(
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
         except utils.ValidationError as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
@@ -3667,7 +3668,7 @@ def can_view_any_topic_editor(
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
         except utils.ValidationError as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
@@ -3780,6 +3781,53 @@ def can_access_classroom_admin_page(
     return test_can_access_classroom_admin_page
 
 
+def can_access_voiceover_admin_page(
+    handler: Callable[..., _GenericHandlerFunctionReturnType]
+) -> Callable[..., _GenericHandlerFunctionReturnType]:
+    """Decorator to check whether user can access voiceover admin page.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks if the user has
+        permission to access the voiceover admin page.
+    """
+
+    # Here we use type Any because this method can accept arbitrary number of
+    # arguments with different types.
+    @functools.wraps(handler)
+    def test_can_access_voiceover_admin_page(
+        self: _SelfBaseHandlerType, **kwargs: Any
+    ) -> _GenericHandlerFunctionReturnType:
+        """Checks if the user is logged in and can access voiceover admin page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException. The user is not logged in.
+            UnauthorizedUserException. The user does not have credentials to
+                access the voiceover admin page.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if (
+            role_services.ACTION_ACCESS_VOICEOVER_ADMIN_PAGE in
+            self.user.actions
+        ):
+            return handler(self, **kwargs)
+
+        raise self.UnauthorizedUserException(
+            'You do not have credentials to access voiceover admin page.')
+
+    return test_can_access_voiceover_admin_page
+
+
 def can_change_topic_publication_status(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
@@ -3819,7 +3867,7 @@ def can_change_topic_publication_status(
         try:
             topic_domain.Topic.require_valid_topic_id(topic_id)
         except utils.ValidationError as e:
-            raise self.PageNotFoundException(e)
+            raise self.NotFoundException(e)
 
         user_actions_info = user_services.get_user_actions_info(self.user_id)
 
@@ -3868,7 +3916,7 @@ def can_access_topic_viewer_page(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
             EntityNotFoundError. The TopicRights with ID topic_id was not
                 found in the datastore.
         """
@@ -3912,7 +3960,7 @@ def can_access_topic_viewer_page(
                 user_actions_info.actions):
             return handler(self, topic.name, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_access
 
@@ -3955,7 +4003,7 @@ def can_access_story_viewer_page(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
         """
         if story_url_fragment != story_url_fragment.lower():
             _redirect_based_on_return_type(
@@ -4018,7 +4066,7 @@ def can_access_story_viewer_page(
                 user_actions_info.actions):
             return handler(self, story_id, *args, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_access
 
@@ -4064,7 +4112,7 @@ def can_access_story_viewer_page_as_logged_in_user(
 
         Raises:
             NotLoggedInException. The user is not logged in.
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
         """
         if self.user_id is None:
             raise self.NotLoggedInException
@@ -4131,7 +4179,7 @@ def can_access_story_viewer_page_as_logged_in_user(
         ):
             return handler(self, story_id, *args, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_access
 
@@ -4172,7 +4220,7 @@ def can_access_subtopic_viewer_page(
             *. The return value of decorated function.
 
         Raises:
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
         """
         if subtopic_url_fragment != subtopic_url_fragment.lower():
             _redirect_based_on_return_type(
@@ -4322,7 +4370,7 @@ def get_decorator_for_accepting_suggestion(
             )
 
             if suggestion is None:
-                raise self.PageNotFoundException
+                raise self.NotFoundException
 
             # TODO(#6671): Currently, the can_user_review_category is
             # not in use as the suggestion scoring system is not enabled.
@@ -4335,7 +4383,7 @@ def get_decorator_for_accepting_suggestion(
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
                 if user_services.can_review_translation_suggestions(
                         self.user_id,
-                        language_code=suggestion.change.language_code):
+                        language_code=suggestion.change_cmd.language_code):
                     return handler(self, target_id, suggestion_id, **kwargs)
             elif suggestion.suggestion_type == (
                     feconf.SUGGESTION_TYPE_ADD_QUESTION):
@@ -4383,7 +4431,7 @@ def can_view_reviewable_suggestions(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
             Exception. User is not allowed to review translation suggestions.
             Exception. User is not allowed to review question suggestions.
         """
@@ -4408,7 +4456,7 @@ def can_view_reviewable_suggestions(
                     'suggestions.' % self.user_id
                 )
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_view_reviewable_suggestions
 
@@ -4446,7 +4494,7 @@ def can_edit_entity(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
         """
         arg_swapped_handler = lambda x, y, z: handler(y, x, z)
         # This swaps the first two arguments (self and entity_type), so
@@ -4484,7 +4532,7 @@ def can_edit_entity(
                     self, entity_id, **kwargs))
         }
         if entity_type not in dict.keys(functions):
-            raise self.PageNotFoundException
+            raise self.NotFoundException
         return functions[entity_type](entity_id)
 
     return test_can_edit_entity
@@ -4523,7 +4571,7 @@ def can_play_entity(
             *. The return value of the decorated function.
 
         Raises:
-            PageNotFoundException. The given page cannot be found.
+            NotFoundException. The given page cannot be found.
         """
         arg_swapped_handler = lambda x, y, z: handler(y, x, z)
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -4542,7 +4590,7 @@ def can_play_entity(
             return can_play_question(reduced_handler)(
                 self, entity_id, **kwargs)
         else:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
     return test_can_play_entity
 
@@ -4611,7 +4659,7 @@ def can_update_suggestion(
         UnauthorizedUserException. The user does not have credentials to
             edit this suggestion.
         InvalidInputException. The submitted suggestion id is not valid.
-        PageNotFoundException. A suggestion is not found with the given
+        NotFoundException. A suggestion is not found with the given
             suggestion id.
     """
 
@@ -4638,7 +4686,7 @@ def can_update_suggestion(
             UnauthorizedUserException. The user does not have credentials to
                 edit this suggestion.
             InvalidInputException. The submitted suggestion id is not valid.
-            PageNotFoundException. A suggestion is not found with the given
+            NotFoundException. A suggestion is not found with the given
                 suggestion id.
         """
         if not self.user_id:
@@ -4655,7 +4703,7 @@ def can_update_suggestion(
         )
 
         if suggestion is None:
-            raise self.PageNotFoundException
+            raise self.NotFoundException
 
         if role_services.ACTION_ACCEPT_ANY_SUGGESTION in user_actions:
             return handler(self, suggestion_id, **kwargs)
@@ -4673,7 +4721,7 @@ def can_update_suggestion(
                 feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT):
             if user_services.can_review_translation_suggestions(
                     self.user_id,
-                    language_code=suggestion.change.language_code):
+                    language_code=suggestion.change_cmd.language_code):
                 return handler(self, suggestion_id, **kwargs)
         elif suggestion.suggestion_type == (
                 feconf.SUGGESTION_TYPE_ADD_QUESTION):

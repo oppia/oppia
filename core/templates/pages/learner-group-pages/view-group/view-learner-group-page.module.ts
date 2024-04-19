@@ -16,19 +16,19 @@
  * @fileoverview Module for the view learner group page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
-import { CommonModule } from '@angular/common';
-import { Error404PageModule } from 'pages/error-pages/error-404/error-404-page.module';
-import { SmartRouterModule } from 'hybrid-router-module-provider';
-import { ViewLearnerGroupPageRootComponent } from './view-learner-group-page-root.component';
-import { ViewLearnerGroupPageRoutingModule } from './view-learner-group-page-routing.module';
-import { ViewLearnerGroupPageComponent } from './view-learner-group-page.component';
-import { LearnerGroupViewAssignedSyllabusComponent } from './learner-group-view-assigned-syllabus.component';
-import { LearnerGroupPreferencesModalComponent } from '../templates/learner-group-preferences-modal.component';
-import { ExitLearnerGroupModalComponent } from '../templates/exit-learner-group-modal.component';
-import { SharedLearnerGroupComponentsModule } from '../shared-learner-group-component.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
+import {CommonModule} from '@angular/common';
+import {Error404PageModule} from 'pages/error-pages/error-404/error-404-page.module';
+import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {ViewLearnerGroupPageRootComponent} from './view-learner-group-page-root.component';
+import {ViewLearnerGroupPageRoutingModule} from './view-learner-group-page-routing.module';
+import {ViewLearnerGroupPageComponent} from './view-learner-group-page.component';
+import {LearnerGroupViewAssignedSyllabusComponent} from './learner-group-view-assigned-syllabus.component';
+import {LearnerGroupPreferencesModalComponent} from '../templates/learner-group-preferences-modal.component';
+import {ExitLearnerGroupModalComponent} from '../templates/exit-learner-group-modal.component';
+import {SharedLearnerGroupComponentsModule} from '../shared-learner-group-component.module';
 
 @NgModule({
   imports: [
@@ -40,21 +40,21 @@ import { SharedLearnerGroupComponentsModule } from '../shared-learner-group-comp
     SmartRouterModule,
     ViewLearnerGroupPageRoutingModule,
     SharedLearnerGroupComponentsModule,
-    Error404PageModule
+    Error404PageModule,
   ],
   declarations: [
     ViewLearnerGroupPageComponent,
     ViewLearnerGroupPageRootComponent,
     LearnerGroupViewAssignedSyllabusComponent,
     ExitLearnerGroupModalComponent,
-    LearnerGroupPreferencesModalComponent
+    LearnerGroupPreferencesModalComponent,
   ],
   entryComponents: [
     ViewLearnerGroupPageComponent,
     ViewLearnerGroupPageRootComponent,
     LearnerGroupViewAssignedSyllabusComponent,
     ExitLearnerGroupModalComponent,
-    LearnerGroupPreferencesModalComponent
-  ]
+    LearnerGroupPreferencesModalComponent,
+  ],
 })
 export class ViewLearnerGroupPageModule {}

@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for history tab yaml conversion service.
  */
 
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { State, StateObjectFactory } from 'domain/state/StateObjectFactory';
-import { YamlService } from 'services/yaml.service';
-import { HistoryTabYamlConversionService } from './history-tab-yaml-conversion.service';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {State, StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {YamlService} from 'services/yaml.service';
+import {HistoryTabYamlConversionService} from './history-tab-yaml-conversion.service';
 
 describe('History tab yaml conversion service', () => {
   let historyTabYamlConversionService: HistoryTabYamlConversionService;
@@ -30,44 +30,46 @@ describe('History tab yaml conversion service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [YamlService]
+      providers: [YamlService],
     });
 
     historyTabYamlConversionService = TestBed.inject(
-      HistoryTabYamlConversionService);
+      HistoryTabYamlConversionService
+    );
     yamlService = TestBed.inject(YamlService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
 
     testState = stateObjectFactory.createDefaultState(
-      'state_1', 'content_0', 'default_outcome_1');
+      'state_1',
+      'content_0',
+      'default_outcome_1'
+    );
     testStateYamlString = yamlService.stringify(testState.toBackendDict());
   });
 
-  it('should get the yaml representation of the given entity when it is truthy',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should get the yaml representation of the given entity when it is truthy', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      historyTabYamlConversionService
-        .getYamlStringFromStateOrMetadata(testState)
-        .then(successHandler, failHandler);
-      tick(201);
+    historyTabYamlConversionService
+      .getYamlStringFromStateOrMetadata(testState)
+      .then(successHandler, failHandler);
+    tick(201);
 
-      expect(successHandler).toHaveBeenCalledWith(testStateYamlString);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalledWith(testStateYamlString);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should return an empty string when the given entity is falsy',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should return an empty string when the given entity is falsy', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      historyTabYamlConversionService
-        .getYamlStringFromStateOrMetadata(null)
-        .then(successHandler, failHandler);
-      tick(201);
+    historyTabYamlConversionService
+      .getYamlStringFromStateOrMetadata(null)
+      .then(successHandler, failHandler);
+    tick(201);
 
-      expect(successHandler).toHaveBeenCalledWith('');
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+    expect(successHandler).toHaveBeenCalledWith('');
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 });

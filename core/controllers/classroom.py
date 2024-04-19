@@ -74,7 +74,7 @@ class ClassroomDataHandler(
         # in the decorator `does_classroom_exist` we are already handling
         # the None case of classroom.
         assert classroom is not None
-        topic_ids = list(classroom.topic_id_to_prerequisite_topic_ids.keys())
+        topic_ids = classroom.get_topic_ids()
         topic_summaries = topic_fetchers.get_multi_topic_summaries(topic_ids)
         topic_rights = topic_fetchers.get_multi_topic_rights(topic_ids)
         topic_summary_dicts: List[ClassroomTopicSummaryDict] = []
@@ -137,30 +137,16 @@ class DefaultClassroomRedirectPage(
         self.redirect('/learn/%s' % constants.DEFAULT_CLASSROOM_URL_FRAGMENT)
 
 
-class ClassroomAdminPage(
+class ClassroomIdToNameHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Renders the classroom admin page."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_classroom_admin_page
-    def get(self) -> None:
-        """Renders the classroom admin page."""
-        self.render_template('classroom-admin-page.mainpage.html')
-
-
-class ClassroomAdminDataHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Fetches relevant data for the classroom admin page."""
+    """Fetches a list of classroom names corresponding to the given ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_classroom_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves a mapping of classroom IDs to classroom names."""
         classroom_id_to_classroom_name = (
@@ -260,13 +246,13 @@ class ClassroomHandler(
             classroom_id: str. The ID of the classroom.
 
         Raises:
-            PageNotFoundException. The classroom with the given id or
+            NotFoundException. The classroom with the given id or
                 url doesn't exist.
         """
         classroom = classroom_config_services.get_classroom_by_id(
             classroom_id, strict=False)
         if classroom is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The classroom with the given id or url doesn\'t exist.')
 
         self.values.update({
@@ -358,13 +344,13 @@ class ClassroomIdHandler(
             classroom_url_fragment: str. The classroom URL fragment.
 
         Raises:
-            PageNotFoundException. The classroom with the given url doesn't
+            NotFoundException. The classroom with the given url doesn't
                 exist.
         """
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
         if classroom is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The classroom with the given url doesn\'t exist.')
 
         self.render_json({

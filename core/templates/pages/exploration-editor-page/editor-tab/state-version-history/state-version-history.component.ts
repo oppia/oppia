@@ -16,14 +16,17 @@
  * @fileoverview Component for the state version history button.
  */
 
-import { Component, Input } from '@angular/core';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { StateVersionHistoryModalComponent } from 'pages/exploration-editor-page/modal-templates/state-version-history-modal.component';
-import { StateDiffData, VersionHistoryService } from 'pages/exploration-editor-page/services/version-history.service';
+import {Component, Input} from '@angular/core';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {StateVersionHistoryModalComponent} from 'pages/exploration-editor-page/modal-templates/state-version-history-modal.component';
+import {
+  StateDiffData,
+  VersionHistoryService,
+} from 'pages/exploration-editor-page/services/version-history.service';
 
 @Component({
   selector: 'oppia-state-version-history',
-  templateUrl: './state-version-history.component.html'
+  templateUrl: './state-version-history.component.html',
 })
 export class StateVersionHistoryComponent {
   @Input() validationErrorIsShown!: boolean;
@@ -38,9 +41,8 @@ export class StateVersionHistoryComponent {
   }
 
   getLastEditedCommitterUsername(): string {
-    return (
-      this.versionHistoryService.getBackwardStateDiffData().committerUsername
-    );
+    return this.versionHistoryService.getBackwardStateDiffData()
+      .committerUsername;
   }
 
   getLastEditedVersionNumber(): number {
@@ -59,14 +61,16 @@ export class StateVersionHistoryComponent {
 
   onClickExploreVersionHistoryButton(): void {
     const modalRef: NgbModalRef = this.ngbModal.open(
-      StateVersionHistoryModalComponent, {
+      StateVersionHistoryModalComponent,
+      {
         backdrop: true,
         windowClass: 'metadata-diff-modal',
-        size: 'xl'
-      });
+        size: 'xl',
+      }
+    );
 
-    const stateDiffData: StateDiffData = (
-      this.versionHistoryService.getBackwardStateDiffData());
+    const stateDiffData: StateDiffData =
+      this.versionHistoryService.getBackwardStateDiffData();
 
     // Explanation for why diffData.newState can be null:
     // It is explained in VersionHistoryService as to why the values of
@@ -97,16 +101,21 @@ export class StateVersionHistoryComponent {
       }
       modalRef.componentInstance.oldStateName = stateDiffData.oldState.name;
     }
-    modalRef.componentInstance.committerUsername = (
-      stateDiffData.committerUsername);
+    modalRef.componentInstance.committerUsername =
+      stateDiffData.committerUsername;
     modalRef.componentInstance.oldVersion = stateDiffData.oldVersionNumber;
 
-    modalRef.result.then(() => {
-      this.versionHistoryService
-        .setCurrentPositionInStateVersionHistoryList(0);
-    }, () => {
-      this.versionHistoryService
-        .setCurrentPositionInStateVersionHistoryList(0);
-    });
+    modalRef.result.then(
+      () => {
+        this.versionHistoryService.setCurrentPositionInStateVersionHistoryList(
+          0
+        );
+      },
+      () => {
+        this.versionHistoryService.setCurrentPositionInStateVersionHistoryList(
+          0
+        );
+      }
+    );
   }
 }

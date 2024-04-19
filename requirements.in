@@ -27,7 +27,7 @@ mailchimp3==3.0.15
 mutagen==1.45.1
 Pillow==10.1.0
 pylatexenc==2.10
-pytest==6.2.5
+pytest==7.4.4
 PyYAML==6.0
 redis==3.5.3
 requests==2.31.0

@@ -16,21 +16,21 @@
  * @fileoverview Component for oppia email dashboard page.
  */
 
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { EmailDashboardResultBackendApiService } from './email-dashboard-result-backend-api.service';
+import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {EmailDashboardResultBackendApiService} from './email-dashboard-result-backend-api.service';
 
 export interface EmailData {
-  'email_subject': string;
-  'email_body': string;
-  'email_intent': string;
-  'max_recipients': number;
+  email_subject: string;
+  email_body: string;
+  email_intent: string;
+  max_recipients: number;
 }
 
 @Component({
   selector: 'oppia-email-dashboard-result',
-  templateUrl: './email-dashboard-result.component.html'
+  templateUrl: './email-dashboard-result.component.html',
 })
 export class EmailDashboardResultComponent {
   EMAIL_DASHBOARD_PAGE = '/emaildashboard';
@@ -38,7 +38,7 @@ export class EmailDashboardResultComponent {
   invalid = {
     subject: false,
     body: false,
-    maxRecipients: false
+    maxRecipients: false,
   };
 
   emailSubject: string = '';
@@ -46,10 +46,12 @@ export class EmailDashboardResultComponent {
   emailOption: string = 'all';
   submitIsInProgress: boolean = false;
   POSSIBLE_EMAIL_INTENTS = [
-    'bulk_email_marketing', 'bulk_email_improve_exploration',
+    'bulk_email_marketing',
+    'bulk_email_improve_exploration',
     'bulk_email_create_exploration',
     'bulk_email_creator_reengagement',
-    'bulk_email_learner_reengagement'];
+    'bulk_email_learner_reengagement',
+  ];
 
   emailIntent = this.POSSIBLE_EMAIL_INTENTS[0];
   emailSubmitted: boolean = false;
@@ -58,14 +60,14 @@ export class EmailDashboardResultComponent {
   testEmailSentSuccesfully: boolean = false;
 
   constructor(
-    private emailDashboardResultBackendApiService:
-    EmailDashboardResultBackendApiService,
-    private windowRef: WindowRef,
+    private emailDashboardResultBackendApiService: EmailDashboardResultBackendApiService,
+    private windowRef: WindowRef
   ) {}
 
   getQueryId(): string {
-    return (
-      this.windowRef.nativeWindow.location.pathname.split('/').slice(-1)[0]);
+    return this.windowRef.nativeWindow.location.pathname
+      .split('/')
+      .slice(-1)[0];
   }
 
   validateEmailSubjectAndBody(): boolean {
@@ -84,8 +86,7 @@ export class EmailDashboardResultComponent {
   submitEmail(): void {
     let dataIsValid = this.validateEmailSubjectAndBody();
 
-    if (this.emailOption === 'custom' &&
-      this.maxRecipients === 0) {
+    if (this.emailOption === 'custom' && this.maxRecipients === 0) {
       this.invalid.maxRecipients = true;
       dataIsValid = false;
     }
@@ -96,20 +97,24 @@ export class EmailDashboardResultComponent {
         email_subject: this.emailSubject,
         email_body: this.emailBody,
         email_intent: this.emailIntent,
-        max_recipients: (
-          this.emailOption !== 'all' ? this.maxRecipients : 0)
+        max_recipients: this.emailOption !== 'all' ? this.maxRecipients : 0,
       };
 
-      this.emailDashboardResultBackendApiService.submitEmailAsync(
-        data, this.getQueryId()).then(() => {
-        this.emailSubmitted = true;
-        setTimeout(() => {
-          this.windowRef.nativeWindow.location.href = this.EMAIL_DASHBOARD_PAGE;
-        }, 4000);
-      }, () => {
-        this.errorHasOccurred = true;
-        this.submitIsInProgress = false;
-      });
+      this.emailDashboardResultBackendApiService
+        .submitEmailAsync(data, this.getQueryId())
+        .then(
+          () => {
+            this.emailSubmitted = true;
+            setTimeout(() => {
+              this.windowRef.nativeWindow.location.href =
+                this.EMAIL_DASHBOARD_PAGE;
+            }, 4000);
+          },
+          () => {
+            this.errorHasOccurred = true;
+            this.submitIsInProgress = false;
+          }
+        );
       this.invalid.subject = false;
       this.invalid.body = false;
       this.invalid.maxRecipients = false;
@@ -125,26 +130,36 @@ export class EmailDashboardResultComponent {
   cancelEmail(): void {
     this.submitIsInProgress = true;
 
-    this.emailDashboardResultBackendApiService.cancelEmailAsync(
-      this.getQueryId()).then(() => {
-      this.emailCancelled = true;
-      setTimeout(() => {
-        this.windowRef.nativeWindow.location.href = this.EMAIL_DASHBOARD_PAGE;
-      }, 4000);
-    }, () => {
-      this.errorHasOccurred = true;
-      this.submitIsInProgress = false;
-    });
+    this.emailDashboardResultBackendApiService
+      .cancelEmailAsync(this.getQueryId())
+      .then(
+        () => {
+          this.emailCancelled = true;
+          setTimeout(() => {
+            this.windowRef.nativeWindow.location.href =
+              this.EMAIL_DASHBOARD_PAGE;
+          }, 4000);
+        },
+        () => {
+          this.errorHasOccurred = true;
+          this.submitIsInProgress = false;
+        }
+      );
   }
 
   sendTestEmail(): void {
     let dataIsValid = this.validateEmailSubjectAndBody();
 
     if (dataIsValid) {
-      this.emailDashboardResultBackendApiService.sendTestEmailAsync(
-        this.emailSubject, this.emailBody, this.getQueryId()).then(() => {
-        this.testEmailSentSuccesfully = true;
-      });
+      this.emailDashboardResultBackendApiService
+        .sendTestEmailAsync(
+          this.emailSubject,
+          this.emailBody,
+          this.getQueryId()
+        )
+        .then(() => {
+          this.testEmailSentSuccesfully = true;
+        });
       this.invalid.subject = false;
       this.invalid.body = false;
       this.invalid.maxRecipients = false;
@@ -152,7 +167,9 @@ export class EmailDashboardResultComponent {
   }
 }
 
-angular.module('oppia').directive('oppiaEmailDashboardResultPage',
+angular.module('oppia').directive(
+  'oppiaEmailDashboardResultPage',
   downgradeComponent({
-    component: EmailDashboardResultComponent
-  }));
+    component: EmailDashboardResultComponent,
+  })
+);

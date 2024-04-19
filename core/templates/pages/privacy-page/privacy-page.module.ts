@@ -16,26 +16,16 @@
  * @fileoverview Module for the privacy page.
  */
 
-import { NgModule } from '@angular/core';
-import { SharedComponentsModule } from 'components/shared-component.module';
-import { PrivacyPageComponent } from './privacy-page.component';
-import { PrivacyPageRootComponent } from './privacy-page-root.component';
-import { CommonModule } from '@angular/common';
-import { PrivacyPageRoutingModule } from './privacy-page-routing.module';
+import {NgModule} from '@angular/core';
+import {SharedComponentsModule} from 'components/shared-component.module';
+import {PrivacyPageComponent} from './privacy-page.component';
+import {PrivacyPageRootComponent} from './privacy-page-root.component';
+import {CommonModule} from '@angular/common';
+import {PrivacyPageRoutingModule} from './privacy-page-routing.module';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    SharedComponentsModule,
-    PrivacyPageRoutingModule
-  ],
-  declarations: [
-    PrivacyPageRootComponent,
-    PrivacyPageComponent
-  ],
-  entryComponents: [
-    PrivacyPageRootComponent,
-    PrivacyPageComponent
-  ]
+  imports: [CommonModule, SharedComponentsModule, PrivacyPageRoutingModule],
+  declarations: [PrivacyPageRootComponent, PrivacyPageComponent],
+  entryComponents: [PrivacyPageRootComponent, PrivacyPageComponent],
 })
 export class PrivacyPageModule {}

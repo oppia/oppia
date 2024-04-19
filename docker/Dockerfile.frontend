@@ -7,7 +7,7 @@ RUN apt-get update -y && apt-get upgrade -y \
     curl \
     git
 
-# Installing packages from the package.json file
+# Installing packages from the package.json file.
 COPY package.json .
 COPY scripts/linters/custom_eslint_checks ./scripts/linters/custom_eslint_checks
 

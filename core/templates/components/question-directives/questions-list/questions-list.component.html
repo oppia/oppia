@@ -43,7 +43,8 @@
                            [misconceptionsBySkill]="misconceptionsBySkill"
                            [questionStateData]="questionStateData"
                            [question]="question"
-                           [userCanEditQuestion]="canEditQuestion">
+                           [userCanEditQuestion]="canEditQuestion"
+                           [stateContentShouldStayVisibleOnScroll]="false">
     </oppia-question-editor>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && questionValidationService.getValidationErrorMessage(question)">
       {{questionValidationService.getValidationErrorMessage(question)}}
@@ -63,7 +64,7 @@
         <div *ngFor="let questionSummaryForOneSkill of questionSummariesForOneSkill; let index = index" class="question-list-item e2e-test-question-list-item">
           <div *ngIf="!deletedQuestionIds.includes(questionSummaryForOneSkill.getQuestionSummary().getQuestionId())"
                (click)="editQuestion(questionSummaryForOneSkill.getQuestionSummary(), questionSummaryForOneSkill.getSkillDescription(), questionSummaryForOneSkill.getSkillDifficulty())">
-            <div class="question-data">
+            <div class="question-data e2e-test-edit-question-button">
               <oppia-rte-output-display classStr="question-text"
                                          [rteString]="questionSummaryForOneSkill.getQuestionSummary().getQuestionContent()">
               </oppia-rte-output-display>
@@ -77,7 +78,7 @@
                 <i class="fas fa-trash"></i>
               </span>
             </div>
-            <div class="question-interaction-id">
+            <div class="question-interaction-id e2e-test-question-interaction-id">
               <span>{{questionSummaryForOneSkill.getQuestionSummary().getInteractionId()}}</span>
             </div>
           </div>
@@ -336,8 +337,10 @@
       margin-left: 0;
       margin-right: 0;
       margin-top: 30px;
+      max-height: none;
       order: 10;
       padding: 0;
+      padding-bottom: 90px;
       width: 100%;
     }
     .create-question-container {

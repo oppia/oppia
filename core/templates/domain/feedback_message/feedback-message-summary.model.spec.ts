@@ -16,39 +16,42 @@
  * @fileoverview Tests for FeedbackMessageSummaryModel.
  */
 
-import { FeedbackMessageSummary } from
-  'domain/feedback_message/feedback-message-summary.model';
+import {FeedbackMessageSummary} from 'domain/feedback_message/feedback-message-summary.model';
 
 describe('Feedback message model', () => {
   it('should create a new message', () => {
-    var feedbackMessageSummary = (
-      FeedbackMessageSummary.createNewMessage(
-        0, 'Sample message', 'Test user'));
+    var feedbackMessageSummary = FeedbackMessageSummary.createNewMessage(
+      0,
+      'Sample message',
+      'Test user'
+    );
 
     expect(feedbackMessageSummary.messageId).toEqual(0);
     expect(feedbackMessageSummary.text).toEqual('Sample message');
     expect(feedbackMessageSummary.authorUsername).toEqual('Test user');
   });
 
-  it('should fetch the feedback message domain object from the backend ' +
-     'summary dict', () => {
-    var messageSummary = {
-      message_id: 0,
-      text: 'Sample text',
-      updated_status: null,
-      suggestion_html: 'html',
-      current_content_html: 'html',
-      description: 'desc',
-      author_username: 'User 1',
-      created_on_msecs: 1000
-    };
+  it(
+    'should fetch the feedback message domain object from the backend ' +
+      'summary dict',
+    () => {
+      var messageSummary = {
+        message_id: 0,
+        text: 'Sample text',
+        updated_status: null,
+        suggestion_html: 'html',
+        current_content_html: 'html',
+        description: 'desc',
+        author_username: 'User 1',
+        created_on_msecs: 1000,
+      };
 
-    var feedbackMessageSummary = (
-      FeedbackMessageSummary.createFromBackendDict(
-        messageSummary));
+      var feedbackMessageSummary =
+        FeedbackMessageSummary.createFromBackendDict(messageSummary);
 
-    expect(feedbackMessageSummary.text).toEqual('Sample text');
-    expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
-    expect(feedbackMessageSummary.createdOnMsecs).toEqual(1000);
-  });
+      expect(feedbackMessageSummary.text).toEqual('Sample text');
+      expect(feedbackMessageSummary.authorUsername).toEqual('User 1');
+      expect(feedbackMessageSummary.createdOnMsecs).toEqual(1000);
+    }
+  );
 });

@@ -32,3 +32,6 @@ cron:
 - description: daily job to populate translation contribution stats
   url: /cron/suggestions/translation_contribution_stats
   schedule: every day 16:00
+- description: daily email about new suggestions to review on the Contributor Dashboard
+  url: /cron/mail/reviewers/new_contributor_dashboard_suggestions
+  schedule: every day 17:00

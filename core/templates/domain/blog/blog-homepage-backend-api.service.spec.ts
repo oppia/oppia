@@ -16,18 +16,29 @@
  * @fileoverview Unit tests for BlogHomepageBackendApiService.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
-  BlogHomePageBackendApiService, BlogHomePageData, BlogPostPageData,
-  BlogPostPageBackendResponse, BlogHomePageBackendResponse, SearchResponseData,
-  SearchResponseBackendDict, BlogAuthorProfilePageBackendResponse,
-  BlogAuthorProfilePageData
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {
+  BlogHomePageBackendApiService,
+  BlogHomePageData,
+  BlogPostPageData,
+  BlogPostPageBackendResponse,
+  BlogHomePageBackendResponse,
+  SearchResponseData,
+  SearchResponseBackendDict,
+  BlogAuthorProfilePageBackendResponse,
+  BlogAuthorProfilePageData,
 } from 'domain/blog/blog-homepage-backend-api.service';
-import { BlogPostSummary, BlogPostSummaryBackendDict } from 'domain/blog/blog-post-summary.model';
-import { BlogPostBackendDict, BlogPostData } from 'domain/blog/blog-post.model';
-import { BlogHomePageConstants } from 'pages/blog-home-page/blog-home-page.constants';
-import { BlogAuthorDetailsBackendDict } from './blog-dashboard-backend-api.service';
+import {
+  BlogPostSummary,
+  BlogPostSummaryBackendDict,
+} from 'domain/blog/blog-post-summary.model';
+import {BlogPostBackendDict, BlogPostData} from 'domain/blog/blog-post.model';
+import {BlogHomePageConstants} from 'pages/blog-home-page/blog-home-page.constants';
+import {BlogAuthorDetailsBackendDict} from './blog-dashboard-backend-api.service';
 
 describe('Blog home page backend api service', () => {
   let bhpbas: BlogHomePageBackendApiService;
@@ -70,12 +81,12 @@ describe('Blog home page backend api service', () => {
   let urlSearchQuery: string;
   let blogAuthorBackendDetails: BlogAuthorDetailsBackendDict = {
     displayed_author_name: 'new_displayed_author_name',
-    author_bio: 'general bio'
+    author_bio: 'general bio',
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule]
+      imports: [HttpClientTestingModule],
     });
 
     bhpbas = TestBed.inject(BlogHomePageBackendApiService);
@@ -93,9 +104,8 @@ describe('Blog home page backend api service', () => {
       blogPostSummaryDicts: [],
       listOfDefaultTags: ['learners', 'news'],
     };
-    blogPostSummaryObject = BlogPostSummary.createFromBackendDict(
-      blogPostSummary
-    );
+    blogPostSummaryObject =
+      BlogPostSummary.createFromBackendDict(blogPostSummary);
     searchResponseBackendDict = {
       search_offset: null,
       blog_post_summaries_list: [],
@@ -110,7 +120,7 @@ describe('Blog home page backend api service', () => {
     blogPostPageBackendResponse = {
       author_username: 'test_username',
       blog_post_dict: blogPost,
-      summary_dicts: [] as BlogPostSummaryBackendDict[]
+      summary_dicts: [] as BlogPostSummaryBackendDict[],
     };
     blogPostPageDataObject = {
       authorUsername: 'test_username',
@@ -120,7 +130,7 @@ describe('Blog home page backend api service', () => {
     blogAuthorProfileBackendResponse = {
       author_details: blogAuthorBackendDetails,
       no_of_blog_post_summaries: 0,
-      summary_dicts: [] as BlogPostSummaryBackendDict[]
+      summary_dicts: [] as BlogPostSummaryBackendDict[],
     };
     blogAuthorProfileDataObject = {
       numOfBlogPostSummaries: 0,
@@ -138,7 +148,8 @@ describe('Blog home page backend api service', () => {
     bhpbas.fetchBlogHomePageDataAsync('0').then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0');
+      BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0'
+    );
     expect(req.request.method).toEqual('GET');
 
     req.flush(blogHomePageBackendResponse);
@@ -148,52 +159,59 @@ describe('Blog home page backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should fetch the blog home page data with blog post summary data',
-    fakeAsync(() => {
-      blogHomePageBackendResponse.blog_post_summary_dicts = [
-        blogPostSummary];
-      blogHomePageDataObject.blogPostSummaryDicts = [
-        blogPostSummaryObject];
-      bhpbas.fetchBlogHomePageDataAsync('0').then(successHandler, failHandler);
-
-      let req = httpTestingController.expectOne(
-        BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0');
-      expect(req.request.method).toEqual('GET');
-
-      req.flush(blogHomePageBackendResponse);
-      flushMicrotasks();
-
-      expect(successHandler).toHaveBeenCalledWith(blogHomePageDataObject);
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
-
-  it('should use the rejection handler if the backend request fails to fetch' +
-    'blog home page data', fakeAsync(() => {
+  it('should fetch the blog home page data with blog post summary data', fakeAsync(() => {
+    blogHomePageBackendResponse.blog_post_summary_dicts = [blogPostSummary];
+    blogHomePageDataObject.blogPostSummaryDicts = [blogPostSummaryObject];
     bhpbas.fetchBlogHomePageDataAsync('0').then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0');
+      BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0'
+    );
     expect(req.request.method).toEqual('GET');
 
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
+    req.flush(blogHomePageBackendResponse);
     flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
+    expect(successHandler).toHaveBeenCalledWith(blogHomePageDataObject);
+    expect(failHandler).not.toHaveBeenCalled();
   }));
+
+  it(
+    'should use the rejection handler if the backend request fails to fetch' +
+      'blog home page data',
+    fakeAsync(() => {
+      bhpbas.fetchBlogHomePageDataAsync('0').then(successHandler, failHandler);
+
+      let req = httpTestingController.expectOne(
+        BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '?offset=0'
+      );
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(
+        {
+          error: 'Some error in the backend.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 
   it('should successfully fetch search data', fakeAsync(() => {
     urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
-    bhpbas.fetchBlogPostSearchResultAsync(
-      urlSearchQuery).then(successHandler, failHandler);
+    bhpbas
+      .fetchBlogPostSearchResultAsync(urlSearchQuery)
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery);
+      BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery
+    );
     expect(req.request.method).toEqual('GET');
 
     req.flush(searchResponseBackendDict);
@@ -203,38 +221,47 @@ describe('Blog home page backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should use the rejection handler if the backend request fails to fetch' +
-    'search data', fakeAsync(() => {
-    urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
-    bhpbas.fetchBlogPostSearchResultAsync(
-      urlSearchQuery).then(successHandler, failHandler);
+  it(
+    'should use the rejection handler if the backend request fails to fetch' +
+      'search data',
+    fakeAsync(() => {
+      urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
+      bhpbas
+        .fetchBlogPostSearchResultAsync(urlSearchQuery)
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery);
-    expect(req.request.method).toEqual('GET');
+      let req = httpTestingController.expectOne(
+        BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery
+      );
+      expect(req.request.method).toEqual('GET');
 
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
+      req.flush(
+        {
+          error: 'Some error in the backend.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 
   it('should fetch search data with blog post summary data', fakeAsync(() => {
     urlSearchQuery = '?q=testBlogSearch&tags=("News"%20OR%20"Mathematics")';
-    searchResponseBackendDict.blog_post_summaries_list = [
-      blogPostSummary];
-    searchResponseData.blogPostSummariesList = [
-      blogPostSummaryObject];
-    bhpbas.fetchBlogPostSearchResultAsync(
-      urlSearchQuery).then(successHandler, failHandler);
+    searchResponseBackendDict.blog_post_summaries_list = [blogPostSummary];
+    searchResponseData.blogPostSummariesList = [blogPostSummaryObject];
+    bhpbas
+      .fetchBlogPostSearchResultAsync(urlSearchQuery)
+      .then(successHandler, failHandler);
 
     let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery);
+      BlogHomePageConstants.BLOG_SEARCH_DATA_URL + urlSearchQuery
+    );
     expect(req.request.method).toEqual('GET');
 
     req.flush(searchResponseBackendDict);
@@ -244,13 +271,36 @@ describe('Blog home page backend api service', () => {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should fetch the blog post data to populate blog post page', fakeAsync(
-    () => {
-      bhpbas.fetchBlogPostPageDataAsync('sample-url').then(
-        successHandler, failHandler);
+  it('should fetch the blog post data to populate blog post page', fakeAsync(() => {
+    bhpbas
+      .fetchBlogPostPageDataAsync('sample-url')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url'
+    );
+    expect(req.request.method).toEqual('GET');
+
+    req.flush(blogPostPageBackendResponse);
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(blogPostPageDataObject);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it(
+    'should fetch the blog post data to populate blog post page with summary' +
+      'dicts',
+    fakeAsync(() => {
+      blogPostPageBackendResponse.summary_dicts = [blogPostSummary];
+      blogPostPageDataObject.summaryDicts = [blogPostSummaryObject];
+      bhpbas
+        .fetchBlogPostPageDataAsync('sample-url')
+        .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url');
+        BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url'
+      );
       expect(req.request.method).toEqual('GET');
 
       req.flush(blogPostPageBackendResponse);
@@ -261,71 +311,43 @@ describe('Blog home page backend api service', () => {
     })
   );
 
-  it('should fetch the blog post data to populate blog post page with summary' +
-    'dicts', fakeAsync(() => {
-    blogPostPageBackendResponse.summary_dicts = [
-      blogPostSummary];
-    blogPostPageDataObject.summaryDicts = [blogPostSummaryObject];
-    bhpbas.fetchBlogPostPageDataAsync('sample-url').then(
-      successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush(blogPostPageBackendResponse);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(blogPostPageDataObject);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should use the rejection handler if the backend request fails to fetch' +
-    'blog post page data', fakeAsync(() => {
-    bhpbas.fetchBlogPostPageDataAsync('sample-url').then(
-      successHandler, failHandler);
-
-    let req = httpTestingController.expectOne(
-      BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url');
-    expect(req.request.method).toEqual('GET');
-
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
-
-  it('should successfully fetch the author profile page data.', fakeAsync(
-    () => {
-      bhpbas.fetchBlogAuthorProfilePageDataAsync('test_username', '0').then(
-        successHandler, failHandler);
+  it(
+    'should use the rejection handler if the backend request fails to fetch' +
+      'blog post page data',
+    fakeAsync(() => {
+      bhpbas
+        .fetchBlogPostPageDataAsync('sample-url')
+        .then(successHandler, failHandler);
 
       let req = httpTestingController.expectOne(
-        '/blog/author/data/test_username?offset=0');
+        BlogHomePageConstants.BLOG_HOMEPAGE_DATA_URL_TEMPLATE + '/sample-url'
+      );
       expect(req.request.method).toEqual('GET');
 
-      req.flush(blogAuthorProfileBackendResponse);
+      req.flush(
+        {
+          error: 'Some error in the backend.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
       flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalledWith(blogAuthorProfileDataObject);
-      expect(failHandler).not.toHaveBeenCalled();
-    }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 
-  it('should fetch the blog author profile page data with blog post summary' +
-  'data', fakeAsync(() => {
-    blogAuthorProfileBackendResponse.summary_dicts = [
-      blogPostSummary];
-    blogAuthorProfileDataObject.blogPostSummaries = [
-      blogPostSummaryObject];
-    bhpbas.fetchBlogAuthorProfilePageDataAsync('test_username', '0').then(
-      successHandler, failHandler);
+  it('should successfully fetch the author profile page data.', fakeAsync(() => {
+    bhpbas
+      .fetchBlogAuthorProfilePageDataAsync('test_username', '0')
+      .then(successHandler, failHandler);
+
     let req = httpTestingController.expectOne(
-      '/blog/author/data/test_username?offset=0');
+      '/blog/author/data/test_username?offset=0'
+    );
     expect(req.request.method).toEqual('GET');
 
     req.flush(blogAuthorProfileBackendResponse);
@@ -333,26 +355,56 @@ describe('Blog home page backend api service', () => {
 
     expect(successHandler).toHaveBeenCalledWith(blogAuthorProfileDataObject);
     expect(failHandler).not.toHaveBeenCalled();
-  })
+  }));
+
+  it(
+    'should fetch the blog author profile page data with blog post summary' +
+      'data',
+    fakeAsync(() => {
+      blogAuthorProfileBackendResponse.summary_dicts = [blogPostSummary];
+      blogAuthorProfileDataObject.blogPostSummaries = [blogPostSummaryObject];
+      bhpbas
+        .fetchBlogAuthorProfilePageDataAsync('test_username', '0')
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/blog/author/data/test_username?offset=0'
+      );
+      expect(req.request.method).toEqual('GET');
+
+      req.flush(blogAuthorProfileBackendResponse);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(blogAuthorProfileDataObject);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
   );
 
-  it('should use the rejection handler if the backend request fails to fetch' +
-    'blog home page data', fakeAsync(() => {
-    bhpbas.fetchBlogAuthorProfilePageDataAsync('test_username', '0').then(
-      successHandler, failHandler);
+  it(
+    'should use the rejection handler if the backend request fails to fetch' +
+      'blog home page data',
+    fakeAsync(() => {
+      bhpbas
+        .fetchBlogAuthorProfilePageDataAsync('test_username', '0')
+        .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      '/blog/author/data/test_username?offset=0');
-    expect(req.request.method).toEqual('GET');
+      let req = httpTestingController.expectOne(
+        '/blog/author/data/test_username?offset=0'
+      );
+      expect(req.request.method).toEqual('GET');
 
-    req.flush({
-      error: 'Some error in the backend.'
-    }, {
-      status: 500, statusText: 'Internal Server Error'
-    });
-    flushMicrotasks();
+      req.flush(
+        {
+          error: 'Some error in the backend.',
+        },
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      );
+      flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  }));
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });

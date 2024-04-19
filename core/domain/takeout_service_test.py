@@ -58,6 +58,7 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import topic_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     app_feedback_report_models,
@@ -76,7 +77,8 @@ if MYPY: # pragma: no cover
     subtopic_models,
     suggestion_models,
     topic_models,
-    user_models
+    user_models,
+    voiceover_models
 ) = models.Registry.import_models([
     models.Names.APP_FEEDBACK_REPORT,
     models.Names.AUTH,
@@ -94,7 +96,8 @@ if MYPY: # pragma: no cover
     models.Names.SUBTOPIC,
     models.Names.SUGGESTION,
     models.Names.TOPIC,
-    models.Names.USER
+    models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 
@@ -474,6 +477,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         20) Creates new BlogPostModel and BlogPostRightsModel.
         21) Creates a TranslationContributionStatsModel.
         22) Creates new LearnerGroupModel and LearnerGroupsUserModel.
+        23) Creates a VoiceArtistMetadataModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -928,12 +932,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
-        config_models.ConfigPropertySnapshotMetadataModel(
-            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
-            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
-            commit_cmds=self.COMMIT_CMDS
-        ).put()
-
         exploration_models.ExplorationRightsSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
@@ -970,6 +968,16 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.USER_ID_1,
             parent_user_id=self.PROFILE_ID_1
         ).put()
+
+        language_code_to_accent: Dict[str, str] = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
+        # Setup for VoiceArtistMetadataModel.
+        voiceover_models.VoiceArtistMetadataModel.create_model(
+            voice_artist_id=self.USER_ID_1,
+            language_code_to_accent=language_code_to_accent
+        )
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
         report_id = '%s.%s.%s' % (
@@ -1095,7 +1103,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
     def test_export_data_for_full_user_trivial_is_correct(self) -> None:
         """Trivial test of export_data functionality."""
         self.set_up_trivial()
-        self.maxDiff = 0
+        self.maxDiff = None
         # Generate expected output.
         app_feedback_report: Dict[str, Dict[str, Union[str, int]]] = {}
         collection_progress_data: Dict[str, List[str]] = {}
@@ -1214,7 +1222,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
-        expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_exploration_rights_sm: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1231,6 +1238,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
+        expected_voice_artist_data: Dict[str, str] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1299,15 +1307,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
             'platform_parameter_snapshot_metadata':
                 expected_platform_parameter_sm,
             'user_auth_details': expected_user_auth_details,
-            'user_email_preferences': expected_user_email_preferences
+            'user_email_preferences': expected_user_email_preferences,
+            'voice_artist_metadata': expected_voice_artist_data
         }
 
         # Perform export and compare.
@@ -1834,12 +1841,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
-        expected_config_property_sm = {
-            self.GENERIC_MODEL_ID: {
-                'commit_type': self.COMMIT_TYPE,
-                'commit_message': self.COMMIT_MESSAGE,
-            }
-        }
 
         expected_exploration_rights_sm = {
             self.GENERIC_MODEL_ID: {
@@ -2101,6 +2102,10 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
+        expected_language_code_to_accent: Dict[str, str] = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_settings': expected_user_settings_data,
@@ -2163,8 +2168,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'pinned_opportunity': expected_pinned_opportunities_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
-            'config_property_snapshot_metadata':
-                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
@@ -2175,7 +2178,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'app_feedback_report': expected_app_feedback_report,
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
-            'blog_author_details': expected_blog_author_details
+            'blog_author_details': expected_blog_author_details,
+            'voice_artist_metadata': expected_language_code_to_accent
         }
 
         with utils.open_file(

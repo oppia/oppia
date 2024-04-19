@@ -16,23 +16,22 @@
  * @fileoverview Unit tests for AssignedSkill.
  */
 
-import { AssignedSkill } from 'domain/skill/assigned-skill.model';
+import {AssignedSkill} from 'domain/skill/assigned-skill.model';
 
 describe('Assigned Skill Model', () => {
-  it('should correctly convert backend dict to Assigned Skill Object.',
-    () => {
-      let backendDict = {
-        topic_id: 'topicId',
-        topic_name: 'topic',
-        topic_version: 1,
-        subtopic_id: 2
-      };
+  it('should correctly convert backend dict to Assigned Skill Object.', () => {
+    let backendDict = {
+      topic_id: 'topicId',
+      topic_name: 'topic',
+      topic_version: 1,
+      subtopic_id: 2,
+    };
 
-      let assignedSkill = AssignedSkill.createFromBackendDict(backendDict);
+    let assignedSkill = AssignedSkill.createFromBackendDict(backendDict);
 
-      expect(assignedSkill.topicId).toEqual('topicId');
-      expect(assignedSkill.topicName).toEqual('topic');
-      expect(assignedSkill.topicVersion).toEqual(1);
-      expect(assignedSkill.subtopicId).toEqual(2);
-    });
+    expect(assignedSkill.topicId).toEqual('topicId');
+    expect(assignedSkill.topicName).toEqual('topic');
+    expect(assignedSkill.topicVersion).toEqual(1);
+    expect(assignedSkill.subtopicId).toEqual(2);
+  });
 });

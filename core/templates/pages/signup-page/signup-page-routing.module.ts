@@ -16,25 +16,19 @@
  * @fileoverview Routing module for signup page.
  */
 
-import { NgModule } from '@angular/core';
-import { Route, RouterModule } from '@angular/router';
-import { SignupPageRootComponent } from './signup-page-root.component';
-
+import {NgModule} from '@angular/core';
+import {Route, RouterModule} from '@angular/router';
+import {SignupPageRootComponent} from './signup-page-root.component';
 
 const routes: Route[] = [
   {
     path: '',
-    component: SignupPageRootComponent
-  }
+    component: SignupPageRootComponent,
+  },
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
-  exports: [
-    RouterModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
 })
-
 export class SignupPageRoutingModule {}

@@ -20,8 +20,8 @@
             {{ translationReviewersCount ? translationReviewersCount : 0 }}
           </h2>
         </div>
-        <div class="question-reviewer stats-card" [attr.aria-label]="'Question Reviewer '" tabindex="0" *ngIf="isQuestionCoordinator">
-          <p class="stat-description">Question Reviewers</p>
+        <div class="question-reviewer stats-card" [attr.aria-label]="'Practice Question Reviewer '" tabindex="0" *ngIf="isQuestionCoordinator">
+          <p class="stat-description">Practice Question Reviewers</p>
           <h2 class="stat-value-with-rating e2e-test-oppia-total-plays">
             {{questionReviewersCount}}
           </h2>
@@ -107,7 +107,7 @@
           </div>
           <div class="topic-selector-container">
             <oppia-topic-filter
-              *ngIf="(activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
+              *ngIf="topicsAreFetched === 'true' && (activeTab === TAB_NAME_TRANSLATION_SUBMITTER) || (activeTab === TAB_NAME_QUESTION_SUBMITTER)"
               [(defaultTopicNames)]="allTopicNames"
               [(selectedTopicNames)]="selectedTopicNames"
               (selectionsChange)="applyTopicFilter()">
@@ -115,9 +115,9 @@
           </div>
         </div>
       </div>
-      <contributor-admin-stats-table [activeTab]="activeTab" [filter]="filter"></contributor-admin-stats-table>
+      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
     </div>
-    <div class="dashboard-content-mobile">
+    <div class="dashboard-content-mobile"  *ngIf="checkMobileView()">
       <div class="dropdown">
         <mat-form-field class="choices-field">
           <mat-select placeholder="Contribution Type"
@@ -190,7 +190,7 @@
           </oppia-topic-filter>
         </div>
       </div>
-      <contributor-admin-stats-table [activeTab]="activeTab" [filter]="filter"></contributor-admin-stats-table>
+      <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
     </div>
   </div>
 </div>

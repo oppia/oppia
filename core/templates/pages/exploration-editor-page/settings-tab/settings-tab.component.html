@@ -36,16 +36,16 @@
                   <p>
                     <mat-form-field class="e2e-test-exploration-category" appearance="fill">
                       <mat-label for="explorationCategory" class="d-block">Add a category (Choose or type new)</mat-label>
-                      <mat-select [(value)]="explorationCategoryService.displayed" class="e2e-test-exploration-category-dropdown">
+                      <mat-select [(value)]="explorationCategoryService.displayed"
+                                  (valueChange)="updateCategoryListWithUserData()"
+                                  class="e2e-test-exploration-category-dropdown">
                         <mat-option class="e2e-test-exploration-new-category-add">
                           <ngx-mat-select-search ngModel
                                                  (ngModelChange)="filterChoices($event)"
-                                                 (keydown.enter)="updateCategoryListWithUserData()"
                                                  placeholderLabel="Type new category here...">
                           </ngx-mat-select-search>
                         </mat-option>
-                        <mat-option (click)="updateCategoryListWithUserData()"
-                                    *ngFor="let option of filteredChoices"
+                        <mat-option *ngFor="let option of filteredChoices"
                                     class="e2e-test-exploration-category-selector-choice"
                                     [value]="option.id">
                           {{ option.text }}
@@ -269,32 +269,6 @@
         </div>
       </div>
       <hr class="oppia-feature-separator">
-      <div role="form" class="form-horizontal">
-        <div class="oppia-features-header">
-          <label for="enableCorrectnessFeedback">
-            Correctness Feedback
-          </label>
-          <div>
-            <div class="oppia-on-off-switch">
-              <input type="checkbox" class="sr-only" *ngIf="!isCorrectnessFeedbackEnabled()" (click)="toggleCorrectnessFeedback()" aria-label="Correctness feedback" tabindex="0" (keydown.enter)="toggleCorrectnessFeedback()">
-              <input type="checkbox" *ngIf="!isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" (click)="toggleCorrectnessFeedback()">
-              <input type="checkbox" class="sr-only" *ngIf="isCorrectnessFeedbackEnabled()" (click)="toggleCorrectnessFeedback()" aria-label="Correctness feedback" tabindex="0" (keydown.enter)="toggleCorrectnessFeedback()" checked>
-              <input type="checkbox" *ngIf="isCorrectnessFeedbackEnabled()" [disabled]="explorationIsLinkedToStory" class="oppia-on-off-switch-checkbox" id="correctness-switch" (click)="toggleCorrectnessFeedback()" checked>
-              <label class="oppia-on-off-switch-label e2e-test-enable-mark-correctness-feedback" for="correctness-switch">
-                <span class="oppia-on-off-switch-inner"></span>
-                <span class="oppia-on-off-switch-main"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-        <span class="form-text secondary-info-text" tabindex="0">
-          Correctness feedback allows the user to categorise answer groups as correct or incorrect.
-        </span>
-        <span class="form-text secondary-info-text" *ngIf="explorationIsLinkedToStory && isCorrectnessFeedbackEnabled()" tabindex="0">
-          Correctness feedback cannot be disabled for an exploration linked to a story.
-        </span>
-      </div>
-      <hr class="oppia-feature-separator">
     </div>
   </mat-card>
 
@@ -403,7 +377,7 @@
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
         <h3 tabindex="0">Voice Artists</h3>
-        <i class="fa fa-caret-down"
+        <i class="fa fa-caret-down e2e-test-voice-artist-collapsible-card-header"
            *ngIf="!voiceArtistsCardIsShown"
            aria-hidden="true">
         </i>
@@ -412,7 +386,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="voiceArtistsCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content e2e-test-voice-artist-card" *ngIf="voiceArtistsCardIsShown">
         <div>
           <div [hidden]="isVoiceoverFormOpen" tabindex="0" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
@@ -425,9 +399,9 @@
         </div>
 
         <div [hidden]="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length > 0)">
-          <ul>
+          <ul class="e2e-test-voiceArtist-list">
             <li *ngFor="let voiceArtistName of explorationRightsService.voiceArtistNames; let index = index">
-              <div class="oppia-user-list-item .e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
+              <div class="oppia-user-list-item e2e-test-voiceArtist-role-names e2e-test-voice-artist-{{voiceArtistName}}">
                 <span tabindex="0">{{voiceArtistName}}</span>
                 <span [hidden]="!(isVoiceoverFormOpen)" type="button" [ngbTooltip]="'Remove user'" class="far fa-times-circle" tabindex="0" aria-label="remove user" role="button" (keydown.enter)="removeVoiceArtist(voiceArtistName)" (click)="removeVoiceArtist(voiceArtistName)">
                 </span>
@@ -440,7 +414,7 @@
           <div class="form-group">
             <form>
               <div>
-                <label>Add new voice artsit: </label>
+                <label>Add new voice artist: </label>
                 <input id="newVoicAartistUsername"
                        class="form-control e2e-test-new-voice-artist-username"
                        [(ngModel)]="newVoicAartistUsername"

@@ -16,16 +16,16 @@
  * @fileoverview Root component for Splash Page.
  */
 
-import { Component, OnDestroy } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
+import {Component, OnDestroy} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {Subscription} from 'rxjs';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
 
 @Component({
   selector: 'oppia-splash-page-root',
-  templateUrl: './splash-page-root.component.html'
+  templateUrl: './splash-page-root.component.html',
 })
 export class SplashPageRootComponent implements OnDestroy {
   directiveSubscriptions = new Subscription();
@@ -36,10 +36,12 @@ export class SplashPageRootComponent implements OnDestroy {
 
   setPageTitleAndMetaTags(): void {
     let translatedTitle = this.translateService.instant(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.TITLE
+    );
     this.pageHeadService.updateTitleAndMetaTags(
       translatedTitle,
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.META
+    );
   }
 
   ngOnInit(): void {

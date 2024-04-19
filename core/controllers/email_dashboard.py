@@ -38,20 +38,6 @@ class UserQueryDict(TypedDict):
     num_qualified_users: int
 
 
-class EmailDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page to submit query and show past queries."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_manage_email_dashboard
-    def get(self) -> None:
-        """Handles GET requests."""
-        self.render_template('email-dashboard-page.mainpage.html')
-
-
 def _generate_user_query_dicts(
     user_queries: List[user_query_domain.UserQuery]
 ) -> List[UserQueryDict]:

@@ -16,49 +16,62 @@
  * @fileoverview Topic filter component for the blog home page.
  */
 
-import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter} from '@angular/core';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { FormControl } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  Input,
+  Output,
+  EventEmitter,
+} from '@angular/core';
+import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {FormControl} from '@angular/forms';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  startWith,
+} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'oppia-topic-filter',
-  templateUrl: './topic-filter.component.html'
+  templateUrl: './topic-filter.component.html',
 })
-
 export class TopicFilterComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() defaultTopicNames!: string[];
   @Input() selectedTopicNames: string[] = [];
-  @Output() selectionsChange: EventEmitter<string[]> = (
-    new EventEmitter());
+  @Output() selectionsChange: EventEmitter<string[]> = new EventEmitter();
 
   separatorKeysCodes: number[] = [ENTER, COMMA];
   topicFilter = new FormControl('');
   searchDropDownTopics: string[] = [];
   filteredTopics!: Observable<string[]>;
 
-  @ViewChild('topicFilterInput') topicFilterInput!: (
-    ElementRef<HTMLInputElement>);
+  @ViewChild('topicFilterInput')
+  topicFilterInput!: ElementRef<HTMLInputElement>;
 
   @ViewChild('trigger') autoTrigger!: MatAutocompleteTrigger;
 
   constructor() {
     this.filteredTopics = this.topicFilter.valueChanges.pipe(
       startWith(null),
-      map((topic: string | null) => (
-        topic ? this.filter(topic) : this.searchDropDownTopics.slice())),
+      map((topic: string | null) =>
+        topic ? this.filter(topic) : this.searchDropDownTopics.slice()
+      )
     );
   }
 
   filter(value: string): string[] {
     const filterValue = value.toLowerCase();
-    return this.searchDropDownTopics.filter(
-      topic => topic.toLowerCase().includes(filterValue));
+    return this.searchDropDownTopics.filter(topic =>
+      topic.toLowerCase().includes(filterValue)
+    );
   }
 
   removeTopic(topic: string, topicsList: string[]): void {
@@ -75,7 +88,7 @@ export class TopicFilterComponent implements OnInit {
     this.topicFilter.setValue(null);
   }
 
-  selectTopic(event: { option: { viewValue: string}}): void {
+  selectTopic(event: {option: {viewValue: string}}): void {
     this.selectedTopicNames.push(event.option.viewValue);
     this.refreshSearchDropDownTopics();
     this.topicFilterInput.nativeElement.value = '';
@@ -93,11 +106,10 @@ export class TopicFilterComponent implements OnInit {
 
   ngOnInit(): void {
     this.refreshSearchDropDownTopics();
-    this.filteredTopics.pipe(
-      debounceTime(1500), distinctUntilChanged()
-    ).subscribe(() => {
-      this.autoTrigger.closePanel();
-      this.selectionsChange.emit(this.selectedTopicNames);
-    });
+    this.filteredTopics
+      .pipe(debounceTime(1500), distinctUntilChanged())
+      .subscribe(() => {
+        this.selectionsChange.emit(this.selectedTopicNames);
+      });
   }
 }

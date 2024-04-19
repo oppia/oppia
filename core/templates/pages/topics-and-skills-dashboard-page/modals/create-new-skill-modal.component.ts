@@ -16,36 +16,39 @@
  * @fileoverview Modal for the creating new skill.
  */
 
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
-import { SkillCreationService } from 'components/entity-creation-services/skill-creation.service';
-import { SubtitledHtml, SubtitledHtmlBackendDict } from 'domain/exploration/subtitled-html.model';
-import { Rubric } from 'domain/skill/rubric.model';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
-import { SkillEditorStateService } from 'pages/skill-editor-page/services/skill-editor-state.service';
-import { ContextService } from 'services/context.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { TopicsAndSkillsDashboardPageConstants } from '../topics-and-skills-dashboard-page.constants';
+import {ChangeDetectorRef, Component} from '@angular/core';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
+import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
+import {
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+} from 'domain/exploration/subtitled-html.model';
+import {Rubric} from 'domain/skill/rubric.model';
+import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
+import {ContextService} from 'services/context.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
 
 @Component({
   selector: 'oppia-create-new-skill-modal',
-  templateUrl: './create-new-skill-modal.component.html'
+  templateUrl: './create-new-skill-modal.component.html',
 })
 export class CreateNewSkillModalComponent {
   rubrics = [
     Rubric.create(AppConstants.SKILL_DIFFICULTIES[0], []),
     Rubric.create(AppConstants.SKILL_DIFFICULTIES[1], ['']),
-    Rubric.create(AppConstants.SKILL_DIFFICULTIES[2], [])];
+    Rubric.create(AppConstants.SKILL_DIFFICULTIES[2], []),
+  ];
 
   newSkillDescription: string = '';
   errorMsg: string = '';
   skillDescriptionExists: boolean = true;
   conceptCardExplanationEditorIsShown: boolean = false;
   bindableDict = {displayedConceptCardExplanation: ''};
-  HTML_SCHEMA: {type: string} = { type: 'html' };
-  MAX_CHARS_IN_SKILL_DESCRIPTION = (
-    AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION);
+  HTML_SCHEMA: {type: string} = {type: 'html'};
+  MAX_CHARS_IN_SKILL_DESCRIPTION = AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION;
 
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -77,22 +80,22 @@ export class CreateNewSkillModalComponent {
     this.conceptCardExplanationEditorIsShown = true;
   }
 
-  getHtmlSchema(): { type: string } {
+  getHtmlSchema(): {type: string} {
     return this.HTML_SCHEMA;
   }
 
   setErrorMessageIfNeeded(): void {
     if (
-      !this.skillObjectFactory.hasValidDescription(
-        this.newSkillDescription)) {
-      this.errorMsg = (
+      !this.skillObjectFactory.hasValidDescription(this.newSkillDescription)
+    ) {
+      this.errorMsg =
         'Please use a non-empty description consisting of ' +
-          'alphanumeric characters, spaces and/or hyphens.');
+        'alphanumeric characters, spaces and/or hyphens.';
     }
     if (this.skillDescriptionExists) {
-      this.errorMsg = (
+      this.errorMsg =
         'This description already exists. Please choose a ' +
-            'new name or modify the existing skill.');
+        'new name or modify the existing skill.';
     }
   }
 
@@ -112,8 +115,9 @@ export class CreateNewSkillModalComponent {
     }
     if (
       this.skillCreationService.getSkillDescriptionStatus() !==
-          TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
-            .STATUS_DISABLED) {
+      TopicsAndSkillsDashboardPageConstants.SKILL_DESCRIPTION_STATUS_VALUES
+        .STATUS_DISABLED
+    ) {
       this.rubrics[1].setExplanations([this.newSkillDescription]);
       this.skillCreationService.markChangeInSkillDescription();
     }
@@ -124,13 +128,12 @@ export class CreateNewSkillModalComponent {
   }
 
   saveConceptCardExplanation(): void {
-    const explanationObject: SubtitledHtml =
-    SubtitledHtml.createDefault(
+    const explanationObject: SubtitledHtml = SubtitledHtml.createDefault(
       this.bindableDict.displayedConceptCardExplanation,
-      AppConstants.COMPONENT_NAME_EXPLANATION);
+      AppConstants.COMPONENT_NAME_EXPLANATION
+    );
     this.newExplanationObject = explanationObject.toBackendDict();
-    this.bindableDict.displayedConceptCardExplanation = (
-      explanationObject.html);
+    this.bindableDict.displayedConceptCardExplanation = explanationObject.html;
   }
 
   createNewSkill(): void {
@@ -142,7 +145,7 @@ export class CreateNewSkillModalComponent {
     this.ngbActiveModal.close({
       description: this.newSkillDescription,
       rubrics: this.rubrics,
-      explanation: this.newExplanationObject
+      explanation: this.newExplanationObject,
     });
   }
 

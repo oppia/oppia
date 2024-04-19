@@ -16,26 +16,28 @@
  * @fileoverview Service to validate candidates for curated lessons
  */
 
-import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
+import {Injectable} from '@angular/core';
+import {downgradeInjectable} from '@angular/upgrade/static';
 
-import { AppConstants } from 'app.constants';
-import { ExplorationSummaryBackendApiService, ExplorationSummaryBackendDict } from
-  'domain/summary/exploration-summary-backend-api.service';
-import { ReadOnlyExplorationBackendApiService, FetchExplorationBackendResponse } from
-  './read-only-exploration-backend-api.service';
-import { MultipleChoiceInputCustomizationArgsBackendDict } from
-  'extensions/interactions/customization-args-defs';
+import {AppConstants} from 'app.constants';
+import {
+  ExplorationSummaryBackendApiService,
+  ExplorationSummaryBackendDict,
+} from 'domain/summary/exploration-summary-backend-api.service';
+import {
+  ReadOnlyExplorationBackendApiService,
+  FetchExplorationBackendResponse,
+} from './read-only-exploration-backend-api.service';
+import {MultipleChoiceInputCustomizationArgsBackendDict} from 'extensions/interactions/customization-args-defs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CuratedExplorationValidationService {
   constructor(
-    private explorationSummaryBackendApiService:
-      ExplorationSummaryBackendApiService,
-    private readOnlyExplorationBackendApiService:
-      ReadOnlyExplorationBackendApiService) {}
+    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService
+  ) {}
 
   /* *****************************************
   Validate exploration settings.
@@ -43,40 +45,31 @@ export class CuratedExplorationValidationService {
 
   // Exploration must be published.
   async isExpPublishedAsync(explorationId: string): Promise<boolean> {
-    return this.explorationSummaryBackendApiService.
-      loadPublicExplorationSummariesAsync([explorationId]).then(
-        (response: ExplorationSummaryBackendDict) => {
-          let summaries = response.summaries;
-          return (summaries.length === 1 && summaries[0] !== null);
-        });
-  }
-
-  // Exploration must have correctness feedback enabled.
-  async isCorrectnessFeedbackEnabled(explorationId: string): Promise<boolean> {
-    return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null).then(
-        (response: FetchExplorationBackendResponse) => {
-          return response.correctness_feedback_enabled;
-        });
+    return this.explorationSummaryBackendApiService
+      .loadPublicExplorationSummariesAsync([explorationId])
+      .then((response: ExplorationSummaryBackendDict) => {
+        let summaries = response.summaries;
+        return summaries.length === 1 && summaries[0] !== null;
+      });
   }
 
   // Exploration cannot be in a custom category.
   async isDefaultCategoryAsync(explorationId: string): Promise<boolean> {
     return this.explorationSummaryBackendApiService
-      .loadPublicExplorationSummariesAsync([explorationId]).then(
-        (response: ExplorationSummaryBackendDict) => {
-          let summaries = response.summaries;
-          let isCategoryPresent = false;
-          if (summaries.length === 1) {
-            let category = summaries[0].category;
-            for (let i of AppConstants.ALL_CATEGORIES) {
-              if (i === category) {
-                isCategoryPresent = true;
-              }
+      .loadPublicExplorationSummariesAsync([explorationId])
+      .then((response: ExplorationSummaryBackendDict) => {
+        let summaries = response.summaries;
+        let isCategoryPresent = false;
+        if (summaries.length === 1) {
+          let category = summaries[0].category;
+          for (let i of AppConstants.ALL_CATEGORIES) {
+            if (i === category) {
+              isCategoryPresent = true;
             }
           }
-          return isCategoryPresent;
-        });
+        }
+        return isCategoryPresent;
+      });
   }
 
   /* *****************************************
@@ -93,52 +86,58 @@ export class CuratedExplorationValidationService {
 
   // Interactions are restricted to an allowlist.
   async getStatesWithRestrictedInteractions(
-      explorationId: string): Promise<string[]> {
+    explorationId: string
+  ): Promise<string[]> {
     let allowedInteractionIds: string[] = [];
-    for (const category of (
-      AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES)) {
+    for (const category of AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES) {
       allowedInteractionIds.push(...category.interaction_ids);
     }
     return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null).then(
-        (response: FetchExplorationBackendResponse) => {
-          let invalidStateNames = [];
-          for (const [stateName, stateDict] of Object.entries(
-            response.exploration.states)) {
-            const interactionId = stateDict.interaction.id as string;
-            if (!allowedInteractionIds.includes(interactionId)) {
-              invalidStateNames.push(stateName);
-            }
+      .fetchExplorationAsync(explorationId, null)
+      .then((response: FetchExplorationBackendResponse) => {
+        let invalidStateNames = [];
+        for (const [stateName, stateDict] of Object.entries(
+          response.exploration.states
+        )) {
+          const interactionId = stateDict.interaction.id as string;
+          if (!allowedInteractionIds.includes(interactionId)) {
+            invalidStateNames.push(stateName);
           }
-          return invalidStateNames;
-        });
+        }
+        return invalidStateNames;
+      });
   }
 
   // Multiple choice interactions must have at least 4 choices.
   async getStatesWithInvalidMultipleChoices(
-      explorationId: string): Promise<string[]> {
+    explorationId: string
+  ): Promise<string[]> {
     return this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(explorationId, null).then(
-        (response: FetchExplorationBackendResponse) => {
-          let invalidStateNames = [];
-          for (const [stateName, stateDict] of Object.entries(
-            response.exploration.states)) {
-            if (stateDict.interaction.id === 'MultipleChoiceInput') {
-              const args = (
-                stateDict.interaction.customization_args as
-                MultipleChoiceInputCustomizationArgsBackendDict);
-              if (args.choices.value.length < (
-                AppConstants.MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP)
-              ) {
-                invalidStateNames.push(stateName);
-              }
+      .fetchExplorationAsync(explorationId, null)
+      .then((response: FetchExplorationBackendResponse) => {
+        let invalidStateNames = [];
+        for (const [stateName, stateDict] of Object.entries(
+          response.exploration.states
+        )) {
+          if (stateDict.interaction.id === 'MultipleChoiceInput') {
+            const args = stateDict.interaction
+              .customization_args as MultipleChoiceInputCustomizationArgsBackendDict;
+            if (
+              args.choices.value.length <
+              AppConstants.MIN_CHOICES_IN_MULTIPLE_CHOICE_INPUT_CURATED_EXP
+            ) {
+              invalidStateNames.push(stateName);
             }
           }
-          return invalidStateNames;
-        });
+        }
+        return invalidStateNames;
+      });
   }
 }
 
-angular.module('oppia').factory(
-  'CuratedExplorationValidationService',
-  downgradeInjectable(CuratedExplorationValidationService));
+angular
+  .module('oppia')
+  .factory(
+    'CuratedExplorationValidationService',
+    downgradeInjectable(CuratedExplorationValidationService)
+  );

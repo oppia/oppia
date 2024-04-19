@@ -16,27 +16,26 @@
  * @fileoverview Unit tests for create learner group page.
  */
 
-import { Clipboard } from '@angular/cdk/clipboard';
-import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from
-  '@angular/core/testing';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { LearnerGroupBackendApiService } from
-  'domain/learner_group/learner-group-backend-api.service';
-import { CreateLearnerGroupPageComponent } from
-  './create-learner-group-page.component';
-import { LearnerGroupPagesConstants } from '../learner-group-pages.constants';
-import { LearnerGroupSubtopicSummary } from
-  'domain/learner_group/learner-group-subtopic-summary.model';
-import { StorySummary } from 'domain/story/story-summary.model';
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
-import { LearnerGroupData } from 'domain/learner_group/learner-group.model';
-import { TranslateService } from '@ngx-translate/core';
-import { PageTitleService } from 'services/page-title.service';
-import { LearnerGroupUserInfo } from
-  'domain/learner_group/learner-group-user-info.model';
+import {Clipboard} from '@angular/cdk/clipboard';
+import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import {
+  ComponentFixture,
+  fakeAsync,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
+import {CreateLearnerGroupPageComponent} from './create-learner-group-page.component';
+import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
+import {LearnerGroupSubtopicSummary} from 'domain/learner_group/learner-group-subtopic-summary.model';
+import {StorySummary} from 'domain/story/story-summary.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
+import {TranslateService} from '@ngx-translate/core';
+import {PageTitleService} from 'services/page-title.service';
+import {LearnerGroupUserInfo} from 'domain/learner_group/learner-group-user-info.model';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -57,7 +56,7 @@ describe('CreateLearnerGroupPageComponent', () => {
 
   const userInfo = LearnerGroupUserInfo.createFromBackendDict({
     username: 'username1',
-    error: ''
+    error: '',
   });
 
   const sampleSubtopicSummaryDict = {
@@ -67,11 +66,12 @@ describe('CreateLearnerGroupPageComponent', () => {
     parent_topic_name: 'parentTopicName',
     thumbnail_filename: 'thumbnailFilename',
     thumbnail_bg_color: 'red',
-    subtopic_mastery: 0.5
+    subtopic_mastery: 0.5,
   };
-  const sampleLearnerGroupSubtopicSummary = (
+  const sampleLearnerGroupSubtopicSummary =
     LearnerGroupSubtopicSummary.createFromBackendDict(
-      sampleSubtopicSummaryDict));
+      sampleSubtopicSummaryDict
+    );
 
   const sampleStorySummaryBackendDict = {
     id: 'story_id_0',
@@ -86,31 +86,30 @@ describe('CreateLearnerGroupPageComponent', () => {
     all_node_dicts: [],
     topic_name: 'Topic',
     classroom_url_fragment: 'math',
-    topic_url_fragment: 'topic'
+    topic_url_fragment: 'topic',
   };
   const sampleStorySummary = StorySummary.createFromBackendDict(
-    sampleStorySummaryBackendDict);
+    sampleStorySummaryBackendDict
+  );
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        CreateLearnerGroupPageComponent,
-        MockTranslatePipe
-      ],
+      declarations: [CreateLearnerGroupPageComponent, MockTranslatePipe],
       providers: [
         {
           provide: TranslateService,
-          useClass: MockTranslateService
-        }
+          useClass: MockTranslateService,
+        },
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
 
   beforeEach(() => {
     learnerGroupBackendApiService = TestBed.inject(
-      LearnerGroupBackendApiService);
+      LearnerGroupBackendApiService
+    );
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     translateService = TestBed.inject(TranslateService);
     pageTitleService = TestBed.inject(PageTitleService);
@@ -130,7 +129,8 @@ describe('CreateLearnerGroupPageComponent', () => {
     expect(component.subscribeToOnLangChange).toHaveBeenCalled();
     expect(component.activeSection).toEqual(
       LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS
-        .GROUP_DETAILS);
+        .GROUP_DETAILS
+    );
   }));
 
   it('should call set page title whenever the language is changed', () => {
@@ -149,32 +149,35 @@ describe('CreateLearnerGroupPageComponent', () => {
     component.setPageTitle();
 
     expect(translateService.instant).toHaveBeenCalledWith(
-      'I18N_CREATE_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_CREATE_LEARNER_GROUP_PAGE_TITLE'
+    );
     expect(pageTitleService.setDocumentTitle).toHaveBeenCalledWith(
-      'I18N_CREATE_LEARNER_GROUP_PAGE_TITLE');
+      'I18N_CREATE_LEARNER_GROUP_PAGE_TITLE'
+    );
   });
 
   it('should set active section correctly', () => {
     component.setActiveSection(
       LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS
-        .ADD_SYLLABUS_ITEMS, 2);
+        .ADD_SYLLABUS_ITEMS,
+      2
+    );
 
     expect(component.activeSection).toEqual(
       LearnerGroupPagesConstants.LEARNER_GROUP_CREATION_SECTION_I18N_IDS
-        .ADD_SYLLABUS_ITEMS);
+        .ADD_SYLLABUS_ITEMS
+    );
     expect(component.furthestReachedSectionNumber).toEqual(2);
   });
 
-  it('should check if next button on group details section is disabled',
-    () => {
-      expect(component.isGroupDetailsNextButtonDisabled()).toBeTrue();
+  it('should check if next button on group details section is disabled', () => {
+    expect(component.isGroupDetailsNextButtonDisabled()).toBeTrue();
 
-      component.learnerGroupTitle = 'title';
-      component.learnerGroupDescription = 'description';
+    component.learnerGroupTitle = 'title';
+    component.learnerGroupDescription = 'description';
 
-      expect(component.isGroupDetailsNextButtonDisabled()).toBeFalse();
-    }
-  );
+    expect(component.isGroupDetailsNextButtonDisabled()).toBeFalse();
+  });
 
   it('should check if next button on add syllabus section is disabled', () => {
     expect(component.isAddSyllabusNextButtonDisabled()).toBeTrue();
@@ -209,10 +212,10 @@ describe('CreateLearnerGroupPageComponent', () => {
     expect(component.learnerGroupTitle).toBe('title');
     expect(component.learnerGroupDescription).toBe('description');
     expect(component.learnerGroupStoryIds).toEqual(['story_id']);
-    expect(component.learnerGroupSubtopicPageIds).toEqual(
-      ['subtopic_page_id']);
-    expect(component.syllabusSubtopicSummaries).toEqual(
-      [sampleLearnerGroupSubtopicSummary]);
+    expect(component.learnerGroupSubtopicPageIds).toEqual(['subtopic_page_id']);
+    expect(component.syllabusSubtopicSummaries).toEqual([
+      sampleLearnerGroupSubtopicSummary,
+    ]);
     expect(component.syllabusStorySummaries).toEqual([sampleStorySummary]);
     expect(component.learnerGroupInvitedLearners).toEqual(['username1']);
     expect(component.learnerGroupInvitedLearnersInfo).toEqual([userInfo]);
@@ -227,10 +230,12 @@ describe('CreateLearnerGroupPageComponent', () => {
 
   it('should get oppia large avatar url', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      '/avatar/oppia_avatar_large_100px.svg');
+      '/avatar/oppia_avatar_large_100px.svg'
+    );
 
     expect(component.getOppiaLargeAvatarUrl()).toBe(
-      '/avatar/oppia_avatar_large_100px.svg');
+      '/avatar/oppia_avatar_large_100px.svg'
+    );
   });
 
   it('should create new learner group successfully', fakeAsync(() => {
@@ -242,13 +247,16 @@ describe('CreateLearnerGroupPageComponent', () => {
       learner_usernames: [],
       invited_learner_usernames: ['username1'],
       subtopic_page_ids: ['subtopic_page_id'],
-      story_ids: []
+      story_ids: [],
     };
     const learnerGroup = LearnerGroupData.createFromBackendDict(
-      learnerGroupBackendDict);
+      learnerGroupBackendDict
+    );
 
-    spyOn(learnerGroupBackendApiService, 'createNewLearnerGroupAsync')
-      .and.returnValue(Promise.resolve(learnerGroup));
+    spyOn(
+      learnerGroupBackendApiService,
+      'createNewLearnerGroupAsync'
+    ).and.returnValue(Promise.resolve(learnerGroup));
 
     expect(component.learnerGroup).toBeUndefined();
 

@@ -16,10 +16,13 @@
  * @fileoverview Service to update page's title and meta tags.
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-import { PageTitleService } from 'services/page-title.service';
-import { MetaAttribute, MetaTagCustomizationService } from './contextual/meta-tag-customization.service';
+import {PageTitleService} from 'services/page-title.service';
+import {
+  MetaAttribute,
+  MetaTagCustomizationService,
+} from './contextual/meta-tag-customization.service';
 
 interface MetaTagData {
   readonly PROPERTY_TYPE: string;
@@ -28,7 +31,7 @@ interface MetaTagData {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PageHeadService {
   constructor(
@@ -37,7 +40,9 @@ export class PageHeadService {
   ) {}
 
   updateTitleAndMetaTags(
-      pageTitle: string, pageMetaAttributes: readonly MetaTagData[]): void {
+    pageTitle: string,
+    pageMetaAttributes: readonly MetaTagData[]
+  ): void {
     // Update default title.
     this.pageTitleService.setDocumentTitle(pageTitle);
 
@@ -46,7 +51,7 @@ export class PageHeadService {
       metaAttributes.push({
         propertyType: pageMetaAttributes[i].PROPERTY_TYPE,
         propertyValue: pageMetaAttributes[i].PROPERTY_VALUE,
-        content: pageMetaAttributes[i].CONTENT
+        content: pageMetaAttributes[i].CONTENT,
       });
     }
     // Update meta tags.

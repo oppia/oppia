@@ -1,0 +1,89 @@
+<div class="oppia-lesson-player-sidebar">
+  <div class="player-desktop-sidebar-menu"
+       [class.expanded]="sidebarIsExpanded">
+    <div class="lesson-player-sidebar-top">
+      <button class="player-sidebar-toggle"
+              (click)="toggleSidebar()"
+              [class.expanded]="sidebarIsExpanded">
+        <div *ngIf="!sidebarIsExpanded">
+          {{ 'I18N_LESSON_PLAYER_OPEN_SIDEBAR' | translate }}
+          <i class="fa fa-lg fa-chevron-right"></i>
+        </div>
+        <div *ngIf="sidebarIsExpanded">
+          {{ 'I18N_LESSON_PLAYER_CLOSE_SIDEBAR' | translate }}
+          <i class="fa fa-lg fa-chevron-left lesson-player-sidebar-chevron"></i>
+        </div>
+      </button>
+      <div *ngIf="sidebarIsExpanded">
+        <div class="oppia-exploration-description"
+            *ngIf="!isHackyExpDescTranslationDisplayed()">
+          {{ expDescription | truncateAndCapitalize: 90 }}
+        </div>
+        <div class="oppia-exploration-description"
+             tabindex="0"
+             *ngIf="isHackyExpDescTranslationDisplayed()">
+          {{ expDescTranslationKey | translate | truncateAndCapitalize: 90 }}
+        </div>
+      </div>
+    </div>
+    <div class="player-sidebar-button-container">
+      <button class="player-sidebar-button">
+        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-share-alt"></i>
+        <div *ngIf="sidebarIsExpanded">
+          <i class="fa fa-lg fa-share-alt"></i>
+          {{ 'I18N_SHARE_LESSON' | translate }}
+        </div>
+      </button>
+      <button class="player-sidebar-button">
+        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
+        <div *ngIf="sidebarIsExpanded">
+          <i class="fa fa-lg fa-comments"></i>
+          {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
+        </div>
+      </button>
+      <button class="player-sidebar-button">
+        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
+        <div *ngIf="sidebarIsExpanded">
+          <i class="fa fa-lg fa-flag"></i>
+          {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
+        </div>
+      </button>
+      <button class="player-sidebar-button">
+        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-question-circle"></i>
+        <div *ngIf="sidebarIsExpanded">
+          <i class="fa fa-lg fa-question-circle"></i>
+          {{ 'I18N_LESSON_PLAYER_HELP_BUTTON' | translate }}
+        </div>
+      </button>
+    </div>
+  </div>
+  <div *ngIf="mobileMenuVisible" class="player-mobile-menu-container">
+    <div class="player-mobile-menu-overlay"
+         (click)="mobileMenuService.toggleMenuVisibility()">
+    </div>
+    <div class="player-mobile-menu">
+      <div class="player-mobile-menu-close"
+           (click)="mobileMenuService.toggleMenuVisibility()">
+        <i class="fa fa-lg fa-times"></i>
+      </div>
+      <div class="player-mobile-menu-options">
+        <button>
+          <i class="fa fa-lg fa-share-alt"></i>
+          {{ 'I18N_SHARE_LESSON' | translate }}
+        </button>
+        <button>
+          <i class="fa fa-lg fa-comments"></i>
+          {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
+        </button>
+        <button>
+          <i class="fa fa-lg fa-flag"></i>
+          {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
+        </button>
+        <button>
+          <i class="fa fa-lg fa-question-circle"></i>
+          {{ 'I18N_LESSON_PLAYER_HELP_BUTTON' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

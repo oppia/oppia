@@ -38,7 +38,7 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = 'eid'
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
-        self.maxDiff = 0
+        self.maxDiff = None
 
     def test_task_id_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(

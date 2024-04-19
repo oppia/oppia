@@ -16,9 +16,9 @@
  * @fileoverview Unit tests for recorded-voiceovers model.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { Voiceover } from 'domain/exploration/voiceover.model';
+import {TestBed} from '@angular/core/testing';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 describe('RecordedVoiceovers object factory', () => {
   let rv: RecordedVoiceovers;
@@ -29,70 +29,70 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename1.mp3',
           file_size_bytes: 100000,
           needs_update: false,
-          duration_secs: 10.0
+          duration_secs: 10.0,
         },
         hi: {
           filename: 'filename2.mp3',
           file_size_bytes: 11000,
           needs_update: false,
-          duration_secs: 0.11
-        }
+          duration_secs: 0.11,
+        },
       },
       default_outcome: {
         en: {
           filename: 'filename3.mp3',
           file_size_bytes: 3000,
           needs_update: false,
-          duration_secs: 0.33
+          duration_secs: 0.33,
         },
         hi: {
           filename: 'filename4.mp3',
           file_size_bytes: 5000,
           needs_update: false,
-          duration_secs: 0.5
-        }
+          duration_secs: 0.5,
+        },
       },
       feedback_1: {
         en: {
           filename: 'filename5.mp3',
           file_size_bytes: 2000,
           needs_update: false,
-          duration_secs: 0.2
+          duration_secs: 0.2,
         },
         hi: {
           filename: 'filename6.mp3',
           file_size_bytes: 9000,
           needs_update: false,
-          duration_secs: 0.9
-        }
+          duration_secs: 0.9,
+        },
       },
       feedback_2: {
         en: {
           filename: 'filename7.mp3',
           file_size_bytes: 1000,
           needs_update: false,
-          duration_secs: 0.1
+          duration_secs: 0.1,
         },
         hi: {
           filename: 'filename8.mp3',
           file_size_bytes: 600,
           needs_update: false,
-          duration_secs: 0.06
-        }
+          duration_secs: 0.06,
+        },
       },
       hint_1: {
         en: {
           filename: 'filename9.mp3',
           file_size_bytes: 104000,
           needs_update: false,
-          duration_secs: 10.4
+          duration_secs: 10.4,
         },
         hi: {
           filename: 'filename10.mp3',
           file_size_bytes: 1000,
           needs_update: true,
-          duration_secs: 0.1
-        }
+          duration_secs: 0.1,
+        },
       },
       hint_2: {},
       solution: {
@@ -100,21 +100,21 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename13.mp3',
           file_size_bytes: 15080,
           needs_update: false,
-          duration_secs: 1.5
+          duration_secs: 1.5,
         },
         hi: {
           filename: 'filename14.mp3',
           file_size_bytes: 10500,
           needs_update: false,
-          duration_secs: 1.05
-        }
-      }
-    }
+          duration_secs: 1.05,
+        },
+      },
+    },
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [RecordedVoiceovers]
+      providers: [RecordedVoiceovers],
     });
 
     rv = RecordedVoiceovers.createFromBackendDict(rvDict);
@@ -122,8 +122,14 @@ describe('RecordedVoiceovers object factory', () => {
 
   it('should get all content id', () => {
     let contentIdList = [
-      'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
-      'hint_2', 'solution'];
+      'content',
+      'default_outcome',
+      'feedback_1',
+      'feedback_2',
+      'hint_1',
+      'hint_2',
+      'solution',
+    ];
     expect(rv.getAllContentIds()).toEqual(contentIdList);
   });
 
@@ -133,27 +139,31 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        duration_secs: 10.0
+        duration_secs: 10.0,
       }),
       hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false,
-        duration_secs: 0.11
-      })
+        duration_secs: 0.11,
+      }),
     });
   });
 
-  it('should return a correct voiceover for a given content ' +
-    'id and language', () => {
-    expect(rv.getVoiceover('hint_1', 'en')).toEqual(
-      Voiceover.createFromBackendDict({
-        filename: 'filename9.mp3',
-        file_size_bytes: 104000,
-        needs_update: false,
-        duration_secs: 10.4
-      }));
-  });
+  it(
+    'should return a correct voiceover for a given content ' +
+      'id and language',
+    () => {
+      expect(rv.getVoiceover('hint_1', 'en')).toEqual(
+        Voiceover.createFromBackendDict({
+          filename: 'filename9.mp3',
+          file_size_bytes: 104000,
+          needs_update: false,
+          duration_secs: 10.4,
+        })
+      );
+    }
+  );
 
   it('should make all audio needs update for a give content id', () => {
     rv.markAllVoiceoversAsNeedingUpdate('content');
@@ -162,14 +172,14 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: true,
-        duration_secs: 10.0
+        duration_secs: 10.0,
       }),
       hi: Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: true,
-        duration_secs: 0.11
-      })
+        duration_secs: 0.11,
+      }),
     });
   });
 
@@ -200,8 +210,13 @@ describe('RecordedVoiceovers object factory', () => {
   it('should delete a given content id', () => {
     rv.deleteContentId('feedback_1');
     let contentIdList = [
-      'content', 'default_outcome', 'feedback_2', 'hint_1', 'hint_2',
-      'solution'];
+      'content',
+      'default_outcome',
+      'feedback_2',
+      'hint_1',
+      'hint_2',
+      'solution',
+    ];
     expect(rv.getAllContentIds()).toEqual(contentIdList);
     expect(() => {
       rv.deleteContentId('feedback_3');
@@ -215,8 +230,8 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename11.mp3',
         file_size_bytes: 1000,
         needs_update: false,
-        duration_secs: 0.1
-      })
+        duration_secs: 0.1,
+      }),
     });
     expect(() => {
       rv.addVoiceover('content', 'en', 'filename.mp3', 1000, 0.1);
@@ -230,8 +245,8 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        duration_secs: 10.0
-      })
+        duration_secs: 10.0,
+      }),
     });
   });
 
@@ -241,16 +256,16 @@ describe('RecordedVoiceovers object factory', () => {
     );
   });
 
-  it('should toggle needs update attribute in a given ' +
-    'content id', () => {
+  it('should toggle needs update attribute in a given ' + 'content id', () => {
     rv.toggleNeedsUpdateAttribute('content', 'hi');
     expect(rv.getVoiceover('content', 'hi')).toEqual(
       Voiceover.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: true,
-        duration_secs: 0.11
-      }));
+        duration_secs: 0.11,
+      })
+    );
   });
 
   it('should correctly convert to backend dict', () => {
