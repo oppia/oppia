@@ -1159,6 +1159,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
         }
+        user_group: Dict[str, str] = {}
         skill_data: Dict[str, str] = {}
         stats_data: Dict[str, stats_domain.AggregatedStatsDict] = {}
         story_progress_data: Dict[str, List[str]] = {}
@@ -1252,6 +1253,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
+            'user_group': user_group,
             'user_skill_mastery': skill_data,
             'user_contributions': contribution_data,
             'exploration_user_data': exploration_data,
@@ -1571,6 +1573,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
+
+        user_group_model = user_models.UserGroupModel(
+            id='user_group_model', users=[self.USER_ID_1]
+        )
+        user_group_model.put()
+
+        expected_user_group_data = {
+            'user_group_model': {
+                'users': self.USER_ID_1
+            }
+        }
 
         blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_POST_ID_1,
@@ -2108,6 +2121,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_user_data = {
             'user_stats': expected_stats_data,
+            'user_group': expected_user_group_data,
             'user_settings': expected_user_settings_data,
             'user_subscriptions': expected_subscriptions_data,
             'user_skill_mastery': expected_user_skill_data,
