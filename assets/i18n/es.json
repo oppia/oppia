@@ -1,5 +1,6 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "Sobre la fundación",
+	"I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT": "De los <a href=\"http://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education\" class=\"inline-links\">61 millones de niños</a> en todo el mundo que no pueden asistir a la escuela primaria, 17 millones nunca pondrán un pie en una escuela si las tendencias continúan. Desafortunadamente, <a href=\"https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf\" class=\"inline-links\">incluso aquellos que están en la escuela</a> pueden no recibir la educación efectiva que necesitan.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "Crea una exploración",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "acerca de un tema que te interese.",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_FEEDBACK": "Obtén retroalimentación",
@@ -580,6 +581,7 @@
 	"I18N_PREFERENCES_PROFILE_PICTURE_DRAG": "Arrastra para recortar y cambiar el tamaño:",
 	"I18N_PREFERENCES_PROFILE_PICTURE_ERROR": "Error: no se pudo leer el archivo de imagen.",
 	"I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD": "Subir foto de perfil",
+	"I18N_PREFERENCES_SAVE_CHANGES": "Guardar cambios",
 	"I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "Selecciona tus idiomas preferidos...",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS": "Temas de interés",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK": "Ej: matemática, ciencias de la computación, arte, ...",
