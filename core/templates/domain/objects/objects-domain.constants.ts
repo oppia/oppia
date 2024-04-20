@@ -126,7 +126,7 @@ export const ObjectsDomainConstants = {
     teaspoon: 'teaspoon',
     tablespoon: 'tablespoon',
 
-    // Liquid volume
+    // Liquid volume.
     minim: 'minim',
     fluiddram: 'fldr',
     fldr: 'fldr',

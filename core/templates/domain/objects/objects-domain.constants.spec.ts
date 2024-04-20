@@ -25,10 +25,13 @@ const getUnitPrefixes = (): string[] => {
   const prefixes = math.Unit.PREFIXES;
   let prefixSet = new Set<string>();
   for (const name in prefixes) {
-    if (name === 'NONE') continue;
-
+    if (name === 'NONE') {
+      continue;
+    }
     for (const prefix in prefixes[name]) {
-      if (prefix === '') continue;
+      if (prefix === '') {
+        continue;
+      }
       prefixSet.add(prefix);
     }
   }
@@ -56,8 +59,6 @@ const isValidUnit = (unit: string): boolean => {
 const isValidPrefix = (prefix: string): boolean => {
   return unitPrefixes.includes(prefix);
 };
-
-console.log(unitPrefixes);
 
 describe('ObjectsDomainConstants', () => {
   it(
@@ -91,7 +92,6 @@ describe('ObjectsDomainConstants', () => {
       Object.values(
         ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
       ).forEach(prefix => {
-        console.log(prefix, unitPrefixes);
         expect(isValidPrefix(prefix)).toBe(true);
       });
     }
