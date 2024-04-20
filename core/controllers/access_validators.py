@@ -401,10 +401,10 @@ class BlogAuthorProfilePageAccessValidationHandler(
             )
 
 
-class CollectionEditorPageAccessValidationHandler(
+class CollectionEditorAccessValidationPage(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """The editor page for a single collection."""
+    """Validates access to collection editor page."""
 
     URL_PATH_ARGS_SCHEMAS = {
         'collection_id': {

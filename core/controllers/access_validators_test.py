@@ -565,7 +565,7 @@ class BlogAuthorProfilePageAccessValidationHandlerTests(
         self.logout()
 
 
-class CollectionEditorPageAccessValidationHandler(test_utils.GenericTestBase):
+class CollectionEditorAccessValidationPage(test_utils.GenericTestBase):
     """Test for collection editor page access validation"""
 
     COLLECTION_ID: Final = '0'

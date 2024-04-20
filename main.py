@@ -240,7 +240,7 @@ URLS = [
     get_redirect_route(
         r'%s/can_access_collection_editor_page/<collection_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
-        access_validators.CollectionEditorPageAccessValidationHandler
+        access_validators.CollectionEditorAccessValidationPage
     ),
     get_redirect_route(
         r'%s/can_access_blog_home_page' %
