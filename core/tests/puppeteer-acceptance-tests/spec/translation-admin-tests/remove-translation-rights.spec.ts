@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {TranslationAdmin} from '../../user-utilities/translation-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Translation Admin', function () {
@@ -33,7 +33,7 @@ describe('Translation Admin', function () {
       'translation_admin@example.com',
       [ROLES.TRANSLATION_ADMIN]
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to remove translation rights from user.',
@@ -62,7 +62,7 @@ describe('Translation Admin', function () {
       );
       await translationAdmin.expectUserToNotBeDisplayed('translatorSpanish');
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
