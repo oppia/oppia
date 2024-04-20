@@ -1103,6 +1103,45 @@ def get_reviewable_translation_suggestions_by_offset(
     return translation_suggestions, next_offset
 
 
+def get_reviewable_translation_suggestion_target_ids(
+    user_id: str,
+    exp_ids: List[str],
+    language: Optional[str] = None
+) -> List[str]:
+    contribution_rights = user_services.get_user_contribution_rights(
+        user_id
+    )
+    language_codes = (
+        contribution_rights.can_review_translation_for_language_codes
+    )
+
+    # No language means all languages.
+    if language is not None:
+        language_codes = [language] if language in language_codes else []
+
+    # The user cannot review any translations, so return early.
+    if len(language_codes) == 0:
+        return []
+
+    in_review_translation_suggestion_models: Sequence[
+        suggestion_models.GeneralSuggestionModel
+    ] = (
+        suggestion_models.GeneralSuggestionModel
+        .get_in_review_translation_suggestion_target_ids(
+            user_id,
+            language_codes
+        )
+    )
+
+    # We start with a set as we only care about unique target IDs.
+    return list({
+        suggestion_model.target_id for
+        suggestion_model in
+        in_review_translation_suggestion_models
+        if suggestion_model.target_id in exp_ids
+    })
+
+
 def get_reviewable_translation_suggestions_for_single_exp(
     user_id: str,
     opportunity_summary_exp_id: str,

@@ -700,6 +700,21 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_in_review_translation_suggestion_target_ids(
+        cls,
+        user_id: str,
+        language_codes: List[str]
+    ) -> Sequence[GeneralSuggestionModel]:
+        return cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.author_id != user_id,
+            cls.language_code.IN(language_codes)
+        )).fetch(
+            projection=[cls.target_id]
+        )
+
+    @classmethod
     def get_reviewable_translation_suggestions(
         cls,
         user_id: str,

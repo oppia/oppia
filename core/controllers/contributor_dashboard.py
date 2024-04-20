@@ -398,19 +398,13 @@ class ReviewableOpportunitiesHandler(
                         'No exploration_id found for the node_id: %s'
                         % node.id
                     )
-                topic_exp_ids.append(node.exploration_id)
-        in_review_suggestions, _ = (
+                topic_exp_ids.append(node.exploration_id) 
+        in_review_suggestion_target_ids = (
             suggestion_services
-            .get_reviewable_translation_suggestions_by_offset(
-                user_id, topic_exp_ids, None, 0, None, language))
-        # Filter out suggestions that should not be shown to the user.
-        # This is defined as a set as we only care about the unique IDs.
-        in_review_suggestion_target_ids = {
-            suggestion.target_id
-            for suggestion in
-            suggestion_services.get_suggestions_with_editable_explorations(
-                in_review_suggestions)
-        }
+            .get_reviewable_translation_suggestion_target_ids(
+                user_id, topic_exp_ids, language
+            )
+        ) 
         exp_ids = [
             exp_id
             for exp_id in topic_exp_ids
