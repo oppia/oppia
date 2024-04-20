@@ -214,6 +214,7 @@ CHROME_PATHS = [
 ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-admin-tests/assign-roles-to-users-and-change-tag-properties',
     'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'exploration-editor-tests/load-complete-and-restart-exploration-preview',
     'logged-in-user-tests/click-all-buttons-on-about-page',
     'logged-in-user-tests/click-all-buttons-on-about-foundation-page',
     'logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page',
