@@ -428,11 +428,13 @@ export class RteHelperModalComponent {
               this.tmpCustomizationArgs[i - 1].value;
           }
         }
-        (
-          customizationArgsDict as {
-            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-          }
-        )[caName] = this.tmpCustomizationArgs[i].value;
+        if (this.tmpCustomizationArgs[i].value) {
+          (
+            customizationArgsDict as {
+              [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+            }
+          )[caName] = this.tmpCustomizationArgs[i].value;
+        }
       }
       this.ngbActiveModal.close(customizationArgsDict);
       this.customizationArgsFormSubscription.unsubscribe();
