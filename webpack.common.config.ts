@@ -78,10 +78,6 @@ module.exports = {
       commonPrefix +
       '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    diagnostic_test_player_page:
-      commonPrefix +
-      '/pages/diagnostic-test-player-page/' +
-      'diagnostic-test-player-page.import.ts',
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',

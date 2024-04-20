@@ -763,6 +763,18 @@ describe('Questions List Component', () => {
     })
   );
 
+  it('should not disable save button when user cancels the save modal', fakeAsync(() => {
+    component.questionIsBeingUpdated = true;
+    spyOn(ngbModal, 'open').and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.saveQuestion();
+    tick();
+
+    expect(component.questionIsBeingSaved).toBe(false);
+  }));
+
   it(
     "should close 'confirm question modal exit' modal when user clicks" +
       ' cancel',
