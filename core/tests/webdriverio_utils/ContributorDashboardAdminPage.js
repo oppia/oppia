@@ -58,8 +58,10 @@ var ContributorDashboardAdminPage = function () {
   var translationSubmitterTab = $('.e2e-test-translation-submitters-tab');
   var translationReviewerTab = $('.e2e-test-translation-reviewers-tab');
   var languageSelector = $('.e2e-test-language-selector');
+  var lastDatePicker = $('.e2e-test-last-date-picker');
   var lastDatePickerInput = $('.e2e-test-last-date-picker-input');
   var lastDatePickerToggle = $('.e2e-test-last-date-picker-toggle');
+  var firstDatePicker = $('.e2e-test-first-date-picker');
   var firstDatePickerInput = $('.e2e-test-first-date-picker-input');
   var firstDatePickerToggle = $('.e2e-test-first-date-picker-toggle');
   var noDataMessage = $('.e2e-test-no-data-message');
@@ -239,6 +241,7 @@ var ContributorDashboardAdminPage = function () {
   };
 
   this.selectDate = async function (
+    datePicker,
     datePickerToggle,
     datePickerInput,
     selectedDate
@@ -256,14 +259,13 @@ var ContributorDashboardAdminPage = function () {
     var year = selectedDate.getFullYear();
 
     if (year) {
-      var nextMonthButton = $(
-        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
-          'mat-calendar/mat-calendar-header/div/div/button[3]'
-      );
-      var prevMonthButton = $(
-        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
-          'mat-calendar/mat-calendar-header/div/div/button[2]'
-      );
+      var nextMonthButton = datePicker.$('.mat-calendar-next-button');
+      var prevMonthButton = datePicker.$('.mat-calendar-previous-button');
+
+      var dateTextContainer = datePicker
+        .$('.mat-calendar-period-button')
+        .$('.mat-button-wrapper')
+        .$('#mat-calendar-button-1');
 
       var yearsToNavigate =
         year - new Date(initialValueOfDatePicker).getFullYear();
@@ -288,14 +290,8 @@ var ContributorDashboardAdminPage = function () {
     }
 
     if (month) {
-      var nextMonthButton = $(
-        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
-          'mat-calendar/mat-calendar-header/div/div/button[3]'
-      );
-      var prevMonthButton = $(
-        '//body/div[1]/div[2]/div/mat-datepicker-content/div[2]/' +
-          'mat-calendar/mat-calendar-header/div/div/button[2]'
-      );
+      var nextMonthButton = datePicker.$('.mat-calendar-next-button');
+      var prevMonthButton = datePicker.$('.mat-calendar-previous-button');
 
       var currentMonth = new Date(initialValueOfDatePicker).getMonth() + 1;
       var monthsToNavigate = month - currentMonth;
@@ -320,7 +316,7 @@ var ContributorDashboardAdminPage = function () {
     }
 
     if (day) {
-      var daySelector = $(`aria/${day}`);
+      var daySelector = datePicker.$(`aria/${day}`);
       await waitFor.visibilityOf(daySelector, 'Date to select is not visible');
       await action.click('Day Selector', daySelector);
     }
@@ -341,6 +337,7 @@ var ContributorDashboardAdminPage = function () {
 
   this.setLastDatePickerValue = async function (selectedDate) {
     await this.selectDate(
+      lastDatePicker,
       lastDatePickerToggle,
       lastDatePickerInput,
       selectedDate
@@ -349,6 +346,7 @@ var ContributorDashboardAdminPage = function () {
 
   this.setFirstDatePickerValue = async function (selectedDate) {
     await this.selectDate(
+      firstDatePicker,
       firstDatePickerToggle,
       firstDatePickerInput,
       selectedDate

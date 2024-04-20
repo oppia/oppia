@@ -88,13 +88,13 @@
             <div class="date-selector-inner-container">
               <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER || activeTab === TAB_NAME_QUESTION_SUBMITTER" class="filter-label">Filter by Last Contributed from:</b>
               <b *ngIf="activeTab === TAB_NAME_TRANSLATION_REVIEWER || activeTab === TAB_NAME_QUESTION_REVIEWER" class="filter-label">Filter by Last Reviewed from:</b>
-              <mat-form-field>
+              <mat-form-field class="e2e-test-first-date-picker-parent">
                 <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatepicker" (dateChange)="changeLastActivity($event.value)" [(ngModel)]="endDateForUsersLastActivity" [max]="startDateForUsersLastActivity">
                 <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatepicker"></mat-datepicker-toggle>
                 <mat-datepicker #lastDatepicker class="e2e-test-last-date-picker"></mat-datepicker>
               </mat-form-field>
               <b class="filter-label double-sided-arrow">to</b>
-              <mat-form-field>
+              <mat-form-field class="e2e-test-last-date-picker-parent">
                 <input matInput class="e2e-test-first-date-picker-input" [matDatepicker]="firstDatepicker" (dateChange)="changeFirstActivity($event.value)" [(ngModel)]="startDateForUsersLastActivity" [max]="today" [min]="endDateForUsersLastActivity">
                 <mat-datepicker-toggle matSuffix class="e2e-test-first-date-picker-toggle" [for]="firstDatepicker"></mat-datepicker-toggle>
                 <mat-datepicker #firstDatepicker class="e2e-test-first-date-picker"></mat-datepicker>
