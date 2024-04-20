@@ -21,9 +21,14 @@ from __future__ import annotations
 import json
 import os
 
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import state_domain
 from core.domain import user_services
 from core.domain import voiceover_services
@@ -425,6 +430,8 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
                 'hi': ('voice_artist_1', self.voiceover2)
             }
         }
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_should_create_exploration_voice_artists_link_model_successfully(
         self
@@ -596,3 +603,309 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             total_files += len(filnames)
 
         self.assertEqual(total_files, 1)
+
+    def test_auto_update_exploration_voice_artist_link_model(self) -> None:
+        content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_1', self.voiceover1),
+            }
+        }
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_1', self.voiceover1],
+                'hi': ['voice_artist_3', self.voiceover7]
+            }
+        }
+
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+        exploration_voice_artists_link_model.put()
+
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover1,
+                    },
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            }
+        })]
+
+        exp_services.update_exploration(
+            'voice_artist_1', 'exploration_id',
+            change_list, 'Adds voiceover')
+        exploration = exp_fetchers.get_exploration_by_id('exploration_id')
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover1,
+                        'hi': self.voiceover7,
+                    },
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover1
+                    },
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            }
+        })]
+
+        exp_services.update_exploration(
+            'voice_artist_3', 'exploration_id',
+            change_list, 'Adds voiceover')
+        updated_exploration = exp_fetchers.get_exploration_by_id(
+            'exploration_id')
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_not_update_exp_link_model_for_empty_change_list(
+        self
+    ) -> None:
+        content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_1', self.voiceover1),
+            }
+        }
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_1', self.voiceover1],
+            }
+        }
+
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+        exploration_voice_artists_link_model.put()
+
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'Introduction',
+            'new_value': {}
+        })]
+
+        updated_exploration = exp_services.apply_change_list(
+            'exploration_id', change_list
+        )
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_create_exp_link_model(self) -> None:
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_3', self.voiceover7],
+            }
+        }
+
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'Introduction',
+            'new_value': {}
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover7
+                    }
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            }
+        })]
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id', strict=False))
+        self.assertIsNone(exp_voice_artist_link_model)
+
+        updated_exploration = exp_services.apply_change_list(
+            'exploration_id', change_list
+        )
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_not_create_link_model_when_feature_flag_is_false(
+        self
+    ) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'Introduction',
+            'new_value': {}
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover7
+                    }
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            }
+        })]
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id', strict=False))
+        self.assertIsNone(exp_voice_artist_link_model)
+
+        updated_exploration = exp_services.apply_change_list(
+            'exploration_id', change_list
+        )
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, False, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id', strict=False))
+        self.assertIsNone(exp_voice_artist_link_model)
