@@ -20,15 +20,44 @@ import {ObjectsDomainConstants} from './objects-domain.constants';
 import {all, create} from 'mathjs';
 
 const math = create(all);
-let currencyUnits: string[] = [];
-for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
-  const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
-  currencyUnits.push(currency, ...currencyInfo.aliases);
-}
+
+const getUnitPrefixes = (): string[] => {
+  const prefixes = math.Unit.PREFIXES;
+  let prefixSet = new Set<string>();
+  for (const name in prefixes) {
+    if (name === 'NONE') continue;
+
+    for (const prefix in prefixes[name]) {
+      if (prefix === '') continue;
+      prefixSet.add(prefix);
+    }
+  }
+
+  return Array.from(prefixSet);
+};
+
+const getCurrencyUnits = (): string[] => {
+  let currencyUnits: string[] = [];
+  for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
+    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+    currencyUnits.push(currency, ...currencyInfo.aliases);
+  }
+
+  return currencyUnits;
+};
+
+const unitPrefixes = getUnitPrefixes();
+const currencyUnits = getCurrencyUnits();
 
 const isValidUnit = (unit: string): boolean => {
   return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
 };
+
+const isValidPrefix = (prefix: string): boolean => {
+  return unitPrefixes.includes(prefix);
+};
+
+console.log(unitPrefixes);
 
 describe('ObjectsDomainConstants', () => {
   it(
@@ -51,6 +80,31 @@ describe('ObjectsDomainConstants', () => {
         ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
       ).forEach(unit => {
         expect(isValidUnit(unit)).toBe(true);
+      });
+    }
+  );
+
+  it(
+    'should check that every value in PREFIX_TO_' +
+      'NORMALIZED_PREFIX_MAPPING is a valid prefix',
+    () => {
+      Object.values(
+        ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
+      ).forEach(prefix => {
+        console.log(prefix, unitPrefixes);
+        expect(isValidPrefix(prefix)).toBe(true);
+      });
+    }
+  );
+
+  it(
+    'should check that every key in PREFIX_TO_' +
+      'NORMALIZED_PREFIX_MAPPING is a valid prefix',
+    () => {
+      Object.keys(
+        ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
+      ).forEach(prefix => {
+        expect(isValidPrefix(prefix)).toBe(true);
       });
     }
   );

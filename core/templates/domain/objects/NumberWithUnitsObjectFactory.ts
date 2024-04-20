@@ -24,6 +24,7 @@ import {Fraction} from 'domain/objects/fraction.model';
 import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
 import {Units, UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {Unit, NumberWithUnitsAnswer} from 'interactions/answer-defs';
+import {unit as mathjsUnit} from 'mathjs';
 
 type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
 
@@ -125,10 +126,30 @@ export class NumberWithUnits {
   }
 
   getCanonicalRepresentationOfUnits(): Unit[] {
-    const updatedUnits = this.units.map(({unit, exponent}: Unit) => ({
-      unit: ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[unit],
-      exponent: exponent,
-    }));
+    const updatedUnits = this.units.map(({unit, exponent}: Unit) => {
+      const baseUnit = mathjsUnit(unit).units[0].unit.name;
+      const unitPrefix = mathjsUnit(unit).units[0].prefix.name;
+      let normalizedUnit = '';
+
+      if (unitPrefix !== '') {
+        normalizedUnit +=
+          ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING[
+            unitPrefix
+          ];
+      }
+
+      normalizedUnit +=
+        ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[baseUnit];
+
+      return {
+        unit: normalizedUnit,
+        exponent: exponent,
+      };
+    });
+
+    updatedUnits.sort((a: Unit, b: Unit) => {
+      return a.unit.localeCompare(b.unit);
+    });
 
     return updatedUnits;
   }
