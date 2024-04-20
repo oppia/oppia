@@ -43,6 +43,9 @@ export class AccessValidationBackendApiService {
   LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_create_learner_group_page';
 
+  DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_diagnostic_test_player_page';
+
   FACILITATOR_DASHBOARD_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_facilitator_dashboard_page';
 
@@ -152,6 +155,12 @@ export class AccessValidationBackendApiService {
   validateAccessToLearnerGroupCreatorPage(): Promise<void> {
     return this.http
       .get<void>(this.LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR)
+      .toPromise();
+  }
+
+  validateAccessToDiagnosticTestPlayerPage(): Promise<void> {
+    return this.http
+      .get<void>(this.DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR)
       .toPromise();
   }
 
