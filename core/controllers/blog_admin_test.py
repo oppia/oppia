@@ -179,7 +179,10 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             '/blogadminhandler', payload, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response_dict['error'], 'Schema validation for \'new_platform_'
+            response_dict['error'],
+            'At \'http://localhost/blogadminhandler\' '
+            'these errors are happening:\n'
+            'Schema validation for \'new_platform_'
             'parameter_values\' failed: The value of max_number_of_tags_'
             'assigned_to_blog_post platform parameter is not of valid type, '
             'it should be one of typing.Union[str, int, bool, float].')
@@ -233,7 +236,10 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             '/blogadminhandler', payload, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response_dict['error'], 'Schema validation for \'new_platform_'
+            response_dict['error'],
+            'At \'http://localhost/blogadminhandler\' '
+            'these errors are happening:\n'
+            'Schema validation for \'new_platform_'
             'parameter_values\' failed: The value of max_number_of_tags_'
             'assigned_to_blog_post should be greater than 0, it is -2.')
 
@@ -264,7 +270,10 @@ class BlogAdminHandlerTest(test_utils.GenericTestBase):
             '/blogadminhandler', payload, csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response_dict['error'], 'Schema validation for \'new_platform_'
+            response_dict['error'],
+            'At \'http://localhost/blogadminhandler\' '
+            'these errors are happening:\n'
+            'Schema validation for \'new_platform_'
             'parameter_values\' failed: The value of platform parameter '
             'max_number_of_tags_assigned_to_blog_post is of type \'string\', '
             'expected it to be of type \'number\'')

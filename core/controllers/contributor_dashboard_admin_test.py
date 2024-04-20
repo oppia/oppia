@@ -548,6 +548,8 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/translationcontributionstatshandler\' these '
+            'errors are happening:\n'
             'Missing key in handler args: username.')
 
     def test_get_stats_with_invalid_username_raises_error(self) -> None:
