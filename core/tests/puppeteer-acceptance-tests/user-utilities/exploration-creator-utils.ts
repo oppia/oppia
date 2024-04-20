@@ -145,10 +145,8 @@ export class ExplorationCreator extends BaseUser {
       await this.clickOn(navBarOpenerIcon);
       await this.clickOn(optionsDropdown);
       await this.clickOn(mobileSettingsBar);
-      /**
-       * Open all dropdowns because by default
-       * all dropdowns are closed in mobile view.
-       */
+
+      // Open all dropdowns because by default all dropdowns are closed in mobile view.
       await this.clickOn(basicSettingsDropdown);
       await this.clickOn(advanceSettingsDropdown);
       await this.clickOn(rolesSettingsDropdown);
@@ -233,13 +231,10 @@ export class ExplorationCreator extends BaseUser {
   }
 
   async selectLanguage(language: string): Promise<void> {
-    /**
-     * The language dropdown was visible, but it was mostly hidden
-     * towards the bottom of the screen. When we clicked on the dropdown,
-     * the options did not fully appear, leading to incorrect selections.
-     * To prevent this, we are now scrolling the page. We can use 300 - 500px
-     * to move the language dropdown to the upper part of the page.
-     */
+    // The language dropdown was visible, but it was mostly hidden towards the bottom
+    // of the screen. When we clicked on the dropdown, the options did not fully appear,
+    // leading to incorrect selections.To prevent this, we are now scrolling the page.
+    // We can use 300 - 500px to move the language dropdown to the upper part of the page.
     await this.page.evaluate(() => {
       window.scrollTo(0, 350);
     });
@@ -288,10 +283,8 @@ export class ExplorationCreator extends BaseUser {
   }
 
   async expectTagsToMatch(expectedTags: string[]): Promise<void> {
-    /**
-     * When adding a tag in the exploration settings UI, it gets
-     * auto-converted to lowercase by the input field.
-     */
+    // When adding a tag in the exploration settings UI, it gets auto-converted
+    // to lowercase by the input field.
     const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
     await this.page.waitForSelector('mat-chip-list');
     const observedTags = await this.page.evaluate(() => {
