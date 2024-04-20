@@ -30,8 +30,8 @@ const explorationIntroContentBoxPlaceholder = 'div.e2e-test-state-edit-content';
 const editCardNameButton = '.e2e-test-state-name-text';
 const editCardNameBox = '.e2e-test-state-name-input';
 const explorationIntroBox = 'div.e2e-test-rte';
-const introSubmitButton = 'button.e2e-test-state-name-submit';
-const introTitleSubmitButton = 'button.e2e-test-save-state-content';
+const submitIntroButton = 'button.e2e-test-state-name-submit';
+const submitIntroTitleButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const endExplorationInteractionOption =
   '.e2e-test-interaction-tile-EndExploration';
@@ -55,11 +55,11 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 const desktopSaveDraftButton = 'button.e2e-test-save-changes';
-const saveDraftConfirmButton = '.e2e-test-save-draft-button';
+const confirmSaveDraftButton = '.e2e-test-save-draft-button';
 const desktopPublishButton = 'button.e2e-test-publish-exploration';
 const discardDraftDropdown = 'button.e2e-test-save-discard-toggle';
 const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
-const discardConfirmButton = 'button.e2e-test-confirm-discard-changes';
+const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const confirmPublishButton = 'button.e2e-test-confirm-publish';
 const commitMessage = 'textarea.e2e-test-commit-message-input';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
@@ -85,7 +85,6 @@ const publishButtonDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
 
 let explorationUrlAfterPublished = '';
-let explorationId = '';
 
 export class ExplorationCreator extends BaseUser {
   async navigateToCreatorDashboardPage(): Promise<void> {
@@ -101,11 +100,11 @@ export class ExplorationCreator extends BaseUser {
   }
 
   /**
-   * Closes the tutorial popup before a new exploration.
+   * Closes the tutorial pop-up before a new exploration.
    */
   async dismissWelcomeModal(): Promise<void> {
     await this.clickOn(tutorialTakeMeToEditorButton);
-    showMessage('Tutorial popup closed successfully.');
+    showMessage('Tutorial pop-up closed successfully.');
   }
 
   /**
@@ -115,7 +114,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(editCardNameButton);
     await this.clearAllTextFrom(editCardNameBox);
     await this.type(editCardNameBox, cardName);
-    await this.clickOn(introSubmitButton);
+    await this.clickOn(submitIntroButton);
     showMessage('Card name updated successfully.');
   }
 
@@ -127,7 +126,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(explorationIntroBox);
     await this.clearAllTextFrom(explorationIntroBox);
     await this.type(explorationIntroBox, introText);
-    await this.clickOn(introTitleSubmitButton);
+    await this.clickOn(submitIntroTitleButton);
     showMessage('Intro text updated successfully.');
   }
 
@@ -456,7 +455,7 @@ export class ExplorationCreator extends BaseUser {
 
     await this.clickOn(commitMessage);
     await this.type(commitMessage, 'Testing Testing');
-    await this.clickOn(saveDraftConfirmButton);
+    await this.clickOn(confirmSaveDraftButton);
     await this.page.waitForFunction('document.readyState === "complete"');
     showMessage('Exploration is saved successfully.');
   }
@@ -478,7 +477,7 @@ export class ExplorationCreator extends BaseUser {
     await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
 
     explorationUrlAfterPublished = await this.page.url();
-    explorationId = explorationUrlAfterPublished
+    let explorationId = explorationUrlAfterPublished
       .replace(/^.*\/create\//, '')
       .replace(/#\/.*/, '');
 
@@ -488,7 +487,9 @@ export class ExplorationCreator extends BaseUser {
     return explorationId;
   }
 
-  async expectExplorationToBeAccessibleByUrl(): Promise<void> {
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
     if (!explorationId) {
       throw new Error('ExplorationId is null');
     }
@@ -501,7 +502,9 @@ export class ExplorationCreator extends BaseUser {
     }
   }
 
-  async expectExplorationToBeNotAccessibleByUrl(): Promise<void> {
+  async expectExplorationToBeNotAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
     if (!explorationId) {
       throw new Error('ExplorationId is null');
     }
@@ -528,11 +531,11 @@ export class ExplorationCreator extends BaseUser {
       });
       await this.clickOn(desktopDiscardDraftButton);
     }
-    await this.page.waitForSelector(discardConfirmButton, {
+    await this.page.waitForSelector(confirmDiscardButton, {
       visible: true,
     });
     await Promise.all([
-      this.clickOn(discardConfirmButton),
+      this.clickOn(confirmDiscardButton),
       this.page.waitForNavigation(),
     ]);
     if (this.isViewportAtMobileWidth()) {

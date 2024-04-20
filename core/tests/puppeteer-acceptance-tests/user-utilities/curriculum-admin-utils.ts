@@ -25,7 +25,8 @@ const baseURL = testConstants.URLs.BaseURL;
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const explorationSettingsTab = '.e2e-test-settings-tab';
 const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
-const deleteConfirmButton = 'button.e2e-test-really-delete-exploration-button';
+const confirmDeletionButton =
+  'button.e2e-test-really-delete-exploration-button';
 
 /**
  * For mobile.
@@ -74,7 +75,7 @@ export class CurriculumAdmin extends BaseUser {
   async deleteExplorationPermanently(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
     await this.clickOn(deleteExplorationButton);
-    await this.clickOn(deleteConfirmButton);
+    await this.clickOn(confirmDeletionButton);
   }
 
   /**

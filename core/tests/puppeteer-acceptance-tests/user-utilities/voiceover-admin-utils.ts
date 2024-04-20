@@ -58,7 +58,7 @@ export class VoiceoverAdmin extends BaseUser {
       await this.clickOn(explorationSettingsTab);
     }
 
-    showMessage('Navigation to settings tab is successfull.');
+    showMessage('Navigation to settings tab is successful.');
   }
 
   /**
@@ -80,7 +80,7 @@ export class VoiceoverAdmin extends BaseUser {
       hidden: true,
     });
 
-    showMessage('Tutorial pop is closed.');
+    showMessage('Tutorial pop-up is closed.');
   }
 
   /**
@@ -96,7 +96,7 @@ export class VoiceoverAdmin extends BaseUser {
     const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.page.goto(editorUrl);
 
-    showMessage('Navigation to exploration editor is successfull.');
+    showMessage('Navigation to exploration editor is successful.');
   }
 
   /**

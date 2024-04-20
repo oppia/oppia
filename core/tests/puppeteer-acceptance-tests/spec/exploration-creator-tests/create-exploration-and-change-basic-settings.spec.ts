@@ -152,7 +152,9 @@ describe('Exploration Creator', function () {
       await curriculumAdmin.openExplorationControlDropdown();
       await curriculumAdmin.deleteExplorationPermanently();
 
-      await explorationCreator.expectExplorationToBeNotAccessibleByUrl();
+      await explorationCreator.expectExplorationToBeNotAccessibleByUrl(
+        explorationId
+      );
     },
     DEFAULT_SPEC_TIMEOUT
   );
