@@ -40,6 +40,7 @@ export enum FeatureNames {
   AddVoiceoverWithAccent = 'add_voiceover_with_accent',
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
   EnableVoiceoverContribution = 'enable_voiceover_contribution',
+  AutoUpdateExpVoiceArtistLink = 'auto_update_exp_voice_artist_link',
 }
 
 export interface FeatureStatusSummaryBackendDict {
