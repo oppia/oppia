@@ -11,7 +11,7 @@
 
   <div class="modal-body">
     <div class="oppia-question-editor-section">
-      <h3 class="e2e-test-selected-difficulty">Selected Difficulty: {{skillDifficultyString}}
+      <h3>Selected Difficulty: {{skillDifficultyString}}
         <i role="button"
            class="fas fa-pen oppia-editor-edit-icon select-difficulty-icon oppia-editable-section"
            (click)="onClickChangeDifficulty()"
@@ -22,9 +22,9 @@
         <h3 title="Use these notes to make sure your question is at the right difficulty.">
           Notes from Skill Rubric
         </h3>
-        <ul class="e2e-test-selected-difficulty-rubric-explanation-list">
+        <ul>
           <li *ngFor="let explanation of skill.getRubricExplanations(skillDifficultyString)">
-            <span [innerHtml]="explanation" class="d-block mt-1 oppia-explanation e2e-test-selected-difficulty-rubric-explanation"></span>
+            <span [innerHtml]="explanation" class="d-block mt-1 oppia-explanation"></span>
           </li>
         </ul>
       </div>

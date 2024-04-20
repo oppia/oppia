@@ -16,8 +16,7 @@
   </div>
 
   <div *ngIf="this.selectedRubricIndex != null">
-    <div *ngFor="let explanation of this.explanationsMemento[this.rubric.getDifficulty()]; index as idx"
-         class="e2e-test-rubric-explanation-list">
+    <div *ngFor="let explanation of this.explanationsMemento[this.rubric.getDifficulty()]; index as idx">
       <div *ngIf="!this.explanationEditorIsOpen[this.rubric.getDifficulty()][idx]">
         <div class="oppia-readonly-rule-tile"
              [ngClass]="{'oppia-editable-section': this.isEditable()}">

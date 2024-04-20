@@ -1,11 +1,10 @@
 <p class="topic-dashboard-link">
-  <a href="/topics-and-skills-dashboard" class="e2e-test-back-to-topics-and-skills-dashboard">
+  <a href="/topics-and-skills-dashboard">
     Back to Topics Dashboard <i class="fa fa-angle-left"></i>
   </a>
   <span>{{ editableName }}</span>
 </p>
-<a class="oppia-mobile-back-to-parent e2e-test-back-to-topic-dashboard"
-   href="/topics-and-skills-dashboard">
+<a class="oppia-mobile-back-to-parent" href="/topics-and-skills-dashboard">
   <i class="fa fa-angle-left"></i>
   <span>Back to Topics Dashboard</span>
 </a>
@@ -264,7 +263,7 @@
                  *ngIf="topicRights.canEditTopic()">
               </i>
             </div>
-            <div class="uncategorized-skill-option-box e2e-test-options-for-uncategorized-skill"
+            <div class="uncategorized-skill-option-box"
                  *ngIf="uncategorizedEditOptionsIndex === $index"
                  (mouseleave)="toggleUncategorizedSkillOptions(null)"
                  (click)="toggleUncategorizedSkillOptions(null)">
@@ -272,7 +271,7 @@
                 <i class="fa fa-trash" *ngIf="topicRights.canEditTopic()"></i>
                 <span>Remove from topic</span>
               </div>
-              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-skill-to-subtopic"
+              <div class="uncategorized-skill-edit-option edit-option-assign e2e-test-assign-subtopic"
                    tabindex="0"
                    role="button"
                    (keydown.enter)="changeSubtopicAssignment(null, skillSummary)"

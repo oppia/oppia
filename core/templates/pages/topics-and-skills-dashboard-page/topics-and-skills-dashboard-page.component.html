@@ -1,7 +1,7 @@
 <background-banner></background-banner>
 <div class="oppia-topics-and-skills-dashboard position-relative">
   <div>
-    <h2 class="dashboard-title e2e-test-no-topics-and-no-skills-present-message"
+    <h2 class="dashboard-title"
         *ngIf="(totalTopicSummaries.length === 0 && untriagedSkillSummaries.length === 0)">
       {{ 'I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD' | translate }}
     </h2>
@@ -11,7 +11,7 @@
         <span class="oppia-navbar-tab-content">Create Topic</span>
       </button>
       <button (click)="createSkill()" *ngIf="userCanCreateSkill"
-              class="btn oppia-navbar-button oppia-transition-200 e2e-test-create-first-skill-button">
+              class="btn oppia-navbar-button oppia-transition-200">
         <span class="oppia-navbar-tab-content">Create Skill</span>
       </button>
     </div>
@@ -28,7 +28,7 @@
     <div class="dashboard-content">
       <div class="dashboard-content-primary">
         <div>
-          <ul class="dashboard-tabs e2e-test-topics-and-skills-tab-list">
+          <ul class="dashboard-tabs e2e-test-topics-tab">
             <li [ngClass]="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
               <a class="dashboard-tabs-text e2e-test-topics-tab"
                  (click)="setActiveTab(TAB_NAME_TOPICS)">

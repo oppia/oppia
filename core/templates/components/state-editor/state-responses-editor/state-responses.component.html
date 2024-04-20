@@ -167,14 +167,14 @@
           <small class="text-muted">The following must be addressed by tagging to an incorrect answer. If a misconception is not relevant to this question, mark it as "Not Applicable".</small>
           <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
             <h4 class="pl-3">Compulsory</h4>
-            <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill)" class="misconception-list-item">
+            <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill)">
               {{misconceptionName}}
             </p>
           </div>
           <div class="pt-4">
             <h4 class="pl-3" *ngIf="containsOptionalMisconceptions">Optional</h4>
-            <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue; let skillIndex = index">
-              <div *ngFor="let misconception of skillWithMisconceptions.value; let misconceptionIndex = index">
+            <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue; let index = index">
+              <div *ngFor="let misconception of skillWithMisconceptions.value">
                 <div *ngIf="!misconception.isMandatory()"
                      class="misconception-list-item optional-misconception-list-item"
                      [ngClass]="{'optional-misconception-list-no-action': isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())}">
@@ -188,20 +188,18 @@
                   <div *ngIf="skillWithMisconceptions.key + '-' + misconception.getId() === activeEditOption" class="optional-misconception-edit-options">
                     <div *ngIf="inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
                          (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), true)"
-                         (mouseleave)="setActiveEditOption(null)"
-                         class="e2e-test-mark-applicable-misconception-{{skillIndex}}-{{misconceptionIndex}}">
+                         (mouseleave)="setActiveEditOption(null)">
                         Mark as "Applicable"
                     </div>
                     <div *ngIf="!inapplicableSkillMisconceptionIds.includes(skillWithMisconceptions.key + '-' + misconception.getId())"
                          (click)="updateOptionalMisconceptionIdStatus(skillWithMisconceptions.key + '-' + misconception.getId(), false)"
-                         (mouseleave)="setActiveEditOption(null)"
-                         class="e2e-test-mark-non-applicable-misconception-{{skillIndex}}-{{misconceptionIndex}}">
+                         (mouseleave)="setActiveEditOption(null)">
                         Mark as "Not Applicable"
                     </div>
                   </div>
                   <div *ngIf="editabilityService.isEditable()"
                        (click)="setActiveEditOption(skillWithMisconceptions.key + '-' + misconception.getId())"
-                       class="fas fa-ellipsis-v optional-misconception-options-button e2e-test-misconception-{{skillIndex}}-{{misconceptionIndex}}-options"
+                       class="fas fa-ellipsis-v optional-misconception-options-button"
                        [ngClass]="{'d-none': getOptionalSkillMisconceptionStatus(skillWithMisconceptions.key + '-' + misconception.getId()) === 'Assigned'}">
                   </div>
                 </div>
