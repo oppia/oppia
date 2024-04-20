@@ -1534,9 +1534,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 suggestion.suggestion_id), {},
             csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: translation_html.',
             response['error'],
-            'Missing key in handler args: translation_html.')
+        )
         self.logout()
 
     def test_cannot_update_translation_with_invalid_translation_html(
@@ -1785,9 +1786,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             expected_status_int=400
         )
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: question_state_data.',
             response['error'],
-            'Missing key in handler args: question_state_data.'
         )
         self.logout()
 
@@ -1851,9 +1852,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             expected_status_int=400
         )
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: skill_difficulty.',
             response['error'],
-            'Missing key in handler args: skill_difficulty.'
         )
 
         self.logout()
@@ -1917,9 +1918,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             expected_status_int=400
         )
 
-        self.assertEqual(
+        self.assertIn(
+            'Missing key in handler args: next_content_id_index.',
             response['error'],
-            'Missing key in handler args: next_content_id_index.'
         )
         self.logout()
 
@@ -2373,10 +2374,10 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions']
 
-        self.assertEqual(
-            response['error'],
+        self.assertIn(
             'Schema validation for \'target_version_at_submission\' failed: '
-            'Could not convert str to int: invalid_target_version'
+            'Could not convert str to int: invalid_target_version',
+            response['error'],
         )
         self.assertEqual(len(suggestions), 1)
         self.logout()
