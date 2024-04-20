@@ -223,6 +223,43 @@ describe('RteHelperModalComponent', () => {
     }));
   });
 
+  describe('when the text is empty in link form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'url',
+        default_value: 'oppia.org',
+      },
+      {
+        name: 'text',
+        default_value: ' ',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'link'),
+        (component.attrsCustomizationArgsDict = {
+          url: 'oppia.org',
+          text: ' ',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should make the text equal to url when text is empty', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'oppia.org';
+      component.customizationArgsForm.value[1] = '';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(false);
+      expect(component.customizationArgsForm.value[1]).toBe('oppia.org');
+      flush();
+    }));
+  });
+
   describe('when there are validation errors in video form control', function () {
     var customizationArgSpecs = [
       {
