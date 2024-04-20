@@ -150,10 +150,10 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'invalid_query_type'},
             expected_status_int=400)
-        self.assertEqual(
-            response['error'],
+        self.assertIn(
             'Schema validation for \'query_type\' failed: Received '
             'invalid_query_type which is not in the allowed range of '
-            'choices: [\'all_non_private_commits\']'
+            'choices: [\'all_non_private_commits\']',
+            response['error'],
         )
         self.logout()

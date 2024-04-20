@@ -262,6 +262,8 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 )
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/feature_flags\' '
+            'these errors are happening:\n'
             'Schema validation for \'rollout_percentage\' failed: '
             'Validation failed: is_at_most ({\'max_value\': 100}) '
             'for object 200')

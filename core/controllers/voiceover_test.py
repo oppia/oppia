@@ -108,6 +108,8 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response_dict['error'],
+            'At \'http://localhost/voiceover_language_codes_mapping\' '
+            'these errors are happening:\n'
             'Schema validation for \'language_codes_mapping\' failed: '
             'Expected dict, received en-US')
 

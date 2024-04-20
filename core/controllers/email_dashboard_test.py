@@ -533,6 +533,8 @@ class EmailDashboardResultTests(test_utils.EmailTestBase):
             expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/emaildashboarddatahandler?'
+            'invalid_param_key=2\' these errors are happening:\n'
             'Missing key in handler args: num_queries_to_fetch.\n'
             'Found extra args: [\'invalid_param_key\'].')
         self.assertEqual(

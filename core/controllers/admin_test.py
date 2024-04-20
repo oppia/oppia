@@ -963,6 +963,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'platform_param_name\' failed: Expected '
             'string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -986,6 +987,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'commit_message\' failed: Expected '
             'string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -1009,6 +1011,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'new_rules\' failed: Expected list, '
             'received {}')
         self.assertEqual(response['error'], error_msg)
@@ -1022,6 +1025,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'new_rules\' failed: \'int\' '
             'object is not subscriptable')
         response = self.post_json(
@@ -1125,7 +1129,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
             expected_status_int=400)
 
-        error_msg = 'Missing key in handler args: username.'
+        error_msg = (
+            'At \'http://localhost/adminsuperadminhandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_grant_super_admin_privileges_fails_with_invalid_username(
@@ -1177,7 +1185,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.delete_json(
             '/adminsuperadminhandler', params={}, expected_status_int=400)
 
-        error_msg = 'Missing key in handler args: username.'
+        error_msg = (
+            'At \'http://localhost/adminsuperadminhandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_revoke_super_admin_privileges_fails_with_invalid_username(
@@ -1268,6 +1280,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'num_dummy_exps_to_generate\' failed: '
             'Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
@@ -1292,6 +1305,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'num_dummy_exps_to_publish\' failed: '
             'Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
@@ -1441,6 +1455,9 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             params={'filter_criterion': 'invalid', 'username': 'user1'},
             expected_status_int=400)
         error_msg = (
+            'At \'http://localhost/adminrolehandler?'
+            'filter_criterion=invalid&username=user1\' '
+            'these errors are happening:\n'
             'Schema validation for \'filter_criterion\' failed: Received '
             'invalid which is not in the allowed range of choices: '
             '[\'role\', \'username\']')
@@ -2286,6 +2303,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         }
 
         error_msg = (
+            'At \'http://localhost/explorationdataextractionhandler?'
+            'exp_id=exp&exp_version=a&state_name=Introduction&num_answers=0\' '
+            'these errors are happening:\n'
             'Schema validation for \'exp_version\' failed: '
             'Could not convert str to int: a')
         response = self.get_json(
@@ -2433,7 +2453,11 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': None},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = 'Missing key in handler args: new_username.'
+        error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: new_username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_none_old_username(self) -> None:
@@ -2446,7 +2470,11 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = 'Missing key in handler args: old_username.'
+        error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: old_username.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_non_string_new_username(self) -> None:
@@ -2460,7 +2488,10 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Schema validation for \'new_username\' failed:'
+            response['error'],
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
+            'Schema validation for \'new_username\' failed:'
             ' Expected string, received 123')
 
     def test_update_username_with_non_string_old_username(self) -> None:
@@ -2474,6 +2505,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
             'Schema validation for \'old_username\' failed: Expected'
             ' string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -2490,6 +2523,8 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         error_msg = (
+            'At \'http://localhost/updateusernamehandler\' '
+            'these errors are happening:\n'
             'Schema validation for \'new_username\' failed: Validation failed'
             ': has_length_at_most ({\'max_value\': %s}) for object %s'
             % (constants.MAX_USERNAME_LENGTH, long_username))
@@ -2940,6 +2975,7 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'blog_post_title\' failed: Received %s '
             'which is not in the allowed range of choices: [\'Leading The '
             'Arabic Translations Team\', \'Education\', \'Blog with different'
@@ -2996,4 +3032,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             '/interactions', params={},
             expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Missing key in handler args: exp_id.')
+            response['error'],
+            'At \'http://localhost/interactions\' these errors are happening:\n'
+            'Missing key in handler args: exp_id.'
+        )

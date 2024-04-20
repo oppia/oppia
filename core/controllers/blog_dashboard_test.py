@@ -410,9 +410,11 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         response = self.put_json(
             '%s/%s' % (feconf.BLOG_EDITOR_DATA_URL_PREFIX, self.blog_post.id),
             payload, csrf_token=csrf_token, expected_status_int=400)
-        self.assertEqual(
-            response['error'], 'Schema validation for \'change_dict\''
-            ' failed: Title should be a string.')
+        self.assertIn(
+            'Schema validation for \'change_dict\''
+            ' failed: Title should be a string.',
+            response['error'],
+        )
 
     def test_publishing_unpublishing_blog_post(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)

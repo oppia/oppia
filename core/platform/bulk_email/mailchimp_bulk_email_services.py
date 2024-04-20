@@ -195,13 +195,12 @@ def add_or_update_user_status(
         tag: str. Tag to add to user in mailchimp.
 
     Returns:
-        bool. Whether the user was successfully added to the db. (This will be
-        False if the user was permanently deleted earlier and therefore cannot
-        be added back.)
+        bool. Whether the user was successfully added to the db. This will be
+        False if and only if MailChimp throws an error or getting the MailChimp
+        client fails.
 
     Raises:
-        Exception. Any error (other than the case where the user was permanently
-            deleted earlier) raised by the mailchimp API.
+        Exception. Raised if the tag or merge fields are invalid.
     """
     client = _get_mailchimp_class()
     if not client:
@@ -284,7 +283,7 @@ def add_or_update_user_status(
                 feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
                 unsubscribed_mailchimp_data)
 
-    except mailchimpclient.MailChimpError as error:
+    except Exception as error:
         # This has to be done since the message can only be accessed from
         # MailChimpError by error.message in Python2, but this is deprecated in
         # Python3.
@@ -301,5 +300,8 @@ def add_or_update_user_status(
                 if not user_creation_successful:
                     return False
         else:
-            raise Exception(error_message['detail']) from error
+            logging.error(
+                'Mailchimp error prevented email signup: %s',
+                error_message['detail'])
+            return False
     return True

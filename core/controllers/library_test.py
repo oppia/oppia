@@ -344,6 +344,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=missing-'
+            'outer-parens&language_code=%28%22en%22%29\' '
+            'these errors are happening:\n'
             'Schema validation for \'category\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object missing-outer-parens'
@@ -356,6 +359,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=%28missing-'
+            'inner-quotes%29&language_code=%28%22en%22%29\' '
+            'these errors are happening:\n'
             'Schema validation for \'category\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object (missing-inner-quotes)'
@@ -369,6 +375,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=%28%22A+'
+            'category%22%29&language_code=missing-outer-parens\' '
+            'these errors are happening:\n'
             'Schema validation for \'language_code\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object missing-outer-parens'
@@ -381,6 +390,9 @@ class LibraryPageTests(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/searchhandler/data?category=%28%22A+'
+            'category%22%29&language_code=%28missing-inner-quotes%29\' '
+            'these errors are happening:\n'
             'Schema validation for \'language_code\' failed: Validation '
             'failed: is_search_query_string ({}) for '
             'object (missing-inner-quotes)'

@@ -539,14 +539,16 @@ class SignupHandler(
             'can_receive_email_updates']
         bulk_email_signup_message_should_be_shown = False
 
-        bulk_email_signup_message_should_be_shown = (
-            user_services.update_email_preferences(
-                self.user_id, can_receive_email_updates,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
-            )
+        config_bulk_email_failed = user_services.update_email_preferences(
+            self.user_id, can_receive_email_updates,
+            feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
         )
+        # Only block registration if bulk email configuration failed and the
+        # user requested bulk emails.
+        bulk_email_signup_message_should_be_shown = (
+            can_receive_email_updates and config_bulk_email_failed)
         if bulk_email_signup_message_should_be_shown:
             self.render_json({
                 'bulk_email_signup_message_should_be_shown': (
