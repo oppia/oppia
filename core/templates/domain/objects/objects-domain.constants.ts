@@ -199,7 +199,7 @@ export const ObjectsDomainConstants = {
     kilogram: 'kg',
     g: 'g',
     gram: 'g',
-    tonne: 'tonne',
+    tonne: 'ton',
     ton: 'ton',
     gr: 'gr',
     grain: 'gr',

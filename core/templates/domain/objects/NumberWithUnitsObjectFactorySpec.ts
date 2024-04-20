@@ -467,28 +467,20 @@ describe('NumberWithUnitsObjectFactory', () => {
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
-          {unit: 'N', exponent: 1},
-          {unit: 'm', exponent: -1},
           {unit: 'degC', exponent: -2},
+          {unit: 'm', exponent: -1},
+          {unit: 'N', exponent: 1},
         ]).units
       );
 
       expect(
         new NumberWithUnits(
           'real',
-          1,
+          24,
           new Fraction(false, 0, 0, 1),
-          new Units([
-            {unit: 'rupee', exponent: 1},
-            {unit: 'dollars', exponent: -1},
-          ])
+          new Units([{unit: 'megatonne', exponent: 1}])
         ).getCanonicalRepresentationOfUnits()
-      ).toEqual(
-        new Units([
-          {unit: 'Rs', exponent: 1},
-          {unit: 'dollar', exponent: -1},
-        ]).units
-      );
+      ).toEqual(new Units([{unit: 'Mton', exponent: 1}]).units);
     });
   });
 });
