@@ -84,8 +84,6 @@ const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
 const publishButtonDropdown = 'div.e2e-test-mobile-changes-dropdown';
 const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
 
-let explorationUrlAfterPublished = '';
-
 export class ExplorationCreator extends BaseUser {
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardUrl);
@@ -476,7 +474,7 @@ export class ExplorationCreator extends BaseUser {
     await this.clickOn(confirmPublishButton);
     await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
 
-    explorationUrlAfterPublished = await this.page.url();
+    const explorationUrlAfterPublished = await this.page.url();
     let explorationId = explorationUrlAfterPublished
       .replace(/^.*\/create\//, '')
       .replace(/#\/.*/, '');
