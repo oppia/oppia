@@ -87,5 +87,5 @@ export default {
       '../images/blog-post-thumbnail.svg'
     ),
   },
-  DEFAULT_SPEC_TIMEOUT: 300000,
+  DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };

@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User in About page', function () {
   let testUser: LoggedInUser;
@@ -31,18 +31,18 @@ describe('Logged-in User in About page', function () {
       'testuser',
       'testuser@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
     await testUser.navigateToAboutPage();
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open Math Classroom page with the Browse Our Lessons button.',
     async function () {
       await testUser.clickBrowseOurLessonsButtonInAboutPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -50,7 +50,7 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickAccessAndroidAppButtonInAboutPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -58,7 +58,7 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickVisitClassroomButtonInAboutPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -66,7 +66,7 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickBrowseLibraryButtonInAboutPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -75,7 +75,7 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickCreateLessonsButtonInAboutPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -83,7 +83,7 @@ describe('Logged-in User in About page', function () {
     async function () {
       await testUser.clickExploreLessonsButtonInAboutPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
