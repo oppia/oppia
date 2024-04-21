@@ -19,7 +19,6 @@
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
-import {element} from 'angular';
 
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
@@ -843,7 +842,7 @@ export class LoggedInUser extends BaseUser {
       element => element.textContent
     );
 
-    if (parseInt(subscriberCount!) === number) {
+    if (subscriberCount && parseInt(subscriberCount) === number) {
       showMessage(`Number of subscribers is equal to ${number}`);
     } else {
       throw new Error(`Number of subscribers is not equal to ${number}`);
@@ -909,7 +908,7 @@ export class LoggedInUser extends BaseUser {
     const explorations = await this.page.$$(explorationCard);
 
     if (explorations.length === 0) {
-      throw new Error(`There are no explorations authored by the creator`);
+      throw new Error('There are no explorations authored by the creator');
     }
 
     const explorationTitle = await explorations[0].$eval(
