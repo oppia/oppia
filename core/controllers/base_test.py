@@ -2065,6 +2065,8 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                     expected_status_int=400)
             error_msg = (
+                'At \'http://localhost/mock_play_exploration?'
+                'exploration_id=exp_id\' these errors are happening:\n'
                 'Schema validation for \'exploration_id\' failed: Could not '
                 'convert str to int: %s' % self.exp_id)
             self.assertEqual(response['error'], error_msg)
