@@ -144,7 +144,6 @@
 /core/templates/domain/opportunity/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-page/ @oppia/contributor-experience-team
 /core/templates/pages/contributor-dashboard-admin-page/ @oppia/contributor-experience-team
-/scripts/populate_sample_contributor_data*.py @oppia/contributor-experience-team
 /core/templates/services/html-length.service.ts @oppia/contributor-experience-team
 /core/templates/services/html-length.service.spec.ts @oppia/contributor-experience-team
 
