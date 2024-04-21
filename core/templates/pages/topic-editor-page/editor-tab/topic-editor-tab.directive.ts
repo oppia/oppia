@@ -23,6 +23,7 @@ import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormControl} from '@angular/forms';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -69,7 +70,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   topicNameExists: boolean;
   topicUrlFragmentExists: boolean;
   hostname: string;
-  selectedSkillForDiagnosticTest;
   availableSkillSummariesForDiagnosticTest: ShortSkillSummary[];
   selectedSkillSummariesForDiagnosticTest: ShortSkillSummary[];
   diagnosticTestSkillsDropdownIsShown: boolean;
@@ -98,6 +98,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   maxCharsInPageTitleFragmentForWeb!: number;
   maxCharsInMetaTagContent!: number;
   minCharsInPageTitleFragmentForWeb!: number;
+  skillForDiagnosticTestFormControl = new FormControl(null);
 
   constructor(
     private contextService: ContextService,
@@ -161,7 +162,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.selectedSkillSummariesForDiagnosticTest =
       this.topic.getSkillSummariesForDiagnosticTest();
     this.diagnosticTestSkillsDropdownIsShown = false;
-    this.selectedSkillForDiagnosticTest = null;
 
     this.editableDescriptionIsEmpty = this.editableDescription === '';
     this.topicDescriptionChanged = false;
@@ -198,8 +198,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   addSkillForDiagnosticTest(): void {
-    let skillToAdd = this.selectedSkillForDiagnosticTest;
-    this.selectedSkillForDiagnosticTest = null;
+    let skillToAdd = this.skillForDiagnosticTestFormControl.value;
+    this.skillForDiagnosticTestFormControl.setValue(null);
     this.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
     let skillSummary = this.availableSkillSummariesForDiagnosticTest.find(
