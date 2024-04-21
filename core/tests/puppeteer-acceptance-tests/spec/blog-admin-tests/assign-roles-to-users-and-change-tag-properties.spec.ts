@@ -21,7 +21,7 @@ import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {BlogAdmin} from '../../user-utilities/blog-admin-utils';
 import {SuperAdmin} from '../../user-utilities/super-admin-utils';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
 
@@ -36,7 +36,7 @@ describe('Blog Admin', function () {
       'blog_admin@example.com',
       [ROLES.BLOG_ADMIN]
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   /** TODO(#17162): This test should be done without the need of super admin, as
    * blog admin must be able to revoke blog editor role of other users from the
@@ -86,7 +86,7 @@ describe('Blog Admin', function () {
       await guestUsr1.closeBrowser();
       await guestUsr2.closeBrowser();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
