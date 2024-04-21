@@ -37,7 +37,7 @@ describe('Logged-in User', function () {
       'exploration_creator@example.com'
     );
 
-    await explorationCreator.createEndExploration();
+    await explorationCreator.createExplorationWithOnlyEndInteraction();
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(

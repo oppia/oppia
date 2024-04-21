@@ -67,6 +67,7 @@ const CONSOLE_ERRORS_TO_IGNORE = [
       'the server responded with a status of 405 ()',
     'g'
   ),
+  new RegExp('ERROR CONTEXT JSHandle@object.*'),
 ];
 
 const CONSOLE_ERRORS_TO_FIX = [
@@ -79,6 +80,10 @@ const CONSOLE_ERRORS_TO_FIX = [
     'http://localhost:8181/dist/oppia-angular/midi/examples/soundfont/acoustic' +
       '_grand_piano-ogg.js Failed to load resource: the server responded with a ' +
       'status of 404 (Not Found)'
+  ),
+  // TODO(#20189): ExpressionChangedAfterItHasBeenCheckedError console error In creator dashboard's Subscribers tab.
+  new RegExp(
+    "ExpressionChangedAfterItHasBeenCheckedError: Expression has changed after it was checked. Previous value: 'srcset: .*'\\. Current value: 'srcset: .*'\\."
   ),
 ];
 

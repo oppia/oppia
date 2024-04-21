@@ -752,7 +752,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function for creating an exploration with only EndExploration interaction.
    */
-  async createEndExploration(): Promise<string | null> {
+  async createExplorationWithOnlyEndInteraction(): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.clickOn(createExplorationButton);
     await this.page.waitForSelector(
