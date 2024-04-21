@@ -137,10 +137,8 @@ export class VoiceoverAdmin extends BaseUser {
       await this.clearAllTextFrom(voiceArtistUsernameInputBox);
       await this.type(voiceArtistUsernameInputBox, voiceArtists[i]);
       await this.clickOn(saveVoiceoverArtistEditButton);
-      /**
-       * Adding try catch here to avoid unnecessary waiting for selector if
-       * the added voice artist is not a user.
-       */
+      // Adding try catch here to avoid unnecessary waiting for selector if
+      // the added voice artist is not an user.
       try {
         await this.page.waitForSelector(
           `div.e2e-test-voice-artist-${voiceArtists[i]}`,

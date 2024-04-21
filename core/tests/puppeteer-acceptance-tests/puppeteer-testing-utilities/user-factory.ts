@@ -31,9 +31,9 @@ import {QuestionAdminFactory} from '../user-utilities/question-admin-utils';
 import {BlogPostEditorFactory} from '../user-utilities/blog-post-editor-utils';
 import {VoiceoverAdminFactory} from '../user-utilities/voiceover-admin-utils';
 import {
-  ExplorationCreatorFactory,
-  ExplorationCreator,
-} from '../user-utilities/exploration-creator-utils';
+  ExplorationEditorFactory,
+  ExplorationEditor,
+} from '../user-utilities/exploration-editor-utils';
 import {CurriculumAdminFactory} from '../user-utilities/curriculum-admin-utils';
 import testConstants from './test-constants';
 
@@ -147,11 +147,11 @@ export class UserFactory {
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>
   ): Promise<
-    LoggedInUser & ExplorationCreator & MultipleRoleIntersection<TRoles>
+    LoggedInUser & ExplorationEditor & MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedInUserFactory(),
-      ExplorationCreatorFactory(),
+      ExplorationEditorFactory(),
     ]);
     await user.openBrowser();
     await user.signUpNewUser(username, email);

@@ -19,18 +19,20 @@
 
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {VoiceoverAdmin} from '../../user-utilities/voiceover-admin-utils';
-import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
+import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const invalidIdErrorToastMessage =
   'Sorry, we could not find the specified user.';
+enum INTERACTION_TYPES {
+  END_EXPLORATION = 'End Exploration',
+}
 
 // The backend 400 error is a known consequence of adding an invalid user ID.
 // By ignoring it, we prevent noise in the test output and focus on other unexpected errors.
-//
 // The frontend toast message is directly asserted by test case, ensuring it is displayed correctly.
 
 ConsoleReporter.setConsoleErrorsToIgnore([
@@ -42,7 +44,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 
 describe('Voiceover Admin', function () {
   let voiceoverAdmin: VoiceoverAdmin;
-  let explorationCreator: ExplorationCreator;
+  let explorationEditor: ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -52,33 +54,29 @@ describe('Voiceover Admin', function () {
       [ROLES.VOICEOVER_ADMIN]
     );
 
-    explorationCreator = await UserFactory.createNewUser(
-      'explorationCreator',
-      'exploration_creator@example.com'
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
     async function () {
-      await explorationCreator.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.dismissWelcomeModal();
 
-      await explorationCreator.createNewExploration();
-      await explorationCreator.dismissWelcomeModal();
-      await explorationCreator.updateExplorationIntroText('Exploration one');
-      await explorationCreator.updateCardName('Test');
-      await explorationCreator.addEndInteraction();
-
-      await explorationCreator.navigateToSettingsTab();
-
-      await explorationCreator.updateTitleTo('Exploration one');
-      await explorationCreator.updateGoalTo('Exploration one');
-      await explorationCreator.selectCategory('Algebra');
-      await explorationCreator.selectLanguage('Arabic');
-      await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
-      await explorationCreator.saveDraftExploration();
-
-      explorationId = await explorationCreator.publishExploration();
+      await explorationEditor.createExplorationWithMinimumContent(
+        'Exploration one',
+        INTERACTION_TYPES.END_EXPLORATION
+      );
+      await explorationEditor.saveExplorationDraft();
+      explorationId = await explorationEditor.publishExplorationWithContent(
+        'Exploration one',
+        'Exploration one',
+        'Algebra'
+      );
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.dismissWelcomeModal();
@@ -96,7 +94,7 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.closeToastMessage();
       await voiceoverAdmin.verifyVoiceoverArtistStillOmitted('invalidUserId');
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -106,24 +104,19 @@ describe('Voiceover Admin', function () {
         'voiceoverartist',
         'voiceoverartist@example.com'
       );
-      await explorationCreator.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorPage();
 
-      await explorationCreator.createNewExploration();
-      await explorationCreator.updateExplorationIntroText('Exploration two');
-      await explorationCreator.updateCardName('Test');
-      await explorationCreator.addEndInteraction();
-
-      await explorationCreator.navigateToSettingsTab();
-
-      await explorationCreator.updateTitleTo('Exploration two');
-      await explorationCreator.updateGoalTo('Exploration two');
-      await explorationCreator.selectCategory('Algebra');
-      await explorationCreator.selectLanguage('Arabic');
-      await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
-      await explorationCreator.saveDraftExploration();
-
-      explorationId = await explorationCreator.publishExploration();
-
+      await explorationEditor.createExplorationWithMinimumContent(
+        'Exploration two',
+        INTERACTION_TYPES.END_EXPLORATION
+      );
+      await explorationEditor.saveExplorationDraft();
+      explorationId = await explorationEditor.publishExplorationWithContent(
+        'Exploration one',
+        'Exploration one',
+        'Algebra'
+      );
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.navigateToExplorationSettingsTab();
 
@@ -138,7 +131,7 @@ describe('Voiceover Admin', function () {
         'voiceoverartist'
       );
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {

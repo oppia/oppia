@@ -30,7 +30,7 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
             </a>
           </li>
-          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
+          <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-preview-button" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
             <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
                class="oppia-exploration-editor-tabs-dropdown-element">
               <i class="fa fa-play oppia-mobile-exploration-editor-tabs-icon"></i>

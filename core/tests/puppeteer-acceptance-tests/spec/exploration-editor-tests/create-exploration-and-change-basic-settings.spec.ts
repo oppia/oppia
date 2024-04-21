@@ -21,11 +21,14 @@ import {showMessage} from '../../puppeteer-testing-utilities/show-message-utils'
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {CurriculumAdmin} from '../../user-utilities/curriculum-admin-utils';
-import {ExplorationCreator} from '../../user-utilities/exploration-creator-utils';
+import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 import {VoiceoverAdmin} from '../../user-utilities/voiceover-admin-utils';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
+enum INTERACTION_TYPES {
+  END_EXPLORATION = 'End Exploration',
+}
 
 /**
  * After deleting the exploration if we want to access the exploration with the
@@ -40,17 +43,17 @@ ConsoleReporter.setConsoleErrorsToIgnore([
 ]);
 
 describe('Exploration Creator', function () {
-  let explorationCreator: ExplorationCreator;
+  let explorationEditor: ExplorationEditor;
   let voiceoverAdmin: VoiceoverAdmin;
   let curriculumAdmin: CurriculumAdmin;
   let explorationId: string | null;
 
   beforeAll(async function () {
-    explorationCreator = await UserFactory.createNewUser(
-      'explorationCreator',
-      'exploration_creator@example.com'
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
     );
-    showMessage('explorationCreator is signed up successfully');
+    showMessage('explorationEditor is signed up successfully.');
 
     voiceoverAdmin = await UserFactory.createNewUser(
       'voiceoverAdm',
@@ -86,55 +89,57 @@ describe('Exploration Creator', function () {
     );
     showMessage('guestUser3 is signed up successfully.');
     await guestUser3.closeBrowser();
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should create an exploration and modify it via the Settings tab',
     async function () {
-      await explorationCreator.navigateToCreatorDashboardPage();
-      await explorationCreator.createNewExploration();
-      await explorationCreator.dismissWelcomeModal();
-      await explorationCreator.updateExplorationIntroText(
-        'Exploration intro text'
+      await explorationEditor.navigateToCreatorDashboardPage();
+
+      await explorationEditor.navigateToExplorationEditorPage();
+
+      await explorationEditor.dismissWelcomeModal();
+
+      await explorationEditor.createExplorationWithMinimumContent(
+        'Exploration intro text',
+        INTERACTION_TYPES.END_EXPLORATION
       );
-      await explorationCreator.updateCardName('Test');
-      await explorationCreator.addEndInteraction();
 
-      await explorationCreator.navigateToSettingsTab();
+      await explorationEditor.navigateToSettingsTab();
 
-      await explorationCreator.updateTitleTo(
+      await explorationEditor.updateTitleTo(
         'This title is too long and will be truncated'
       );
       /**
        * Here expecting title to be truncated to 36 characters. It is the default
        * behavior of title input bar.
        */
-      await explorationCreator.expectTitleToBe(
+      await explorationEditor.expectTitleToBe(
         'This title is too long and will be t'
       );
 
-      await explorationCreator.updateGoalTo('OppiaAcceptanceTestsCheck');
-      await explorationCreator.expectGoalToBe('OppiaAcceptanceTestsCheck');
+      await explorationEditor.updateGoalTo('OppiaAcceptanceTestsCheck');
+      await explorationEditor.expectGoalToBe('OppiaAcceptanceTestsCheck');
 
-      await explorationCreator.selectCategory('Algebra');
-      await explorationCreator.expectSelectedCategoryToBe('Algebra');
+      await explorationEditor.selectCategory('Algebra');
+      await explorationEditor.expectSelectedCategoryToBe('Algebra');
 
-      await explorationCreator.selectLanguage('Arabic');
-      await explorationCreator.expectSelectedLanguageToBe('Arabic');
+      await explorationEditor.selectLanguage('Arabic');
+      await explorationEditor.expectSelectedLanguageToBe('Arabic');
 
-      await explorationCreator.addTags(['TagA', 'TagB', 'TagC']);
-      await explorationCreator.expectTagsToMatch(['TagA', 'TagB', 'TagC']);
+      await explorationEditor.addTags(['TagA', 'TagB', 'TagC']);
+      await explorationEditor.expectTagsToMatch(['TagA', 'TagB', 'TagC']);
 
-      await explorationCreator.previewSummary();
+      await explorationEditor.previewSummary();
 
-      await explorationCreator.enableAutomaticTextToSpeech();
+      await explorationEditor.enableAutomaticTextToSpeech();
 
-      await explorationCreator.assignUserToCollaboratorRole('guestUser1');
-      await explorationCreator.assignUserToPlaytesterRole('guestUser2');
+      await explorationEditor.assignUserToCollaboratorRole('guestUser1');
+      await explorationEditor.assignUserToPlaytesterRole('guestUser2');
 
-      await explorationCreator.saveDraftExploration();
-      explorationId = await explorationCreator.publishExploration();
-      await explorationCreator.optInToEmailNotifications();
+      await explorationEditor.saveExplorationDraft();
+      explorationId = await explorationEditor.publishExploration();
+      await explorationEditor.optInToEmailNotifications();
 
       await voiceoverAdmin.navigateToExplorationEditor(explorationId);
       await voiceoverAdmin.dismissWelcomeModal();
@@ -152,11 +157,11 @@ describe('Exploration Creator', function () {
       await curriculumAdmin.openExplorationControlDropdown();
       await curriculumAdmin.deleteExplorationPermanently();
 
-      await explorationCreator.expectExplorationToBeNotAccessibleByUrl(
+      await explorationEditor.expectExplorationToBeNotAccessibleByUrl(
         explorationId
       );
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
