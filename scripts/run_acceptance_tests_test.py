@@ -367,6 +367,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         lines = output_file.readlines()
         for i in range(0, len(lines), 2):
             self.assertTrue(lines[i].startswith('Spec started'))
-            self.assertTrue('passed' in lines[i+1] or 'failed' in lines[i+1])
+            self.assertTrue('passed' in lines[i + 1] or 'failed' in lines[i + 1])
 
     os.remove('test_output.log')
