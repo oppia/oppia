@@ -20,6 +20,7 @@ import path from 'path';
 
 export default {
   URLs: {
+    BaseURL: 'http://localhost:8181',
     About: 'http://localhost:8181/about',
     AboutFoundation: 'http://localhost:8181/about-foundation',
     AdminPage: 'http://localhost:8181/admin',
@@ -72,6 +73,7 @@ export default {
     BLOG_ADMIN: 'blog admin',
     BLOG_POST_EDITOR: 'blog post editor',
     QUESTION_ADMIN: 'question admin',
+    VOICEOVER_ADMIN: 'voiceover admin',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',
@@ -86,5 +88,5 @@ export default {
       '../images/blog-post-thumbnail.svg'
     ),
   },
-  DEFAULT_SPEC_TIMEOUT: 300000,
+  DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };

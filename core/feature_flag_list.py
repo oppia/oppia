@@ -50,6 +50,7 @@ class FeatureNames(enum.Enum):
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     NEW_LESSON_PLAYER = 'new_lesson_player'
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
+    AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -75,7 +76,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW
+    FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -201,6 +203,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value: (
+        (
+            'The flag allows auto-updating of the exploration voice artists '
+            'link model after an exploration update.',
             feature_flag_domain.ServerMode.DEV
         )
     )
