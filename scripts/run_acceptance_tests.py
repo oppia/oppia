@@ -102,9 +102,15 @@ def compile_test_ts_files() -> None:
 def print_test_output(output_lines: List[bytes]) -> None:
     """Print the test output lines to a separate file."""
     with open('test_output.log', 'w', encoding='utf-8') as output_file:
+        last_spec_started_line = None
         for line in output_lines:
             line_text = line.decode('utf-8')
-            if 'passed' in line_text.lower() or 'failed' in line_text.lower():
+            if line_text.startswith('Spec started'):
+                last_spec_started_line = line_text
+            elif 'passed' in line_text.lower() or 'failed' in line_text.lower():
+                if last_spec_started_line:
+                    output_file.write(last_spec_started_line + '\n')
+                    last_spec_started_line = None
                 output_file.write(line_text + '\n')
 
 
