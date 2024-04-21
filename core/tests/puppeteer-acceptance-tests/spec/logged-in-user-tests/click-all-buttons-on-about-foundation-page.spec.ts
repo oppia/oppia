@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User in About Foundation page', function () {
   let testUser: LoggedInUser;
@@ -31,18 +31,18 @@ describe('Logged-in User in About Foundation page', function () {
       'testuser',
       'testuser@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
     await testUser.navigateToAboutFoundationPage();
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open the page with the 61 million children link.',
     async function () {
       await testUser.click61MillionChildrenLinkInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -50,7 +50,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickEvenThoseWhoAreInSchoolLinkInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -58,7 +58,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickSourceUnescoLinkInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -66,7 +66,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.click420MillionLinkInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -74,7 +74,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickLearnMoreAboutOppiaButtonInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -82,7 +82,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickBecomeAVolunteerButtonInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -91,7 +91,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickConsiderBecomingAPartnerTodayLinkInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -100,7 +100,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickJoinOurLargeVolunteerCommunityLinkInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -108,7 +108,7 @@ describe('Logged-in User in About Foundation page', function () {
     async function () {
       await testUser.clickDonationsLinkInAboutFoundation();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
