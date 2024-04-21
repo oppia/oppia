@@ -114,7 +114,7 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 export class ExplorationEditor extends BaseUser {
   /**
-   * Function to navigate to creator dashboard page
+   * Function to navigate to creator dashboard page.
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.page.goto(creatorDashboardPage);
@@ -122,7 +122,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to navigate to exploration editor
+   * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
     await this.clickOn(createExplorationButton);
@@ -213,7 +213,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to dismiss welcome modal
+   * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
