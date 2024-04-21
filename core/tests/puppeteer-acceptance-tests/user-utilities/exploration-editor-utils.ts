@@ -31,7 +31,7 @@ const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 
-//Settings Tab elements
+// Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const addGoalInputBox = '.e2e-test-exploration-objective-input';
