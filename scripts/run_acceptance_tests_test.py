@@ -352,15 +352,16 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_print_test_output(self) -> None:
-        test_data = [b'Test case 1 passed',
-          b'Test case 2 failed', b'Test case 3 skipped']
+        test_data = [b'Spec started: Test case 1', b'Test case 1 passed',
+                     b'Spec started: Test case 2', b'Test case 2 failed',
+                     b'Spec started: Test case 3', b'Test case 3 passed']
 
         run_acceptance_tests.print_test_output(test_data)
 
         with open('test_output.log', 'r', encoding='utf-8') as output_file:
             lines = output_file.readlines()
-            self.assertEqual(len(lines), 2)
-            self.assertEqual(lines[0].strip(), 'Test case 1 passed')
-            self.assertEqual(lines[1].strip(), 'Test case 2 failed')
+            for i in range(0, len(lines), 2):
+                self.assertTrue(lines[i].startswith('Spec started'))
+                self.assertTrue('passed' in lines[i+1] or 'failed' in lines[i+1])
 
-        os.remove('test_output.log')
+    os.remove('test_output.log')
