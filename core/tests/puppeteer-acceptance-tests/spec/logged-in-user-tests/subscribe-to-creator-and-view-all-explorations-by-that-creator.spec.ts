@@ -51,6 +51,7 @@ describe('Logged-in User', function () {
 
       await explorationCreator.refreshPage();
       await explorationCreator.expectNumberOfSubscribersToBe(1);
+
       await explorationCreator.openSubscribersTab();
       await explorationCreator.expectUserToBeASubscriber('testLearner');
 

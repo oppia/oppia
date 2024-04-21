@@ -136,6 +136,11 @@ const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
 const saveContentButton = 'button.e2e-test-save-state-content';
+const mobileExplorationEditorOptions = '.e2e-test-mobile-options';
+const saveDraftMobileButton = '.e2e-test-save-changes-for-small-screens';
+const explorationMobileDropdown = '.e2e-test-mobile-changes-dropdown';
+const publishExplorationMobileButton = '.e2e-test-mobile-publish-button';
+const toastMessage = '.e2e-test-toast-message';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -773,13 +778,24 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(interactionEndExplorationInputButton);
     await this.clickOn(saveInteractionButton);
-    await this.clickOn(saveChangesButton);
-    await this.clickOn(saveDraftButton);
 
-    await this.page.waitForSelector(
-      `${publishExplorationButton}:not([disabled])`
-    );
-    await this.clickOn(publishExplorationButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(mobileExplorationEditorOptions);
+      await this.clickOn(saveDraftMobileButton);
+      await this.clickOn(saveDraftButton);
+      await this.page.waitForSelector(toastMessage, {visible: true});
+      await this.page.waitForSelector(toastMessage, {visible: false});
+      await this.clickOn(explorationMobileDropdown);
+      await this.clickOn(publishExplorationMobileButton);
+    } else {
+      await this.clickOn(saveChangesButton);
+      await this.clickOn(saveDraftButton);
+      await this.page.waitForSelector(
+        `${publishExplorationButton}:not([disabled])`
+      );
+      await this.clickOn(publishExplorationButton);
+    }
+
     await this.type(explorationTitleInput, 'Test Exploration');
     await this.type(explorationGoalInput, 'Test Exploration');
     await this.clickOn(explorationCategoryDropdown);
@@ -808,7 +824,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function for subscribing to a creator.
+   * Function for subscribing to a creator with given username.
    */
   async subscribeToCreator(username: string): Promise<void> {
     await this.navigateToProfilePage(username);
