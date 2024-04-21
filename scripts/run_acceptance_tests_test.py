@@ -20,6 +20,7 @@ import contextlib
 import os
 import subprocess
 import sys
+from unittest import mock
 
 from core.constants import constants
 from core.tests import test_utils
@@ -353,20 +354,71 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
     def test_print_test_output(self) -> None:
         test_data = [
-            b'Spec started: Test case 1', 
+            b'Spec started: Test Suite 1',
             b'Test case 1 passed',
-            b'Spec started: Test case 2', 
             b'Test case 2 failed',
-            b'Spec started: Test case 3', 
-            b'Test case 3 passed'
+            b'Spec started: Test Suite 2',
+            b'Test case 3 passed',
+            b'Test case 4 skipped',
+            b'Test case 5 failed',
+        ]
+        expected_output = [
+            'Spec started: Test Suite 1',
+            'Test case 1 passed',
+            'Test case 2 failed',
+            'Spec started: Test Suite 2',
+            'Test case 3 passed',
+            'Test case 5 failed',
         ]
 
-    run_acceptance_tests.print_test_output(test_data)
+        run_acceptance_tests.print_test_output(test_data)
 
-    with open('test_output.log', 'r', encoding='utf-8') as output_file:
-        lines = output_file.readlines()
-        for i in range(0, len(lines), 2):
-            self.assertTrue(lines[i].startswith('Spec started'))
-            self.assertTrue('passed' in lines[i + 1] or 'failed' in lines[i + 1])
+        with open(
+            self.test_output_file_path, 'r', encoding='utf-8'
+        ) as output_file:
+            lines = output_file.readlines()
 
-    os.remove('test_output.log')
+        self.assertEqual(len(lines), len(expected_output))
+        for line, expected_line in zip(lines, expected_output):
+            self.assertEqual(line.strip(), expected_line)
+
+    @mock.patch(
+        'builtins.open', new_callable=mock.mock_open
+    )
+    def test_print_test_output_with_io_error(
+        self, mock_open: mock.MagicMock
+    ) -> None:
+        mock_open.side_effect = IOError('Failed to open file')
+        test_data = [
+            b'Spec started: Test Suite', 
+            b'Test case 1 passed'
+        ]
+
+        with self.assertRaises(IOError):
+            run_acceptance_tests.print_test_output(test_data)
+
+        mock_open.assert_called_once_with(
+            self.test_output_file_path, 'w', encoding='utf-8'
+        )
+
+    def test_print_test_output_results(self) -> None:
+        test_data = [
+            b'Spec started: Test case 1',
+            b'Test case 1 passed',
+            b'Spec started: Test case 2',
+            b'Test case 2 failed',
+            b'Spec started: Test case 3',
+            b'Test case 3 skipped'
+        ]
+
+        run_acceptance_tests.test_print_test_output_results(test_data)
+
+        with open('test_output.log', 'r', encoding='utf-8') as output_file:
+            lines = output_file.readlines()
+            self.assertEqual(len(lines), 4)
+            self.assertEqual(lines[0].strip(), 'Spec started: Test case 1')
+            self.assertEqual(lines[1].strip(), 'Test case 1 passed')
+            self.assertEqual(lines[2].strip(), 'Spec started: Test case 2')
+            self.assertEqual(lines[3].strip(), 'Test case 2 failed')
+
+        os.remove('test_output.log')
