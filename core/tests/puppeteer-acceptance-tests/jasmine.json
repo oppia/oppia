@@ -5,7 +5,7 @@
   "env": {
     "failSpecWithNoExpectations": false,
     "stopSpecOnExpectationFailure": false,
-    "stopOnSpecFailure": false,
+    "stopOnSpecFailure": true,
     "random": false
   }
 }
