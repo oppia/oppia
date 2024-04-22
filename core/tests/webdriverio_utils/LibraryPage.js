@@ -20,6 +20,7 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 var forms = require('./forms.js');
+var general = require('./general.js');
 
 var LibraryPage = function () {
   var LIBRARY_URL_SUFFIX = '/community-library';
@@ -108,6 +109,16 @@ var LibraryPage = function () {
 
   this.getHomePage = async function () {
     await action.click('Oppia logo', oppiaLogo);
+    await waitFor.textToBePresentInElement(
+      homeSection,
+      'Home',
+      'Library page takes too long to load'
+    );
+  };
+
+  this.getHomePageWithAlert = async function () {
+    await action.click('Oppia logo', oppiaLogo);
+    await general.acceptAlert();
     await waitFor.textToBePresentInElement(
       homeSection,
       'Home',

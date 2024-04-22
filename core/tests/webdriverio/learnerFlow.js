@@ -260,9 +260,7 @@ describe('Learner dashboard functionality', function () {
     }
     // User clicks on Oppia logo to leave exploration, user should be
     // able to always get an alert message.
-    await libraryPage.getHomePage();
-    await waitFor.alertToBePresent();
-    await general.acceptAlert();
+    await libraryPage.getHomePageWithAlert();
 
     // Go to 'Test Exploration'.
     await libraryPage.get();
@@ -421,10 +419,8 @@ describe('Learner dashboard functionality', function () {
       await explorationPlayerPage.expectExplorationToNotBeOver();
     }
     // User clicks on Oppia logo to leave collection, user should be
-    // able to always get an alert message.
+    // able to leave the page directly without getting any alert message.
     await libraryPage.getHomePage();
-    await waitFor.alertToBePresent();
-    await general.acceptAlert();
 
     // Learner Dashboard should display
     // 'Test Collection' as incomplete.
