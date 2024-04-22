@@ -16,6 +16,7 @@
  * @fileoverview End-to-end tests for user management.
  */
 
+var _ = require('lodash');
 var action = require('../webdriverio_utils/action.js');
 var CollectionEditorPage = require('../webdriverio_utils/CollectionEditorPage.js');
 var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
@@ -309,8 +310,11 @@ describe('Site language', function () {
       // The following errors are ignored since we are visting the /learn/math
       // page when the classroom hasn't actually been created.
       'The requested path /learn/math is not found.',
-      '/access_validation_handler/can_access_classroom_page?classroom_url_fragment=math - ' +
-        'Failed to load resource: the server responded with a status of 404 (Not Found)',
+      _.escapeRegExp(
+        'http://localhost:8181/access_validation_handler/can_access_classroom_page' +
+          '?classroom_url_fragment=math - Failed to load resource: the server ' +
+          'responded with a status of 404 (Not Found)'
+      ),
     ]);
   });
 });
