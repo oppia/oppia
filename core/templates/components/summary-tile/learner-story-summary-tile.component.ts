@@ -95,7 +95,7 @@ export class LearnerStorySummaryTileComponent implements OnInit {
         }
       }
     }
-    /* For classroom navigation */
+
     return this.urlInterpolationService.interpolateUrl(
       TopicViewerDomainConstants.STORY_VIEWER_URL_TEMPLATE,
       {

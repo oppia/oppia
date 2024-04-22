@@ -73,7 +73,7 @@ export class LessonCardComponent implements OnInit {
         completedStories === this.story.getAllNodes().length
           ? completedStories - 1
           : completedStories;
-      /* Last completed story index works because if 1 is completed, 1 index is 2nd item */
+
       let lessonArgs = {
         classroom: this.story.getClassroomUrlFragment(),
         topicFragment: this.story.getTopicUrlFragment(),
@@ -88,7 +88,6 @@ export class LessonCardComponent implements OnInit {
       );
       this.lessonTopic = this.topic;
     } else {
-      /* Implementation for explorations & collections */
       this.desc = this.story.objective;
       this.imgColor = this.story.thumbnailBgColor;
       this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
@@ -98,7 +97,7 @@ export class LessonCardComponent implements OnInit {
       this.title = this.story.title;
 
       if (this.story instanceof CollectionSummary) {
-        this.lessonUrl = '';
+        this.lessonUrl = `/collection/${this.story.id}`;
         this.lessonTopic = 'Collections';
       } else {
         this.lessonUrl = `/explore/${this.story.id}`;
