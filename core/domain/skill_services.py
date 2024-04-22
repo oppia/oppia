@@ -17,9 +17,9 @@
 from __future__ import annotations
 
 import collections
+import copy
 import itertools
 import logging
-import copy
 
 from core import feconf
 from core.constants import constants
@@ -39,8 +39,8 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import (
-    Callable, Dict, List, Literal, Optional, Set, Tuple, cast, overload)
+from typing import (Callable, Dict, List, Literal, Optional, Set, Tuple, cast, 
+                    overload)
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -598,6 +598,7 @@ def remove_skill_from_all_topics(user_id: str, skill_id: str) -> None:
 
 def remove_skill_id_from_all_prerequisites(skill_id: str) -> None:
     """Removes the skill with the given id from every skill's prerequisite list
+
     Args:
         skill_id: str. ID of the skill to be removed.
     """
@@ -615,14 +616,16 @@ def remove_skill_id_from_all_prerequisites(skill_id: str) -> None:
         skill_models.SkillModel.update_timestamps_multi(new_skill_models)
         skill_models.SkillModel.put_multi(new_skill_models)
     if cache_skills:
-        caching_services.set_multi(caching_services.CACHE_NAMESPACE_SKILL, None, cache_skills)
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_SKILL, None, cache_skills)
 
 
 def replace_skill_id_in_all_prerequisites(
         old_skill_id: str, new_skill_id: str) -> None:
     """Removes the skill with the given id from every skill's prerequisite list
-    and adds new_skill_id to their prerequisite list. Used when a skill 
-    is merged into another
+    and adds new_skill_id to their prerequisite list. Used when a skill
+    is merged into another.
+
     Args:
         old_skill_id: str. ID of the skill to be removed.
         new_skill_id: str. ID of the skill to be added.
