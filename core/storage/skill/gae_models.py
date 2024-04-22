@@ -253,6 +253,21 @@ class SkillModel(base_models.VersionedModel):
             found.
         """
         return cls.get_all().filter(cls.description == description).get()
+    
+    @classmethod
+    def get_by_prerequisite(cls, skillid: str) -> Optional[SkillModel]:
+        """Gets SkillModels that contain the prerequisite defined by
+        skillid. Returns None if the skill with description doesn't
+        exist.
+
+        Args:
+            description: str. The prerequisite's skillid.
+
+        Returns:
+            SkillModel|None. The skill models of the skill or None if not
+            found.
+        """
+        return cls.get_all().filter(cls.prerequisite_skill_ids == skillid).fetch()
 
 
 class SkillSummaryModel(base_models.BaseModel):
