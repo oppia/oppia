@@ -18,11 +18,15 @@
 
 from __future__ import annotations
 
+import collections
 import json
 import os
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
+from core.domain import exp_domain
+from core.domain import feature_flag_services
 from core.domain import state_domain
 from core.domain import user_services
 from core.domain import voiceover_domain
@@ -509,3 +513,87 @@ def create_exploration_voice_artists_link_model_instance(
     exploration_voice_artists_link_model.update_timestamps()
 
     return exploration_voice_artists_link_model
+
+
+def update_exploration_voice_artist_link_model(
+    user_id: str,
+    change_list: Sequence[exp_domain.ExplorationChange],
+    old_exploration: exp_domain.Exploration,
+    updated_exploration: exp_domain.Exploration
+) -> None:
+    """Create or update a voice artist link model following modifications to
+    the recorded voiceover property in an exploration's state.
+
+    Args:
+        user_id: str. The committer ID for the given change list.
+        change_list: list(ExplorationChange). A list of exploration change
+            objects.
+        old_exploration: Exploration. An instance of exploration class
+            representing an old version.
+        updated_exploration: Exploration. An instance of exploration class
+            representing the latest version.
+    """
+
+    if not feature_flag_services.is_feature_flag_enabled(
+            None,
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value):
+        return
+
+    is_voiceover_changes_made: bool = False
+    for change in change_list:
+        if (
+            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            change.property_name == (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS)
+        ):
+            is_voiceover_changes_made = True
+            break
+
+    if not is_voiceover_changes_made:
+        return
+
+    old_filenames: List[str] = []
+    for state in old_exploration.states.values():
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
+        for lang_code_to_voiceovers in voiceovers_mapping.values():
+            for voiceover_dict in lang_code_to_voiceovers.values():
+                old_filenames.append(voiceover_dict.filename)
+
+    exp_voice_artist_link_model = (
+        voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+            updated_exploration.id, strict=False))
+
+    content_id_to_voiceovers_mapping: (
+        voiceover_domain.ContentIdToVoiceoverMappingType) = (
+            collections.defaultdict(dict))
+
+    if exp_voice_artist_link_model is not None:
+        content_id_to_voiceovers_mapping.update(
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping)
+
+    for state in updated_exploration.states.values():
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
+        for content_id, lang_code_to_voiceovers in voiceovers_mapping.items():
+            for lang_code, voiceover_dict in lang_code_to_voiceovers.items():
+                filename = voiceover_dict.filename
+
+                if filename in old_filenames:
+                    continue
+                content_id_to_voiceovers_mapping[content_id][lang_code] = (
+                    user_id, voiceover_dict.to_dict())
+
+    if exp_voice_artist_link_model is None:
+        exp_voice_artist_link_model = (
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id=updated_exploration.id,
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+    else:
+        exp_voice_artist_link_model.content_id_to_voiceovers_mapping = (
+            content_id_to_voiceovers_mapping)
+
+    exp_voice_artist_link_model.update_timestamps()
+    exp_voice_artist_link_model.put()

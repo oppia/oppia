@@ -80,7 +80,7 @@
 
       <li [ngClass]="{'navbar-tab-active': getActiveTabName() === 'settings', 'oppia-disabled-tab': !connectedToInternet}" class="nav-item icon nav-list-item e2e-test-settings-tab"
           (click)="!connectedToInternet || selectSettingsTab()" [ngbTooltip]="'Settings does not work when offline.'" [disableTooltip]="connectedToInternet" placement="bottom">
-        <a class="nav-link  navbar-tab"
+        <a class="nav-link navbar-tab e2e-test-exploration-settings-tab"
            [ngbTooltip]="'Settings'"
            placement="bottom"
            tabindex="0"

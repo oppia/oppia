@@ -312,6 +312,8 @@ jobs:
           suite:
             - blog-admin-tests/assign-roles-to-users-and-change-tag-properties
             - blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked
+            - exploration-editor-tests/load-complete-and-restart-exploration-preview
+            - exploration-editor-tests/create-exploration-and-change-basic-settings
             - logged-in-user-tests/click-all-buttons-on-about-foundation-page
             - logged-in-user-tests/click-all-buttons-on-about-page
             - logged-in-user-tests/click-all-buttons-on-navbar
@@ -327,6 +329,7 @@ jobs:
             - practice-question-admin-tests/add-and-remove-contribution-rights
             - translation-admin-tests/add-translation-rights
             - translation-admin-tests/remove-translation-rights
+            - voiceover-admin-tests/add-voiceover-artist-to-an-exploration
       steps:
         - uses: actions/checkout@v3
         - uses: actions/setup-python@v3
