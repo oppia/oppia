@@ -20,16 +20,17 @@ import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 import {ElementHandle} from 'puppeteer';
+import {values} from 'lodash';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const previewTabButton = '.e2e-test-preview-tab';
 const SettingsTabButton = '.e2e-test-settings-tab';
 const MainTabButton = '.e2e-test-main-tab';
 const HistoryTabButton = '.e2e-test-history-tab';
-const mobileSettingsTabButton = '.e2e-test-mobile-settings-tab';
-const mobilePreviewTabButton = '.e2e-test-mobile-preview-tab';
-const mobileHistoryTabButton = '.e2e-test-mobile-history-tab';
-const mobileMainTabButton = '.e2e-test-mobile-main-tab';
+const mobileSettingsTabButton = '.e2e-test-mobile-settings-tab-button';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-tab-button';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-tab-button';
+const mobileMainTabButton = '.e2e-test-mobile-main-tab-button';
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -463,7 +464,6 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(SettingsTabButton);
     }
-    await this.page.waitForNavigation();
   }
 
   async updateExplorationTitle(title: string): Promise<void> {
@@ -478,7 +478,6 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(MainTabButton);
     }
-    await this.page.waitForNavigation();
   }
 
   async navigateToHistoryTab(): Promise<void> {
@@ -489,7 +488,6 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(HistoryTabButton);
     }
-    await this.page.waitForNavigation();
   }
 
   /**
@@ -647,85 +645,106 @@ export class ExplorationEditor extends BaseUser {
     revisionIndex1: number,
     revisionIndex2: number
   ): Promise<void> {
+    if (revisionIndex1 === revisionIndex2) {
+      throw new Error('Both revision indexes cannot be the same.');
+    }
+
     await this.page.waitForSelector(firstRevisionDropdown);
     await this.clickOn(firstRevisionDropdown);
-    const panel1 = '.mat-select-panel';
+    const panel1 = '#mat-select-0-panel';
+    await this.page.waitForSelector(
+      `${panel1} mat-option:nth-last-child(${revisionIndex1})`
+    );
     await this.clickOn(
       `${panel1} mat-option:nth-last-child(${revisionIndex1})`
     );
+
     await this.page.waitForSelector(secondRevisionDropdown);
     await this.clickOn(secondRevisionDropdown);
     const panel2 = '#mat-select-2-panel';
+    await this.page.waitForSelector(
+      `${panel2} mat-option:nth-last-child(${revisionIndex2})`
+    );
     await this.clickOn(
       `${panel2} mat-option:nth-last-child(${revisionIndex2})`
     );
   }
 
   /**
-   * Function to verify if changes are reflected for each property.
+   * Function to verify if changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
-   * @param {any[]} codeBlocks - The code blocks to check.
    */
-  async expectChangesInProperties(
-    properties: string[],
-    codeBlocks: ElementHandle<Element>[]
-  ): Promise<void> {
+  async expectChangesInProperties(properties: string[]): Promise<void> {
     // Function to extract property values from a block.
-    const extractPropertyValues = async block => {
+    const extractPropertyValues = async () => {
       const values = {};
       for (let property of properties) {
-        const element = await block.$x(
-          `.//span[contains(text(), '${property}')]`
+        await this.page.waitForSelector('.cm-atom', {visible: true});
+        const elements = await this.page.$$('.cm-atom');
+        console.log(elements.length);
+        const propertyElements = await Promise.all(
+          elements.map(async el => {
+            const textContent = await el.evaluate(node => node.textContent);
+            return textContent === property ? el : null;
+          })
         );
-        if (element[0]) {
-          const line = await element[0].$x('..');
-          const valueElement = await line[0].$('span:nth-child(3)');
-          values[property] = await valueElement?.evaluate(
-            node => node.textContent
-          );
+
+        const filteredElements = propertyElements.filter(el => el !== null);
+        console.log(filteredElements);
+
+        if (filteredElements.length >= 2) {
+          const line1 = filteredElements[0]
+            ? await filteredElements[0].evaluate(
+                el => el.nextElementSibling?.nextElementSibling?.textContent
+              )
+            : null;
+          const line2 = filteredElements[1]
+            ? await filteredElements[1].evaluate(
+                el => el.nextElementSibling?.nextElementSibling?.textContent
+              )
+            : null;
+
+          values[property] = [line1, line2];
         }
       }
       return values;
     };
 
-    // Extract property values from both blocks.
-    const propertyValues = await Promise.all(
-      codeBlocks.map(extractPropertyValues)
-    );
+    // Extract property values.
+    const propertyValues = await extractPropertyValues();
+    console.log(propertyValues);
 
-    // Check if the property values are the same in both blocks.
-    properties.forEach(property => {
-      if (propertyValues[0][property] !== propertyValues[1][property]) {
-        throw new Error(`Changes are not reflected in ${property}`);
+    // Check if the property values are the same for each property.
+    for (let property in propertyValues) {
+      if (propertyValues[property][0] === propertyValues[property][1]) {
+        throw new Error(`No changes are reflected in ${property}`);
       } else {
         showMessage(`Changes are reflected in ${property}.`);
       }
-    });
+    }
   }
 
   /**
-   * Function to verify if metadata changes are reflected for each property.
+   * Function to verify if metadata changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
    */
   async expectMetadataChangesInProperties(properties: string[]): Promise<void> {
     await this.page.waitForSelector(viewMetadataChangesButton, {visible: true});
     await this.clickOn(viewMetadataChangesButton);
-    const codeBlocks = await this.page.$$('.CodeMirror-code');
 
-    await this.expectChangesInProperties(properties, codeBlocks);
+    await this.expectChangesInProperties(properties);
 
     await this.clickOn(closeMetadataModal);
   }
 
   /**
-   * Function to verify if exploration state changes are reflected for each property.
+   * Function to verify if exploration state changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
    */
   async expectStateChangesInProperties(properties: string[]): Promise<void> {
     await this.clickOn(testNodeBackground);
-    const codeBlocks = await this.page.$$('.CodeMirror-code');
-
-    await this.expectChangesInProperties(properties, codeBlocks);
+    await this.page.waitForTimeout(2000);
+    await this.expectChangesInProperties(properties);
 
     await this.clickOn(closeStateModal);
   }
@@ -739,32 +758,43 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to download a specific revision.
-   * @param {number} index - The index of the revision to be downloaded.
+   * Function to find the button for a specific version.
+   * @param {number} version - The version number to find.
    */
-  async downloadRevisionAtIndex(index: number): Promise<void> {
+  async findOptionsButtonForVersion(version: number): Promise<ElementHandle> {
     const buttons = await this.page.$$('.history-table-option');
-    await buttons[index].click();
-    await this.page.waitForSelector(downloadVersionButton);
+    if (version - 1 < 0 || version - 1 >= buttons.length) {
+      throw new Error(`No button found for version ${version}`);
+    }
+    return buttons[version - 1];
+  }
+
+  /**
+   * Function to download a specific version.
+   * @param {number} version - The version number to be downloaded.
+   */
+  async downloadRevision(version: number): Promise<void> {
+    const button = await this.findOptionsButtonForVersion(version);
+    await button.click();
     await this.clickOn(downloadVersionButton);
   }
 
   /**
-   * Function to revert to a specific revision.
-   * @param {number} index - The index of the revision to revert to.
+   * Function to revert to a specific version.
+   * @param {number} version - The version number to revert to.
    */
-  async revertToRevisionAtIndex(index: number): Promise<void> {
-    const buttons = await this.page.$$('.history-table-option');
-    await buttons[index].click();
+  async revertToVersion(version: number): Promise<void> {
+    const button = await this.findOptionsButtonForVersion(version);
+    await button.click();
     await this.clickOn(revertVersionButton);
     await this.clickOn(confirmRevertVersionButton);
   }
 
   /**
-   * Function to verify if a revision is reverting and downloading or not.
-   * @param {number} index - The index of the revision to check.
+   * Function to verify if a version is reverting and downloading or not.
+   * @param {number} version - The version number to check.
    */
-  async expectReversionOfRevisionAtIndex(index: number): Promise<void> {
+  async expectReversionToVersion(version: number): Promise<void> {
     await this.page.waitForSelector(historyListItem);
     let element = await this.page.$(historyListItem);
     if (element === null) {
@@ -777,7 +807,8 @@ export class ExplorationEditor extends BaseUser {
     if (notes === null) {
       throw new Error('Revision does not contain a Note');
     }
-    if (notes === ` Reverted exploration to version ${index + 1} `) {
+    console.log(notes);
+    if (notes === ` Reverted exploration to version ${version} `) {
       showMessage('Revision is reverting successfully');
     } else {
       throw new Error('Revision is not reverting');

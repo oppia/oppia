@@ -39,19 +39,25 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.createExplorationWithContentAndInteraction(
-      'Test-revision 1',
+      'Solar System Exploration',
       INTERACTION_TYPES.END_EXPLORATION
     );
 
-    // Create multiple revisions
-    await explorationEditor.updateCardContent('changed');
+    // Create multiple revisions.
+    await explorationEditor.updateCardContent(
+      'In this exploration, we will learn about the planets in our solar system.'
+    );
     await explorationEditor.saveExplorationDraft();
-    await explorationEditor.updateCardContent('changed again');
+    await explorationEditor.updateCardContent(
+      'In this exploration, we will learn about the planets and moons in our solar system.'
+    );
     await explorationEditor.saveExplorationDraft();
 
-    // Create a new revision with metadata changes
+    // Create a new revision with metadata changes.
     await explorationEditor.navigateToSettingsTab();
-    await explorationEditor.updateExplorationTitle('Test-Revision 2');
+    await explorationEditor.updateExplorationTitle(
+      'Solar System Exploration - Revision 5'
+    );
     await explorationEditor.navigateToMainTab();
     await explorationEditor.saveExplorationDraft();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
@@ -61,7 +67,7 @@ describe('Exploration Editor', function () {
     async function () {
       await explorationEditor.navigateToHistoryTab();
 
-      // Check properties of revisions
+      // Check properties of revisions.
       await explorationEditor.expectRevisionToHave(1, [
         'Version No.',
         'Notes',
@@ -75,28 +81,25 @@ describe('Exploration Editor', function () {
         'Date',
       ]);
 
-      // Check order of revisions and filter by user
+      // Check order of revisions and filter by user.
       await explorationEditor.expectRevisionsToBeOrderedBy(DATE);
       await explorationEditor.filterRevisionsByUser('explorationEditor');
       await explorationEditor.expectNumberOfRevisions(5);
 
-      // Adjust paginator and select revisions for comparison
+      // Adjust paginator and select revisions for comparison.
       await explorationEditor.adjustPaginatorToShowRevisionsPerPage(15);
       await explorationEditor.expectNextPageOfRevisionsButtonToBe('disabled');
 
-      // Select two revisions for comparison and verify changes in metadata and state
+      // Select two revisions for comparison and verify changes in metadata and state.
       await explorationEditor.selectTwoRevisionsForComparison(1, 5);
-      await explorationEditor.expectMetadataChangesInProperties([
-        'title',
-        'goal',
-      ]);
-      await explorationEditor.expectStateChangesInProperties(['content']);
+      await explorationEditor.expectMetadataChangesInProperties(['title']);
+      await explorationEditor.expectStateChangesInProperties(['html']);
       await explorationEditor.resetComparisonResults();
 
-      // Download and revert revisions
-      await explorationEditor.downloadRevisionAtIndex(1);
-      await explorationEditor.revertToRevisionAtIndex(2);
-      await explorationEditor.expectReversionOfRevisionAtIndex(5);
+      // Download and revert revisions.
+      await explorationEditor.downloadRevision(1);
+      await explorationEditor.revertToVersion(2);
+      await explorationEditor.expectReversionToVersion(2);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
