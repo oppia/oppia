@@ -296,9 +296,6 @@ class SuggestionHandler(
                 for which images are being uploaded.
             filenames: list(str). The image filenames.
         """
-        suggestion_image_context = suggestion.image_context
-        # TODO(#10513): Find a way to save the images before the suggestion is
-        # created.
         for filename in filenames:
             image = files[filename]
             decoded_image = base64.decodebytes(image.encode('utf-8'))
@@ -308,7 +305,7 @@ class SuggestionHandler(
             image_is_compressible = (
                 file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS)
             fs_services.save_original_and_compressed_versions_of_image(
-                filename, suggestion_image_context, suggestion.target_id,
+                filename, suggestion.image_context, suggestion.target_id,
                 decoded_image, 'image', image_is_compressible)
 
     def _copy_images_from_target_exploration_to_translation(
