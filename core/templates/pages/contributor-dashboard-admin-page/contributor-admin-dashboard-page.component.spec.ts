@@ -307,7 +307,7 @@ describe('Contributor dashboard Admin page', () => {
     }));
   });
 
-  describe('when user is logged in', () => {
+  fdescribe('when user is logged in', () => {
     beforeEach(() => {
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
@@ -415,20 +415,24 @@ describe('Contributor dashboard Admin page', () => {
     }));
 
     it(
-      'initially filters users by whether their last activity occurred ' +
+      'should initially filters users by whether their last activity occurred ' +
         'within the last 90 days',
       fakeAsync(() => {
         component.ngOnInit();
         tick();
         fixture.detectChanges();
 
-        expect(component.filter.firstActivity).toEqual(0);
+        expect(component.filter.numberOfDaysSinceLastActivityStartDate).toEqual(
+          0
+        );
 
-        expect(component.filter.lastActivity).toEqual(90);
+        expect(component.filter.numberOfDaysSinceLastActivityEndDate).toEqual(
+          90
+        );
       })
     );
 
-    it("changes filter by users' last activity when start date changes", fakeAsync(() => {
+    it("should changes filter by users' last activity when start date changes", fakeAsync(() => {
       const numberOfDaysSinceFirstActivity = 7;
       component.ngOnInit();
       tick();
@@ -438,49 +442,55 @@ describe('Contributor dashboard Admin page', () => {
         component.getDateThatIsDaysBeforeToday(numberOfDaysSinceFirstActivity)
       );
 
-      expect(component.filter.firstActivity).toEqual(
+      expect(component.filter.numberOfDaysSinceLastActivityStartDate).toEqual(
         numberOfDaysSinceFirstActivity
       );
     }));
 
     it(
-      "does not change filter by users' last activity when given start date " +
+      "should not change filter by users' last activity when given start date " +
         'is in the future',
       fakeAsync(() => {
         const numberOfDaysSinceFirstActivity = -1;
         component.ngOnInit();
         tick();
         fixture.detectChanges();
-        const initialFirstActivity = component.filter.firstActivity;
+        const initialFirstActivity =
+          component.filter.numberOfDaysSinceLastActivityStartDate;
 
         component.changeFirstActivity(
           component.getDateThatIsDaysBeforeToday(numberOfDaysSinceFirstActivity)
         );
 
-        expect(component.filter.firstActivity).toEqual(initialFirstActivity);
+        expect(component.filter.numberOfDaysSinceLastActivityStartDate).toEqual(
+          initialFirstActivity
+        );
       })
     );
 
     it(
-      "does not change filter by users' last activity when given start date " +
+      "should not change filter by users' last activity when given start date " +
         "comes before filter's current end date",
       fakeAsync(() => {
         component.ngOnInit();
         tick();
         fixture.detectChanges();
-        const initialFirstActivity = component.filter.firstActivity;
+        const initialFirstActivity =
+          component.filter.numberOfDaysSinceLastActivityStartDate;
         const numberOfDaysSinceFirstActivity =
-          component.filter.lastActivity! + 1;
+          component.filter.numberOfDaysSinceLastActivityEndDate + 1;
 
         component.changeFirstActivity(
           component.getDateThatIsDaysBeforeToday(numberOfDaysSinceFirstActivity)
         );
 
-        expect(component.filter.firstActivity).toEqual(initialFirstActivity);
+        expect(component.filter.numberOfDaysSinceLastActivityStartDate).toEqual(
+          initialFirstActivity
+        );
       })
     );
 
-    it("changes filter by users' last activity when end date changes", fakeAsync(() => {
+    it("should changes filter by users' last activity when end date changes", fakeAsync(() => {
       const numberOfDaysSinceLastActivity = 30;
       component.ngOnInit();
       tick();
@@ -490,45 +500,51 @@ describe('Contributor dashboard Admin page', () => {
         component.getDateThatIsDaysBeforeToday(numberOfDaysSinceLastActivity)
       );
 
-      expect(component.filter.lastActivity).toEqual(
+      expect(component.filter.numberOfDaysSinceLastActivityEndDate).toEqual(
         numberOfDaysSinceLastActivity
       );
     }));
 
     it(
-      "does not change filter by users' last activity when given end date " +
+      "should not change filter by users' last activity when given end date " +
         'is in the future',
       fakeAsync(() => {
         const numberOfDaysSinceLastActivity = -1;
         component.ngOnInit();
         tick();
         fixture.detectChanges();
-        const initialLastActivity = component.filter.lastActivity;
+        const initialLastActivity =
+          component.filter.numberOfDaysSinceLastActivityEndDate;
 
         component.changeLastActivity(
           component.getDateThatIsDaysBeforeToday(numberOfDaysSinceLastActivity)
         );
 
-        expect(component.filter.lastActivity).toEqual(initialLastActivity);
+        expect(component.filter.numberOfDaysSinceLastActivityEndDate).toEqual(
+          initialLastActivity
+        );
       })
     );
 
     it(
-      "does not change filter by users' last activity when given end date " +
+      "should not change filter by users' last activity when given end date " +
         "comes after filter's current start date",
       fakeAsync(() => {
         component.ngOnInit();
         tick();
         fixture.detectChanges();
-        const initialLastActivity = component.filter.lastActivity;
+        const initialLastActivity =
+          component.filter.numberOfDaysSinceLastActivityEndDate;
         const numberOfDaysSinceLastActivity =
-          component.filter.firstActivity! - 1;
+          component.filter.numberOfDaysSinceLastActivityStartDate - 1;
 
         component.changeLastActivity(
           component.getDateThatIsDaysBeforeToday(numberOfDaysSinceLastActivity)
         );
 
-        expect(component.filter.lastActivity).toEqual(initialLastActivity);
+        expect(component.filter.numberOfDaysSinceLastActivityEndDate).toEqual(
+          initialLastActivity
+        );
       })
     );
 

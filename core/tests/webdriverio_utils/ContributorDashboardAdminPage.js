@@ -259,27 +259,15 @@ var ContributorDashboardAdminPage = function () {
       var nextMonthButton = $('.mat-calendar-next-button');
       var prevMonthButton = $('.mat-calendar-previous-button');
 
-      var dateTextContainer = $('.mat-calendar-period-button')
-        .$('.mat-button-wrapper')
-        .$('#mat-calendar-button-1');
-
       var yearsToNavigate =
         year - new Date(initialValueOfDatePicker).getFullYear();
 
       if (yearsToNavigate > 0) {
         for (let i = 0; i < yearsToNavigate * 12; i++) {
-          // await waitFor.visibilityOf(
-          //   nextMonthButton,
-          //   'Next Month Button is not visible'
-          // );
           await action.click('Next Month Button', nextMonthButton);
         }
       } else if (yearsToNavigate < 0) {
         for (let i = 0; i < Math.abs(yearsToNavigate) * 12; i++) {
-          // await waitFor.visibilityOf(
-          //   prevMonthButton,
-          //   'Previous Month Button is not visible'
-          // );
           await action.click('Previous Month Button', prevMonthButton);
         }
       }
@@ -294,18 +282,10 @@ var ContributorDashboardAdminPage = function () {
 
       if (monthsToNavigate > 0) {
         for (let i = 0; i < monthsToNavigate; i++) {
-          // await waitFor.visibilityOf(
-          //   nextMonthButton,
-          //   'Next Month Button is not visible'
-          // );
           await action.click('Next Month Button', nextMonthButton);
         }
       } else if (monthsToNavigate < 0) {
         for (let i = 0; i < Math.abs(monthsToNavigate); i++) {
-          // await waitFor.visibilityOf(
-          //   prevMonthButton,
-          //   'Previous Month Button is not visible'
-          // );
           await action.click('Previous Month Button', prevMonthButton);
         }
       }

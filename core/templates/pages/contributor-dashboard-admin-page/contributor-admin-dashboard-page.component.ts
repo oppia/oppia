@@ -296,14 +296,14 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   createFilter(): void {
-    const firstActivity = this.selectFirstActivity();
-    const lastActivity = this.selectLastActivity();
+    const numberOfDaysSinceStartDate = this.selectFirstActivity();
+    const numberOfDaysSinceEndDate = this.selectLastActivity();
     const tempFilter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      firstActivity,
-      lastActivity
+      numberOfDaysSinceStartDate,
+      numberOfDaysSinceEndDate
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {

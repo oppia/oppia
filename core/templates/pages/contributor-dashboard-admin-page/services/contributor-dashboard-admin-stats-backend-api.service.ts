@@ -226,14 +226,16 @@ export class ContributorDashboardAdminStatsBackendApiService {
       language_code: filter.languageCode
         ? filter.languageCode
         : PageConstants.DEFAULT_LANGUAGE_FILTER,
-      ...(filter.firstActivity
+      ...(filter.numberOfDaysSinceLastActivityStartDate
         ? {
-            max_days_since_first_activity: filter.firstActivity,
+            max_days_since_first_activity:
+              filter.numberOfDaysSinceLastActivityStartDate,
           }
         : {}),
-      ...(filter.lastActivity
+      ...(filter.numberOfDaysSinceLastActivityEndDate
         ? {
-            max_days_since_last_activity: filter.lastActivity,
+            max_days_since_last_activity:
+              filter.numberOfDaysSinceLastActivityEndDate,
           }
         : {}),
     };

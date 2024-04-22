@@ -253,10 +253,10 @@ def get_translation_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        max_days_since_first_activity: int. To get number of users
-            who are active in max_days_since_first_activity.
-        max_days_since_last_activity: int. To get number of users
-            who are active in max_days_since_last_activity.
+        max_days_since_first_activity: int. Number of days before today
+            to start including users with contributions.
+        max_days_since_last_activity: int. Number of days before today
+            from which to stop including users with contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -316,10 +316,10 @@ def get_translation_reviewer_total_stats(
         language_code: str. The language code to get results for.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        max_days_since_first_activity: int|None. To get number of users
-            who are active in max_days_since_first_activity.
-        max_days_since_last_activity: int|None. To get number of users
-            who are active in max_days_since_last_activity.
+        max_days_since_first_activity: int. Number of days before today
+            to start including users with contributions.
+        max_days_since_last_activity: int. Number of days before today
+            from which to stop including users with contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -380,10 +380,10 @@ def get_question_submitter_total_stats(
             result.
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
-        max_days_since_first_activity: int. To get results of users
-            who are active in max_days_since_first_activity.
-        max_days_since_last_activity: int. To get results of users
-            who are active in max_days_since_last_activity.
+        max_days_since_first_activity: int. Number of days before today
+            to start including users with contributions.
+        max_days_since_last_activity: int. Number of days before today
+            from which to stop including users with contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -440,10 +440,10 @@ def get_question_reviewer_total_stats(
             results matching the query.
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
-        max_days_since_first_activity: int|None. To get result of users
-            who are active in max_days_since_first_activity.
-        max_days_since_last_activity: int|None. To get result of users
-            who are active in max_days_since_last_activity.
+        max_days_since_first_activity: int. Number of days before today
+            to start including users with contributions.
+        max_days_since_last_activity: int. Number of days before today
+            from which to stop including users with contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
