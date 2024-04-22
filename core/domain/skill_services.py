@@ -39,8 +39,8 @@ from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 
-from typing import (Callable, Dict, List, Literal, Optional, Set, Tuple, cast,
-                    overload
+from typing import (
+    Callable, Dict, List, Literal, Optional, Set, Tuple, cast, overload
                     )
 
 MYPY = False
