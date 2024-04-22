@@ -1,7 +1,7 @@
 <mat-card>
   <h3>Voiceovers</h3>
   <div *ngIf="pageIsLoaded">
-    <mat-form-field class="oppia-language-accent-dropdown-selector">
+    <mat-form-field class="oppia-language-accent-dropdown-selector" class="language-accent-selector">
       <mat-label>Select Accent: </mat-label>
       <mat-select (selectionChange)="getVoiceovers($event.value)">
         <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
@@ -25,7 +25,7 @@
           <mat-icon *ngIf="audioPlayerService.isPlaying()">pause_arrow</mat-icon>
         </button>
         <mat-progress-bar mode="determinate"
-                          value="voiceoverProgress"
+                          [value]="voiceoverProgress"
                           class="voiceover-progress">
         </mat-progress-bar>
         <span class="voiceover-timer">
@@ -50,6 +50,9 @@
 </mat-card>
 
 <style>
+  .language-accent-selector {
+    width: 350px;
+  }
   .voiceover-timer {
     margin: 10px;
   }
@@ -73,7 +76,6 @@
     border-style: dashed;
     color: #009688;
     height: 40px;
-    /* margin: 0 75px; */
-    width: 90%;
+    width: 100%;
   }
 </style>

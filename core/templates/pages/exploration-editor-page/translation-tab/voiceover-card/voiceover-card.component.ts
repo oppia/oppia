@@ -87,10 +87,11 @@ export class VoiceoverCardComponent implements OnInit {
     );
     setInterval(() => {
       if (this.audioPlayerService.isPlaying()) {
-        this.voiceoverProgress =
+        this.voiceoverProgress = Math.round(
           (this.audioPlayerService.getCurrentTime() /
             this.manualVoiceoverDuration) *
-          100;
+            100
+        );
       }
     }, 1000);
   }
@@ -123,16 +124,12 @@ export class VoiceoverCardComponent implements OnInit {
     this.voiceoversAreLoaded = true;
   }
 
-  calculateVoiceoverProgress(currentDuration, totalDuration) {
-    let progressValue = (currentDuration / totalDuration) * 100;
-  }
-
   playAndPauseVoiceover(filename: string): void {
     if (this.audioPlayerService.isPlaying()) {
       this.audioPlayerService.pause();
       return;
     }
-    if (this.audioIsLoaded) {
+    if (this.audioPlayerService.isTrackLoaded()) {
       this.audioPlayerService.play();
     } else {
       this.audioPlayerService.loadAsync(filename).then(() => {

@@ -192,7 +192,6 @@ export class ChangeListService {
     // opened):
     // - Changes are not mergeable when a version mismatch occurs.
     // - Non-strict Validation Fail.
-    console.log('Autosave method');
     this.explorationDataService.autosaveChangeListAsync(
       explorationChangeList as ExplorationChange[],
       response => {
