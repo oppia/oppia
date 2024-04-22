@@ -811,22 +811,23 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function for navigating to the profile page for a given username if not already on that page.
+   * Function for navigating to the profile page for a given username.
    */
   async navigateToProfilePage(username: string): Promise<void> {
     const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
-
-    if (this.page.url() !== profilePageUrl) {
-      await this.goto(profilePageUrl);
-    }
-    return;
+    if (this.page.url() === profilePageUrl) return;
+    await this.goto(profilePageUrl);
   }
 
   /**
    * Function to subscribe to a creator with the given username.
    */
   async subscribeToCreator(username: string): Promise<void> {
-    await this.navigateToProfilePage(username);
+    const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
+
+    if (this.page.url() !== profilePageUrl) {
+      await this.navigateToProfilePage(username);
+    }
 
     await this.clickOn(subscribeButton);
     await this.page.waitForSelector(unsubscribeLabel);
@@ -889,8 +890,6 @@ export class LoggedInUser extends BaseUser {
       '.e2e-test-subscription-name',
       element => (element as HTMLElement).textContent?.trim()
     );
-
-    showMessage(`username ${subscriberUsername}`);
 
     if (truncatedUsername === subscriberUsername) {
       showMessage(`User ${username} is a subscriber`);
