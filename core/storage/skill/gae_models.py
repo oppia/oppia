@@ -255,7 +255,7 @@ class SkillModel(base_models.VersionedModel):
         return cls.get_all().filter(cls.description == description).get()
 
     @classmethod
-    def get_by_prerequisite(cls, skillid: str) -> Optional[SkillModel]:
+    def get_by_prerequisite(cls, skillid: str) -> Sequence[SkillModel]:
         """Gets SkillModels that contain the prerequisite defined by
         skillid. Returns None if none exist.
 
