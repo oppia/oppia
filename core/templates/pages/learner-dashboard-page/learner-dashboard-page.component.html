@@ -119,7 +119,7 @@
            [ngClass]="{'oppia-learner-dashboard-main-content-container pl-5': !windowIsNarrow && !isShowRedesignedLearnerDashboardActive(), 'justify-content-center': windowIsNarrow}">
         <div class="w-100" *ngIf="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.HOME">
           <oppia-home-tab [currentGoals]="topicsToLearn"
-                          [featureFlag]="isShowRedesignedLearnerDashboardActive()"
+                          [redesignFeatureFlag]="isShowRedesignedLearnerDashboardActive()"
                           [goalTopics]="allTopics"
                           [incompleteCollectionsList]="incompleteCollectionsList"
                           [incompleteExplorationsList]="incompleteExplorationsList"
