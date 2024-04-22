@@ -73,6 +73,7 @@ export default {
     BLOG_POST_EDITOR: 'blog post editor',
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
+    CURRICULUM_ADMIN: 'curriculum admin',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',
