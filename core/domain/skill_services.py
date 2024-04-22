@@ -604,23 +604,22 @@ def remove_skill_id_from_all_prerequisites(skill_id: str) -> None:
     target_skills = skill_models.SkillModel.get_by_prerequisite(skill_id)
     new_skill_models = []
     cache_skills = {}
-    print("here are the target skills:")
-    print(target_skills)
     for skill in target_skills:
         for index, prereq in enumerate(skill.prerequisite_skill_ids):
             if prereq == skill_id:
                 del skill.prerequisite_skill_ids[index]
         new_skill_models.append(skill)
-        cache_skills[skill.id] = copy.deepcopy(skill_fetchers.get_skill_from_model(skill))
+        cache_skills[skill.id] = copy.deepcopy(
+            skill_fetchers.get_skill_from_model(skill))
     if new_skill_models:
         skill_models.SkillModel.update_timestamps_multi(new_skill_models)
         skill_models.SkillModel.put_multi(new_skill_models)
-    print("here are the cache skills:")
-    print(cache_skills)
     if cache_skills:
         caching_services.set_multi(caching_services.CACHE_NAMESPACE_SKILL, None, cache_skills)
 
-def replace_skill_id_in_all_prerequisites(old_skill_id: str, new_skill_id: str) -> None:
+
+def replace_skill_id_in_all_prerequisites(
+        old_skill_id: str, new_skill_id: str) -> None:
     """Removes the skill with the given id from every skill's prerequisite list
     and adds new_skill_id to their prerequisite list. Used when a skill 
     is merged into another
@@ -640,12 +639,14 @@ def replace_skill_id_in_all_prerequisites(old_skill_id: str, new_skill_id: str) 
                 already_in_skill = True
         if not already_in_skill:
             new_skill_models.append(skill)
-            cache_skills[skill.id] = copy.deepcopy(skill_fetchers.get_skill_from_model(skill))
+            cache_skills[skill.id] = copy.deepcopy(
+                skill_fetchers.get_skill_from_model(skill))
     if new_skill_models:
         skill_models.SkillModel.update_timestamps_multi(new_skill_models)
         skill_models.SkillModel.put_multi(new_skill_models)
     if cache_skills:
-        caching_services.set_multi(caching_services.CACHE_NAMESPACE_SKILL, None, cache_skills)
+        caching_services.set_multi(
+            caching_services.CACHE_NAMESPACE_SKILL, None, cache_skills)
 
 
 @overload
