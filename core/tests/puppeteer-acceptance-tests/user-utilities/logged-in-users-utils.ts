@@ -815,7 +815,9 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToProfilePage(username: string): Promise<void> {
     const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
-    if (this.page.url() === profilePageUrl) return;
+    if (this.page.url() === profilePageUrl) {
+      return;
+    }
     await this.goto(profilePageUrl);
   }
 
