@@ -305,6 +305,12 @@ describe('Site language', function () {
     await browser.url('/about');
     await waitFor.pageToFullyLoad();
     await _selectLanguage('en');
-    await general.checkForConsoleErrors([]);
+    await general.checkForConsoleErrors([
+      // The following errors are ignored since we are visting the /learn/math
+      // page when the classroom hasn't actually been created.
+      'The requested path /learn/math is not found.',
+      '/access_validation_handler/can_access_classroom_page?classroom_url_fragment=math - ' +
+        'Failed to load resource: the server responded with a status of 404 (Not Found)',
+    ]);
   });
 });
