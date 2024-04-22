@@ -811,7 +811,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function for navigating to the profile page.
+   * Function for navigating to the profile page for a given username if not already on that page.
    */
   async navigateToProfilePage(username: string): Promise<void> {
     const profilePageUrl = `${profilePageUrlPrefix}/${username}`;
@@ -823,7 +823,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function for subscribing to a creator with given username.
+   * Function to subscribe to a creator with the given username.
    */
   async subscribeToCreator(username: string): Promise<void> {
     await this.navigateToProfilePage(username);
@@ -900,7 +900,7 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * This function checks whether the exploration is authored by the creator.
+   * Checks whether the exploration with the given title is authored by the creator.
    */
   async expectExplorationWithTitleToBePresentInProfilePage(
     title: string
