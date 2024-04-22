@@ -21,6 +21,7 @@ import os
 import subprocess
 import sys
 from unittest import mock
+from unittest.mock import Mock
 
 from core.constants import constants
 from core.tests import test_utils
@@ -88,8 +89,11 @@ def mock_managed_process(
 class RunAcceptanceTestsTests(test_utils.GenericTestBase):
     """Test the run_acceptance_tests methods."""
 
+    test_output_file_path = 'test_output.log'
+
     def setUp(self) -> None:
         super().setUp()
+        self.output_lines = ['Test output line 1', 'Test output line 2']
         self.exit_stack = contextlib.ExitStack()
 
         def mock_constants() -> None:
@@ -385,40 +389,29 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
     @mock.patch(
         'builtins.open', new_callable=mock.mock_open
     )
-    def test_print_test_output_with_io_error(
-        self, mock_open: mock.MagicMock
-    ) -> None:
+    def test_print_test_output_with_io_error(self, mock_open: Mock) -> None:
         mock_open.side_effect = IOError('Failed to open file')
-        test_data = [
-            b'Spec started: Test Suite', 
-            b'Test case 1 passed'
-        ]
-
-        with self.assertRaises(IOError):
-            run_acceptance_tests.print_test_output(test_data)
-
+        self.assertRaises(
+            IOError,
+            run_acceptance_tests.print_test_output,
+            self.output_lines
+        )
         mock_open.assert_called_once_with(
-            self.test_output_file_path, 'w', encoding='utf-8'
+            'test_output.log', 'w', encoding='utf-8'
         )
 
     def test_print_test_output_results(self) -> None:
-        test_data = [
-            b'Spec started: Test case 1',
-            b'Test case 1 passed',
-            b'Spec started: Test case 2',
-            b'Test case 2 failed',
-            b'Spec started: Test case 3',
-            b'Test case 3 skipped'
-        ]
+        test_instance = RunAcceptanceTestsTests()
+        try:
+            test_instance.test_print_test_output_results()
 
-        run_acceptance_tests.test_print_test_output_results(test_data)
+            with open('test_output.log', 'r', encoding='utf-8') as output_file:
+                lines = output_file.readlines()
+                self.assertEqual(len(lines), 4)
+                self.assertEqual(lines[0].strip(), 'Spec started: Test case 1')
+                self.assertEqual(lines[1].strip(), 'Test case 1 passed')
+                self.assertEqual(lines[2].strip(), 'Spec started: Test case 2')
+                self.assertEqual(lines[3].strip(), 'Test case 2 failed')
 
-        with open('test_output.log', 'r', encoding='utf-8') as output_file:
-            lines = output_file.readlines()
-            self.assertEqual(len(lines), 4)
-            self.assertEqual(lines[0].strip(), 'Spec started: Test case 1')
-            self.assertEqual(lines[1].strip(), 'Test case 1 passed')
-            self.assertEqual(lines[2].strip(), 'Spec started: Test case 2')
-            self.assertEqual(lines[3].strip(), 'Test case 2 failed')
-
-        os.remove('test_output.log')
+        finally:
+            os.remove('test_output.log')
