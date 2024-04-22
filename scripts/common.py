@@ -222,6 +222,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page',
     'logged-in-user-tests/click-all-buttons-on-teach-page',
     'logged-in-user-tests/click-all-links-in-about-oppia-footer',
+    'logged-in-user-tests/click-all-links-in-teach-learn-footer',
     'logged-in-user-tests/click-all-links-on-creator-guidelines-page',
     'logged-in-user-tests/click-all-links-on-get-started-page',
     'logged-in-user-tests/click-all-links-on-privacy-policy-page',

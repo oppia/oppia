@@ -33,78 +33,67 @@ describe('Logged-in Users', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
+  beforeEach(async function () {
+    await testUser.navigateToGetStartedPage();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
   it(
-    'should be able to navigate to the Get Started page using the footer',
+    'should be able to use the "create one here" link',
     async function () {
-      await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToGetStartedPageViaFooter();
+      await testUser.clickCreateOneHereLinkOnGetStartedPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  describe('on the Get Started page', function () {
-    beforeEach(async function () {
-      await testUser.navigateToGetStartedPage();
-    }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  it(
+    'should be able to use the "Welcome to Oppia" link',
+    async function () {
+      await testUser.clickWelcomeToOppiaLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "create one here" link',
-      async function () {
-        await testUser.clickCreateOneHereLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "Get Electrified!" link',
+    async function () {
+      await testUser.clickGetElectrifiedLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Welcome to Oppia" link',
-      async function () {
-        await testUser.clickWelcomeToOppiaLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "Programming with Carla" link',
+    async function () {
+      await testUser.clickProgrammingWithCarlaLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Get Electrified!" link',
-      async function () {
-        await testUser.clickGetElectrifiedLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use "in our user documentation" link',
+    async function () {
+      await testUser.clickInOurUserDocumentationLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Programming with Carla" link',
-      async function () {
-        await testUser.clickProgrammingWithCarlaLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "embed it in your own web page" link',
+    async function () {
+      await testUser.clickEmbedItInYourOwnWebPageLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use "in our user documentation" link',
-      async function () {
-        await testUser.clickInOurUserDocumentationLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "discover more ways to get involved" link',
+    async function () {
+      await testUser.clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "embed it in your own web page" link',
-      async function () {
-        await testUser.clickEmbedItInYourOwnWebPageLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    it(
-      'should be able to use the "discover more ways to get involved" link',
-      async function () {
-        await testUser.clickDiscoverMoreWaysToGetInvolvedLinkOnGetStartedPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    afterAll(async function () {
-      await UserFactory.closeAllBrowsers();
-    });
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

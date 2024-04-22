@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in Users', function () {
   let testUser: LoggedInUser;
@@ -31,38 +31,27 @@ describe('Logged-in Users', function () {
       'testuser',
       'testuser@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  beforeEach(async function () {
+    await testUser.navigateToTermsPage();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to navigate to the Terms of Use page using the footer',
+    'should be able to follow the link about the CC-BY-SA 4.0 license',
     async function () {
-      await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToTermsPageViaFooter();
+      await testUser.clickLinkToLicenseOnTermsPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  describe('on the Terms of Use page', function () {
-    beforeEach(async function () {
-      await testUser.navigateToTermsPage();
-    }, DEFAULT_SPEC_TIMEOUT);
-
-    it(
-      'should be able to follow the link about the CC-BY-SA 4.0 license',
-      async function () {
-        await testUser.clickLinkToLicenseOnTermsPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-
-    it(
-      'should be able to follow the link to the Oppia Annouce google group.',
-      async function () {
-        await testUser.clickLinkToGoogleGroupOnTermsPage();
-      },
-      DEFAULT_SPEC_TIMEOUT
-    );
-  });
+  it(
+    'should be able to follow the link to the Oppia Annouce google group.',
+    async function () {
+      await testUser.clickLinkToGoogleGroupOnTermsPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

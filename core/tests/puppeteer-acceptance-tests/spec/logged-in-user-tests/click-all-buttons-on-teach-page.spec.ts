@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in Users', function () {
   let testUser: LoggedInUser;
@@ -31,7 +31,7 @@ describe('Logged-in Users', function () {
       'testuser',
       'testuser@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to navigate to the Teach page using the footer',
@@ -39,20 +39,20 @@ describe('Logged-in Users', function () {
       await testUser.navigateToAboutFoundationPage();
       await testUser.navigateToTeachPageViaFooter();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   describe('on the Teach page', function () {
     beforeEach(async function () {
       await testUser.navigateToTeachPage();
-    }, DEFAULT_SPEC_TIMEOUT);
+    }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
     it(
       'should be able to use the "Browse our Lessons" button',
       async function () {
         await testUser.clickBrowseOurLessonsOnTeachPage();
       },
-      DEFAULT_SPEC_TIMEOUT
+      DEFAULT_SPEC_TIMEOUT_MSECS
     );
 
     it(
@@ -60,7 +60,7 @@ describe('Logged-in Users', function () {
       async function () {
         await testUser.clickAccessTheAndroidAppOnTeachPage();
       },
-      DEFAULT_SPEC_TIMEOUT
+      DEFAULT_SPEC_TIMEOUT_MSECS
     );
 
     it(
@@ -68,7 +68,7 @@ describe('Logged-in Users', function () {
       async function () {
         await testUser.clickVisitClassroomOnTeachPage();
       },
-      DEFAULT_SPEC_TIMEOUT
+      DEFAULT_SPEC_TIMEOUT_MSECS
     );
 
     it(
@@ -76,7 +76,7 @@ describe('Logged-in Users', function () {
       async function () {
         await testUser.clickBrowseLibraryOnTeachPage();
       },
-      DEFAULT_SPEC_TIMEOUT
+      DEFAULT_SPEC_TIMEOUT_MSECS
     );
 
     it(
@@ -84,7 +84,7 @@ describe('Logged-in Users', function () {
       async function () {
         await testUser.clickExploreLessonsOnTeachPage();
       },
-      DEFAULT_SPEC_TIMEOUT
+      DEFAULT_SPEC_TIMEOUT_MSECS
     );
   });
 
