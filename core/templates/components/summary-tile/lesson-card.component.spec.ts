@@ -144,6 +144,22 @@ describe('LessonCardComponent', () => {
     topic_url_fragment: 'topic',
   };
 
+  const sampleTopic4 = {
+    id: '0',
+    title: 'Story Title',
+    description: 'Story Description',
+    node_titles: ['Chapter 1', 'Chapter 2'],
+    thumbnail_filename: null,
+    thumbnail_bg_color: '#F8BF74',
+    story_is_published: true,
+    completed_node_titles: ['Chapter 1'],
+    url_fragment: 'story-title',
+    all_node_dicts: [sampleNode, sampleNode],
+    topic_name: 'Topic',
+    classroom_url_fragment: 'math',
+    topic_url_fragment: 'topic',
+  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
@@ -289,11 +305,13 @@ describe('LessonCardComponent', () => {
     expect(component.imgUrl).toBe('');
   });
 
-  it('should set story to StorySummary with a null thumbnail', () => {
-    component.story = StorySummary.createFromBackendDict(sampleTopic3);
-    component.topic = sampleTopic3.topic_name;
+  it('should set story to StorySummary and set its null imgUrl correctly', () => {
+    component.story = StorySummary.createFromBackendDict(sampleTopic4);
+    component.topic = sampleTopic4.topic_name;
 
     fixture.detectChanges();
+
+    expect(component.imgUrl).toBe('');
   });
 
   it('should set story to StorySummary and get the correct progress', () => {

@@ -60,7 +60,7 @@ export class LessonCardComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.story instanceof StorySummary) {
-      let completedStories = this.story.getCompletedNodeTitles().length;
+      const completedStories = this.story.getCompletedNodeTitles().length;
 
       this.desc = this.story.getTitle();
       this.imgColor = this.story.getThumbnailBgColor();
@@ -69,12 +69,12 @@ export class LessonCardComponent implements OnInit {
         id: this.story.getId(),
       });
 
-      let nextStory =
+      const nextStory =
         completedStories === this.story.getAllNodes().length
           ? completedStories - 1
           : completedStories;
 
-      let lessonArgs = {
+      const lessonArgs = {
         classroom: this.story.getClassroomUrlFragment(),
         topicFragment: this.story.getTopicUrlFragment(),
         currentStory: this.story.getAllNodes()[nextStory],
@@ -107,21 +107,21 @@ export class LessonCardComponent implements OnInit {
   }
 
   getProgress(arg: number): string {
-    let leftCircle = 50 >= arg ? arg : 50;
-    let rightCircle = arg > 50 ? arg - 50 : 0;
+    const leftCircle = 50 >= arg ? arg : 50;
+    const rightCircle = arg > 50 ? arg - 50 : 0;
 
     return `linear-gradient(${50 >= arg ? 180 + (arg / 100) * 180 : 270}deg, #00645c ${leftCircle}%, transparent ${leftCircle}%), linear-gradient(0deg, #00645c ${rightCircle}%, lightgray ${rightCircle}%)`;
   }
 
   getStorySummaryThumbnailUrl({filename, id}: ThumbnailUrl): string {
     if (filename) {
-      return this.assetsBackendApiService.getThumbnailUrlForPreview(
-        AppConstants.ENTITY_TYPE.STORY,
-        id,
-        filename
-      );
+      return '';
     }
-    return '';
+    this.assetsBackendApiService.getThumbnailUrlForPreview(
+      AppConstants.ENTITY_TYPE.STORY,
+      id,
+      filename
+    );
   }
 
   getStorySummaryLessonUrl({
