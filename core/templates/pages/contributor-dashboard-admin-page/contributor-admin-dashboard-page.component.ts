@@ -98,11 +98,8 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   isTranslationCoordinator!: boolean;
   loadingMessage!: string;
   allTopicNames: string[] = [];
-  today!: Date;
   startDateForUsersLastActivity!: Date;
   endDateForUsersLastActivity!: Date;
-  startDateForUsersLastActivityInDays!: number;
-  endDateForUsersLastActivityInDays!: number;
   selectedTopicIds: string[] = [];
   selectedTopicNames: string[] = [];
   languageChoices: LanguageChoice[] = [];
@@ -154,7 +151,6 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             if (username === null) {
               return;
             }
-            this.today = new Date();
             this.startDateForUsersLastActivity = new Date();
             this.endDateForUsersLastActivity =
               this.getDateThatIsDaysBeforeToday(90);
@@ -250,17 +246,17 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   getDateThatIsDaysBeforeToday(numberOfDaysBeforeToday: number): Date {
+    const today = new Date();
     return new Date(
-      this.today.getTime() - 24 * 60 * 60 * 1000 * numberOfDaysBeforeToday
+      today.getTime() - 24 * 60 * 60 * 1000 * numberOfDaysBeforeToday
     );
   }
 
   isValidStartDate(selectedStartDate: Date): boolean {
+    const today = new Date();
     if (
-      this.today.getTime() >= selectedStartDate.getTime() &&
-      this.endDateForUsersLastActivity &&
-      selectedStartDate.getTime() >=
-        new Date(this.endDateForUsersLastActivity).getTime()
+      today.getTime() >= selectedStartDate.getTime() &&
+      selectedStartDate.getTime() >= this.endDateForUsersLastActivity.getTime()
     ) {
       return true;
     } else {
@@ -269,11 +265,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   isValidEndDate(selectedEndDate: Date): boolean {
+    const today = new Date();
     if (
-      this.today.getTime() >= selectedEndDate.getTime() &&
-      this.startDateForUsersLastActivity &&
-      selectedEndDate.getTime() <=
-        new Date(this.startDateForUsersLastActivity).getTime()
+      today.getTime() >= selectedEndDate.getTime() &&
+      selectedEndDate.getTime() <= this.startDateForUsersLastActivity.getTime()
     ) {
       return true;
     } else {
@@ -282,36 +277,33 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   selectFirstActivity(): number {
-    this.today = new Date();
-    if (this.isValidStartDate(this.startDateForUsersLastActivity)) {
-      const oneDay = 24 * 60 * 60 * 1000;
-      return Math.floor(
-        Math.abs(
-          this.today.getTime() - this.startDateForUsersLastActivity.getTime()
-        ) / oneDay
-      );
-    }
+    const oneDay = 24 * 60 * 60 * 1000;
+    const today = new Date();
+    return Math.floor(
+      Math.abs(
+        today.getTime() - this.startDateForUsersLastActivity?.getTime()
+      ) / oneDay
+    );
   }
 
   selectLastActivity(): number {
-    this.today = new Date();
-    if (this.isValidEndDate(this.endDateForUsersLastActivity)) {
-      const oneDay = 24 * 60 * 60 * 1000;
-      return Math.floor(
-        Math.abs(
-          this.today.getTime() - this.endDateForUsersLastActivity.getTime()
-        ) / oneDay
-      );
-    }
+    const oneDay = 24 * 60 * 60 * 1000;
+    const today = new Date();
+    return Math.floor(
+      Math.abs(today.getTime() - this.endDateForUsersLastActivity?.getTime()) /
+        oneDay
+    );
   }
 
   createFilter(): void {
+    const firstActivity = this.selectFirstActivity();
+    const lastActivity = this.selectLastActivity();
     const tempFilter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
       this.selectedLanguage.id,
       null,
-      this.selectFirstActivity(),
-      this.selectLastActivity()
+      firstActivity,
+      lastActivity
     );
 
     if (this.filter === undefined || !isEqual(tempFilter, this.filter)) {
@@ -320,13 +312,17 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   changeFirstActivity(value: Date): void {
-    this.startDateForUsersLastActivity = new Date(value);
-    this.createFilter();
+    if (this.isValidStartDate(value)) {
+      this.startDateForUsersLastActivity = new Date(value);
+      this.createFilter();
+    }
   }
 
   changeLastActivity(value: Date): void {
-    this.endDateForUsersLastActivity = new Date(value);
-    this.createFilter();
+    if (this.isValidEndDate(value)) {
+      this.endDateForUsersLastActivity = new Date(value);
+      this.createFilter();
+    }
   }
 
   applyTopicFilter(): void {

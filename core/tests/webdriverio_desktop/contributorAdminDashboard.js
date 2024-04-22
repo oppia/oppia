@@ -351,13 +351,14 @@ describe('Contributor Admin Dashboard', function () {
     await users.logout();
   });
 
-  it(
+  fit(
     'should be able to filter those translation submitters, who have submitted' +
       ' translations between a given date range',
     async function () {
       /**
-      This test works on the principle that one translation submission was created
-      earlier by a translation submitter, so it was created within the last 24 hours.
+      One translation submission was created previously by the beforeAll block in
+      this describe block for earlier e2e test, it was created within the last 24
+      hours.
       **/
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
       await contributorDashboardAdminPage.get();
@@ -390,8 +391,9 @@ describe('Contributor Admin Dashboard', function () {
       ' translations between a given date range',
     async function () {
       /**
-      This test works on the principle that one translation submission was reviewed
-      earlier by a translation reviewer, so it was reviewed within the last 24 hours.
+      One translation review was created previously by the beforeAll block in this
+      describe block for earlier e2e test, it was created within the last 24
+      hours.
       **/
       await users.login(TRANSLATION_COORDINATOR_EMAIL);
       await contributorDashboardAdminPage.get();
@@ -424,8 +426,9 @@ describe('Contributor Admin Dashboard', function () {
       ' questiions between a given date range',
     async function () {
       /**
-      This test works on the principle that one question submission was created
-      earlier by a question submitter, so it was created within the last 24 hours.
+      One question submission was created previously by the beforeAll block in this
+      describe block for earlier e2e test, it was created within the last 24
+      hours.
       **/
       await users.login(QUESTION_COORDINATOR_EMAIL);
       await contributorDashboardAdminPage.get();
@@ -455,8 +458,9 @@ describe('Contributor Admin Dashboard', function () {
       ' questions between a given date range',
     async function () {
       /**
-      This test works on the principle that one question submission was reviewed
-      earlier by a question reviewer, so it was reviewed within the last 24 hours.
+      One question review was created previously by the beforeAll block in this
+      describe block for earlier e2e test, it was created within the last 24
+      hours.
       **/
       await users.login(QUESTION_COORDINATOR_EMAIL);
       await contributorDashboardAdminPage.get();
