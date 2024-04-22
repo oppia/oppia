@@ -730,6 +730,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(target_skills, [])
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_2'])
+
     def test_replace_skill_id_in_all_prerequisites(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(

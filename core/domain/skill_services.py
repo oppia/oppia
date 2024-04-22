@@ -638,7 +638,7 @@ def replace_skill_id_in_all_prerequisites(
         for index, prereq in enumerate(skill.prerequisite_skill_ids):
             if prereq == old_skill_id:
                 skill.prerequisite_skill_ids[index] = new_skill_id
-            # Case where old skill and new skill are both in the list
+            # Case where old skill and new skill are both in the list.
             elif prereq == new_skill_id:
                 del skill.prerequisite_skill_ids[index]
 
