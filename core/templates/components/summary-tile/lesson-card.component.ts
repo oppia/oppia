@@ -114,10 +114,10 @@ export class LessonCardComponent implements OnInit {
   }
 
   getStorySummaryThumbnailUrl({filename, id}: ThumbnailUrl): string {
-    if (filename) {
+    if (!filename) {
       return '';
     }
-    this.assetsBackendApiService.getThumbnailUrlForPreview(
+    return this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.STORY,
       id,
       filename
