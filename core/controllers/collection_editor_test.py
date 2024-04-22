@@ -75,6 +75,28 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.release_ownership_of_collection(
             system_user, self.COLLECTION_ID)
 
+    def test_editable_collection_handler_get(self) -> None:
+        allowed_usernames = [self.EDITOR_USERNAME]
+        self.set_collection_editors(allowed_usernames)
+
+        # Check that non-editors cannot access the editor data handler.
+        # This is due to them not being allowed.
+        self.get_json(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
+                self.COLLECTION_ID), expected_status_int=401)
+
+        # Check that allowed users can access the data
+        # from the editable_collection_data_handler.
+        self.login(self.EDITOR_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
+                self.COLLECTION_ID))
+        self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
+        self.logout()
+
     def test_editable_collection_handler_put_with_invalid_payload_version(
         self
     ) -> None:
