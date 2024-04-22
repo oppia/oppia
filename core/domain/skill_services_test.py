@@ -726,16 +726,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2'])
         skill_services.remove_skill_id_from_all_prerequisites('skill_id_1')
         target_skills = skill_models.SkillModel.get_by_prerequisite(
-            "skill_id_1")
+            'skill_id_1')
         self.assertEqual(target_skills, [])
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_2'])
-    
     def test_replace_skill_id_in_all_prerequisites(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
         self.assertEqual(
             skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2'])
-        
         skill_services.replace_skill_id_in_all_prerequisites(
             'skill_id_1', 'skill_id_2')
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
