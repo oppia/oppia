@@ -683,42 +683,6 @@ def apply_change_list(
                     state.update_card_is_checkpoint(
                         edit_card_is_checkpoint_cmd.new_value
                     )
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if not isinstance(change.new_value, dict):
-                        raise Exception(
-                            'Expected recorded_voiceovers to be a dict, '
-                            'received %s' % change.new_value)
-                    # Explicitly convert the duration_secs value from
-                    # int to float. Reason for this is the data from
-                    # the frontend will be able to match the backend
-                    # state model for Voiceover properly. Also js
-                    # treats any number that can be float and int as
-                    # int (no explicit types). For example,
-                    # 10.000 is not 10.000 it is 10.
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExpStatePropertyRecordedVoiceoversCmd.
-                    edit_recorded_voiceovers_cmd = cast(
-                        exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
-                        change
-                    )
-                    new_voiceovers_mapping = (
-                        edit_recorded_voiceovers_cmd.new_value[
-                            'voiceovers_mapping'
-                        ]
-                    )
-                    language_codes_to_audio_metadata = (
-                        new_voiceovers_mapping.values())
-                    for language_codes in language_codes_to_audio_metadata:
-                        for audio_metadata in language_codes.values():
-                            audio_metadata['duration_secs'] = (
-                                float(audio_metadata['duration_secs'])
-                            )
-                    recorded_voiceovers = (
-                        state_domain.RecordedVoiceovers.from_dict(
-                            change.new_value))
-                    state.update_recorded_voiceovers(recorded_voiceovers)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     # Here we use cast because this 'if' condition forces
@@ -1035,16 +999,9 @@ def update_states_version_history(
         state_name: False
         for state_name in states_which_were_not_renamed
     }
-    # The following ignore list contains those state properties which are
-    # related to voiceovers. Hence, they are ignored in order to avoid
-    # updating the version history in case of voiceover-only commits.
-    state_property_ignore_list = [
-        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
-    ]
     for change in change_list:
         if (
-            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-            change.property_name not in state_property_ignore_list
+            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
         ):
             state_name = change.state_name
             if state_name in state_property_changed_data:
@@ -3130,6 +3087,8 @@ def get_exp_with_draft_applied(
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = exp_fetchers.get_exploration_by_id(exp_id)
     draft_change_list = []
+    print(exp_user_data)
+    print(draft_change_list)
     if exp_user_data:
         if exp_user_data.draft_change_list:
             draft_change_list_exp_version = (

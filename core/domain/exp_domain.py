@@ -69,7 +69,6 @@ STATE_PROPERTY_PARAM_CHANGES: Final = 'param_changes'
 STATE_PROPERTY_CONTENT: Final = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS: Final = 'solicit_answer_details'
 STATE_PROPERTY_CARD_IS_CHECKPOINT: Final = 'card_is_checkpoint'
-STATE_PROPERTY_RECORDED_VOICEOVERS: Final = 'recorded_voiceovers'
 DEPRECATED_STATE_PROPERTY_WRITTEN_TRANSLATIONS: Final = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID: Final = 'widget_id'
 DEPRECATED_STATE_PROPERTY_NEXT_CONTENT_ID_INDEX: Final = 'next_content_id_index'
@@ -299,7 +298,6 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_CARD_IS_CHECKPOINT,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_LINKED_SKILL_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
@@ -568,18 +566,6 @@ class EditExpStatePropertyCardIsCheckpointCmd(ExplorationChange):
     state_name: str
     new_value: bool
     old_value: bool
-
-
-class EditExpStatePropertyRecordedVoiceoversCmd(ExplorationChange):
-    """Class representing the ExplorationChange's
-    CMD_EDIT_STATE_PROPERTY command with
-    STATE_PROPERTY_RECORDED_VOICEOVERS as allowed value.
-    """
-
-    property_name: Literal['recorded_voiceovers']
-    state_name: str
-    new_value: state_domain.RecordedVoiceoversDict
-    old_value: state_domain.RecordedVoiceoversDict
 
 
 class EditExpStatePropertyInteractionIdCmd(ExplorationChange):
@@ -1563,10 +1549,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 idict['confirmed_unclassified_answers'],
                 [state_domain.Hint.from_dict(h) for h in idict['hints']],
                 solution)
-
-            state.recorded_voiceovers = (
-                state_domain.RecordedVoiceovers.from_dict(
-                    sdict['recorded_voiceovers']))
 
             state.linked_skill_id = sdict['linked_skill_id']
 
@@ -5165,7 +5147,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 60
+    CURRENT_EXP_SCHEMA_VERSION = 61
     EARLIEST_SUPPORTED_EXP_SCHEMA_VERSION = 46
 
     @classmethod
@@ -5529,11 +5511,11 @@ class Exploration(translation_domain.BaseTranslatableObject):
             dict. The dict representation of the Exploration domain object,
             following schema version v61.
         """
-        exploration_dict['schema_version'] = 60
+        exploration_dict['schema_version'] = 61
 
         exploration_dict['states'] = cls._convert_states_v55_dict_to_v56_dict(
             exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 61
+        exploration_dict['states_schema_version'] = 56
 
         return exploration_dict
 
@@ -6188,7 +6170,6 @@ class ExplorationChangeMergeVerifier:
     # cust args changes.
     PROPERTIES_CONFLICTING_CUST_ARGS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS
     ]
 
@@ -6200,7 +6181,6 @@ class ExplorationChangeMergeVerifier:
     # answer groups changes.
     PROPERTIES_CONFLICTING_ANSWER_GROUPS_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS
     ]
 
@@ -6212,7 +6192,6 @@ class ExplorationChangeMergeVerifier:
     # solution changes.
     PROPERTIES_CONFLICTING_SOLUTION_CHANGES: List[str] = [
         STATE_PROPERTY_INTERACTION_ANSWER_GROUPS,
-        STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_INTERACTION_CUST_ARGS
     ]
 
@@ -6374,17 +6353,6 @@ class ExplorationChangeMergeVerifier:
                 current_exp_states = (
                     current_exploration.states[state_name])
                 if (change.property_name ==
-                        STATE_PROPERTY_CONTENT):
-                    if (old_exp_states.content.html ==
-                            current_exp_states.content.html):
-                        if (STATE_PROPERTY_CONTENT not in
-                                self.changed_translations[state_name] and
-                                STATE_PROPERTY_RECORDED_VOICEOVERS not in
-                                self.changed_properties[state_name]):
-                            change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
                       STATE_PROPERTY_INTERACTION_ID):
                     if (old_exp_states.interaction.id ==
                             current_exp_states.interaction.id):
@@ -6477,14 +6445,6 @@ class ExplorationChangeMergeVerifier:
                             current_exp_states.interaction.id and
                             old_exp_states.solicit_answer_details ==
                             current_exp_states.solicit_answer_details):
-                        change_is_mergeable = True
-                    if not self.changed_properties[state_name]:
-                        change_is_mergeable = True
-                elif (change.property_name ==
-                      STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if not self.changed_properties[state_name].intersection(
-                            self.PROPERTIES_CONFLICTING_VOICEOVERS_CHANGES +
-                            [STATE_PROPERTY_RECORDED_VOICEOVERS]):
                         change_is_mergeable = True
                     if not self.changed_properties[state_name]:
                         change_is_mergeable = True

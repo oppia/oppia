@@ -2275,8 +2275,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_drag_and_drop_interaction(self) -> None:
         """Tests DragAndDrop interaction."""
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_2')
         content_id_generator = translation_domain.ContentIdGenerator()
         self.set_interaction_for_state(
             self.state, 'DragAndDropSortInput', content_id_generator)
@@ -2550,16 +2548,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     def test_text_interaction(self) -> None:
         """Tests Text interaction."""
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'feedback_0')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'rule_input_27')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_0')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_1')
-        self.state.recorded_voiceovers.add_content_id_for_voiceover(
-            'ca_choices_2')
         content_id_generator = translation_domain.ContentIdGenerator()
         self.set_interaction_for_state(
             self.state, 'TextInput', content_id_generator)
@@ -4687,10 +4675,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   New state:
     card_is_checkpoint: false
@@ -4717,10 +4701,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_2: {}
-        default_outcome_3: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -6990,7 +6970,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7052,14 +7032,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        solution_3: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -7079,11 +7051,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: Title
 version: 0
@@ -7237,7 +7206,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7309,14 +7278,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        solution_3: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -7336,11 +7297,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: Title
 version: 0
@@ -7455,7 +7413,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   (untitled state):
     card_is_checkpoint: true
@@ -7486,11 +7444,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2: {}
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   END:
     card_is_checkpoint: false
@@ -7510,11 +7463,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: Title
 version: 0
@@ -7649,7 +7599,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7694,11 +7644,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -7718,11 +7663,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -7905,7 +7847,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -7976,16 +7918,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2:
-          hi:
-            duration_secs: 2.324875
-            file_size_bytes: 37198
-            filename: default_outcome-hi-en-7hl9iw3az8.mp3
-            needs_update: true
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8008,11 +7940,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -8151,7 +8080,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8187,16 +8116,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2:
-          hi:
-            duration_secs: 2.324875
-            file_size_bytes: 37198
-            filename: default_outcome-hi-en-7hl9iw3az8.mp3
-            needs_update: true
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8219,11 +8138,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -8336,7 +8252,7 @@ next_content_id_index: 4
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8367,11 +8283,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_buttonText_2: {}
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8394,11 +8305,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_3: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -8729,7 +8637,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -8834,14 +8742,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        hint_5: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -8861,11 +8761,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -9146,7 +9043,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9259,15 +9156,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_customPlaceholder_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        feedback_4: {}
-        feedback_5: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -9287,11 +9175,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -9441,7 +9326,7 @@ next_content_id_index: 5
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9498,12 +9383,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_customPlaceholder_3: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -9523,11 +9402,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_4: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -9730,7 +9606,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -9799,20 +9675,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4:
-          hi:
-            duration_secs: 2.324875
-            file_size_bytes: 37198
-            filename: default_outcome-hi-en-7hl9iw3az8.mp3
-            needs_update: true
-        ca_choices_5: {}
-        ca_choices_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -9832,11 +9694,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10034,7 +9893,7 @@ next_content_id_index: 10
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10128,17 +9987,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_5: {}
-        ca_choices_6: {}
-        ca_choices_7: {}
-        ca_choices_8: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
-        solution_4: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -10158,11 +10006,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_9: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10384,7 +10229,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10448,14 +10293,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -10475,11 +10312,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10644,7 +10478,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10703,15 +10537,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        ca_choices_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -10731,11 +10556,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -10872,7 +10694,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -10926,13 +10748,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -10952,11 +10767,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_5: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -11209,7 +11021,7 @@ next_content_id_index: 9
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11289,16 +11101,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        ca_choices_6: {}
-        ca_choices_7: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        feedback_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -11318,11 +11120,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_8: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -11491,7 +11290,7 @@ next_content_id_index: 8
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11568,15 +11367,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_3: {}
-        ca_choices_4: {}
-        ca_choices_5: {}
-        ca_choices_6: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -11596,11 +11386,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_7: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -11776,7 +11563,7 @@ next_content_id_index: 7
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -11841,14 +11628,6 @@ states:
           html: This is <i>solution</i> for state1
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_choices_4: {}
-        ca_choices_5: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        solution_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -11868,11 +11647,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_6: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -12176,7 +11952,7 @@ next_content_id_index: 15
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12313,22 +12089,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_13: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_10: {}
-        feedback_2: {}
-        feedback_4: {}
-        feedback_6: {}
-        feedback_8: {}
-        rule_input_11: {}
-        rule_input_12: {}
-        rule_input_3: {}
-        rule_input_5: {}
-        rule_input_7: {}
-        rule_input_9: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -12348,11 +12108,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_14: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -12487,7 +12244,7 @@ next_content_id_index: 6
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 60
+schema_version: 61
 states:
   Introduction:
     card_is_checkpoint: true
@@ -12542,13 +12299,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_4: {}
-        content_0: {}
-        default_outcome_1: {}
-        feedback_2: {}
-        rule_input_3: {}
     solicit_answer_details: false
   end:
     card_is_checkpoint: false
@@ -12568,11 +12318,8 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_5: {}
     solicit_answer_details: false
-states_schema_version: 55
+states_schema_version: 56
 tags: []
 title: ''
 version: 0
@@ -12613,12 +12360,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 'content': {
                     'content_id': content_id_for_content,
                     'html': content_str,
-                },
-                'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                        content_id_for_content: {},
-                        content_id_for_default_outcome: {}
-                    }
                 },
                 'solicit_answer_details': False,
                 'card_is_checkpoint': is_init_state,
