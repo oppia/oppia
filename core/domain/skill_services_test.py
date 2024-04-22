@@ -711,6 +711,41 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_all_topic_assignments_for_skill(self.SKILL_ID))
         self.assertEqual(len(topic_assignments_dict), 0)
 
+    def test_delete_skill_with_prerequisite(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2'])
+        skill_services.delete_skill(self.USER_ID, 'skill_id_2')
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_1'])
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+
+    def test_remove_skill_id_from_all_prerequisites(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2'])
+        skill_services.remove_skill_id_from_all_prerequisites('skill_id_1')
+        target_skills = skill_models.SkillModel.get_by_prerequisite(
+            "skill_id_1")
+        self.assertEqual(target_skills, [])
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_2'])
+    
+    def test_replace_skill_id_in_all_prerequisites(self) -> None:
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.prerequisite_skill_ids, ['skill_id_1', 'skill_id_2'])
+        
+        skill_services.replace_skill_id_in_all_prerequisites(
+            'skill_id_1', 'skill_id_2')
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_2'])
+
+        skill_services.replace_skill_id_in_all_prerequisites(
+            'skill_id_2', 'skill_id_3')
+        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.prerequisite_skill_ids, ['skill_id_3'])
+
     def test_successfully_replace_skill_id_in_all_topics(self) -> None:
         topic_id = topic_fetchers.get_new_topic_id()
         topic_id_1 = topic_fetchers.get_new_topic_id()

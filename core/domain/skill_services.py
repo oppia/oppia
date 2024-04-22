@@ -635,16 +635,17 @@ def replace_skill_id_in_all_prerequisites(
     new_skill_models = []
     cache_skills = {}
     for skill in target_skills:
-        already_in_skill = False
         for index, prereq in enumerate(skill.prerequisite_skill_ids):
             if prereq == old_skill_id:
                 skill.prerequisite_skill_ids[index] = new_skill_id
-            if prereq == new_skill_id:
-                already_in_skill = True
-        if not already_in_skill:
-            new_skill_models.append(skill)
-            cache_skills[skill.id] = copy.deepcopy(
-                skill_fetchers.get_skill_from_model(skill))
+            # Case where old skill and new skill are both in the list
+            elif prereq == new_skill_id:
+                del skill.prerequisite_skill_ids[index]
+
+        new_skill_models.append(skill)
+        cache_skills[skill.id] = copy.deepcopy(
+            skill_fetchers.get_skill_from_model(skill))
+
     if new_skill_models:
         skill_models.SkillModel.update_timestamps_multi(new_skill_models)
         skill_models.SkillModel.put_multi(new_skill_models)
