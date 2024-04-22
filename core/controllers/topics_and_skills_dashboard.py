@@ -681,6 +681,8 @@ class MergeSkillHandler(
 
         skill_services.replace_skill_id_in_all_topics(
             self.user_id, old_skill_id, new_skill_id)
+        skill_services.replace_skill_id_in_all_prerequisites(
+            old_skill_id, new_skill_id)
         question_services.replace_skill_id_for_all_questions(
             old_skill_id, old_skill.description, new_skill_id)
         changelist = [
