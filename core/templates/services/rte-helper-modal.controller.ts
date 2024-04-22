@@ -419,22 +419,16 @@ export class RteHelperModalComponent {
         } else if (this.componentId === this.COMPONENT_ID_LINK) {
           if (caName === 'text') {
             // Set the link `text` to the link `url` if the `text` is empty.
-            (
-              customizationArgsDict as {
-                [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-              }
-            )[caName] =
+            this.tmpCustomizationArgs[i].value =
               this.tmpCustomizationArgs[i].value ||
               this.tmpCustomizationArgs[i - 1].value;
           }
         }
-        if (this.tmpCustomizationArgs[i].value) {
-          (
-            customizationArgsDict as {
-              [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-            }
-          )[caName] = this.tmpCustomizationArgs[i].value;
-        }
+        (
+          customizationArgsDict as {
+            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
+          }
+        )[caName] = this.tmpCustomizationArgs[i].value;
       }
       this.ngbActiveModal.close(customizationArgsDict);
       this.customizationArgsFormSubscription.unsubscribe();
