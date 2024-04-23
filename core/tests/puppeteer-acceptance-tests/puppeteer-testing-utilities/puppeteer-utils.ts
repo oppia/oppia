@@ -86,7 +86,6 @@ export class BaseUser {
          * every test passes on both modes. */
         headless,
         args,
-        defaultViewport: null,
       })
       .then(async browser => {
         this.startTimeInMilliseconds = Date.now();
