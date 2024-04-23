@@ -459,17 +459,12 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           1,
           new Fraction(false, 0, 0, 1),
-          new Units([
-            {unit: 'newton', exponent: 1},
-            {unit: 'meter', exponent: -1},
-            {unit: 'celsius', exponent: -2},
-          ])
+          uof.fromRawInputString('celsius / meter')
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
-          {unit: 'degC', exponent: -2},
+          {unit: 'degC', exponent: 1},
           {unit: 'm', exponent: -1},
-          {unit: 'N', exponent: 1},
         ]).units
       );
 
@@ -512,6 +507,31 @@ describe('NumberWithUnitsObjectFactory', () => {
         new Units([
           {unit: 'm', exponent: 1},
           {unit: 'Rs', exponent: -1},
+        ]).units
+      );
+    });
+
+    it('should convert units to their canonical form and sort them lexographically', () => {
+      expect(
+        new NumberWithUnits(
+          'real',
+          1,
+          new Fraction(false, 0, 0, 1),
+          new Units([
+            {unit: 'newton', exponent: 1},
+            {unit: 'meter', exponent: -1},
+            {unit: 'celsius', exponent: -2},
+            {unit: 'arcminutes', exponent: -3},
+            {unit: 'cycle', exponent: -1},
+          ])
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'arcmin', exponent: -3},
+          {unit: 'cycle', exponent: -1},
+          {unit: 'degC', exponent: -2},
+          {unit: 'm', exponent: -1},
+          {unit: 'N', exponent: 1},
         ]).units
       );
     });
