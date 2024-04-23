@@ -275,10 +275,13 @@ export class ExplorationEditor extends BaseUser {
     await this.clearAllTextFrom(addTitleBar);
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
+    // Auto save pop up bar is visible only when current input is different from
+    // old input.
     if (oldTitle !== title) {
       if (this.isViewportAtMobileWidth()) {
         // Navbar text is hidden in mobile view port due to less screen so there is no visible
-        // change in UI after we update the input bar. Hence we need to explicitly wait for 2 sec.
+        // change in the UI (specially Auto save pop up bar) after we update the input bar.
+        // Hence we need to explicitly wait for 2 seconds.
         await this.page.waitForTimeout(2000);
       } else {
         await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
