@@ -36,6 +36,7 @@ import {LoaderService} from 'services/loader.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {
   ExplorationChangeEditTranslation,
   ExplorationChangeMarkTranslationsNeedsUpdate,
@@ -78,6 +79,7 @@ export class TranslatorOverviewComponent implements OnInit {
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
+    private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef
   ) {}
 
@@ -114,6 +116,11 @@ export class TranslatorOverviewComponent implements OnInit {
         };
       }
     );
+  }
+
+  isVoiceoverContributionWithAccentEnabled(): boolean {
+    return this.platformFeatureService.status.ADD_VOICEOVER_WITH_ACCENT
+      .isEnabled;
   }
 
   changeActiveMode(modeName: string): void {

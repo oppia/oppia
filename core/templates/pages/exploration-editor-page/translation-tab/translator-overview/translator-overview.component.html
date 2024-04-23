@@ -35,7 +35,7 @@
       </button>
     </div>
   </div>
-  <div class="oppia-translation-progress">
+  <div class="oppia-translation-progress" *ngIf="!isVoiceoverContributionWithAccentEnabled()">
     <div class="e2e-test-progress-info">
       <strong>Exploration {{ inVoiceoverMode ? 'voiceover' : 'translation' }} progress:</strong>
     </div>

@@ -51,8 +51,9 @@ export class VoiceoverCardComponent implements OnInit {
   isAudioAvailable: boolean = false;
   voiceoversAreLoaded: boolean = false;
   audioIsLoaded: boolean = false;
-  manualVoiceoverDuration;
-  voiceoverProgress;
+  manualVoiceoverDuration: number = 0;
+  currentVoiceoverDuration: number = 0;
+  voiceoverProgress: number = 0;
   languageAccentDescription!: string;
 
   constructor(
@@ -86,12 +87,16 @@ export class VoiceoverCardComponent implements OnInit {
       })
     );
     setInterval(() => {
-      if (this.audioPlayerService.isPlaying()) {
+      if (
+        this.audioPlayerService.isTrackLoaded() &&
+        this.audioPlayerService.isPlaying()
+      ) {
+        this.currentVoiceoverDuration =
+          this.audioPlayerService.getCurrentTime();
         this.voiceoverProgress = Math.round(
-          (this.audioPlayerService.getCurrentTime() /
-            this.manualVoiceoverDuration) *
-            100
+          (this.currentVoiceoverDuration / this.manualVoiceoverDuration) * 100
         );
+        this.audioIsLoaded = true;
       }
     }, 1000);
   }
@@ -103,6 +108,10 @@ export class VoiceoverCardComponent implements OnInit {
       this.translationTabActiveContentIdService.getActiveContentId();
     let explorationVersion = this.contextService.getExplorationVersion();
     let entityType = 'exploration';
+    this.currentVoiceoverDuration = 0;
+    this.voiceoverProgress = 0;
+    this.audioIsLoaded = false;
+    this.audioPlayerService.clear();
 
     this.voiceoverBackendApiService
       .fetchVoiceoversAsync(
@@ -118,6 +127,7 @@ export class VoiceoverCardComponent implements OnInit {
           this.manualVoiceoverDuration = Math.round(
             this.manualVoiceover.durationSecs
           );
+          this.audioIsLoaded = true;
         }
       });
 

@@ -31,6 +31,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -63,7 +64,8 @@ export class TranslationStatusService implements OnInit {
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private entityTranslationsService: EntityTranslationsService,
-    private stateEditorService: StateEditorService
+    private stateEditorService: StateEditorService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   ngOnInit(): void {
@@ -233,7 +235,11 @@ export class TranslationStatusService implements OnInit {
         this.explorationTranslationContentNotAvailableCount +=
           noTranslationCount;
         this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
-        if (noTranslationCount === 0 && !stateNeedsUpdate) {
+        if (
+          this.platformFeatureService.status.ADD_VOICEOVER_WITH_ACCENT.isEnabled
+        ) {
+          this.stateWiseStatusColor[stateName] = '#fff';
+        } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
           this.stateWiseStatusColor[stateName] =
             this.ALL_ASSETS_AVAILABLE_COLOR;
         } else if (

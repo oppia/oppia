@@ -29,7 +29,7 @@
                           class="voiceover-progress">
         </mat-progress-bar>
         <span class="voiceover-timer">
-          {{audioPlayerService.getCurrentTime() | formatTime}} / {{manualVoiceoverDuration | formatTime}}
+          {{currentVoiceoverDuration | formatTime}} / {{manualVoiceoverDuration | formatTime}}
         </span>
         <button (click)="deleteManualVoiceover()"
                 mat-icon-button
