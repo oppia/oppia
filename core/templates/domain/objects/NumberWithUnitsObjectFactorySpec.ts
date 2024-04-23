@@ -459,12 +459,17 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           1,
           new Fraction(false, 0, 0, 1),
-          uof.fromRawInputString('celsius / meter')
+          new Units([
+            {unit: 'newton', exponent: 1},
+            {unit: 'meter', exponent: -1},
+            {unit: 'celsius', exponent: -2},
+          ])
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
-          {unit: 'degC', exponent: 1},
+          {unit: 'degC', exponent: -2},
           {unit: 'm', exponent: -1},
+          {unit: 'N', exponent: 1},
         ]).units
       );
 
