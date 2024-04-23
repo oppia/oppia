@@ -261,6 +261,14 @@ export class ExplorationRightsService {
           response.rights.community_owned,
           response.rights.viewable_if_private
         );
+      })
+      .catch(error => {
+        this.ownerNames = initialState.ownerNames;
+        this.editorNames = initialState.editorNames;
+        this.viewerNames = initialState.viewerNames;
+        this.alertsService.addWarning(
+          'Failed to remove the user role. Please try again.'
+        );
       });
   }
 
