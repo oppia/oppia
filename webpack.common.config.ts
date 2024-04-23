@@ -139,29 +139,6 @@ module.exports = {
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
     }),
     new HtmlWebpackPlugin({
-      chunks: ['diagnostic_test_player_page'],
-      filename: 'diagnostic-test-player-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'With Oppia, you can access free lessons on math, ' +
-          'physics, statistics, chemistry, music, history, and more from ' +
-          'anywhere in the world. Oppia is a nonprofit with the mission of ' +
-          'providing high-quality education to those who lack access to it. ' +
-          'The Learner Diagnostic test page will allow the learner to ' +
-          'test their knowledge and get a set of recommendations for where ' +
-          'they should begin learning.',
-      },
-      template:
-        commonPrefix +
-        '/pages/diagnostic-test-player-page/' +
-        'diagnostic-test-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-
-    new HtmlWebpackPlugin({
       chunks: ['console_errors'],
       filename: 'console_errors.html',
       hybrid: true,
