@@ -106,6 +106,15 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/facilitator-dashboard-page/facilitator-dashboard-page.module'
+      ).then(m => m.FacilitatorDashboardPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_CREATOR
       .ROUTE,
     loadChildren: () =>

@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -89,10 +88,3 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaFacilitatorDashboardPage',
-    downgradeComponent({component: FacilitatorDashboardPageComponent})
-  );
