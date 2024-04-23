@@ -16,7 +16,10 @@
  * @fileoverview unit tests for the units object domain constants.
  */
 
-import {ObjectsDomainConstants} from './objects-domain.constants';
+import {
+  ObjectsDomainConstants,
+  getCurrencyUnits,
+} from './objects-domain.constants';
 import {all, create} from 'mathjs';
 
 const math = create(all);
@@ -37,16 +40,6 @@ const getUnitPrefixes = (): string[] => {
   }
 
   return Array.from(prefixSet);
-};
-
-const getCurrencyUnits = (): string[] => {
-  let currencyUnits: string[] = [];
-  for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
-    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
-    currencyUnits.push(currency, ...currencyInfo.aliases);
-  }
-
-  return currencyUnits;
 };
 
 const getAllMathjsUnits = (): string[] => {

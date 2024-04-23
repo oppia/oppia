@@ -446,3 +446,13 @@ export const ObjectsDomainConstants = {
     MM: 'MM',
   } as {[key: string]: string},
 } as const;
+
+export const getCurrencyUnits = (): string[] => {
+  let currencyUnits: string[] = [];
+  for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
+    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+    currencyUnits.push(currency, ...currencyInfo.aliases);
+  }
+
+  return currencyUnits;
+};
