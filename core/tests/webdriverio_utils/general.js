@@ -129,11 +129,13 @@ var CONSOLE_ERRORS_TO_FIX = [
       "(reading 'version_number')"
   ),
   // TODO(#20198): Parameter 'key' required console error.
-  _.escapeRegExp('Parameter "key" required'),
+  new RegExp('Parameter.*key.*required'),
   // TODO(#20197): 404 Not Found error in collection player.
   new RegExp(
-    'http://localhost:8181/collection/.*Failed to load resource: the ' +
-      'server responded with a status of 404 (Not Found)'
+    _.escapeRegExp(
+      'http://localhost:8181/collection/.*Failed to load resource: the ' +
+        'server responded with a status of 404 (Not Found)'
+    )
   ),
 ];
 
