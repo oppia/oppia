@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Exploration Creator and Exploration Manager
+ * @fileoverview Acceptance Test for settings tab in exploration editor.
  */
 
 import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
