@@ -94,7 +94,7 @@ describe('ObjectsDomainConstants', () => {
     }
   );
 
-  it('shoud check that the UNIT_TO_NORMALIZED_UNIT_MAPPING contains all units supported by mathjs', () => {
+  it('should check that the UNIT_TO_NORMALIZED_UNIT_MAPPING contains all units supported by mathjs', () => {
     const units = Object.keys(
       ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
     )
@@ -129,7 +129,7 @@ describe('ObjectsDomainConstants', () => {
     }
   );
 
-  it('shoud check that the PREFIX_TO_NORMALIZED_PREFIX_MAPPING contains all prefixes supported by mathjs', () => {
+  it('should check that the PREFIX_TO_NORMALIZED_PREFIX_MAPPING contains all prefixes supported by mathjs', () => {
     const prefixes = Object.keys(
       ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
     ).sort();
