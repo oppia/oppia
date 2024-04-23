@@ -273,31 +273,36 @@ class SuggestionHandler(
                 suggestion.get_new_image_filenames_added_in_suggestion()
             )
             if new_image_filenames and files is not None:
-                self._upload_new_images_in_translation(
-                    files, suggestion, new_image_filenames
+                new_image_files = {
+                    filename: image_blob
+                    for filename, image_blob
+                    in files.items()
+                    if filename in new_image_filenames
+                }
+                self._save_new_images_added_in_translation(
+                    new_image_files, suggestion
                 )
 
-            self._copy_images_from_target_exploration_to_translation(suggestion)
+            self._copy_images_from_target_exploration_content_to_translation(
+                suggestion
+            )
 
         self.render_json(self.values)
 
-    def _upload_new_images_in_translation(
+    def _save_new_images_added_in_translation(
         self,
-        files: Dict[str, str],
-        suggestion: suggestion_registry.SuggestionTranslateContent,
-        filenames: List[str]
+        new_files: Dict[str, str],
+        suggestion: suggestion_registry.SuggestionTranslateContent
     ) -> None:
         """Saves new images introduced in translation suggestion to storage.
 
         Args:
-            files: dict. Files containing a mapping of image
-                filename to image blob.
+            new_files: dict. A mapping from each new image's filename to its
+                corresponding image blob.
             suggestion: SuggestionTranslateContent. The translation suggestion
                 for which images are being uploaded.
-            filenames: list(str). The image filenames.
         """
-        for filename in filenames:
-            image = files[filename]
+        for filename, image in new_files.items():
             decoded_image = base64.decodebytes(image.encode('utf-8'))
             file_format = (
                 image_validation_services.validate_image_and_filename(
@@ -308,7 +313,7 @@ class SuggestionHandler(
                 filename, suggestion.image_context, suggestion.target_id,
                 decoded_image, 'image', image_is_compressible)
 
-    def _copy_images_from_target_exploration_to_translation(
+    def _copy_images_from_target_exploration_content_to_translation(
         self,
         suggestion: suggestion_registry.SuggestionTranslateContent
     ) -> None:
