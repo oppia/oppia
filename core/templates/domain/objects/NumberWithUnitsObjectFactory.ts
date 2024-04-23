@@ -27,6 +27,12 @@ import {Unit, NumberWithUnitsAnswer} from 'interactions/answer-defs';
 import {unit as mathjsUnit} from 'mathjs';
 
 type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+let currencyUnits: string[] = [];
+
+for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
+  const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+  currencyUnits.push(currency, ...currencyInfo.aliases);
+}
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:
@@ -127,8 +133,13 @@ export class NumberWithUnits {
 
   getCanonicalRepresentationOfUnits(): Unit[] {
     const updatedUnits = this.units.map(({unit, exponent}: Unit) => {
-      const baseUnit = mathjsUnit(unit).units[0].unit.name;
-      const unitPrefix = mathjsUnit(unit).units[0].prefix.name;
+      const baseUnit = currencyUnits.includes(unit)
+        ? ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING[unit]
+        : mathjsUnit(unit).units[0].unit.name;
+
+      const unitPrefix = currencyUnits.includes(unit)
+        ? ''
+        : mathjsUnit(unit).units[0].prefix.name;
       let normalizedUnit = '';
 
       if (unitPrefix !== '') {
