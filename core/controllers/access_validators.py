@@ -439,5 +439,5 @@ class SkillEditorPageAccessValidationHandler(
         skill = skill_fetchers.get_skill_by_id(skill_id, strict=False)
 
         if skill is None:
-            raise self.PageNotFoundException(
+            raise self.NotFoundException(
                 'The skill with the given id doesn\'t exist.')
