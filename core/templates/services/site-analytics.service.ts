@@ -137,6 +137,30 @@ export class SiteAnalyticsService {
     );
   }
 
+  registerClickCreateAccountButtonEvent(): void {
+    this._sendEventToLegacyGoogleAnalytics(
+      'CreateAccountButton',
+      'click',
+      this.windowRef.nativeWindow.location.pathname
+    );
+  }
+
+  registerClickExploreClassroomButtonEvent(): void {
+    this._sendEventToLegacyGoogleAnalytics(
+      'ExploreClassroomButton',
+      'click',
+      this.windowRef.nativeWindow.location.pathname
+    );
+  }
+
+  registerClickStartExploringButtonEvent(): void {
+    this._sendEventToLegacyGoogleAnalytics(
+      'StartExploringButton',
+      'click',
+      this.windowRef.nativeWindow.location.pathname
+    );
+  }
+
   registerClickStartContributingButtonEvent(): void {
     this._sendEventToLegacyGoogleAnalytics(
       'StartContributingButton',

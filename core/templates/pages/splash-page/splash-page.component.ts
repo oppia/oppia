@@ -46,6 +46,7 @@ export class SplashPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   classroomUrlFragment!: string;
   classroomUrl!: string;
+  accountCreationUrl!: string;
   displayedTestimonialId!: number;
   testimonialCount!: number;
   isWindowNarrow: boolean = false;
@@ -77,32 +78,55 @@ export class SplashPageComponent implements OnInit {
     );
   }
 
-  private _nagivateToClassroomPage(): void {
+  private _navigateToClassroomPage(): void {
     this.windowRef.nativeWindow.location.href = this.classroomUrl;
+  }
+
+  private _navigateToAccountCreationPage(): void {
+    this.userService.getLoginUrlAsync().then(loginUrl => {
+      if (loginUrl) {
+        setTimeout(() => {
+          this.windowRef.nativeWindow.location.href = loginUrl;
+        }, 150);
+      } else {
+        this.windowRef.nativeWindow.location.reload();
+      }
+    });
   }
 
   onClickStartLearningButton(): void {
     this.siteAnalyticsService.registerClickHomePageStartLearningButtonEvent();
-    this._nagivateToClassroomPage();
+    this._navigateToClassroomPage();
   }
 
-  onClickBrowseLessonsButton(): void {
-    this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
-    this._nagivateToClassroomPage();
+  onClickCreateAccountButton(): void {
+    this.siteAnalyticsService.registerClickCreateAccountButtonEvent();
+    this._navigateToAccountCreationPage();
   }
 
-  onClickAccessAndroidButton(): void {
-    this.windowRef.nativeWindow.location.href = '/android';
+  onClickExploreClassroomButton(): void {
+    this.siteAnalyticsService.registerClickExploreClassroomButtonEvent();
+    this._navigateToClassroomPage();
+  }
+
+  onClickExploreLessonsButton(): void {
+    this.siteAnalyticsService.registerClickExploreLessonsButtonEvent();
+    this.windowRef.nativeWindow.location.href = '/community-library';
+  }
+
+  onClickStartTeachingButton(): void {
+    this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
+    this._navigateToAccountCreationPage();
+  }
+
+  onClickStartExploringButton(): void {
+    this.siteAnalyticsService.registerClickStartExploringButtonEvent();
+    this._navigateToAccountCreationPage();
   }
 
   onClickStartContributingButton(): void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
     this.windowRef.nativeWindow.location.href = '/volunteer';
-  }
-
-  onClickStartTeachingButton(): void {
-    this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
-    this.windowRef.nativeWindow.location.href = '/creator-guidelines';
   }
 
   // TODO(#11657): Extract the testimonials code into a separate component.

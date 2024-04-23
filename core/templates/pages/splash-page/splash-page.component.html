@@ -1,86 +1,101 @@
 <div class="splash-page">
-  <div class="oppia-splash-section-one" dir="auto">
-    <div class="oppia-splash-section-one-header">
-      <h2 class="oppia-splash-title oppia-splash-indigo-text"> 
-        {{ 'I18N_SPLASH_TITLE' | translate }} 
+  <div class="oppia-splash-section-one" dir="auto" role="region" >
+    <div class="oppia-splash-section-one-header1">
+      <h2 class="oppia-splash-indigo-text">
+        {{ "I18N_SPLASH_TITLE" | translate }}
       </h2>
     </div>
-    <div class="oppia-splash-section-one-hero"> 
+    <div class="oppia-splash-section-one-hero">
       <div class="oppia-splash-section-one-top">
         <div class="oppia-splash-section-one-top-right">
-          <img class="splash-matthew-image"
-                loading="lazy" 
-                alt="Illustration of a young person in front of part of Oppia fraction lesson" 
-                [src]="getStaticImageUrl('/splash/matthew_fractions.svg')">
+          <picture class="splash-matthew-image">
+            <source type="image/webp" [srcset]="getImageSet('/splash/matthewFractions', 'webp')">
+            <source type="image/png" [srcset]="getImageSet('/splash/matthewFractions', 'png')">
+            <img [src]="getStaticImageUrl('/splash/matthewFractions1x.png')"
+                 loading="lazy"
+                 alt="Illustration of a young person in front of part of Oppia fraction lesson">
+          </picture>
         </div>
         <div class="oppia-splash-section-one-top-left">
-          <p class="oppia-splash-section-one-top-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></p>
-          <button type="submit" (click)="onClickBrowseLessonsButton()"
-                  class="btn oppia-splash-button oppia-splash-learn-button oppia-transition-200"
-                  tabindex="0">
-            {{ 'I18N_SPLASH_START_LEARNING' | translate }}
-          </button>
-          <button class="oppia-splash-button oppia-splash-top-account-button"
-                  tabindex="0">
-            {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
-          </button>
+          <div class="oppia-splash-section-one-header2">
+            <h2 class="oppia-splash-title oppia-splash-indigo-text">
+              {{ "I18N_SPLASH_TITLE" | translate }}
+            </h2>
+          </div>
+          <div class="oppia-splash-section-one-content">
+            <p class="oppia-splash-section-one-top-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></p>
+            <button class="btn oppia-splash-button oppia-splash-learn-button oppia-transition-200"
+                    (click)="onClickStartLearningButton()"
+                    aria-label="Start learning on Oppia"
+                    tabindex="0">
+              {{ "I18N_SPLASH_START_LEARNING" | translate }}
+            </button>
+            <button class="oppia-splash-button oppia-splash-top-account-button"
+                    (click)="onClickCreateAccountButton()"
+                    aria-label="Create an account on Oppia"
+                    tabindex="0">
+              {{ "I18N_SPLASH_CREATE_ACCOUNT" | translate }}
+            </button>
+          </div>
         </div>
       </div>
-      <h2 class="oppia-splash-title oppia-splash-orange-text"> 
-        {{ 'I18N_SPLASH_LEARN_MORE_ABOUT_OPPIA' | translate }}  
-      </h2>
       <div class="oppia-splash-section-one-bottom">
-        <div class="oppia-splash-section-one-card">
-          <picture class="oppia-splash-section-one-card-img">
-            <source type="image/webp" [srcset]="getImageSet('/splash/exploration', 'webp')">
-            <source type="image/png" [srcset]="getImageSet('/splash/exploration', 'png')">
-            <img [src]="getStaticImageUrl('/splash/exploration.svg')"
-                 loading="lazy"
-                 alt="Image of a sample exploraiton of Oppia">
-          </picture>
-          <h2 class="oppia-splash-section-one-card-h2"> 
-            {{ 'I18N_SPLASH_FEATURE_ONE_TITLE' | translate }} 
-          </h2>
-          <p> {{ 'I18N_SPLASH_FEATURE_ONE_TEXT' | translate }} </p>
-        </div>
-        <div class="oppia-splash-section-one-card">
-          <picture class="oppia-splash-section-one-card-img">
-            <source type="image/webp" [srcset]="getImageSet('/splash/laptopKid', 'webp')">
-            <source type="image/png" [srcset]="getImageSet('/splash/laptopKid', 'png')">
-            <img [src]="getStaticImageUrl('/splash/laptopKid.svg')"
-                 loading="lazy"
-                 alt="Illustration of a school kid infront of laptop learning online">
-          </picture>
-          <h2 class="oppia-splash-section-one-card-h2"> 
-            {{ 'I18N_SPLASH_FEATURE_TWO_TITLE' | translate }} 
-          </h2>
-          <p> {{ 'I18N_SPLASH_FEATURE_TWO_TEXT' | translate }} </p>
-        </div>
-        <div class="oppia-splash-section-one-card">
-          <picture class="oppia-splash-section-one-card-img">
-            <source type="image/webp" [srcset]="getImageSet('/splash/splashBook', 'webp')">
-            <source type="image/png" [srcset]="getImageSet('/splash/splashBook', 'png')">
-            <img [src]="getStaticImageUrl('/splash/splashBook.svg')"
-                 loading="lazy"
-                 alt="Image of a brown color book">
-          </picture>
-          <h2 class="oppia-splash-section-one-card-h2"> 
-            {{ 'I18N_SPLASH_FEATURE_THREE_TITLE' | translate }} 
-          </h2>
-          <p> {{ 'I18N_SPLASH_FEATURE_THREE_TEXT' | translate }} </p>
+        <h2 class="oppia-splash-title oppia-splash-orange-text oppia-splash-learn-more-title">
+          {{ "I18N_SPLASH_LEARN_MORE_ABOUT_OPPIA" | translate }}
+        </h2>
+        <div class="oppia-splash-section-one-cards">
+          <div class="oppia-splash-section-one-card">
+            <picture class="oppia-splash-section-one-card-img">
+              <source type="image/webp" [srcset]="getImageSet('/splash/exploration', 'webp')">
+              <source type="image/png" [srcset]="getImageSet('/splash/exploration', 'png')">
+              <img [src]="getStaticImageUrl('/splash/exploration1x.png')"
+                   loading="lazy"
+                   alt="Image of a sample exploraiton of Oppia">
+            </picture>
+            <h2 class="oppia-splash-section-one-card-h2">
+              {{ "I18N_SPLASH_FEATURE_ONE_TITLE" | translate }}
+            </h2>
+            <p> {{ "I18N_SPLASH_FEATURE_ONE_TEXT" | translate }} </p>
+          </div>
+          <div class="oppia-splash-section-one-card">
+            <picture class="oppia-splash-section-one-card-img">
+              <source type="image/webp" [srcset]="getImageSet('/splash/laptopKid', 'webp')">
+              <source type="image/png" [srcset]="getImageSet('/splash/laptopKid', 'png')">
+              <img [src]="getStaticImageUrl('/splash/laptopKid1x.png')"
+                   loading="lazy"
+                   alt="Illustration of a school kid infront of laptop learning online">
+            </picture>
+            <h2 class="oppia-splash-section-one-card-h2">
+              {{ "I18N_SPLASH_FEATURE_TWO_TITLE" | translate }}
+            </h2>
+            <p> {{ "I18N_SPLASH_FEATURE_TWO_TEXT" | translate }} </p>
+          </div>
+          <div class="oppia-splash-section-one-card">
+            <picture class="oppia-splash-section-one-card-img">
+              <source type="image/webp" [srcset]="getImageSet('/splash/splashBook', 'webp')">
+              <source type="image/png" [srcset]="getImageSet('/splash/splashBook', 'png')">
+              <img [src]="getStaticImageUrl('/splash/splashBook1x.png')"
+                   loading="lazy"
+                   alt="Image of a brown color book">
+            </picture>
+            <h2 class="oppia-splash-section-one-card-h2">
+              {{ "I18N_SPLASH_FEATURE_THREE_TITLE" | translate }}
+            </h2>
+            <p> {{ "I18N_SPLASH_FEATURE_THREE_TEXT" | translate }} </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="oppia-splash-section-two">
+  <div class="oppia-splash-section-two" role="region" >
     <h2 class="oppia-splash-title oppia-splash-section-two-title">
-      {{ 'I18N_SPLASH_SECTION_TWO_TITLE' | translate }}
+      {{ "I18N_SPLASH_SECTION_TWO_TITLE" | translate }}
     </h2>
     <div class="oppia-splash-section-two-products">
       <div class="oppia-splash-section-two-product">
-        <h2 class="oppia-splash-h2 oppia-splash-classroom-h2"> 
-          {{ 'I18N_SPLASH_CLASSROOM_TITLE' | translate }} 
+        <h2 class="oppia-splash-h2 oppia-splash-classroom-h2">
+          {{ "I18N_SPLASH_CLASSROOM_TITLE" | translate }}
         </h2>
         <picture class="oppia-splash-section-two-product-image">
           <source type="image/webp" [srcset]="getImageSet('/splash/classroomIllustration', 'webp')">
@@ -93,43 +108,49 @@
         </picture>
         <p class="oppia-splash-text" [innerHTML]="'I18N_SPLASH_CLASSROOM_TEXT' | translate:{lessonCount: 70}"></p>
         <button class="oppia-splash-button oppia-splash-classroom-button"
+                (click)="onClickExploreClassroomButton()"
+                aria-label="Explore classrooms on Oppia"
                 tabindex="0">
-          {{ 'I18N_SPLASH_CLASSROOM_BUTTON_TEXT' | translate }} 
+          {{ "I18N_SPLASH_CLASSROOM_BUTTON_TEXT" | translate }}
         </button>
       </div>
       <div class="oppia-splash-section-two-product">
-        <h2 class="oppia-splash-h2 oppia-splash-orange-text"> 
-          {{ 'I18N_SPLASH_LESSONS_TITLE' | translate }} 
+        <h2 class="oppia-splash-h2 oppia-splash-classroom-h2">
+          {{ "I18N_SPLASH_LESSONS_TITLE" | translate }}
         </h2>
         <picture class="oppia-splash-section-two-product-image">
           <source type="image/webp" [srcset]="getImageSet('/splash/lessonsIllustration', 'webp')">
           <source type="image/png" [srcset]="getImageSet('/splash/lessonsIllustration', 'png')">
           <img [src]="getStaticImageUrl('/splash/lessonsIllustration1x.png')"
-                width="500"
-                height="520"
-                loading="lazy"
-                alt="Image illustrating playful lessons of Oppia">
+               width="500"
+               height="520"
+               loading="lazy"
+               alt="Image illustrating playful lessons of Oppia">
         </picture>
         <p class="oppia-splash-text" [innerHTML]="'I18N_SPLASH_LESSONS_TEXT' | translate:{languageCount: 50}"></p>
-        <button class="oppia-splash-button oppia-splash-lessons-button"
-x                tabindex="0">
-          {{ 'I18N_SPLASH_LESSONS_BUTTON_TEXT' | translate }}
+        <button class="oppia-splash-button oppia-splash-classroom-button"
+                (click)="onClickExploreLessonsButton()"
+                aria-label="Explore lessons on Oppia"
+                tabindex="0">
+          {{ "I18N_SPLASH_LESSONS_BUTTON_TEXT" | translate }}
         </button>
       </div>
     </div>
   </div>
 
-  <div class="oppia-splash-section-three">
+  <div class="oppia-splash-section-three" role="region" >
     <div class="oppia-splash-section-three-left">
       <h2 class="oppia-splash-title oppia-splash-indigo-text">
-        {{ 'I18N_SPLASH_STUDENTS_TITLE' | translate }}
+        {{ "I18N_SPLASH_STUDENTS_TITLE" | translate }}
       </h2>
-      <p class="oppia-splash-text oppia-splash-section-two-text">
-        {{ 'I18N_SPLASH_STUDENTS_CONTENT' | translate }}
+      <p class="oppia-splash-text oppia-splash-left-aligned-text">
+        {{ "I18N_SPLASH_STUDENTS_CONTENT" | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-account-button"
+      <button class="oppia-splash-button oppia-splash-desktop-content oppia-splash-account-button"
+              (click)="onClickCreateAccountButton()"
+              aria-label="Create an account on Oppia"
               tabindex="0">
-        {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
+        {{ "I18N_SPLASH_CREATE_ACCOUNT" | translate }}
       </button>
     </div>
     <div class="oppia-splash-section-three-right">
@@ -143,78 +164,90 @@ x                tabindex="0">
              alt="Photo of a kid thinking about fractions">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-account-button"
+    <button class="oppia-splash-button oppia-splash-mobile-content oppia-splash-account-button"
+            (click)="onClickCreateAccountButton()"
+            aria-label="Create an account on Oppia"
             tabindex="0">
-      {{ 'I18N_SPLASH_CREATE_ACCOUNT' | translate }}
+      {{ "I18N_SPLASH_CREATE_ACCOUNT" | translate }}
     </button>
   </div>
 
-  <div class="oppia-splash-section-four">
+  <div class="oppia-splash-section-four" role="region">
     <div class="oppia-splash-section-four-right">
       <h2 class="oppia-splash-title oppia-splash-section-four-title">
-        {{ 'I18N_SPLASH_FOR_TEACHERS' | translate }}
+        {{ "I18N_SPLASH_FOR_TEACHERS" | translate }}
       </h2>
-      <p class="oppia-splash-text oppia-splash-section-four-text">
-        {{ 'I18N_SPLASH_TEACHERS_CONTENT' | translate }}
+      <p class="oppia-splash-text oppia-splash-right-aligned-text">
+        {{ "I18N_SPLASH_TEACHERS_CONTENT" | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-teach-button"
+      <button class="oppia-splash-button oppia-splash-desktop-content oppia-splash-teach-button"
+              (click)="onClickStartTeachingButton()"
+              aria-label="Start teaching on Oppia"
               tabindex="0">
-        {{ 'I18N_SPLASH_START_TEACHING' | translate }}
+        {{ "I18N_SPLASH_START_TEACHING" | translate }}
       </button>
     </div>
     <div class="oppia-splash-section-four-left">
       <picture class="oppia-splash-teaching-image">
-        <source type="image/webp" [srcset]="getImageSet('/splash/splashTeaching', 'webp')">
-        <source type="image/png" [srcset]="getImageSet('/splash/splashTeaching', 'png')">
-        <img [src]="getStaticImageUrl('/splash/splashTeaching1x.png')"
+        <source type="image/webp" [srcset]="getImageSet('/splash/splashTeachingOriginal', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/splashTeachingOriginal', 'png')">
+        <img [src]="getStaticImageUrl('/splash/splashTeachingOriginal1x.png')"
              alt="Photo of two kids and a tutor">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-teach-button"
+    <button class="oppia-splash-button oppia-splash-mobile-content oppia-splash-teach-button"
+            (click)="onClickStartTeachingButton()"
+            aria-label="Start teaching on Oppia"
             tabindex="0">
-      {{ 'I18N_SPLASH_START_TEACHING' | translate }}
+      {{ "I18N_SPLASH_START_TEACHING" | translate }}
     </button>
   </div>
 
-  <div class="oppia-splash-section-five">
+  <div class="oppia-splash-section-five" role="region">
     <div class="oppia-splash-section-five-left">
       <h2 class="oppia-splash-title oppia-splash-section-five-title">
-        {{ 'I18N_SPLASH_FOR_PARENTS' | translate }}
+        {{ "I18N_SPLASH_FOR_PARENTS" | translate }}
       </h2>
-      <p class="oppia-splash-text oppia-splash-section-two-text">
-        {{ 'I18N_SPLASH_PARENTS_CONTENT' | translate }}
+      <p class="oppia-splash-text oppia-splash-left-aligned-text">
+        {{ "I18N_SPLASH_PARENTS_CONTENT" | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-explore-button"
+      <button class="oppia-splash-button oppia-splash-desktop-content oppia-splash-explore-button"
+              (click)="onClickStartExploringButton()"
+              aria-label="Start exploring on Oppia"
               tabindex="0">
-        {{ 'I18N_SPLASH_START_EXPLORING' | translate }}
+        {{ "I18N_SPLASH_START_EXPLORING" | translate }}
       </button>
     </div>
     <div class="oppia-splash-section-five-right">
       <picture class="oppia-splash-students-image">
-        <source type="image/webp" [srcset]="getImageSet('/splash/splashStudents', 'webp')">
-        <source type="image/png" [srcset]="getImageSet('/splash/splashStudents', 'png')">
-        <img [src]="getStaticImageUrl('/splash/splashStudents1x.png')"
+        <source type="image/webp" [srcset]="getImageSet('/splash/splashStudentsOriginal', 'webp')">
+        <source type="image/png" [srcset]="getImageSet('/splash/splashStudentsOriginal', 'png')">
+        <img [src]="getStaticImageUrl('/splash/splashStudentsOriginal1x.png')"
              loading="lazy"
              alt="Image of school students in their school dress">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-explore-button"
+    <button class="oppia-splash-button oppia-splash-mobile-content oppia-splash-explore-button"
+            (click)="onClickStartExploringButton()"
+            aria-label="Start exploring on Oppia"
             tabindex="0">
-      {{ 'I18N_SPLASH_START_EXPLORING' | translate }}
+      {{ "I18N_SPLASH_START_EXPLORING" | translate }}
     </button>
   </div>
 
-  <div class="oppia-splash-section-six">
+  <div class="oppia-splash-section-six" role="region">
     <div class="oppia-splash-section-six-right">
       <h2 class="oppia-splash-title oppia-splash-section-six-title">
-        {{ 'I18N_SPLASH_FOR_VOLUNTEERS' | translate }}
+        {{ "I18N_SPLASH_FOR_VOLUNTEERS" | translate }}
       </h2>
-      <p class="oppia-splash-text oppia-splash-section-six-text">
-        {{ 'I18N_SPLASH_VOLUNTEERS_CONTENT' | translate }}
+      <p class="oppia-splash-text oppia-splash-right-aligned-text">
+        {{ "I18N_SPLASH_VOLUNTEERS_CONTENT" | translate }}
       </p>
-      <button class="oppia-splash-button oppia-splash-desktop-button oppia-splash-volunteer-button"
+      <button (click)="onClickStartContributingButton()"
+              class="oppia-splash-button oppia-splash-desktop-content oppia-splash-volunteer-button"
+              aria-label="Start contributing on Oppia"
               tabindex="0">
-        {{ 'I18N_SPLASH_START_CONTRIBUTING' | translate }}
+        {{ "I18N_SPLASH_START_CONTRIBUTING" | translate }}
       </button>
     </div>
     <div class="oppia-splash-section-six-left">
@@ -225,9 +258,11 @@ x                tabindex="0">
              alt="Logo of Oppia containing photos of contributors">
       </picture>
     </div>
-    <button class="oppia-splash-button oppia-splash-mobile-button oppia-splash-volunteer-button"
+    <button (click)="onClickStartContributingButton()"
+            class="oppia-splash-button oppia-splash-mobile-content oppia-splash-volunteer-button"
+            aria-label="Start contributing on Oppia"
             tabindex="0">
-      {{ 'I18N_SPLASH_START_CONTRIBUTING' | translate }}
+      {{ "I18N_SPLASH_START_CONTRIBUTING" | translate }}
     </button>
   </div>
 </div>
