@@ -17,7 +17,7 @@
   </div>
   <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage && isMobileView()">
     <div class="dashboard-list-header-count">
-      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of {{getOverallItemCount()}}</span>
+      <span>Displaying {{ getIndexOfFirstItemOnPage() }} - {{ getIndexOfLastItemOnPage() }} of {{getOverallItemCount()}}</span>
     </div>
     <div class="results-per-page-div">
       <span>Results per page: </span>
@@ -171,7 +171,7 @@
   </table>
   <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && !isMobileView()">
     <div class="dashboard-list-footer-count">
-      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of {{getOverallItemCount()}}</span>
+      <span>Displaying {{ getIndexOfFirstItemOnPage() }} - {{ getIndexOfLastItemOnPage() }} of {{getOverallItemCount()}}</span>
     </div>
     <div class="dashboard-list-pagination">
       <div>

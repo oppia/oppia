@@ -305,7 +305,7 @@ describe('Contributor stats component', () => {
       expect(component.getOverallItemCount()).toEqual('1+');
     }));
 
-    it('should check for upperlimit for pagination from items per page', fakeAsync(() => {
+    it('should check for upperlimit for pagination from total number of items, as its lower than items per page combined with page number.', fakeAsync(() => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 4;
       fixture.detectChanges();
@@ -314,10 +314,22 @@ describe('Contributor stats component', () => {
         questionReviewerStats,
         questionReviewerStats,
       ];
-      expect(component.getUpperLimitValueForPagination()).toEqual(3);
+      expect(component.getIndexOfLastItemOnPage()).toEqual(3);
     }));
 
-    it('should check for upperlimit for pagination from number of items', fakeAsync(() => {
+    it('should check for upperlimit for pagination from items per page and page number, on the first page, as its lower than total number of items', fakeAsync(() => {
+      component.statsPageNumber = 0;
+      component.itemsPerPage = 1;
+      fixture.detectChanges();
+      component.allStats = [
+        questionReviewerStats,
+        questionReviewerStats,
+        questionReviewerStats,
+      ];
+      expect(component.getIndexOfLastItemOnPage()).toEqual(1);
+    }));
+
+    it('should check for upperlimit for pagination from items per page and page number, on the second page, as its lower than total number of items', fakeAsync(() => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 1;
       fixture.detectChanges();
@@ -326,7 +338,13 @@ describe('Contributor stats component', () => {
         questionReviewerStats,
         questionReviewerStats,
       ];
-      expect(component.getUpperLimitValueForPagination()).toEqual(2);
+      expect(component.getIndexOfLastItemOnPage()).toEqual(2);
+    }));
+
+    it('should retrieve the index of the first item on the page', fakeAsync(() => {
+      component.statsPageNumber = 2;
+      component.itemsPerPage = 3;
+      expect(component.getIndexOfFirstItemOnPage()).toEqual(7);
     }));
 
     it('should show the overall item count from the number of items', fakeAsync(() => {
@@ -341,10 +359,10 @@ describe('Contributor stats component', () => {
       expect(component.getOverallItemCount()).toEqual('3');
     }));
 
-    it('should show a + at the end of the overall item count when the number of items exceeds max expected', fakeAsync(() => {
+    it('should show a "+" at the end of the overall item count when the number of items exceeds max expected', fakeAsync(() => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 1;
-      component.hasMoreThanMaximumExpectedItems = true;
+      component.tableHasMoreThanMaximumExpectedItems = true;
       fixture.detectChanges();
       for (let i = 1; i <= 1000; i++) {
         component.allStats.push(questionReviewerStats);
@@ -920,7 +938,6 @@ describe('Contributor stats component', () => {
       component.ngOnChanges(changes);
 
       tick();
-      expect(component.allStats.length).toEqual(30);
       expect(component.getOverallItemCount()).toEqual('30');
       expect(component.currentStats.length).toEqual(20);
       expect(component.hasMoreItems).toEqual(true);

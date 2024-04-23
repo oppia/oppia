@@ -88,8 +88,8 @@ export class ContributorAdminStatsTable implements OnInit {
   itemsPerPageChoice: number[] = [20, 50, 100];
   itemsPerPage: number = 20;
   statsPageNumber: number = 0;
-  maximumExpectedItems: number = 1000;
-  hasMoreThanMaximumExpectedItems: boolean = false;
+  readonly maximumExpectedItems: number = 1000;
+  tableHasMoreThanMaximumExpectedItems: boolean = false;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
   MOVE_TO_PREV_PAGE: string = 'prev_page';
 
@@ -229,20 +229,21 @@ export class ContributorAdminStatsTable implements OnInit {
       });
   }
 
-  getUpperLimitValueForPagination(): number {
+  getIndexOfLastItemOnPage(): number {
     return Math.min(
       this.statsPageNumber * this.itemsPerPage + this.itemsPerPage,
       this.allStats.length
     );
   }
 
-  showMoreThanMaximumExpectedItems(): string {
-    return this.hasMoreThanMaximumExpectedItems ? '+' : '';
+  getIndexOfFirstItemOnPage(): number {
+    return this.statsPageNumber * this.itemsPerPage + 1;
   }
 
   getOverallItemCount(): string {
     return (
-      this.allStats.length.toString() + this.showMoreThanMaximumExpectedItems()
+      this.allStats.length.toString() +
+      (this.tableHasMoreThanMaximumExpectedItems ? '+' : '')
     );
   }
 
@@ -376,9 +377,9 @@ export class ContributorAdminStatsTable implements OnInit {
       )
       .then(response => {
         this.allStats = response.stats;
-        this.hasMoreThanMaximumExpectedItems = response.more;
+        this.tableHasMoreThanMaximumExpectedItems = response.more;
         this.setCurrentlyDisplayedContributorAdminStats();
-        if (this.allStats.length === 0) {
+        if (!this.hasSomeStats()) {
           this.noDataMessage = 'No statistics to display';
         } else {
           this.updateColumns(contributionSubType);
@@ -386,8 +387,12 @@ export class ContributorAdminStatsTable implements OnInit {
       });
   }
 
+  hasSomeStats(): boolean {
+    return this.allStats.length > 0;
+  }
+
   displayContributorAdminStats(): void {
-    if (this.allStats.length === 0) {
+    if (!this.hasSomeStats()) {
       this.fetchContributorAdminStats();
     } else {
       this.setCurrentlyDisplayedContributorAdminStats();
@@ -400,10 +405,10 @@ export class ContributorAdminStatsTable implements OnInit {
     this.goToPageNumber(0);
   }
 
-  onItemsPerPageChange(value: string): void {
-    // Convert value to a number, as Angular has converted
+  onItemsPerPageChange(newItemsPerPage: string): void {
+    // Convert newItemsPerPage to a number, as Angular has converted
     // the numbers in the dropdown that calls this function to strings.
-    this.itemsPerPage = Number(value);
+    this.itemsPerPage = Number(newItemsPerPage);
     this.refreshPagination();
   }
 
