@@ -543,6 +543,9 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         json_response = self.get_json(url, expected_status_int=400)
         self.assertEqual(
             json_response['error'],
+            'At \'http://localhost/question_player_handler?question_count=1'
+            '&skill_ids=invalid_skill_id&fetch_by_difficulty=true\' '
+            'these errors are happening:\n'
             'Schema validation for \'skill_ids\' failed: Invalid skill id'
         )
 
@@ -1513,7 +1516,11 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Missing key in handler args: version.')
+            response['error'],
+            'At \'http://localhost/explorehandler/exploration_complete_event/'
+            'exp_2\' these errors are happening:\n'
+            'Missing key in handler args: version.'
+        )
 
     def test_exp_incomplete_event_handler(self) -> None:
         """Test handler for leaving an exploration incomplete."""
@@ -1616,7 +1623,12 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         response = self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
             payload, csrf_token=csrf_token, expected_status_int=400)
-        error_msg = 'Missing key in handler args: version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/'
+            'exploration_maybe_leave_event/exp_0\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
     def test_remove_exp_from_incomplete_list_handler(self) -> None:
@@ -2096,10 +2108,12 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: num_starts not in aggregated stats dict.'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2118,10 +2132,12 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         }, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: Expected num_starts to be an int, received invalid'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2137,11 +2153,13 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
                     'exp_version': self.exp_version}, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: total_hit_count not in '
             'state stats mapping of Home in aggregated stats dict.'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2164,10 +2182,12 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
         )
 
         error_msg = (
+            'At \'http://localhost/explorehandler/stats_events/15\' '
+            'these errors are happening:\n'
             'Schema validation for \'aggregated_stats\' '
             'failed: Expected total_hit_count to be an int, received invalid'
         )
-        self.assertEqual(response['error'], error_msg)
+        self.assertIn(error_msg, response['error'])
 
         self.logout()
 
@@ -2243,7 +2263,10 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
         self.assertEqual(
-            response['error'], 'Missing key in handler args: version.'
+            response['error'],
+            'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: version.'
         )
 
     def test_submit_answer_for_exp_raises_error_with_no_answer_matching_type(
@@ -2278,6 +2301,8 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/explorehandler/answer_submitted_event/6\' '
+            'these errors are happening:\n'
             'Schema validation for \'answer\' failed: ' +
             'Type of 1.1 is not present in options'
         )
@@ -2352,6 +2377,8 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             response['error'],
+            'At \'http://localhost/explorehandler/state_hit_event/6\' '
+            'these errors are happening:\n'
             'Missing key in handler args: exploration_version.'
         )
 
@@ -2384,7 +2411,9 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'Missing key in handler args: new_state_name.'
+            'At \'http://localhost/explorehandler/state_hit_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: new_state_name.',
         )
 
         self.logout()
@@ -2454,7 +2483,11 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = 'Missing key in handler args: exp_version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/state_complete_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: exp_version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -2670,7 +2703,11 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = 'Missing key in handler args: version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/exploration_start_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -2739,7 +2776,11 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400
         )
 
-        error_msg = 'Missing key in handler args: exploration_version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/'
+            'exploration_actual_start_event/6\' these errors are happening:\n'
+            'Missing key in handler args: exploration_version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
@@ -2808,7 +2849,11 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
                 'time_spent_in_state_secs': 2.0
             }, expected_status_int=400
         )
-        error_msg = 'Missing key in handler args: exploration_version.'
+        error_msg = (
+            'At \'http://localhost/explorehandler/solution_hit_event/6\' '
+            'these errors are happening:\n'
+            'Missing key in handler args: exploration_version.'
+        )
         self.assertEqual(response['error'], error_msg)
 
         self.logout()

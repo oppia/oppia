@@ -1199,8 +1199,8 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             'Schema validation for \'target_language_code\' failed: '
             'Validation failed: is_supported_audio_language_code ({}) for '
             'object invalid_language_code')
-        self.assertEqual(
-            output['error'], error_msg)
+        self.assertIn(
+            error_msg, output['error'])
 
     def test_handler_with_no_target_language_code_raises_exception(
         self
@@ -1212,9 +1212,10 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
                 'content_ids': '["content"]',
             }, expected_status_int=400)
 
-        error_msg = 'Missing key in handler args: target_language_code.'
-        self.assertEqual(
-            output['error'], error_msg)
+        self.assertIn(
+            'Missing key in handler args: target_language_code.',
+            output['error'],
+        )
 
     def test_handler_with_invalid_exploration_id_returns_not_found(
         self
@@ -1236,8 +1237,8 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400)
 
         error_msg = 'Missing key in handler args: exp_id.'
-        self.assertEqual(
-            output['error'], error_msg)
+        self.assertIn(
+            error_msg, output['error'])
 
     def test_handler_with_invalid_state_name_returns_not_found(self) -> None:
         self.get_json(
@@ -1257,8 +1258,8 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=400)
 
         error_msg = 'Missing key in handler args: state_name.'
-        self.assertEqual(
-            output['error'], error_msg)
+        self.assertIn(
+            error_msg, output['error'])
 
     def test_handler_with_invalid_content_ids_returns_none(self) -> None:
         exp_services.update_exploration(
@@ -1331,8 +1332,8 @@ class MachineTranslationStateTextsHandlerTests(test_utils.GenericTestBase):
         )
 
         error_msg = 'Missing key in handler args: content_ids.'
-        self.assertEqual(
-            output['error'], error_msg)
+        self.assertIn(
+            error_msg, output['error'])
 
     def test_handler_with_valid_input_returns_translation(self) -> None:
         exp_services.update_exploration(
