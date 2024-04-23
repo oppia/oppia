@@ -216,7 +216,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'exploration-editor-tests/create-exploration-and-change-basic-settings',
     'exploration-editor-tests/load-complete-and-restart-exploration-preview',
-    'exploration-editor-tests/savedraft-publish-and-discard-the-changes',
+    'exploration-editor-tests/save-draft-publish-and-discard-the-changes',
     'logged-in-user-tests/click-all-buttons-on-about-page',
     'logged-in-user-tests/click-all-buttons-on-about-foundation-page',
     'logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page',

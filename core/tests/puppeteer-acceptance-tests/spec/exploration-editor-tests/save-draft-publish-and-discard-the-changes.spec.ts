@@ -63,6 +63,10 @@ describe('Exploration Creator', function () {
         'Algebra'
       );
 
+      await explorationVisitor.expectExplorationToBeAccessibleByUrl(
+        explorationId
+      );
+
       await explorationEditor.navigateToSettingsTab();
 
       await explorationEditor.updateTitleTo('New Title');
@@ -72,10 +76,6 @@ describe('Exploration Creator', function () {
       await explorationEditor.updateTitleTo('New Title');
       await explorationEditor.saveExplorationDraft();
       await explorationEditor.expectTitleToBe('New Title');
-
-      await explorationVisitor.expectExplorationToBeAccessibleByUrl(
-        explorationId
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
