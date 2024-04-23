@@ -459,17 +459,12 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           1,
           new Fraction(false, 0, 0, 1),
-          new Units([
-            {unit: 'newton', exponent: 1},
-            {unit: 'meter', exponent: -1},
-            {unit: 'celsius', exponent: -2},
-          ])
+          uof.fromRawInputString('celsius / meter')
         ).getCanonicalRepresentationOfUnits()
       ).toEqual(
         new Units([
-          {unit: 'degC', exponent: -2},
+          {unit: 'degC', exponent: 1},
           {unit: 'm', exponent: -1},
-          {unit: 'N', exponent: 1},
         ]).units
       );
 
@@ -478,9 +473,42 @@ describe('NumberWithUnitsObjectFactory', () => {
           'real',
           24,
           new Fraction(false, 0, 0, 1),
-          new Units([{unit: 'megatonne', exponent: 1}])
+          uof.fromRawInputString('dollar / megatonne')
         ).getCanonicalRepresentationOfUnits()
-      ).toEqual(new Units([{unit: 'Mton', exponent: 1}]).units);
+      ).toEqual(
+        new Units([
+          {unit: 'dollar', exponent: 1},
+          {unit: 'Mton', exponent: -1},
+        ]).units
+      );
+
+      expect(
+        new NumberWithUnits(
+          'real',
+          1,
+          new Fraction(false, 0, 0, 1),
+          uof.fromRawInputString('m / in')
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'in', exponent: -1},
+          {unit: 'm', exponent: 1},
+        ]).units
+      );
+
+      expect(
+        new NumberWithUnits(
+          'real',
+          1,
+          new Fraction(false, 0, 0, 1),
+          uof.fromRawInputString('m / Rupee')
+        ).getCanonicalRepresentationOfUnits()
+      ).toEqual(
+        new Units([
+          {unit: 'm', exponent: 1},
+          {unit: 'Rs', exponent: -1},
+        ]).units
+      );
     });
   });
 });
