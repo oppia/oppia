@@ -21,15 +21,23 @@ import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Fraction} from 'domain/objects/fraction.model';
-import {
-  getCurrencyUnits,
-  ObjectsDomainConstants,
-} from 'domain/objects/objects-domain.constants';
+import {ObjectsDomainConstants} from 'domain/objects/objects-domain.constants';
 import {Units, UnitsObjectFactory} from 'domain/objects/UnitsObjectFactory';
 import {Unit, NumberWithUnitsAnswer} from 'interactions/answer-defs';
 import {unit as mathjsUnit} from 'mathjs';
 
 type CurrencyUnitsKeys = (keyof typeof ObjectsDomainConstants.CURRENCY_UNITS)[];
+
+export const getCurrencyUnits = (): string[] => {
+  let currencyUnits: string[] = [];
+  for (const currency in ObjectsDomainConstants.CURRENCY_UNITS) {
+    const currencyInfo = ObjectsDomainConstants.CURRENCY_UNITS[currency];
+    currencyUnits.push(currency, ...currencyInfo.aliases);
+  }
+
+  return currencyUnits;
+};
+
 let currencyUnits = getCurrencyUnits();
 
 /* Guidelines for adding new custom currency units in Number with Units
