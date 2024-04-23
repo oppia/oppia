@@ -36,7 +36,7 @@ const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
 const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
-const mobileNavToggelbutton = '.e2e-test-mobile-options';
+const mobileNavToggleButton = '.e2e-test-mobile-options';
 const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const mobileVoiceoverArtistsHeader =
@@ -51,7 +51,7 @@ export class VoiceoverAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavToggelbutton);
+      await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {

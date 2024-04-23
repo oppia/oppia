@@ -38,10 +38,11 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createExplorationWithContentAndInteraction(
+    await explorationEditor.createExplorationWithMinimumContent(
       'Solar System Exploration',
       INTERACTION_TYPES.END_EXPLORATION
     );
+    await explorationEditor.saveExplorationDraft();
 
     // Create multiple revisions.
     await explorationEditor.updateCardContent(
@@ -55,9 +56,8 @@ describe('Exploration Editor', function () {
 
     // Create a new revision with metadata changes.
     await explorationEditor.navigateToSettingsTab();
-    await explorationEditor.updateExplorationTitle(
-      'Solar System Exploration - Revision 5'
-    );
+    await explorationEditor.updateTitleTo('Solar System Exploration - Revised');
+    await explorationEditor.updateGoalTo('Learn about the solar system');
     await explorationEditor.navigateToMainTab();
     await explorationEditor.saveExplorationDraft();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
@@ -92,14 +92,17 @@ describe('Exploration Editor', function () {
 
       // Select two revisions for comparison and verify changes in metadata and state.
       await explorationEditor.selectTwoRevisionsForComparison(1, 5);
-      await explorationEditor.expectMetadataChangesInProperties(['title']);
+      await explorationEditor.expectMetadataChangesInProperties([
+        'title',
+        'objective',
+      ]);
       await explorationEditor.expectStateChangesInProperties(['html']);
       await explorationEditor.resetComparisonResults();
 
       // Download and revert revisions.
-      await explorationEditor.downloadRevision(1);
-      await explorationEditor.revertToVersion(2);
-      await explorationEditor.expectReversionToVersion(2);
+      await explorationEditor.downloadVersion(5);
+      await explorationEditor.revertToVersion(4);
+      await explorationEditor.expectReversionToVersion(4);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -21,7 +21,6 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 import {error} from 'console';
 import {ElementHandle} from 'puppeteer';
-import {values} from 'lodash';
 
 const baseURL = testConstants.URLs.BaseURL;
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
@@ -29,10 +28,9 @@ const previewTabButton = '.e2e-test-preview-tab';
 const SettingsTabButton = '.e2e-test-settings-tab';
 const MainTabButton = '.e2e-test-main-tab';
 const HistoryTabButton = '.e2e-test-history-tab';
-const mobileSettingsTabButton = '.e2e-test-mobile-settings-tab-button';
-const mobilePreviewTabButton = '.e2e-test-mobile-preview-tab-button';
-const mobileHistoryTabButton = '.e2e-test-mobile-history-tab-button';
-const mobileMainTabButton = '.e2e-test-mobile-main-tab-button';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
+const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const mobileMainTabButton = '.e2e-test-mobile-main-button';
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -42,7 +40,6 @@ const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
 
 // Settings Tab elements.
-const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
 const addGoalInputBox = '.e2e-test-exploration-objective-input';
 const categoryDropdown = 'mat-select.e2e-test-exploration-category-dropdown';
@@ -120,9 +117,6 @@ const previewRestartButton = '.e2e-test-preview-restart-button';
 const stateConversationContent = '.e2e-test-conversation-content';
 const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
-// Settings tab elements.
-const explorationTitleInputField = '.e2e-test-exploration-title-input';
-
 // History tab elements.
 const userNameEdit = 'input.e2e-test-history-filter-input';
 const historyListItem = 'div.e2e-test-history-list-item';
@@ -147,7 +141,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.page.goto(creatorDashboardPage);
-    showMessage('Creator dashboard page is opened successfully.');
+    await this.page.waitForNetworkIdle();
   }
 
   /**
@@ -155,6 +149,33 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToExplorationEditorPage(): Promise<void> {
     await this.clickOn(createExplorationButton);
+  }
+
+  /**
+   * Navigates to a specified tab in the application.
+   * @param {string} mobileButtonSelector - The selector of the button to click on in mobile view.
+   * @param {string} desktopButtonSelector - The selector of the button to click on in desktop view.
+   */
+  async navigateToTab(
+    mobileButtonSelector: string,
+    desktopButtonSelector: string
+  ): Promise<void> {
+    if (!mobileButtonSelector || !desktopButtonSelector) {
+      throw new Error('Invalid button selectors');
+    }
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileOptionsButton, {visible: true});
+      const element = await this.page.$(mobileNavbarOptions);
+      if (!element) {
+        await this.clickOn(mobileOptionsButton);
+      }
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileButtonSelector);
+    } else {
+      await this.clickOn(desktopButtonSelector);
+    }
   }
 
   /**
@@ -177,13 +198,14 @@ export class ExplorationEditor extends BaseUser {
    * Open settings tab.(Note->It also opens all the dropdowns present
    * in the setting tab for mobile view port.)
    */
+  /**
+   * Navigates to the settings tab in the application.
+   * @returns {Promise<void>}
+   */
   async navigateToSettingsTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileOptionsButton, {visible: true});
-      await this.clickOn(mobileOptionsButton);
-      await this.clickOn(mobileNavbarDropdown);
-      await this.clickOn(mobileSettingsBar);
+    await this.navigateToTab(mobileSettingsBar, SettingsTabButton);
 
+    if (this.isViewportAtMobileWidth()) {
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
       await this.clickOn(basicSettingsDropdown);
       await this.clickOn(advanceSettingsDropdown);
@@ -192,10 +214,8 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
       await this.clickOn(explorationControlsSettingsDropdown);
-    } else {
-      await this.clickOn(settingsTab);
+      await this.page.waitForNetworkIdle();
     }
-    showMessage('Settings tab is opened successfully.');
   }
 
   /**
@@ -265,6 +285,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
+    await this.clearAllTextFrom(stateContentInputField);
     await this.waitForElementToBeClickable(stateContentInputField);
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
@@ -592,6 +613,7 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(mobileOptionsButton);
       }
       await this.clickOn(mobileSaveChangesButton);
+      this.clickOn('.e2e-test-toast-message');
     } else {
       await this.clickOn(saveChangesButton);
     }
@@ -784,13 +806,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobilePreviewTabButton);
-    } else {
-      await this.clickOn(previewTabButton);
-    }
+    await this.navigateToTab(mobilePreviewTabButton, previewTabButton);
     await this.page.waitForNavigation();
   }
 
@@ -902,42 +918,24 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(previewRestartButton);
   }
 
-  async navigateToSettingsTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileSettingsTabButton);
-    } else {
-      await this.clickOn(SettingsTabButton);
-    }
-  }
-
-  async updateExplorationTitle(title: string): Promise<void> {
-    await this.type(explorationTitleInputField, title);
-  }
-
+  /**
+   * Navigates to the main tab in the application.
+   * @returns {Promise<void>}
+   */
   async navigateToMainTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileMainTabButton);
-    } else {
-      await this.clickOn(MainTabButton);
-    }
-  }
-
-  async navigateToHistoryTab(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileHistoryTabButton);
-    } else {
-      await this.clickOn(HistoryTabButton);
-    }
+    await this.navigateToTab(mobileMainTabButton, MainTabButton);
   }
 
   /**
-   * This function checks if a specific revision has certain properties.
+   * Navigates to the history tab in the application.
+   * @returns {Promise<void>}
+   */
+  async navigateToHistoryTab(): Promise<void> {
+    await this.navigateToTab(mobileHistoryTabButton, HistoryTabButton);
+  }
+
+  /**
+   * Checks if a specific revision has certain properties.
    * @param {number} revisionNumber - The number of the revision to check.
    * @param {string[]} properties - The properties to check for in the revision.
    */
@@ -945,6 +943,10 @@ export class ExplorationEditor extends BaseUser {
     revisionNumber: number,
     properties: string[]
   ): Promise<void> {
+    if (!Number.isInteger(revisionNumber) || revisionNumber <= 0) {
+      throw new Error('Invalid revision number');
+    }
+
     let elements = await this.page.$$(historyListItem);
     if (elements.length < revisionNumber) {
       throw new Error(
@@ -979,10 +981,14 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function checks if the revisions are ordered by a specific property.
+   * Checks if the revisions are ordered by a specific property.
    * @param {string} property - The property to check the order by.
    */
   async expectRevisionsToBeOrderedBy(property: string): Promise<void> {
+    if (!property) {
+      throw new Error('Invalid property');
+    }
+
     let revisions = await this.page.$$(historyListItem);
     for (let i = 0; i < revisions.length - 1; i++) {
       let value1 = revisions[i][property];
@@ -1002,20 +1008,29 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function filters the revisions by a specific user.
+   * Filters the revisions by a specific user.
    * @param {string} userName - The name of the user to filter the revisions by.
+
    */
   async filterRevisionsByUser(userName: string): Promise<void> {
+    if (!userName) {
+      throw new Error('Invalid user name');
+    }
+
     await this.type(userNameEdit, userName);
     // The unicode '\u000d' is used to simulate the Enter key press.
     await this.type(userNameEdit, '\u000d');
   }
 
   /**
-   * This function checks if the number of revisions matches the expected number.
+   * Checks if the number of revisions matches the expected number.
    * @param {number} expectedNumber - The expected number of revisions.
    */
   async expectNumberOfRevisions(expectedNumber: number): Promise<void> {
+    if (!Number.isInteger(expectedNumber) || expectedNumber < 0) {
+      throw new Error('Invalid expected number of revisions');
+    }
+
     let revisions = await this.page.$$(historyListItem);
     if (revisions.length !== expectedNumber) {
       throw new Error(
@@ -1027,39 +1042,49 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * This function adjusts the paginator to show a specific number of revisions per page.
-   *
+   * Adjusts the paginator to show a specific number of revisions per page.
    * @param {number} revisionsPerPage - The number of revisions to show per page. Can be 10, 15, or 20.
    */
   async adjustPaginatorToShowRevisionsPerPage(
     revisionsPerPage: number
   ): Promise<void> {
-    const revisionsToIndex = {
+    const REVISIONS_PER_PAGE_OPTIONS = {
       10: 1,
       15: 2,
       20: 3,
     };
-
-    const index = revisionsToIndex[revisionsPerPage];
+    const index = REVISIONS_PER_PAGE_OPTIONS[revisionsPerPage];
     if (index === undefined) {
       throw new Error(
         `Invalid number of revisions per page: ${revisionsPerPage}`
       );
     }
 
-    await this.page.waitForSelector(paginatorToggler, {visible: true});
-    await this.page.click(paginatorToggler);
+    if (this.isViewportAtMobileWidth()) {
+      const elements = await this.page.$$(paginatorToggler);
+      await elements[1].click();
+    } else {
+      await this.page.waitForSelector(paginatorToggler, {visible: true});
+      await this.page.click(paginatorToggler);
+    }
+
     const PaginatorOptionsSelector = '.mat-select-panel';
-    await this.clickOn(
-      `${PaginatorOptionsSelector} mat-option:nth-child(${index})`
-    );
+    const optionSelector = `${PaginatorOptionsSelector} mat-option:nth-child(${index})`;
+    await this.page.waitForSelector(optionSelector, {visible: true});
+    await this.clickOn(optionSelector);
   }
 
   /**
-   * Function to check if the next page of revisions button is in a certain status.
-   * @param {string} status - The status to check for.
+   * Checks if the next page of revisions button is in a certain status.
+   * @param {string} status - The status to check for. Can be 'enabled' or 'disabled'.
    */
   async expectNextPageOfRevisionsButtonToBe(status: string): Promise<void> {
+    if (status !== 'enabled' && status !== 'disabled') {
+      throw new Error(
+        'Invalid status argument. Expected "enabled" or "disabled".'
+      );
+    }
+
     const nextPageButton = await this.page.$('.mat-paginator-navigation-next');
     if (!nextPageButton) {
       throw new Error('Next page button not found');
@@ -1083,7 +1108,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to select two revisions of an exploration for comparison.
+   * Selects two revisions of an exploration for comparison.
    * @param {number} revisionIndex1 - The index of the first revision to select.
    * @param {number} revisionIndex2 - The index of the second revision to select.
    */
@@ -1117,17 +1142,15 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to verify if changes are reflected for each property within a single code block.
+   * Verifies if changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
    */
   async expectChangesInProperties(properties: string[]): Promise<void> {
-    // Function to extract property values from a block.
     const extractPropertyValues = async () => {
       const values = {};
       for (let property of properties) {
         await this.page.waitForSelector('.cm-atom', {visible: true});
         const elements = await this.page.$$('.cm-atom');
-        console.log(elements.length);
         const propertyElements = await Promise.all(
           elements.map(async el => {
             const textContent = await el.evaluate(node => node.textContent);
@@ -1136,43 +1159,62 @@ export class ExplorationEditor extends BaseUser {
         );
 
         const filteredElements = propertyElements.filter(el => el !== null);
-        console.log(filteredElements);
 
-        if (filteredElements.length >= 2) {
-          const line1 = filteredElements[0]
-            ? await filteredElements[0].evaluate(
-                el => el.nextElementSibling?.nextElementSibling?.textContent
-              )
-            : null;
-          const line2 = filteredElements[1]
-            ? await filteredElements[1].evaluate(
-                el => el.nextElementSibling?.nextElementSibling?.textContent
-              )
-            : null;
+        if (filteredElements.length === 0) {
+          throw new Error(`Property ${property} not found`);
+        } else if (
+          filteredElements[0] !== null &&
+          filteredElements[1] !== null
+        ) {
+          const line1 = await filteredElements[0].evaluate(el => {
+            if (
+              el.nextElementSibling &&
+              el.nextElementSibling.nextElementSibling
+            ) {
+              return el.nextElementSibling.nextElementSibling.textContent;
+            } else {
+              throw new Error(
+                `Unable to find third sibling for property ${property}`
+              );
+            }
+          });
+
+          const line2 = await filteredElements[1].evaluate(el => {
+            if (
+              el.nextElementSibling &&
+              el.nextElementSibling.nextElementSibling
+            ) {
+              return el.nextElementSibling.nextElementSibling.textContent;
+            } else {
+              throw new Error(
+                `Unable to find third sibling for property ${property}`
+              );
+            }
+          });
 
           values[property] = [line1, line2];
+        } else {
+          throw new Error(`Null elements found for property ${property}`);
         }
       }
       return values;
     };
 
-    // Extract property values.
     const propertyValues = await extractPropertyValues();
-    console.log(propertyValues);
 
-    // Check if the property values are the same for each property.
     for (let property in propertyValues) {
       if (propertyValues[property][0] === propertyValues[property][1]) {
         throw new Error(`No changes are reflected in ${property}`);
-      } else {
-        showMessage(`Changes are reflected in ${property}.`);
       }
+      showMessage(`Changes are reflected in ${property}.`);
     }
   }
 
   /**
-   * Function to verify if metadata changes are reflected for each property within a single code block.
+   * Verifies if metadata changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
+   * @throws {Error} If a property is not found or if no changes are reflected in a property.
+   * @returns {Promise<void>}
    */
   async expectMetadataChangesInProperties(properties: string[]): Promise<void> {
     await this.page.waitForSelector(viewMetadataChangesButton, {visible: true});
@@ -1181,22 +1223,26 @@ export class ExplorationEditor extends BaseUser {
     await this.expectChangesInProperties(properties);
 
     await this.clickOn(closeMetadataModal);
+    await this.page.waitForSelector(closeMetadataModal, {hidden: true});
   }
 
   /**
-   * Function to verify if exploration state changes are reflected for each property within a single code block.
+   * Verifies if exploration state changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
    */
   async expectStateChangesInProperties(properties: string[]): Promise<void> {
+    // Add two spaces in front of each property to match the formatting in the UI.
+    const formattedProperties = properties.map(property => `  ${property}`);
+
     await this.clickOn(testNodeBackground);
-    await this.page.waitForTimeout(2000);
-    await this.expectChangesInProperties(properties);
+    await this.expectChangesInProperties(formattedProperties);
 
     await this.clickOn(closeStateModal);
   }
 
   /**
-   * Function to reset the comparison results.
+   * Resets the comparison results by clicking on the reset graph button.
+   * @returns {Promise<void>}
    */
   async resetComparisonResults(): Promise<void> {
     await this.page.waitForSelector(resetGraphButton);
@@ -1204,29 +1250,30 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to find the button for a specific version.
+   * Finds the options button for a specific version.
    * @param {number} version - The version number to find.
    */
   async findOptionsButtonForVersion(version: number): Promise<ElementHandle> {
     const buttons = await this.page.$$('.history-table-option');
-    if (version - 1 < 0 || version - 1 >= buttons.length) {
+    const index = buttons.length - version;
+    if (index < 0 || index >= buttons.length) {
       throw new Error(`No button found for version ${version}`);
     }
-    return buttons[version - 1];
+    return buttons[index];
   }
 
   /**
-   * Function to download a specific version.
+   * Downloads a specific version.
    * @param {number} version - The version number to be downloaded.
    */
-  async downloadRevision(version: number): Promise<void> {
+  async downloadVersion(version: number): Promise<void> {
     const button = await this.findOptionsButtonForVersion(version);
     await button.click();
     await this.clickOn(downloadVersionButton);
   }
 
   /**
-   * Function to revert to a specific version.
+   * Reverts to a specific version.
    * @param {number} version - The version number to revert to.
    */
   async revertToVersion(version: number): Promise<void> {
@@ -1234,30 +1281,33 @@ export class ExplorationEditor extends BaseUser {
     await button.click();
     await this.clickOn(revertVersionButton);
     await this.clickOn(confirmRevertVersionButton);
+    // Wait for navigation to complete as the reversion reloads the page.
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
   }
 
   /**
-   * Function to verify if a version is reverting and downloading or not.
+   * Verifies if the reversion to a specific version was successful.
    * @param {number} version - The version number to check.
    */
   async expectReversionToVersion(version: number): Promise<void> {
     await this.page.waitForSelector(historyListItem);
     let element = await this.page.$(historyListItem);
     if (element === null) {
-      throw new Error('No Revisions found');
+      throw new Error('No revisions found in the history list.');
     }
+
     let notes = await element.$eval(
       revisionNoteSelector,
       async el => el.textContent
     );
     if (notes === null) {
-      throw new Error('Revision does not contain a Note');
+      throw new Error('The selected revision does not contain a note.');
     }
-    console.log(notes);
+
     if (notes === ` Reverted exploration to version ${version} `) {
-      showMessage('Revision is reverting successfully');
+      showMessage(`Revision successfully reverted to version ${version}.`);
     } else {
-      throw new Error('Revision is not reverting');
+      throw new Error(`Failed to revert to version ${version}.`);
     }
   }
 }
