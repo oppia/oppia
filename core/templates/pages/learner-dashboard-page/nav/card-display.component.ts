@@ -26,13 +26,16 @@ export class CardDisplayComponent implements OnInit {
 
   nextCard(num: number): void {
     let allCards = this.cards.nativeElement;
+
+    let maxShift = 200 + 224 * (this.getMaxShifts(allCards.offsetWidth) - 1);
+    let lastShift = maxShift % allCards.offsetWidth;
     console.log(this.getMaxShifts(allCards.offsetWidth));
     console.log(allCards.offsetWidth);
     console.log(num);
-    let lastShift =
+    /*let lastShift =
       224 -
       (allCards.offsetWidth % 224) +
-      (this.getMaxShifts(allCards.offsetWidth) > 1 ? 24 : 0);
+      (this.getMaxShifts(allCards.offsetWidth) > 1 ? 24 : 0);*/
     if (allCards !== null) {
       if (this.shift > num) {
         allCards.scrollLeft -=
