@@ -34,6 +34,7 @@ const saveChangesButton = 'button.e2e-test-save-changes';
 // Settings Tab elements.
 const settingsTab = 'a.e2e-test-exploration-settings-tab';
 const addTitleBar = 'input#explorationTitle';
+const explorationTitleSelector = '.e2e-test-exploration-title-input';
 const addGoalInputBox = '.e2e-test-exploration-objective-input';
 const categoryDropdown = 'mat-select.e2e-test-exploration-category-dropdown';
 const languageUpdateDropdown =
@@ -150,8 +151,14 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToSettingsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileOptionsButton, {visible: true});
-      await this.clickOn(mobileOptionsButton);
+      const element = await this.page.$(mobileNavbarDropdown);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.page.waitForSelector(mobileOptionsButton, {visible: true});
+        await this.clickOn(mobileOptionsButton);
+      }
       await this.clickOn(mobileNavbarDropdown);
       await this.clickOn(mobileSettingsBar);
 
@@ -262,9 +269,26 @@ export class ExplorationEditor extends BaseUser {
    * Deletes the previous written title and updates the new title.
    */
   async updateTitleTo(title: string): Promise<void> {
+    await this.page.waitForSelector(explorationTitleSelector);
+    const titleInput = await this.page.$(explorationTitleSelector);
+    const oldTitle = await this.page.evaluate(input => input.value, titleInput);
     await this.clearAllTextFrom(addTitleBar);
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
+    if (oldTitle !== title) {
+      if (this.isViewportAtMobileWidth()) {
+        // Navbar text is hidden in mobile view port due to less screen so there is no visible
+        // change in UI after we update the input bar. Hence we need to explicitly wait for 2 sec.
+        await this.page.waitForTimeout(2000);
+      } else {
+        await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+          visible: true,
+        });
+        await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+          hidden: true,
+        });
+      }
+    }
     showMessage(`Title has been updated to ${title}`);
   }
 
@@ -272,8 +296,8 @@ export class ExplorationEditor extends BaseUser {
    * Matches the expected title with current title.
    */
   async expectTitleToBe(expectedTitle: string): Promise<void> {
-    await this.page.waitForSelector('.e2e-test-exploration-title-input');
-    const titleInput = await this.page.$('.e2e-test-exploration-title-input');
+    await this.page.waitForSelector(explorationTitleSelector);
+    const titleInput = await this.page.$(explorationTitleSelector);
     const currentTitle = await this.page.evaluate(
       input => input.value,
       titleInput
@@ -650,8 +674,9 @@ export class ExplorationEditor extends BaseUser {
     });
     await Promise.all([
       this.clickOn(confirmDiscardButton),
-      this.page.waitForNavigation(),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
+    await this.page.waitForFunction('document.readyState === "complete"');
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsButton);
       await this.clickOn(basicSettingsDropdown);
