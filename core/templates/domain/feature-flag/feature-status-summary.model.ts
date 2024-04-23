@@ -38,6 +38,7 @@ export enum FeatureNames {
   CdAdminDashboardNewUi = 'cd_admin_dashboard_new_ui',
   NewLessonPlayer = 'new_lesson_player',
   CdAllowUndoingTranslationReview = 'cd_allow_undoing_translation_review',
+  AutoUpdateExpVoiceArtistLink = 'auto_update_exp_voice_artist_link',
 }
 
 export interface FeatureStatusSummaryBackendDict {
