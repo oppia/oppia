@@ -98,6 +98,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   isTranslationCoordinator!: boolean;
   loadingMessage!: string;
   allTopicNames: string[] = [];
+  today!: Date;
   startDateForUsersLastActivity!: Date;
   endDateForUsersLastActivity!: Date;
   selectedTopicIds: string[] = [];
@@ -151,6 +152,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
             if (username === null) {
               return;
             }
+            this.today = new Date();
             this.startDateForUsersLastActivity = new Date();
             this.endDateForUsersLastActivity =
               this.getDateThatIsDaysBeforeToday(90);

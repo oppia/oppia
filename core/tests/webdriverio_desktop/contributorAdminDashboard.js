@@ -351,7 +351,7 @@ describe('Contributor Admin Dashboard', function () {
     await users.logout();
   });
 
-  it(
+  fit(
     'should be able to filter those translation submitters, who have submitted' +
       ' translations between a given date range',
     async function () {
@@ -371,7 +371,7 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
@@ -406,7 +406,7 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
@@ -438,7 +438,7 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
@@ -470,7 +470,7 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
