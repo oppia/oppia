@@ -1349,16 +1349,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'files': {},
         }
 
-        with self.assertRaisesRegex(
-            Exception,
-            'There are images in the target exploration that are ' +
-            'not recognized as assets belonging to the target ' +
-            'exploration.'
-        ):
-            self.post_json(
-                '%s/' % feconf.SUGGESTION_URL_PREFIX, request_body,
-                csrf_token=csrf_token
-            )
+        response_dict = self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX, request_body,
+            csrf_token=csrf_token, expected_status_int=500
+        )
+
+        self.assertIn(
+            'An image in the submitted translation\'s original content '
+            'named "img.png" cannot be found. Please save it to the '
+            'backend file system at /exploration/%s/assets/image/ ' % (
+                exp_id
+            ) + 'before submitting this translation again.',
+            response_dict['error']
+        )
 
     def test_set_of_strings_translation_suggestion_creation(self) -> None:
         self.login(self.TRANSLATOR_EMAIL)

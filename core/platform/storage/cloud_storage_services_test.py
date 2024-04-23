@@ -260,7 +260,8 @@ class CloudStorageServicesTests(test_utils.TestBase):
         non_existent_source_path = 'path/to/file.txt'
 
         with self.get_bucket_swap, self.assertRaisesRegex(
-            ValueError, 'Source asset does not exist.'
+            ValueError,
+            'Source asset does not exist at %s.' % non_existent_source_path
         ):
             cloud_storage_services.copy(
                 'bucket_1', non_existent_source_path, 'other/path/to/file.txt'

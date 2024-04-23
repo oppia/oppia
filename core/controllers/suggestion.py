@@ -268,6 +268,10 @@ class SuggestionHandler(
                 suggestion,
                 suggestion_registry.SuggestionTranslateContent
             )
+            self._copy_images_from_target_exploration_content_to_translation(
+                suggestion
+            )
+
             files = self.normalized_payload.get('files')
             new_image_filenames = (
                 suggestion.get_new_image_filenames_added_in_suggestion()
@@ -282,10 +286,6 @@ class SuggestionHandler(
                 self._save_new_images_added_in_translation(
                     new_image_files, suggestion
                 )
-
-            self._copy_images_from_target_exploration_content_to_translation(
-                suggestion
-            )
 
         self.render_json(self.values)
 
@@ -340,10 +340,17 @@ class SuggestionHandler(
                 target_image_filenames
             )
         except ValueError as error:
+            _, source_asset_path, *_ = error.args
+            filename_start_index = source_asset_path.rfind('/') + 1
+            source_asset_filename = source_asset_path[filename_start_index:]
+            source_asset_directory = source_asset_path[:filename_start_index]
             raise Exception(
-                'There are images in the target exploration that are '
-                'not recognized as assets belonging to the target '
-                'exploration.'
+                'An image in the submitted translation\'s original content '
+                'named "%s" cannot be found. Please save it to the ' % (
+                    source_asset_filename
+                ) + 'backend file system at /%s ' % (
+                    source_asset_directory
+                ) + 'before submitting this translation again.'
             ) from error
 
 
