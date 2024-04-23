@@ -49,8 +49,17 @@ const getCurrencyUnits = (): string[] => {
   return currencyUnits;
 };
 
+const getAllMathjsUnits = (): string[] => {
+  let mathjsUnits: string[] = [];
+  for (const unit in math.Unit.UNITS) {
+    mathjsUnits.push(unit);
+  }
+  return mathjsUnits;
+};
+
 const unitPrefixes = getUnitPrefixes();
 const currencyUnits = getCurrencyUnits();
+const mathjsUnits = getAllMathjsUnits();
 
 const isValidUnit = (unit: string): boolean => {
   return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
@@ -85,6 +94,17 @@ describe('ObjectsDomainConstants', () => {
     }
   );
 
+  it('shoud check that the UNIT_TO_NORMALIZED_UNIT_MAPPING contains all units supported by mathjs', () => {
+    const units = Object.keys(
+      ObjectsDomainConstants.UNIT_TO_NORMALIZED_UNIT_MAPPING
+    )
+      .filter((unit: string) => {
+        return !currencyUnits.includes(unit);
+      })
+      .sort();
+    expect(units).toEqual(mathjsUnits.sort());
+  });
+
   it(
     'should check that every value in PREFIX_TO_' +
       'NORMALIZED_PREFIX_MAPPING is a valid prefix',
@@ -108,4 +128,11 @@ describe('ObjectsDomainConstants', () => {
       });
     }
   );
+
+  it('shoud check that the PREFIX_TO_NORMALIZED_PREFIX_MAPPING contains all prefixes supported by mathjs', () => {
+    const prefixes = Object.keys(
+      ObjectsDomainConstants.PREFIX_TO_NORMALIZED_PREFIX_MAPPING
+    ).sort();
+    expect(prefixes).toEqual(unitPrefixes.sort());
+  });
 });
