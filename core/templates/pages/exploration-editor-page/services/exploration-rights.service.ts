@@ -230,6 +230,11 @@ export class ExplorationRightsService {
   }
 
   removeRoleAsync(memberUsername: string): Promise<void> {
+    const initialState = {
+      ownerNames: [...(this.ownerNames || [])],
+      editorNames: [...(this.editorNames || [])],
+      viewerNames: [...(this.viewerNames || [])],
+    };
     return this.explorationRightsBackendApiService
       .removeRoleAsyncDeleteData(
         this.explorationDataService.explorationId,
