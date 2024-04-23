@@ -200,7 +200,7 @@ export class ExplorationEditor extends BaseUser {
    */
   /**
    * Navigates to the settings tab in the application.
-   * @returns {Promise<void>}
+
    */
   async navigateToSettingsTab(): Promise<void> {
     await this.navigateToTab(mobileSettingsBar, SettingsTabButton);
@@ -920,7 +920,6 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Navigates to the main tab in the application.
-   * @returns {Promise<void>}
    */
   async navigateToMainTab(): Promise<void> {
     await this.navigateToTab(mobileMainTabButton, MainTabButton);
@@ -928,7 +927,6 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Navigates to the history tab in the application.
-   * @returns {Promise<void>}
    */
   async navigateToHistoryTab(): Promise<void> {
     await this.navigateToTab(mobileHistoryTabButton, HistoryTabButton);
@@ -1213,8 +1211,6 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Verifies if metadata changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
-   * @throws {Error} If a property is not found or if no changes are reflected in a property.
-   * @returns {Promise<void>}
    */
   async expectMetadataChangesInProperties(properties: string[]): Promise<void> {
     await this.page.waitForSelector(viewMetadataChangesButton, {visible: true});
