@@ -235,6 +235,15 @@ export class ExplorationRightsService {
       editorNames: [...(this.editorNames || [])],
       viewerNames: [...(this.viewerNames || [])],
     };
+    this.ownerNames = (this.ownerNames || []).filter(
+      name => name !== memberUsername
+    );
+    this.editorNames = (this.editorNames || []).filter(
+      name => name !== memberUsername
+    );
+    this.viewerNames = (this.viewerNames || []).filter(
+      name => name !== memberUsername
+    );
     return this.explorationRightsBackendApiService
       .removeRoleAsyncDeleteData(
         this.explorationDataService.explorationId,
