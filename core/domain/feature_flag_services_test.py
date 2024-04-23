@@ -619,7 +619,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                         self.USER_GROUP_1, self.USER_GROUP_2]
                 )
                 self.assertTrue(feature_services.is_feature_flag_enabled(
-                    user_1_id, self.dev_feature_flag.name))
+                    self.dev_feature_flag.name, user_1_id))
 
     def test_feature_flag_disabled_if_user_not_in_user_groups(self) -> None:
         swap_name_to_description_feature_stage_registry_dict = (
@@ -631,7 +631,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     self.dev_feature_flag.name, False, 0, [self.USER_GROUP_2]
                 )
                 self.assertFalse(feature_services.is_feature_flag_enabled(
-                    'user_id', self.dev_feature_flag.name))
+                    self.dev_feature_flag.name, 'user_id'))
 
     def test_feature_flag_config_is_same_for_user_with_every_retrieval(
         self) -> None:
