@@ -166,7 +166,7 @@ const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
 
 export class CurriculumAdmin extends BaseUser {
   /**
-   * Function for navigating to the topic and skills dashboard page.
+   * Navigate to the topic and skills dashboard page.
    */
   async navigateToTopicAndSkillsDashboardPage(): Promise<void> {
     await this.page.bringToFront();
@@ -175,7 +175,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function to create a skill for a particular topic.
+   * Create a skill for a particular topic.
    */
   async createSkillForTopic(
     description: string,
@@ -202,7 +202,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function to add any number of questions to a particular skill.
+   * Add any number of questions to a particular skill.
    */
   async createQuestionsForSkill(
     skillName: string,
@@ -214,7 +214,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating a basic algebra question in the skill editor page.
+   * Create a basic algebra question in the skill editor page.
    */
   async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
     await this.openSkillEditor(skillName);
@@ -270,7 +270,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for navigating to the creator dashboard page.
+   * Navigate to the creator dashboard page.
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.page.bringToFront();
@@ -278,7 +278,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating an exploration as a curriculum admin.
+   * Create an exploration as a curriculum admin.
    */
   async createAndPublishExploration(
     title: string,
@@ -340,7 +340,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating a topic in the topics-and-skills dashboard.
+   * Create a topic in the topics-and-skills dashboard.
    */
   async createTopic(name: string, urlFragment: string): Promise<void> {
     await this.navigateToTopicAndSkillsDashboardPage();
@@ -371,7 +371,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function that opens the topic editor page for a topic.
+   * Open the topic editor page for a topic.
    */
   async openTopicEditor(topicName: string): Promise<void> {
     const topicNameSelector = this.isViewportAtMobileWidth()
@@ -404,7 +404,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function that opens the skill editor page for a skill.
+   * Open the skill editor page for a skill.
    */
   async openSkillEditor(skillName: string): Promise<void> {
     const skillSelector = this.isViewportAtMobileWidth()
@@ -437,6 +437,9 @@ export class CurriculumAdmin extends BaseUser {
     ]);
   }
 
+  /**
+   * Save a topic as a curriculum admin.
+   */
   async saveTopicDraft(topicName: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
@@ -466,7 +469,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating a subtopic as a curriculum admin.
+   * Create a subtopic as a curriculum admin.
    */
   async createSubtopicForTopic(
     title: string,
@@ -500,7 +503,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for assigning a skill to a subtopic in the topic editor page.
+   * Assign a skill to a subtopic in the topic editor page.
    */
   async assignSkillToSubtopicInTopicEditor(
     skillName: string,
@@ -571,10 +574,10 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for adding a skill for diagnostic tests and then publishing the topic.
-   * Adding a skill to diagnostic tests is necessary for publishing the topic.
+   * Add a skill for diagnostic test and then publish the topic.
+   * Adding a skill to diagnostic test is necessary for publishing the topic.
    */
-  async addSkillToDiagnostingTestsOfTopic(
+  async addSkillToDiagnosticTest(
     skillName: string,
     topicName: string
   ): Promise<void> {
@@ -630,8 +633,8 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating a story, executing chapter creation for
-   * the story, and then publishing the story.
+   * Create a story, execute chapter creation for
+   * the story, and then publish the story.
    */
   async createAndPublishStoryWithChapter(
     storyTitle: string,
@@ -678,7 +681,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for creating a chapter for a certain story.
+   * Create a chapter for a certain story.
    */
   async createChapter(explorationId: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -699,7 +702,7 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function for saving a story as a curriculum admin.
+   * Save a story as a curriculum admin.
    */
   async saveStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -718,10 +721,10 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * This function checks if the topic has been published successfully,
-   * by verifying the status and the counts in the topic and skills dashboard.
+   * Check if the topic has been published successfully, by verifying
+   * the status and the counts in the topics and skills dashboard.
    */
-  async expectTopicToBePublishedInTopicAndSkillsDashboard(
+  async expectTopicToBePublishedInTopicsAndSkillsDashboard(
     topicName: string,
     expectedPublishedStoryCount: number,
     expectedSubtopicCount: number,
