@@ -1,6 +1,6 @@
 <div role="main" class="oppia-conversation-skin-animate-cards-container position-relative" *ngIf="hasFullyLoaded">
   <div class="conversation-skin-cards-container conversation-skin-animate-cards e2e-test-conversation-skin-cards-container"
-       [ngClass]="{'animate-to-two-cards': isPlayerAnimatingToOneCard(), 'animate-to-one-card': isPlayerAnimatingToTwoCards()}">
+       [ngClass]="{'animate-to-two-cards': isAnimatingToTwoCards, 'animate-to-one-card': isAnimatingToOneCard}">
 
     <div class="conversation-skin-tutor-card-container"
          [ngClass]="{'conversation-skin-animate-tutor-card-on-narrow':

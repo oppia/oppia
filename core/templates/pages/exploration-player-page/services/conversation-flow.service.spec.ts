@@ -18,7 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {TestBed, waitForAsync} from '@angular/core/testing';
 
 import {ConversationFlowService} from './conversation-flow.service';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -30,8 +30,6 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockWindowRef {
@@ -55,7 +53,6 @@ describe('Conversation skin service', () => {
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
-  let windowDimensionsService: WindowDimensionsService;
 
   let displayedCard = new StateCard(
     null,
@@ -97,7 +94,6 @@ describe('Conversation skin service', () => {
     );
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
   }));
 
   it('should handle new card addition', () => {
@@ -113,38 +109,12 @@ describe('Conversation skin service', () => {
       contentTranslationManagerService,
       'displayTranslations'
     ).and.returnValue();
-    spyOn(playerTranscriptService, 'getNumCards').and.returnValues(2, 1);
-    spyOn(playerPositionService, 'setDisplayedCardIndex');
-    spyOn(playerPositionService, 'changeCurrentQuestion');
 
-    spyOn(
-      conversationFlowService,
-      'isSupplementalCardNonempty'
-    ).and.returnValues(false, true);
-    spyOn(conversationFlowService, 'canWindowShowTwoCards').and.returnValue(
-      true
-    );
-    spyOn(conversationFlowService, 'animateToTwoCards');
-
-    conversationFlowService.addAndDisplayNewCard(displayedCard);
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
-    expect(conversationFlowService.animateToTwoCards).toHaveBeenCalled();
-
-    conversationFlowService.addAndDisplayNewCard(displayedCard);
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(1);
-
-    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    conversationFlowService.addAndDisplayNewCard(displayedCard);
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(0);
-    expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalledWith(0);
-  });
-
-  it('should tell if window can show two cards', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
-    );
-
-    expect(conversationFlowService.canWindowShowTwoCards()).toBeTrue();
+    conversationFlowService.addNewCardAndDisplayTranslations(displayedCard);
+    expect(playerTranscriptService.addNewCard).toHaveBeenCalled();
+    expect(
+      contentTranslationManagerService.displayTranslations
+    ).toHaveBeenCalled();
   });
 
   it('should tell if supplemental card is non empty', () => {
@@ -152,22 +122,4 @@ describe('Conversation skin service', () => {
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
     ).toBeFalse();
   });
-
-  it('should animate to one card', fakeAsync(() => {
-    let doneCallbackSpy = jasmine.createSpy('done callback');
-    conversationFlowService.animateToOneCard(doneCallbackSpy);
-
-    tick(600);
-    expect(conversationFlowService.playerIsAnimatingToOneCard).toBeFalse();
-    expect(doneCallbackSpy).toHaveBeenCalled();
-  }));
-
-  it('should animate to two cards', fakeAsync(() => {
-    let doneCallbackSpy = jasmine.createSpy('done callback');
-    conversationFlowService.animateToTwoCards(doneCallbackSpy);
-
-    tick(1000);
-    expect(conversationFlowService.playerIsAnimatingToTwoCards).toBeFalse();
-    expect(doneCallbackSpy).toHaveBeenCalled();
-  }));
 });

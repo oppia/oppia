@@ -14,8 +14,8 @@
 
 /**
  * @fileoverview Service to manage the conversation flow of the exploration player,
- * controlling behaviours such as adding cards to the stack and displaying them, or
- * submitting the answer to progress further.
+ * controlling behaviours such as adding cards to the stack, or submitting the
+ * answer to progress further.
  */
 
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -24,32 +24,20 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ExplorationPlayerStateService} from './exploration-player-state.service';
-import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConversationFlowService {
-  TIME_PADDING_MSEC = 250;
-  TIME_FADEIN_MSEC = 100;
-  TIME_NUM_CARDS_CHANGE_MSEC = 500;
-
-  playerIsAnimatingToTwoCards!: boolean;
-  playerIsAnimatingToOneCard!: boolean;
-
   constructor(
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
-    private playerPositionService: PlayerPositionService,
-    private playerTranscriptService: PlayerTranscriptService,
-    private windowDimensionsService: WindowDimensionsService
+    private playerTranscriptService: PlayerTranscriptService
   ) {}
 
-  addAndDisplayNewCard(newCard: StateCard): void {
+  addNewCardAndDisplayTranslations(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
     const explorationLanguageCode =
       this.explorationPlayerStateService.getLanguageCode();
@@ -60,80 +48,6 @@ export class ConversationFlowService {
         selectedLanguageCode
       );
     }
-
-    let totalNumCards = this.playerTranscriptService.getNumCards();
-
-    let previousSupplementalCardIsNonempty =
-      totalNumCards > 1 &&
-      this.isSupplementalCardNonempty(
-        this.playerTranscriptService.getCard(totalNumCards - 2)
-      );
-
-    let nextSupplementalCardIsNonempty = this.isSupplementalCardNonempty(
-      this.playerTranscriptService.getLastCard()
-    );
-
-    // Check if next card is supplemental and previous card isn't, indicating
-    // we need to animate player to two cards if the window can show two cards.
-    if (
-      totalNumCards > 1 &&
-      this.canWindowShowTwoCards() &&
-      !previousSupplementalCardIsNonempty &&
-      nextSupplementalCardIsNonempty
-    ) {
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-      this.animateToTwoCards(function () {});
-    } else if (
-      // Check if next card isn't supplemental and previous card is, and if the player
-      // is animated to two cards, indicating that the player should now animate to one card.
-      totalNumCards > 1 &&
-      this.canWindowShowTwoCards() &&
-      previousSupplementalCardIsNonempty &&
-      !nextSupplementalCardIsNonempty
-    ) {
-      this.animateToOneCard(() => {
-        this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-      });
-    } else {
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-    }
-    this.playerPositionService.changeCurrentQuestion(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
-  }
-
-  // Returns whether the screen is wide enough to fit two
-  // cards (e.g., the tutor and supplemental cards) side-by-side.
-  canWindowShowTwoCards(): boolean {
-    return (
-      this.windowDimensionsService.getWidth() >
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
-    );
-  }
-
-  animateToTwoCards(doneCallback: () => void): void {
-    this.playerIsAnimatingToTwoCards = true;
-    setTimeout(
-      () => {
-        this.playerIsAnimatingToTwoCards = false;
-        if (doneCallback) {
-          doneCallback();
-        }
-      },
-      this.TIME_NUM_CARDS_CHANGE_MSEC +
-        this.TIME_FADEIN_MSEC +
-        this.TIME_PADDING_MSEC
-    );
-  }
-
-  animateToOneCard(doneCallback: () => void): void {
-    this.playerIsAnimatingToOneCard = true;
-    setTimeout(() => {
-      this.playerIsAnimatingToOneCard = false;
-      if (doneCallback) {
-        doneCallback();
-      }
-    }, this.TIME_NUM_CARDS_CHANGE_MSEC);
   }
 
   isSupplementalCardNonempty(card: StateCard): boolean {
