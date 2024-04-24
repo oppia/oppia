@@ -107,18 +107,15 @@ var LibraryPage = function () {
     await action.click('Main header', mainHeader);
   };
 
-  this.getHomePage = async function () {
+  this.getHomePage = async function (expectAlertToAppear) {
+    // In the circumstance that the user is leaving the exploration or
+    // collection page, the user will get an alert for warning leaving 
+    // and need to set expectAlertToAppear to be true for handle the alert
     await action.click('Oppia logo', oppiaLogo);
-    await waitFor.textToBePresentInElement(
-      homeSection,
-      'Home',
-      'Library page takes too long to load'
-    );
-  };
-
-  this.getHomePageWithAlert = async function () {
-    await action.click('Oppia logo', oppiaLogo);
-    await general.acceptAlert();
+    if (expectAlertToAppear) {
+      // Handle the alert if it is expected
+      await general.acceptAlert();
+    }
     await waitFor.textToBePresentInElement(
       homeSection,
       'Home',
