@@ -49,7 +49,7 @@ describe('Logged-in User', function () {
       await testLearner.navigateToProfilePage('explorationCreator');
       await testLearner.subscribeToCreator('explorationCreator');
 
-      await explorationCreator.refreshPage();
+      await explorationCreator.reloadPage();
       await explorationCreator.expectNumberOfSubscribersToBe(1);
 
       await explorationCreator.openSubscribersTab();

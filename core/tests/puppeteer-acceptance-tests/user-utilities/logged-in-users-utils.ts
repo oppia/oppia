@@ -146,6 +146,7 @@ const unsubscribeLabel = '.e2e-test-unsubscribe-label';
 const subscriberTabButton = '.e2e-test-subscription-tab';
 const subscriberCard = '.e2e-test-subscription-card';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
+const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -840,8 +841,9 @@ export class LoggedInUser extends BaseUser {
    * This function checks if the number of subscribers equal to.
    */
   async expectNumberOfSubscribersToBe(number: number): Promise<void> {
+    await this.page.waitForSelector(subscriberCountLabel);
     const subscriberCount = await this.page.$eval(
-      '.e2e-test-oppia-total-subscribers',
+      subscriberCountLabel,
       element => element.textContent
     );
 
@@ -850,13 +852,6 @@ export class LoggedInUser extends BaseUser {
     } else {
       throw new Error(`Number of subscribers is not equal to ${number}`);
     }
-  }
-
-  /**
-   * Function for refreshing the page.
-   */
-  async refreshPage(): Promise<void> {
-    await this.page.reload();
   }
 
   /**
