@@ -238,6 +238,61 @@ var ContributorDashboardAdminPage = function () {
     await action.click(`${language} option selector`, selectorOption);
   };
 
+  this.navigateThroughMonths = async function (numberOfMonths) {
+    var nextMonthButton = $('.mat-calendar-next-button');
+    var prevMonthButton = $('.mat-calendar-previous-button');
+    var calenderBody = $('.mat-calendar-content')
+      .$('.mat-calendar-table')
+      .$('.mat-calendar-body');
+
+    var months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ];
+
+    var monthText = await calenderBody.getAttribute('ng-reflect-label');
+    var monthIndex;
+    for (let i = 0; i < 12; i++) {
+      if (months[i] == monthText) {
+        monthIndex = i;
+      }
+    }
+
+    if (numberOfMonths > 0) {
+      for (let i = 0; i < numberOfMonths; i++) {
+        await action.click('Next Month Button', nextMonthButton);
+        if (monthIndex == 11) {
+          monthIndex = 0;
+        } else {
+          monthIndex++;
+        }
+        monthText = await calenderBody.getAttribute('ng-reflect-label');
+        expect(months[monthIndex]).toBe(monthText);
+      }
+    } else if (numberOfMonths < 0) {
+      for (let i = 0; i < Math.abs(numberOfMonths); i++) {
+        await action.click('Previous Month Button', prevMonthButton);
+        if (monthIndex == 0) {
+          monthIndex = 11;
+        } else {
+          monthIndex--;
+        }
+        monthText = await calenderBody.getAttribute('ng-reflect-label');
+        expect(months[monthIndex]).toBe(monthText);
+      }
+    }
+  };
+
   this.selectDate = async function (
     datePickerToggle,
     datePickerInput,
@@ -254,103 +309,19 @@ var ContributorDashboardAdminPage = function () {
     var day = selectedDate.getDate();
     var month = selectedDate.getMonth() + 1;
     var year = selectedDate.getFullYear();
-    var months = [
-      'JAN',
-      'FEB',
-      'MAR',
-      'APR',
-      'MAY',
-      'JUN',
-      'JUL',
-      'AUG',
-      'SEP',
-      'OCT',
-      'NOV',
-      'DEC',
-    ];
-
-    var dateTextContainer = $('.mat-calendar-content')
-      .$('.mat-calendar-table')
-      .$('.mat-calendar-body');
 
     if (year) {
-      var nextMonthButton = $('.mat-calendar-next-button');
-      var prevMonthButton = $('.mat-calendar-previous-button');
-
       var yearsToNavigate =
         year - new Date(initialValueOfDatePicker).getFullYear();
 
-      var monthText = await dateTextContainer.getAttribute('ng-reflect-label');
-      var monthIndex;
-      for (let i = 0; i < 12; i++) {
-        if (months[i] == monthText) {
-          monthIndex = i;
-        }
-      }
-
-      if (yearsToNavigate > 0) {
-        for (let i = 0; i < yearsToNavigate * 12; i++) {
-          await action.click('Next Month Button', nextMonthButton);
-          if (monthIndex == 11) {
-            monthIndex = 0;
-          } else {
-            monthIndex++;
-          }
-          monthText = await dateTextContainer.getAttribute('ng-reflect-label');
-          expect(months[monthIndex]).toBe(monthText);
-        }
-      } else if (yearsToNavigate < 0) {
-        for (let i = 0; i < Math.abs(yearsToNavigate) * 12; i++) {
-          await action.click('Previous Month Button', prevMonthButton);
-          if (monthIndex == 0) {
-            monthIndex = 11;
-          } else {
-            monthIndex--;
-          }
-          monthText = await dateTextContainer.getAttribute('ng-reflect-label');
-          expect(months[monthIndex]).toBe(monthText);
-        }
-      }
+      await this.navigateThroughMonths(yearsToNavigate * 12);
     }
 
     if (month) {
-      var nextMonthButton = $('.mat-calendar-next-button');
-      var prevMonthButton = $('.mat-calendar-previous-button');
-
       var currentMonth = new Date(initialValueOfDatePicker).getMonth() + 1;
       var monthsToNavigate = month - currentMonth;
 
-      var monthText = await dateTextContainer.getAttribute('ng-reflect-label');
-      var monthIndex;
-      for (let i = 0; i < 12; i++) {
-        if (months[i] == monthText) {
-          monthIndex = i;
-        }
-      }
-
-      if (monthsToNavigate > 0) {
-        for (let i = 0; i < monthsToNavigate; i++) {
-          await action.click('Next Month Button', nextMonthButton);
-          if (monthIndex == 11) {
-            monthIndex = 0;
-          } else {
-            monthIndex++;
-          }
-          monthText = await dateTextContainer.getAttribute('ng-reflect-label');
-          expect(months[monthIndex]).toBe(monthText);
-        }
-      } else if (monthsToNavigate < 0) {
-        for (let i = 0; i < Math.abs(monthsToNavigate); i++) {
-          await action.click('Previous Month Button', prevMonthButton);
-          if (monthIndex == 0) {
-            monthIndex = 11;
-          } else {
-            monthIndex--;
-          }
-          monthText = await dateTextContainer.getAttribute('ng-reflect-label');
-          expect(months[monthIndex]).toBe(monthText);
-        }
-      }
+      await this.navigateThroughMonths(monthsToNavigate);
     }
 
     if (day) {
