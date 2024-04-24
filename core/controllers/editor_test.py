@@ -911,6 +911,8 @@ solicit_answer_details: false
             % (exp_id), expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/download/exp_id1?output_'
+            'format=invalid_output_format\' these errors are happening:\n'
             'Schema validation for \'output_format\' failed: Received '
             'invalid_output_format which is not in the allowed range of '
             'choices: [\'zip\', \'json\']'
@@ -1462,6 +1464,8 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/revert/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'current_version\' failed: Could not '
             'convert str to int: invalid_version'
         )
@@ -2272,6 +2276,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         )
 
         error_msg = (
+            'At \'http://localhost/createhandler/data/eid\' these errors are '
+            'happening:\n'
             'Schema validation for \'commit_message\' failed: Validation '
             'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
             % long_commit_message
@@ -2403,6 +2409,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.assertEqual(
             response_dict['error'],
+            'At \'http://localhost/createhandler/rights/eid\' '
+            'these errors are happening:\n'
             'Missing key in handler args: version.')
 
         # Raises error as version from payload does not match the exploration
@@ -2487,6 +2495,8 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
             csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/notificationpreferences/eid\' '
+            'these errors are happening:\n'
             'Schema validation for \'message_type\' failed: Received '
             'invalid_message_type which is not in the allowed range '
             'of choices: [\'feedback\', \'suggestion\']'
@@ -3134,6 +3144,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             csrf_token=self.csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/data/3\' these errors '
+            'are happening:\n'
             'Schema validation for \'change_list\' failed: Command '
             'edit_exploration_propert is not allowed'
         )
@@ -3167,6 +3179,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
             csrf_token=self.csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/autosave_draft/1\' these '
+            'errors are happening:\n'
             'Schema validation for \'change_list\' failed: Command '
             'edit_exploration_propert is not allowed'
         )
