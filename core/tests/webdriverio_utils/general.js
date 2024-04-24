@@ -134,7 +134,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   /http:\/\/localhost:8181\/collection\/.*Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
   // TODO(#20212): Deleting an existing topic connected to a classroom
   // results in console errors.
-  /http:\/\/localhost:8181\/topic_id_to_topic_name_handler\/\?comma_separated_topic_ids=.*Failed to load resource: the server responded with a status of 500 (Internal Server Error)/,
+  /http:\/\/localhost:8181\/topic_id_to_topic_name_handler\/\?comma_separated_topic_ids=.*Failed to load resource: the server responded with a status of 500 \(Internal Server Error\)/,
   _.escapeRegExp(
     'Uncaught (in promise): No corresponding topic models exist for these ' +
       'topic IDs'
