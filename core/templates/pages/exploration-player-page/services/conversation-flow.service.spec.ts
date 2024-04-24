@@ -29,23 +29,8 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {WindowRef} from 'services/contextual/window-ref.service';
 
-class MockWindowRef {
-  nativeWindow = {
-    location: {
-      pathname: '/path/name',
-      reload: () => {},
-    },
-    onresize: () => {},
-    addEventListener(event: string, callback) {
-      callback({returnValue: null});
-    },
-    scrollTo: (x, y) => {},
-  };
-}
-
-describe('Conversation skin service', () => {
+describe('Conversation flow service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let conversationFlowService: ConversationFlowService;
@@ -71,10 +56,6 @@ describe('Conversation skin service', () => {
         {
           provide: TranslateService,
           useClass: MockTranslateService,
-        },
-        {
-          provide: WindowRef,
-          useClass: MockWindowRef,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
