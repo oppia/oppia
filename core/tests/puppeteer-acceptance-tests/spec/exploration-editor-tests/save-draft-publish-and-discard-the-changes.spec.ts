@@ -35,13 +35,13 @@ describe('Exploration Creator', function () {
       'explorationEditor',
       'exploration_editor@example.com'
     );
-    showMessage('explorationEditor is signed up successfully.');
+    showMessage('explorationEditor has signed up successfully.');
 
     explorationVisitor = await UserFactory.createNewUser(
       'explorationVisitor',
       'exploration_visitor@example.com'
     );
-    showMessage('explorationVisitor is signed up successfully.');
+    showMessage('explorationVisitor has signed up successfully.');
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(

@@ -53,41 +53,41 @@ describe('Exploration Creator', function () {
       'explorationEditor',
       'exploration_editor@example.com'
     );
-    showMessage('explorationEditor is signed up successfully.');
+    showMessage('explorationEditor has signed up successfully.');
 
     voiceoverAdmin = await UserFactory.createNewUser(
       'voiceoverAdm',
       'voiceover_admin@example.com',
       [ROLES.VOICEOVER_ADMIN]
     );
-    showMessage('Voiceover admin is signed up successfully.');
+    showMessage('Voiceover admin has signed up successfully.');
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
-    showMessage('Curriculum admin is signed up successfully.');
+    showMessage('Curriculum admin has signed up successfully.');
 
     const guestUser1 = await UserFactory.createNewUser(
       'guestUser1',
       'guest_user1@example.com'
     );
-    showMessage('guestUser1 is signed up successfully.');
+    showMessage('guestUser1 has signed up successfully.');
     await guestUser1.closeBrowser();
 
     const guestUser2 = await UserFactory.createNewUser(
       'guestUser2',
       'guest_user2@example.com'
     );
-    showMessage('guestUser2 is signed up successfully.');
+    showMessage('guestUser2 has signed up successfully.');
     await guestUser2.closeBrowser();
 
     const guestUser3 = await UserFactory.createNewUser(
       'guestUser3',
       'guest_user3@example.com'
     );
-    showMessage('guestUser3 is signed up successfully.');
+    showMessage('guestUser3 has signed up successfully.');
     await guestUser3.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
