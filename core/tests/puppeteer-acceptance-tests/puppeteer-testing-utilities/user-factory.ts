@@ -36,7 +36,6 @@ import {
 } from '../user-utilities/exploration-editor-utils';
 import {CurriculumAdminFactory} from '../user-utilities/curriculum-admin-utils';
 import testConstants from './test-constants';
-import {CurriculumAdminFactory} from '../user-utilities/curriculum-admin-utils';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -51,7 +50,6 @@ const USER_ROLE_MAPPING = {
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
-  [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
 } as const;
 
 /**

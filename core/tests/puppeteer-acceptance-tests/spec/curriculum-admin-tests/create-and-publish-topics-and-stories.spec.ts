@@ -20,7 +20,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {CurriculumAdmin} from '../../user-utilities/curriculum-admin-utils';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Curriculum Admin', function () {
@@ -33,7 +33,7 @@ describe('Curriculum Admin', function () {
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should create and publish topics, subtopics, skills, stories and chapters.',
@@ -57,7 +57,7 @@ describe('Curriculum Admin', function () {
         'Test Subtopic 1',
         'Test Topic 1'
       );
-      await curriculumAdmin.addSkillToDiagnostingTestsOfTopic(
+      await curriculumAdmin.addSkillToDiagnosticTest(
         'Test Skill 1',
         'Test Topic 1'
       );
@@ -69,14 +69,14 @@ describe('Curriculum Admin', function () {
         explorationId,
         'Test Topic 1'
       );
-      await curriculumAdmin.expectTopicToBePublishedInTopicAndSkillsDashboard(
+      await curriculumAdmin.expectTopicToBePublishedInTopicsAndSkillsDashboard(
         'Test Topic 1',
         1,
         1,
         1
       );
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
