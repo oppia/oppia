@@ -24,6 +24,7 @@ const curriculumAdminThumbnailImage =
   testConstants.images.curriculumAdminThumbnailImage;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
+const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
 const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
@@ -141,6 +142,11 @@ const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 const explorationMobileSaveMenu = '.e2e-test-mobile-options';
 const explorationMobileSaveButton = '.e2e-test-save-changes-for-small-screens';
 
+const explorationSettingsTab = '.e2e-test-settings-tab';
+const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
+const confirmDeletionButton =
+  'button.e2e-test-really-delete-exploration-button';
+
 const mobileToastMessage = '.e2e-test-toast-message';
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
 const mobileSaveChangesDropdown = '.e2e-test-mobile-changes-dropdown';
@@ -163,6 +169,12 @@ const mobileSaveStoryChangesButton =
 const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const mobileAddChapterDropdown = '.e2e-test-mobile-add-chapter';
+
+const mobileNavToggelbutton = '.e2e-test-mobile-options';
+const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
+const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
+const explorationControlsSettingsDropdown =
+  'h3.e2e-test-controls-bar-settings-container';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -821,6 +833,69 @@ export class CurriculumAdmin extends BaseUser {
     );
     expect(topicDetails.skillsCount).toEqual(expectedSkillsCount.toString());
     showMessage('Topic has been published successfully!');
+  }
+
+  /**
+   * Function to navigate to exploration editor
+   * @param explorationUrl - url of the exploration
+   */
+  async navigateToExplorationEditor(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    const editorUrl = `${baseURL}/create/${explorationId}`;
+    await this.page.goto(editorUrl);
+    showMessage('Navigation to exploration editor is successfull.');
+  }
+
+  /**
+   * Function to navigate to exploration settings tab
+   */
+  async navigateToExplorationSettingsTab(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavToggelbutton);
+      await this.clickOn(mobileOptionsDropdown);
+      await this.clickOn(mobileSettingsButton);
+    } else {
+      await this.clickOn(explorationSettingsTab);
+    }
+    showMessage('Navigation to settings tab is successfull.');
+  }
+
+  /**
+   * Deletes the exploration permanently.
+   * Note: This action requires Curriculum Admin role.
+   */
+  async deleteExplorationPermanently(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.clickOn(deleteExplorationButton);
+    await this.clickOn(confirmDeletionButton);
+  }
+
+  /**
+   * Function to dismiss welcome modal
+   */
+  async dismissWelcomeModal(): Promise<void> {
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      visible: true,
+    });
+    await this.clickOn(dismissWelcomeModalSelector);
+    await this.page.waitForSelector(dismissWelcomeModalSelector, {
+      hidden: true,
+    });
+
+    showMessage('Tutorial pop is closed.');
+  }
+
+  /**
+   * Function to open control dropdown so that delete exploration button is visible
+   * in mobile view.
+   */
+  async openExplorationControlDropdown(): Promise<void> {
+    await this.clickOn(explorationControlsSettingsDropdown);
   }
 }
 

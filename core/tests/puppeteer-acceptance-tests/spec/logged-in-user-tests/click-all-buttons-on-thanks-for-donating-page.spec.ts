@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User in Thanks for Donating page', function () {
   let testUser: LoggedInUser;
@@ -31,18 +31,18 @@ describe('Logged-in User in Thanks for Donating page', function () {
       'testuser',
       'testuser@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   beforeEach(async function () {
     await testUser.navigateToThanksForDonatingPage();
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open the right page with the Watch A Video button.',
     async function () {
       await testUser.clickWatchAVideoButtonInThanksForDonatingPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -50,7 +50,7 @@ describe('Logged-in User in Thanks for Donating page', function () {
     async function () {
       await testUser.clickReadOurBlogButtonInThanksForDonatingPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -59,7 +59,7 @@ describe('Logged-in User in Thanks for Donating page', function () {
     async function () {
       await testUser.clickDismissButtonInThanksForDonatingPage();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {

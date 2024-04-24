@@ -76,6 +76,7 @@ export default {
     CURRICULUM_ADMIN: 'curriculum admin',
     QUESTION_ADMIN: 'question admin',
     VOICEOVER_ADMIN: 'voiceover admin',
+    CURRICULUM_ADMIN: 'curriculum admin',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',
@@ -94,5 +95,5 @@ export default {
       '../images/curriculum-admin-thumbnail.svg'
     ),
   },
-  DEFAULT_SPEC_TIMEOUT: 300000,
+  DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };
