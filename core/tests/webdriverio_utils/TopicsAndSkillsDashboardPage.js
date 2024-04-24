@@ -533,8 +533,8 @@ var TopicsAndSkillsDashboardPage = function () {
   };
 
   this.expectNumberOfTopicsToBe = async function (number) {
-    var topicsListItems = await topicsListItemsSelector();
     let topicsTableIsPresent = await topicsTable.isExisting();
+    var topicsListItems = await topicsListItemsSelector();
     if (topicsTableIsPresent) {
       expect(topicsListItems.length).toBe(number);
     }
