@@ -108,9 +108,8 @@ var LibraryPage = function () {
   };
 
   this.getHomePage = async function (expectAlertToAppear) {
-    // In the circumstance that the user is leaving the exploration or
-    // collection page, the user will get an alert for warning leaving 
-    // and need to set expectAlertToAppear to be true for handle the alert
+    // In the event that the user leaves the exploration or collection page, an alert warning is issued.
+    // The `expectAlertToAppear` must be set to true to handle the alert.
     await action.click('Oppia logo', oppiaLogo);
     if (expectAlertToAppear) {
       // Handle the alert if it is expected
