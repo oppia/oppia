@@ -16,15 +16,14 @@
  * @fileoverview Unit tests for Topics and Skills Dashboard Page Root component.
  */
 
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
-import { AppConstants } from 'app.constants';
-import { PageHeadService } from 'services/page-head.service';
-import { TopicsAndSkillsDashboardPageRootComponent } from
-  './topics-and-skills-dashboard-page-root.component';
+import {AppConstants} from 'app.constants';
+import {PageHeadService} from 'services/page-head.service';
+import {TopicsAndSkillsDashboardPageRootComponent} from './topics-and-skills-dashboard-page-root.component';
 
 describe('TopicsAndSkillsDashboardPageRootComponent', () => {
   let fixture: ComponentFixture<TopicsAndSkillsDashboardPageRootComponent>;
@@ -39,16 +38,19 @@ describe('TopicsAndSkillsDashboardPageRootComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(
-      TopicsAndSkillsDashboardPageRootComponent);
+      TopicsAndSkillsDashboardPageRootComponent
+    );
     component = fixture.componentInstance;
   });
 
   it('should have the title and meta tags set', () => {
     expect(component.title).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .TOPICS_AND_SKILLS_DASHBOARD.TITLE);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPICS_AND_SKILLS_DASHBOARD
+        .TITLE
+    );
     expect(component.meta).toEqual(
-      AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .TOPICS_AND_SKILLS_DASHBOARD.META);
+      AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPICS_AND_SKILLS_DASHBOARD
+        .META
+    );
   });
 });

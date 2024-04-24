@@ -16,22 +16,19 @@
  * @fileoverview Topic and skills dashboard page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'oppia-topics-and-skills-dashboard-page-root',
   templateUrl: './topics-and-skills-dashboard-page-root.component.html',
 })
-export class TopicsAndSkillsDashboardPageRootComponent
-  extends BaseRootComponent {
-  title: string = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .TOPICS_AND_SKILLS_DASHBOARD.TITLE);
+export class TopicsAndSkillsDashboardPageRootComponent extends BaseRootComponent {
+  title: string =
+    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPICS_AND_SKILLS_DASHBOARD
+      .TITLE;
 
-  meta: MetaTagData[] = (
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-      .TOPICS_AND_SKILLS_DASHBOARD.META) as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+    .TOPICS_AND_SKILLS_DASHBOARD.META as unknown as Readonly<MetaTagData>[];
 }
