@@ -146,6 +146,18 @@ export class BaseUser {
   }
 
   /**
+   * This function Waits for the autosave indicator to appear and then disappear.
+   */
+  async waitForAutosaveIndicator(): Promise<void> {
+    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+      visible: true,
+    });
+    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+      hidden: true,
+    });
+  }
+
+  /**
    * This function waits for an element to be clickable either by its CSS selector or
    * by the ElementHandle.
    */

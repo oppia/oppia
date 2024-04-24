@@ -100,7 +100,7 @@ describe('Exploration Creator', function () {
 
       await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.createExplorationWithMinimumContent(
+      await explorationEditor.createMinimalExploration(
         'Exploration intro text',
         INTERACTION_TYPES.END_EXPLORATION
       );

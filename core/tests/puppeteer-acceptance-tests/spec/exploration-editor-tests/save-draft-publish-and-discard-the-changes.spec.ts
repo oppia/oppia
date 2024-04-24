@@ -51,13 +51,13 @@ describe('Exploration Creator', function () {
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.createExplorationWithMinimumContent(
+      await explorationEditor.createMinimalExploration(
         'Exploration intro text',
         INTERACTION_TYPES.END_EXPLORATION
       );
 
       await explorationEditor.saveExplorationDraft();
-      explorationId = await explorationEditor.publishExplorationWithContent(
+      explorationId = await explorationEditor.publishExplorationWithMetadata(
         'Old Title',
         'OppiaAcceptanceTestsCheck',
         'Algebra'

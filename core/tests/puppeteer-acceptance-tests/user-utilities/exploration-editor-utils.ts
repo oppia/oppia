@@ -136,7 +136,7 @@ export class ExplorationEditor extends BaseUser {
    * @param content - content of the exploration
    * @param interaction - the interaction to be added to the exploration
    */
-  async createExplorationWithMinimumContent(
+  async createMinimalExploration(
     content: string,
     interaction: string
   ): Promise<void> {
@@ -183,7 +183,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.
    */
-  async publishExplorationWithContent(
+  async publishExplorationWithMetadata(
     title: string,
     goal: string,
     category: string
@@ -272,11 +272,11 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(explorationTitleSelector);
     const titleInput = await this.page.$(explorationTitleSelector);
     const oldTitle = await this.page.evaluate(input => input.value, titleInput);
+
     await this.clearAllTextFrom(addTitleBar);
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
-    // Auto save pop up bar is visible only when current input is different from
-    // old input.
+
     if (oldTitle !== title) {
       if (this.isViewportAtMobileWidth()) {
         // Navbar text is hidden in mobile view port due to less screen so there is no visible
@@ -284,12 +284,7 @@ export class ExplorationEditor extends BaseUser {
         // Hence we need to explicitly wait for 2 seconds.
         await this.page.waitForTimeout(2000);
       } else {
-        await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
-          visible: true,
-        });
-        await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
-          hidden: true,
-        });
+        await this.waitForAutosaveIndicator();
       }
     }
     showMessage(`Title has been updated to ${title}`);
