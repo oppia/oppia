@@ -115,7 +115,9 @@ export class LessonCardComponent implements OnInit {
 
   getStorySummaryThumbnailUrl({filename, id}: ThumbnailUrl): string {
     if (!filename) {
-      return '';
+      return this.urlInterpolationService.getStaticImageUrl(
+        '/subjects/Lightbulb.svg'
+      );
     }
     return this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.STORY,
@@ -141,6 +143,12 @@ export class LessonCardComponent implements OnInit {
           })
             .map(([key, value]) => `${key}=${value}`)
             .join('&');
+  }
+
+  handleImageError(): void {
+    this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
+      '/subjects/Lightbulb.svg'
+    );
   }
 }
 

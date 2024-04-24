@@ -302,7 +302,9 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.imgUrl).toBe('');
+    expect(component.imgUrl).toBe(
+      urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
+    );
   });
 
   it('should set story to StorySummary and set its null imgUrl correctly', () => {
@@ -311,7 +313,9 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.imgUrl).toBe('');
+    expect(component.imgUrl).toBe(
+      urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
+    );
   });
 
   it('should set story to StorySummary and get the correct progress', () => {
