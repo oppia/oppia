@@ -268,6 +268,9 @@ export class ExplorationRightsService {
           response.rights.community_owned,
           response.rights.viewable_if_private
         );
+        this.alertsService.addSuccessMessage(
+          'Successfully removed user ' + memberUsername
+        );
       })
       .catch(error => {
         if (
