@@ -276,18 +276,21 @@ export class ExplorationRightsService {
         if (
           initialState.owner_names &&
           initialState.owner_names.includes(memberUsername)
-        )
+        ) {
           this.ownerNames = initialState.owner_names;
+        }
         if (
           initialState.editor_names &&
           initialState.editor_names.includes(memberUsername)
-        )
+        ) {
           this.editorNames = initialState.editor_names;
+        }
         if (
           initialState.viewer_names &&
           initialState.viewer_names.includes(memberUsername)
-        )
+        ) {
           this.viewerNames = initialState.viewer_names;
+        }
         this.alertsService.addWarning(
           'Failed to remove the user role. Please try again.'
         );
