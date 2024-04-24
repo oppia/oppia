@@ -220,7 +220,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(await table.getRows()).toHaveSize(2);
 
     component.ngOnDestroy();
-  }, 10000);
+  });
 
   it('should deselect a job after changing the input', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
@@ -240,7 +240,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.selectedJob).toBeUndefined();
 
     component.ngOnDestroy();
-  }, 10000);
+  });
 
   it('should add a new job after starting a new job run', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
@@ -287,7 +287,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
 
     component.ngOnDestroy();
-  }, 10000);
+  });
 
   it('should cancel the job and update its status', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
@@ -336,7 +336,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
 
     component.ngOnDestroy();
-  }, 10000);
+  });
 
   it('should show the job output', async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
@@ -367,7 +367,7 @@ describe('Beam Jobs Tab Component', () => {
     expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
 
     component.ngOnDestroy();
-  }, 10000);
+  });
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
     const getBeamJobRunsSpy = spyOn(
