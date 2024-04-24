@@ -30,7 +30,7 @@ enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
 
-// After deleting the exploration if we want to access the exploration with the
+// After deleting the exploration, if we want to access the exploration with the
 // URL, then these errors can arise. So, we ignore these errors.
 // Using regex because each time the exploration ID will be different.
 ConsoleReporter.setConsoleErrorsToIgnore([

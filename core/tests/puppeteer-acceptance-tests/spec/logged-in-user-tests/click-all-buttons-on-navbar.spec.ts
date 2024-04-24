@@ -25,8 +25,7 @@ import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporte
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 // Exclude the error related to Google Docs Viewer since it's from an external service
-// and cannot be controlled.
-// https://stackoverflow.com/questions/50909239/how-to-use-google-docs-viewer-with-puppeteer
+// and cannot be controlled by us. (https://stackoverflow.com/q/50909239)
 ConsoleReporter.setConsoleErrorsToIgnore([
   'https://content.googleapis.com/drive/v2internal/viewerimpressions?key=AIzaSyC1eQ1xj69IdTMeii5r7brs3R90eck-m7k&alt=json Failed to load resource: the server responded with a status of 403 ()',
 ]);
