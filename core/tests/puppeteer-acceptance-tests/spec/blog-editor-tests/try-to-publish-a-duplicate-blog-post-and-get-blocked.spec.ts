@@ -27,6 +27,8 @@ const duplicateBlogPostWarning =
   ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
 
+// This is the error that appears in the console when we try to post a blog with a title
+// that already exists. Since we are testing this functionality, this error occurred.
 ConsoleReporter.setConsoleErrorsToIgnore([
   'Blog Post with the given title exists already. Please use a different title.',
 ]);
