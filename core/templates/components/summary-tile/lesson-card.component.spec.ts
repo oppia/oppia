@@ -335,4 +335,17 @@ describe('LessonCardComponent', () => {
       'linear-gradient(270deg, #00645c 50%, transparent 50%), linear-gradient(0deg, #00645c 0%, lightgray 0%)'
     );
   });
+
+  it('should set imgUrl to default if encountering an error', () => {
+    component.story = StorySummary.createFromBackendDict(sampleTopic4);
+    component.topic = sampleTopic4.topic_name;
+
+    component.handleImageError();
+
+    fixture.detectChanges();
+
+    expect(component.imgUrl).toBe(
+      urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
+    );
+  });
 });
