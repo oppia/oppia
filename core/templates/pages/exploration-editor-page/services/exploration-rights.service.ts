@@ -231,19 +231,26 @@ export class ExplorationRightsService {
 
   removeRoleAsync(memberUsername: string): Promise<void> {
     const initialState = {
-      ownerNames: [...(this.ownerNames || [])],
-      editorNames: [...(this.editorNames || [])],
-      viewerNames: [...(this.viewerNames || [])],
+      owner_names: [],
+      editor_names: [],
+      viewer_names: [],
     };
-    this.ownerNames = (this.ownerNames || []).filter(
-      name => name !== memberUsername
-    );
-    this.editorNames = (this.editorNames || []).filter(
-      name => name !== memberUsername
-    );
-    this.viewerNames = (this.viewerNames || []).filter(
-      name => name !== memberUsername
-    );
+    if (this.ownerNames && this.ownerNames.includes(memberUsername)) {
+      initialState.owner_names = [...this.ownerNames];
+      this.ownerNames = this.ownerNames.filter(name => name !== memberUsername);
+    }
+    if (this.editorNames && this.editorNames.includes(memberUsername)) {
+      initialState.editor_names = [...this.editorNames];
+      this.editorNames = this.editorNames.filter(
+        name => name !== memberUsername
+      );
+    }
+    if (this.viewerNames && this.viewerNames.includes(memberUsername)) {
+      initialState.viewer_names = [...this.viewerNames];
+      this.viewerNames = this.viewerNames.filter(
+        name => name !== memberUsername
+      );
+    }
     return this.explorationRightsBackendApiService
       .removeRoleAsyncDeleteData(
         this.explorationDataService.explorationId,
@@ -263,9 +270,21 @@ export class ExplorationRightsService {
         );
       })
       .catch(error => {
-        this.ownerNames = initialState.ownerNames;
-        this.editorNames = initialState.editorNames;
-        this.viewerNames = initialState.viewerNames;
+        if (
+          initialState.owner_names &&
+          initialState.owner_names.includes(memberUsername)
+        )
+          this.ownerNames = initialState.owner_names;
+        if (
+          initialState.editor_names &&
+          initialState.editor_names.includes(memberUsername)
+        )
+          this.editorNames = initialState.editor_names;
+        if (
+          initialState.viewer_names &&
+          initialState.viewer_names.includes(memberUsername)
+        )
+          this.viewerNames = initialState.viewer_names;
         this.alertsService.addWarning(
           'Failed to remove the user role. Please try again.'
         );
