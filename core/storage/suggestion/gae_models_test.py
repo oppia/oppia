@@ -4592,7 +4592,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for max_days_since_end_date_for_last_activity filter within 7 days.
+        # max_days_since_end_date_for_last_activity filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
@@ -4608,7 +4608,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for max_days_since_end_date_for_last_activity filter within 90 days.
+        # max_days_since_end_date_for_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
             .fetch_page(
@@ -4791,7 +4791,7 @@ class TranslationReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 1)
 
-        # Check for max_days_since_end_date_for_last_activity filter within 7 days
+        # max_days_since_end_date_for_last_activity filter within 7 days
         # and IncreasingReviewedTranslations sort.
         sorted_results, next_offset, more = (
             suggestion_models.TranslationReviewerTotalContributionStatsModel
@@ -6203,7 +6203,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 datetime.date.today() - datetime.timedelta(125))
         ).put()
 
-        # Check for max_days_since_end_date_for_last_activity filter within 7 days.
+        # max_days_since_end_date_for_last_activity filter within 7 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
@@ -6218,7 +6218,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 5)
 
-        # Check for max_days_since_end_date_for_last_activity filter within 90 days.
+        # max_days_since_end_date_for_last_activity filter within 90 days.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
             .fetch_page(
@@ -6353,7 +6353,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
                 datetime.date.today() - datetime.timedelta(5))
         ).put()
 
-        # Check for max_days_since_end_date_for_last_activity filter within 90 days
+        # max_days_since_end_date_for_last_activity filter within 90 days
         # and IncreasingReviewedQuestions sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -6371,7 +6371,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for max_days_since_end_date_for_last_activity filter within 7 days
+        # max_days_since_end_date_for_last_activity filter within 7 days
         # and IncreasingReviewedQuestions sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel
@@ -6388,7 +6388,7 @@ class QuestionReviewerTotalContributionStatsModelUnitTests(
         self.assertFalse(more)
         self.assertEqual(next_offset, 3)
 
-        # Check for max_days_since_end_date_for_last_activity filter within 90 days
+        # max_days_since_end_date_for_last_activity filter within 90 days
         # and IncreasingLastActivity sort.
         sorted_results, next_offset, more = (
             suggestion_models.QuestionReviewerTotalContributionStatsModel

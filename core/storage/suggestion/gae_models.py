@@ -2337,10 +2337,11 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
-            max_days_since_start_date_for_last_activity: int. To get number of users
-                who are active in max_days_since_start_date_for_last_activity.
-            max_days_since_end_date_for_last_activity: int. To get number of users
-                who are active in max_days_since_end_date_for_last_activity.
+            max_days_since_start_date_for_last_activity: int|None. Number of
+                days before today to start including users with contributions.
+            max_days_since_end_date_for_last_activity: int|None. Number of
+                days before today from which to stop including users with
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -2348,8 +2349,8 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
                     topic_ids, max_days_since_start_date_for_last_activity and
-                    max_days_since_end_date_for_last_activity filters, returned in the order
-                    specified by sort_by.
+                    max_days_since_end_date_for_last_activity filters, returned
+                    in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -2796,10 +2797,11 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             language_code: str. The language code to get results for.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            max_days_since_start_date_for_last_activity: int|None. To get number of users
-                who are active in max_days_since_start_date_for_last_activity.
-            max_days_since_end_date_for_last_activity: int|None. To get number of users
-                who are active in max_days_since_end_date_for_last_activity.
+            max_days_since_start_date_for_last_activity: int|None. Number of
+                days before today to start including users with contributions.
+            max_days_since_end_date_for_last_activity: int|None. Number of
+                days before today from which to stop including users with
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -2807,8 +2809,8 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
                     list(TranslationSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied language_code,
                     max_days_since_start_date_for_last_activity and
-                    max_days_since_end_date_for_last_activityfilters, returned in the order
-                    specified by sort_by.
+                    max_days_since_end_date_for_last_activityfilters, returned
+                    in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3162,10 +3164,11 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
-            max_days_since_start_date_for_last_activity: int|None. To get number of users
-                who are active in max_days_since_start_date_for_last_activity.
-            max_days_since_end_date_for_last_activity: int|None. To get number of users
-                who are active in max_days_since_end_date_for_last_activity.
+            max_days_since_start_date_for_last_activity: int|None. Number of
+                days before today to start including users with contributions.
+            max_days_since_end_date_for_last_activity: int|None. Number of
+                days before today from which to stop including users with
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -3173,8 +3176,8 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied topic_ids
                     max_days_since_start_date_for_last_activity and
-                    max_days_since_end_date_for_last_activity filters, returned in the
-                    order specified by sort_by.
+                    max_days_since_end_date_for_last_activity filters, returned
+                    in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3498,18 +3501,20 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 results matching the query.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            max_days_since_start_date_for_last_activity: int|None. To get number of users
-                who are active in max_days_since_start_date_for_last_activity.
-            max_days_since_end_date_for_last_activity: int|None. To get number of users
-                who are active in max_days_since_end_date_for_last_activity.
+            max_days_since_start_date_for_last_activity: int|None. Number of
+                days before today to start including users with contributions.
+            max_days_since_end_date_for_last_activity: int|None. Number of
+                days before today from which to stop including users with
+                contributions.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
-                    max_days_since_start_date_for_last_activity, max_days_since_end_date_for_last_activity
-                    filters, returned in the order specified by sort_by.
+                    max_days_since_start_date_for_last_activity,
+                    max_days_since_end_date_for_last_activity filters, returned
+                    in the order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results

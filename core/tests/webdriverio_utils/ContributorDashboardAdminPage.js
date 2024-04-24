@@ -263,7 +263,7 @@ var ContributorDashboardAdminPage = function () {
     var monthText = await calenderBody.getAttribute('ng-reflect-label');
     var monthIndex;
     for (let i = 0; i < 12; i++) {
-      if (months[i] == monthText) {
+      if (months[i] === monthText) {
         monthIndex = i;
       }
     }
@@ -271,7 +271,7 @@ var ContributorDashboardAdminPage = function () {
     if (numberOfMonths > 0) {
       for (let i = 0; i < numberOfMonths; i++) {
         await action.click('Next Month Button', nextMonthButton);
-        if (monthIndex == 11) {
+        if (monthIndex === 11) {
           monthIndex = 0;
         } else {
           monthIndex++;
@@ -282,7 +282,7 @@ var ContributorDashboardAdminPage = function () {
     } else if (numberOfMonths < 0) {
       for (let i = 0; i < Math.abs(numberOfMonths); i++) {
         await action.click('Previous Month Button', prevMonthButton);
-        if (monthIndex == 0) {
+        if (monthIndex === 0) {
           monthIndex = 11;
         } else {
           monthIndex--;

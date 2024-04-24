@@ -3976,6 +3976,7 @@ class ContributorStatsSummaryUnitTests(test_utils.GenericTestBase):
             contribution_summary.to_dict(), expected_contribution_summary
         )
 
+
 class TranslationSubmitterTotalContributionStatsUnitTests(
     test_utils.GenericTestBase):
     """Tests for the TranslationSubmitterTotalContributionStats class."""
@@ -4051,10 +4052,12 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.LAST_CONTRIBUTION_DATE)
+            'first_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                    self.FIRST_CONTRIBUTION_DATE)),
+            'last_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                    self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats( # pylint: disable=line-too-long
@@ -4141,10 +4144,12 @@ class TranslationReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.LAST_CONTRIBUTION_DATE)
+            'first_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                    self.FIRST_CONTRIBUTION_DATE)),
+            'last_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                    self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.TranslationReviewerTotalContributionStats( # pylint: disable=line-too-long
@@ -4230,10 +4235,12 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.LAST_CONTRIBUTION_DATE)
+            'first_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                    self.FIRST_CONTRIBUTION_DATE)),
+            'last_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                    self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.QuestionSubmitterTotalContributionStats( # pylint: disable=line-too-long
@@ -4311,10 +4318,12 @@ class QuestionReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'first_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.FIRST_CONTRIBUTION_DATE),
-            'last_contributed_in_days': suggestion_registry.getNumberOfDaysSinceADate(
-                self.LAST_CONTRIBUTION_DATE)
+            'first_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                self.FIRST_CONTRIBUTION_DATE)),
+            'last_contributed_in_days': (
+                suggestion_registry.get_number_of_days_since_a_date(
+                self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.QuestionReviewerTotalContributionStats( # pylint: disable=line-too-long

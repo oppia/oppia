@@ -632,8 +632,9 @@ class ContributorDashboardAdminStatsHandler(
         language_code = self.normalized_request.get('language_code')
         sort_by = self.normalized_request.get('sort_by')
         topic_ids = self.normalized_request.get('topic_ids')
-        max_days_since_start_date_for_last_activity = self.normalized_request.get(
-            'max_days_since_start_date_for_last_activity')
+        max_days_since_start_date_for_last_activity = (
+            self.normalized_request.get(
+                'max_days_since_start_date_for_last_activity'))
         max_days_since_end_date_for_last_activity = self.normalized_request.get(
             'max_days_since_end_date_for_last_activity')
 
