@@ -297,10 +297,24 @@ describe('Exploration rights service', () => {
     expect(failHandler).not.toHaveBeenCalled();
 
     expect(ers.editorNames).toEqual(serviceData.rights.editor_names);
+
+    ers.viewerNames = ['viewerName', 'newViewer'];
+    serviceData.rights.viewer_names = [];
+
+    ers.removeRoleAsync('viewerName').then(successHandler, failHandler);
+    expect(ers.viewerNames).toEqual(['newViewer']);
+    expect(ers.viewerNames).not.toEqual(serviceData.rights.viewer_names);
+    tick();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    expect(ers.viewerNames).toEqual(serviceData.rights.viewer_names);
   }));
 
   it('should redisplay users when removing a user fails', fakeAsync(() => {
     ers.ownerNames = ['ownerName'];
+    ers.editorNames = ['editorName'];
     ers.viewerNames = ['viewerName'];
     spyOn(
       explorationRightsBackendApiService,
@@ -308,13 +322,21 @@ describe('Exploration rights service', () => {
     ).and.returnValue(Promise.reject(new Error('Error')));
 
     ers.removeRoleAsync('ownerName').then(successHandler, failHandler);
-    expect(ers.ownerNames).not.toEqual(['ownerName']);
+    expect(ers.ownerNames).toEqual([]);
     tick();
 
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-
     expect(ers.ownerNames).toEqual(['ownerName']);
+
+    ers.removeRoleAsync('editorName').then(successHandler, failHandler);
+    expect(ers.editorNames).toEqual([]);
+    tick();
+
+    expect(ers.editorNames).toEqual(['editorName']);
+
+    ers.removeRoleAsync('viewerName').then(successHandler, failHandler);
+    expect(ers.viewerNames).toEqual([]);
+    tick();
+
     expect(ers.viewerNames).toEqual(['viewerName']);
   }));
 
