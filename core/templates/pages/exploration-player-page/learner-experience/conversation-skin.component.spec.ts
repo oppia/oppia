@@ -2177,7 +2177,6 @@ describe('Conversation skin component', () => {
     spyOn(conversationFlowService, 'addNewCardAndDisplayTranslations');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
-    spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(playerPositionService, 'changeCurrentQuestion');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue(['123']);
