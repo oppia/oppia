@@ -112,7 +112,7 @@ var LibraryPage = function () {
     // The `expectAlertToAppear` must be set to true to handle the alert.
     await action.click('Oppia logo', oppiaLogo);
     if (expectAlertToAppear) {
-      // Handle the alert if it is expected
+      // Handle the alert if it is expected.
       await general.acceptAlert();
     }
     await waitFor.textToBePresentInElement(
