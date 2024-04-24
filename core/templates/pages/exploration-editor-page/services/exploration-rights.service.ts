@@ -231,9 +231,9 @@ export class ExplorationRightsService {
 
   removeRoleAsync(memberUsername: string): Promise<void> {
     const initialState = {
-      owner_names: [],
-      editor_names: [],
-      viewer_names: [],
+      owner_names: [] as string[],
+      editor_names: [] as string[],
+      viewer_names: [] as string[],
     };
     if (this.ownerNames && this.ownerNames.includes(memberUsername)) {
       initialState.owner_names = [...this.ownerNames];
