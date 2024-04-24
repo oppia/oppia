@@ -94,10 +94,6 @@ module.exports = {
       commonPrefix +
       '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
-    facilitator_dashboard:
-      commonPrefix +
-      '/pages/facilitator-dashboard-page/' +
-      'facilitator-dashboard-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
@@ -381,18 +377,6 @@ module.exports = {
         commonPrefix +
         '/pages/topic-viewer-page/' +
         'topic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['facilitator_dashboard'],
-      filename: 'facilitator-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/facilitator-dashboard-page/' +
-        'facilitator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
