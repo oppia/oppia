@@ -256,29 +256,21 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
 
   isValidStartDate(selectedStartDate: Date): boolean {
     const today = new Date();
-    if (
+    return (
       today.getTime() >= selectedStartDate.getTime() &&
       selectedStartDate.getTime() >= this.endDateForUsersLastActivity.getTime()
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    );
   }
 
   isValidEndDate(selectedEndDate: Date): boolean {
     const today = new Date();
-    if (
+    return (
       today.getTime() >= selectedEndDate.getTime() &&
       selectedEndDate.getTime() <= this.startDateForUsersLastActivity.getTime()
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    );
   }
 
-  selectFirstActivity(): number {
+  getNumberOfDaysSinceStartDateForLastActivity(): number {
     const oneDay = 24 * 60 * 60 * 1000;
     const today = new Date();
     return Math.floor(
@@ -288,7 +280,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
     );
   }
 
-  selectLastActivity(): number {
+  getNumberOfDaysSinceEndDateForLastActivity(): number {
     const oneDay = 24 * 60 * 60 * 1000;
     const today = new Date();
     return Math.floor(
@@ -298,8 +290,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   createFilter(): void {
-    const numberOfDaysSinceStartDate = this.selectFirstActivity();
-    const numberOfDaysSinceEndDate = this.selectLastActivity();
+    const numberOfDaysSinceStartDate =
+      this.getNumberOfDaysSinceStartDateForLastActivity();
+    const numberOfDaysSinceEndDate =
+      this.getNumberOfDaysSinceEndDateForLastActivity();
     const tempFilter = new ContributorAdminDashboardFilter(
       this.selectedTopicIds,
       this.selectedLanguage.id,

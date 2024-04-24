@@ -1226,13 +1226,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_last_activity filter and pagination.
+        # Test with max_days_since_end_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'max_days_since_last_activity': 120,
+                'max_days_since_end_date_for_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1263,13 +1263,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_first_activity filter and pagination.
+        # Test with max_days_since_start_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,
                 'offset': 0,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'max_days_since_first_activity': 5,
+                'max_days_since_start_date_for_last_activity': 5,
                 'topic_ids': []
             })
 
@@ -1357,13 +1357,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_last_activity filter and pagination.
+        # Test with max_days_since_end_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
                 'offset': 1,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'max_days_since_last_activity': 120,
+                'max_days_since_end_date_for_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1394,13 +1394,13 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_first_activity filter and pagination.
+        # Test with max_days_since_start_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/review', {
                 'page_size': 4,
                 'offset': 0,
                 'language_code': self.SUGGESTION_LANGUAGE_CODE,
-                'max_days_since_first_activity': 5,
+                'max_days_since_start_date_for_last_activity': 5,
                 'topic_ids': []
             })
 
@@ -1519,12 +1519,12 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_last_activity filter and pagination.
+        # Test with max_days_since_end_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 1,
-                'max_days_since_last_activity': 120,
+                'max_days_since_end_date_for_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1555,12 +1555,12 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_first_activity filter and pagination.
+        # Test with max_days_since_start_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/submission', {
                 'page_size': 4,
                 'offset': 0,
-                'max_days_since_first_activity': 5,
+                'max_days_since_start_date_for_last_activity': 5,
                 'topic_ids': []
             })
 
@@ -1646,12 +1646,12 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_last_activity filter and pagination.
+        # Test with max_days_since_end_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 1,
-                'max_days_since_last_activity': 120,
+                'max_days_since_end_date_for_last_activity': 120,
                 'topic_ids': []
             })
 
@@ -1682,12 +1682,12 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with max_days_since_first_activity filter and pagination.
+        # Test with max_days_since_start_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/question/review', {
                 'page_size': 4,
                 'offset': 0,
-                'max_days_since_first_activity': 5,
+                'max_days_since_start_date_for_last_activity': 5,
                 'topic_ids': []
             })
 
@@ -1716,7 +1716,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'max_days_since_last_activity': 0,
+                'max_days_since_end_date_for_last_activity': 0,
                 'topic_ids': [],
                 'sort_by': 'DecreasingCoordinatorCounts'
             })
@@ -1738,7 +1738,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/translation/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'max_days_since_last_activity': 0,
+                'max_days_since_end_date_for_last_activity': 0,
                 'topic_ids': [],
                 'sort_by': 'IncreasingCoordinatorCounts'
             })
@@ -1764,7 +1764,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
             '/contributor-dashboard-admin-stats/question/coordinate', {
                 'page_size': 0,
                 'offset': 0,
-                'max_days_since_last_activity': 0,
+                'max_days_since_end_date_for_last_activity': 0,
                 'topic_ids': []
             })
 

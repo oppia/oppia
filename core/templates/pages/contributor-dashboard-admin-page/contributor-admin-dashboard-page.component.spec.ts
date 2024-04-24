@@ -470,7 +470,7 @@ describe('Contributor dashboard Admin page', () => {
 
     it(
       "should not change filter by users' last activity when given start date " +
-        "comes before filter's current end date",
+        "comes after filter's current end date",
       fakeAsync(() => {
         component.ngOnInit();
         tick();
@@ -528,7 +528,7 @@ describe('Contributor dashboard Admin page', () => {
 
     it(
       "should not change filter by users' last activity when given end date " +
-        "comes after filter's current start date",
+        "comes before filter's current start date",
       fakeAsync(() => {
         component.ngOnInit();
         tick();

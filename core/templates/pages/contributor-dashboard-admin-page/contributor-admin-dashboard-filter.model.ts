@@ -30,21 +30,23 @@ export class ContributorAdminDashboardFilter {
    * @param {String} languageCode - Language Code to filter for.
    * @param {String[]} topicIds - keywords to filter for.
    * @param {string} sort - sort options.
-   * @param {number} numberOfDaysSinceLastActivityStartDate - number of days since first activity.
-   * @param {number} numberOfDaysSinceLastActivityEndDate - number of days since last activity.
+   * @param {number} numberOfDaysSinceLastActivityStartDate - number of days since start date of last activity.
+   * @param {number} numberOfDaysSinceLastActivityEndDate - number of days since end date of last activity.
    */
   constructor(
     topicIds: string[],
     languageCode?: string,
     sort?: string | null,
-    numberOfDaysSinceStartDate?: number,
-    numberOfDaysSinceEndDate?: number
+    numberOfDaysSinceLastActivityStartDate?: number,
+    numberOfDaysSinceLastActivityEndDate?: number
   ) {
     this.languageCode = languageCode;
     this.topicIds = topicIds;
     this.sort = sort;
-    this.numberOfDaysSinceLastActivityStartDate = numberOfDaysSinceStartDate;
-    this.numberOfDaysSinceLastActivityEndDate = numberOfDaysSinceEndDate;
+    this.numberOfDaysSinceLastActivityStartDate =
+      numberOfDaysSinceLastActivityStartDate;
+    this.numberOfDaysSinceLastActivityEndDate =
+      numberOfDaysSinceLastActivityEndDate;
   }
 
   /**

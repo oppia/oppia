@@ -2000,6 +2000,8 @@ class ReviewableSuggestionEmailInfo:
         self.suggestion_content = suggestion_content
         self.submission_datetime = submission_datetime
 
+def getNumberOfDaysSinceADate(intputDate: datetime.date) -> int:
+    return int((datetime.date.today() - intputDate).days)
 
 class TranslationSubmitterTotalContributionStatsFrontendDict(TypedDict):
     """Dictionary representing the TranslationSubmitterTotalContributionStats
@@ -2098,10 +2100,10 @@ class TranslationSubmitterTotalContributionStats:
                 self.rejected_translation_word_count),
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'first_contributed_in_days': int(
-                (datetime.date.today() - self.first_contribution_date).days),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'first_contributed_in_days': getNumberOfDaysSinceADate(
+                self.first_contribution_date),
+            'last_contributed_in_days': getNumberOfDaysSinceADate(
+                self.last_contribution_date)
         }
 
 
@@ -2182,10 +2184,10 @@ class TranslationReviewerTotalContributionStats:
             'rejected_translations_count': self.rejected_translations_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'first_contributed_in_days': int(
-                (datetime.date.today() - self.first_contribution_date).days),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'first_contributed_in_days': getNumberOfDaysSinceADate(
+                self.first_contribution_date),
+            'last_contributed_in_days': getNumberOfDaysSinceADate(
+                self.last_contribution_date)
         }
 
 
@@ -2267,10 +2269,10 @@ class QuestionSubmitterTotalContributionStats:
             'rejected_questions_count': self.rejected_questions_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'first_contributed_in_days': int(
-                (datetime.date.today() - self.first_contribution_date).days),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'first_contributed_in_days': getNumberOfDaysSinceADate(
+                self.first_contribution_date),
+            'last_contributed_in_days': getNumberOfDaysSinceADate(
+                self.last_contribution_date)
         }
 
 
@@ -2342,8 +2344,8 @@ class QuestionReviewerTotalContributionStats:
             'rejected_questions_count': self.rejected_questions_count,
             'first_contribution_date': (
                 self.first_contribution_date.strftime('%b %d, %Y')),
-            'first_contributed_in_days': int(
-                (datetime.date.today() - self.first_contribution_date).days),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.last_contribution_date).days)
+            'first_contributed_in_days': getNumberOfDaysSinceADate(
+                self.first_contribution_date),
+            'last_contributed_in_days': getNumberOfDaysSinceADate(
+                self.last_contribution_date)
         }
