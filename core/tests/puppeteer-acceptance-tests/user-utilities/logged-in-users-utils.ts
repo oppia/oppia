@@ -251,10 +251,8 @@ export class LoggedInUser extends BaseUser {
    * and check if it opens the Creator Dashboard page in Create Mode.
    */
   async clickCreateLessonsButtonInAboutPage(): Promise<void> {
-    await Promise.all([
-      this.clickOn(createLessonsButton),
-      this.page.waitForNavigation(),
-    ]);
+    await this.clickOn(createLessonsButton);
+    await this.page.waitForNavigation();
     if (this.page.url() !== creatorDashboardCreateModeUrl) {
       throw new Error(
         'The Create Lessons button does not open the Creator Dashboard ' +
