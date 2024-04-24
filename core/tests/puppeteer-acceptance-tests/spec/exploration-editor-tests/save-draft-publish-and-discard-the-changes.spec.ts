@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for savedraft, publish and discard the changes.
+ * @fileoverview Acceptance Test for saving drafts, publishing, and discarding changes.
  */
 
 import {showMessage} from '../../puppeteer-testing-utilities/show-message-utils';
