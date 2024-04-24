@@ -379,8 +379,10 @@ export const ObjectsDomainConstants = {
     Cents: 'Cent',
     cent: 'Cent',
     cents: 'Cent',
-    Paisa: 'Paisa',
     paise: 'Paisa',
+    paisa: 'Paisa',
+    Paise: 'Paisa',
+    Paisa: 'Paisa',
   } as {[key: string]: string},
 
   // Used for converting unit prefixes to their canonical forms.
