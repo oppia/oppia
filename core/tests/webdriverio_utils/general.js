@@ -131,12 +131,7 @@ var CONSOLE_ERRORS_TO_FIX = [
   // TODO(#20198): Parameter 'key' required console error.
   new RegExp('Parameter.*key.*required'),
   // TODO(#20197): 404 Not Found error in collection player.
-  new RegExp(
-    _.escapeRegExp(
-      'http://localhost:8181/collection/.*Failed to load resource: the ' +
-        'server responded with a status of 404 (Not Found)'
-    )
-  ),
+  /http:\/\/localhost:8181\/collection\/.*Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
 ];
 
 var checkForConsoleErrors = async function (
