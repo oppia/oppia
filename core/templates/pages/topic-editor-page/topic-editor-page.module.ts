@@ -17,7 +17,6 @@
  */
 
 import {APP_INITIALIZER, NgModule, StaticProvider} from '@angular/core';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule, HAMMER_GESTURE_CONFIG} from '@angular/platform-browser';
 import {downgradeComponent} from '@angular/upgrade/static';
 import {HttpClientModule} from '@angular/common/http';
@@ -63,8 +62,6 @@ import {SubtopicEditorTabComponent} from './subtopic-editor/subtopic-editor-tab.
     SmartRouterModule,
     RouterModule.forRoot([]),
     InteractionExtensionsModule,
-    FormsModule,
-    ReactiveFormsModule,
     SharedComponentsModule,
     TopicPlayerViewerCommonModule,
     ToastrModule.forRoot(toastrConfig),

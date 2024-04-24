@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
   ComponentFixture,
@@ -110,7 +109,7 @@ describe('Topic editor tab directive', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      imports: [HttpClientTestingModule],
       declarations: [
         TopicEditorTabComponent,
         RearrangeSkillsInSubtopicsModalComponent,
@@ -765,7 +764,7 @@ describe('Topic editor tab directive', () => {
         topicUpdateService,
         'updateDiagnosticTestSkills'
       );
-      component.skillForDiagnosticTestFormControl.setValue(skillSummary);
+      component.selectedSkillForDiagnosticTest = skillSummary;
       component.availableSkillSummariesForDiagnosticTest = [skillSummary];
       component.addSkillForDiagnosticTest();
       tick();

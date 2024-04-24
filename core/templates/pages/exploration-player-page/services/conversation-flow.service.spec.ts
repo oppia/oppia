@@ -25,6 +25,7 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ExplorationPlayerStateService} from './exploration-player-state.service';
+import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
@@ -50,6 +51,7 @@ describe('Conversation skin service', () => {
   let contentTranslationManagerService: ContentTranslationManagerService;
   let conversationFlowService: ConversationFlowService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
+  let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
 
   let displayedCard = new StateCard(
@@ -90,6 +92,7 @@ describe('Conversation skin service', () => {
     explorationPlayerStateService = TestBed.inject(
       ExplorationPlayerStateService
     );
+    playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
   }));
 

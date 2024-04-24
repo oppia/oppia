@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
 
 describe('Logged-in User', function () {
   let testUser: LoggedInUser;
@@ -31,7 +31,7 @@ describe('Logged-in User', function () {
       'testuser',
       'testuser@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  }, DEFAULT_SPEC_TIMEOUT);
 
   beforeEach(async function () {
     // Navigate to a page that has the oppia footer.
@@ -43,7 +43,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.navigateToAboutPageViaFooter();
     },
-    DEFAULT_SPEC_TIMEOUT_MSECS
+    DEFAULT_SPEC_TIMEOUT
   );
 
   it(
@@ -51,7 +51,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.navigateToAboutFoundationPageViaFooter();
     },
-    DEFAULT_SPEC_TIMEOUT_MSECS
+    DEFAULT_SPEC_TIMEOUT
   );
 
   it(
@@ -59,7 +59,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.navigateToBlogPageViaFooter();
     },
-    DEFAULT_SPEC_TIMEOUT_MSECS
+    DEFAULT_SPEC_TIMEOUT
   );
 
   it(
@@ -67,7 +67,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.navigateToForumPageViaFooter();
     },
-    DEFAULT_SPEC_TIMEOUT_MSECS
+    DEFAULT_SPEC_TIMEOUT
   );
 
   afterAll(async function () {

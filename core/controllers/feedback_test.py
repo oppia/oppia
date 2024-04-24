@@ -179,10 +179,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
             response_dict['error'],
-            'At \'http://localhost/threadlisthandler/0\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: subject.'
-        )
+            'Missing key in handler args: subject.')
         self.logout()
 
     def test_missing_thread_text_raises_400_error(self) -> None:
@@ -194,11 +191,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'subject': u'New Thread ¡unicode!',
             }, csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(
-            response_dict['error'],
-            'At \'http://localhost/threadlisthandler/0\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: text.'
-        )
+            response_dict['error'], 'Missing key in handler args: text.')
         self.logout()
 
     def test_post_message_to_existing_thread(self) -> None:
@@ -537,10 +530,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 'updated_status': None
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.assertIn(
-            'Missing key in handler args: text.',
-            response['error'],
-        )
+        self.assertEqual(
+            response['error'], 'Missing key in handler args: text.')
 
         self.logout()
 
