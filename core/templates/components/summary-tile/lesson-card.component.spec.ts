@@ -112,7 +112,7 @@ describe('LessonCardComponent', () => {
     topic_url_fragment: 'topic',
   };
 
-  const sampleTopic2 = {
+  const incompleteTopic = {
     id: '0',
     title: 'Story Title',
     description: 'Story Description',
@@ -128,23 +128,7 @@ describe('LessonCardComponent', () => {
     topic_url_fragment: 'topic',
   };
 
-  const sampleTopic3 = {
-    id: '0',
-    title: 'Story Title',
-    description: 'Story Description',
-    node_titles: ['Chapter 1', 'Chapter 2'],
-    thumbnail_filename: '',
-    thumbnail_bg_color: '#F8BF74',
-    story_is_published: true,
-    completed_node_titles: ['Chapter 1'],
-    url_fragment: 'story-title',
-    all_node_dicts: [sampleNode, sampleNode],
-    topic_name: 'Topic',
-    classroom_url_fragment: 'math',
-    topic_url_fragment: 'topic',
-  };
-
-  const sampleTopic4 = {
+  const emptyImgTopic = {
     id: '0',
     title: 'Story Title',
     description: 'Story Description',
@@ -234,25 +218,25 @@ describe('LessonCardComponent', () => {
   });
 
   it('should set story to incomplete StorySummary and its non-url values to the respective fields', () => {
-    component.story = StorySummary.createFromBackendDict(sampleTopic2);
-    component.topic = sampleTopic2.topic_name;
+    component.story = StorySummary.createFromBackendDict(incompleteTopic);
+    component.topic = incompleteTopic.topic_name;
 
     fixture.detectChanges();
 
     let nextStory =
-      sampleTopic2.completed_node_titles.length -
-      (sampleTopic2.completed_node_titles.length ===
-      sampleTopic2.node_titles.length
+      incompleteTopic.completed_node_titles.length -
+      (incompleteTopic.completed_node_titles.length ===
+      incompleteTopic.node_titles.length
         ? 1
         : 0);
 
     expect(component.title).toEqual(
-      `Chapter ${nextStory + 1}: ${sampleTopic2.node_titles[nextStory]}`
+      `Chapter ${nextStory + 1}: ${incompleteTopic.node_titles[nextStory]}`
     );
     expect(component.progress).toEqual(
       Math.floor(
-        (sampleTopic2.completed_node_titles.length /
-          sampleTopic2.node_titles.length) *
+        (incompleteTopic.completed_node_titles.length /
+          incompleteTopic.node_titles.length) *
           100
       )
     );
@@ -296,20 +280,9 @@ describe('LessonCardComponent', () => {
     );
   });
 
-  it('should set story to StorySummary and set its empty imgUrl correctly', () => {
-    component.story = StorySummary.createFromBackendDict(sampleTopic3);
-    component.topic = sampleTopic3.topic_name;
-
-    fixture.detectChanges();
-
-    expect(component.imgUrl).toBe(
-      urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
-    );
-  });
-
   it('should set story to StorySummary and set its null imgUrl correctly', () => {
-    component.story = StorySummary.createFromBackendDict(sampleTopic4);
-    component.topic = sampleTopic4.topic_name;
+    component.story = StorySummary.createFromBackendDict(emptyImgTopic);
+    component.topic = emptyImgTopic.topic_name;
 
     fixture.detectChanges();
 
@@ -319,14 +292,14 @@ describe('LessonCardComponent', () => {
   });
 
   it('should set story to StorySummary and get the correct progress', () => {
-    component.story = StorySummary.createFromBackendDict(sampleTopic2);
-    component.topic = sampleTopic2.topic_name;
+    component.story = StorySummary.createFromBackendDict(incompleteTopic);
+    component.topic = incompleteTopic.topic_name;
     fixture.detectChanges();
 
     const progressStyle = component.getProgress(
       Math.floor(
-        (sampleTopic2.completed_node_titles.length /
-          sampleTopic2.node_titles.length) *
+        (incompleteTopic.completed_node_titles.length /
+          incompleteTopic.node_titles.length) *
           100
       )
     );
@@ -337,8 +310,8 @@ describe('LessonCardComponent', () => {
   });
 
   it('should set imgUrl to default if encountering an error', () => {
-    component.story = StorySummary.createFromBackendDict(sampleTopic4);
-    component.topic = sampleTopic4.topic_name;
+    component.story = StorySummary.createFromBackendDict(sampleTopic);
+    component.topic = sampleTopic.topic_name;
 
     component.handleImageError();
 
