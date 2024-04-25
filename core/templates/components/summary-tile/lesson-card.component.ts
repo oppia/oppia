@@ -106,13 +106,6 @@ export class LessonCardComponent implements OnInit {
     }
   }
 
-  getProgress(arg: number): string {
-    const leftCircle = 50 >= arg ? arg : 50;
-    const rightCircle = arg > 50 ? arg - 50 : 0;
-
-    return `linear-gradient(${50 >= arg ? 180 + (arg / 100) * 180 : 270}deg, #00645c ${leftCircle}%, transparent ${leftCircle}%), linear-gradient(0deg, #00645c ${rightCircle}%, lightgray ${rightCircle}%)`;
-  }
-
   getStorySummaryThumbnailUrl({filename, id}: ThumbnailUrl): string {
     if (!filename) {
       return this.urlInterpolationService.getStaticImageUrl(
@@ -149,6 +142,17 @@ export class LessonCardComponent implements OnInit {
     this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
       '/subjects/Lightbulb.svg'
     );
+  }
+
+  setButtonText(): string {
+    switch (this.progress) {
+      case 100:
+        return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_REDO';
+      case 0:
+        return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START';
+      default:
+        return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_RESUME';
+    }
   }
 }
 

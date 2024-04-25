@@ -14,14 +14,9 @@
       <p class="lesson-card-desc mb-0"> {{ desc }} </p>
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
-      <div class="align-items-center border border-light d-flex justify-content-center lesson-card-progress-border relative rounded-circle"
-           [ngStyle]="{'background': getProgress(progress)}"
-      >
-        
-      </div>
       <circle-progress [percent]="progress"> </circle-progress>
       <a class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none" [href]="lessonUrl" target="_self">
-        {{ 'I18N_LEARNER_DASHBOARD_CARD_BUTTON' | translate: {progressText: (progress ===  100 ? 'Redo' : (progress === 0 ? 'Start' : 'Resume'))} }}
+        {{ setButtonText() | translate }}
       </a>
     </div>
   </div>
@@ -60,19 +55,6 @@
 
   .lesson-card-img {
     height: 136px;
-  }
-
-  .lesson-card-progress {
-    background-color: #fff;
-    color: #00645c;
-    font-size: 11px;
-    height: 28px;
-    width: 28px;
-  }
-
-  .lesson-card-progress-border {
-    height: 32px;
-    width: 32px;
   }
 
   .lesson-card-tags {
