@@ -18,7 +18,7 @@
 
 import {EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {TestBed, fakeAsync, flushMicrotasks, tick} from '@angular/core/testing';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -42,6 +42,7 @@ class MockWindowRef {
         this._href = val;
       },
       replace: (val: string) => {},
+      reload: () => {},
     },
     sessionStorage: {
       last_uploaded_audio_lang: 'en',
@@ -138,23 +139,69 @@ describe('Splash Page', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should record analytics when Browse Lessons is clicked', function () {
+  it('should record analytics and direct to login page when Create account button is clicked', fakeAsync(async function () {
     spyOn(
       siteAnalyticsService,
-      'registerClickBrowseLessonsButtonEvent'
+      'registerClickCreateAccountButtonEvent'
     ).and.callThrough();
-    component.onClickBrowseLessonsButton();
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
+
+    component.onClickCreateAccountButton();
+    tick(151);
+
     expect(
-      siteAnalyticsService.registerClickBrowseLessonsButtonEvent
+      siteAnalyticsService.registerClickCreateAccountButtonEvent
+    ).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/login/url');
+  }));
+
+  it('should reload window if fetched login URL is null when Create account button is clicked', fakeAsync(async function () {
+    spyOn(userService, 'getLoginUrlAsync').and.resolveTo('');
+    spyOn(mockWindowRef.nativeWindow.location, 'reload');
+    spyOn(
+      siteAnalyticsService,
+      'registerClickCreateAccountButtonEvent'
+    ).and.callThrough();
+
+    component.onClickCreateAccountButton();
+    tick(151);
+
+    expect(
+      siteAnalyticsService.registerClickCreateAccountButtonEvent
+    ).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
+  }));
+
+  it('should record analytics when Explore Classroom button is clicked', function () {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickExploreClassroomButtonEvent'
+    ).and.callThrough();
+
+    component.onClickExploreClassroomButton();
+
+    expect(
+      siteAnalyticsService.registerClickExploreClassroomButtonEvent
     ).toHaveBeenCalled();
   });
 
-  it('should direct users to the android page on click', function () {
-    expect(mockWindowRef.nativeWindow.location.href).not.toEqual('/android');
+  it('should record analytics and direct to community library page when Explore Lessons button is clicked', function () {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickExploreLessonsButtonEvent'
+    ).and.callThrough();
+    expect(mockWindowRef.nativeWindow.location.href).not.toEqual(
+      '/community-library'
+    );
 
-    component.onClickAccessAndroidButton();
+    component.onClickExploreLessonsButton();
 
-    expect(mockWindowRef.nativeWindow.location.href).toEqual('/android');
+    expect(
+      siteAnalyticsService.registerClickExploreLessonsButtonEvent
+    ).toHaveBeenCalled();
+    expect(mockWindowRef.nativeWindow.location.href).toEqual(
+      '/community-library'
+    );
   });
 
   it('should record analytics when Start Contributing is clicked', function () {
@@ -179,25 +226,17 @@ describe('Splash Page', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should increment and decrement testimonial IDs correctly', function () {
-    component.ngOnInit();
-    expect(component.displayedTestimonialId).toBe(0);
-    component.incrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(1);
-    component.incrementDisplayedTestimonialId();
-    component.incrementDisplayedTestimonialId();
-    component.incrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(0);
+  it('should record analytics when Start exploring button is clicked', function () {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickStartExploringButtonEvent'
+    ).and.callThrough();
 
-    component.decrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(3);
-    component.decrementDisplayedTestimonialId();
-    expect(component.displayedTestimonialId).toBe(2);
-  });
+    component.onClickStartExploringButton();
 
-  it('should get testimonials correctly', function () {
-    component.ngOnInit();
-    expect(component.getTestimonials().length).toBe(component.testimonialCount);
+    expect(
+      siteAnalyticsService.registerClickStartExploringButtonEvent
+    ).toHaveBeenCalled();
   });
 
   it('should evaluate if user is logged in', fakeAsync(() => {

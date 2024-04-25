@@ -27,14 +27,6 @@ import {UserService} from 'services/user.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import './splash-page.component.css';
 
-export interface Testimonial {
-  quote: string;
-  studentDetails: string;
-  imageUrl: string;
-  imageUrlWebp: string;
-  borderPresent: boolean;
-}
-
 @Component({
   selector: 'oppia-splash-page',
   templateUrl: './splash-page.component.html',
@@ -46,11 +38,9 @@ export class SplashPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   classroomUrlFragment!: string;
   classroomUrl!: string;
-  accountCreationUrl!: string;
   displayedTestimonialId!: number;
   testimonialCount!: number;
   isWindowNarrow: boolean = false;
-  testimonials: Testimonial[] = [];
   userIsLoggedIn: boolean = false;
 
   constructor(
@@ -129,63 +119,9 @@ export class SplashPageComponent implements OnInit {
     this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 
-  // TODO(#11657): Extract the testimonials code into a separate component.
-  // The 2 functions below are to cycle between values:
-  // 0 to (testimonialCount - 1) for displayedTestimonialId.
-  incrementDisplayedTestimonialId(): void {
-    // This makes sure that incrementing from (testimonialCount - 1)
-    // returns 0 instead of testimonialCount,since we want the testimonials
-    // to cycle through.
-    this.displayedTestimonialId =
-      (this.displayedTestimonialId + 1) % this.testimonialCount;
-  }
-
-  decrementDisplayedTestimonialId(): void {
-    // This makes sure that decrementing from 0, returns
-    // (testimonialCount - 1) instead of -1, since we want the testimonials
-    // to cycle through.
-    this.displayedTestimonialId =
-      (this.displayedTestimonialId + this.testimonialCount - 1) %
-      this.testimonialCount;
-  }
-
-  getTestimonials(): [Testimonial, Testimonial, Testimonial, Testimonial] {
-    return [
-      {
-        quote: 'I18N_SPLASH_TESTIMONIAL_1',
-        studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_1',
-        imageUrl: this.getImageSet('/splash/mira', 'png'),
-        imageUrlWebp: this.getImageSet('/splash/mira', 'webp'),
-        borderPresent: false,
-      },
-      {
-        quote: 'I18N_SPLASH_TESTIMONIAL_2',
-        studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_2',
-        imageUrl: this.getImageSet('/splash/Dheeraj', 'png'),
-        imageUrlWebp: this.getImageSet('/splash/Dheeraj', 'webp'),
-        borderPresent: true,
-      },
-      {
-        quote: 'I18N_SPLASH_TESTIMONIAL_3',
-        studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_3',
-        imageUrl: this.getImageSet('/splash/sama', 'png'),
-        imageUrlWebp: this.getImageSet('/splash/sama', 'webp'),
-        borderPresent: false,
-      },
-      {
-        quote: 'I18N_SPLASH_TESTIMONIAL_4',
-        studentDetails: 'I18N_SPLASH_STUDENT_DETAILS_4',
-        imageUrl: this.getImageSet('/splash/Gaurav', 'png'),
-        imageUrlWebp: this.getImageSet('/splash/Gaurav', 'webp'),
-        borderPresent: true,
-      },
-    ];
-  }
-
   ngOnInit(): void {
     this.displayedTestimonialId = 0;
     this.testimonialCount = 4;
-    this.testimonials = this.getTestimonials();
     this.classroomUrl = this.urlInterpolationService.interpolateUrl(
       '/learn/<classroomUrlFragment>',
       {
