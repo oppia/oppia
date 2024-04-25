@@ -37,7 +37,7 @@ export class ConversationFlowService {
     private playerTranscriptService: PlayerTranscriptService
   ) {}
 
-  addNewCardAndDisplayTranslations(newCard: StateCard): void {
+  addNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
     const explorationLanguageCode =
       this.explorationPlayerStateService.getLanguageCode();

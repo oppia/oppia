@@ -908,7 +908,7 @@ export class ConversationSkinComponent {
   }
 
   private _addNewCard(newCard): void {
-    this.conversationFlowService.addNewCardAndDisplayTranslations(newCard);
+    this.conversationFlowService.addNewCard(newCard);
 
     let totalNumCards = this.playerTranscriptService.getNumCards();
 

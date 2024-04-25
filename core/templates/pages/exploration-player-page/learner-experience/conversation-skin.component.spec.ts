@@ -2174,7 +2174,7 @@ describe('Conversation skin component', () => {
     spyOn(explorationPlayerStateService, 'getLanguageCode').and.returnValue(
       'en'
     );
-    spyOn(conversationFlowService, 'addNewCardAndDisplayTranslations');
+    spyOn(conversationFlowService, 'addNewCard');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
     spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
@@ -2367,7 +2367,7 @@ describe('Conversation skin component', () => {
       null
     );
     spyOn(explorationPlayerStateService, 'recordNewCardAdded');
-    spyOn(conversationFlowService, 'addNewCardAndDisplayTranslations');
+    spyOn(conversationFlowService, 'addNewCard');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(
       conversationFlowService,
@@ -2718,7 +2718,7 @@ describe('Conversation skin component', () => {
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(componentInstance, 'scrollToTop');
     spyOn(playerPositionService.onNewCardOpened, 'emit');
-    spyOn(conversationFlowService, 'addNewCardAndDisplayTranslations');
+    spyOn(conversationFlowService, 'addNewCard');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(0);
     spyOn(
       conversationFlowService,

@@ -74,7 +74,7 @@ describe('Conversation flow service', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
   }));
 
-  it('should handle new card addition', () => {
+  it('should handle adding new cards to transcript', () => {
     spyOn(playerTranscriptService, 'addNewCard');
     spyOn(explorationPlayerStateService, 'getLanguageCode').and.returnValue(
       'en'
@@ -88,16 +88,32 @@ describe('Conversation flow service', () => {
       'displayTranslations'
     ).and.returnValue();
 
-    conversationFlowService.addNewCardAndDisplayTranslations(displayedCard);
-    expect(playerTranscriptService.addNewCard).toHaveBeenCalled();
+    conversationFlowService.addNewCard(displayedCard);
+    expect(playerTranscriptService.addNewCard).toHaveBeenCalledWith(
+      displayedCard
+    );
     expect(
       contentTranslationManagerService.displayTranslations
-    ).toHaveBeenCalled();
+    ).toHaveBeenCalledWith('es');
   });
 
   it('should tell if supplemental card is non empty', () => {
     expect(
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
     ).toBeFalse();
+
+    let supplementalCard = new StateCard(
+      null,
+      null,
+      null,
+      new Interaction([], [], null, null, [], 'ImageClickInput', null),
+      [],
+      null,
+      '',
+      null
+    );
+    expect(
+      conversationFlowService.isSupplementalCardNonempty(supplementalCard)
+    ).toBeTrue();
   });
 });
