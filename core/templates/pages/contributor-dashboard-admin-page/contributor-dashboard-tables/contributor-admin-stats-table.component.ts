@@ -72,8 +72,7 @@ export class ContributorAdminStatsTable implements OnInit {
 
   columnsToDisplay: string[] = [];
   allStats: ContributorStats[] = [];
-  currentStats: ContributorStats[] = [];
-  hasMoreItems: boolean = true;
+  tableCanShowMoreItems: boolean = true;
 
   expandedElement: ContributorStats[] | null = null;
 
@@ -88,6 +87,9 @@ export class ContributorAdminStatsTable implements OnInit {
   itemsPerPageChoice: number[] = [20, 50, 100];
   itemsPerPage: number = 20;
   statsPageNumber: number = 0;
+  // The maximumExpectedItems readony variable is used while fetching data from the datastore. We don't expect to ever exceed
+  // this number of items, so when we fetch the data, we retrieve all the items at once, and then handle the pagination within the component.
+  // If the number of items does happen to be exceeded, we will display a '+' sign next to the total number of items.
   readonly maximumExpectedItems: number = 1000;
   tableHasMoreThanMaximumExpectedItems: boolean = false;
   MOVE_TO_NEXT_PAGE: string = 'next_page';
@@ -236,8 +238,12 @@ export class ContributorAdminStatsTable implements OnInit {
     );
   }
 
-  getIndexOfFirstItemOnPage(): number {
-    return this.statsPageNumber * this.itemsPerPage + 1;
+  getDisplayedIndexOfFirstItemOnPage(): number {
+    return this.getIndexOfFirstItemOnPage() + 1;
+  }
+
+  private getIndexOfFirstItemOnPage(): number {
+    return this.statsPageNumber * this.itemsPerPage;
   }
 
   getOverallItemCount(): string {
@@ -347,16 +353,11 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  setCurrentlyDisplayedContributorAdminStats(): void {
-    let nextOffset: number =
-      this.statsPageNumber * this.itemsPerPage + this.itemsPerPage;
-    this.currentStats = this.allStats.slice(
-      this.statsPageNumber * this.itemsPerPage,
-      Math.min(nextOffset, this.allStats.length)
+  displayStatsForCurrentPage(): ContributorStats[] {
+    return this.allStats.slice(
+      this.getIndexOfFirstItemOnPage(),
+      this.getIndexOfLastItemOnPage()
     );
-    this.hasMoreItems = nextOffset >= this.allStats.length ? false : true;
-    this.loadingMessage = '';
-    this.noDataMessage = '';
   }
 
   fetchContributorAdminStats(): void {
@@ -378,10 +379,13 @@ export class ContributorAdminStatsTable implements OnInit {
       .then(response => {
         this.allStats = response.stats;
         this.tableHasMoreThanMaximumExpectedItems = response.more;
-        this.setCurrentlyDisplayedContributorAdminStats();
+        this.tableCanShowMoreItems =
+          this.getIndexOfLastItemOnPage() < this.allStats.length;
+        this.loadingMessage = '';
         if (!this.hasSomeStats()) {
           this.noDataMessage = 'No statistics to display';
         } else {
+          this.noDataMessage = '';
           this.updateColumns(contributionSubType);
         }
       });
@@ -395,7 +399,10 @@ export class ContributorAdminStatsTable implements OnInit {
     if (!this.hasSomeStats()) {
       this.fetchContributorAdminStats();
     } else {
-      this.setCurrentlyDisplayedContributorAdminStats();
+      this.tableCanShowMoreItems =
+        this.getIndexOfLastItemOnPage() < this.allStats.length;
+      this.loadingMessage = '';
+      this.noDataMessage = '';
     }
   }
 

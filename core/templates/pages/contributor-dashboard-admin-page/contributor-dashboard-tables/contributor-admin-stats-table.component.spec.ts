@@ -305,7 +305,7 @@ describe('Contributor stats component', () => {
       expect(component.getOverallItemCount()).toEqual('1+');
     }));
 
-    it('should check for upperlimit for pagination from total number of items, as its lower than items per page combined with page number.', fakeAsync(() => {
+    it('should index last item on page as "overall item count" when "max allowed per page item count plus previous pages item count" exceeds "overall item count".', fakeAsync(() => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 4;
       fixture.detectChanges();
@@ -317,19 +317,7 @@ describe('Contributor stats component', () => {
       expect(component.getIndexOfLastItemOnPage()).toEqual(3);
     }));
 
-    it('should check for upperlimit for pagination from items per page and page number, on the first page, as its lower than total number of items', fakeAsync(() => {
-      component.statsPageNumber = 0;
-      component.itemsPerPage = 1;
-      fixture.detectChanges();
-      component.allStats = [
-        questionReviewerStats,
-        questionReviewerStats,
-        questionReviewerStats,
-      ];
-      expect(component.getIndexOfLastItemOnPage()).toEqual(1);
-    }));
-
-    it('should check for upperlimit for pagination from items per page and page number, on the second page, as its lower than total number of items', fakeAsync(() => {
+    it('should index last item on page as "max allowed per page item count plus previous pages item count" when "overall item count" exceeds "max allowed per page item count plus previous pages item count".', fakeAsync(() => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 1;
       fixture.detectChanges();
@@ -344,7 +332,7 @@ describe('Contributor stats component', () => {
     it('should retrieve the index of the first item on the page', fakeAsync(() => {
       component.statsPageNumber = 2;
       component.itemsPerPage = 3;
-      expect(component.getIndexOfFirstItemOnPage()).toEqual(7);
+      expect(component.getDisplayedIndexOfFirstItemOnPage()).toEqual(7);
     }));
 
     it('should show the overall item count from the number of items', fakeAsync(() => {
@@ -356,7 +344,9 @@ describe('Contributor stats component', () => {
         questionReviewerStats,
         questionReviewerStats,
       ];
-      expect(component.getOverallItemCount()).toEqual('3');
+      expect(component.getOverallItemCount()).toEqual(
+        component.allStats.length.toString()
+      );
     }));
 
     it('should show a "+" at the end of the overall item count when the number of items exceeds max expected', fakeAsync(() => {
@@ -911,11 +901,20 @@ describe('Contributor stats component', () => {
   });
 
   describe('when more than one page of stats are returned', () => {
-    it('should show data on multiple pages', fakeAsync(() => {
-      let allQuestionReviewerStats: QuestionReviewerStats[] = [];
-      for (let i = 1; i <= 30; i++) {
-        allQuestionReviewerStats.push(questionReviewerStats);
+    var createContributorStats = function createContributorStats(
+      numStats: number
+    ): QuestionReviewerStats[] {
+      let stats: QuestionReviewerStats[] = [];
+      for (let i = 0; i < numStats; i++) {
+        stats.push(questionReviewerStats);
       }
+      return stats;
+    };
+
+    it('should show data on multiple pages', fakeAsync(() => {
+      let allQuestionReviewerStats: QuestionReviewerStats[] =
+        createContributorStats(30);
+
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
         'fetchContributorAdminStats'
@@ -939,12 +938,12 @@ describe('Contributor stats component', () => {
 
       tick();
       expect(component.getOverallItemCount()).toEqual('30');
-      expect(component.currentStats.length).toEqual(20);
-      expect(component.hasMoreItems).toEqual(true);
+      expect(component.displayStatsForCurrentPage().length).toEqual(20);
+      expect(component.tableCanShowMoreItems).toEqual(true);
 
       component.goToPageNumber(1);
-      expect(component.currentStats.length).toEqual(10);
-      expect(component.hasMoreItems).toEqual(false);
+      expect(component.displayStatsForCurrentPage().length).toEqual(10);
+      expect(component.tableCanShowMoreItems).toEqual(false);
     }));
   });
 });
