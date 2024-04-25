@@ -284,7 +284,7 @@
     <div class="diagram-editor-saved-image-container e2e-test-saved-diagram-container">
       <i class="fas fa-pen diagram-editor-edit edit-icon" (click)="continueDiagramEditing()"
          title="Continue editing the diagram">
-         <span class="edit-text">SVG</span>
+        <span class="edit-text">SVG</span>
       </i>
       <img [src]="data.savedSvgUrl" [ngStyle]="svgContainerStyle">
     </div>
@@ -335,6 +335,7 @@
   }
 
   .edit-text {
+    font-family: "Roboto", Arial, sans-serif;
     font-size: 10px;
   }
 
