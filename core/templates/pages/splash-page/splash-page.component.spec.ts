@@ -126,7 +126,7 @@ describe('Splash Page', () => {
     );
   });
 
-  it('should correctly construct image set string', function() {
+  it('should correctly construct image set string', function () {
     spyOn(component, 'getStaticImageUrl').and.callFake((path: string) => {
       return '/assets/images' + path;
     });
@@ -136,11 +136,10 @@ describe('Splash Page', () => {
 
     const result = component.getImageSet(imageName, imageExt);
 
-    const expected = (
+    const expected =
       '/assets/images/path/to/image1x.png 1x, ' +
       '/assets/images/path/to/image15x.png 1.5x, ' +
-      '/assets/images/path/to/image2x.png 2x'
-    );
+      '/assets/images/path/to/image2x.png 2x';
 
     expect(result).toEqual(expected);
   });
