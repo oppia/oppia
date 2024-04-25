@@ -183,6 +183,15 @@ export class BaseUser {
       await this.page.click(selector);
     }
   }
+  /**
+   * The function selects all text content and delete it.
+   */
+  async clearAllTextFrom(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    // Clicking three times on a line of text selects all the text.
+    await this.page.click(selector, {clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+  }
 
   /**
    * This function types the text in the input field using its CSS selector.
