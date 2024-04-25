@@ -296,47 +296,45 @@ describe('LessonCardComponent', () => {
     component.story = StorySummary.createFromBackendDict(sampleTopic);
     component.topic = sampleTopic.topic_name;
 
-    component.handleImageError();
+    fixture.detectChanges();
+    const img = fixture.debugElement.nativeElement.querySelector('img');
+    const spyError = spyOn(component, 'handleImageError').and.callThrough();
+    img.dispatchEvent(new Event('error'));
 
     fixture.detectChanges();
 
+    expect(spyError).toHaveBeenCalled();
     expect(component.imgUrl).toBe(
       urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
     );
   });
 
   it('should return Redo translation key when progress is 100', () => {
-    spyOn(component, 'setButtonText');
     component.story = StorySummary.createFromBackendDict(sampleTopic);
     component.topic = sampleTopic.topic_name;
 
     fixture.detectChanges();
 
-    expect(component.setButtonText).toHaveBeenCalled();
     const buttonText = component.setButtonText();
     expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_REDO');
   });
 
   it('should return Resume translation key when progress is < 100', () => {
-    spyOn(component, 'setButtonText');
     component.story = StorySummary.createFromBackendDict(incompleteTopic);
     component.topic = incompleteTopic.topic_name;
 
     fixture.detectChanges();
 
-    expect(component.setButtonText).toHaveBeenCalled();
     const buttonText = component.setButtonText();
     expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_RESUME');
   });
 
   it('should return Start translation key when progress is 0', () => {
-    spyOn(component, 'setButtonText');
     component.story = StorySummary.createFromBackendDict(emptyImgTopic);
     component.topic = emptyImgTopic.topic_name;
 
     fixture.detectChanges();
 
-    expect(component.setButtonText).toHaveBeenCalled();
     const buttonText = component.setButtonText();
     expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START');
   });
