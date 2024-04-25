@@ -31,6 +31,7 @@ import {Voiceover} from 'domain/exploration/voiceover.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/voiceover-removal-confirm-modal.component';
+import {LocalStorageService} from 'services/local-storage.service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -42,6 +43,7 @@ export class VoiceoverCardComponent implements OnInit {
   directiveSubscriptions = new Subscription();
   languageCode: string;
   availableLanguageAccentCodesToDescriptions;
+  availableLanguageAccentCodesLength: number = 0;
   contentId: string;
   manualVoiceover = null;
   pageIsLoaded: boolean = false;
@@ -65,7 +67,8 @@ export class VoiceoverCardComponent implements OnInit {
     private ngbModal: NgbModal,
     private idGenerationService: IdGenerationService,
     private alertsService: AlertsService,
-    private changeListService: ChangeListService
+    private changeListService: ChangeListService,
+    private localStorageService: LocalStorageService
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +84,13 @@ export class VoiceoverCardComponent implements OnInit {
             this.availableLanguageAccentCodesToDescriptions =
               response.languageAccentMasterList[this.languageCode];
             this.pageIsLoaded = true;
+            if (this.availableLanguageAccentCodesToDescriptions) {
+              this.availableLanguageAccentCodesLength = Object.keys(
+                this.availableLanguageAccentCodesToDescriptions
+              ).length;
+            }
+            this.languageAccentCode =
+              this.localStorageService.getLastSelectedLanguageAccentCode();
             this.contentId =
               this.translationTabActiveContentIdService.getActiveContentId();
           });
@@ -102,6 +112,9 @@ export class VoiceoverCardComponent implements OnInit {
   }
 
   getVoiceovers(languageAccentCode: string): void {
+    this.localStorageService.setLastSelectedLanguageAccentCode(
+      languageAccentCode
+    );
     this.languageAccentCode = languageAccentCode;
     let explorationId = this.contextService.getExplorationId();
     this.contentId =

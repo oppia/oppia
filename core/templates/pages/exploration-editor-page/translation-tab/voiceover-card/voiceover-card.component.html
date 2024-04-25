@@ -1,9 +1,11 @@
 <mat-card>
   <h3>Voiceovers</h3>
   <div *ngIf="pageIsLoaded">
-    <mat-form-field class="oppia-language-accent-dropdown-selector" class="language-accent-selector">
+    <mat-form-field class="oppia-language-accent-dropdown-selector language-accent-selector"
+                    *ngIf="availableLanguageAccentCodesLength > 0">
       <mat-label>Select Accent: </mat-label>
-      <mat-select (selectionChange)="getVoiceovers($event.value)">
+      <mat-select (selectionChange)="getVoiceovers($event.value)"
+                  [ngModel]="languageAccentCode">
         <mat-option *ngFor="let languageAccentCodeToDescription of availableLanguageAccentCodesToDescriptions | keyvalue"
                     [value]="languageAccentCodeToDescription.key">
           <span>
@@ -12,8 +14,11 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
+    <div *ngIf="availableLanguageAccentCodesLength === 0">
+      No accent available for the selected voiceover.
+    </div>
   </div>
-  <div *ngIf="pageIsLoaded && !voiceoversAreLoaded">
+  <div *ngIf="pageIsLoaded && !voiceoversAreLoaded && availableLanguageAccentCodesLength > 0">
     <p>Please select an accent to get voiceovers!</p>
   </div>
 
@@ -21,8 +26,8 @@
     <div class="manual-voiceovers">
       <div class="voiceovers-component" *ngIf="manualVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename)">
-          <mat-icon *ngIf="!audioPlayerService.isPlaying()">play_arrow</mat-icon>
-          <mat-icon *ngIf="audioPlayerService.isPlaying()">pause_arrow</mat-icon>
+          <mat-icon *ngIf="!audioPlayerService.isPlaying()" [ngbTooltip]="'Play'">play_arrow</mat-icon>
+          <mat-icon *ngIf="audioPlayerService.isPlaying()" [ngbTooltip]="'Pause'">pause_arrow</mat-icon>
         </button>
         <mat-progress-bar mode="determinate"
                           [value]="voiceoverProgress"
@@ -34,13 +39,17 @@
         <button (click)="deleteManualVoiceover()"
                 mat-icon-button
                 mat-button>
-          <mat-icon>close</mat-icon>
+          <mat-icon [ngbTooltip]="'Delete voiceover'">close</mat-icon>
         </button>
         <button (click)="toggleAudioNeedsUpdate()"
                 mat-icon-button
                 mat-button>
-          <mat-icon>warning</mat-icon>
+          <mat-icon [ngbTooltip]="'Audio needs update'" *ngIf="manualVoiceover.needsUpdate">warning</mat-icon>
+          <mat-icon [ngbTooltip]="'Audio does not needs update'" *ngIf="!manualVoiceover.needsUpdate">warning</mat-icon>
         </button>
+      </div>
+      <div *ngIf="manualVoiceover">
+        <i *ngIf="manualVoiceover.needsUpdate">The current voiceover is stale.</i>
       </div>
       <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
         <button (click)="addManualVoiceover()" class="add-manual-voiceover-button">ADD MANUAL VOICEOVER</button>
