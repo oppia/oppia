@@ -17,8 +17,8 @@
  */
 
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
-import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
+import testConstants from '../puppeteer-testing-utilities/test-constants';
 
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -26,7 +26,7 @@ const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 const explorationSettingsTab = '.e2e-test-settings-tab';
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
-const voiceArtistEditSelector = 'input.e2e-test-new-voice-artist-username';
+const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
 const saveVoiceoverArtistEditButton =
   'button.e2e-test-add-voice-artist-role-button';
 
@@ -41,10 +41,12 @@ const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
+const voiceArtistSettingsDropdown =
+  'h3.e2e-test-voice-artists-settings-container';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
-   * Function to navigate to exploration settings tab
+   * Function to navigate to exploration settings tab.
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.page.waitForFunction('document.readyState === "complete"');
@@ -55,10 +57,19 @@ export class VoiceoverAdmin extends BaseUser {
     } else {
       await this.clickOn(explorationSettingsTab);
     }
+
+    showMessage('Navigation to settings tab is successful.');
   }
 
   /**
-   * Function to dismiss welcome modal
+   * Function to open voice artist dropdown in mobile view.
+   */
+  async openvoiceArtistDropdown(): Promise<void> {
+    await this.clickOn(voiceArtistSettingsDropdown);
+  }
+
+  /**
+   * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -68,11 +79,13 @@ export class VoiceoverAdmin extends BaseUser {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
     });
+
+    showMessage('Tutorial pop-up is closed.');
   }
 
   /**
-   * Function to navigate to exploration editor
-   * @param explorationUrl - url of the exploration
+   * Function to navigate to exploration editor.
+   * @param explorationUrl - url of the exploration.
    */
   async navigateToExplorationEditor(
     explorationId: string | null
@@ -82,11 +95,13 @@ export class VoiceoverAdmin extends BaseUser {
     }
     const editorUrl = `${baseURL}/create/${explorationId}`;
     await this.page.goto(editorUrl);
+
+    showMessage('Navigation to exploration editor is successful.');
   }
 
   /**
    * Asserts that a voiceover artist does not exist in the list.
-   * @param artistUsername - The username of the voiceover artist to check for
+   * @param artistUsername - The username of the voiceover artist to check for.
    */
   async expectVoiceoverArtistsListDoesNotContain(
     artistUsername: string
@@ -107,18 +122,38 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Adds a voiceover artist to an exploration.
-   * @param artistUsername - The username of the voiceover artist to add
+   * Add voiceover artists to an exploration.
+   * @param voiceArtists - The username list of the voiceover artists to add.
    */
-  async addVoiceoverArtistToExploration(artistUsername: string): Promise<void> {
-    await this.clickOn(editVoiceoverArtistButton);
-    await this.type(voiceArtistEditSelector, artistUsername);
-    await this.clickOn(saveVoiceoverArtistEditButton);
+  async addVoiceoverArtistsToExploration(
+    voiceArtists: string[]
+  ): Promise<void> {
+    for (let i = 0; i < voiceArtists.length; i++) {
+      await this.clickOn(editVoiceoverArtistButton);
+      await this.clickOn(voiceArtistUsernameInputBox);
+      await this.page.waitForSelector(voiceArtistUsernameInputBox, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(voiceArtistUsernameInputBox);
+      await this.type(voiceArtistUsernameInputBox, voiceArtists[i]);
+      await this.clickOn(saveVoiceoverArtistEditButton);
+      // Adding try catch here to avoid unnecessary waiting for selector if
+      // the added voice artist is not an user.
+      try {
+        await this.page.waitForSelector(
+          `div.e2e-test-voice-artist-${voiceArtists[i]}`,
+          {visible: true}
+        );
+        showMessage(voiceArtists[i] + ' has been added as a voice artist.');
+      } catch (error) {
+        showMessage(voiceArtists[i] + ' is not added.');
+      }
+    }
   }
 
   /**
    * Function to expect to see error toast message
-   * @param expectedErrorMessage - expected error message
+   * @param expectedErrorMessage - expected error message.
    */
   async expectToSeeErrorToastMessage(
     expectedErrorMessage: string
@@ -138,15 +173,15 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to close toast message
+   * Function to close toast message.
    */
   async closeToastMessage(): Promise<void> {
     await this.clickOn(closeToastMessageButton);
   }
 
   /**
-   * Function to expect voiceover artists list to contain
-   * @param artistUsername - artist username
+   * Function to expect voiceover artists list to contain.
+   * @param artistUsername - artist username.
    */
   async expectVoiceoverArtistsListContains(
     artistUsername: string
@@ -164,8 +199,8 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to get all voiceover artists
-   * @returns {Promise<string[]>} - list of voiceover artists
+   * Function to get all voiceover artists.
+   * @returns {Promise<string[]>} - list of voiceover artists.
    */
   async getAllVoiceoverArtists(): Promise<string[]> {
     await this.page.waitForSelector(allVoiceoverArtistsList);
@@ -178,8 +213,8 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to verify voiceover artist is still omitted
-   * @param artistUsername - artist username
+   * Function to verify voiceover artist is still omitted.
+   * @param artistUsername - artist username.
    */
   async verifyVoiceoverArtistStillOmitted(
     artistUsername: string
