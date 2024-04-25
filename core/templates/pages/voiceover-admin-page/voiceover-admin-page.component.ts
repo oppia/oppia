@@ -17,18 +17,25 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
 import {
   VoiceoverBackendApiService,
   LanguageAccentToDescription,
   LanguageCodesMapping,
   LanguageAccentMasterList,
+  VoiceArtistIdToLanguageMapping,
+  VoiceArtistIdToVoiceArtistName,
 } from 'domain/voiceover/voiceover-backend-api.service';
+import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
+import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
+import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
+}
+
+export interface LanguageAccentDescriptionToCode {
+  [languageAccentDescription: string]: string;
 }
 
 @Component({
@@ -46,12 +53,24 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
   supportedLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
-  availableLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
+  availableLanguageAccentDescriptionsToCodes!: LanguageAccentDescriptionToCode;
   languageAccentCodesToDescriptionsMasterList!: LanguageAccentToDescription;
   languageCodesMapping!: LanguageCodesMapping;
   pageIsInitialized: boolean = false;
   languageAccentDropdownIsShown: boolean = false;
   languageAccentCodeIsPresent: boolean = false;
+  voiceArtistIdToLanguageMappingList!: VoiceArtistLanguageMapping[];
+  voiceArtistIdToLanguageMapping!: VoiceArtistIdToLanguageMapping;
+  voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
+  languageAccentMasterList!: LanguageAccentMasterList;
+  columnsToDisplay: string[] = [
+    'voiceArtist',
+    'languageCode',
+    'languageAccentCode',
+    'languageAccentCodeModify',
+  ];
+
+  voiceArtistsDataCount: number = 0;
 
   ngOnInit(): void {
     this.voiceoverBackendApiService
@@ -60,13 +79,71 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.languageCodesMapping = response.languageCodesMapping;
         this.languageAccentCodeToLanguageCode = {};
         this.supportedLanguageAccentCodesToDescriptions = {};
-        this.availableLanguageAccentCodesToDescriptions = {};
         this.languageAccentCodesToDescriptionsMasterList = {};
+        this.availableLanguageAccentDescriptionsToCodes = {};
         this.initializeLanguageAccentCodesFields(
           response.languageAccentMasterList
         );
+        this.languageAccentMasterList = response.languageAccentMasterList;
         this.pageIsInitialized = true;
       });
+    this.voiceoverBackendApiService
+      .fetchVoiceArtistMetadataAsync()
+      .then(response => {
+        this.voiceArtistIdToLanguageMapping =
+          response.voiceArtistIdToLanguageMapping;
+        this.voiceArtistIdToLanguageMappingList =
+          VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
+            this.voiceArtistIdToLanguageMapping
+          );
+        this.voiceArtistsDataCount =
+          this.voiceArtistIdToLanguageMappingList.length;
+        this.voiceArtistIdToVoiceArtistName =
+          response.voiceArtistIdToVoiceArtistName;
+      });
+  }
+
+  addLanguageAccentForVoiceArtist(
+    voiceArtistId: string,
+    languageCode: string
+  ): void {
+    let languageAccentCodes = this.languageAccentMasterList[languageCode];
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      AddAccentToVoiceoverLanguageModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    let currentLanguageAccentCode =
+      this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode];
+
+    modalRef.componentInstance.languageCode = languageCode;
+    modalRef.componentInstance.voiceArtistId = voiceArtistId;
+    modalRef.componentInstance.voiceArtistName =
+      this.voiceArtistIdToVoiceArtistName[voiceArtistId];
+    modalRef.componentInstance.languageAccentCode = currentLanguageAccentCode;
+    modalRef.componentInstance.languageAccentCodes = languageAccentCodes;
+
+    modalRef.result.then(
+      languageAccentCode => {
+        this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode] =
+          languageAccentCode;
+        this.voiceArtistIdToLanguageMappingList =
+          VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
+            this.voiceArtistIdToLanguageMapping
+          );
+        this.voiceoverBackendApiService.updateVoiceArtistToLanguageAccentAsync(
+          voiceArtistId,
+          languageCode,
+          languageAccentCode
+        );
+      },
+      () => {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is
+        // clicked. No further action is needed.
+      }
+    );
   }
 
   initializeLanguageAccentCodesFields(
@@ -109,8 +186,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
       if (
         !(languageAccentCode in this.supportedLanguageAccentCodesToDescriptions)
       ) {
-        this.availableLanguageAccentCodesToDescriptions[languageAccentCode] =
-          languageAccentDescription;
+        this.availableLanguageAccentDescriptionsToCodes[
+          languageAccentDescription
+        ] = languageAccentCode;
       }
     }
 
@@ -126,8 +204,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
     this.supportedLanguageAccentCodesToDescriptions[languageAccentCodeToAdd] =
       languageAccentDescription;
-    delete this.availableLanguageAccentCodesToDescriptions[
-      languageAccentCodeToAdd
+    delete this.availableLanguageAccentDescriptionsToCodes[
+      languageAccentDescription
     ];
 
     if (!(languageCode in this.languageCodesMapping)) {
@@ -164,9 +242,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
         delete this.supportedLanguageAccentCodesToDescriptions[
           languageAccentCodeToRemove
         ];
-        this.availableLanguageAccentCodesToDescriptions[
-          languageAccentCodeToRemove
-        ] = languageAccentDescription;
+        this.availableLanguageAccentDescriptionsToCodes[
+          languageAccentDescription
+        ] = languageAccentCodeToRemove;
 
         delete this.languageCodesMapping[languageCode][
           languageAccentCodeToRemove
@@ -205,10 +283,3 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.languageAccentDropdownIsShown = false;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaVoiceoverAdminPage',
-    downgradeComponent({component: VoiceoverAdminPageComponent})
-  );

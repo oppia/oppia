@@ -268,6 +268,12 @@ URLS = [
     ),
 
     get_redirect_route(
+        r'%s/can_access_facilitator_dashboard_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.FacilitatorDashboardPageAccessValidationHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_create_learner_group_page' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.CreateLearnerGroupPageAccessValidationHandler
@@ -283,6 +289,17 @@ URLS = [
         r'%s/does_learner_group_exist/<learner_group_id>' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.ViewLearnerGroupPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_collection_player_page/<collection_id>' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.CollectionViewerPageAccessValidationHandler),
+
+    get_redirect_route(
+        r'%s/can_access_diagnostic_test_player_page' %
+        feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.DiagnosticTestPlayerAccessValidationHandler
+    ),
 
     get_redirect_route(r'%s' % feconf.ADMIN_URL, oppia_root.OppiaRootPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
@@ -438,10 +455,6 @@ URLS = [
         r'%s/story' % feconf.TOPIC_VIEWER_URL_PREFIX,
         topic_viewer.TopicViewerPage),
     get_redirect_route(
-        r'%s' % feconf.DIAGNOSTIC_TEST_PLAYER_PAGE_URL,
-        diagnostic_test_player.DiagnosticTestPlayerPage
-    ),
-    get_redirect_route(
         r'%s/<topic_id>' % feconf.DIAGNOSTIC_TEST_QUESTIONS_HANDLER_URL,
         diagnostic_test_player.DiagnosticTestQuestionsHandler
     ),
@@ -465,16 +478,21 @@ URLS = [
         classroom.ClassroomIdHandler
     ),
     get_redirect_route(
-        r'%s' % feconf.VOICEOVER_ADMIN_PAGE_URL,
-        voiceover.VoiceoverAdminPage
-    ),
-    get_redirect_route(
         r'%s' % feconf.VOICEOVER_ADMIN_DATA_HANDLER_URL,
         voiceover.VoiceoverAdminDataHandler
     ),
     get_redirect_route(
         r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
         voiceover.VoiceoverLanguageCodesMappingHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
+        voiceover.VoiceArtistMetadataHandler
+    ),
+    get_redirect_route(
+        r'%s/<voice_artist_id>/<language_code>' %
+        feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
+        voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler
     ),
 
     get_redirect_route(
@@ -866,9 +884,6 @@ URLS = [
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
-        collection_viewer.CollectionPage),
-    get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_DATA_URL_PREFIX,
         collection_viewer.CollectionDataHandler),
 
@@ -1102,9 +1117,6 @@ URLS = [
         r'/learner_group_learner_specific_progress_handler/<learner_group_id>',
         learner_group.LearnerGroupLearnerSpecificProgressHandler
     ),
-    get_redirect_route(
-        r'%s' % feconf.FACILITATOR_DASHBOARD_PAGE_URL,
-        learner_group.FacilitatorDashboardPage),
     get_redirect_route(
         r'/learner_group_search_learner_handler',
         learner_group.LearnerGroupSearchLearnerHandler),

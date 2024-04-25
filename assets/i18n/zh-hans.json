@@ -1,5 +1,6 @@
 {
 	"I18N_ABOUT_FOUNDATION_PAGE_BREADCRUMB": "关于Oppia基金会",
+	"I18N_ABOUT_FOUNDATION_PAGE_MILLIONS_OF_CONTENT": "如果这种趋势持续下去，全世界<a href=\"http://uis.unesco.org/en/news/world-poverty-could-be-cut-half-if-all-adults-completed-secondary-education\" class=\"inline-links\">6100万名无法上小学的儿童</a>中，将有1700万名学生将永远不会踏入学校。不幸的是，<a href=\"https://uis.unesco.org/sites/default/files/documents/fs46-more-than-half-children-not-learning-en-2017.pdf\" class=\"inline-links\">即使是那些在学校的</a>，也可能无法获得他们所需的有效教育。",
 	"I18N_ABOUT_FOUNDATION_PAGE_TITLE": "关于Oppia基金会 | Oppia",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "创建一个探险",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE_TEXT": "关于您关心的话题。",
@@ -566,6 +567,7 @@
 	"I18N_PREFERENCES_PROFILE_PICTURE_DRAG": "拖放以裁剪并调整大小：",
 	"I18N_PREFERENCES_PROFILE_PICTURE_ERROR": "错误：不能读取图片文件。",
 	"I18N_PREFERENCES_PROFILE_PICTURE_UPLOAD": "上传个人照片",
+	"I18N_PREFERENCES_SAVE_CHANGES": "保存更改",
 	"I18N_PREFERENCES_SEARCH_LABEL": "搜索",
 	"I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE": "选择首选语言...",
 	"I18N_PREFERENCES_SUBJECT_INTERESTS": "学科兴趣",

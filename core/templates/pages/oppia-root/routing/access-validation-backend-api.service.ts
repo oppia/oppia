@@ -43,6 +43,12 @@ export class AccessValidationBackendApiService {
   LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_create_learner_group_page';
 
+  DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_diagnostic_test_player_page';
+
+  FACILITATOR_DASHBOARD_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/can_access_facilitator_dashboard_page';
+
   DOES_LEARNER_GROUP_EXIST =
     '/access_validation_handler/does_learner_group_exist/<learner_group_id>';
 
@@ -54,6 +60,9 @@ export class AccessValidationBackendApiService {
 
   BLOG_AUTHOR_PROFILE_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_blog_author_profile_page/<author_username>'; // eslint-disable-line max-len
+
+  COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
+    '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
   constructor(
     private http: HttpClient,
@@ -102,6 +111,17 @@ export class AccessValidationBackendApiService {
       .toPromise();
   }
 
+  validateAccessToCollectionPlayerPage(collectionId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE,
+      {
+        collection_id: collectionId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
+
   doesProfileExist(username: string): Promise<void> {
     let url = this.urlInterpolationService.interpolateUrl(
       this.DOES_PROFILE_EXIST,
@@ -135,6 +155,18 @@ export class AccessValidationBackendApiService {
   validateAccessToLearnerGroupCreatorPage(): Promise<void> {
     return this.http
       .get<void>(this.LEARNER_GROUP_CREATOR_PAGE_ACCESS_VALIDATOR)
+      .toPromise();
+  }
+
+  validateAccessToDiagnosticTestPlayerPage(): Promise<void> {
+    return this.http
+      .get<void>(this.DIAGNOSTIC_TEST_PLAYER_PAGE_ACCESS_VALIDATOR)
+      .toPromise();
+  }
+
+  validateAccessToFacilitatorDashboardPage(): Promise<void> {
+    return this.http
+      .get<void>(this.FACILITATOR_DASHBOARD_PAGE_ACCESS_VALIDATOR)
       .toPromise();
   }
 

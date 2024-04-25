@@ -23,6 +23,7 @@ import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {FormControl} from '@angular/forms';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -69,7 +70,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   topicNameExists: boolean;
   topicUrlFragmentExists: boolean;
   hostname: string;
-  selectedSkillForDiagnosticTest;
   availableSkillSummariesForDiagnosticTest: ShortSkillSummary[];
   selectedSkillSummariesForDiagnosticTest: ShortSkillSummary[];
   diagnosticTestSkillsDropdownIsShown: boolean;
@@ -92,6 +92,13 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   uncategorizedEditOptionsIndex: number;
   subtopicEditOptionsAreShown: number;
   skillOptionDialogueBox: boolean = true;
+  maxCharsInTopicName!: number;
+  maxCharsInTopicUrlFragment!: number;
+  maxCharsInTopicDescription!: number;
+  maxCharsInPageTitleFragmentForWeb!: number;
+  maxCharsInMetaTagContent!: number;
+  minCharsInPageTitleFragmentForWeb!: number;
+  skillForDiagnosticTestFormControl = new FormControl(null);
 
   constructor(
     private contextService: ContextService,
@@ -155,7 +162,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.selectedSkillSummariesForDiagnosticTest =
       this.topic.getSkillSummariesForDiagnosticTest();
     this.diagnosticTestSkillsDropdownIsShown = false;
-    this.selectedSkillForDiagnosticTest = null;
 
     this.editableDescriptionIsEmpty = this.editableDescription === '';
     this.topicDescriptionChanged = false;
@@ -192,8 +198,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   addSkillForDiagnosticTest(): void {
-    let skillToAdd = this.selectedSkillForDiagnosticTest;
-    this.selectedSkillForDiagnosticTest = null;
+    let skillToAdd = this.skillForDiagnosticTestFormControl.value;
+    this.skillForDiagnosticTestFormControl.setValue(null);
     this.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
     let skillSummary = this.availableSkillSummariesForDiagnosticTest.find(
@@ -651,6 +657,16 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     );
     this.initEditor();
     this._initStorySummaries();
+    this.maxCharsInTopicName = AppConstants.MAX_CHARS_IN_TOPIC_NAME;
+    this.maxCharsInTopicUrlFragment =
+      AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT;
+    this.maxCharsInTopicDescription =
+      AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION;
+    this.maxCharsInPageTitleFragmentForWeb =
+      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
+    this.maxCharsInMetaTagContent = AppConstants.MAX_CHARS_IN_META_TAG_CONTENT;
+    this.minCharsInPageTitleFragmentForWeb =
+      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   }
 
   ngOnDestroy(): void {

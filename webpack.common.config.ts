@@ -82,10 +82,6 @@ module.exports = {
       commonPrefix +
       '/pages/contributor-dashboard-page/' +
       'contributor-dashboard-page.import.ts',
-    diagnostic_test_player_page:
-      commonPrefix +
-      '/pages/diagnostic-test-player-page/' +
-      'diagnostic-test-player-page.import.ts',
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.import.ts',
@@ -98,10 +94,6 @@ module.exports = {
       commonPrefix +
       '/pages/exploration-editor-page/' +
       'exploration-editor-page.import.ts',
-    facilitator_dashboard:
-      commonPrefix +
-      '/pages/facilitator-dashboard-page/' +
-      'facilitator-dashboard-page.import.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.import.ts',
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
@@ -127,10 +119,6 @@ module.exports = {
       'topics-and-skills-dashboard-page.import.ts',
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.import.ts',
-    voiceover_admin:
-      commonPrefix +
-      '/pages/voiceover-admin-page/' +
-      'voiceover-admin-page.import.ts',
   },
 
   /**
@@ -151,28 +139,6 @@ module.exports = {
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
     }),
     new HtmlWebpackPlugin({
-      chunks: ['diagnostic_test_player_page'],
-      filename: 'diagnostic-test-player-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'With Oppia, you can access free lessons on math, ' +
-          'physics, statistics, chemistry, music, history, and more from ' +
-          'anywhere in the world. Oppia is a nonprofit with the mission of ' +
-          'providing high-quality education to those who lack access to it. ' +
-          'The Learner Diagnostic test page will allow the learner to ' +
-          'test their knowledge and get a set of recommendations for where ' +
-          'they should begin learning.',
-      },
-      template:
-        commonPrefix +
-        '/pages/diagnostic-test-player-page/' +
-        'diagnostic-test-player-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
       filename: 'collection-editor-page.mainpage.html',
       hybrid: true,
@@ -186,23 +152,6 @@ module.exports = {
         commonPrefix +
         '/pages/collection-editor-page/' +
         'collection-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['collection_player'],
-      filename: 'collection-player-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.',
-      },
-      template:
-        commonPrefix +
-        '/pages/collection-player-page/' +
-        'collection-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),
@@ -428,39 +377,6 @@ module.exports = {
         commonPrefix +
         '/pages/topic-viewer-page/' +
         'topic-viewer-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['facilitator_dashboard'],
-      filename: 'facilitator-dashboard-page.mainpage.html',
-      hybrid: true,
-      meta: defaultMeta,
-      template:
-        commonPrefix +
-        '/pages/facilitator-dashboard-page/' +
-        'facilitator-dashboard-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['voiceover_admin'],
-      filename: 'voiceover-admin-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'The voiceover admin page provides functionalities ' +
-          'for the voiceover admin, allowing them to manage language accent' +
-          " support for Oppia's voiceovers. The Voiceover Admin can use " +
-          'this page to add new language accent support, remove existing ' +
-          'language accent support, and generate automatic voiceovers ' +
-          'for exploration.',
-      },
-      template:
-        commonPrefix +
-        '/pages/voiceover-admin-page/' +
-        'voiceover-admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
     }),

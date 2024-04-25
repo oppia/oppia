@@ -969,38 +969,14 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             parent_user_id=self.PROFILE_ID_1
         ).put()
 
-        voiceover1: voiceover_models.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1
-        }
-        voiceover2: voiceover_models.VoiceoverDict = {
-            'filename': 'filename2.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.9
-        }
-        voiceover3: voiceover_models.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0
-        }
-        voiceovers_and_contents_mapping: (
-            voiceover_models.VoiceoversAndContentsMappingType) = {
-            'en': {
-                'language_accent_code': 'en-US',
-                'exploration_id_to_content_ids': {
-                    'exp_1': ['content_1', 'content_2', 'content_3']
-                },
-                'voiceovers': [voiceover1, voiceover2, voiceover3]
-            }
+        language_code_to_accent: Dict[str, str] = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
         }
         # Setup for VoiceArtistMetadataModel.
-        voiceover_models.VoiceArtistMetadataModel.create(
+        voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=self.USER_ID_1,
-            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
+            language_code_to_accent=language_code_to_accent
         )
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
@@ -1183,6 +1159,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
         }
+        user_group: Dict[str, str] = {}
         skill_data: Dict[str, str] = {}
         stats_data: Dict[str, stats_domain.AggregatedStatsDict] = {}
         story_progress_data: Dict[str, List[str]] = {}
@@ -1262,8 +1239,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
-        expected_voice_artist_data: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {}
+        expected_voice_artist_data: Dict[str, str] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1277,6 +1253,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
+            'user_group': user_group,
             'user_skill_mastery': skill_data,
             'user_contributions': contribution_data,
             'exploration_user_data': exploration_data,
@@ -1596,6 +1573,17 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
+
+        user_group_model = user_models.UserGroupModel(
+            id='user_group_model', users=[self.USER_ID_1]
+        )
+        user_group_model.put()
+
+        expected_user_group_data = {
+            'user_group_model': {
+                'users': self.USER_ID_1
+            }
+        }
 
         blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_POST_ID_1,
@@ -2127,39 +2115,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
-        expected_voice_artist_data: Dict[
-            str, voiceover_models.VoiceoversAndContentsMappingType] = {
-                'voiceovers_and_contents_mapping': {
-                    'en': {
-                        'language_accent_code': 'en-US',
-                        'exploration_id_to_content_ids': {
-                            'exp_1': ['content_1', 'content_2', 'content_3']
-                        },
-                        'voiceovers': [
-                            {
-                                'filename': 'filename1.mp3',
-                                'file_size_bytes': 3000,
-                                'needs_update': False,
-                                'duration_secs': 6.1,
-                            },
-                            {
-                                'filename': 'filename2.mp3',
-                                'file_size_bytes': 3500,
-                                'needs_update': False,
-                                'duration_secs': 5.9,
-                            },
-                            {
-                                'filename': 'filename3.mp3',
-                                'file_size_bytes': 3500,
-                                'needs_update': False,
-                                'duration_secs': 5.0,
-                            },
-                        ],
-                    }
-                }
-            }
+        expected_language_code_to_accent: Dict[str, str] = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
         expected_user_data = {
             'user_stats': expected_stats_data,
+            'user_group': expected_user_group_data,
             'user_settings': expected_user_settings_data,
             'user_subscriptions': expected_subscriptions_data,
             'user_skill_mastery': expected_user_skill_data,
@@ -2231,7 +2193,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
             'blog_author_details': expected_blog_author_details,
-            'voice_artist_metadata': expected_voice_artist_data
+            'voice_artist_metadata': expected_language_code_to_accent
         }
 
         with utils.open_file(

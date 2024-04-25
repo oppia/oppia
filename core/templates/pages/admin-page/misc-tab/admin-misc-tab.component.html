@@ -274,7 +274,7 @@
       <div class="form-group row">
         <label>Exploration ID:</label>
         <input type="text"
-               [(ngModel)]="expIdToGetInteractions"
+               [(ngModel)]="expIdToGetInteractionIdsFor"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
@@ -285,9 +285,9 @@
   </div>
 
   <div>
-    <p *ngIf="explorationInteractions.length > 0">Exploration IDs:</p>
+    <p *ngIf="explorationInteractionIds.length > 0">Interaction IDs:</p>
     <ul>
-      <li *ngFor="let interaction of explorationInteractions" [innerHTML]="interaction.id"></li>
+      <li *ngFor="let interactionId of explorationInteractionIds" [innerHTML]="interactionId"></li>
     </ul>
   </div>
 </mat-card>
