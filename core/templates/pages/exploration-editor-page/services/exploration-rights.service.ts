@@ -230,27 +230,14 @@ export class ExplorationRightsService {
   }
 
   removeRoleAsync(memberUsername: string): Promise<void> {
-    const initialState = {
-      owner_names: [] as string[],
-      editor_names: [] as string[],
-      viewer_names: [] as string[],
-    };
-    if (this.ownerNames && this.ownerNames.includes(memberUsername)) {
-      initialState.owner_names = [...this.ownerNames];
-      this.ownerNames = this.ownerNames.filter(name => name !== memberUsername);
-    }
-    if (this.editorNames && this.editorNames.includes(memberUsername)) {
-      initialState.editor_names = [...this.editorNames];
-      this.editorNames = this.editorNames.filter(
-        name => name !== memberUsername
-      );
-    }
-    if (this.viewerNames && this.viewerNames.includes(memberUsername)) {
-      initialState.viewer_names = [...this.viewerNames];
-      this.viewerNames = this.viewerNames.filter(
-        name => name !== memberUsername
-      );
-    }
+    const categories = ['ownerNames', 'editorNames', 'viewerNames'];
+    let initialState: {[key: string]: string[]} = {};
+    categories.forEach(category => {
+      if (this[category] && this[category].includes(memberUsername)) {
+        initialState[category] = [...this[category]];
+        this[category] = this[category].filter(name => name !== memberUsername);
+      }
+    });
     return this.explorationRightsBackendApiService
       .removeRoleAsyncDeleteData(
         this.explorationDataService.explorationId,
@@ -273,27 +260,18 @@ export class ExplorationRightsService {
         );
       })
       .catch(error => {
-        if (
-          initialState.owner_names &&
-          initialState.owner_names.includes(memberUsername)
-        ) {
-          this.ownerNames = initialState.owner_names;
-        }
-        if (
-          initialState.editor_names &&
-          initialState.editor_names.includes(memberUsername)
-        ) {
-          this.editorNames = initialState.editor_names;
-        }
-        if (
-          initialState.viewer_names &&
-          initialState.viewer_names.includes(memberUsername)
-        ) {
-          this.viewerNames = initialState.viewer_names;
-        }
+        categories.forEach(category => {
+          if (
+            initialState[category] &&
+            initialState[category].includes(memberUsername)
+          ) {
+            this[category] = initialState[category];
+          }
+        });
         this.alertsService.addWarning(
           'Failed to remove the user role. Please try again.'
         );
+        throw error;
       });
   }
 
