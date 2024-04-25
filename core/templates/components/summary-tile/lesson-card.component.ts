@@ -97,7 +97,7 @@ export class LessonCardComponent implements OnInit {
     this.lessonTopic = this.topic;
   }
 
-  setCollectionSummary(collectionModel: CollectionSummary) {
+  setCollectionSummary(collectionModel: CollectionSummary): void {
     this.desc = collectionModel.objective;
     this.imgColor = collectionModel.thumbnailBgColor;
     this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
@@ -109,7 +109,7 @@ export class LessonCardComponent implements OnInit {
     this.lessonTopic = 'Collections';
   }
 
-  setExplorationSummary(explorationModel: LearnerExplorationSummary) {
+  setExplorationSummary(explorationModel: LearnerExplorationSummary): void {
     this.desc = explorationModel.objective;
     this.imgColor = explorationModel.thumbnailBgColor;
     this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
