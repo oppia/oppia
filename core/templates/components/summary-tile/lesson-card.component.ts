@@ -60,50 +60,65 @@ export class LessonCardComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.story instanceof StorySummary) {
-      const completedStories = this.story.getCompletedNodeTitles().length;
-
-      this.desc = this.story.getTitle();
-      this.imgColor = this.story.getThumbnailBgColor();
-      this.imgUrl = this.getStorySummaryThumbnailUrl({
-        filename: this.story.getThumbnailFilename(),
-        id: this.story.getId(),
-      });
-
-      const nextStory =
-        completedStories === this.story.getAllNodes().length
-          ? completedStories - 1
-          : completedStories;
-
-      const lessonArgs = {
-        classroom: this.story.getClassroomUrlFragment(),
-        topicFragment: this.story.getTopicUrlFragment(),
-        currentStory: this.story.getAllNodes()[nextStory],
-        story: this.story.getUrlFragment(),
-      };
-      this.lessonUrl = this.getStorySummaryLessonUrl(lessonArgs);
-
-      this.title = `Chapter ${nextStory + 1}: ${this.story.getNodeTitles()[nextStory]}`;
-      this.progress = Math.floor(
-        (completedStories / this.story.getNodeTitles().length) * 100
-      );
-      this.lessonTopic = this.topic;
+      this.setStorySummary(this.story);
+    } else if (this.story instanceof CollectionSummary) {
+      this.setCollectionSummary(this.story);
     } else {
-      this.desc = this.story.objective;
-      this.imgColor = this.story.thumbnailBgColor;
-      this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
-        this.story.thumbnailIconUrl
-      );
-      this.progress = 0;
-      this.title = this.story.title;
-
-      if (this.story instanceof CollectionSummary) {
-        this.lessonUrl = `/collection/${this.story.id}`;
-        this.lessonTopic = 'Collections';
-      } else {
-        this.lessonUrl = `/explore/${this.story.id}`;
-        this.lessonTopic = 'Community Lessons';
-      }
+      this.setExplorationSummary(this.story);
     }
+  }
+
+  setStorySummary(storyModel: StorySummary): void {
+    const completedStories = storyModel.getCompletedNodeTitles().length;
+    this.desc = storyModel.getTitle();
+    this.imgColor = storyModel.getThumbnailBgColor();
+    this.imgUrl = this.getStorySummaryThumbnailUrl({
+      filename: storyModel.getThumbnailFilename(),
+      id: storyModel.getId(),
+    });
+
+    const nextStory =
+      completedStories === storyModel.getAllNodes().length
+        ? completedStories - 1
+        : completedStories;
+
+    const lessonArgs = {
+      classroom: storyModel.getClassroomUrlFragment(),
+      topicFragment: storyModel.getTopicUrlFragment(),
+      currentStory: storyModel.getAllNodes()[nextStory],
+      story: storyModel.getUrlFragment(),
+    };
+    this.lessonUrl = this.getStorySummaryLessonUrl(lessonArgs);
+
+    this.title = `Chapter ${nextStory + 1}: ${storyModel.getNodeTitles()[nextStory]}`;
+    this.progress = Math.floor(
+      (completedStories / storyModel.getNodeTitles().length) * 100
+    );
+    this.lessonTopic = this.topic;
+  }
+
+  setCollectionSummary(collectionModel: CollectionSummary) {
+    this.desc = collectionModel.objective;
+    this.imgColor = collectionModel.thumbnailBgColor;
+    this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
+      collectionModel.thumbnailIconUrl
+    );
+    this.progress = 0;
+    this.title = collectionModel.title;
+    this.lessonUrl = `/collection/${collectionModel.id}`;
+    this.lessonTopic = 'Collections';
+  }
+
+  setExplorationSummary(explorationModel: LearnerExplorationSummary) {
+    this.desc = explorationModel.objective;
+    this.imgColor = explorationModel.thumbnailBgColor;
+    this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
+      explorationModel.thumbnailIconUrl
+    );
+    this.progress = 0;
+    this.title = explorationModel.title;
+    this.lessonUrl = `/explore/${explorationModel.id}`;
+    this.lessonTopic = 'Community Lessons';
   }
 
   getStorySummaryThumbnailUrl({filename, id}: ThumbnailUrl): string {
