@@ -136,7 +136,7 @@ describe('LessonCardComponent', () => {
     thumbnail_filename: null,
     thumbnail_bg_color: '#F8BF74',
     story_is_published: true,
-    completed_node_titles: ['Chapter 1'],
+    completed_node_titles: [],
     url_fragment: 'story-title',
     all_node_dicts: [sampleNode, sampleNode],
     topic_name: 'Topic',
@@ -240,6 +240,7 @@ describe('LessonCardComponent', () => {
           100
       )
     );
+    expect(component.lessonTopic).toEqual(incompleteTopic.topic_name);
   });
 
   it('should set story to CollectionSummary and set its imgUrl correctly', () => {
@@ -302,5 +303,41 @@ describe('LessonCardComponent', () => {
     expect(component.imgUrl).toBe(
       urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
     );
+  });
+
+  it('should return Redo translation key when progress is 100', () => {
+    spyOn(component, 'setButtonText');
+    component.story = StorySummary.createFromBackendDict(sampleTopic);
+    component.topic = sampleTopic.topic_name;
+
+    fixture.detectChanges();
+
+    expect(component.setButtonText).toHaveBeenCalled();
+    const buttonText = component.setButtonText();
+    expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_REDO');
+  });
+
+  it('should return Resume translation key when progress is < 100', () => {
+    spyOn(component, 'setButtonText');
+    component.story = StorySummary.createFromBackendDict(incompleteTopic);
+    component.topic = incompleteTopic.topic_name;
+
+    fixture.detectChanges();
+
+    expect(component.setButtonText).toHaveBeenCalled();
+    const buttonText = component.setButtonText();
+    expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_RESUME');
+  });
+
+  it('should return Start translation key when progress is 0', () => {
+    spyOn(component, 'setButtonText');
+    component.story = StorySummary.createFromBackendDict(emptyImgTopic);
+    component.topic = emptyImgTopic.topic_name;
+
+    fixture.detectChanges();
+
+    expect(component.setButtonText).toHaveBeenCalled();
+    const buttonText = component.setButtonText();
+    expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START');
   });
 });
