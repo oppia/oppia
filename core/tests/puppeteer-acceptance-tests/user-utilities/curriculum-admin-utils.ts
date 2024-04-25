@@ -527,6 +527,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(subtopicReassignHeader);
     }
 
+    await this.page.waitForSelector('div.e2e-test-skill-item', {visible: true});
     await this.page.evaluate(
       (skillName, topicName, editSkillItemSelector) => {
         const skillItemDivs = Array.from(
