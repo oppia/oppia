@@ -67,11 +67,7 @@ var CONSOLE_ERRORS_TO_IGNORE = [
   // error was observed on other websites (e.g. https://edu.google.com/) that
   // use gtag and it does not affect the user experience in any way.
   // Considering these reasons, the error may be ignored.
-  new RegExp(
-    'https://www.googletagmanager.com/a.* Failed to load resource: ' +
-      'the server responded with a status of 405 ()',
-    'g'
-  ),
+  /https:\/\/www.googletagmanager.com\/a.* Failed to load resource: the server responded with a status of 405/,
 ];
 
 // Existing console errors that are not fixed yet. Remember to remove these
