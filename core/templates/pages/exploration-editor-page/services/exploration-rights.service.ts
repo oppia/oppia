@@ -232,10 +232,11 @@ export class ExplorationRightsService {
   removeRoleAsync(memberUsername: string): Promise<void> {
     const categories = ['ownerNames', 'editorNames', 'viewerNames'];
     let initialState: {[key: string]: string[]} = {};
+    const role: any = this;
     categories.forEach(category => {
-      if (this[category] && this[category].includes(memberUsername)) {
-        initialState[category] = [...this[category]];
-        this[category] = this[category].filter(name => name !== memberUsername);
+      if (role[category] && role[category].includes(memberUsername)) {
+        initialState[category] = [...role[category]];
+        role[category] = role[category].filter(name => name !== memberUsername);
       }
     });
     return this.explorationRightsBackendApiService
@@ -265,7 +266,7 @@ export class ExplorationRightsService {
             initialState[category] &&
             initialState[category].includes(memberUsername)
           ) {
-            this[category] = initialState[category];
+            role[category] = initialState[category];
           }
         });
         this.alertsService.addWarning(
