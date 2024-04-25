@@ -49,6 +49,15 @@ import {
 } from '../contributor-dashboard-admin-summary.model';
 
 describe('Contributor stats component', () => {
+  var createQuestionReviewerStats = function createQuestionReviewerStats(
+    numStats: number
+  ): QuestionReviewerStats[] {
+    let stats: QuestionReviewerStats[] = [];
+    for (let i = 0; i < numStats; i++) {
+      stats.push(questionReviewerStats);
+    }
+    return stats;
+  };
   let component: ContributorAdminStatsTable;
   let fixture: ComponentFixture<ContributorAdminStatsTable>;
   let $window: WindowRef;
@@ -305,27 +314,19 @@ describe('Contributor stats component', () => {
       expect(component.getOverallItemCount()).toEqual('1+');
     }));
 
-    it('should index last item on page as "overall item count" when "max allowed per page item count plus previous pages item count" exceeds "overall item count".', fakeAsync(() => {
+    it('should index last item on page as "overall item count" when "current page\'s cumulative item count" exceeds "overall item count".', fakeAsync(() => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 4;
       fixture.detectChanges();
-      component.allStats = [
-        questionReviewerStats,
-        questionReviewerStats,
-        questionReviewerStats,
-      ];
+      component.allStats = createQuestionReviewerStats(3);
       expect(component.getIndexOfLastItemOnPage()).toEqual(3);
     }));
 
-    it('should index last item on page as "max allowed per page item count plus previous pages item count" when "overall item count" exceeds "max allowed per page item count plus previous pages item count".', fakeAsync(() => {
+    it('should index last item on page as "current page\'s cumulative item count" when "overall item count" exceeds "current page\'s cumulative item count".', fakeAsync(() => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 1;
       fixture.detectChanges();
-      component.allStats = [
-        questionReviewerStats,
-        questionReviewerStats,
-        questionReviewerStats,
-      ];
+      component.allStats = createQuestionReviewerStats(3);
       expect(component.getIndexOfLastItemOnPage()).toEqual(2);
     }));
 
@@ -339,11 +340,7 @@ describe('Contributor stats component', () => {
       component.statsPageNumber = 1;
       component.itemsPerPage = 1;
       fixture.detectChanges();
-      component.allStats = [
-        questionReviewerStats,
-        questionReviewerStats,
-        questionReviewerStats,
-      ];
+      component.allStats = createQuestionReviewerStats(3);
       expect(component.getOverallItemCount()).toEqual(
         component.allStats.length.toString()
       );
@@ -354,9 +351,7 @@ describe('Contributor stats component', () => {
       component.itemsPerPage = 1;
       component.tableHasMoreThanMaximumExpectedItems = true;
       fixture.detectChanges();
-      for (let i = 1; i <= 1000; i++) {
-        component.allStats.push(questionReviewerStats);
-      }
+      component.allStats = createQuestionReviewerStats(1000);
       expect(component.getOverallItemCount()).toEqual('1000+');
     }));
 
@@ -901,19 +896,9 @@ describe('Contributor stats component', () => {
   });
 
   describe('when more than one page of stats are returned', () => {
-    var createContributorStats = function createContributorStats(
-      numStats: number
-    ): QuestionReviewerStats[] {
-      let stats: QuestionReviewerStats[] = [];
-      for (let i = 0; i < numStats; i++) {
-        stats.push(questionReviewerStats);
-      }
-      return stats;
-    };
-
     it('should show data on multiple pages', fakeAsync(() => {
       let allQuestionReviewerStats: QuestionReviewerStats[] =
-        createContributorStats(30);
+        createQuestionReviewerStats(30);
 
       spyOn(
         contributorDashboardAdminStatsBackendApiService,
