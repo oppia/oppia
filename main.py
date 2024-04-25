@@ -493,6 +493,11 @@ URLS = [
         r'<entity_version>/<language_accent_code>/<content_id>',
         voiceover.EntityVoiceoversHandler
     ),
+    get_redirect_route(
+        r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
+        r'<entity_version>/<language_code>',
+        voiceover.EntityVoiceoversBulkHandler
+    ),
 
     get_redirect_route(
         r'%s/<classroom_url_fragment>/<topic_url_fragment>'

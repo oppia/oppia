@@ -27,6 +27,10 @@ import {
   Voiceover,
   VoiceoverBackendDict,
 } from 'domain/exploration/voiceover.model';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from './entity-voiceovers.model';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -45,6 +49,10 @@ interface VoiceoverTypeToVoiceoverBackendDict {
   voiceover_type_to_voiceovers: {
     [type: string]: VoiceoverBackendDict;
   };
+}
+
+interface EntityVoiceoversBulkBackendDict {
+  entity_voiceovers_list: EntityVoiceoversBackendDict[];
 }
 
 interface VoiceoverTypeToVoiceover {
@@ -88,6 +96,16 @@ export interface VoiceArtistIdToLanguageMapping {
 
 export interface VoiceArtistIdToVoiceArtistName {
   [voiceArtistId: string]: string;
+}
+
+interface VoiceoverTypeToVoiceoverBackendDict {
+  voiceover_type_to_voiceovers: {
+    [type: string]: VoiceoverBackendDict;
+  };
+}
+
+interface VoiceoverTypeToVoiceover {
+  manualVoiceover: Voiceover;
 }
 
 interface VoiceArtistMetaDataBackendDict {
@@ -263,6 +281,47 @@ export class VoiceoverBackendApiService {
           resolve({
             manualVoiceover: manualVoiceover,
           });
+        });
+    });
+  }
+
+  async fetchEntityVoiceoversForGivenLanguageCodeAsync(
+    entityType: string,
+    entitytId: string,
+    entityVersion: number,
+    languageCode: string
+  ): Promise<EntityVoiceovers[]> {
+    console.log(entityType);
+    console.log(entitytId);
+    console.log(entityVersion);
+    console.log(languageCode);
+    let entityVoiceoversBulkHandlerUrl =
+      this.urlInterpolationService.interpolateUrl(
+        VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS_BULK,
+        {
+          entity_type: entityType,
+          entity_id: entitytId,
+          entity_version: String(entityVersion),
+          language_code: languageCode,
+        }
+      );
+
+    console.log(entityVoiceoversBulkHandlerUrl);
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<EntityVoiceoversBulkBackendDict>(entityVoiceoversBulkHandlerUrl)
+        .toPromise()
+        .then(response => {
+          let entityVoiceoversList = [];
+          console.log('Hi');
+          console.log(response);
+          for (let entityVoiceoverBackendDict of response.entity_voiceovers_list) {
+            entityVoiceoversList.push(
+              EntityVoiceovers.createFromBackendDict(entityVoiceoverBackendDict)
+            );
+          }
+          resolve(entityVoiceoversList);
         });
     });
   }

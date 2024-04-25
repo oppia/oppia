@@ -32,6 +32,7 @@ import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/voiceover-removal-confirm-modal.component';
 import {LocalStorageService} from 'services/local-storage.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -68,34 +69,48 @@ export class VoiceoverCardComponent implements OnInit {
     private idGenerationService: IdGenerationService,
     private alertsService: AlertsService,
     private changeListService: ChangeListService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   ngOnInit(): void {
     this.pageIsLoaded = false;
     this.voiceoversAreLoaded = false;
+
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
         this.languageCode =
           this.translationLanguageService.getActiveLanguageCode();
+
+        this.entityVoiceoversService.setLanguageCode(this.languageCode);
+        this.entityVoiceoversService.fetchEntityVoiceovers();
+
         this.voiceoverBackendApiService
           .fetchVoiceoverAdminDataAsync()
-          .then(response => {
+          .then(voiceoverLanguages => {
             this.availableLanguageAccentCodesToDescriptions =
-              response.languageAccentMasterList[this.languageCode];
-            this.pageIsLoaded = true;
+              voiceoverLanguages.languageAccentMasterList[this.languageCode];
+
             if (this.availableLanguageAccentCodesToDescriptions) {
               this.availableLanguageAccentCodesLength = Object.keys(
                 this.availableLanguageAccentCodesToDescriptions
               ).length;
             }
+
             this.languageAccentCode =
               this.localStorageService.getLastSelectedLanguageAccentCode();
-            this.contentId =
-              this.translationTabActiveContentIdService.getActiveContentId();
+            this.entityVoiceoversService.getVoiceoverInGivenLanguageAccentCode(
+              this.languageAccentCode
+            );
+
+            this.pageIsLoaded = true;
           });
+
+        this.contentId =
+          this.translationTabActiveContentIdService.getActiveContentId();
       })
     );
+
     setInterval(() => {
       if (
         this.audioPlayerService.isTrackLoaded() &&

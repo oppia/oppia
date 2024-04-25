@@ -73,6 +73,8 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationNextContentIdIndexService} from './services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from './services/version-history.service';
 import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
 interface ExplorationData extends ExplorationBackendDict {
   exploration_is_linked_to_story: boolean;
@@ -175,7 +177,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private userService: UserService,
     private windowDimensionsService: WindowDimensionsService,
-    private versionHistoryService: VersionHistoryService
+    private versionHistoryService: VersionHistoryService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService
   ) {}
 
   setDocumentTitle(): void {
@@ -241,6 +245,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.version
       );
       this.contextService.setExplorationVersion(explorationData.version);
+
+      this.entityVoiceoversService.init(
+        this.explorationId,
+        'exploration',
+        explorationData.version,
+        explorationData.language_code
+      );
+      this.entityVoiceoversService.fetchEntityVoiceovers();
 
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(
