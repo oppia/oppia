@@ -95,6 +95,33 @@ describe('Site Analytics Service', () => {
       });
     });
 
+    it('should register click create account button event', () => {
+      sas.registerClickCreateAccountButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+        event_category: 'CreateAccountButton',
+        event_label: pathname,
+      });
+    });
+
+    it('should register click explore classroom button event', () => {
+      sas.registerClickExploreClassroomButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+        event_category: 'ExploreClassroomButton',
+        event_label: pathname,
+      });
+    });
+
+    it('should register click start exploring button event', () => {
+      sas.registerClickStartExploringButtonEvent();
+
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'click', {
+        event_category: 'StartExploringButton',
+        event_label: pathname,
+      });
+    });
+
     it('should register click start contributing button event', () => {
       sas.registerClickStartContributingButtonEvent();
 
