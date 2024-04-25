@@ -17,15 +17,16 @@
  * and view all explorations created by that creator
  */
 
-import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
-import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
+import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User', function () {
   let testLearner: LoggedInUser;
-  let explorationCreator: LoggedInUser;
+  let explorationCreator: ExplorationEditor;
 
   beforeAll(async function () {
     testLearner = await UserFactory.createNewUser(
@@ -37,7 +38,9 @@ describe('Logged-in User', function () {
       'exploration_creator@example.com'
     );
 
-    await explorationCreator.createExplorationWithOnlyEndInteraction();
+    await explorationCreator.createExplorationWithOnlyEndInteraction(
+      'Test Exploration'
+    );
   }, DEFAULT_SPEC_TIMEOUT);
 
   it(
@@ -55,7 +58,7 @@ describe('Logged-in User', function () {
       await explorationCreator.openSubscribersTab();
       await explorationCreator.expectUserToBeASubscriber('testLearner');
 
-      await testLearner.expectExplorationWithTitleToBePresentInProfilePage(
+      await testLearner.expectExplorationToBePresentInProfilePageWithTitle(
         'Test Exploration'
       );
     },

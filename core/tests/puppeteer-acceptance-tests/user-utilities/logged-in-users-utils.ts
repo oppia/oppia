@@ -20,7 +20,6 @@ import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 
-const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const homeUrl = testConstants.URLs.Home;
 const aboutUrl = testConstants.URLs.About;
@@ -116,37 +115,9 @@ const mobileSidevbarGetInvolvedMenuDonateButton =
 const mobileSidebarGetInvolvedMenuContactUsButton =
   'a.e2e-mobile-test-sidebar-get-involved-menu-contact-us-button';
 
-const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
-const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const textStateEditSelector = 'div.e2e-test-state-edit-content';
-const richTextAreaField = 'div.e2e-test-rte';
-const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
-const interactionEndExplorationInputButton =
-  'div.e2e-test-interaction-tile-EndExploration';
-const saveInteractionButton = 'button.e2e-test-save-interaction';
-const saveChangesButton = 'button.e2e-test-save-changes';
-const saveDraftButton = 'button.e2e-test-save-draft-button';
-const publishExplorationButton = 'button.e2e-test-publish-exploration';
-const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
-const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
-const explorationCategoryDropdown =
-  'mat-form-field.e2e-test-exploration-category-metadata-modal';
-const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
-const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
-const explorationIdElement = 'span.oppia-unique-progress-id';
-const saveContentButton = 'button.e2e-test-save-state-content';
-const mobileExplorationEditorOptions = '.e2e-test-mobile-options';
-const saveDraftMobileButton = '.e2e-test-save-changes-for-small-screens';
-const explorationMobileDropdown = '.e2e-test-mobile-changes-dropdown';
-const publishExplorationMobileButton = '.e2e-test-mobile-publish-button';
-const toastMessage = '.e2e-test-toast-message';
-
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
-const subscriberTabButton = '.e2e-test-subscription-tab';
-const subscriberCard = '.e2e-test-subscription-card';
 const explorationCard = '.e2e-test-exploration-dashboard-card';
-const subscriberCountLabel = '.e2e-test-oppia-total-subscribers';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -748,70 +719,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function for navigating to the creator dashboard page.
-   */
-  async navigateToCreatorDashboardPage(): Promise<void> {
-    await this.goto(creatorDashboardUrl);
-  }
-
-  /**
-   * Function for creating an exploration with only EndExploration interaction.
-   */
-  async createExplorationWithOnlyEndInteraction(): Promise<string | null> {
-    await this.navigateToCreatorDashboardPage();
-    await this.clickOn(createExplorationButton);
-    await this.page.waitForSelector(
-      `${dismissWelcomeModalSelector}:not([disabled])`
-    );
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-    await this.clickOn(textStateEditSelector);
-    await this.page.keyboard.press('Tab');
-    await this.type(richTextAreaField, 'Test Exploration');
-    await this.clickOn(saveContentButton);
-
-    await this.clickOn(addInteractionButton);
-    await this.page.waitForSelector('oppia-customize-interaction', {
-      visible: true,
-    });
-    await this.clickOn(interactionEndExplorationInputButton);
-    await this.clickOn(saveInteractionButton);
-
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.click(mobileExplorationEditorOptions);
-      await this.clickOn(saveDraftMobileButton);
-      await this.clickOn(saveDraftButton);
-      await this.page.waitForSelector(toastMessage, {visible: true});
-      await this.page.waitForSelector(toastMessage, {visible: false});
-      await this.clickOn(explorationMobileDropdown);
-      await this.clickOn(publishExplorationMobileButton);
-    } else {
-      await this.clickOn(saveChangesButton);
-      await this.clickOn(saveDraftButton);
-      await this.page.waitForSelector(
-        `${publishExplorationButton}:not([disabled])`
-      );
-      await this.clickOn(publishExplorationButton);
-    }
-
-    await this.type(explorationTitleInput, 'Test Exploration');
-    await this.type(explorationGoalInput, 'Test Exploration');
-    await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn('Algebra');
-    await this.clickOn(saveExplorationChangesButton);
-    await this.clickOn(explorationConfirmPublishButton);
-    await this.page.waitForSelector(explorationIdElement);
-    await this.page.click('.e2e-test-share-publish-close');
-    const explorationIdUrl = await this.page.$eval(
-      explorationIdElement,
-      element => element.textContent
-    );
-    return explorationIdUrl;
-  }
-
-  /**
    * Function for navigating to the profile page for a given username.
    */
   async navigateToProfilePage(username: string): Promise<void> {
@@ -838,69 +745,12 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * This function checks if the number of subscribers equal to.
-   */
-  async expectNumberOfSubscribersToBe(number: number): Promise<void> {
-    await this.page.waitForSelector(subscriberCountLabel);
-    const subscriberCount = await this.page.$eval(
-      subscriberCountLabel,
-      element => element.textContent
-    );
-
-    if (subscriberCount && parseInt(subscriberCount) === number) {
-      showMessage(`Number of subscribers is equal to ${number}`);
-    } else {
-      throw new Error(`Number of subscribers is not equal to ${number}`);
-    }
-  }
-
-  /**
-   * Function for opening the subscribers tab.
-   */
-  async openSubscribersTab(): Promise<void> {
-    if (this.page.url() !== creatorDashboardUrl) {
-      await this.navigateToCreatorDashboardPage();
-    }
-
-    await this.page.click(subscriberTabButton);
-    await this.page.waitForSelector('.e2e-test-subscription-card');
-  }
-
-  /**
-   * This function checks whether given user is a subscriber or not.
-   */
-  async expectUserToBeASubscriber(username: string): Promise<void> {
-    let truncatedUsername = username;
-    if (username.length > 10) {
-      const ellipsis = '...';
-      truncatedUsername =
-        username.substring(0, 10 - ellipsis.length) + ellipsis;
-    }
-
-    const subscribers = await this.page.$$(subscriberCard);
-
-    if (subscribers.length === 0) {
-      throw new Error(`User "${username}" is not subscribed.`);
-    }
-
-    const subscriberUsername = await subscribers[0].$eval(
-      '.e2e-test-subscription-name',
-      element => (element as HTMLElement).textContent?.trim()
-    );
-
-    if (truncatedUsername === subscriberUsername) {
-      showMessage(`User ${username} is a subscriber`);
-    } else {
-      throw new Error(`User ${username} is not a subscriber`);
-    }
-  }
-
-  /**
    * Checks whether the exploration with the given title is authored by the creator.
    */
-  async expectExplorationWithTitleToBePresentInProfilePage(
+  async expectExplorationToBePresentInProfilePageWithTitle(
     title: string
   ): Promise<void> {
+    await this.page.waitForSelector(explorationCard);
     const explorations = await this.page.$$(explorationCard);
 
     if (explorations.length === 0) {
@@ -908,11 +758,11 @@ export class LoggedInUser extends BaseUser {
     }
 
     const explorationTitle = await explorations[0].$eval(
-      '.e2e-test-exp-summary-tile-title span',
+      '.e2e-test-exp-summary-tile-title span span',
       element => (element as HTMLElement).textContent
     );
 
-    if (explorationTitle === explorationTitle) {
+    if (explorationTitle?.trim() === title) {
       showMessage(`Exploration with title ${title} is present`);
     } else {
       throw new Error(`Exploration with title ${title} is not present`);
