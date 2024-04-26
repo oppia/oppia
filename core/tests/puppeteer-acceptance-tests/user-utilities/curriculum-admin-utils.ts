@@ -32,9 +32,6 @@ const solutionFloatTextField =
 const textStateEditSelector = 'div.e2e-test-state-edit-content';
 const saveContentButton = 'button.e2e-test-save-state-content';
 
-const saveChangesButton = 'button.e2e-test-save-changes';
-const saveDraftButton = 'button.e2e-test-save-draft-button';
-const publishExplorationButton = 'button.e2e-test-publish-exploration';
 const modalDiv = 'div.modal-content';
 const closeSaveModalButton = '.e2e-test-close-save-modal-button';
 
@@ -52,8 +49,6 @@ const createQuestionButton = 'div.e2e-test-create-question';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const interactionNumberInputButton =
   'div.e2e-test-interaction-tile-NumericInput';
-const interactionEndExplorationInputButton =
-  'div.e2e-test-interaction-tile-EndExploration';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const responseRuleDropdown =
   'oppia-rule-type-selector.e2e-test-answer-description';
@@ -72,15 +67,7 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
 
-const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
-const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
-const explorationCategoryDropdown =
-  'mat-form-field.e2e-test-exploration-category-metadata-modal';
-const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
-const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
-const explorationIdElement = 'span.oppia-unique-progress-id';
 
 const topicsTab = 'a.e2e-test-topics-tab';
 const desktopTopicSelector = 'a.e2e-test-topic-name';
@@ -138,19 +125,12 @@ const chapterTitleField = 'input.e2e-test-new-chapter-title-field';
 const chapterExplorationIdField = 'input.e2e-test-chapter-exploration-input';
 const createChapterButton = 'button.e2e-test-confirm-chapter-creation-button';
 
-const explorationMobileSaveMenu = '.e2e-test-mobile-options';
-const explorationMobileSaveButton = '.e2e-test-save-changes-for-small-screens';
-
 const explorationSettingsTab = '.e2e-test-settings-tab';
 const deleteExplorationButton = 'button.e2e-test-delete-exploration-button';
 const confirmDeletionButton =
   'button.e2e-test-really-delete-exploration-button';
 
-const mobileToastMessage = '.e2e-test-toast-message';
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
-const mobileSaveChangesDropdown = '.e2e-test-mobile-changes-dropdown';
-const mobilePublishButton = '.e2e-test-mobile-publish-button';
-
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
 
