@@ -453,7 +453,7 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  fit(
+  it(
     'should be able to filter those question reviewers, who have reviewed' +
       ' questions between a given date range',
     async function () {
