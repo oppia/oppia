@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SkillEditorPageAuthGuard
+ * @fileoverview Tests for SkillEditorPageAccess
  */
 import {Location} from '@angular/common';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
@@ -29,7 +29,7 @@ import {SkillEditorAccessGuard} from './skill-editor-access.guard';
 import {AccessValidationBackendApiService} from '../oppia-root/routing/access-validation-backend-api.service';
 
 class MockAccessValidationBackendApiService {
-  validateAccessSkillEditorPage(skillId: string) {
+  validateAccessToSkillEditorPage(skillId: string) {
     return Promise.resolve();
   }
 }
@@ -40,7 +40,7 @@ class MockRouter {
   }
 }
 
-describe('SkillEditorPageAuthGuard', () => {
+describe('SkillEditorPageAccess', () => {
   let guard: SkillEditorAccessGuard;
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;
