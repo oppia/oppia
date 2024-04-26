@@ -20,8 +20,15 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+// Exclude the error related to Google Docs Viewer since it's from an external service
+// and cannot be controlled by us. (https://stackoverflow.com/q/50909239)
+ConsoleReporter.setConsoleErrorsToIgnore([
+  'https://content.googleapis.com/drive/v2internal/viewerimpressions?key=AIzaSyC1eQ1xj69IdTMeii5r7brs3R90eck-m7k&alt=json Failed to load resource: the server responded with a status of 403 ()',
+]);
 
 describe('Logged-in User', function () {
   let testUser: LoggedInUser;
@@ -31,14 +38,14 @@ describe('Logged-in User', function () {
       'testuser',
       'testuser@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should open About Url with About Oppia button in About Menu on navbar',
     async function () {
       await testUser.clickAboutButtonInAboutMenuOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -47,7 +54,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickAboutFoundationButtonInAboutMenuOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -55,7 +62,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickBlogButtonInAboutMenuOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -64,7 +71,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -73,7 +80,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickVolunteerButtonInGetInvolvedMenuOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -81,7 +88,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickDonateButtonInGetInvolvedMenuOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -90,7 +97,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickContactUsButtonInGetInvolvedMenuOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
@@ -98,7 +105,7 @@ describe('Logged-in User', function () {
     async function () {
       await testUser.clickDonateButtonOnNavbar();
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
