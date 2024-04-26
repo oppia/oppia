@@ -704,8 +704,24 @@ class GeneralSuggestionModel(base_models.BaseModel):
         cls,
         user_id: str,
         language_codes: List[str]
-    ) -> Sequence[GeneralSuggestionModel]:
-        return cls.get_all().filter(datastore_services.all_of(
+    ) -> List[str]:
+        """Fetches all target ids of translation suggestion that are in-review
+        where the author_id != user_id and language_code matches one of the
+        supplied language_codes.
+
+        Args:
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
+            language_codes: list(str). List of language codes that the
+                suggestions should match.
+
+        Returns:
+            list(str). A list of target ids of the matching suggestions.
+        """
+        fetched_models: Sequence[
+            GeneralSuggestionModel
+        ] = cls.get_all().filter(datastore_services.all_of(
             cls.status == STATUS_IN_REVIEW,
             cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             cls.author_id != user_id,
@@ -713,6 +729,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )).fetch(
             projection=[cls.target_id]
         )
+
+        # We start with a set as we only care about unique target IDs.
+        return list({model.target_id for model in fetched_models})
 
     @classmethod
     def get_reviewable_translation_suggestions(

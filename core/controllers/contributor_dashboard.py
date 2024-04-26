@@ -398,14 +398,14 @@ class ReviewableOpportunitiesHandler(
                         'No exploration_id found for the node_id: %s'
                         % node.id
                     )
-                topic_exp_ids.append(node.exploration_id) 
+                topic_exp_ids.append(node.exploration_id)
         in_review_suggestion_target_ids = (
             suggestion_services
             .get_reviewable_translation_suggestion_target_ids(
-                user_id, topic_exp_ids, language
+                user_id, language
             )
-        ) 
-        exp_ids = [
+        )
+        topic_exp_ids_targetted_by_in_review_suggestions = [
             exp_id
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
@@ -423,7 +423,7 @@ class ReviewableOpportunitiesHandler(
 
         exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                exp_ids
+                topic_exp_ids_targetted_by_in_review_suggestions
             )
         )
 

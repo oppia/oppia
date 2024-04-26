@@ -1105,9 +1105,20 @@ def get_reviewable_translation_suggestions_by_offset(
 
 def get_reviewable_translation_suggestion_target_ids(
     user_id: str,
-    exp_ids: List[str],
-    language: Optional[str] = None
+    language_code: Optional[str] = None
 ) -> List[str]:
+    """Returns a list of translation suggestions matching the
+    passed opportunity IDs which the user can review.
+
+    Args:
+        user_id: str. The ID of the user.
+        language_code: str|None. ISO 639-1 language code for which to filter.
+            If it is None, all available languages will be returned.
+
+    Returns:
+        list(str). A list of translation suggestion target ids
+        which the supplied user is permitted to review.
+    """
     contribution_rights = user_services.get_user_contribution_rights(
         user_id
     )
@@ -1115,31 +1126,23 @@ def get_reviewable_translation_suggestion_target_ids(
         contribution_rights.can_review_translation_for_language_codes
     )
 
-    # No language means all languages.
-    if language is not None:
-        language_codes = [language] if language in language_codes else []
+    # No language code means all languages.
+    if language_code is not None:
+        language_codes = [
+            language_code
+        ] if language_code in language_codes else []
 
     # The user cannot review any translations, so return early.
     if len(language_codes) == 0:
         return []
 
-    in_review_translation_suggestion_models: Sequence[
-        suggestion_models.GeneralSuggestionModel
-    ] = (
+    return (
         suggestion_models.GeneralSuggestionModel
         .get_in_review_translation_suggestion_target_ids(
             user_id,
             language_codes
         )
     )
-
-    # We start with a set as we only care about unique target IDs.
-    return list({
-        suggestion_model.target_id for
-        suggestion_model in
-        in_review_translation_suggestion_models
-        if suggestion_model.target_id in exp_ids
-    })
 
 
 def get_reviewable_translation_suggestions_for_single_exp(
