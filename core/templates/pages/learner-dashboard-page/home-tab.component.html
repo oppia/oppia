@@ -119,17 +119,16 @@
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
-        <p *ngIf="item.value.length !== 0" class="oppia-learner-dash-section-subheading"> {{ 'I18N_LEARNER_DASHBOARD_CLASSROOM_TITLE' | translate: {classroomName: item.key} }} </p>
-        <hr width="100%" color="#00645c" class="mt-2" size="2">
-        <div class="oppia-learner-dash-classes d-flex gap-4 mt-4 overflow-hidden w-100">
-          <ng-container *ngFor="let topicSummaryTile of item.value.slice(0,3)">
+        <card-display [heading]="'Basic math'" [numCards]="item.value.length" [tabType]="'home'" [cardWidth]="210">
+          <ng-container *ngFor="let topicSummaryTile of item.value">
             <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
             </oppia-learner-topic-summary-tile>
           </ng-container>
-        </div>
+        </card-display>
+        <p *ngIf="item.value.length !== 0" class="oppia-learner-dash-section-subheading"> {{ 'I18N_LEARNER_DASHBOARD_CLASSROOM_TITLE' | translate: {classroomName: item.key} }} </p>
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
            class="align-items-center d-inline-flex justify-content-center mt-4 oppia-learner-dash-home-button text-center">
-          <span class="fa fa-arrow-right mr-2"></span>
+          <span class="fas fa-arrow-right mr-2"></span>
           {{ 'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key} }}
         </a>
       </ng-container>

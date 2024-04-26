@@ -1,14 +1,14 @@
 <div #carddisplay class="card-display-container d-flex flex-column mb-4">
   <div class="d-flex justify-content-between">
     <p class="card-display-heading"> {{ heading }} </p>
-    <div class="d-flex" *ngIf="(numCards > 1) && ((numCards - 1) * 224 + 216 > carddisplay.offsetWidth) && (tabType === 'home')">
-      <button [disabled]="shift === 0" class="align-items-center border-0 d-flex justify-content-center mr-2 px-0 card-display-button" (click)="nextCard(shift - 1)">
+    <div class="d-flex" *ngIf="(numCards > 1) && ((numCards - 1) * (cardWidth + 8) + cardWidth > carddisplay.offsetWidth) && (tabType === 'home')">
+      <button [disabled]="currentShift === 0" class="align-items-center border-0 d-flex justify-content-center mr-2 px-0 card-display-button" (click)="nextCard(currentShift - 1)">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
         </svg>
       </button>
       <p> </p>
-      <button [disabled]="shift === getMaxShifts(carddisplay.offsetWidth)" class="align-items-center border-0 d-flex justify-content-center px-0 card-display-button" (click)="nextCard(shift + 1)">
+      <button [disabled]="currentShift === getMaxShifts(carddisplay.offsetWidth)" class="align-items-center border-0 d-flex justify-content-center px-0 card-display-button" (click)="nextCard(currentShift + 1)">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
         </svg>
@@ -16,14 +16,13 @@
     </div>
   </div>
   <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-  <div class="d-flex card-display-content-container pb-1 mb-n1" #cards [ngClass]="shift === getMaxShifts(carddisplay.offsetWidth) ? 'pr-1 ml-1 mr-n1' : 'pl-1 ml-n1'"> 
+  <div class="d-flex card-display-content-container pb-1 mb-n1" #cards [ngClass]="currentShift === getMaxShifts(carddisplay.offsetWidth) ? 'pr-1 ml-1 mr-n1' : 'pl-1 ml-n1'"> 
     <ng-content></ng-content>
   </div>
   <button *ngIf="tabType !== 'home'" class="align-self-end">  {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }} </button>
 </div>
 
 <style>
-  /*width: calc(100vw - 32px - 1.5em - 32px);*/
   .card-display-container {
     max-width: fit-content;
     width: 100%;

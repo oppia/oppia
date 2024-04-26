@@ -9,43 +9,44 @@ export class CardDisplayComponent implements OnInit {
   @Input() heading!: string;
   @Input() numCards!: number;
   @Input() tabType!: string;
+  @Input() cardWidth: number = 216;
+
+  currentShift: number = 0;
 
   @ViewChild('cards', {static: false}) cards!: ElementRef;
-
-  shift: number = 0;
 
   ngOnInit(): void {}
 
   getMaxShifts(width: number): number {
-    return this.numCards - Math.floor(width / 224);
+    return this.numCards - Math.floor(width / (this.cardWidth + 8));
   }
 
   nextCard(num: number): void {
-    let allCards = this.cards.nativeElement;
-    let lastShift =
-      ((224 *
+    const allCards = this.cards.nativeElement;
+    const lastShift =
+      (((this.cardWidth + 8) *
         (this.numCards - 1 - (this.getMaxShifts(allCards.offsetWidth) - 2))) %
         allCards.offsetWidth) +
       28.5;
 
     if (allCards !== null) {
-      if (this.shift > num) {
+      if (this.currentShift > num) {
         allCards.scrollLeft -=
-          this.shift === this.getMaxShifts(allCards.offsetWidth)
+          this.currentShift === this.getMaxShifts(allCards.offsetWidth)
             ? lastShift
-            : this.shift === 1
-              ? 200
-              : 224;
+            : this.currentShift === 1
+              ? this.cardWidth - 16
+              : this.cardWidth + 8;
       } else {
         allCards.scrollLeft +=
           num === 1
-            ? 200
+            ? this.cardWidth - 16
             : num === this.getMaxShifts(allCards.offsetWidth)
               ? lastShift
-              : 224;
+              : this.cardWidth + 8;
       }
     }
-    this.shift = num;
+    this.currentShift = num;
   }
 }
 
