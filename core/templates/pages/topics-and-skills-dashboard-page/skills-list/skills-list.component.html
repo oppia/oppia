@@ -94,9 +94,9 @@
         <div class="skill-item-description-box">
           <div class="skill-item-description-name">
             <div class="skill-item-description-mobile">
-              <a [href]="getSkillEditorUrl(skill.id)">
+              <a [href]="getSkillEditorUrl(skill.id)" class="e2e-test-mobile-skills-tab">
                 <span>{{ getSerialNumberForSkill(idx) }}.</span>
-                <span>{{ skill.description }}</span>
+                <span class="e2e-test-mobile-skill-name">{{ skill.description }}</span>
               </a>
             </div>
             <div class="skill-list-options-container">

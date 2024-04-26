@@ -418,6 +418,7 @@
                   aria-label="selection dropdown">
             <option [ngValue]="null">Please select a skill...</option>
             <option *ngFor="let skillSummary of availableSkillSummariesForDiagnosticTest"
+                    class="e2e-test-diagnostic-test-skill-option"
                     [ngValue]="skillSummary">
                     {{ skillSummary.getDescription()  }}
             </option>

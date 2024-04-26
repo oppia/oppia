@@ -47,9 +47,9 @@ const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
+  [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
-  [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
 } as const;
 
 /**
