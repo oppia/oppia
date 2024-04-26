@@ -211,6 +211,28 @@ class ReleaseCoordinatorAccessValidationHandlerTests(
             ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
+class DiagnosticTestPlayerPageAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
+    """Test for diagnostic test player access validation."""
+
+    def test_should_not_access_diagnostic_test_page_when_feature_is_disabled(
+        self) -> None:
+        self.get_json(
+            '%s/can_access_diagnostic_test_player_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.DIAGNOSTIC_TEST])
+    def test_should_access_diagnostic_test_page_when_feature_is_enabled(
+        self) -> None:
+        self.get_html_response(
+           '%s/can_access_diagnostic_test_player_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+            expected_status_int=200
+        )
+
+
 class ProfileExistsValidationHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -378,6 +400,34 @@ class EditLearnerGroupPageAccessValidationHandlerTests(
         self.get_html_response(
             '%s/can_access_edit_learner_group_page/%s' % (
                 ACCESS_VALIDATION_HANDLER_PREFIX, self.LEARNER_GROUP_ID))
+
+
+class FacilitatorDashboardPageAccessValidationHandlerTests(
+        test_utils.GenericTestBase):
+    """Test for facilitator dashboard access validation."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+
+    def test_should_not_access_facilitator_dashboard_when_feature_is_disabled(
+        self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/can_access_facilitator_dashboard_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+                expected_status_int=404)
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.LEARNER_GROUPS_ARE_ENABLED])
+    def test_should_access_facilitator_dashboard_page_when_feature_is_enabled(
+        self) -> None:
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+           '%s/can_access_facilitator_dashboard_page' % (
+                ACCESS_VALIDATION_HANDLER_PREFIX),
+            expected_status_int=200
+        )
 
 
 class CreateLearnerGroupPageAccessValidationHandlerTests(

@@ -523,7 +523,11 @@ class BaseHandler(
             'Use self.normalized_payload instead of self.payload.')
 
         if errors:
-            raise self.InvalidInputException('\n'.join(errors))
+            raise self.InvalidInputException(
+                'At \'%s\' these errors are happening:\n%s' % (
+                    self.request.uri, '\n'.join(errors)
+                )
+            )
 
     @property
     def current_user_is_site_maintainer(self) -> bool:
