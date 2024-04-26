@@ -1,4 +1,4 @@
-// Copyright 2023 The Oppia Authors. All Rights Reserved.
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Guard for the skill editor page.
-*/
+ * @fileoverview Guard that redirects user to 401 error page
+ * if the user is not a Skill Editor.
+ */
 
-import { Location } from '@angular/common';
-import { Injectable } from '@angular/core';
+import {Location} from '@angular/common';
+import {Injectable} from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivate,
@@ -25,33 +26,41 @@ import {
   RouterStateSnapshot,
 } from '@angular/router';
 
-import { AppConstants } from 'app.constants';
-import { UserService } from 'services/user.service';
+import {AppConstants} from 'app.constants';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SkillEditorAccessGuard implements CanActivate {
   constructor(
-    private userService: UserService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
     private location: Location
   ) {}
 
   async canActivate(
-      route: ActivatedRouteSnapshot,
-      state: RouterStateSnapshot
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
   ): Promise<boolean> {
-    const userInfo = await this.userService.getUserInfoAsync();
-    if (userInfo.isCurriculumAdmin()) {
-      return true;
-    }
-
-    this.router.navigate(
-      [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND
-        .ERROR.ROUTE}/401`]).then(() => {
-      this.location.replaceState(state.url);
+    return new Promise<boolean>(resolve => {
+      let skillId = route.paramMap.get('skill_id') || '';
+      this.accessValidationBackendApiService
+        .validateAccessToSkillEditorPage(skillId)
+        .then(() => {
+          resolve(true);
+        })
+        .catch(err => {
+          let statusCode = err ? err.error.status_code : 401;
+          this.router
+            .navigate([
+              `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${statusCode}`,
+            ])
+            .then(() => {
+              this.location.replaceState(state.url);
+              resolve(false);
+            });
+        });
     });
-    return false;
   }
 }

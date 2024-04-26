@@ -13,78 +13,105 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for SkillEditorAccessGuard.
+ * @fileoverview Tests for SkillEditorPageAuthGuard
  */
+import {Location} from '@angular/common';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+} from '@angular/router';
+import {RouterTestingModule} from '@angular/router/testing';
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, NavigationExtras } from '@angular/router';
+import {AppConstants} from 'app.constants';
+import {SkillEditorAccessGuard} from './skill-editor-access.guard';
+import {AccessValidationBackendApiService} from '../oppia-root/routing/access-validation-backend-api.service';
 
-import { AppConstants } from 'app.constants';
-import { UserInfo } from 'domain/user/user-info.model';
-import { UserService } from 'services/user.service';
-import { SkillEditorAccessGuard } from './skill-editor-access.guard';
-
+class MockAccessValidationBackendApiService {
+  validateAccessSkillEditorPage(skillId: string) {
+    return Promise.resolve();
+  }
+}
 
 class MockRouter {
-  navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
+  navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
   }
 }
 
-describe('Skill editor access guard', () => {
-  let skillEditorAccessGuard: SkillEditorAccessGuard;
-  let userService: UserService;
+describe('SkillEditorPageAuthGuard', () => {
+  let guard: SkillEditorAccessGuard;
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
   let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [UserService,
-        { provide: Router, useClass: MockRouter }, SkillEditorAccessGuard],
-    }).compileComponents();
+      imports: [RouterTestingModule],
+      providers: [
+        SkillEditorAccessGuard,
+        {
+          provide: AccessValidationBackendApiService,
+          useClass: MockAccessValidationBackendApiService,
+        },
+        {provide: Router, useClass: MockRouter},
+        Location,
+      ],
+    });
 
-    skillEditorAccessGuard = TestBed.inject(SkillEditorAccessGuard);
-    userService = TestBed.inject(UserService);
+    guard = TestBed.inject(SkillEditorAccessGuard);
+    accessValidationBackendApiService = TestBed.inject(
+      AccessValidationBackendApiService
+    );
     router = TestBed.inject(Router);
   });
 
-  it('should redirect user to 401 page if user is not curriculum admin',
-    async() => {
-      const getUserInfoAsyncSpy = spyOn(
-        userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(UserInfo.createDefault())
-      );
-      const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+  it('should allow access if validation succeeds', fakeAsync(() => {
+    const validateAccessSpy = spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToSkillEditorPage'
+    ).and.returnValue(Promise.resolve());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
 
-      const canActivate = await skillEditorAccessGuard.canActivate(
-        {} as ActivatedRouteSnapshot,
-        {} as RouterStateSnapshot
-      );
+    let canActivateResult: boolean | null = null;
 
-      expect(canActivate).toBeFalse();
-      expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-      expect(navigateSpy).toHaveBeenCalledWith(
-        [`${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`]
-      );
-    });
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
+        canActivateResult = result;
+      });
 
-  it('should allow user to access the page if user is curriculum admin',
-    async() => {
-      const getUserInfoAsyncSpy = spyOn(
-        userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(new UserInfo(
-          [], false, true, false, false, false, '', '', '', true))
-      );
-      const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+    tick();
 
-      const canActivate = await skillEditorAccessGuard.canActivate(
-          {} as ActivatedRouteSnapshot,
-          {} as RouterStateSnapshot
-      );
+    expect(canActivateResult).toBeTrue();
+    expect(validateAccessSpy).toHaveBeenCalled();
+    expect(navigateSpy).not.toHaveBeenCalled();
+  }));
 
-      expect(canActivate).toBeTrue();
-      expect(getUserInfoAsyncSpy).toHaveBeenCalledTimes(1);
-      expect(navigateSpy).not.toHaveBeenCalled();
-    });
+  it('should redirect to 401 page if validation fails', fakeAsync(() => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToSkillEditorPage'
+    ).and.returnValue(Promise.reject());
+    const navigateSpy = spyOn(router, 'navigate').and.returnValue(
+      Promise.resolve(true)
+    );
+
+    let canActivateResult: boolean | null = null;
+
+    guard
+      .canActivate(new ActivatedRouteSnapshot(), {} as RouterStateSnapshot)
+      .then(result => {
+        canActivateResult = result;
+      });
+
+    tick();
+
+    expect(canActivateResult).toBeFalse();
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+    ]);
+  }));
 });
