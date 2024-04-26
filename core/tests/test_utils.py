@@ -51,6 +51,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_domain
 from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import interaction_registry
@@ -63,6 +64,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
@@ -342,14 +344,18 @@ def swap_is_feature_flag_enabled_function(
         context. The context with function replaced.
     """
     def mock_is_feature_flag_enabled(
-        _: Optional[str], feature_flag_name: str
+        feature_flag_name: str,
+        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        user_id: Optional[str] = None # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
         target_feature_flag_name is present in feature_flag_names.
 
         Args:
-            _: str|None. The id of the user, can be None.
             feature_flag_name: str. The name of the target feature flag.
+            feature_flag: FeatureFlag|None. The feature flag domain model.
+            user_id: str|None. The id of the user, if logged-out user
+                then None.
 
         Returns:
             enable_feature_flag: bool. Returns True if the target feature flag
@@ -3596,6 +3602,44 @@ version: 1
         committer = user_services.get_user_actions_info(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
+    def add_explorations_to_story(
+        self, topic_id: str, story_id: str, exp_ids: List[str]
+    ) -> None:
+        """Appends a story node for each exploration id given in exp_ids to the
+        story with story_id. Each story node is assigned its exp id and then it
+        is published.
+
+        Args:
+            topic_id: str. ID of the topic that contains the story.
+            story_id: str. ID of the story containing the new node.
+            exp_ids: list(str). IDs of the exploration.
+        """
+        story = story_fetchers.get_story_by_id(story_id)
+        change_list = []
+
+        node_id = story.story_contents.next_node_id
+        for exp_id in exp_ids:
+            change_list.extend([
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': node_id,
+                    'title': node_id
+                }),
+                story_domain.StoryChange({
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name':
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                    'node_id': node_id,
+                    'old_value': None,
+                    'new_value': exp_id
+                })])
+            node_id = story_domain.StoryNode.get_incremented_node_id(node_id)
+
+        if len(change_list) > 0:
+            topic_services.update_story_and_topic_summary(
+                feconf.SYSTEM_COMMITTER_ID, story_id, change_list,
+                'Linked explorations to story %s' % story_id, topic_id)
+
     def create_story_for_translation_opportunity(
         self,
         owner_id: str,
@@ -3629,15 +3673,23 @@ version: 1
             topic_id, story.id, admin_id)
         story_services.update_story(
             owner_id, story.id, [story_domain.StoryChange({
-                'cmd': 'add_story_node',
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Node1',
             }), story_domain.StoryChange({
-                'cmd': 'update_story_node_property',
-                'property_name': 'exploration_id',
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                 'node_id': 'node_1',
                 'old_value': None,
                 'new_value': exploration_id
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_STATUS),
+                'node_id': 'node_1',
+                'old_value': constants.STORY_NODE_STATUS_DRAFT,
+                'new_value': constants.STORY_NODE_STATUS_PUBLISHED
             })], 'Changes.')
 
     def save_new_story(
@@ -3769,13 +3821,15 @@ version: 1
         Returns:
             Topic. A newly-created topic.
         """
+        canonical_story_ids = canonical_story_ids or []
+        additional_story_ids = additional_story_ids or []
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (canonical_story_ids or [])
+            for story_id in canonical_story_ids
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in (additional_story_ids or [])
+            for story_id in additional_story_ids
         ]
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []

@@ -1244,8 +1244,8 @@ def can_access_contributor_dashboard_admin_page(
             raise self.NotLoggedInException
 
         new_dashboard_enabled = feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value)
+            feature_flag_list.FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI.value,
+            self.user_id)
 
         if new_dashboard_enabled and (
             role_services

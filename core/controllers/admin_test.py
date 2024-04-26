@@ -20,6 +20,7 @@ import datetime
 import enum
 import logging
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -541,6 +542,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(classrooms), 1)
         self.logout()
 
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
+    ])
     def test_regenerate_topic_related_opportunities_action(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -572,6 +577,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
+
         topic_services.publish_story(topic_id, story_id, self.admin_id)
         story_services.update_story(
             owner_id, story_id, [story_domain.StoryChange({
@@ -1637,6 +1643,44 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
                 'managed_topic_ids': [],
                 'coordinated_language_ids': []
             })
+
+
+class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
+    """Tests for RegenerateTopicSummariesHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_regenerate_topic_summaries(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, name='Topic 1',
+            abbreviated_name='T1', url_fragment='url-frag-one',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2, self.admin_id, name='Topic 2',
+            abbreviated_name='T2', url_fragment='url-frag-two',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap_with_checks(
+                topic_services, 'generate_topic_summary',
+                topic_services.generate_topic_summary,
+                expected_args=[(topic_id_1,), (topic_id_2,)]):
+            self.put_json(
+                feconf.REGENERATE_TOPIC_SUMMARIES_URL, {},
+                csrf_token=csrf_token, expected_status_int=200)
 
 
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):

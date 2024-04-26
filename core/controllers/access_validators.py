@@ -193,8 +193,8 @@ class DiagnosticTestPlayerAccessValidationHandler(
     def get(self) -> None:
         """Handles GET requests."""
         if not feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            user_id=self.user_id
         ):
             raise self.NotFoundException
 

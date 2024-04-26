@@ -1191,34 +1191,28 @@ class LearnerStoriesChaptersProgressHandlerTests(test_utils.GenericTestBase):
         )
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, self.story_id)
-        changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_1,
-                'title': 'Title 1'
-            })
-        ]
-        story_services.update_story(
-            self.USER_ID, self.story_id, changelist,
-            'Added node.')
-        self.story = story_fetchers.get_story_by_id(self.story_id)
 
         self.exp_id_1 = 'expid1'
         self.save_new_valid_exploration(self.exp_id_1, self.USER_ID)
 
         change_list = [
             story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            }), story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': self.NODE_ID_1,
                 'old_value': None,
                 'new_value': self.exp_id_1
             })
         ]
         story_services.update_story(
             self.USER_ID, self.story_id, change_list,
-            'Added a node.')
+            'Added node.')
+        self.story = story_fetchers.get_story_by_id(self.story_id)
 
     def test_get_learner_stories_chapters_progress(self) -> None:
         self.login(self.NEW_USER_EMAIL)

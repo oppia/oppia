@@ -99,8 +99,8 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 class TopicModel(base_models.VersionedModel):
     """Model for storing Topics.
 
-    This class should only be imported by the topic services file
-    and the topic model test file.
+    This class should only be imported by the topic services file and the topic
+    model test file.
     """
 
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
@@ -332,11 +332,6 @@ class TopicSummaryModel(base_models.BaseModel):
     This should be used whenever the content blob of the topic is not
     needed (e.g. search results, etc).
 
-    A TopicSummaryModel instance stores the following information:
-
-        id, description, language_code, last_updated, created_on, version,
-        url_fragment.
-
     The key of each instance is the topic id.
     """
 
@@ -388,6 +383,14 @@ class TopicSummaryModel(base_models.BaseModel):
     # The thumbnail background color of the topic.
     thumbnail_bg_color = datastore_services.StringProperty(indexed=True)
     version = datastore_services.IntegerProperty(required=True)
+    # A dict that maps published story ids to lists of exploration ids.
+    # Each list represents the story's published chapters' linked
+    # exploration ids and each list of exploration ids is in the same
+    # order as the story's published chapters. This dict is regenerated
+    # whenever a story in this topic is updated, which occurs
+    # in `topic_services.compute_summary_of_topic()`.
+    published_story_exploration_mapping = datastore_services.JsonProperty(
+        required=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -422,7 +425,9 @@ class TopicSummaryModel(base_models.BaseModel):
             'thumbnail_filename': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'thumbnail_bg_color': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE
+            'url_fragment': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'published_story_exploration_mapping':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
 

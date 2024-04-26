@@ -20,6 +20,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 
+import {AppConstants} from 'app.constants';
 import {
   ContributionOpportunitiesService,
   // eslint-disable-next-line max-len
@@ -49,11 +50,11 @@ export class TranslationTopicService {
     this.ContributionOpportunitiesService.getTranslatableTopicNamesAsync().then(
       data => {
         if (
-          newActiveTopicName !== 'All' &&
+          newActiveTopicName !== AppConstants.TOPIC_SENTINEL_NAME_ALL &&
           data.indexOf(newActiveTopicName) < 0
         ) {
           this.loggerService.error(
-            'Invalid active topic name: ' + newActiveTopicName
+            `Invalid active topic name: ${newActiveTopicName}`
           );
           return;
         }

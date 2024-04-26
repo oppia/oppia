@@ -728,6 +728,41 @@ describe('Admin misc tab component ', () => {
     );
   });
 
+  describe('when regenerating topic summaries', () => {
+    it('should regenerate all topic summaries successfully', fakeAsync(() => {
+      const topicModelSpy = spyOn(
+        adminBackendApiService,
+        'regenerateTopicSummariesAsync'
+      ).and.returnValue(Promise.resolve());
+
+      component.regenerateTopicSummaries();
+      tick();
+
+      expect(topicModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Successfully regenerated all topic summaries.'
+      );
+    }));
+
+    it(
+      'should not regenerate topic summaries in case of ' + 'server error',
+      fakeAsync(() => {
+        const topicModelSpy = spyOn(
+          adminBackendApiService,
+          'regenerateTopicSummariesAsync'
+        ).and.rejectWith('Internal Server Error');
+
+        component.regenerateTopicSummaries();
+        tick();
+
+        expect(topicModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error'
+        );
+      })
+    );
+  });
+
   it('should sumbit query when clicking on submit query button', () => {
     let setQueryDataSpy = spyOn(
       component,

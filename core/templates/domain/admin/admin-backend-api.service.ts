@@ -356,6 +356,22 @@ export class AdminBackendApiService {
     });
   }
 
+  async regenerateTopicSummariesAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .put<void>(AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL, {})
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
   async rollbackExplorationToSafeState(expId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http

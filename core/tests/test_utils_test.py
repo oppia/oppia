@@ -47,7 +47,7 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
     def test_enable_feature_flags_decorator(self) -> None:
         """Tests if single feature-flag is enabled."""
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
-            None, 'dummy_feature_flag_for_e2e_tests'))
+            'dummy_feature_flag_for_e2e_tests', None))
 
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
@@ -56,9 +56,9 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
     def test_enable_multiple_feature_flags_decorator(self) -> None:
         """Tests if multiple feature flags are enabled."""
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
-            None, 'dummy_feature_flag_for_e2e_tests'))
+            'dummy_feature_flag_for_e2e_tests', None))
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
-            None, 'diagnostic_test'))
+            'diagnostic_test', None))
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
