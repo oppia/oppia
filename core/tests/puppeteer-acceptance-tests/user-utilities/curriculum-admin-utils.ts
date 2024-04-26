@@ -23,7 +23,6 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 const curriculumAdminThumbnailImage =
   testConstants.images.curriculumAdminThumbnailImage;
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
-const creatorDashboardUrl = testConstants.URLs.CreatorDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
@@ -279,76 +278,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(saveQuestionButton);
-  }
-
-  /**
-   * Navigate to the creator dashboard page.
-   */
-  async navigateToCreatorDashboardPage(): Promise<void> {
-    await this.page.bringToFront();
-    await this.goto(creatorDashboardUrl);
-  }
-
-  /**
-   * Create an exploration as a curriculum admin.
-   */
-  async createAndPublishExploration(
-    title: string,
-    initialContentText: string
-  ): Promise<string> {
-    await this.navigateToCreatorDashboardPage();
-    await this.clickOn(createExplorationButton);
-    await this.page.waitForSelector(
-      `${dismissWelcomeModalSelector}:not([disabled])`
-    );
-    await this.clickOn(dismissWelcomeModalSelector);
-    await this.page.waitForSelector(dismissWelcomeModalSelector, {
-      hidden: true,
-    });
-    await this.clickOn(textStateEditSelector);
-    await this.page.keyboard.press('Tab');
-    await this.type(richTextAreaField, initialContentText);
-    await this.clickOn(saveContentButton);
-
-    await this.clickOn(addInteractionButton);
-    await this.page.waitForSelector('oppia-customize-interaction', {
-      visible: true,
-    });
-    await this.clickOn(interactionEndExplorationInputButton);
-    await this.clickOn(saveInteractionButton);
-
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(explorationMobileSaveMenu);
-      await this.clickOn(explorationMobileSaveButton);
-      await this.clickOn(saveDraftButton);
-      await this.clickOn(mobileToastMessage);
-      await this.page.waitForSelector(mobileToastMessage, {
-        hidden: true,
-      });
-      await this.clickOn(mobileSaveChangesDropdown);
-      await this.clickOn(mobilePublishButton);
-    } else {
-      await this.clickOn(saveChangesButton);
-      await this.clickOn(saveDraftButton);
-      await this.page.waitForSelector(
-        `${publishExplorationButton}:not([disabled])`
-      );
-      await this.clickOn(publishExplorationButton);
-    }
-
-    await this.type(explorationTitleInput, title);
-    await this.type(explorationGoalInput, `${title} Goal`);
-    await this.clickOn(explorationCategoryDropdown);
-    await this.clickOn('Algebra');
-    await this.clickOn(saveExplorationChangesButton);
-    await this.clickOn(explorationConfirmPublishButton);
-    await this.page.waitForSelector(explorationIdElement);
-    const explorationIdUrl = await this.page.$eval(
-      explorationIdElement,
-      element => (element as HTMLElement).innerText
-    );
-    const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
-    return explorationId;
   }
 
   /**

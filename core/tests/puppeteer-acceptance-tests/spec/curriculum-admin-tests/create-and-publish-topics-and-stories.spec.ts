@@ -19,13 +19,14 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {CurriculumAdmin} from '../../user-utilities/curriculum-admin-utils';
+import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Curriculum Admin', function () {
-  let curriculumAdmin: CurriculumAdmin;
-  let explorationId: string;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
+  let explorationId: string | null;
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -38,10 +39,22 @@ describe('Curriculum Admin', function () {
   it(
     'should create and publish topics, subtopics, skills, stories and chapters.',
     async function () {
-      explorationId = await curriculumAdmin.createAndPublishExploration(
-        'Test Exploration Title 1',
-        'Test Exploration'
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToExplorationEditorPage();
+      await curriculumAdmin.dismissWelcomeModal();
+      await curriculumAdmin.createExplorationWithMinimumContent(
+        'Test Exploration',
+        'End Exploration'
       );
+      await curriculumAdmin.saveExplorationDraft();
+      explorationId = await curriculumAdmin.publishExplorationWithContent(
+        'Test Exploration Title 1',
+        'Test Exploration Goal',
+        'Algebra'
+      );
+      if (!explorationId) {
+        throw new Error('Error publishing exploration successfully.');
+      }
 
       await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
       await curriculumAdmin.createSubtopicForTopic(
