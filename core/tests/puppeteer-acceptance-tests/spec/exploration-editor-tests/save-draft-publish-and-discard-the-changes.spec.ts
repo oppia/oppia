@@ -20,6 +20,7 @@ import {showMessage} from '../../puppeteer-testing-utilities/show-message-utils'
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {
@@ -28,8 +29,9 @@ enum INTERACTION_TYPES {
 
 describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
-  let explorationVisitor: ExplorationEditor;
+  let explorationVisitor: LoggedInUser;
   let explorationId: string | null;
+
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
@@ -59,7 +61,7 @@ describe('Exploration Creator', function () {
       await explorationEditor.saveExplorationDraft();
       explorationId = await explorationEditor.publishExplorationWithMetadata(
         'Old Title',
-        'OppiaAcceptanceTestsCheck',
+        'This is the goal of exploration.',
         'Algebra'
       );
 

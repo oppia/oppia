@@ -20,8 +20,10 @@ import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
+import {showMessage} from './show-message-utils';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
+const baseURL = testConstants.URLs.BaseURL;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -143,18 +145,6 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
-  }
-
-  /**
-   * This function Waits for the autosave indicator to appear and then disappear.
-   */
-  async waitForAutosaveIndicator(): Promise<void> {
-    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
-      visible: true,
-    });
-    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
-      hidden: true,
-    });
   }
 
   /**
@@ -300,6 +290,46 @@ export class BaseUser {
    */
   getCurrentUrlWithoutParameters(): string {
     return this.page.url().split('?')[0];
+  }
+
+  /**
+   * This function checks the exploration accessibility with help of explorationID.
+   */
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
+    }
+  }
+
+  async expectExplorationToBeNotAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('The exploration is still public.');
+    } catch (error) {
+      showMessage('The exploration is not accessible with the URL.');
+    }
+  }
+
+  /**
+   * Waits for the page to fully load by checking the document's ready state.
+   */
+  async waitForPageToFullyLoad(): Promise<void> {
+    await this.page.waitForFunction('document.readyState === "complete"');
   }
 }
 

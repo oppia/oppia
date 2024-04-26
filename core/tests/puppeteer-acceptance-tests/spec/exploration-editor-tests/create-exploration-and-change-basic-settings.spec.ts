@@ -22,6 +22,7 @@ import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {CurriculumAdmin} from '../../user-utilities/curriculum-admin-utils';
 import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
+import {LoggedInUser} from '../../user-utilities/logged-in-users-utils';
 import {VoiceoverAdmin} from '../../user-utilities/voiceover-admin-utils';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -40,12 +41,14 @@ ConsoleReporter.setConsoleErrorsToIgnore([
   /Error: Could not find the resource http:\/\/localhost:8181\/explorehandler\/features\/[a-zA-Z0-9]+\.?/,
   /Could not find the resource http:\/\/localhost:8181\/createhandler\/permissions\/[a-zA-Z0-9]+\.?/,
   /http:\/\/localhost:8181\/build\/webpack_bundles\/exploration_editor\.[a-f0-9]+\.bundle\.js/,
+  /http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+#\/gui\/Introduction Failed to load resource: the server responded with a status of 404 \(Not Found\)/,
 ]);
 
 describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
   let voiceoverAdmin: VoiceoverAdmin;
   let curriculumAdmin: CurriculumAdmin;
+  let explorationVisitor: LoggedInUser;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -54,6 +57,12 @@ describe('Exploration Creator', function () {
       'exploration_editor@example.com'
     );
     showMessage('explorationEditor has signed up successfully.');
+
+    explorationVisitor = await UserFactory.createNewUser(
+      'explorationVisitor',
+      'exploration_visitor@example.com'
+    );
+    showMessage('explorationVisitor has signed up successfully.');
 
     voiceoverAdmin = await UserFactory.createNewUser(
       'voiceoverAdm',
@@ -157,7 +166,7 @@ describe('Exploration Creator', function () {
       await curriculumAdmin.openExplorationControlDropdown();
       await curriculumAdmin.deleteExplorationPermanently();
 
-      await explorationEditor.expectExplorationToBeNotAccessibleByUrl(
+      await explorationVisitor.expectExplorationToBeNotAccessibleByUrl(
         explorationId
       );
     },

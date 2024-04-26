@@ -21,7 +21,6 @@ import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
 import {error} from 'console';
 
-const baseURL = testConstants.URLs.BaseURL;
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
@@ -238,7 +237,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -277,6 +276,8 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
+    // Auto save pop up bar is visible only when current input is different from
+    // old input.
     if (oldTitle !== title) {
       if (this.isViewportAtMobileWidth()) {
         // Navbar text is hidden in mobile view port due to less screen so there is no visible
@@ -306,6 +307,18 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error('Failed to update changes.');
     }
+  }
+
+  /**
+   * This function Waits for the autosave indicator to appear and then disappear.
+   */
+  async waitForAutosaveIndicator(): Promise<void> {
+    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+      visible: true,
+    });
+    await this.page.waitForSelector('span.e2e-test-autosave-indicator', {
+      hidden: true,
+    });
   }
 
   /**
@@ -503,7 +516,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addRoleDropdown);
     await this.clickOn(collaboratorRoleOption);
     await this.clickOn(saveRoleButton);
-    showMessage(`${username} has been added as collaboratorRoleOption.`);
+    showMessage(`${username} has been added as collaboratorRole.`);
   }
 
   /**
@@ -623,36 +636,6 @@ export class ExplorationEditor extends BaseUser {
     return explorationId;
   }
 
-  async expectExplorationToBeAccessibleByUrl(
-    explorationId: string | null
-  ): Promise<void> {
-    if (!explorationId) {
-      throw new Error('ExplorationId is null');
-    }
-    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
-    try {
-      await this.page.goto(explorationUrlAfterPublished);
-      showMessage('Exploration is accessible with the URL, i.e. published.');
-    } catch (error) {
-      throw new Error('The exploration is not public.');
-    }
-  }
-
-  async expectExplorationToBeNotAccessibleByUrl(
-    explorationId: string | null
-  ): Promise<void> {
-    if (!explorationId) {
-      throw new Error('ExplorationId is null');
-    }
-    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
-    try {
-      await this.page.goto(explorationUrlAfterPublished);
-      throw new Error('The exploration is still public.');
-    } catch (error) {
-      showMessage('The exploration is not accessible with the URL.');
-    }
-  }
-
   /**
    * Discards the current changes.
    */
@@ -674,7 +657,7 @@ export class ExplorationEditor extends BaseUser {
       this.clickOn(confirmDiscardButton),
       this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
-    await this.page.waitForFunction('document.readyState === "complete"');
+    await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsButton);
       await this.clickOn(basicSettingsDropdown);
