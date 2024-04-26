@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import io
 import logging
+import operator
 import random
 
 from core import feconf
@@ -2162,6 +2163,30 @@ class UpdateBlogPostHandler(
 
         blog_services.update_blog_models_author_and_published_on_date(
             blog_post_id, author_id, published_on)
+        self.render_json({})
+
+
+class RegenerateTopicSummariesHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler to regenerate the summaries of all topics."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'PUT': {}
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Regenerates all topic summary models."""
+
+        # Fetched topics are sorted only to make the backend tests pass.
+        topics = sorted(
+            topic_fetchers.get_all_topics(),
+            key=operator.attrgetter('created_on'))
+        for topic in topics:
+            topic_services.generate_topic_summary(topic.id)
+
         self.render_json({})
 
 
