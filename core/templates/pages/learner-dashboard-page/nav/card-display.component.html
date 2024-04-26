@@ -19,7 +19,7 @@
   <div class="d-flex card-display-content-container pb-1 mb-n1" #cards [ngClass]="shift === getMaxShifts(carddisplay.offsetWidth) ? 'pr-1 ml-1 mr-n1' : 'pl-1 ml-n1'"> 
     <ng-content></ng-content>
   </div>
-  <button *ngIf="tabType !== 'home'" class="align-self-end">  View more </button>
+  <button *ngIf="tabType !== 'home'" class="align-self-end">  {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }} </button>
 </div>
 
 <style>
