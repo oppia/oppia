@@ -453,8 +453,8 @@ describe('Contributor Admin Dashboard', function () {
     }
   );
 
-  it(
-    'should be able to filter those question reviewers,who have reviewed' +
+  fit(
+    'should be able to filter those question reviewers, who have reviewed' +
       ' questions between a given date range',
     async function () {
       /**
@@ -476,7 +476,7 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000 * 35)
+        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();

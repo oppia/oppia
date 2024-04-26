@@ -4053,10 +4053,10 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
             'first_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                     self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                     self.LAST_CONTRIBUTION_DATE))
         }
 
@@ -4145,10 +4145,10 @@ class TranslationReviewerTotalContributionStatsUnitTests(
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
             'first_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                     self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                     self.LAST_CONTRIBUTION_DATE))
         }
 
@@ -4236,10 +4236,10 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
             'first_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                     self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                     self.LAST_CONTRIBUTION_DATE))
         }
 
@@ -4319,10 +4319,10 @@ class QuestionReviewerTotalContributionStatsUnitTests(
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
             'first_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                 self.FIRST_CONTRIBUTION_DATE)),
             'last_contributed_in_days': (
-                suggestion_registry.get_number_of_days_since_a_date(
+                utils.get_number_of_days_since_date(
                 self.LAST_CONTRIBUTION_DATE))
         }
 
