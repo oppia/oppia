@@ -57,7 +57,6 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
   ],
   declarations: [
     CardDisplayComponent,
-    LessonCardModule,
     LearnerDashboardPageComponent,
     LearnerDashboardPageRootComponent,
     LearnerStorySummaryTileComponent,
@@ -76,7 +75,6 @@ import {LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboar
   ],
   entryComponents: [
     CardDisplayComponent,
-    LessonCardModule,
     LearnerDashboardPageComponent,
     LearnerStorySummaryTileComponent,
     LearnerTopicGoalsSummaryTileComponent,

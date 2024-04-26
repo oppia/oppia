@@ -120,8 +120,8 @@
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
         <card-display [heading]="'Basic math'" [numCards]="item.value.length" [tabType]="'home'" [cardWidth]="210">
-          <ng-container *ngFor="let topicSummaryTile of item.value">
-            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag">
+          <ng-container *ngFor="let topicSummaryTile of item.value; last as last">
+            <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [last]="last">
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </card-display>

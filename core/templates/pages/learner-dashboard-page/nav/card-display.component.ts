@@ -18,13 +18,13 @@ export class CardDisplayComponent implements OnInit {
   ngOnInit(): void {}
 
   getMaxShifts(width: number): number {
-    return this.numCards - Math.floor(width / (this.cardWidth + 8));
+    return this.numCards - Math.floor(width / (this.cardWidth + 16));
   }
 
   nextCard(num: number): void {
     const allCards = this.cards.nativeElement;
     const lastShift =
-      (((this.cardWidth + 8) *
+      (((this.cardWidth + 16) *
         (this.numCards - 1 - (this.getMaxShifts(allCards.offsetWidth) - 2))) %
         allCards.offsetWidth) +
       28.5;
@@ -36,14 +36,14 @@ export class CardDisplayComponent implements OnInit {
             ? lastShift
             : this.currentShift === 1
               ? this.cardWidth - 16
-              : this.cardWidth + 8;
+              : this.cardWidth + 16;
       } else {
         allCards.scrollLeft +=
           num === 1
             ? this.cardWidth - 16
             : num === this.getMaxShifts(allCards.offsetWidth)
               ? lastShift
-              : this.cardWidth + 8;
+              : this.cardWidth + 16;
       }
     }
     this.currentShift = num;
