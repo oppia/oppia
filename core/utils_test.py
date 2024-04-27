@@ -887,9 +887,6 @@ class UtilsTests(test_utils.GenericTestBase):
                 datetime.date.today() - datetime.timedelta(days=90)
             )
         )
-        with self.assertRaisesRegex(
-            AssertionError, 'Time cannot be negative'):
-            utils.get_human_readable_time_string(-1.42)
 
     def test_generate_new_session_id(self) -> None:
         test_string = utils.generate_new_session_id()

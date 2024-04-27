@@ -89,6 +89,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
   TAB_NAME_QUESTION_SUBMITTER: string = 'Question Submitter';
   TAB_NAME_QUESTION_REVIEWER: string = 'Question Reviewer';
+  ONE_DAY_IN_MILLIS: number = 24 * 60 * 60 * 1000;
   translationReviewersCountByLanguage!: translationReviewersCount;
   translationReviewersCount: number = 0;
   questionReviewersCount: number = 0;
@@ -250,7 +251,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   getDateThatIsDaysBeforeToday(numberOfDaysBeforeToday: number): Date {
     const today = new Date();
     return new Date(
-      today.getTime() - 24 * 60 * 60 * 1000 * numberOfDaysBeforeToday
+      today.getTime() - this.ONE_DAY_IN_MILLIS * numberOfDaysBeforeToday
     );
   }
 
@@ -271,7 +272,7 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   getNumberOfDaysSinceStartDateForLastActivity(): number {
-    const oneDay = 24 * 60 * 60 * 1000;
+    const oneDay = this.ONE_DAY_IN_MILLIS;
     const today = new Date();
     return Math.floor(
       Math.abs(
@@ -281,11 +282,10 @@ export class ContributorAdminDashboardPageComponent implements OnInit {
   }
 
   getNumberOfDaysSinceEndDateForLastActivity(): number {
-    const oneDay = 24 * 60 * 60 * 1000;
     const today = new Date();
     return Math.floor(
       Math.abs(today.getTime() - this.endDateForUsersLastActivity?.getTime()) /
-        oneDay
+        this.ONE_DAY_IN_MILLIS
     );
   }
 

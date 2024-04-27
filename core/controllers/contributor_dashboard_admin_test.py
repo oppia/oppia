@@ -1263,7 +1263,7 @@ class ContributorDashboardAdminStatsHandlerTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CONTRIBUTOR_EMAIL)
 
-        # Test with tart_date_for_last_activity filter and pagination.
+        # Test with start_date_for_last_activity filter and pagination.
         response = self.get_json(
             '/contributor-dashboard-admin-stats/translation/submission', {
                 'page_size': 4,

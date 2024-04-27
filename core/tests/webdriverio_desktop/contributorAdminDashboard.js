@@ -49,6 +49,7 @@ describe('Contributor Admin Dashboard', function () {
   const ADMIN_EMAIL = 'curricullum@admin.com';
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
   const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 
   let releaseCoordinatorPage = null;
   let adminPage = null;
@@ -371,13 +372,13 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
@@ -406,13 +407,13 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
@@ -438,13 +439,13 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
@@ -470,13 +471,13 @@ describe('Contributor Admin Dashboard', function () {
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setLastDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
 
       await contributorDashboardAdminPage.setFirstDatePickerValue(
-        new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
       );
       await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
       await contributorDashboardAdminPage.expectNoStatsElement();
