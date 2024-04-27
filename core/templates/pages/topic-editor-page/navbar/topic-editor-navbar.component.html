@@ -130,6 +130,7 @@
         </div>
         <div class="oppia-topic-nav-dropdown-option">
           <div *ngIf="!topicRights.isPublished()"
+               class="e2e-test-mobile-publish-topic-button"
                (click)="publishTopic()"
                [attr.disabled]="isTopicSaveable() || getWarningsCount() > 0 || prepublishValidationIssues.length > 0">
             <i class="fas fa-pen"></i>
@@ -144,7 +145,7 @@
         </div>
       </div>
       <div class="oppia-topic-nav-dropdown-content oppia-right-container">
-        <div class="oppia-topic-nav-dropdown-text"
+        <div class="oppia-topic-nav-dropdown-text e2e-test-mobile-save-topic-button"
              (click)="saveChanges()">
           <span *ngIf="isSaveInProgress()">
             <span>Saving</span>
@@ -156,7 +157,7 @@
             ({{ changeListLength }})
           </span>
         </div>
-        <div class="oppia-topic-nav-dropdown-icon"
+        <div class="oppia-topic-nav-dropdown-icon e2e-test-mobile-save-topic-dropdown"
              (click)="toggleTopicEditOptions()">
           <i class="fa fa-caret-down"></i>
         </div>
