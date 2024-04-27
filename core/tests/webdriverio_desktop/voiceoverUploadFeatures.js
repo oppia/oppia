@@ -49,11 +49,16 @@ describe('Voiceover upload features', function () {
       new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
 
     await users.createAndLoginCurriculumAdminUser(
-      'release@release.com',
-      'releaseCoordinator'
+      'featureFlagEnabler@release.com',
+      'featureFlagEnabler'
     );
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
     await adminPage.get();
-    await adminPage.addRole('releaseCoordinator', 'release coordinator');
+    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();
 
     var voiceoverContributionFlag =

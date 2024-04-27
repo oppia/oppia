@@ -52,6 +52,11 @@ describe('Voiceover player', function () {
       'testVoiceovers@voiceovers.com',
       'testVoiceovers'
     );
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
     await adminPage.get();
     await adminPage.addRole('testVoiceovers', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();
