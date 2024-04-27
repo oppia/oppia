@@ -19,7 +19,9 @@
 import {BaseUser} from '../puppeteer-testing-utilities/puppeteer-utils';
 import testConstants from '../puppeteer-testing-utilities/test-constants';
 import {showMessage} from '../puppeteer-testing-utilities/show-message-utils';
+import {error} from 'console';
 
+const baseURL = testConstants.URLs.BaseURL;
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
@@ -28,8 +30,28 @@ const saveContentButton = 'button.e2e-test-save-state-content';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const saveChangesButton = 'button.e2e-test-save-changes';
-const saveDraftButton = 'button.e2e-test-save-draft-button';
 
+// Settings Tab elements.
+const settingsTab = 'a.e2e-test-exploration-settings-tab';
+const addTitleBar = 'input#explorationTitle';
+const addGoalInputBox = '.e2e-test-exploration-objective-input';
+const categoryDropdown = 'mat-select.e2e-test-exploration-category-dropdown';
+const languageUpdateDropdown =
+  'mat-select.e2e-test-exploration-language-select';
+const addTagsInputBox = 'input.e2e-test-chip-list-tags';
+const previewSummaryButton = 'button.e2e-test-open-preview-summary-modal';
+const dismissPreviewButton = 'button.e2e-test-close-preview-summary-modal';
+const textToSpeechToggle = 'label.e2e-test-on-off-switch';
+const feedbackToggle = 'label.e2e-test-enable-fallbacks';
+const editRoleButton = '.e2e-test-edit-roles';
+const addUsernameInputBox = '#newMemberUsername';
+const addRoleDropdown = 'mat-select.e2e-test-role-select';
+const collaboratorRoleOption = 'Collaborator (can make changes)';
+const playtesterRoleOption = 'Playtester (can give feedback)';
+const saveRoleButton = 'button.e2e-test-save-role';
+
+const saveDraftButton = 'button.e2e-test-save-draft-button';
+const commitMessage = 'textarea.e2e-test-commit-message-input';
 const publishExplorationButton = 'button.e2e-test-publish-exploration';
 const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
@@ -38,17 +60,15 @@ const explorationCategoryDropdown =
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = 'button.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
-const closeShareModalButton = 'button.e2e-test-share-publish-close';
-
-const mobileChangesDropdown = '.e2e-test-mobile-changes-dropdown';
-const mobileSaveChangesButton =
-  'button.e2e-test-save-changes-for-small-screens';
-const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
+const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
+const discardDraftDropdown = 'button.e2e-test-save-discard-toggle';
+const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
+const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 
 const previewTabButton = '.e2e-test-preview-tab';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const stateEditSelector = '.e2e-test-state-edit-content';
-const stateContentInputField = '.oppia-rte';
+const stateContentInputField = 'div.e2e-test-rte';
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = '.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
@@ -61,12 +81,29 @@ const saveOutcomeDestButton = '.e2e-test-save-outcome-dest';
 const stateResponsesSelector = '.e2e-test-default-response-tab';
 const feedbackEditorSelector = '.e2e-test-open-feedback-editor';
 const responseModalHeaderSelector = '.e2e-test-add-response-modal-header';
+const toastMessage = '.e2e-test-toast-message';
+
+// For mobile.
+const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
+const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
+const mobileSaveChangesButton =
+  'button.e2e-test-save-changes-for-small-screens';
+const mobilePublishButton = 'button.e2e-test-mobile-publish-button';
+const mobileDiscardButton = 'div.e2e-test-mobile-exploration-discard-tab';
 const mobileStateGraphResizeButton = '.e2e-test-mobile-graph-resize-button';
-const mobileNavbarDropdown = '.e2e-test-mobile-options-dropdown';
+const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const mobileNavbarOptions = '.navbar-mobile-options';
-const mobileOptionsButton = '.e2e-test-mobile-options';
-const toastMessage = '.e2e-test-toast-message';
+const mobileOptionsButton = 'i.e2e-test-mobile-options';
+const basicSettingsDropdown = 'h3.e2e-test-settings-container';
+const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
+const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
+const voiceArtistSettingsDropdown =
+  'h3.e2e-test-voice-artists-settings-container';
+const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
+const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+const explorationControlsSettingsDropdown =
+  'h3.e2e-test-controls-bar-settings-container';
 
 // Preview tab elements.
 const nextCardButton = '.e2e-test-next-card-button';
@@ -77,14 +114,15 @@ const explorationCompletionToastMessage = '.e2e-test-lesson-completion-message';
 
 export class ExplorationEditor extends BaseUser {
   /**
-   * Function to navigate to creator dashboard page
+   * Function to navigate to creator dashboard page.
    */
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.page.goto(creatorDashboardPage);
+    showMessage('Creator dashboard page is opened successfully.');
   }
 
   /**
-   * Function to navigate to exploration editor
+   * Function to navigate to exploration editor.
    */
   async navigateToExplorationEditorPage(): Promise<void> {
     await this.clickOn(createExplorationButton);
@@ -97,22 +135,48 @@ export class ExplorationEditor extends BaseUser {
    * @param content - content of the exploration
    * @param interaction - the interaction to be added to the exploration
    */
-  async createExplorationWithContentAndInteraction(
+  async createExplorationWithMinimumContent(
     content: string,
     interaction: string
   ): Promise<void> {
     await this.updateCardContent(content);
     await this.addInteraction(interaction);
-    await this.saveExplorationDraft();
+    showMessage('A simple exploration is created.');
   }
 
   /**
-   * Function to publish exploration
+   * Open settings tab.(Note->It also opens all the dropdowns present
+   * in the setting tab for mobile view port.)
+   */
+  async navigateToSettingsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileOptionsButton, {visible: true});
+      await this.clickOn(mobileOptionsButton);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(mobileSettingsBar);
+
+      // Open all dropdowns because by default all dropdowns are closed in mobile view.
+      await this.clickOn(basicSettingsDropdown);
+      await this.clickOn(advanceSettingsDropdown);
+      await this.clickOn(rolesSettingsDropdown);
+      await this.clickOn(voiceArtistSettingsDropdown);
+      await this.clickOn(permissionSettingsDropdown);
+      await this.clickOn(feedbackSettingsDropdown);
+      await this.clickOn(explorationControlsSettingsDropdown);
+    } else {
+      await this.clickOn(settingsTab);
+    }
+    showMessage('Settings tab is opened successfully.');
+  }
+
+  /**
+   * Function to publish exploration.
+   * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
    * @param {string} category - The category of the exploration.
    */
-  async publishExploration(
+  async publishExplorationWithContent(
     title: string,
     goal: string,
     category: string
@@ -144,12 +208,12 @@ export class ExplorationEditor extends BaseUser {
     );
     const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
 
-    await this.clickOn(closeShareModalButton);
+    await this.clickOn(closePublishedPopUpButton);
     return explorationId;
   }
 
   /**
-   * Function to dismiss welcome modal
+   * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -159,6 +223,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(dismissWelcomeModalSelector, {
       hidden: true,
     });
+    showMessage('Tutorial pop-up closed successfully.');
   }
 
   /**
@@ -175,6 +240,7 @@ export class ExplorationEditor extends BaseUser {
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Card content is updated successfully.');
   }
 
   /**
@@ -189,6 +255,407 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector('.customize-interaction-body-container', {
       hidden: true,
     });
+    showMessage(`${interactionToAdd} interaction has been added successfully.`);
+  }
+
+  /**
+   * Deletes the previous written title and updates the new title.
+   */
+  async updateTitleTo(title: string): Promise<void> {
+    await this.clearAllTextFrom(addTitleBar);
+    await this.type(addTitleBar, title);
+    await this.page.keyboard.press('Tab');
+    showMessage(`Title has been updated to ${title}`);
+  }
+
+  /**
+   * Matches the expected title with current title.
+   */
+  async expectTitleToBe(expectedTitle: string): Promise<void> {
+    await this.page.waitForSelector('.e2e-test-exploration-title-input');
+    const titleInput = await this.page.$('.e2e-test-exploration-title-input');
+    const currentTitle = await this.page.evaluate(
+      input => input.value,
+      titleInput
+    );
+
+    if (expectedTitle === currentTitle) {
+      showMessage('Title matches the expected title.');
+    } else {
+      throw new Error('Failed to update changes.');
+    }
+  }
+
+  /**
+   * Clears previous goal and adds a new goal in the exploration.
+   */
+  async updateGoalTo(goal: string): Promise<void> {
+    await this.clickOn(addGoalInputBox);
+    await this.clearAllTextFrom(addGoalInputBox);
+    await this.type(addGoalInputBox, goal);
+    await this.page.keyboard.press('Tab');
+  }
+
+  /**
+   * Matches the goal with expected goal.
+   */
+  async expectGoalToBe(expectedGoal: string): Promise<void> {
+    try {
+      const goalInput = await this.page.$('#explorationObjective');
+      if (!goalInput) {
+        throw new Error('Goal input element not found.');
+      }
+
+      const goal = await this.page.evaluate(input => input.value, goalInput);
+
+      if (goal === expectedGoal) {
+        showMessage('The goal has been set for the exploration.');
+      } else {
+        throw new Error('The goal does not match the expected goal.');
+      }
+    } catch (error) {
+      console.error('Error:', error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * Selects a category from dropdown. For Eg. Algebra, Biology, Chemistry etc.
+   */
+  async selectCategory(category: string): Promise<void> {
+    await this.clickOn(categoryDropdown);
+    await this.clickOn(category);
+  }
+
+  /**
+   * Checks if the category matches the expected category.
+   */
+  async expectSelectedCategoryToBe(expectedCategory: string): Promise<void> {
+    await this.page.waitForSelector('.mat-select-value');
+    const selectedCategory = await this.page.evaluate(() => {
+      return (
+        document.querySelector('.mat-select-value') as HTMLElement
+      ).innerText.trim();
+    });
+    if (selectedCategory === expectedCategory) {
+      showMessage(
+        `The category ${selectedCategory} is same as expectedCategory.`
+      );
+    } else {
+      throw new Error('Category is not correct.');
+    }
+  }
+
+  async selectLanguage(language: string): Promise<void> {
+    // The language dropdown was visible, but it was mostly hidden towards the bottom
+    // of the screen. When we clicked on the dropdown, the options did not fully appear,
+    // leading to incorrect selections.To prevent this, we are now scrolling the page.
+    // We can use 300 - 500px to move the language dropdown to the upper part of the page.
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 350);
+    });
+
+    await this.clickOn(languageUpdateDropdown);
+    await this.clickOn(language);
+  }
+
+  /**
+   *  Verifies that the selected language matches the expected language.
+   */
+  async expectSelectedLanguageToBe(expectedLanguage: string): Promise<void> {
+    await this.page.waitForSelector(languageUpdateDropdown);
+    const languageDropdown = await this.page.$(languageUpdateDropdown);
+    if (!languageDropdown) {
+      throw new Error('Category dropdown not found.');
+    }
+    await languageDropdown.click();
+
+    const selectedLanguage = await this.page.evaluate(() => {
+      const matOption = document.querySelector(
+        '.mat-option.mat-selected'
+      ) as HTMLElement;
+      if (!matOption) {
+        throw new Error('Selected language option not found.');
+      }
+      return matOption.innerText.trim();
+    });
+
+    if (selectedLanguage.includes(expectedLanguage)) {
+      showMessage(
+        `The language ${selectedLanguage} contains the expected language.`
+      );
+    } else {
+      throw new Error('Language is not correct.');
+    }
+    await this.page.keyboard.press('Enter');
+  }
+
+  async addTags(tagNames: string[]): Promise<void> {
+    for (let i = 0; i < tagNames.length; i++) {
+      await this.clickOn(addTagsInputBox);
+      await this.type(addTagsInputBox, tagNames[i].toLowerCase());
+      await this.page.keyboard.press('Tab');
+    }
+  }
+
+  async expectTagsToMatch(expectedTags: string[]): Promise<void> {
+    // When adding a tag in the exploration settings UI, it gets auto-converted
+    // to lowercase by the input field.
+    const lowercaseExpectedTags = expectedTags.map(tag => tag.toLowerCase());
+    await this.page.waitForSelector('mat-chip-list');
+    const observedTags = await this.page.evaluate(() => {
+      const tagElements = Array.from(document.querySelectorAll('mat-chip'));
+      return tagElements
+        .map(tag => {
+          const textContent =
+            tag.querySelector('.mat-chip-remove')?.previousSibling?.textContent;
+          return textContent ? textContent.trim() : '';
+        })
+        .filter(Boolean);
+    });
+
+    for (const expectedTag of lowercaseExpectedTags) {
+      if (!observedTags.includes(expectedTag)) {
+        throw new Error(`Tag "${expectedTag}" was not added.`);
+      }
+    }
+
+    showMessage('All expected tags were added successfully.');
+  }
+
+  /**
+   * Allows you to preview the summary of exploration.
+   */
+  async previewSummary(): Promise<void> {
+    await this.clickOn(previewSummaryButton);
+    await this.expectPreviewSummaryToBeVisible();
+    await this.clickOn(dismissPreviewButton);
+  }
+
+  /**
+   * Verifies that the preview summary is visible.
+   */
+  async expectPreviewSummaryToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(dismissPreviewButton);
+    const previewSummary = await this.page.$(dismissPreviewButton);
+
+    if (previewSummary) {
+      showMessage('Preview summary is visible.');
+    } else {
+      throw new Error('Preview summary is not visible.');
+    }
+  }
+
+  /**
+   * Enables Automatic Text-to-Speech switch present in settings tab.
+   */
+  async enableAutomaticTextToSpeech(): Promise<void> {
+    await this.clickOn(textToSpeechToggle);
+    await this.expectAutomaticTextToSpeechToBeEnabled();
+  }
+
+  /**
+   * Checks whether the Automatic Text-to-Speech setting is enabled or disabled.
+   */
+  async expectAutomaticTextToSpeechToBeEnabled(): Promise<void> {
+    await this.page.waitForSelector('#text-speech-switch');
+    const autoTtsSwitch = await this.page.$('#text-speech-switch');
+    const autoTtsSwitchIsOn = await this.page.evaluate(
+      switchElement => switchElement.checked,
+      autoTtsSwitch
+    );
+    if (autoTtsSwitchIsOn) {
+      showMessage('Automatic Text-to-Speech is enabled.');
+    } else {
+      throw error('Automatic Text-to-Speech is disabled.');
+    }
+  }
+
+  /**
+   * Assigns a role of collaborator to any guest user.
+   */
+  async assignUserToCollaboratorRole(username: string): Promise<void> {
+    await this.clickOn(editRoleButton);
+    await this.clickOn(addUsernameInputBox);
+    await this.type(addUsernameInputBox, username);
+    await this.clickOn(addRoleDropdown);
+    await this.clickOn(collaboratorRoleOption);
+    await this.clickOn(saveRoleButton);
+    showMessage(`${username} has been added as collaboratorRoleOption.`);
+  }
+
+  /**
+   * Assigns a role of Playtester to any guest user.
+   */
+  async assignUserToPlaytesterRole(username: string): Promise<void> {
+    await this.clickOn(editRoleButton);
+    await this.page.waitForSelector('.e2e-test-editor-role-names', {
+      visible: true,
+    });
+    await this.clickOn(addUsernameInputBox);
+    await this.type(addUsernameInputBox, username);
+    await this.clickOn(addRoleDropdown);
+    await this.clickOn(playtesterRoleOption);
+    await this.clickOn(saveRoleButton);
+    showMessage(`${username} has been added as playtester.`);
+  }
+
+  /**
+   * Verifies the presence of the publish button.
+   */
+  async expectExplorationToBePublished(): Promise<void> {
+    let publishButtonSelector = '.e2e-test-publish-exploration';
+    if (this.isViewportAtMobileWidth()) {
+      publishButtonSelector = mobilePublishButton;
+      await this.clickOn(mobileChangesDropdown);
+    }
+    const publishButton = await this.page.$(publishButtonSelector);
+    if (!publishButton) {
+      showMessage(
+        'Exploration is set to Public and is accessible to Oppia users.'
+      );
+    } else {
+      throw new Error(
+        'Exploration is set to Private and is not accessible to Oppia users.'
+      );
+    }
+  }
+
+  /**
+   * Choose notification type by enabling/disabling the feedback toggle.
+   */
+  async optInToEmailNotifications(): Promise<void> {
+    await this.clickOn(feedbackToggle);
+    await this.expectEmailNotificationsToBeActivated();
+  }
+
+  /**
+   * Verifies the choice of receiving feedback and suggestion notifications via email.
+   */
+  async expectEmailNotificationsToBeActivated(): Promise<void> {
+    await this.page.waitForSelector('input[id="suggestion-switch"]');
+    const input = await this.page.$('input[id="suggestion-switch"]');
+
+    if (!input) {
+      throw new Error('Suggestion switch input element not found.');
+    }
+    const suggestionSwitchIsActive = await input.evaluate(
+      input => (input as HTMLInputElement).checked
+    );
+
+    if (suggestionSwitchIsActive) {
+      showMessage('suggestion notifications via email are enabled.');
+    } else {
+      throw new Error('suggestion notifications via email are disabled.');
+    }
+  }
+
+  /**
+   * Function to save an exploration draft.
+   */
+  async saveExplorationDraft(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.clickOn(mobileOptionsButton);
+      }
+      await this.clickOn(mobileSaveChangesButton);
+    } else {
+      await this.clickOn(saveChangesButton);
+    }
+    await this.clickOn(commitMessage);
+    await this.type(commitMessage, 'Testing Testing');
+    await this.clickOn(saveDraftButton);
+    await this.page.waitForSelector(saveDraftButton, {hidden: true});
+    showMessage('Exploration is saved successfully.');
+    await this.page.waitForNetworkIdle();
+  }
+
+  async publishExploration(): Promise<string | null> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        visible: true,
+      });
+      await this.page.waitForSelector('.e2e-test-toast-message', {
+        hidden: true,
+      });
+      await this.clickOn(mobileChangesDropdown);
+      await this.clickOn(mobilePublishButton);
+    } else {
+      await this.clickOn(publishExplorationButton);
+    }
+    await this.clickOn(explorationConfirmPublishButton);
+    await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
+
+    const explorationUrlAfterPublished = await this.page.url();
+    let explorationId = explorationUrlAfterPublished
+      .replace(/^.*\/create\//, '')
+      .replace(/#\/.*/, '');
+
+    await this.clickOn(closePublishedPopUpButton);
+    await this.expectExplorationToBePublished();
+
+    return explorationId;
+  }
+
+  async expectExplorationToBeAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      showMessage('Exploration is accessible with the URL, i.e. published.');
+    } catch (error) {
+      throw new Error('The exploration is not public.');
+    }
+  }
+
+  async expectExplorationToBeNotAccessibleByUrl(
+    explorationId: string | null
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error('ExplorationId is null');
+    }
+    const explorationUrlAfterPublished = `${baseURL}/create/${explorationId}#/gui/Introduction`;
+    try {
+      await this.page.goto(explorationUrlAfterPublished);
+      throw new Error('The exploration is still public.');
+    } catch (error) {
+      showMessage('The exploration is not accessible with the URL.');
+    }
+  }
+
+  /**
+   * Discards the current changes.
+   */
+  async discardCurrentChanges(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileChangesDropdown);
+      await this.clickOn(mobileDiscardButton);
+    } else {
+      await this.clickOn(discardDraftDropdown);
+      await this.page.waitForSelector(desktopDiscardDraftButton, {
+        visible: true,
+      });
+      await this.clickOn(desktopDiscardDraftButton);
+    }
+    await this.page.waitForSelector(confirmDiscardButton, {
+      visible: true,
+    });
+    await Promise.all([
+      this.clickOn(confirmDiscardButton),
+      this.page.waitForNavigation(),
+    ]);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsButton);
+      await this.clickOn(basicSettingsDropdown);
+    }
   }
 
   /**
@@ -209,27 +676,6 @@ export class ExplorationEditor extends BaseUser {
     await this.select(destinationCardSelector, '/');
     await this.type(addStateInput, cardName);
     await this.clickOn(saveOutcomeDestButton);
-  }
-
-  /**
-   * Function to save an exploration draft.
-   */
-  async saveExplorationDraft(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(mobileNavbarOptions);
-      // If the element is not present, it means the mobile navigation bar is not expanded.
-      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-      // which expands the mobile navigation bar.
-      if (!element) {
-        await this.clickOn(mobileOptionsButton);
-      }
-      await this.clickOn(mobileSaveChangesButton);
-    } else {
-      await this.clickOn(saveChangesButton);
-    }
-    await this.clickOn(saveDraftButton);
-    await this.page.waitForSelector(saveDraftButton, {hidden: true});
-    await this.page.waitForNetworkIdle();
   }
 
   /**
