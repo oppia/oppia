@@ -253,6 +253,8 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
             long_message_dict, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
+            'At \'http://localhost/collection_editor_handler/data/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'commit_message\' failed: Validation '
             'failed: has_length_at_most ({\'max_value\': 375}) for object %s'
             % long_message)

@@ -20,6 +20,7 @@ import path from 'path';
 
 export default {
   URLs: {
+    BaseURL: 'http://localhost:8181',
     About: 'http://localhost:8181/about',
     AboutFoundation: 'http://localhost:8181/about-foundation',
     AdminPage: 'http://localhost:8181/admin',
@@ -55,6 +56,8 @@ export default {
     MobileExternalLinkWatchAVideo:
       'https://m.facebook.com/oppiaorg/videos/189487953721583/',
     Partnerships: 'http://localhost:8181/partnerships',
+    TopicAndSkillsDashboard:
+      'http://localhost:8181/topics-and-skills-dashboard',
     ProgrammingWithCarla: 'https://www.oppia.org/collection/inDXV0w8-p1C',
     Volunteer: 'http://localhost:8181/volunteer',
     WelcomeToOppia: 'https://www.oppia.org/explore/0',
@@ -70,7 +73,9 @@ export default {
     TRANSLATION_ADMIN: 'translation admin',
     BLOG_ADMIN: 'blog admin',
     BLOG_POST_EDITOR: 'blog post editor',
+    CURRICULUM_ADMIN: 'curriculum admin',
     QUESTION_ADMIN: 'question admin',
+    VOICEOVER_ADMIN: 'voiceover admin',
   } as const,
   BlogRights: {
     BLOG_ADMIN: 'BLOG_ADMIN',
@@ -84,6 +89,10 @@ export default {
       __dirname,
       '../images/blog-post-thumbnail.svg'
     ),
+    curriculumAdminThumbnailImage: path.resolve(
+      __dirname,
+      '../images/curriculum-admin-thumbnail.svg'
+    ),
   },
-  DEFAULT_SPEC_TIMEOUT: 300000,
+  DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
 };

@@ -16,12 +16,14 @@
 
 from __future__ import annotations
 
+from core import feature_flag_list
 from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import blog_services
 from core.domain import classroom_config_services
+from core.domain import feature_flag_services
 from core.domain import learner_group_services
 from core.domain import user_services
 
@@ -100,6 +102,30 @@ class CollectionViewerPageAccessValidationHandler(
         pass
 
 
+class FacilitatorDashboardPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to facilitator dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_learner_groups
+    def get(self) -> None:
+        """Retrieves information about a learner group.
+
+        Raises:
+            PageNotFoundException. The learner groups are not enabled.
+        """
+        assert self.user_id is not None
+        if not learner_group_services.is_learner_group_feature_enabled(
+            self.user_id
+        ):
+            raise self.NotFoundException
+
+
 class ManageOwnAccountValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -150,6 +176,26 @@ class ProfileExistsValidationHandler(
             username)
 
         if not user_settings:
+            raise self.NotFoundException
+
+
+class DiagnosticTestPlayerAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to diagnostic test player page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Handles GET requests."""
+        if not feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            user_id=self.user_id
+        ):
             raise self.NotFoundException
 
 
