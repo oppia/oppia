@@ -21,7 +21,6 @@ import os
 import subprocess
 import sys
 from unittest import mock
-from unittest.mock import Mock
 
 from core.constants import constants
 from core.tests import test_utils
@@ -89,11 +88,8 @@ def mock_managed_process(
 class RunAcceptanceTestsTests(test_utils.GenericTestBase):
     """Test the run_acceptance_tests methods."""
 
-    test_output_file_path = 'test_output.log'
-
     def setUp(self) -> None:
         super().setUp()
-        self.output_lines = ['Test output line 1', 'Test output line 2']
         self.exit_stack = contextlib.ExitStack()
 
         def mock_constants() -> None:
@@ -362,56 +358,26 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             b'Test case 1 passed',
             b'Test case 2 failed',
             b'Spec started: Test Suite 2',
-            b'Test case 3 passed',
-            b'Test case 4 skipped',
-            b'Test case 5 failed',
+            b'Test case 3 skipped',
+            b'Test case 4 passed'
         ]
-        expected_output = [
-            'Spec started: Test Suite 1',
-            'Test case 1 passed',
-            'Test case 2 failed',
-            'Spec started: Test Suite 2',
-            'Test case 3 passed',
-            'Test case 5 failed',
-        ]
-
-        run_acceptance_tests.print_test_output(test_data)
-
-        with open(
-            self.test_output_file_path, 'r', encoding='utf-8'
-        ) as output_file:
-            lines = output_file.readlines()
-
-        self.assertEqual(len(lines), len(expected_output))
-        for line, expected_line in zip(lines, expected_output):
-            self.assertEqual(line.strip(), expected_line)
-
-    @mock.patch(
-        'builtins.open', new_callable=mock.mock_open
-    )
-    def test_print_test_output_with_io_error(self, mock_open: Mock) -> None:
-        mock_open.side_effect = IOError('Failed to open file')
-        self.assertRaises(
-            IOError,
-            run_acceptance_tests.print_test_output,
-            self.output_lines
-        )
-        mock_open.assert_called_once_with(
-            'test_output.log', 'w', encoding='utf-8'
+        expected_output = (
+            'Spec started: Test Suite 1\n'
+            'Test case 1 passed\n'
+            'Test case 2 failed\n'
+            'Spec started: Test Suite 2\n'
+            'Test case 4 passed\n'
         )
 
-    def test_print_test_output_results(self) -> None:
-        test_instance = RunAcceptanceTestsTests()
-        try:
-            test_instance.test_print_test_output_results()
+        with mock.patch('builtins.open', mock.mock_open()) as mock_file:
+            run_acceptance_tests.print_test_output(test_data)
 
-            with open('test_output.log', 'r', encoding='utf-8') as output_file:
-                lines = output_file.readlines()
-                self.assertEqual(len(lines), 4)
-                self.assertEqual(lines[0].strip(), 'Spec started: Test case 1')
-                self.assertEqual(lines[1].strip(), 'Test case 1 passed')
-                self.assertEqual(lines[2].strip(), 'Spec started: Test case 2')
-                self.assertEqual(lines[3].strip(), 'Test case 2 failed')
+            mock_file.assert_called_once_with(
+                'test_output.log', 'w', encoding='utf-8')
 
-        finally:
+            mock_file_obj = mock_file.return_value
+
+            mock_file_obj.write.assert_called_once_with(expected_output)
+
+        if os.path.exists('test_output.log'):
             os.remove('test_output.log')
