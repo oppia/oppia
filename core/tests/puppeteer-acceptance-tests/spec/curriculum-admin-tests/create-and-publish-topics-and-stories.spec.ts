@@ -42,12 +42,12 @@ describe('Curriculum Admin', function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       await curriculumAdmin.navigateToExplorationEditorPage();
       await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.createExplorationWithMinimumContent(
+      await curriculumAdmin.createMinimalExploration(
         'Test Exploration',
         'End Exploration'
       );
       await curriculumAdmin.saveExplorationDraft();
-      explorationId = await curriculumAdmin.publishExplorationWithContent(
+      explorationId = await curriculumAdmin.publishExplorationWithMetadata(
         'Test Exploration Title 1',
         'Test Exploration Goal',
         'Algebra'
