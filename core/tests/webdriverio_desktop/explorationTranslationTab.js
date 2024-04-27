@@ -49,7 +49,6 @@ describe('Exploration translation and voiceover tab', function () {
       'featureFlagEnabler@release.com',
       'featureFlagEnabler'
     );
-    await browser.debug();
 
     // The below lines enable the enable_voiceover_contribution flag in
     // prod mode.

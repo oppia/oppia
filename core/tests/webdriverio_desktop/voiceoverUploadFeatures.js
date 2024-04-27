@@ -48,24 +48,6 @@ describe('Voiceover upload features', function () {
     releaseCoordinatorPage =
       new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
 
-    await users.createAndLoginCurriculumAdminUser(
-      'featureFlagEnabler@release.com',
-      'featureFlagEnabler'
-    );
-
-    // The below lines enable the enable_voiceover_contribution flag in
-    // prod mode.
-    // They should be removed after the enable_voiceover_contribution flag is
-    // deprecated.
-    await adminPage.get();
-    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
-    await releaseCoordinatorPage.getFeaturesTab();
-
-    var voiceoverContributionFlag =
-      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
-    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
-    await users.logout();
-
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);
     await workflow.createExploration(true);
@@ -92,6 +74,24 @@ describe('Voiceover upload features', function () {
   });
 
   beforeEach(async function () {
+    await users.createAndLoginCurriculumAdminUser(
+      'featureFlagEnabler@release.com',
+      'featureFlagEnabler'
+    );
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
+    await adminPage.get();
+    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
+    await users.logout();
+
     await users.login(TEST_EMAIL);
     await creatorDashboardPage.get();
     await creatorDashboardPage.editExploration(EXPLORATION_TITLE);
@@ -185,6 +185,13 @@ describe('Voiceover upload features', function () {
           ' The uploaded file is 301.87 seconds long.',
       },
     ]);
+    await users.logout();
+
+    await users.login('featureFlagEnabler@release.com');
+    await releaseCoordinatorPage.getFeaturesTab();
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.disableFeatureFlag(voiceoverContributionFlag);
     await users.logout();
   });
 });
