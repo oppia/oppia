@@ -736,7 +736,7 @@ class TopicPublishSendMailHandler(
             topic_id: str. The ID of the topic.
         """
         assert self.normalized_payload is not None
-        topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
+        topic_url = '%s%s%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, '/', topic_id)
         if feconf.CAN_SEND_EMAILS:
             email_manager.send_mail_to_admin(
                 'Request to review and publish a topic',
