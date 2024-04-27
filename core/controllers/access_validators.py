@@ -102,6 +102,30 @@ class CollectionViewerPageAccessValidationHandler(
         pass
 
 
+class FacilitatorDashboardPageAccessValidationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to facilitator dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_learner_groups
+    def get(self) -> None:
+        """Retrieves information about a learner group.
+
+        Raises:
+            PageNotFoundException. The learner groups are not enabled.
+        """
+        assert self.user_id is not None
+        if not learner_group_services.is_learner_group_feature_enabled(
+            self.user_id
+        ):
+            raise self.NotFoundException
+
+
 class ManageOwnAccountValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -169,8 +193,8 @@ class DiagnosticTestPlayerAccessValidationHandler(
     def get(self) -> None:
         """Handles GET requests."""
         if not feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            user_id=self.user_id
         ):
             raise self.NotFoundException
 
