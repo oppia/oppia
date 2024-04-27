@@ -66,7 +66,7 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.createExplorationWithMinimumContent(
+      await explorationEditor.createMinimalExploration(
         'Exploration one',
         INTERACTION_TYPES.END_EXPLORATION
       );
@@ -106,7 +106,7 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorPage();
 
-      await explorationEditor.createExplorationWithMinimumContent(
+      await explorationEditor.createMinimalExploration(
         'Exploration two',
         INTERACTION_TYPES.END_EXPLORATION
       );

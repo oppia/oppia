@@ -38,7 +38,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.createExplorationWithMinimumContent(
+    await explorationEditor.createMinimalExploration(
       'Solar System Exploration',
       INTERACTION_TYPES.END_EXPLORATION
     );

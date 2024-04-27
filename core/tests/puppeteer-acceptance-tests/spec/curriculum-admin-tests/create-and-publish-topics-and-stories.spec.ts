@@ -42,7 +42,7 @@ describe('Curriculum Admin', function () {
       await curriculumAdmin.navigateToCreatorDashboardPage();
       await curriculumAdmin.navigateToExplorationEditorPage();
       await curriculumAdmin.dismissWelcomeModal();
-      await curriculumAdmin.createExplorationWithMinimumContent(
+      await curriculumAdmin.createMinimalExploration(
         'Test Exploration',
         'End Exploration'
       );
