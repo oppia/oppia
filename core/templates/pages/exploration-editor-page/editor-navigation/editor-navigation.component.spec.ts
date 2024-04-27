@@ -315,7 +315,7 @@ describe('Editor Navigation Component', () => {
       expect(component.isEditableOutsideTutorialMode()).toEqual(true);
     });
 
-    it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits', () => {
+    it('should update autosaveIsInProgress when autosaveInProgressEventEmitter emits true', () => {
       spyOn(
         changeListService.autosaveInProgressEventEmitter,
         'subscribe'
