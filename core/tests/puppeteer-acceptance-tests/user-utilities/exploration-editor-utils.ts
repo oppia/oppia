@@ -156,7 +156,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} mobileButtonSelector - The selector of the button to click on in mobile view.
    * @param {string} desktopButtonSelector - The selector of the button to click on in desktop view.
    */
-  async navigateToTab(
+  private async navigateToTab(
     mobileButtonSelector: string,
     desktopButtonSelector: string
   ): Promise<void> {
@@ -943,7 +943,7 @@ export class ExplorationEditor extends BaseUser {
     properties: string[]
   ): Promise<void> {
     if (!Number.isInteger(revisionNumber) || revisionNumber <= 0) {
-      throw new Error('Invalid revision number');
+      throw new Error(`Invalid revision number: ${revisionNumber}`);
     }
 
     let elements = await this.page.$$(historyListItem);
@@ -965,7 +965,9 @@ export class ExplorationEditor extends BaseUser {
     for (let property of properties) {
       let selector = propertyToSelector[property];
       if (!selector) {
-        throw new Error(`Invalid property: ${property}`);
+        throw new Error(
+          `${property} is not one of the following revision properties: ${Object.keys(propertyToSelector).join(', ')}`
+        );
       }
 
       let value = await element.$eval(selector, async el => el.textContent);
@@ -975,7 +977,7 @@ export class ExplorationEditor extends BaseUser {
         );
       }
 
-      showMessage(`Revision ${revisionNumber} has the property ${property}`);
+      showMessage(`Revision ${revisionNumber} has the property ${property} with value: ${value}`);
     }
   }
 
@@ -985,7 +987,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectRevisionsToBeOrderedBy(property: string): Promise<void> {
     if (!property) {
-      throw new Error('Invalid property');
+      throw new Error(`Invalid property: ${property}`);
     }
 
     let elementHandles = await this.page.$$(historyListItem);
@@ -1020,7 +1022,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async filterRevisionsByUser(userName: string): Promise<void> {
     if (!userName) {
-      throw new Error('Invalid user name');
+      throw new Error('Username cannot be empty');
     }
 
     await this.type(userNameEdit, userName);
@@ -1034,16 +1036,16 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectNumberOfRevisions(expectedNumber: number): Promise<void> {
     if (!Number.isInteger(expectedNumber) || expectedNumber < 0) {
-      throw new Error('Invalid expected number of revisions');
+      throw new Error(`Invalid expected number of revisions: ${expectedNumber}`);
     }
 
     let revisions = await this.page.$$(historyListItem);
     if (revisions.length !== expectedNumber) {
       throw new Error(
-        `Expected ${expectedNumber} revisions, but found ${revisions.length}`
+        `Expected exactly ${expectedNumber} revisions, but found ${revisions.length}`
       );
     } else {
-      showMessage(`Found ${expectedNumber} revisions as expected`);
+      showMessage(`Found exactly ${expectedNumber} revisions as expected`);
     }
   }
 
@@ -1062,7 +1064,7 @@ export class ExplorationEditor extends BaseUser {
     const index = REVISIONS_PER_PAGE_OPTIONS[revisionsPerPage];
     if (index === undefined) {
       throw new Error(
-        `Invalid number of revisions per page: ${revisionsPerPage}`
+        `${revisionsPerPage} is not one of the valid number of revisions per page: ${Object.keys(REVISIONS_PER_PAGE_OPTIONS).join(', ')}`
       );
     }
 
@@ -1087,7 +1089,7 @@ export class ExplorationEditor extends BaseUser {
   async expectNextPageOfRevisionsButtonToBe(status: string): Promise<void> {
     if (status !== 'enabled' && status !== 'disabled') {
       throw new Error(
-        'Invalid status argument. Expected "enabled" or "disabled".'
+        `Invalid status argument: ${status}. Expected "enabled" or "disabled".`
       );
     }
 
@@ -1242,7 +1244,7 @@ export class ExplorationEditor extends BaseUser {
    * Finds the options button for a specific version.
    * @param {number} version - The version number to find.
    */
-  async findOptionsButtonForVersion(version: number): Promise<ElementHandle> {
+  private async findOptionsButtonForVersion(version: number): Promise<ElementHandle> {
     const buttons = await this.page.$$('.history-table-option');
     const index = buttons.length - version;
     if (index < 0 || index >= buttons.length) {
