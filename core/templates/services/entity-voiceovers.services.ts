@@ -74,7 +74,7 @@ export class EntityVoiceoversService {
   getLanguageCodes() {
     let voiceoverLanguageCodes = [];
     for (let entityVoiceovers of this.entityVoiceoversList) {
-      let languageAccentCode = entityVoiceovers._languageAccentCode;
+      let languageAccentCode = entityVoiceovers.languageAccentCode;
       voiceoverLanguageCodes.push(languageAccentCode);
     }
 
@@ -91,7 +91,7 @@ export class EntityVoiceoversService {
     let returnedEntityVoiceovers!: EntityVoiceovers;
 
     this.entityVoiceoversList.forEach(entityVoiceovers => {
-      if (entityVoiceovers._languageAccentCode == languageAccentCode) {
+      if (entityVoiceovers.languageAccentCode == languageAccentCode) {
         returnedEntityVoiceovers = entityVoiceovers;
       }
     });

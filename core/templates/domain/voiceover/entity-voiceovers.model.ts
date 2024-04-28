@@ -67,11 +67,11 @@ export interface EntityVoiceoversBackendDict {
 }
 
 export class EntityVoiceovers {
-  _entityId: string;
-  _entityType: string;
-  _entityVersion: number;
-  _languageAccentCode: string;
-  _voiceovers: ContentIdToVoiceoverMapping;
+  entityId: string;
+  entityType: string;
+  entityVersion: number;
+  languageAccentCode: string;
+  voiceovers: ContentIdToVoiceoverMapping;
 
   constructor(
     entityId: string,
@@ -80,11 +80,11 @@ export class EntityVoiceovers {
     languageAccentCode: string,
     voiceovers: ContentIdToVoiceoverMapping
   ) {
-    this._entityId = entityId;
-    this._entityType = entityType;
-    this._entityVersion = entityVersion;
-    this._languageAccentCode = languageAccentCode;
-    this._voiceovers = voiceovers;
+    this.entityId = entityId;
+    this.entityType = entityType;
+    this.entityVersion = entityVersion;
+    this.languageAccentCode = languageAccentCode;
+    this.voiceovers = voiceovers;
   }
 
   static createFromBackendDict(
@@ -107,5 +107,20 @@ export class EntityVoiceovers {
       entityVoiceoversBackendDict['language_accent_code'],
       voiceovers
     );
+  }
+
+  getVoiceovers() {
+    this.voiceovers;
+  }
+
+  countTotalVoiceovers() {
+    let totalVoiceovers = 0;
+
+    for (let contentId in this.voiceovers) {
+      let manualVoieover = this.voiceovers[contentId]['manual'];
+      totalVoiceovers += 1;
+    }
+
+    return totalVoiceovers;
   }
 }
