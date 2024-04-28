@@ -95,6 +95,10 @@ if [ "$is_container_running" != "0" ]; then
     make start-devserver
 fi
 
+# Update Git config in Docker container required by npx lint-staged
+$DOCKER_EXEC_COMMAND git config user.name $(git config user.name)
+$DOCKER_EXEC_COMMAND git config user.email $(git config user.email)
+
 # Run hook in container
 CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_COMMIT_SYMLINK $@"
 echo "Running $CMD"
