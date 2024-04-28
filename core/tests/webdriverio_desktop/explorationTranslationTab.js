@@ -45,24 +45,6 @@ describe('Exploration translation and voiceover tab', function () {
     releaseCoordinatorPage =
       new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
 
-    await users.createAndLoginCurriculumAdminUser(
-      'featureFlagEnabler@release.com',
-      'featureFlagEnabler'
-    );
-
-    // The below lines enable the enable_voiceover_contribution flag in
-    // prod mode.
-    // They should be removed after the enable_voiceover_contribution flag is
-    // deprecated.
-    await adminPage.get();
-    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
-    await releaseCoordinatorPage.getFeaturesTab();
-
-    var voiceoverContributionFlag =
-      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
-    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
-    await users.logout();
-
     await users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
     await users.createUser('user@editorTab.com', 'userEditor');
     await users.createUserWithRole(
@@ -128,6 +110,26 @@ describe('Exploration translation and voiceover tab', function () {
     await general.openEditor(explorationId, true);
     await explorationEditorPage.navigateToSettingsTab();
     await workflow.addExplorationVoiceArtist('userVoiceArtist');
+    await users.logout();
+  });
+
+  beforeEach(async function () {
+    await users.createAndLoginCurriculumAdminUser(
+      'featureFlagEnabler@release.com',
+      'featureFlagEnabler'
+    );
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
+    await adminPage.get();
+    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
     await users.logout();
   });
 
@@ -243,5 +245,11 @@ describe('Exploration translation and voiceover tab', function () {
 
   afterEach(async function () {
     await general.checkForConsoleErrors([]);
+    await users.login('featureFlagEnabler@release.com');
+    await releaseCoordinatorPage.getFeaturesTab();
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.disableFeatureFlag(voiceoverContributionFlag);
+    await users.logout();
   });
 });
