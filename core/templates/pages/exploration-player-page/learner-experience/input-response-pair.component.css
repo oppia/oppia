@@ -28,7 +28,7 @@ oppia-input-response-pair .oppia-popover {
 }
 .oppia-answer-popup-container .oppia-answer-popup {
   max-height: 300px;
-  overflow-y: scroll;
+  max-width: 300px;
 }
 
 .conversation-skin-feedback-dot-one,

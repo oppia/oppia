@@ -44,6 +44,12 @@ export class ResponseGraphInput {
   graph!: GraphAnswer;
   VERTEX_RADIUS!: number;
   EDGE_WIDTH!: number;
+  MIN_LEFT_MARGIN!: number;
+  minX!: number;
+  maxX!: number;
+  WIDTH: number = 250;
+  HEIGHT: number = 250;
+
   GRAPH_INPUT_LEFT_MARGIN =
     InteractionsExtensionsConstants.GRAPH_INPUT_LEFT_MARGIN;
 
@@ -58,6 +64,66 @@ export class ResponseGraphInput {
     ) as GraphAnswer;
     this.VERTEX_RADIUS = this.graphDetailService.VERTEX_RADIUS;
     this.EDGE_WIDTH = this.graphDetailService.EDGE_WIDTH;
+
+    this.MIN_LEFT_MARGIN = this.graphDetailService.getMinLeftMargin(this.graph);
+    this.minX = this.graphDetailService.getMinX(this.graph);
+    this.maxX = this.graphDetailService.getMaxX(this.graph);
+
+    this.reduceGraph();
+  }
+
+  removeWhiteSpace(): void {
+    this.graph.vertices = this.graph.vertices.map(vertex => {
+      return {
+        x: vertex.x - this.minX + this.MIN_LEFT_MARGIN,
+        y: vertex.y,
+        label: vertex.label,
+      };
+    });
+  }
+
+  reduceGraph(): void {
+    this.removeWhiteSpace();
+
+    var scale = this.getScale();
+    if (scale === 1) {
+      return;
+    }
+
+    this.graph.vertices = this.graph.vertices.map(vertex => {
+      return {
+        x: vertex.x * scale,
+        y: vertex.y * scale,
+        label: vertex.label,
+      };
+    });
+  }
+
+  getMaxX(): number {
+    return Math.max(...this.graph.vertices.map(vertex => vertex.x));
+  }
+
+  getMaxY(): number {
+    return Math.max(...this.graph.vertices.map(vertex => vertex.y));
+  }
+
+  getScale(): number {
+    var scale = 1;
+
+    var maxY = this.getMaxY();
+    if (this.HEIGHT < maxY) {
+      scale = this.HEIGHT / (maxY + this.MIN_LEFT_MARGIN);
+    }
+
+    var maxX = this.getMaxX();
+    if (this.WIDTH < maxX) {
+      var scaleX = this.WIDTH / (maxX + this.MIN_LEFT_MARGIN);
+      if (scaleX < scale) {
+        scale = scaleX;
+      }
+    }
+
+    return scale;
   }
 
   getDirectedEdgeArrowPoints(index: number): string {

@@ -32,6 +32,27 @@ export interface EdgeCentre {
 export class GraphDetailService {
   VERTEX_RADIUS: number = 6;
   EDGE_WIDTH: number = 3;
+  MIN_LEFT_MARGIN: number = 10;
+
+  getMinLeftMargin(graph: GraphAnswer): number {
+    if (!graph.isLabeled) {
+      return this.MIN_LEFT_MARGIN;
+    }
+    return Math.max(
+      ...graph.vertices.map(
+        vertex => vertex.label.length * (this.MIN_LEFT_MARGIN / 2)
+      )
+    );
+  }
+
+  getMinX(graph: GraphAnswer): number {
+    return Math.min(...graph.vertices.map(vertex => vertex.x));
+  }
+
+  getMaxX(graph: GraphAnswer): number {
+    var minX = this.getMinX(graph);
+    return Math.max(...graph.vertices.map(vertex => vertex.x - minX));
+  }
 
   getDirectedEdgeArrowPoints(graph: GraphAnswer, index: number): string {
     var ARROW_WIDTH = 5;
