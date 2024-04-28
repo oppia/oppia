@@ -185,7 +185,7 @@ export class ExplorationEditor extends BaseUser {
    * @param content - content of the exploration
    * @param interaction - the interaction to be added to the exploration
    */
-  async createExplorationWithMinimumContent(
+  async createMinimalExploration(
     content: string,
     interaction: string
   ): Promise<void> {
@@ -937,6 +937,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} revisionNumber - The number of the revision to check.
    * @param {string[]} properties - The properties to check for in the revision.
    */
+
   async expectRevisionToHave(
     revisionNumber: number,
     properties: string[]
@@ -954,7 +955,7 @@ export class ExplorationEditor extends BaseUser {
 
     let element = elements[revisionNumber - 1];
 
-    const propertyToSelector = {
+    const propertyToSelector: {[key: string]: string} = {
       'Version No.': revisionVersionNoSelector,
       Notes: revisionNoteSelector,
       User: revisionUsernameSelector,
@@ -987,7 +988,14 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Invalid property');
     }
 
-    let revisions = await this.page.$$(historyListItem);
+    let elementHandles = await this.page.$$(historyListItem);
+    let revisions: {[key: string]: string | Date}[] = await Promise.all(
+      elementHandles.map(async handle => {
+        let value = await handle.getProperty(property);
+        return {[property]: (await value.jsonValue()) as string | Date};
+      })
+    );
+
     for (let i = 0; i < revisions.length - 1; i++) {
       let value1 = revisions[i][property];
       let value2 = revisions[i + 1][property];
@@ -1046,7 +1054,7 @@ export class ExplorationEditor extends BaseUser {
   async adjustPaginatorToShowRevisionsPerPage(
     revisionsPerPage: number
   ): Promise<void> {
-    const REVISIONS_PER_PAGE_OPTIONS = {
+    const REVISIONS_PER_PAGE_OPTIONS: {[key: number]: number} = {
       10: 1,
       15: 2,
       20: 3,
@@ -1144,64 +1152,49 @@ export class ExplorationEditor extends BaseUser {
    * @param {string[]} properties - The properties to check for.
    */
   async expectChangesInProperties(properties: string[]): Promise<void> {
-    const extractPropertyValues = async () => {
-      const values = {};
-      for (let property of properties) {
-        await this.page.waitForSelector('.cm-atom', {visible: true});
-        const elements = await this.page.$$('.cm-atom');
-        const propertyElements = await Promise.all(
-          elements.map(async el => {
-            const textContent = await el.evaluate(node => node.textContent);
-            return textContent === property ? el : null;
-          })
-        );
+    const values: {[key: string]: string[]} = {};
 
-        const filteredElements = propertyElements.filter(el => el !== null);
+    for (let property of properties) {
+      await this.page.waitForSelector('.cm-atom', {visible: true});
+      const elements = await this.page.$$('.cm-atom');
 
-        if (filteredElements.length === 0) {
-          throw new Error(`Property ${property} not found`);
-        } else if (
-          filteredElements[0] !== null &&
-          filteredElements[1] !== null
-        ) {
-          const line1 = await filteredElements[0].evaluate(el => {
-            if (
-              el.nextElementSibling &&
-              el.nextElementSibling.nextElementSibling
-            ) {
-              return el.nextElementSibling.nextElementSibling.textContent;
-            } else {
-              throw new Error(
-                `Unable to find third sibling for property ${property}`
-              );
-            }
-          });
+      const propertyElements = await Promise.all(
+        elements.map(async el => {
+          const textContent = await el.evaluate(node => node.textContent);
+          return textContent === property ? el : null;
+        })
+      );
 
-          const line2 = await filteredElements[1].evaluate(el => {
-            if (
-              el.nextElementSibling &&
-              el.nextElementSibling.nextElementSibling
-            ) {
-              return el.nextElementSibling.nextElementSibling.textContent;
-            } else {
-              throw new Error(
-                `Unable to find third sibling for property ${property}`
-              );
-            }
-          });
+      const filteredElements = propertyElements.filter(el => el !== null);
 
-          values[property] = [line1, line2];
-        } else {
-          throw new Error(`Null elements found for property ${property}`);
-        }
+      if (filteredElements.length === 0) {
+        throw new Error(`Property ${property} not found`);
       }
-      return values;
-    };
 
-    const propertyValues = await extractPropertyValues();
+      values[property] = await Promise.all(
+        filteredElements.map(async el => {
+          if (el) {
+            return el.evaluate(el => {
+              if (
+                el.nextElementSibling &&
+                el.nextElementSibling.nextElementSibling
+              ) {
+                return el.nextElementSibling.nextElementSibling.textContent;
+              } else {
+                throw new Error(
+                  `Unable to find third sibling for property ${property}`
+                );
+              }
+            });
+          } else {
+            throw new Error(`Element is null for property ${property}`);
+          }
+        })
+      ).then(results => results.filter(result => result !== null) as string[]);
+    }
 
-    for (let property in propertyValues) {
-      if (propertyValues[property][0] === propertyValues[property][1]) {
+    for (let property in values) {
+      if (values[property][0] === values[property][1]) {
         throw new Error(`No changes are reflected in ${property}`);
       }
       showMessage(`Changes are reflected in ${property}.`);
