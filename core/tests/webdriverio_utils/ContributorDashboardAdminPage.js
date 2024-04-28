@@ -243,7 +243,9 @@ var ContributorDashboardAdminPage = function () {
     var prevMonthButton = $('.mat-calendar-previous-button');
     var calenderBody = $('.mat-calendar-content')
       .$('.mat-calendar-table')
-      .$('.mat-calendar-body');
+      .$('.mat-calendar-body')
+      .$('tr')
+      .$('td');
 
     var months = [
       'JAN',
@@ -260,7 +262,7 @@ var ContributorDashboardAdminPage = function () {
       'DEC',
     ];
 
-    var monthText = await calenderBody.getAttribute('ng-reflect-label');
+    var monthText = await calenderBody.getText();
     var monthIndex;
     for (let i = 0; i < 12; i++) {
       if (months[i] === monthText) {
@@ -276,7 +278,7 @@ var ContributorDashboardAdminPage = function () {
         } else {
           monthIndex++;
         }
-        monthText = await calenderBody.getAttribute('ng-reflect-label');
+        monthText = await calenderBody.getText();
         expect(months[monthIndex]).toBe(monthText);
       }
     } else if (numberOfMonths < 0) {
@@ -287,7 +289,7 @@ var ContributorDashboardAdminPage = function () {
         } else {
           monthIndex--;
         }
-        monthText = await calenderBody.getAttribute('ng-reflect-label');
+        monthText = await calenderBody.getText();
         expect(months[monthIndex]).toBe(monthText);
       }
     }

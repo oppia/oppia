@@ -53,8 +53,18 @@ export interface TopicChoice {
   id: string;
   topic: string;
 }
+interface DateInputFormat {
+  month: 'short';
+  year: 'numeric';
+  day: 'numeric';
+}
+const dateInputValue: DateInputFormat = {
+  month: 'short',
+  year: 'numeric',
+  day: 'numeric',
+};
 export const PICK_FORMATS = {
-  parse: {dateInput: {month: 'short', year: 'numeric', day: 'numeric'}},
+  parse: {dateInput: dateInputValue},
   display: {
     dateInput: 'input',
     monthYearLabel: {year: 'numeric', month: 'short'},

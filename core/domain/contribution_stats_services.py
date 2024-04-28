@@ -254,9 +254,9 @@ def get_translation_submitter_total_stats(
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
         max_days_since_start_date_for_last_activity: int. Number of days before
-            today to start including users with contributions.
+            today to start including users' contributions.
         max_days_since_end_date_for_last_activity: int. Number of days before
-            today from which to stop including users with contributions.
+            today from which to stop including users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -320,9 +320,9 @@ def get_translation_reviewer_total_stats(
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
         max_days_since_start_date_for_last_activity: int. Number of days before
-            today to start including users with contributions.
+            today to start including users' contributions.
         max_days_since_end_date_for_last_activity: int. Number of days before
-            today from which to stop including users with contributions.
+            today from which to stop including users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -386,9 +386,9 @@ def get_question_submitter_total_stats(
         topic_ids: List[str]|None. List of topic ID(s) to fetch
             contributor stats for.
         max_days_since_start_date_for_last_activity: int. Number of days before
-            today to start including users with contributions.
+            today to start including users' contributions.
         max_days_since_end_date_for_last_activity: int. Number of days before
-            today from which to stop including users with contributions.
+            today from which to stop including users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
@@ -449,9 +449,9 @@ def get_question_reviewer_total_stats(
         sort_by: SortChoices|None. A string indicating how to sort the
             result.
         max_days_since_start_date_for_last_activity: int. Number of days before
-            today to start including users with contributions.
+            today to start including users' contributions.
         max_days_since_end_date_for_last_activity: int. Number of days before
-            today from which to stop including users with contributions.
+            today from which to stop including users' contributions.
 
     Returns:
         3-tuple(sorted_results, next_offset, more). where:
