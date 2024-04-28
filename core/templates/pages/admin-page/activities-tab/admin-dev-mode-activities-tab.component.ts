@@ -23,6 +23,7 @@ import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {AdminDataService} from 'pages/admin-page/services/admin-data.service';
 import {AdminTaskManagerService} from 'pages/admin-page/services/admin-task-manager.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 
 @Component({
   selector: 'oppia-admin-dev-mode-activities-tab',
@@ -34,6 +35,9 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
   demoExplorationIds: string[] = [];
   numDummyExpsToPublish: number = 0;
   numDummyExpsToGenerate: number = 0;
+  numDummySuggestionQuesToGenerate: number = 0;
+  skillList: SkillSummary[] = [];
+  selectedOption: string = '';
   DEMO_COLLECTIONS: string[][] = [[]];
   DEMO_EXPLORATIONS: string[][] = [[]];
   DUMMY_BLOG_POST_TITLES = [
@@ -153,6 +157,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
       )
       .then(
         () => {
+          this.getDataAsync();
           this.setStatusMessage.emit(
             'Dummy explorations generated successfully.'
           );
@@ -170,6 +175,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminBackendApiService.generateDummyNewStructuresDataAsync().then(
       () => {
+        this.getDataAsync();
         this.setStatusMessage.emit(
           'Dummy new structures data generated successfully.'
         );
@@ -187,6 +193,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminBackendApiService.generateDummyNewSkillDataAsync().then(
       () => {
+        this.getDataAsync();
         this.setStatusMessage.emit(
           'Dummy new skill and questions generated successfully.'
         );
@@ -195,6 +202,30 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
         this.setStatusMessage.emit('Server error: ' + errorResponse);
       }
     );
+    this.adminTaskManagerService.finishTask();
+  }
+
+  generateDummySuggestionQuestions(selectedOption: string): void {
+    // Generate dummy suggestion question for the selected skill.
+    const selectedIndex = Number(selectedOption);
+    let selectedSkill = this.skillList[selectedIndex];
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+    this.adminBackendApiService
+      .generateDummySuggestionQuestionsAsync(
+        selectedSkill.id,
+        this.numDummySuggestionQuesToGenerate
+      )
+      .then(
+        () => {
+          this.setStatusMessage.emit(
+            'Dummy suggestion questions generated successfully.'
+          );
+        },
+        errorResponse => {
+          this.setStatusMessage.emit('Server error: ' + errorResponse);
+        }
+      );
     this.adminTaskManagerService.finishTask();
   }
 
@@ -221,6 +252,7 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
     this.adminBackendApiService.generateDummyClassroomDataAsync().then(
       () => {
+        this.getDataAsync();
         this.setStatusMessage.emit(
           'Dummy new classroom generated successfully.'
         );
@@ -261,11 +293,11 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
 
   async getDataAsync(): Promise<void> {
     const adminDataObject = await this.adminDataService.getDataAsync();
-
     this.DEMO_EXPLORATIONS = adminDataObject.demoExplorations;
     this.DEMO_COLLECTIONS = adminDataObject.demoCollections;
     this.demoExplorationIds = adminDataObject.demoExplorationIds;
     this.reloadingAllExplorationPossible = true;
+    this.skillList = adminDataObject.skillList;
   }
 
   ngOnInit(): void {

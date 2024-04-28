@@ -103,6 +103,7 @@ describe('Admin config tab component ', () => {
     },
     topicSummaries: [],
     platformParameters: [],
+    skillList: [],
   };
 
   beforeEach(() => {

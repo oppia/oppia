@@ -4320,15 +4320,13 @@ class State(translation_domain.BaseTranslatableObject):
         Returns:
             State. The corresponding State domain object.
         """
-        content_html = (
-            feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
+        content_html = feconf.DEFAULT_STATE_CONTENT_STR
 
         recorded_voiceovers = RecordedVoiceovers({})
         recorded_voiceovers.add_content_id_for_voiceover(
             content_id_for_state_content)
         recorded_voiceovers.add_content_id_for_voiceover(
             content_id_for_default_outcome)
-
         return cls(
             SubtitledHtml(content_id_for_state_content, content_html),
             [],

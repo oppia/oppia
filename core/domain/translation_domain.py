@@ -1039,10 +1039,10 @@ class ContentIdGenerator:
         extra_prefix: Optional[str] = None
     ) -> str:
         """Generates the new content-id from the next content id."""
+
         content_id = content_type.value + '_'
         if extra_prefix:
             content_id += extra_prefix + '_'
         content_id += str(self.next_content_id_index)
-
         self.next_content_id_index += 1
         return content_id

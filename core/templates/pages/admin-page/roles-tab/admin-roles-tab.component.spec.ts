@@ -94,6 +94,7 @@ describe('Admin roles tab component ', function () {
     },
     topicSummaries: [sampleTopicSummary],
     platformParameters: [],
+    skillList: [],
   };
 
   beforeEach(() => {
