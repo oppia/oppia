@@ -19,7 +19,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {CollectionRightsBackendApiService} from 'domain/collection/collection-rights-backend-api.service';
 import {CollectionRights} from 'domain/collection/collection-rights.model';
 import {Collection} from 'domain/collection/collection.model';
@@ -225,10 +224,3 @@ export class CollectionEditorStateService {
     return this._collectionInitializedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'CollectionEditorStateService',
-    downgradeInjectable(CollectionEditorStateService)
-  );

@@ -445,3 +445,23 @@ class BlogAuthorProfilePageAccessValidationHandler(
             raise self.NotFoundException(
                 'User with given username is not a blog post author.'
             )
+
+
+class CollectionEditorAccessValidationPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to collection editor page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass

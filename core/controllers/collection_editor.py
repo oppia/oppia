@@ -48,26 +48,6 @@ def _require_valid_version(
             % (collection_version, version_from_payload))
 
 
-class CollectionEditorPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """The editor page for a single collection."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'collection_id': {
-            'schema': {
-                'type': 'basestring'
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_edit_collection
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
-        self.render_template('collection-editor-page.mainpage.html')
-
-
 class EditableCollectionDataHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of EditableCollectionDataHandler's normalized_payload
     dictionary.
