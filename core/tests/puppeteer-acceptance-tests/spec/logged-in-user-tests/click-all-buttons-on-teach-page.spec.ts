@@ -33,60 +33,49 @@ describe('Logged-in Users', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
+  beforeEach(async function () {
+    await testUser.navigateToTeachPage();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
   it(
-    'should be able to navigate to the Teach page using the footer',
+    'should be able to use the "Browse our Lessons" button',
     async function () {
-      await testUser.navigateToAboutFoundationPage();
-      await testUser.navigateToTeachPageViaFooter();
+      await testUser.clickBrowseOurLessonsOnTeachPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  describe('on the Teach page', function () {
-    beforeEach(async function () {
-      await testUser.navigateToTeachPage();
-    }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  it(
+    'should be able to use the "Access the Android app" button',
+    async function () {
+      await testUser.clickAccessTheAndroidAppOnTeachPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Browse our Lessons" button',
-      async function () {
-        await testUser.clickBrowseOurLessonsOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "VISIT CLASSROOM" button',
+    async function () {
+      await testUser.clickVisitClassroomOnTeachPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "Access the Android app" button',
-      async function () {
-        await testUser.clickAccessTheAndroidAppOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
+  it(
+    'should be able to use the "BROWSE LIBRARY" button',
+    async function () {
+      await testUser.clickBrowseLibraryOnTeachPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it(
-      'should be able to use the "VISIT CLASSROOM" button',
-      async function () {
-        await testUser.clickVisitClassroomOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    it(
-      'should be able to use the "BROWSE LIBRARY" button',
-      async function () {
-        await testUser.clickBrowseLibraryOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-
-    it(
-      'should be able to use the "EXPLORE LESSONS" button',
-      async function () {
-        await testUser.clickExploreLessonsOnTeachPage();
-      },
-      DEFAULT_SPEC_TIMEOUT_MSECS
-    );
-  });
+  it(
+    'should be able to use the "EXPLORE LESSONS" button',
+    async function () {
+      await testUser.clickExploreLessonsOnTeachPage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
