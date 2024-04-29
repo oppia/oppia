@@ -33,12 +33,29 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?',
 ];
 
+interface ClickDetails {
+  position: {x: number; y: number};
+  timeInMilliseconds: number;
+}
+
+declare global {
+  interface Window {
+    logClick: (clickDetails: ClickDetails) => void;
+  }
+}
+
+export type ModalUserInteractions = (
+  _this: BaseUser,
+  container: string
+) => Promise<void>;
+
 export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
   email: string = '';
   username: string = '';
+  startTimeInMilliseconds: number = -1;
 
   constructor() {}
 
@@ -71,9 +88,10 @@ export class BaseUser {
         args,
       })
       .then(async browser => {
-        ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
         this.page = await browser.newPage();
+        ConsoleReporter.trackConsoleMessagesInBrowser(browser);
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
@@ -90,8 +108,6 @@ export class BaseUser {
               'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
               'Mobile/15A372 Safari/604.1'
           );
-        } else {
-          await this.page.setViewport({width: 1920, height: 1080});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
@@ -101,9 +117,74 @@ export class BaseUser {
             throw new Error(`Unexpected alert: ${alertText}`);
           }
         });
+        this.setupDebugTools();
       });
 
     return this.page;
+  }
+
+  /**
+   * Function to setup debug methods for the current page of any acceptance
+   * test.
+   */
+  private async setupDebugTools(): Promise<void> {
+    await this.setupClickLogger();
+  }
+
+  /**
+   * This function sets up a click logger that logs click events to the
+   * terminal.
+   *
+   * Any time this.page object is replaced, this function must be called
+   * again before it start logging clicks again.
+   */
+  private async setupClickLogger(): Promise<void> {
+    await this.page.exposeFunction(
+      'logClick',
+      ({position: {x, y}, timeInMilliseconds}: ClickDetails) => {
+        // eslint-disable-next-line no-console
+        console.log(
+          `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
+            'of the viewport'
+        );
+        // eslint-disable-next-line no-console
+        console.log(
+          '- Click occurred ' +
+            `${timeInMilliseconds - this.startTimeInMilliseconds} ms ` +
+            'into the test'
+        );
+      }
+    );
+  }
+
+  /**
+   * This function logs click events from all enabled elements selected by
+   * a given selector.
+   *
+   * The selector must be present in the document when called.
+   *
+   * this.setupClickLogger() must be called once before it can log click
+   * events from the elements.
+   */
+  async logClickEventsFrom(selector: string): Promise<void> {
+    await this.page.$$eval(
+      selector,
+      (elements: Element[], ...args: unknown[]) => {
+        const selector = args[0] as string;
+        for (const element of elements) {
+          element.addEventListener('click', (event: Event) => {
+            const mouseEvent = event as MouseEvent;
+            // eslint-disable-next-line no-console
+            console.log(`DEBUG: User clicked on ${selector}:`);
+            window.logClick({
+              position: {x: mouseEvent.clientX, y: mouseEvent.clientY},
+              timeInMilliseconds: Date.now(),
+            });
+          });
+        }
+      },
+      selector
+    );
   }
 
   /**
@@ -143,6 +224,44 @@ export class BaseUser {
    */
   async reloadPage(): Promise<void> {
     await this.page.reload({waitUntil: ['networkidle0', 'domcontentloaded']});
+  }
+
+  /**
+   * The function switches the current page to the tab that was just opened by
+   * interacting with an element on the current page.
+   */
+  async switchToPageOpenedByElementInteraction(): Promise<void> {
+    const newPage: Page =
+      (await (
+        await this.browserObject.waitForTarget(
+          target => target.opener() === this.page.target()
+        )
+      ).page()) ?? (await this.browserObject.newPage());
+    this.page = newPage;
+    this.setupDebugTools();
+  }
+
+  /**
+   * The function coordinates user interactions with the selected modal.
+   */
+  async doWithinModal({
+    selector,
+    beforeOpened = async (_this, container) => {
+      await _this.page.waitForSelector(container, {visible: true});
+    },
+    whenOpened,
+    afterClosing = async (_this, container) => {
+      await _this.page.waitForSelector(container, {hidden: true});
+    },
+  }: {
+    selector: string;
+    beforeOpened?: ModalUserInteractions;
+    whenOpened: ModalUserInteractions;
+    afterClosing?: ModalUserInteractions;
+  }): Promise<void> {
+    await beforeOpened(this, selector);
+    await whenOpened(this, selector);
+    await afterClosing(this, selector);
   }
 
   /**
