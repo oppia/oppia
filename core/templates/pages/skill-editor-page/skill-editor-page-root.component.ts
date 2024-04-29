@@ -16,9 +16,9 @@
  * @fileoverview Skill Editor page root component.
  */
 
-import { Component } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { BaseRootComponent, MetaTagData } from 'pages/base-root.component';
+import {Component} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {BaseRootComponent, MetaTagData} from 'pages/base-root.component';
 
 @Component({
   selector: 'skill-editor-page-root',
@@ -28,7 +28,6 @@ export class SkillEditorPageRootComponent extends BaseRootComponent {
   title: string =
     AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.TITLE;
 
-  meta: MetaTagData[] =
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.META as
-    unknown as Readonly<MetaTagData>[];
+  meta: MetaTagData[] = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR
+    .META as unknown as Readonly<MetaTagData>[];
 }

@@ -55,8 +55,8 @@ import {SkillEditorPageRootComponent} from './skill-editor-page-root.component';
       {
         path: '',
         component: SkillEditorPageRootComponent,
-        canActivate: [SkillEditorAccessGuard]
-      }
+        canActivate: [SkillEditorAccessGuard],
+      },
     ]),
   ],
   declarations: [
@@ -100,7 +100,7 @@ import {SkillEditorPageRootComponent} from './skill-editor-page-root.component';
     SkillQuestionsTabComponent,
     SkillPreviewTabComponent,
     SkillEditorMainTabComponent,
-    SkillEditorPageComponent
-  ]
+    SkillEditorPageComponent,
+  ],
 })
 export class SkillEditorPageModule {}
