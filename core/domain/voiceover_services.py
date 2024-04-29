@@ -112,7 +112,7 @@ def get_voiceovers_for_given_language_accent_code(
 def get_entity_voiceovers_for_given_exploration(
     entity_id: str, entity_type: str, entity_version: int
 ) -> List[voiceover_domain.EntityVoiceovers]:
-    """Retrieve voiceover models for the specified exploration and version.
+    """Retrieve voiceover models for the specified exploration version.
 
     Args:
         entity_id: str. The entity ID for which entity voiceovers need to be
