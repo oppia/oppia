@@ -123,8 +123,8 @@ def get_entity_voiceovers_for_given_exploration(
             which entity voiceovers need to be fetched.
 
     Returns:
-        list(EntityVoiceovers). Returns a list of voiceover models for the
-        specified exploration and version.
+        list(EntityVoiceovers). Returns a list of entity voiceover models for
+        the specified exploration and version.
     """
     entity_voiceovers_objects: List[voiceover_domain.EntityVoiceovers] = []
     entity_voiceover_models = (
@@ -139,8 +139,25 @@ def get_entity_voiceovers_for_given_exploration(
 
 
 def get_entity_voiceovers_for_given_language_code_of_exploration(
-    entity_id, entity_type, entity_version, language_code
-):
+    entity_id: str, entity_type: str, entity_version: int, language_code: str
+) -> List[voiceover_domain.EntityVoiceovers]:
+    """Retrieve entity voiceover models for the specified exploration and
+    version for a given language code.
+
+    Args:
+        entity_id: str. The entity ID for which entity voiceovers need to be
+            fetched.
+        entity_type: str. The entity type for which entity voiceovers need to be
+            fetched.
+        entity_version: int. The entity version of the given exploration for
+            which entity voiceovers need to be fetched.
+        language_code: str. The language code in which entity voiceovers need
+            to be fetched for exploration.
+
+    Returns:
+        list(EntityVoiceovers). Returns a list of entity voiceover models for
+        the specified exploration and version.
+    """
     entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(
         entity_id, entity_type, entity_version)
 
@@ -155,7 +172,6 @@ def get_entity_voiceovers_for_given_language_code_of_exploration(
                 supported_language_accent_codes
         ):
             continue
-        # Checks if voiceovers are present or not.
         if not bool(entity_voiceovers.voiceovers):
             continue
 

@@ -223,7 +223,9 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
 class EntityVoiceoversHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler class to get entity voiceover data."""
+    """Handler class to get entity voiceover data for a given language accent
+    code for a specific content.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
@@ -269,21 +271,22 @@ class EntityVoiceoversHandler(
                 entity_type, entity_id, entity_version, language_accent_code
             )
         )
-        entity_voiceovers_dict = entity_voiceovers.to_dict()
-        voiceover_type_to_voiceovers = entity_voiceovers_dict['voiceovers'].get(
+        voiceover_type_to_voiceovers = entity_voiceovers.voiceovers.get(
             content_id, {})
+
         self.values.update({
             'voiceover_type_to_voiceovers': voiceover_type_to_voiceovers
         })
         self.render_json(self.values)
 
 
-
 class EntityVoiceoversBulkHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """"""
-    print('Hello')
+    """Handler class to get entity voiceover data for a given language code
+    of an exploration.
+    """
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'entity_type': {
@@ -317,14 +320,11 @@ class EntityVoiceoversBulkHandler(
         entity_version: int,
         language_code: str,
     ):
-        print('Ok')
-        # entity_voiceovers_list = (
-        #     voiceover_services.
-        #     get_entity_voiceovers_for_given_language_code_of_exploration(
-        #         entity_id, entity_type, entity_version, language_code)
-        # )
-        entity_voiceovers_list = []
-        print(entity_voiceovers_list)
+        entity_voiceovers_list = (
+            voiceover_services.
+            get_entity_voiceovers_for_given_language_code_of_exploration(
+                entity_id, entity_type, entity_version, language_code)
+        )
 
         self.values.update({
             'entity_voiceovers_list': entity_voiceovers_list
