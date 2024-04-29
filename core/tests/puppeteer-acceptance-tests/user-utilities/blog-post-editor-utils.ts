@@ -96,8 +96,12 @@ export class BlogPostEditor extends BaseUser {
           element => (element as HTMLElement).click()
         );
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
-        await this.page.waitForSelector('div.modal-dialog');
-        await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
+        await this.doWithinModal({
+          selector: 'div.modal-dialog',
+          whenOpened: async (_this: BaseUser, container: string) => {
+            _this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
+          },
+        });
         showMessage('Draft blog post with given title deleted successfully!');
         return;
       }
