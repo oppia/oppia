@@ -196,16 +196,8 @@ describe('LessonCardComponent', () => {
 
     expect(component.desc).toEqual(sampleTopic.title);
     expect(component.imgColor).toEqual(sampleTopic.thumbnail_bg_color);
-
     expect(component.title).toEqual('Chapter 1: Title 1');
-
-    expect(component.progress).toEqual(
-      Math.floor(
-        (sampleTopic.completed_node_titles.length /
-          sampleTopic.node_titles.length) *
-          100
-      )
-    );
+    expect(component.progress).toEqual(100);
     expect(component.lessonTopic).toEqual(sampleTopic.topic_name);
   });
 
@@ -215,23 +207,8 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    const nextStory =
-      incompleteTopic.completed_node_titles.length -
-      (incompleteTopic.completed_node_titles.length ===
-      incompleteTopic.node_titles.length
-        ? 1
-        : 0);
-
-    expect(component.title).toEqual(
-      `Chapter ${nextStory + 1}: ${incompleteTopic.node_titles[nextStory]}`
-    );
-    expect(component.progress).toEqual(
-      Math.floor(
-        (incompleteTopic.completed_node_titles.length /
-          incompleteTopic.node_titles.length) *
-          100
-      )
-    );
+    expect(component.title).toEqual('Chapter 2: Title 2');
+    expect(component.progress).toEqual(50);
     expect(component.lessonTopic).toEqual(incompleteTopic.topic_name);
   });
 
