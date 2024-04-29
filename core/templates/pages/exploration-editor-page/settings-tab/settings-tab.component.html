@@ -206,7 +206,7 @@
 
   <mat-card class="oppia-settings-card-container oppia-advanced-features-card oppia-editor-card oppia-mobile-collapsible-card" *ngIf="editabilityService.isEditable()">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('advanced_features')">
-      <h3 tabindex="0">Advanced Features</h3>
+      <h3 class="e2e-test-advanced-settings-container" tabindex="0">Advanced Features</h3>
       <i class="fa fa-caret-down"
          *ngIf="!advancedFeaturesIsShown"
          aria-hidden="true">
@@ -255,7 +255,7 @@
                   <input type="checkbox" *ngIf="isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()" checked>
                   <input type="checkbox" class="sr-only" *ngIf="!isAutomaticTextToSpeechEnabled()" (click)="toggleAutomaticTextToSpeech()" aria-label="Automatic Text-to-speech" tabindex="0" (keydown.enter)="toggleAutomaticTextToSpeech()">
                   <input type="checkbox" *ngIf="!isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()">
-                  <label class="oppia-on-off-switch-label" for="text-speech-switch">
+                  <label class="oppia-on-off-switch-label e2e-test-on-off-switch" for="text-speech-switch">
                     <span class="oppia-on-off-switch-inner"></span>
                     <span class="oppia-on-off-switch-main"></span>
                   </label>
@@ -276,7 +276,7 @@
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('roles')">
-        <h3 tabindex="0">Roles</h3>
+        <h3 class="e2e-test-roles-settings-container" tabindex="0">Roles</h3>
         <i class="fa fa-caret-down"
            *ngIf="!rolesCardIsShown"
            aria-hidden="true">
@@ -376,7 +376,7 @@
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
-        <h3 tabindex="0">Voice Artists</h3>
+        <h3 class="e2e-test-voice-artists-settings-container" tabindex="0">Voice Artists</h3>
         <i class="fa fa-caret-down e2e-test-voice-artist-collapsible-card-header"
            *ngIf="!voiceArtistsCardIsShown"
            aria-hidden="true">
@@ -438,7 +438,7 @@
   <mat-card class="oppia-settings-card-container oppia-editor-card oppia-permissions-card oppia-mobile-collapsible-card">
     <div>
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('permissions')">
-        <h3 tabindex="0">Permissions</h3>
+        <h3 class="e2e-test-permission-settings-container" tabindex="0">Permissions</h3>
         <i class="fa fa-caret-down"
            *ngIf="!permissionsCardIsShown"
            aria-hidden="true">
@@ -496,7 +496,7 @@
 
   <mat-card class="oppia-settings-card-container oppia-editor-card oppia-feedback-card oppia-mobile-collapsible-card" *ngIf="editabilityService.isEditable()">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('feedback')">
-      <h3 tabindex="0">Feedback/Suggestion Email Preferences</h3>
+      <h3 class="e2e-test-feedback-settings-container" tabindex="0">Feedback/Suggestion Email Preferences</h3>
       <i class="fa fa-caret-down"
          *ngIf="!feedbackCardIsShown"
          aria-hidden="true">
@@ -564,7 +564,7 @@
 
   <mat-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card" *ngIf="canDelete || canReleaseOwnership">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('controls')">
-      <h3 tabindex="0">Controls</h3>
+      <h3 class="e2e-test-controls-bar-settings-container" tabindex="0">Controls</h3>
       <i class="fa fa-caret-down"
          *ngIf="!controlsCardIsShown"
          aria-hidden="true">

@@ -6608,6 +6608,24 @@ export default {
         }
       ]
     },
+    "COLLECTION_EDITOR": {
+      "ROUTE": "collection_editor/create/:collection_id",
+      "TITLE": "Collection Editor Page",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
     "COLLECTION_PLAYER": {
       "ROUTE": "collection/:collection_id",
       "TITLE": "",
@@ -6638,6 +6656,24 @@ export default {
     "DIAGNOSTIC_TEST_PLAYER": {
       "ROUTE": "diagnostic-test-player",
       "TITLE": "Diagnostic Test Player - Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          // eslint-disable-next-line max-len
+          "CONTENT": "With Oppia, you can access free lessons on math, physics, statistics, chemistry, music, history and more from anywhere in the world. Oppia is a nonprofit with the mission of providing high-quality education to those who lack access to it."
+        }
+      ]
+    },
+    "FACILITATOR_DASHBOARD": {
+      "ROUTE": "facilitator-dashboard",
+      "TITLE": "Facilitator Dashboard - Oppia",
       "META": [
         {
           "PROPERTY_TYPE": "itemprop",
