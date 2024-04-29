@@ -64,6 +64,10 @@ export class AccessValidationBackendApiService {
   COLLECTION_PLAYER_PAGE_ACCESS_VALIDATOR_URL_TEMPLATE =
     '/access_validation_handler/can_access_collection_player_page/<collection_id>'; // eslint-disable-line max-len
 
+  COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR =
+    '/access_validation_handler/' +
+    'can_access_collection_editor_page/<collection_id>';
+
   constructor(
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -175,6 +179,17 @@ export class AccessValidationBackendApiService {
       this.DOES_LEARNER_GROUP_EXIST,
       {
         learner_group_id: learnerGroupId,
+      }
+    );
+
+    return this.http.get<void>(url).toPromise();
+  }
+
+  validateAccessCollectionEditorPage(collectionId: string): Promise<void> {
+    let url = this.urlInterpolationService.interpolateUrl(
+      this.COLLECTION_EDITOR_PAGE_ACCESS_VALIDATOR,
+      {
+        collection_id: collectionId,
       }
     );
 
