@@ -33,6 +33,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/collection-editor-page/collection-editor-page.module').then(
+        m => m.CollectionEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () =>
       import('pages/moderator-page/moderator-page.module').then(
@@ -417,13 +425,13 @@ const routes: Route[] = [
       ),
   },
   {
-    path:
-    AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
-    loadChildren: () => import(
-      'pages/skill-editor-page/skill-editor-page.module')
-      .then(m => m.SkillEditorPageModule),
-    canActivate: [IsLoggedInGuard]
-  }
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/skill-editor-page/skill-editor-page.module').then(
+        m => m.SkillEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
 ];
 
 // Register stewards landing pages.

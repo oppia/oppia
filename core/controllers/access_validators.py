@@ -196,8 +196,8 @@ class DiagnosticTestPlayerAccessValidationHandler(
     def get(self) -> None:
         """Handles GET requests."""
         if not feature_flag_services.is_feature_flag_enabled(
-            self.user_id,
-            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value
+            feature_flag_list.FeatureNames.DIAGNOSTIC_TEST.value,
+            user_id=self.user_id
         ):
             raise self.NotFoundException
 
@@ -450,6 +450,7 @@ class BlogAuthorProfilePageAccessValidationHandler(
             )
 
 
+
 class SkillEditorPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -487,3 +488,23 @@ class SkillEditorPageAccessValidationHandler(
         if skill is None:
             raise self.NotFoundException(
                 'The skill with the given id doesn\'t exist.')
+
+
+class CollectionEditorAccessValidationPage(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Validates access to collection editor page."""
+
+    URL_PATH_ARGS_SCHEMAS = {
+        'collection_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_edit_collection
+    def get(self, _: str) -> None:
+        """Handles GET requests."""
+        pass
