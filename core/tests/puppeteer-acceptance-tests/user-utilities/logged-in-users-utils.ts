@@ -181,7 +181,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function to navigate to the Creator Guidelines page.
    */
-  async navigateToCreatorGuidelinesPage(): Promise<void> {
+  async clickOnCreatorGuidelinesLinkinFooter(): Promise<void> {
     await this.goto(creatorGuidelinesUrl);
   }
 
@@ -793,7 +793,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the About page using the oppia website footer.
    */
-  async navigateToAboutPageViaFooter(): Promise<void> {
+  async clickOnAboutLinkInFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerAboutLink,
       'About Oppia link in the About Oppia section in the footer',
@@ -804,7 +804,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the About Foundation page using the oppia website footer.
    */
-  async navigateToAboutFoundationPageViaFooter(): Promise<void> {
+  async clickOnTheOppiaFoundationLinkInFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerAboutFoundationLink,
       'About Foundation link in the About Oppia section in the footer',
@@ -815,7 +815,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Blog page using the oppia website footer.
    */
-  async navigateToBlogPageViaFooter(): Promise<void> {
+  async clickOnBlogLinkInFooter(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       footerBlogLink,
       'Blog link in the About Oppia section in the footer',
@@ -827,7 +827,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Forum page using the oppia website footer.
    */
-  async navigateToForumPageViaFooter(): Promise<void> {
+  async clickOnForumLinkInFooter(): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation(),
       await this.clickOn(footerForumlink),
@@ -839,7 +839,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the GetStarted page using the oppia website footer.
    */
-  async navigateToGetStartedPageViaFooter(): Promise<void> {
+  async clickOnGetStartedLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerGetStartedLink);
     await this.clickButtonToNavigateToNewPage(
       footerGetStartedLink,
@@ -865,7 +865,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Teach page using the oppia website footer.
    */
-  async navigateToTeachPageViaFooter(): Promise<void> {
+  async clickOnForParentsSlashTeachersLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerTeachLink,
@@ -904,7 +904,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Community Library page using the oppia website footer.
    */
-  async navigateToCommunityLibraryPageViaFooter(): Promise<void> {
+  async clickOnBrowseTheLibraryLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerCommunityLibraryLink,
@@ -917,7 +917,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Contact page using the oppia website footer.
    */
-  async navigateToContactPageViaFooter(): Promise<void> {
+  async clickOnContactUsLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerContactUsLink,
@@ -930,7 +930,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Terms page using the oppia website footer.
    */
-  async navigateToDonatePageViaFooter(): Promise<void> {
+  async clickOnDonateLinkInFooter(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"Donate")])');
     const [link] = await this.page.$x('(//a[contains(text(),"Donate")])');
     await Promise.all([this.page.waitForNavigation(), await link.click()]);
@@ -941,7 +941,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Navigates to the Terms page using the oppia website footer.
    */
-  async navigateToVolunteerPageViaFooter(): Promise<void> {
+  async clickOnVolunteerLinkInFooter(): Promise<void> {
     await this.page.waitForXPath('(//a[contains(text(),"volunteer")])');
     const [link] = await this.page.$x('(//a[contains(text(),"volunteer")])');
     await Promise.all([this.page.waitForNavigation(), await link.click()]);

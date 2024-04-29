@@ -41,7 +41,7 @@ describe('Logged-in User', function () {
   it(
     'should open About page via the footer',
     async function () {
-      await testUser.navigateToAboutPageViaFooter();
+      await testUser.clickOnAboutLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -49,7 +49,7 @@ describe('Logged-in User', function () {
   it(
     'should open "About Foundation" page via the footer',
     async function () {
-      await testUser.navigateToAboutFoundationPageViaFooter();
+      await testUser.clickOnTheOppiaFoundationLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -57,7 +57,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Blog" page via the footer',
     async function () {
-      await testUser.navigateToBlogPageViaFooter();
+      await testUser.clickOnBlogLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -65,7 +65,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Forum" page via the footer',
     async function () {
-      await testUser.navigateToForumPageViaFooter();
+      await testUser.clickOnForumLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -41,7 +41,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Get Started" page via the footer',
     async function () {
-      await testUser.navigateToGetStartedPageViaFooter();
+      await testUser.clickOnGetStartedLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -49,7 +49,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Creator Guidelines" page via the footer',
     async function () {
-      await testUser.navigateToCreatorGuidelinesPage();
+      await testUser.clickOnCreatorGuidelinesLinkinFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -57,7 +57,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Teach" page via the footer',
     async function () {
-      await testUser.navigateToTeachPageViaFooter();
+      await testUser.clickOnForParentsSlashTeachersLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -65,7 +65,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Community Library" page via the footer',
     async function () {
-      await testUser.navigateToCommunityLibraryPageViaFooter();
+      await testUser.clickOnBrowseTheLibraryLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -73,7 +73,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Contact" page via the footer',
     async function () {
-      await testUser.navigateToContactPageViaFooter();
+      await testUser.clickOnContactUsLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

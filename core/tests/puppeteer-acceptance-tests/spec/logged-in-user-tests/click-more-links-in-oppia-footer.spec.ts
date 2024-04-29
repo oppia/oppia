@@ -41,7 +41,7 @@ describe('Logged-in User', function () {
   it(
     'should open the "Volunteer" page via the footer',
     async function () {
-      await testUser.navigateToVolunteerPageViaFooter();
+      await testUser.clickOnVolunteerLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -49,15 +49,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Donate" page via the footer',
     async function () {
-      await testUser.navigateToDonatePageViaFooter();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it(
-    'should open "Contact" page via the footer',
-    async function () {
-      await testUser.navigateToContactPageViaFooter();
+      await testUser.clickOnDonateLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -65,7 +57,7 @@ describe('Logged-in User', function () {
   it(
     'should open "Community Library" page via the footer',
     async function () {
-      await testUser.navigateToCommunityLibraryPageViaFooter();
+      await testUser.clickOnBrowseTheLibraryLinkInFooter();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
