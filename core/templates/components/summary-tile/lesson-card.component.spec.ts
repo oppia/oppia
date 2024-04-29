@@ -80,7 +80,7 @@ describe('LessonCardComponent', () => {
   const sampleNode = {
     id: 'node_1',
     thumbnail_filename: 'image.png',
-    title: 'Chapter 1',
+    title: 'Title 1',
     description: 'Description 1',
     prerequisite_skill_ids: ['skill_1'],
     acquired_skill_ids: ['skill_2'],
@@ -100,11 +100,11 @@ describe('LessonCardComponent', () => {
     id: '0',
     title: 'Story Title',
     description: 'Story Description',
-    node_titles: ['Chapter 1'],
+    node_titles: ['Title 1'],
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#F8BF74',
     story_is_published: true,
-    completed_node_titles: ['Chapter 1'],
+    completed_node_titles: ['Title 1'],
     url_fragment: 'story-title',
     all_node_dicts: [sampleNode],
     topic_name: 'Topic',
@@ -116,11 +116,11 @@ describe('LessonCardComponent', () => {
     id: '0',
     title: 'Story Title',
     description: 'Story Description',
-    node_titles: ['Chapter 1', 'Chapter 2'],
+    node_titles: ['Title 1', 'Title 2'],
     thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#F8BF74',
     story_is_published: true,
-    completed_node_titles: ['Chapter 1'],
+    completed_node_titles: ['Title 1'],
     url_fragment: 'story-title',
     all_node_dicts: [sampleNode, sampleNode],
     topic_name: 'Topic',
@@ -132,7 +132,7 @@ describe('LessonCardComponent', () => {
     id: '0',
     title: 'Story Title',
     description: 'Story Description',
-    node_titles: ['Chapter 1', 'Chapter 2'],
+    node_titles: ['Title 1', 'Title 2'],
     thumbnail_filename: null,
     thumbnail_bg_color: '#F8BF74',
     story_is_published: true,
@@ -197,7 +197,7 @@ describe('LessonCardComponent', () => {
     expect(component.desc).toEqual(sampleTopic.title);
     expect(component.imgColor).toEqual(sampleTopic.thumbnail_bg_color);
 
-    expect(component.title).toEqual('Chapter 1: Chapter 1');
+    expect(component.title).toEqual('Chapter 1: Title 1');
 
     expect(component.progress).toEqual(
       Math.floor(
