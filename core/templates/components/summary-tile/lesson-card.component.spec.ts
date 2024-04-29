@@ -197,16 +197,8 @@ describe('LessonCardComponent', () => {
     expect(component.desc).toEqual(sampleTopic.title);
     expect(component.imgColor).toEqual(sampleTopic.thumbnail_bg_color);
 
-    const nextStory =
-      sampleTopic.completed_node_titles.length -
-      (sampleTopic.completed_node_titles.length ===
-      sampleTopic.node_titles.length
-        ? 1
-        : 0);
+    expect(component.title).toEqual('Chapter 1: Chapter 1');
 
-    expect(component.title).toEqual(
-      `Chapter ${nextStory + 1}: ${sampleTopic.node_titles[nextStory]}`
-    );
     expect(component.progress).toEqual(
       Math.floor(
         (sampleTopic.completed_node_titles.length /
