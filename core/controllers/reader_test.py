@@ -260,6 +260,13 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': 'exp_1'
             })
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
@@ -282,7 +289,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'old_value': None,
+            'old_value': 'exp_1',
             'new_value': exp_id,
             'node_id': 'node_1'
         })]
@@ -343,6 +350,13 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': 'exp_1'
             })
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
@@ -362,7 +376,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'old_value': None,
+            'old_value': 'exp_1',
             'new_value': exp_id,
             'node_id': 'node_1'
         })]
@@ -1373,21 +1387,17 @@ class LearnerProgressTest(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
                 'node_id': 'node_1',
                 'title': 'Title 1'
+            }), story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'old_value': None,
+                'new_value': self.EXP_ID_2_0,
+                'node_id': 'node_1'
             })
         ]
         story_services.update_story(
             self.owner_id, self.STORY_ID, changelist, 'Added node.')
-
-        change_list = [story_domain.StoryChange({
-            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': (
-                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'old_value': None,
-            'new_value': self.EXP_ID_2_0,
-            'node_id': 'node_1'
-        })]
-        story_services.update_story(
-            self.owner_id, self.STORY_ID, change_list, 'Updated Node 1.')
 
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)

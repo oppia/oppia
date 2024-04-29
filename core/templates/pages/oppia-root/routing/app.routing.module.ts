@@ -47,6 +47,13 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/creator-dashboard-page/creator-dashboard-page.module').then(
         m => m.CreatorDashboardPageModule
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/collection-editor-page/collection-editor-page.module').then(
+        m => m.CollectionEditorPageModule
       ),
     canActivate: [IsLoggedInGuard],
   },
