@@ -19,12 +19,9 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
 import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {LessonCardComponent} from './lesson-card.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
-import {AppConstants} from 'app.constants';
 
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -33,9 +30,6 @@ import {StorySummary} from 'domain/story/story-summary.model';
 describe('LessonCardComponent', () => {
   let component: LessonCardComponent;
   let fixture: ComponentFixture<LessonCardComponent>;
-
-  let urlInterpolationService: UrlInterpolationService;
-  let assetsBackendApiService: AssetsBackendApiService;
 
   const sampleCollection = {
     last_updated_msec: 1591296737470.528,
@@ -148,7 +142,6 @@ describe('LessonCardComponent', () => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
       declarations: [LessonCardComponent, MockTranslatePipe],
-      providers: [UrlInterpolationService, AssetsBackendApiService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -156,9 +149,6 @@ describe('LessonCardComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LessonCardComponent);
     component = fixture.componentInstance;
-
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
   });
 
   it('should set story to CollectionSummary and its non-url values to the respective fields', () => {
@@ -217,11 +207,7 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.imgUrl).toBe(
-      urlInterpolationService.getStaticImageUrl(
-        sampleCollection.thumbnail_icon_url
-      )
-    );
+    expect(component.imgUrl).toBe('/assets/images/subjects/Algebra.svg');
   });
 
   it('should set story to StorySummary and set its lessonUrl correctly', () => {
@@ -242,11 +228,7 @@ describe('LessonCardComponent', () => {
     fixture.detectChanges();
 
     expect(component.imgUrl).toBe(
-      assetsBackendApiService.getThumbnailUrlForPreview(
-        AppConstants.ENTITY_TYPE.STORY,
-        sampleTopic.id,
-        sampleTopic.thumbnail_filename
-      )
+      '/assetsdevhandler/story/0/assets/thumbnail/image.svg'
     );
   });
 
@@ -256,9 +238,7 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.imgUrl).toBe(
-      urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
-    );
+    expect(component.imgUrl).toBe('/assets/images/subjects/Lightbulb.svg');
   });
 
   it('should set imgUrl to default if encountering an error', () => {
@@ -273,9 +253,7 @@ describe('LessonCardComponent', () => {
     fixture.detectChanges();
 
     expect(spyError).toHaveBeenCalled();
-    expect(component.imgUrl).toBe(
-      urlInterpolationService.getStaticImageUrl('/subjects/Lightbulb.svg')
-    );
+    expect(component.imgUrl).toBe('/assets/images/subjects/Lightbulb.svg');
   });
 
   it('should return Redo translation key when progress is 100', () => {
