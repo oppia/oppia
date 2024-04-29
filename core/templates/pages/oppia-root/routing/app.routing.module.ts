@@ -47,6 +47,7 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/creator-dashboard-page/creator-dashboard-page.module').then(
         m => m.CreatorDashboardPageModule
+      ),
     canActivate: [IsLoggedInGuard],
   },
   {
