@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for a lessons in learner dashboard
+ * @fileoverview Component for a lesson
  */
 
 import {Component, Input, OnInit} from '@angular/core';
