@@ -361,13 +361,13 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             b'Test case 3 skipped',
             b'Test case 4 passed'
         ]
-        expected_output = (
-            'Spec started: Test Suite 1\n'
-            'Test case 1 passed\n'
-            'Test case 2 failed\n'
-            'Spec started: Test Suite 2\n'
+        expected_output_lines = [
+            'Spec started: Test Suite 1\n',
+            'Test case 1 passed\n',
+            'Test case 2 failed\n',
+            'Spec started: Test Suite 2\n',
             'Test case 4 passed\n'
-        )
+        ]
 
         with mock.patch('builtins.open', mock.mock_open()) as mock_file:
             run_acceptance_tests.print_test_output(test_data)
@@ -377,7 +377,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
             mock_file_obj = mock_file.return_value
 
-            mock_file_obj.write.assert_called_once_with(expected_output)
+            mock_file_obj.write.assert_has_calls(
+                [mock.call(line) for line in expected_output_lines],
+                 any_order=False
+            )
 
         if os.path.exists('test_output.log'):
             os.remove('test_output.log')
