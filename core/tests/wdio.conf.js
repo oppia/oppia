@@ -21,7 +21,7 @@ var ffmpegProcess = null;
 // The absolute path where the recorded video of test will be stored.
 var videoPath = null;
 // Enable ALL_VIDEOS if you want success videos to be saved.
-const ALL_VIDEOS = false;
+const ALL_VIDEOS = true;
 
 var suites = {
   full: [

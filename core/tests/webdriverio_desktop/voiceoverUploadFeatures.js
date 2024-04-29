@@ -20,7 +20,6 @@ var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
-var waitFor = require('./waitFor.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 
 var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
@@ -50,12 +49,16 @@ describe('Voiceover upload features', function () {
       new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
 
     await users.createAndLoginCurriculumAdminUser(
-      'release@release.com',
-      'releaseCoordinator'
+      'featureFlagEnabler@release.com',
+      'featureFlagEnabler'
     );
-    await waitFor.pageToFullyLoad();
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
     await adminPage.get();
-    await adminPage.addRole('releaseCoordinator', 'release coordinator');
+    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
     await releaseCoordinatorPage.getFeaturesTab();
 
     var voiceoverContributionFlag =

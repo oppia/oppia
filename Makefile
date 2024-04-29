@@ -209,7 +209,7 @@ run_tests.e2e: ## Runs the e2e tests for the parsed suite
 # Adding env variable for the mobile view
 	@export MOBILE=${MOBILE:-false}
 # Adding env variable for the video recording
-	@export VIDEO_RECORDING_IS_ENABLED=${VIDEO_RECORDING_IS_ENABLED:-0}
+	@export VIDEO_RECORDING_IS_ENABLED=${VIDEO_RECORDING_IS_ENABLED:-1}
 # Starting the development server for the e2e tests.
 	$(MAKE) start-devserver
 	@echo '------------------------------------------------------'
