@@ -450,7 +450,6 @@ class BlogAuthorProfilePageAccessValidationHandler(
             )
 
 
-
 class SkillEditorPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
