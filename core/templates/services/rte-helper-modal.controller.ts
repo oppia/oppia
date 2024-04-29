@@ -431,30 +431,6 @@ export class RteHelperModalComponent {
         } else if (this.componentId === this.COMPONENT_ID_LINK) {
           if (caName === 'text') {
             // Set the link `text` to the link `url` if the `text` is empty.
-            (
-              customizationArgsDict as {
-                [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-              }
-            )[caName] =
-              this.tmpCustomizationArgs[i].value ||
-              this.tmpCustomizationArgs[i - 1].value;
-          }
-        }
-        (
-          customizationArgsDict as {
-            [Prop in CustomizationArgsNameAndValueArray[number]['name']]: CustomizationArgsNameAndValueArray[number]['value'];
-          }
-        )[caName] = this.tmpCustomizationArgs[i].value;
-        if (this.componentId === this.COMPONENT_ID_VIDEO) {
-          if (caName === 'video_id') {
-            this.tmpCustomizationArgs[i].value =
-              this.extractVideoIdFromVideoUrl(
-                this.tmpCustomizationArgs[i].value.toString()
-              );
-          }
-        } else if (this.componentId === this.COMPONENT_ID_LINK) {
-          if (caName === 'text') {
-            // Set the link `text` to the link `url` if the `text` is empty.
             this.tmpCustomizationArgs[i].value =
               this.tmpCustomizationArgs[i].value ||
               this.tmpCustomizationArgs[i - 1].value;

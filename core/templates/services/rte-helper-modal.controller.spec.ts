@@ -375,5 +375,4 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
-
 });
