@@ -37,6 +37,7 @@ interface ThumbnailUrl {
   filename: string;
   id: string;
 }
+
 @Component({
   selector: 'lesson-card',
   templateUrl: './lesson-card.component.html',
@@ -159,7 +160,7 @@ export class LessonCardComponent implements OnInit {
     );
   }
 
-  setButtonText(): string {
+  getButtonTranslationKey(): string {
     switch (this.progress) {
       case 100:
         return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_REDO';

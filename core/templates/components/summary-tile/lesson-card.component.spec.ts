@@ -262,7 +262,7 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    const buttonText = component.setButtonText();
+    const buttonText = component.getButtonTranslationKey();
     expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_REDO');
   });
 
@@ -272,7 +272,7 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    const buttonText = component.setButtonText();
+    const buttonText = component.getButtonTranslationKey();
     expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_RESUME');
   });
 
@@ -282,7 +282,7 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    const buttonText = component.setButtonText();
+    const buttonText = component.getButtonTranslationKey();
     expect(buttonText).toBe('I18N_LEARNER_DASHBOARD_CARD_BUTTON_START');
   });
 });
