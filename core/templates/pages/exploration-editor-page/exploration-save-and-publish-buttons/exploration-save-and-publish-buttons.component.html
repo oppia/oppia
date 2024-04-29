@@ -67,7 +67,6 @@
           <loading-dots [hidden]="!loadingDotsAreShown"></loading-dots>
         </span>
       </button>
-<!-- Represents a button used to discard the changes.This button is disabled if there are no changes to discard, or if an autosave operation is currently in progress to prevent the user from discarding unsaved changes.-->
       <button [matMenuTriggerFor]="discardButton" type="button" class="btn btn-light oppia-discard-button e2e-test-save-discard-toggle dropdown-toggle"
               [disabled]="!connectedToInternet || !getChangeListLength() || autosaveIsInProgress" aria-label="Discard Draft">
       </button>
