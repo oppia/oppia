@@ -197,7 +197,7 @@ describe('LessonCardComponent', () => {
     expect(component.desc).toEqual(sampleTopic.title);
     expect(component.imgColor).toEqual(sampleTopic.thumbnail_bg_color);
 
-    let nextStory =
+    const nextStory =
       sampleTopic.completed_node_titles.length -
       (sampleTopic.completed_node_titles.length ===
       sampleTopic.node_titles.length
@@ -223,7 +223,7 @@ describe('LessonCardComponent', () => {
 
     fixture.detectChanges();
 
-    let nextStory =
+    const nextStory =
       incompleteTopic.completed_node_titles.length -
       (incompleteTopic.completed_node_titles.length ===
       incompleteTopic.node_titles.length

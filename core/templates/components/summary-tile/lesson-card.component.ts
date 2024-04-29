@@ -140,17 +140,17 @@ export class LessonCardComponent implements OnInit {
     story,
     currentStory,
   }: LessonUrl): string {
-    return classroom === undefined || topicFragment === undefined
-      ? '#'
-      : `/explore/${currentStory.getExplorationId()}?` +
-          Object.entries({
-            topic_url_fragment: topicFragment,
-            classroom_url_fragment: classroom,
-            story_url_fragment: story,
-            node_id: currentStory.getId(),
-          })
-            .map(([key, value]) => `${key}=${value}`)
-            .join('&');
+    return (
+      `/explore/${currentStory.getExplorationId()}?` +
+      Object.entries({
+        topic_url_fragment: topicFragment,
+        classroom_url_fragment: classroom,
+        story_url_fragment: story,
+        node_id: currentStory.getId(),
+      })
+        .map(([key, value]) => `${key}=${value}`)
+        .join('&')
+    );
   }
 
   handleImageError(): void {
