@@ -710,10 +710,7 @@ def _save_story(
     if story_is_published:
         exp_ids = []
         for node in story.story_contents.nodes:
-            if not node.exploration_id:
-                raise Exception(
-                    'Story node with id %s does not contain an '
-                    'exploration id.' % node.id)
+            assert node.exploration_id is not None
             exp_ids.append(node.exploration_id)
 
         validate_explorations_for_story(exp_ids, True)
