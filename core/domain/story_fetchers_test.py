@@ -38,8 +38,8 @@ if MYPY: # pragma: no cover
 class StoryFetchersUnitTests(test_utils.GenericTestBase):
     """Test the story fetchers module."""
 
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
-    NODE_ID_2: Final = story_domain.NODE_ID_PREFIX + '2'
+    NODE_ID_1: Final = '%s%s' % (story_domain.NODE_ID_PREFIX, '1')
+    NODE_ID_2: Final = '%s%s' % (story_domain.NODE_ID_PREFIX, '2')
     USER_ID: Final = 'user'
 
     def setUp(self) -> None:
@@ -337,7 +337,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': (
                     story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': story_domain.NODE_ID_PREFIX + '1',
+                'node_id': '%s%s' % (story_domain.NODE_ID_PREFIX, '1'),
                 'old_value': None,
                 'new_value': exp_id_1
             })
