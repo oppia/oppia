@@ -1122,18 +1122,20 @@ def get_reviewable_translation_suggestion_target_ids(
     contribution_rights = user_services.get_user_contribution_rights(
         user_id
     )
-    language_codes = (
+    allowed_language_codes_for_review = (
         contribution_rights.can_review_translation_for_language_codes
     )
 
-    # No language code means all languages.
-    if language_code is not None:
-        language_codes = [
-            language_code
-        ] if language_code in language_codes else []
+    filtering_by_language_code = language_code is not None
+    language_codes = (
+        allowed_language_codes_for_review if not filtering_by_language_code
+        else [language_code]
+        if language_code in allowed_language_codes_for_review
+        else []
+    )
 
-    # The user cannot review any translations, so return early.
-    if len(language_codes) == 0:
+    user_can_review_translations = len(language_codes) != 0
+    if not user_can_review_translations:
         return []
 
     return (
