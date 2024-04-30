@@ -353,7 +353,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_print_test_output(self) -> None:
-        test_data = [
+        test_input = [
             b'Spec started: Test Suite 1',
             b'Test case 1 passed',
             b'Test case 2 failed',
@@ -370,7 +370,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         ]
 
         with mock.patch('builtins.open', mock.mock_open()) as mock_file:
-            run_acceptance_tests.print_test_output(test_data)
+            run_acceptance_tests.print_test_output(test_input)
 
             mock_file.assert_called_once_with(
                 'test_output.log', 'w', encoding='utf-8')
