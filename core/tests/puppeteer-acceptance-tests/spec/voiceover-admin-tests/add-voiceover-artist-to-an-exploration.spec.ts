@@ -33,9 +33,7 @@ enum INTERACTION_TYPES {
 
 // The backend 400 error is a known consequence of adding an invalid user ID.
 // By ignoring it, we prevent noise in the test output and focus on other unexpected errors.
-//
 // The frontend toast message is directly asserted by test case, ensuring it is displayed correctly.
-
 ConsoleReporter.setConsoleErrorsToIgnore([
   new RegExp(
     'http://localhost:8181/voice_artist_management_handler/exploration/.*Failed to load resource: the server responded with a status of 400'
@@ -68,11 +66,12 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToExplorationEditorPage();
       await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.createExplorationWithContentAndInteraction(
+      await explorationEditor.createExplorationWithMinimumContent(
         'Exploration one',
         INTERACTION_TYPES.END_EXPLORATION
       );
-      explorationId = await explorationEditor.publishExploration(
+      await explorationEditor.saveExplorationDraft();
+      explorationId = await explorationEditor.publishExplorationWithContent(
         'Exploration one',
         'Exploration one',
         'Algebra'
@@ -86,7 +85,7 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'invalidUserId'
       );
-      await voiceoverAdmin.addVoiceoverArtistToExploration('invalidUserId');
+      await voiceoverAdmin.addVoiceoverArtistsToExploration(['invalidUserId']);
 
       await voiceoverAdmin.expectToSeeErrorToastMessage(
         invalidIdErrorToastMessage
@@ -107,11 +106,12 @@ describe('Voiceover Admin', function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorPage();
 
-      await explorationEditor.createExplorationWithContentAndInteraction(
+      await explorationEditor.createExplorationWithMinimumContent(
         'Exploration two',
         INTERACTION_TYPES.END_EXPLORATION
       );
-      explorationId = await explorationEditor.publishExploration(
+      await explorationEditor.saveExplorationDraft();
+      explorationId = await explorationEditor.publishExplorationWithContent(
         'Exploration one',
         'Exploration one',
         'Algebra'
@@ -122,7 +122,9 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'voiceoverartist'
       );
-      await voiceoverAdmin.addVoiceoverArtistToExploration('voiceoverartist');
+      await voiceoverAdmin.addVoiceoverArtistsToExploration([
+        'voiceoverartist',
+      ]);
 
       await voiceoverAdmin.expectVoiceoverArtistsListContains(
         'voiceoverartist'
