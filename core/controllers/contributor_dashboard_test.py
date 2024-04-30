@@ -2165,9 +2165,10 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_get_contributor_certificate(self) -> None:
-        score_category: str = (
-            suggestion_models.SCORE_TYPE_TRANSLATION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'English')
+        score_category: str = ('%s%s%s' % (
+            suggestion_models.SCORE_TYPE_TRANSLATION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER, 'English')
+            )
         change_cmd = {
             'cmd': 'add_translation',
             'content_id': 'content',
