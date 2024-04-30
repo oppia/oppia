@@ -65,10 +65,6 @@ module.exports = {
     },
   },
   entry: {
-    collection_editor:
-      commonPrefix +
-      '/pages/collection-editor-page/' +
-      'collection-editor-page.import.ts',
     collection_player:
       commonPrefix +
       '/pages/collection-player-page/' +
@@ -137,23 +133,6 @@ module.exports = {
       DIFF_EQUAL: ['diff_match_patch/lib/diff_match_patch', 'DIFF_EQUAL'],
       DIFF_INSERT: ['diff_match_patch/lib/diff_match_patch', 'DIFF_INSERT'],
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['collection_editor'],
-      filename: 'collection-editor-page.mainpage.html',
-      hybrid: true,
-      meta: {
-        name: defaultMeta.name,
-        description:
-          'Contact the Oppia team, submit feedback, and learn ' +
-          'how to get involved with the Oppia project.',
-      },
-      template:
-        commonPrefix +
-        '/pages/collection-editor-page/' +
-        'collection-editor-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false,
     }),
     new HtmlWebpackPlugin({
       chunks: ['console_errors'],
