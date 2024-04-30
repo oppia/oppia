@@ -236,7 +236,7 @@ export class TranslationStatusService implements OnInit {
           noTranslationCount;
         this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
         if (
-          this.platformFeatureService.status.ADD_VOICEOVER_WITH_ACCENT.isEnabled
+          this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled
         ) {
           this.stateWiseStatusColor[stateName] = '#fff';
         } else if (noTranslationCount === 0 && !stateNeedsUpdate) {

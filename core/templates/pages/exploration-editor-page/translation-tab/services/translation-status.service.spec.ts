@@ -29,11 +29,22 @@ import {StateRecordedVoiceoversService} from 'components/state-editor/state-edit
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockNgbModal {
   open() {
     return {
       result: Promise.resolve(),
+    };
+  }
+}
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      AddVoiceoverWithAccent: {
+        isEnabled: true,
+      },
     };
   }
 }
@@ -75,6 +86,10 @@ describe('Translation status service', () => {
               return;
             },
           },
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
       ],
     });
