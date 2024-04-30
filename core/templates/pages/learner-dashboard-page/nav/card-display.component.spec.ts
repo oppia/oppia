@@ -38,5 +38,44 @@ describe('CardDisplayComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CardDisplayComponent);
     component = fixture.componentInstance;
+
+    component.numCards = 5;
+    const mockDivElement = document.createElement('div');
+    mockDivElement.style.width = '400px';
+    const mockDivElementRef = {nativeElement: mockDivElement};
+    component.cards = mockDivElementRef as any;
+  });
+
+  afterEach(() => {
+    fixture.destroy();
+  });
+
+  it('should return 0 shifts for getMaxShifts if container can fit cards perfectly', () => {
+    component.numCards = 2;
+
+    expect(component.getMaxShifts(650)).toEqual(0);
+  });
+
+  it('should return correct number of shifts for getMaxShifts if container cannot fit cards', () => {
+    expect(component.getMaxShifts(400)).toEqual(4);
+  });
+
+  describe('when shifting cards container to the right', () => {
+    it('should shift by (cardWidth - 32) if first shift', () => {
+      const cardsElement = component.cards.nativeElement;
+      spyOn(cardsElement, 'scrollLeft');
+    });
+
+    it('should shift by cardWidth if not first shift or last', () => {});
+
+    it('should shift by remainder needed to show last card if last shift', () => {});
+  });
+
+  describe('when shifting cards container to the left', () => {
+    it('should shift by remainder needed to show last if first shift', () => {});
+
+    it('should shift by cardWidth if not first shift or last', () => {});
+
+    it('should shift by (cardWidth - 32) if last shift', () => {});
   });
 });
