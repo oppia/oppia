@@ -88,7 +88,7 @@ describe('Create Activity Modal Component', () => {
     fixture.destroy();
   });
 
-  it('should evalute component properties after component is initialized', fakeAsync(() => {
+  it('should evaluate component properties after component is initialized', fakeAsync(() => {
     const UserInfoObject = {
       roles: ['USER_ROLE'],
       is_moderator: false,
