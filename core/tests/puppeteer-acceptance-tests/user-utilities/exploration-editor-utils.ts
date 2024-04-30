@@ -919,14 +919,14 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Navigates to the main tab in the application.
+   * Navigates to the main tab..
    */
   async navigateToMainTab(): Promise<void> {
     await this.navigateToTab(mobileMainTabButton, MainTabButton);
   }
 
   /**
-   * Navigates to the history tab in the application.
+   * Navigates to the history tab.
    */
   async navigateToHistoryTab(): Promise<void> {
     await this.navigateToTab(mobileHistoryTabButton, HistoryTabButton);
@@ -953,8 +953,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
 
-    // versions are in descending order
-    let element = elements[elements.length - version];
+    let element = elements[version];
 
     const propertyToSelector: {[key: string]: string} = {
       'Version No.': revisionVersionNoSelector,
@@ -996,11 +995,22 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Invalid property: ${property}`);
     }
 
+    const propertyToSelector: {[key: string]: string} = {
+      'Version No.': revisionVersionNoSelector,
+      Notes: revisionNoteSelector,
+      User: revisionUsernameSelector,
+      Date: revisionDateSelector,
+    };
+
     let elementHandles = await this.page.$$(historyListItem);
     let revisions: {[key: string]: string | Date | number}[] =
       await Promise.all(
         elementHandles.map(async handle => {
-          let value = await handle.getProperty(property);
+          let valueHandle = await handle.$(propertyToSelector[property]);
+          if (!valueHandle) {
+            throw new Error(`Failed to retrieve value handle for ${property}`);
+          }
+          let value = await valueHandle.getProperty('textContent');
           return {
             [property]: (await value.jsonValue()) as string | Date | number,
           };
@@ -1011,12 +1021,25 @@ export class ExplorationEditor extends BaseUser {
       let value1 = revisions[i][property];
       let value2 = revisions[i + 1][property];
 
+      if (value1 === undefined || value2 === undefined) {
+        throw new Error(
+          `Undefined value for ${property} in one or more revisions`
+        );
+      }
+
       if (typeof value1 === 'string' && !isNaN(Date.parse(value1))) {
         value1 = new Date(value1);
         value2 = new Date(value2);
       }
 
-      if (order === 'asc' ? value1 > value2 : value1 < value2) {
+      if (value1 instanceof Date && value2 instanceof Date) {
+        value1 = value1.getTime();
+        value2 = value2.getTime();
+      }
+
+      if (value1 === value2) {
+        throw new Error(`Two revisions have the same ${property}: ${value1}`);
+      } else if (order === 'asc' ? value1 > value2 : value1 < value2) {
         throw new Error(
           `Revisions are not sorted by ${property} in ${order} order`
         );

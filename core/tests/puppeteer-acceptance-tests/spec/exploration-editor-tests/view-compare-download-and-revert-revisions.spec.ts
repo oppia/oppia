@@ -19,11 +19,9 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {ExplorationEditor} from '../../user-utilities/exploration-editor-utils';
-import {descending} from 'd3-array';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const DATE: string = 'Date';
 enum INTERACTION_TYPES {
   END_EXPLORATION = 'End Exploration',
 }
@@ -83,7 +81,10 @@ describe('Exploration Editor', function () {
       ]);
 
       // Check order of revisions and filter by user.
-      await explorationEditor.expectRevisionsToBeOrderedBy(DATE, 'desc');
+      await explorationEditor.expectRevisionsToBeOrderedBy(
+        'Version No.',
+        'desc'
+      );
       await explorationEditor.filterRevisionsByUser('explorationEditor');
       await explorationEditor.expectNumberOfRevisions(5);
 
