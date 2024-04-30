@@ -404,16 +404,12 @@ export class ConversationSkinComponent {
             this.learnerParamsService.getAllParams()
           );
 
-          let isLoggedOutProgressTracked =
-            this.explorationPlayerStateService.isLoggedOutLearnerProgressTracked();
-          if (!this.isLoggedIn && !isLoggedOutProgressTracked) {
-            let confirmationMessage =
-              'Please save your progress before navigating away from the' +
-              ' page; else, you will lose your exploration progress.';
-            (e || this.windowRef.nativeWindow.event).returnValue =
-              confirmationMessage;
-            return confirmationMessage;
-          }
+          let confirmationMessage =
+            'Please save your progress before navigating away from the' +
+            ' page; else, you will lose your exploration progress.';
+          (e || this.windowRef.nativeWindow.event).returnValue =
+            confirmationMessage;
+          return confirmationMessage;
         }
       });
 

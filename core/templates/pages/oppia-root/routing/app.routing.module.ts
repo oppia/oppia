@@ -33,6 +33,14 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/collection-editor-page/collection-editor-page.module').then(
+        m => m.CollectionEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () =>
       import('pages/moderator-page/moderator-page.module').then(
@@ -103,6 +111,15 @@ const routes: Route[] = [
       import(
         'pages/learner-group-pages/edit-group/edit-learner-group-page.module'
       ).then(m => m.EditLearnerGroupPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/facilitator-dashboard-page/facilitator-dashboard-page.module'
+      ).then(m => m.FacilitatorDashboardPageModule),
     canActivate: [IsLoggedInGuard],
   },
   {

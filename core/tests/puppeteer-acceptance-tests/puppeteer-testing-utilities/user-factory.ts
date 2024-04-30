@@ -34,6 +34,7 @@ import {
   ExplorationEditorFactory,
   ExplorationEditor,
 } from '../user-utilities/exploration-editor-utils';
+import {CurriculumAdminFactory} from '../user-utilities/curriculum-admin-utils';
 import testConstants from './test-constants';
 
 const ROLES = testConstants.Roles;
@@ -46,6 +47,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
+  [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
 } as const;
