@@ -21,7 +21,6 @@ import {Injectable} from '@angular/core';
 import {downgradeInjectable} from '@angular/upgrade/static';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {AlertsService} from './alerts.service';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
@@ -39,6 +38,7 @@ export class EntityVoiceoversService {
   public entityVersion: number;
   public languageCode: string;
   public entityVoiceoversList: EntityVoiceovers[] = [];
+  public languageAccentCodeToEntityVoiceovers = {};
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
 
@@ -58,6 +58,14 @@ export class EntityVoiceoversService {
     this.languageCode = languageCode;
   }
 
+  createLanguageAccentCodeToEntityVoiceovers() {
+    for (let entityVoiceovers of this.entityVoiceoversList) {
+      this.languageAccentCodeToEntityVoiceovers[
+        entityVoiceovers.languageAccentCode
+      ] = entityVoiceovers;
+    }
+  }
+
   fetchEntityVoiceovers() {
     this.voiceoverBackendApiService
       .fetchEntityVoiceoversForGivenLanguageCodeAsync(
@@ -68,6 +76,7 @@ export class EntityVoiceoversService {
       )
       .then(response => {
         this.entityVoiceoversList = response;
+        this.createLanguageAccentCodeToEntityVoiceovers();
       });
   }
 
@@ -83,20 +92,13 @@ export class EntityVoiceoversService {
 
   setEntityVoiceovers(entityVoiceoversList) {
     this.entityVoiceoversList = entityVoiceoversList;
+    this.createLanguageAccentCodeToEntityVoiceovers();
   }
 
   getVoiceoverInGivenLanguageAccentCode(
     languageAccentCode
   ): EntityVoiceovers | undefined {
-    let returnedEntityVoiceovers!: EntityVoiceovers;
-
-    this.entityVoiceoversList.forEach(entityVoiceovers => {
-      if (entityVoiceovers.languageAccentCode == languageAccentCode) {
-        returnedEntityVoiceovers = entityVoiceovers;
-      }
-    });
-
-    return returnedEntityVoiceovers;
+    return this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }
 }
 

@@ -291,10 +291,6 @@ export class VoiceoverBackendApiService {
     entityVersion: number,
     languageCode: string
   ): Promise<EntityVoiceovers[]> {
-    console.log(entityType);
-    console.log(entitytId);
-    console.log(entityVersion);
-    console.log(languageCode);
     let entityVoiceoversBulkHandlerUrl =
       this.urlInterpolationService.interpolateUrl(
         VoiceoverDomainConstants.GET_ENTITY_VOICEOVERS_BULK,
@@ -306,16 +302,12 @@ export class VoiceoverBackendApiService {
         }
       );
 
-    console.log(entityVoiceoversBulkHandlerUrl);
-
     return new Promise((resolve, reject) => {
       this.http
         .get<EntityVoiceoversBulkBackendDict>(entityVoiceoversBulkHandlerUrl)
         .toPromise()
         .then(response => {
           let entityVoiceoversList = [];
-          console.log('Hi');
-          console.log(response);
           for (let entityVoiceoverBackendDict of response.entity_voiceovers_list) {
             entityVoiceoversList.push(
               EntityVoiceovers.createFromBackendDict(entityVoiceoverBackendDict)

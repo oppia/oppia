@@ -113,7 +113,7 @@ export class EntityVoiceovers {
     this.voiceovers;
   }
 
-  countTotalVoiceovers() {
+  countTotalVoiceovers(): number {
     let totalVoiceovers = 0;
 
     for (let contentId in this.voiceovers) {
@@ -122,5 +122,15 @@ export class EntityVoiceovers {
     }
 
     return totalVoiceovers;
+  }
+
+  getManualVoiceover(contentId: string): Voiceover | undefined {
+    let voiceoverTypeToVoiceovers = this.voiceovers[contentId];
+
+    if (voiceoverTypeToVoiceovers) {
+      return voiceoverTypeToVoiceovers.manual;
+    } else {
+      return undefined;
+    }
   }
 }
