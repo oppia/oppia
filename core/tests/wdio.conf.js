@@ -208,7 +208,8 @@ exports.config = {
   // ====================
   // Runner Configuration
   // ====================
-  // Set bail to 1 to stop test execution after the first failure.
+  // Set 'bail' to 1 to stop the entire test suite execution after the first test failure. 
+  // Set it to 0 to allow all tests to run to completion, regardless of any individual test failures.
   bail: 1,
   //
   // ==================
