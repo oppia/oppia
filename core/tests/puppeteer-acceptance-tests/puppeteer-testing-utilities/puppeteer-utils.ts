@@ -90,8 +90,8 @@ export class BaseUser {
       .then(async browser => {
         this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
-        this.page = await browser.newPage();
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        this.page = await browser.newPage();
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
@@ -108,6 +108,8 @@ export class BaseUser {
               'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
               'Mobile/15A372 Safari/604.1'
           );
+        } else {
+          this.page.setViewport({width: 1920, height: 1080});
         }
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
