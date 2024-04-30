@@ -30,14 +30,14 @@ import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 
-fdescribe('Conversation flow service', () => {
+describe('Conversation flow service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let conversationFlowService: ConversationFlowService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let playerTranscriptService: PlayerTranscriptService;
 
-  function createCard(interactionType: string) {
+  let createCard = function (interactionType: string): StateCard {
     return new StateCard(
       null,
       null,
@@ -48,7 +48,7 @@ fdescribe('Conversation flow service', () => {
       '',
       null
     );
-  }
+  };
   let displayedCard = createCard('');
 
   beforeEach(waitForAsync(() => {
