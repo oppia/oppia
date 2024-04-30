@@ -208,7 +208,8 @@ exports.config = {
   // ====================
   // Runner Configuration
   // ====================
-  //
+  // Set bail to 1 to stop test execution after the first failure.
+  bail: 1,
   //
   // ==================
   // Specify Test Files
