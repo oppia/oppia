@@ -90,8 +90,8 @@ export class BaseUser {
       .then(async browser => {
         this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
-        this.page = await browser.newPage();
         ConsoleReporter.trackConsoleMessagesInBrowser(browser);
+        this.page = await browser.newPage();
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
