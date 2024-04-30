@@ -934,26 +934,27 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Checks if a specific revision has certain properties.
-   * @param {number} revisionNumber - The number of the revision to check.
+   * @param {number} version - The number of the revision to check.
    * @param {string[]} properties - The properties to check for in the revision.
    */
 
   async expectRevisionToHave(
-    revisionNumber: number,
+    version: number,
     properties: string[]
   ): Promise<void> {
-    if (!Number.isInteger(revisionNumber) || revisionNumber <= 0) {
-      throw new Error(`Invalid revision number: ${revisionNumber}`);
+    if (!Number.isInteger(version) || version <= 0) {
+      throw new Error(`Invalid revision number: ${version}`);
     }
 
     let elements = await this.page.$$(historyListItem);
-    if (elements.length < revisionNumber) {
+    if (elements.length < version) {
       throw new Error(
-        `There are not enough revisions. Requested: ${revisionNumber}, available: ${elements.length}`
+        `There are not enough revisions. Requested: ${version}, available: ${elements.length}`
       );
     }
 
-    let element = elements[revisionNumber - 1];
+    // versions are in descending order
+    let element = elements[elements.length - version];
 
     const propertyToSelector: {[key: string]: string} = {
       'Version No.': revisionVersionNoSelector,
@@ -973,11 +974,13 @@ export class ExplorationEditor extends BaseUser {
       let value = await element.$eval(selector, async el => el.textContent);
       if (property !== 'Notes' && (!value || value.trim() === '')) {
         throw new Error(
-          `Revision ${revisionNumber} is missing or has an empty ${property}`
+          `Revision ${version} is missing or has an empty ${property}`
         );
       }
 
-      showMessage(`Revision ${revisionNumber} has the property ${property} with value: ${value}`);
+      showMessage(
+        `Revision ${version} has the property ${property} with value: ${value}`
+      );
     }
   }
 
@@ -985,34 +988,42 @@ export class ExplorationEditor extends BaseUser {
    * Checks if the revisions are ordered by a specific property.
    * @param {string} property - The property to check the order by.
    */
-  async expectRevisionsToBeOrderedBy(property: string): Promise<void> {
+  async expectRevisionsToBeOrderedBy(
+    property: string,
+    order: 'asc' | 'desc'
+  ): Promise<void> {
     if (!property) {
       throw new Error(`Invalid property: ${property}`);
     }
 
     let elementHandles = await this.page.$$(historyListItem);
-    let revisions: {[key: string]: string | Date}[] = await Promise.all(
-      elementHandles.map(async handle => {
-        let value = await handle.getProperty(property);
-        return {[property]: (await value.jsonValue()) as string | Date};
-      })
-    );
+    let revisions: {[key: string]: string | Date | number}[] =
+      await Promise.all(
+        elementHandles.map(async handle => {
+          let value = await handle.getProperty(property);
+          return {
+            [property]: (await value.jsonValue()) as string | Date | number,
+          };
+        })
+      );
 
     for (let i = 0; i < revisions.length - 1; i++) {
       let value1 = revisions[i][property];
       let value2 = revisions[i + 1][property];
 
-      if (typeof value1 === 'string') {
+      if (typeof value1 === 'string' && !isNaN(Date.parse(value1))) {
         value1 = new Date(value1);
         value2 = new Date(value2);
       }
 
-      if (value1 < value2) {
-        throw new Error(`Revisions are not sorted by ${property}`);
+      if (order === 'asc' ? value1 > value2 : value1 < value2) {
+        throw new Error(
+          `Revisions are not sorted by ${property} in ${order} order`
+        );
       }
     }
 
-    showMessage(`Revisions are sorted by ${property}`);
+    showMessage(`Revisions are sorted by ${property} in ${order} order`);
   }
 
   /**
@@ -1036,7 +1047,9 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectNumberOfRevisions(expectedNumber: number): Promise<void> {
     if (!Number.isInteger(expectedNumber) || expectedNumber < 0) {
-      throw new Error(`Invalid expected number of revisions: ${expectedNumber}`);
+      throw new Error(
+        `Invalid expected number of revisions: ${expectedNumber}`
+      );
     }
 
     let revisions = await this.page.$$(historyListItem);
@@ -1153,7 +1166,7 @@ export class ExplorationEditor extends BaseUser {
    * Verifies if changes are reflected for each property within a single code block.
    * @param {string[]} properties - The properties to check for.
    */
-  async expectChangesInProperties(properties: string[]): Promise<void> {
+  private async expectChangesInProperties(properties: string[]): Promise<void> {
     const values: {[key: string]: string[]} = {};
 
     for (let property of properties) {
@@ -1167,7 +1180,9 @@ export class ExplorationEditor extends BaseUser {
         })
       );
 
-      const filteredElements = propertyElements.filter(el => el !== null);
+      const filteredElements = propertyElements.filter(
+        el => el !== null
+      ) as ElementHandle<Element>[];
 
       if (filteredElements.length === 0) {
         throw new Error(`Property ${property} not found`);
@@ -1175,22 +1190,19 @@ export class ExplorationEditor extends BaseUser {
 
       values[property] = await Promise.all(
         filteredElements.map(async el => {
-          if (el) {
-            return el.evaluate(el => {
-              if (
-                el.nextElementSibling &&
-                el.nextElementSibling.nextElementSibling
-              ) {
-                return el.nextElementSibling.nextElementSibling.textContent;
-              } else {
-                throw new Error(
-                  `Unable to find third sibling for property ${property}`
-                );
-              }
-            });
-          } else {
-            throw new Error(`Element is null for property ${property}`);
-          }
+          return el.evaluate(el => {
+            // The value of the property is held in the third sibling span element.
+            if (
+              el.nextElementSibling &&
+              el.nextElementSibling.nextElementSibling
+            ) {
+              return el.nextElementSibling.nextElementSibling.textContent;
+            } else {
+              throw new Error(
+                `Unable to find third sibling for property ${property}`
+              );
+            }
+          });
         })
       ).then(results => results.filter(result => result !== null) as string[]);
     }
@@ -1244,7 +1256,9 @@ export class ExplorationEditor extends BaseUser {
    * Finds the options button for a specific version.
    * @param {number} version - The version number to find.
    */
-  private async findOptionsButtonForVersion(version: number): Promise<ElementHandle> {
+  private async findOptionsButtonForVersion(
+    version: number
+  ): Promise<ElementHandle> {
     const buttons = await this.page.$$('.history-table-option');
     const index = buttons.length - version;
     if (index < 0 || index >= buttons.length) {
