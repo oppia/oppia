@@ -23,7 +23,6 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
-const { showMessage } = require('../puppeteer-acceptance-tests/puppeteer-testing-utilities/show-message-utils.js');
 
 var _createFirebaseAccount = async function (email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -206,14 +205,11 @@ var createUserWithRole = async function (email, username, role) {
   // fails the test with error '$ is not defined for Admin.js file'.
   var adminPage = new AdminPage.AdminPage();
   await _createFirebaseAccount(email, true);
-  await login(email);
+  login(email);
   await _completeSignup(username);
   await adminPage.get();
   await adminPage.addRole(username, role);
   await logout();
-
-// Introduce a flaw: try to use a variable that hasn't been defined
-console.log(undefinedVariable);
 };
 
 var createModerator = async function (email, username) {
