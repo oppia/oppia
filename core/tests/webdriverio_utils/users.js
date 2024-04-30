@@ -23,6 +23,7 @@ var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 var action = require('./action.js');
 var AdminPage = require('./AdminPage.js');
+const { showMessage } = require('../puppeteer-acceptance-tests/puppeteer-testing-utilities/show-message-utils.js');
 
 var _createFirebaseAccount = async function (email, isSuperAdmin = false) {
   // The Firebase Admin SDK stores all emails in lower case. To ensure that the
@@ -210,6 +211,9 @@ var createUserWithRole = async function (email, username, role) {
   await adminPage.get();
   await adminPage.addRole(username, role);
   await logout();
+
+// Introduce a flaw: try to use a variable that hasn't been defined
+console.log(undefinedVariable);
 };
 
 var createModerator = async function (email, username) {
