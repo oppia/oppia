@@ -31,7 +31,6 @@ export default {
     BlogDashboard: 'http://localhost:8181/blog-dashboard',
     CommunityLibrary: 'http://localhost:8181/community-library',
     Contact: 'http://localhost:8181/contact',
-    ContributorDashboard: 'http://localhost:8181/contributor-dashboard',
     ContributorDashboardAdmin:
       'http://localhost:8181/contributor-admin-dashboard',
     CreatorDashboard: 'http://localhost:8181/creator-dashboard',
