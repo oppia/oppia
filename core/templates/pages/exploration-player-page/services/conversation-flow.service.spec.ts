@@ -30,23 +30,26 @@ import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 
-describe('Conversation flow service', () => {
+fdescribe('Conversation flow service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let conversationFlowService: ConversationFlowService;
   let explorationPlayerStateService: ExplorationPlayerStateService;
   let playerTranscriptService: PlayerTranscriptService;
 
-  let displayedCard = new StateCard(
-    null,
-    null,
-    null,
-    new Interaction([], [], null, null, [], '', null),
-    [],
-    null,
-    '',
-    null
-  );
+  function createCard(interactionType: string) {
+    return new StateCard(
+      null,
+      null,
+      null,
+      new Interaction([], [], null, null, [], interactionType, null),
+      [],
+      null,
+      '',
+      null
+    );
+  }
+  let displayedCard = createCard('');
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -102,18 +105,16 @@ describe('Conversation flow service', () => {
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
     ).toBeFalse();
 
-    let supplementalCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'ImageClickInput', null),
-      [],
-      null,
-      '',
-      null
-    );
+    let textInputCard = createCard('TextInput');
     expect(
-      conversationFlowService.isSupplementalCardNonempty(supplementalCard)
+      conversationFlowService.isSupplementalCardNonempty(textInputCard)
+    ).toBeFalse();
+
+    let supplementaryImageInputCard = createCard('ImageClickInput');
+    expect(
+      conversationFlowService.isSupplementalCardNonempty(
+        supplementaryImageInputCard
+      )
     ).toBeTrue();
   });
 });
