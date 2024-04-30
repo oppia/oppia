@@ -240,11 +240,11 @@ var ContributorDashboardAdminPage = function () {
 
   this.navigateThroughMonths = async function (numberOfMonths) {
     /**
-    Here, we require to use element selector classes without "e2e-*"
-    prefix because the mat-datepicker that we use here do not contain
-    any such classes for e2e test purposes. Also we can not add any e2e
-    test class to any ansector element since, the ancestor to this is
-    the body tag, in the DOM.
+    We require to use element selector classes without "e2e-*" fix
+    because the mat-datepicker that we use here do not contain any
+    such classes for e2e test purposes. Also we can not add any e2e
+    test class to any ansector element since, the ancestor to this
+    is the body tag, in the DOM.
     **/
     var nextMonthButton = $('.mat-calendar-next-button');
     var prevMonthButton = $('.mat-calendar-previous-button');
@@ -335,11 +335,11 @@ var ContributorDashboardAdminPage = function () {
 
     if (day) {
       /**
-    Here, we require to use element selector classes without "e2e-*"
-    prefix because the mat-datepicker that we use here do not contain
-    any such classes for e2e test purposes. Also we can not add any e2e
-    test class to any ansector element since, the ancestor to this is
-    the body tag, in the DOM.
+    We require to use element selector classes without "e2e-*" fix
+    because the mat-datepicker that we use here do not contain any
+    such classes for e2e test purposes. Also we can not add any e2e
+    test class to any ansector element since, the ancestor to this
+    is the body tag, in the DOM.
     **/
       var daySelector = $('.mat-calendar-content')
         .$('.mat-calendar-table')
