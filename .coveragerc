@@ -16,6 +16,8 @@ omit =
     */scripts/setup.py
     */scripts/setup_gae.py
     */scripts/run_acceptance_tests.py
+# The above files in the scripts folder will be deleted once the migration to Docker is complete.
+# Currently, the backend tests for these files are failing when runnning within the Docker container.
 
 # The 'exclude_lines' is used to skip a particular clause in coverage.
 # We exclude any line with a comment of “pragma: no cover” as this is the default option

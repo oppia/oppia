@@ -15,7 +15,6 @@ jobs:
   e2e_test:
     runs-on:  ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-22.04]
         suite:
@@ -144,7 +143,7 @@ jobs:
           sudo docker cp oppia-angular-build:/app/oppia/node_modules .
       - name: Run Lighthouse performance checks shard
         if: startsWith(github.head_ref, 'update-changelog-for-release') == false
-        run: make run_tests.lighthouse_performance shard=${{ matrix.shard }} RECORD_SCREEN="true"
+        run: make run_tests.lighthouse_performance shard=${{ matrix.shard }} RECORD_SCREEN="false"
       - name: Uploading puppeteer video as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v3
@@ -160,7 +159,6 @@ jobs:
   acceptance_test:
       runs-on:  ${{ matrix.os }}
       strategy:
-        fail-fast: false
         matrix:
           os: [ubuntu-22.04]
           suite:
