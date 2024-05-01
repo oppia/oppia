@@ -255,6 +255,8 @@ export class TranslationStatusService implements OnInit {
     }
   }
 
+  numberOfContentNeedsVoiceovers() {}
+
   _getContentIdListRelatedToComponent(
     componentName: string,
     availableContentIds: string[]

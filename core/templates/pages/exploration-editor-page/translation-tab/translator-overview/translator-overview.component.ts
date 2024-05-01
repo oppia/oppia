@@ -119,8 +119,7 @@ export class TranslatorOverviewComponent implements OnInit {
   }
 
   isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.ADD_VOICEOVER_WITH_ACCENT
-      .isEnabled;
+    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
   changeActiveMode(modeName: string): void {

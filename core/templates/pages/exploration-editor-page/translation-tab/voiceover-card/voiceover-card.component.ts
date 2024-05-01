@@ -99,9 +99,7 @@ export class VoiceoverCardComponent implements OnInit {
 
             this.languageAccentCode =
               this.localStorageService.getLastSelectedLanguageAccentCode();
-            this.entityVoiceoversService.getVoiceoverInGivenLanguageAccentCode(
-              this.languageAccentCode
-            );
+            this.getVoiceovers(this.languageAccentCode);
 
             this.pageIsLoaded = true;
           });
