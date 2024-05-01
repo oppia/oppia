@@ -156,6 +156,11 @@ export class LocalStorageService {
    */
   updateLastSelectedTranslationLanguageCode(languageCode: string): void {
     if (this.isStorageAvailable()) {
+      console.log('updating the language');
+      console.log(this.getLastSelectedLanguageAccentCode());
+      this.setLastSelectedLanguageAccentCode(undefined);
+      console.log(this.getLastSelectedLanguageAccentCode());
+
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.

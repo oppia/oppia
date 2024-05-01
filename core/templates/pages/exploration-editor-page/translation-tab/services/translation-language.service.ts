@@ -22,6 +22,7 @@ import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {LoggerService} from 'services/contextual/logger.service';
+import {LocalStorageService} from 'services/local-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,8 @@ export class TranslationLanguageService {
 
   constructor(
     private languageUtilService: LanguageUtilService,
-    private loggerService: LoggerService
+    private loggerService: LoggerService,
+    private localStorageService: LocalStorageService
   ) {}
 
   getActiveLanguageCode(): string {
@@ -61,6 +63,17 @@ export class TranslationLanguageService {
         'Invalid active language code: ' + newActiveLanguageCode
       );
       return;
+    }
+    if (
+      this.localStorageService.getLastSelectedTranslationLanguageCode() !==
+      newActiveLanguageCode
+    ) {
+      console.log('Different language');
+      console.log(
+        this.localStorageService.getLastSelectedTranslationLanguageCode()
+      );
+      console.log(newActiveLanguageCode);
+      this.localStorageService.setLastSelectedLanguageAccentCode(undefined);
     }
     this.activeLanguageCode = newActiveLanguageCode;
     this._activeLanguageChangedEventEmitter.emit();

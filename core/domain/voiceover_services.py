@@ -161,6 +161,10 @@ def get_entity_voiceovers_for_given_language_code_of_exploration(
     entity_voiceovers_for_exp = get_entity_voiceovers_for_given_exploration(
         entity_id, entity_type, entity_version)
 
+    print('Inside service file')
+    print(entity_voiceovers_for_exp)
+    print('Done')
+
     language_codes_mapping = get_all_language_accent_codes_for_voiceovers()
     supported_language_accent_codes = (
         language_codes_mapping.get(language_code, {}))

@@ -17,9 +17,9 @@
     <div *ngIf="availableLanguageAccentCodesLength === 0">
       No accent available for the selected voiceover.
     </div>
-  </div>
-  <div *ngIf="pageIsLoaded && !voiceoversAreLoaded && availableLanguageAccentCodesLength > 0">
-    <p>Please select an accent to get voiceovers!</p>
+    <div *ngIf="(!!languageAccentCode) && (availableLanguageAccentCodesLength > 0)">
+      <p>Please select an accent to get voiceovers!</p>
+    </div>
   </div>
 
   <div *ngIf="pageIsLoaded && voiceoversAreLoaded">
@@ -43,9 +43,16 @@
         </button>
         <button (click)="toggleAudioNeedsUpdate()"
                 mat-icon-button
-                mat-button>
-          <mat-icon [ngbTooltip]="'Audio needs update'" *ngIf="manualVoiceover.needsUpdate">warning</mat-icon>
-          <mat-icon [ngbTooltip]="'Audio does not needs update'" *ngIf="!manualVoiceover.needsUpdate">warning</mat-icon>
+                mat-button
+                [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
+          <mat-icon [ngbTooltip]="'Audio needs update'"
+                    *ngIf="manualVoiceover.needsUpdate">
+            warning
+          </mat-icon>
+          <mat-icon [ngbTooltip]="'Audio does not needs update'"
+                    *ngIf="!manualVoiceover.needsUpdate">
+            warning
+          </mat-icon>
         </button>
       </div>
       <div *ngIf="manualVoiceover">
@@ -59,6 +66,14 @@
 </mat-card>
 
 <style>
+  .needs-update-button-icon {
+    color: white;
+    background-color: #E9B330;
+  }
+  .does-not-needs-update-button-icon {
+    color: white;
+    background-color: #009688;
+  }
   .language-accent-selector {
     width: 350px;
   }
@@ -68,6 +83,8 @@
   .audio-button {
     border-radius: 20px;
     margin: 10px;
+    color: white;
+    background-color: #009688;
   }
   .voiceover-progress {
     margin: 10px;

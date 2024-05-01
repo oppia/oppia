@@ -416,6 +416,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   initAudioBar(): void {
     // This stops the voiceoverRecorder when user navigates
     // while recording.
+    console.log('Init');
     if (this.voiceoverRecorder) {
       if (
         this.voiceoverRecorder.status().isRecording &&
@@ -513,6 +514,7 @@ export class AudioTranslationBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    console.log('Initialized');
     this.recordingTimeLimit =
       ExplorationEditorPageConstants.RECORDING_TIME_LIMIT;
     this.startingDuration = 0;

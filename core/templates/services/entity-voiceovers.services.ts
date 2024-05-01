@@ -100,6 +100,12 @@ export class EntityVoiceoversService {
   ): EntityVoiceovers | undefined {
     return this.languageAccentCodeToEntityVoiceovers[languageAccentCode];
   }
+
+  addManualVoiceover(languageCode, newlyAddedEntityVoiceovers) {
+    this.languageAccentCodeToEntityVoiceovers[languageCode] =
+      newlyAddedEntityVoiceovers;
+    this.entityVoiceoversList.push(newlyAddedEntityVoiceovers);
+  }
 }
 
 angular
