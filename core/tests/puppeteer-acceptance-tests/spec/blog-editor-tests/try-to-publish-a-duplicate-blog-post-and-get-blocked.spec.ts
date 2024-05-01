@@ -19,12 +19,19 @@
 import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 import {BlogPostEditor} from '../../user-utilities/blog-post-editor-utils';
+import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const duplicateBlogPostWarning =
   ' Blog Post with the' +
   ' given title exists already. Please use a different title. ';
+
+// This is the error that appears in the console when we try to post a blog with a title
+// that already exists. Since we are testing this functionality, this error occurred.
+ConsoleReporter.setConsoleErrorsToIgnore([
+  'Blog Post with the given title exists already. Please use a different title.',
+]);
 
 describe('Blog Editor', function () {
   let blogPostEditor: BlogPostEditor;
@@ -35,7 +42,7 @@ describe('Blog Editor', function () {
       'blog_post_editor@example.com',
       [ROLES.BLOG_POST_EDITOR]
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should check blog editor unable to publish duplicate blog post',
@@ -57,7 +64,7 @@ describe('Blog Editor', function () {
         duplicateBlogPostWarning
       );
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {

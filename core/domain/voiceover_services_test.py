@@ -21,10 +21,16 @@ from __future__ import annotations
 import json
 import os
 
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import state_domain
+from core.domain import user_services
 from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
@@ -245,3 +251,661 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         self.assertTrue(
             set(language_accent_master_list).issuperset(
                 set(autogeneratable_langauge_accent_codes)))
+
+
+class VoiceArtistMetadataTests(test_utils.GenericTestBase):
+    """Unit test to validate voice artists metadata informations."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.voice_artist_id = 'voice_artist_id'
+        self.language_code_to_accent = {
+            'en': 'en-US',
+            'hi': 'hi-IN'
+        }
+
+    def test_should_create_and_put_new_voice_artist_model(self) -> None:
+        initial_retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        self.assertIsNone(initial_retrieved_model)
+
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id,
+            self.language_code_to_accent
+        )
+
+        final_retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        self.assertIsNotNone(final_retrieved_model)
+
+    def test_should_update_and_put_existing_voice_artist_model(self) -> None:
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, {})
+        retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        assert retrieved_model is not None
+
+        self.assertDictEqual(
+            retrieved_model.language_code_to_accent, {})
+
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, self.language_code_to_accent)
+
+        retrieved_model = voiceover_models.VoiceArtistMetadataModel.get(
+            self.voice_artist_id, strict=False)
+        assert retrieved_model is not None
+
+        self.assertDictEqual(
+            retrieved_model.language_code_to_accent,
+            self.language_code_to_accent)
+
+    def test_update_voice_artist_language_mapping(self) -> None:
+        language_code = 'en'
+        initial_language_accent_code = 'en-US'
+        final_language_accent_code = 'en-IN'
+        voiceover_services.update_voice_artist_metadata(
+            self.voice_artist_id, self.language_code_to_accent)
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+        assert voice_artist_metadata_model is not None
+
+        self.assertEqual(
+            voice_artist_metadata_model.language_code_to_accent[language_code],
+            initial_language_accent_code
+        )
+
+        voiceover_services.update_voice_artist_language_mapping(
+            self.voice_artist_id, language_code, final_language_accent_code)
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+        assert voice_artist_metadata_model is not None
+
+        self.assertEqual(
+            voice_artist_metadata_model.language_code_to_accent[language_code],
+            final_language_accent_code)
+
+    def test_should_create_and_update_voice_artist_language_mapping(
+        self
+    ) -> None:
+        language_code = 'en'
+        language_accent_code = 'en-US'
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+
+        self.assertIsNone(voice_artist_metadata_model)
+
+        voiceover_services.update_voice_artist_language_mapping(
+            self.voice_artist_id, language_code, language_accent_code)
+
+        voice_artist_metadata_model = (
+            voiceover_models.VoiceArtistMetadataModel.get(
+                self.voice_artist_id, strict=False))
+        assert voice_artist_metadata_model is not None
+
+        self.assertEqual(
+            voice_artist_metadata_model.language_code_to_accent[language_code],
+            language_accent_code)
+
+    def test_should_create_voice_artist_metadata_model_successfully(
+        self
+    ) -> None:
+        voice_artist_metadata_model = (
+            voiceover_services.create_voice_artist_metadata_model_instance(
+                self.voice_artist_id,
+                self.language_code_to_accent
+            )
+        )
+
+        self.assertEqual(voice_artist_metadata_model.id, self.voice_artist_id)
+        self.assertDictEqual(
+            voice_artist_metadata_model.language_code_to_accent,
+            self.language_code_to_accent)
+
+
+class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
+    """Unit test to validate exploration voice artists link informations."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.voiceover1: state_domain.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        self.voiceover2: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        self.voiceover3: state_domain.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        self.voiceover4: state_domain.VoiceoverDict = {
+            'filename': 'filename4.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 3.0
+        }
+        self.voiceover5: state_domain.VoiceoverDict = {
+            'filename': 'filename5.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 7.0
+        }
+        self.voiceover6: state_domain.VoiceoverDict = {
+            'filename': 'filename6.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        self.voiceover7: state_domain.VoiceoverDict = {
+            'filename': 'filename7.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        self.voiceover8: state_domain.VoiceoverDict = {
+            'filename': 'filename8.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        self.exploration_id = 'exploration_id'
+        self.content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_0', self.voiceover1)
+            },
+            'content_1': {
+                'hi': ('voice_artist_1', self.voiceover2)
+            }
+        }
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_should_create_exploration_voice_artists_link_model_successfully(
+        self
+    ) -> None:
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                self.exploration_id,
+                self.content_id_to_voiceovers_mapping
+            )
+        )
+
+        self.assertEqual(
+            exploration_voice_artists_link_model.id, self.exploration_id)
+        self.assertDictEqual(
+            exploration_voice_artists_link_model.
+            content_id_to_voiceovers_mapping,
+            self.content_id_to_voiceovers_mapping
+        )
+
+    def test_should_get_all_voice_artist_language_accent_mapping(self) -> None:
+
+        voiceover_services.update_voice_artist_metadata(
+            voice_artist_id='voice_artist_1',
+            language_code_to_accent={
+                'en': 'en-US',
+                'hi': 'hi-IN'
+            }
+        )
+
+        exploration_voice_artists_link_model1 = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_1',
+                content_id_to_voiceovers_mapping={
+                    'content_0': {
+                        'en': ('voice_artist_1', self.voiceover1),
+                    },
+                    'content_1': {
+                        'ar': ('voice_artist_2', self.voiceover3)
+                    }
+                }
+            )
+        )
+        exploration_voice_artists_link_model1.put()
+
+        exploration_voice_artists_link_model2 = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_2',
+                content_id_to_voiceovers_mapping={
+                    'content_0': {
+                        'hi': ('voice_artist_1', self.voiceover2)
+                    }
+                }
+            )
+        )
+        exploration_voice_artists_link_model2.put()
+
+        expected_voice_artist_to_language_mapping = {
+            'voice_artist_1': {
+                'en': 'en-US',
+                'hi': 'hi-IN'
+            },
+            'voice_artist_2': {
+                'ar': ''
+            }
+        }
+
+        retrieved_voice_artist_to_language_mapping = (
+            voiceover_services.get_all_voice_artist_language_accent_mapping()
+        )
+
+        self.assertDictEqual(
+            expected_voice_artist_to_language_mapping,
+            retrieved_voice_artist_to_language_mapping
+        )
+
+    def test_get_all_voice_artist_id_to_username(self) -> None:
+        auth_id = 'someUser'
+        username = 'username'
+        user_settings = user_services.create_new_user(
+            auth_id, 'user@example.com')
+        voice_artist_id = user_settings.user_id
+        user_services.set_username(voice_artist_id, username)
+
+        expected_voice_artist_id_to_username = {
+            voice_artist_id: username
+        }
+
+        exploration_voice_artists_link_model2 = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_2',
+                content_id_to_voiceovers_mapping={
+                    'content_0': {
+                        'hi': (voice_artist_id, self.voiceover1)
+                    },
+                    'content_1': {
+                        'en': (voice_artist_id, self.voiceover2)
+                    }
+                }
+            )
+        )
+        exploration_voice_artists_link_model2.put()
+
+        self.assertDictEqual(
+            voiceover_services.get_voice_artist_ids_to_voice_artist_names(),
+            expected_voice_artist_id_to_username
+        )
+
+    def test_should_get_exploration_id_to_filenames(self) -> None:
+        exploration_voice_artists_link_model1 = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_1',
+                content_id_to_voiceovers_mapping={
+                    'content_0': {
+                        'en': ('voice_artist_1', self.voiceover1),
+                    },
+                    'content_1': {
+                        'ar': ('voice_artist_2', self.voiceover3),
+                        'en': ('voice_artist_1', self.voiceover4)
+                    },
+                    'content_2': {
+                        'en': ('voice_artist_1', self.voiceover6),
+                    },
+                    'content_3': {
+                        'en': ('voice_artist_1', self.voiceover5)
+                    }
+                }
+            )
+        )
+        exploration_voice_artists_link_model1.put()
+
+        exploration_voice_artists_link_model2 = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id_2',
+                content_id_to_voiceovers_mapping={
+                    'content_0': {
+                        'en': ('voice_artist_1', self.voiceover2),
+                    },
+                    'content_1': {
+                        'en': ('voice_artist_1', self.voiceover7),
+                        'ar': ('voice_artist_1', self.voiceover8)
+                    }
+                }
+            )
+        )
+        exploration_voice_artists_link_model2.put()
+
+        exploration_id_to_filenames = (
+            voiceover_services.get_voiceover_filenames(
+                voice_artist_id='voice_artist_1', language_code='en'))
+
+        total_files = 0
+        for filnames in exploration_id_to_filenames.values():
+            total_files += len(filnames)
+
+        self.assertEqual(total_files, 5)
+
+        exploration_id_to_filenames = (
+            voiceover_services.get_voiceover_filenames(
+                voice_artist_id='voice_artist_2', language_code='ar'))
+
+        total_files = 0
+        for filnames in exploration_id_to_filenames.values():
+            total_files += len(filnames)
+
+        self.assertEqual(total_files, 1)
+
+    def test_auto_update_exploration_voice_artist_link_model(self) -> None:
+        content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_1', self.voiceover1),
+            }
+        }
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_1', self.voiceover1],
+                'hi': ['voice_artist_3', self.voiceover7]
+            }
+        }
+
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+        exploration_voice_artists_link_model.put()
+
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover1,
+                    },
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {},
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            }
+        })]
+
+        exp_services.update_exploration(
+            'voice_artist_1', 'exploration_id',
+            change_list, 'Adds voiceover')
+        exploration = exp_fetchers.get_exploration_by_id('exploration_id')
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover1,
+                        'hi': self.voiceover7,
+                    },
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover1
+                    },
+                    'default_outcome_1': {},
+                    'ca_placeholder_2': {}
+                }
+            }
+        })]
+
+        exp_services.update_exploration(
+            'voice_artist_3', 'exploration_id',
+            change_list, 'Adds voiceover')
+        updated_exploration = exp_fetchers.get_exploration_by_id(
+            'exploration_id')
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_not_update_exp_link_model_for_empty_change_list(
+        self
+    ) -> None:
+        content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ('voice_artist_1', self.voiceover1),
+            }
+        }
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_1', self.voiceover1],
+            }
+        }
+
+        exploration_voice_artists_link_model = (
+            voiceover_services.
+            create_exploration_voice_artists_link_model_instance(
+                exploration_id='exploration_id',
+                content_id_to_voiceovers_mapping=(
+                    content_id_to_voiceovers_mapping)
+            )
+        )
+        exploration_voice_artists_link_model.put()
+
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'Introduction',
+            'new_value': {}
+        })]
+
+        updated_exploration = exp_services.apply_change_list(
+            'exploration_id', change_list
+        )
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_create_exp_link_model(self) -> None:
+        expected_content_id_to_voiceovers_mapping = {
+            'content_0': {
+                'en': ['voice_artist_3', self.voiceover7],
+            }
+        }
+
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'Introduction',
+            'new_value': {}
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover7
+                    }
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            }
+        })]
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id', strict=False))
+        self.assertIsNone(exp_voice_artist_link_model)
+
+        updated_exploration = exp_services.apply_change_list(
+            'exploration_id', change_list
+        )
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, True, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id'))
+        retrieved_content_id_to_voiceovers_mapping = (
+            exp_voice_artist_link_model.content_id_to_voiceovers_mapping
+        )
+
+        self.assertDictEqual(
+            retrieved_content_id_to_voiceovers_mapping,
+            expected_content_id_to_voiceovers_mapping
+        )
+
+    def test_should_not_create_link_model_when_feature_flag_is_false(
+        self
+    ) -> None:
+        exploration = self.save_new_valid_exploration(
+            'exploration_id',
+            self.owner_id,
+            title='title1',
+            category='Algebra',
+            end_state_name='End State',
+        )
+        self.publish_exploration(self.owner_id, exploration.id)
+
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME),
+            'state_name': 'Introduction',
+            'new_value': {}
+        }), exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': (
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+            'state_name': 'Introduction',
+            'new_value': {
+                'voiceovers_mapping': {
+                    'content_0': {
+                        'en': self.voiceover7
+                    }
+                }
+            },
+            'old_value': {
+                'voiceovers_mapping': {
+                    'content_0': {}
+                }
+            }
+        })]
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id', strict=False))
+        self.assertIsNone(exp_voice_artist_link_model)
+
+        updated_exploration = exp_services.apply_change_list(
+            'exploration_id', change_list
+        )
+
+        feature_flag_services.update_feature_flag(
+            feature_flag_list.FeatureNames.
+            AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value, False, 0, [])
+
+        voiceover_services.update_exploration_voice_artist_link_model(
+            'voice_artist_3', change_list, exploration, updated_exploration
+        )
+
+        exp_voice_artist_link_model = (
+            voiceover_models.ExplorationVoiceArtistsLinkModel.get(
+                'exploration_id', strict=False))
+        self.assertIsNone(exp_voice_artist_link_model)

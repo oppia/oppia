@@ -43,7 +43,8 @@
                            [misconceptionsBySkill]="misconceptionsBySkill"
                            [questionStateData]="questionStateData"
                            [question]="question"
-                           [userCanEditQuestion]="canEditQuestion">
+                           [userCanEditQuestion]="canEditQuestion"
+                           [stateContentShouldStayVisibleOnScroll]="false">
     </oppia-question-editor>
     <div class="alert alert-danger" *ngIf="question.getStateData().interaction.id && questionValidationService.getValidationErrorMessage(question)">
       {{questionValidationService.getValidationErrorMessage(question)}}
@@ -336,8 +337,10 @@
       margin-left: 0;
       margin-right: 0;
       margin-top: 30px;
+      max-height: none;
       order: 10;
       padding: 0;
+      padding-bottom: 90px;
       width: 100%;
     }
     .create-question-container {

@@ -572,7 +572,7 @@ ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.3.6'
+OPPIA_VERSION = '3.3.8'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia-beam-job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1018,6 +1018,7 @@ QUESTION_COUNT_URL_PREFIX = '/question_count_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+REGENERATE_TOPIC_SUMMARIES_URL = '/regenerate_topic_summaries_handler'
 DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
 EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
@@ -1096,10 +1097,11 @@ NEW_CLASSROOM_ID_HANDLER_URL = '/new_classroom_id_handler'
 CLASSROOM_HANDLER_URL = '/classroom'
 CLASSROOM_URL_FRAGMENT_HANDLER = '/classroom_url_fragment_handler'
 CLASSROOM_ID_HANDLER_URL = '/classroom_id_handler'
-VOICEOVER_ADMIN_PAGE_URL = '/voiceover-admin'
 VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
 VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping')
+VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
+GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
