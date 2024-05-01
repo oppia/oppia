@@ -20,7 +20,6 @@ voiceover models."""
 from __future__ import annotations
 
 from core.domain import state_domain
-from core.domain import voiceover_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
@@ -51,6 +50,37 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
     """
 
     DATASTORE_UPDATES_ALLOWED = True
+
+    @classmethod
+    def create_entity_voiceovers_model_instance(
+        cls,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        language_accent_code: str
+    ) -> voiceover_models.EntityVoiceoversModel:
+        """Returns a unique entity voiceovers model instance.
+
+        Args:
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
+            entity_version: int. The version of the entity.
+            language_accent_code: str. The language-accent code of the
+                voiceover.
+
+        Returns:
+            EntityVoiceoversModel. An instance of entity voiceover model
+            instance.
+        """
+        with datastore_services.get_ndb_context():
+            entity_voiceovers_model = (
+                voiceover_models.EntityVoiceoversModel.create_new(
+                    entity_id, entity_type, entity_version,
+                    language_accent_code, {}
+                )
+            )
+        entity_voiceovers_model.update_timestamps()
+        return entity_voiceovers_model
 
     @classmethod
     def update_entity_voiceover_for_given_id(
@@ -99,10 +129,9 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
         )
 
         if entity_voiceover_id not in entity_voiceover_id_to_entity_voiceovers:
-            with datastore_services.get_ndb_context():
-                entity_voiceovers_object = (
-                    voiceover_services.create_entity_voiceovers_model_instance(
-                        entity_id, entity_type, entity_version, accent_code))
+            entity_voiceovers_object = (
+                cls.create_entity_voiceovers_model_instance(
+                    entity_id, entity_type, entity_version, accent_code))
         else:
             entity_voiceovers_object = (
                 entity_voiceover_id_to_entity_voiceovers[entity_voiceover_id])

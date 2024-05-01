@@ -109,30 +109,6 @@ def get_voiceovers_for_given_language_accent_code(
         language_accent_code=language_accent_code)
 
 
-def create_entity_voiceovers_model_instance(
-    entity_type: str,
-    entity_id: str,
-    entity_version: int,
-    language_accent_code: str
-) -> voiceover_models.EntityVoiceoversModel:
-    """Returns a unique entity voiceovers domain object.
-
-    Args:
-        entity_type: str. The type of the entity.
-        entity_id: str. The ID of the entity.
-        entity_version: int. The version of the entity.
-        language_accent_code: str. The language-accent code of the voiceover.
-
-    Returns:
-        EntityVoiceovers. An instance of entity voiceover.
-    """
-    entity_voiceovers_model = voiceover_models.EntityVoiceoversModel.create_new(
-        entity_id, entity_type, entity_version, language_accent_code, {}
-    )
-    entity_voiceovers_model.update_timestamps()
-    return entity_voiceovers_model
-
-
 # NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
 # model does not contain any data yet. Issue #19590 tracks the changes required
 # in order to use this function.
