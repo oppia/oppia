@@ -21,7 +21,7 @@ import {UserFactory} from '../../puppeteer-testing-utilities/user-factory';
 import {QuestionAdmin} from '../../user-utilities/question-admin-utils';
 import testConstants from '../../puppeteer-testing-utilities/test-constants';
 
-const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Question Admin', function () {
@@ -33,7 +33,7 @@ describe('Question Admin', function () {
       'question_admin@example.com',
       [ROLES.QUESTION_ADMIN]
     );
-  }, DEFAULT_SPEC_TIMEOUT);
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
     'should be able to provide rights to review and submit questions to user.',
@@ -66,7 +66,7 @@ describe('Question Admin', function () {
       await questionAdmin.verifyUserCannotSubmitQuestions('Tester');
       await questionAdmin.verifyQuestionSubmittersExcludeUser('Tester');
     },
-    DEFAULT_SPEC_TIMEOUT
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   afterAll(async function () {
