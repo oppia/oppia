@@ -55,6 +55,7 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {TranslationLanguageService} from '../services/translation-language.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -103,6 +104,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     name: string;
     content: SubtitledUnicode | SubtitledHtml;
   }[];
+  voiceoverContributionIsEnabled: boolean = true;
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -119,11 +121,17 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     private ConvertToPlainTextPipe: ConvertToPlainTextPipe,
     private truncatePipe: TruncatePipe,
     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
-    private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe
+    private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   isVoiceoverModeActive(): boolean {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
+  }
+
+  isVoiceoverContributionEnabled(): boolean {
+    return this.platformFeatureService.status.EnableVoiceoverContribution
+      .isEnabled;
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {

@@ -20,9 +20,11 @@ var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
 var workflow = require('../webdriverio_utils/workflow.js');
+var AdminPage = require('../webdriverio_utils/AdminPage.js');
 
 var ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 var CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
+var ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 
 describe('Voiceover upload features', function () {
   var TEST_USERNAME = 'uploadUser';
@@ -33,6 +35,8 @@ describe('Voiceover upload features', function () {
   var explorationEditorMainTab = null;
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
+  var adminPage = null;
+  var releaseCoordinatorPage = null;
 
   beforeAll(async function () {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
@@ -40,6 +44,27 @@ describe('Voiceover upload features', function () {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    adminPage = new AdminPage.AdminPage();
+    releaseCoordinatorPage =
+      new ReleaseCoordinatorPage.ReleaseCoordinatorPage();
+
+    await users.createAndLoginCurriculumAdminUser(
+      'featureFlagEnabler@release.com',
+      'featureFlagEnabler'
+    );
+
+    // The below lines enable the enable_voiceover_contribution flag in
+    // prod mode.
+    // They should be removed after the enable_voiceover_contribution flag is
+    // deprecated.
+    await adminPage.get();
+    await adminPage.addRole('featureFlagEnabler', 'release coordinator');
+    await releaseCoordinatorPage.getFeaturesTab();
+
+    var voiceoverContributionFlag =
+      await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
+    await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
+    await users.logout();
 
     await users.createUser(TEST_EMAIL, TEST_USERNAME);
     await users.login(TEST_EMAIL);

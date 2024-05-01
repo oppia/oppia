@@ -49,7 +49,9 @@ class FeatureNames(enum.Enum):
     IS_IMPROVEMENTS_TAB_ENABLED = 'is_improvements_tab_enabled'
     LEARNER_GROUPS_ARE_ENABLED = 'learner_groups_are_enabled'
     NEW_LESSON_PLAYER = 'new_lesson_player'
+    ADD_VOICEOVER_WITH_ACCENT = 'add_voiceover_with_accent'
     CD_ALLOW_UNDOING_TRANSLATION_REVIEW = 'cd_allow_undoing_translation_review'
+    ENABLE_VOICEOVER_CONTRIBUTION = 'enable_voiceover_contribution'
     AUTO_UPDATE_EXP_VOICE_ARTIST_LINK = 'auto_update_exp_voice_artist_link'
 
 
@@ -76,6 +78,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK
 ]
@@ -86,6 +89,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ADMIN_DASHBOARD_NEW_UI,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW,
     FeatureNames.DIAGNOSTIC_TEST,
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW
 ]
 
@@ -199,11 +203,26 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.DEV
         )
     ),
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
+        (
+            'The flag allows voice artists to add voiceovers in a specific '
+            'accent for the given language.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
+        (
+            'The flag controls whether voiceover contributions from the '
+            'voiceover tab of the exploration editor page is enabled or '
+            'disabled during voiceover migration.',
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value: (
