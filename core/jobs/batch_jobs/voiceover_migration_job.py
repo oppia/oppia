@@ -69,8 +69,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 voiceover.
 
         Returns:
-            EntityVoiceoversModel. An instance of entity voiceover model
-            instance.
+            EntityVoiceoversModel. An instance of entity voiceover model.
         """
         with datastore_services.get_ndb_context():
             entity_voiceovers_model = (
