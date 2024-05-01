@@ -475,14 +475,15 @@ class VoiceArtistMetadataModelsTestsBaseClass(
             voice_artist_id=self.editor_id_2,
             language_code_to_accent=language_code_to_accent_2)
 
-    def _create_voice_artist_metadata_with_empty_accent_code(self) -> None:
+    def _create_voice_artist_metadata_with_missing_accent_code(self) -> None:
         """The method creates two instances of the voice artist metadata model,
-        and one model contains an empty accent code.
+        and one model contains a missing accent code.
         """
         language_code_to_accent_1 = {
             'en': 'en-US'
         }
         language_code_to_accent_2: Dict[str, str] = {}
+
         voiceover_models.VoiceArtistMetadataModel.create_model(
             voice_artist_id=self.editor_id_1,
             language_code_to_accent=language_code_to_accent_1)

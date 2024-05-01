@@ -69,7 +69,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 voiceover.
 
         Returns:
-            EntityVoiceoversModel. An instance of entity voiceover model.
+            EntityVoiceoversModel. An instance of the entity voiceover model.
         """
         with datastore_services.get_ndb_context():
             entity_voiceovers_model = (
@@ -97,8 +97,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
         accent code for a specific content of an exploration.
 
         Args:
-            entity_type: str. The entity type for the given entity voiceover
-                instance.
+            entity_type: str. The entity type of an entity voiceovers instance.
             entity_id: str. The given entity ID.
             entity_version: int. The version number of the given exploration.
             accent_code: str. The language accent code for the given entity
@@ -144,7 +143,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
         return entity_voiceover_id_to_entity_voiceovers
 
     @classmethod
-    def generate_entity_voiceover_model(
+    def generate_entity_voiceover_models(
         cls,
         element: ExplorationAndVoiceArtistLinkType,
         voice_artist_metadata_models_list: List[
@@ -166,8 +165,8 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
                 for a given voice artist should be fetched from this model.
 
         Returns:
-            list(EntityVoiceoversModel). A list of entity voiceovers models used
-            for storing voiceovers from the given exploration data.
+            list(EntityVoiceoversModel). A list of entity voiceover models
+            containing voiceovers from the given exploration data.
 
         Raises:
             Exception. All voice artists are not assigned accents in the
@@ -238,9 +237,9 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
         voiceover model.
 
         Args:
-            entity_voiceovers_model: EntityVoiceoversModel. An instance of
-                entity voiceover model from which number of voiceovers will be
-                calculated.
+            entity_voiceovers_model: EntityVoiceoversModel. An instance of an
+                entity voiceover model from which the number of voiceovers will
+                be calculated.
 
         Returns:
             int. The number of voiceovers present in the given entity
@@ -321,7 +320,7 @@ class PopulateManualVoiceoversToEntityVoiceoverModelJob(base_jobs.JobBase):
             )
             | 'Get entity voiceover models' >> beam.Map(
                 PopulateManualVoiceoversToEntityVoiceoverModelJob.
-                generate_entity_voiceover_model,
+                generate_entity_voiceover_models,
                 beam.pvalue.AsList(voice_artist_metadata_models)
             )
             | 'Merge all entity voiceovers model' >> beam.FlatMap(
