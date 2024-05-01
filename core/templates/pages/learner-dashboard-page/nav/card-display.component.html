@@ -1,14 +1,14 @@
-<div class="card-display-container d-flex flex-column mb-4" [ngStyle]="{'max-width': (tabType === 'homeTopics' || tabType.includes('progress') ? '100%' : 'fit-content')}">
+<div class="card-display-container d-flex flex-column h-100 mb-4" [ngStyle]="{'max-width': (tabType === 'homeTopics' || tabType.includes('progress') ? '100%' : 'fit-content')}">
   <div class="d-flex justify-content-between">
     <p class="card-display-heading"> {{ heading }} </p>
-    <div class="d-flex" *ngIf="(numCards > 1) && ((numCards - 1) * cardWidth + (cardWidth - 32) > carddisplay.offsetWidth) && (tabType.includes('home'))">
+    <div class="d-flex" *ngIf="(numCards > 1) && ((numCards - 1) * cardWidth + (cardWidth - 32) > cards.offsetWidth) && (tabType.includes('home'))">
       <button [disabled]="currentShift === 0" class="align-items-center border-0 d-flex justify-content-center mr-2 px-0 card-display-button" (click)="nextCard(currentShift - 1)">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
         </svg>
       </button>
       <p> </p>
-      <button [disabled]="currentShift === getMaxShifts(carddisplay.offsetWidth)" class="align-items-center border-0 d-flex justify-content-center px-0 card-display-button" (click)="nextCard(currentShift + 1)">
+      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="align-items-center border-0 d-flex justify-content-center px-0 card-display-button card-display-button-right" (click)="nextCard(currentShift + 1)">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
           <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
         </svg>
@@ -16,8 +16,8 @@
     </div>
   </div>
   <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-  <!--[ngClass]="(cardWidth === 216) && (numCards === 1 ? 'px-1 card-display-one-card' : (currentShift === getMaxShifts(carddisplay.offsetWidth) ? 'pr-1 ml-1 mr-n1' : 'pl-1 ml-n1'))"-->
-  <div #carddisplay class="d-flex card-display-content-container pb-1 mb-n1" #cards [ngClass]="cardWidth === 216 && 'card-display-content-container-offset'"> 
+  <!--[ngClass]="(cardWidth === 216) && (numCards === 1 ? 'px-1 card-display-one-card' : (currentShift === getMaxShifts(cards.offsetWidth) ? 'pr-1 ml-1 mr-n1' : 'pl-1 ml-n1'))"-->
+  <div class="d-flex card-display-content-container pb-1 mb-n1" #cards [ngClass]="cardWidth === 216 && 'card-display-content-container-offset'"> 
     <ng-content></ng-content>
   </div>
   <button *ngIf="!tabType.includes('home')" class="align-self-end">  {{ 'I18N_LEARNER_DASHBOARD_CARD_DISPLAY_BUTTON' | translate }} </button>

@@ -113,7 +113,7 @@ module.exports = function (config) {
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
-      terminal: argv.terminalEnabled,
+      terminal: true,
     },
     // Continue running in the background after running tests.
     singleRun: true,

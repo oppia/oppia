@@ -23,9 +23,10 @@ export class CardDisplayComponent implements OnInit {
 
   nextCard(num: number): void {
     const allCards = this.cards.nativeElement;
+    //(this.numCards - 1 - (this.getMaxShifts(allCards.offsetWidth) - 2)))
     const lastShift =
       ((this.cardWidth *
-        (this.numCards - 1 - (this.getMaxShifts(allCards.offsetWidth) - 2))) %
+        (this.numCards - (this.getMaxShifts(allCards.offsetWidth) - 1))) %
         allCards.offsetWidth) +
       28.5;
 
@@ -44,6 +45,7 @@ export class CardDisplayComponent implements OnInit {
             : num === this.getMaxShifts(allCards.offsetWidth)
               ? lastShift
               : this.cardWidth;
+        console.log(allCards.scrollLeft + 20);
       }
     }
     this.currentShift = num;

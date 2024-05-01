@@ -26,6 +26,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 describe('CardDisplayComponent', () => {
   let component: CardDisplayComponent;
   let fixture: ComponentFixture<CardDisplayComponent>;
+  let scrollLeftSetterSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -40,14 +41,20 @@ describe('CardDisplayComponent', () => {
     component = fixture.componentInstance;
 
     component.numCards = 5;
-    const mockDivElement = document.createElement('div');
-    mockDivElement.style.width = '400px';
-    const mockDivElementRef = {nativeElement: mockDivElement};
-    component.cards = mockDivElementRef as any;
-  });
+    component.tabType = 'home';
+    component.heading = 'Mock Heading';
+    fixture.detectChanges();
 
-  afterEach(() => {
-    fixture.destroy();
+    spyOnProperty(
+      component.cards.nativeElement,
+      'offsetWidth',
+      'get'
+    ).and.returnValue(400);
+    scrollLeftSetterSpy = spyOnProperty(
+      component.cards.nativeElement,
+      'scrollLeft',
+      'set'
+    );
   });
 
   it('should return 0 shifts for getMaxShifts if container can fit cards perfectly', () => {
@@ -61,21 +68,89 @@ describe('CardDisplayComponent', () => {
   });
 
   describe('when shifting cards container to the right', () => {
-    it('should shift by (cardWidth - 32) if first shift', () => {
-      const cardsElement = component.cards.nativeElement;
-      spyOn(cardsElement, 'scrollLeft');
+    it('should shift by (cardWidth - 32) if first shift to the right', () => {
+      component.nextCard(1);
+
+      fixture.detectChanges();
+
+      expect(scrollLeftSetterSpy.calls.mostRecent().args[0]).toBe(200);
     });
 
-    it('should shift by cardWidth if not first shift or last', () => {});
+    it('should shift by cardWidth if not first shift or last to the right', () => {
+      spyOnProperty(
+        component.cards.nativeElement,
+        'scrollLeft',
+        'get'
+      ).and.returnValue(200);
 
-    it('should shift by remainder needed to show last card if last shift', () => {});
+      component.currentShift = 1;
+      component.nextCard(2);
+
+      fixture.detectChanges();
+
+      expect(scrollLeftSetterSpy.calls.mostRecent().args[0]).toBe(432);
+    });
+
+    it('should shift by remainder needed to show last card if last shift to the right', () => {
+      spyOnProperty(
+        component.cards.nativeElement,
+        'scrollLeft',
+        'get'
+      ).and.returnValue(664);
+
+      component.currentShift = 3;
+      component.nextCard(4);
+
+      fixture.detectChanges();
+
+      expect(scrollLeftSetterSpy.calls.mostRecent().args[0]).toBe(756.5);
+    });
   });
 
   describe('when shifting cards container to the left', () => {
-    it('should shift by remainder needed to show last if first shift', () => {});
+    it('should shift by remainder needed to show last if first shift', () => {
+      spyOnProperty(
+        component.cards.nativeElement,
+        'scrollLeft',
+        'get'
+      ).and.returnValue(756.5);
 
-    it('should shift by cardWidth if not first shift or last', () => {});
+      component.currentShift = 4;
+      component.nextCard(3);
 
-    it('should shift by (cardWidth - 32) if last shift', () => {});
+      fixture.detectChanges();
+
+      expect(scrollLeftSetterSpy.calls.mostRecent().args[0]).toBe(664);
+    });
+
+    it('should shift by cardWidth if not first shift or last', () => {
+      spyOnProperty(
+        component.cards.nativeElement,
+        'scrollLeft',
+        'get'
+      ).and.returnValue(664);
+
+      component.currentShift = 3;
+      component.nextCard(2);
+
+      fixture.detectChanges();
+
+      expect(scrollLeftSetterSpy.calls.mostRecent().args[0]).toBe(432);
+    });
+
+    it('should shift by (cardWidth - 32) if last shift', () => {
+      spyOnProperty(
+        component.cards.nativeElement,
+        'scrollLeft',
+        'get'
+      ).and.returnValue(200);
+
+      component.currentShift = 1;
+      component.nextCard(0);
+
+      fixture.detectChanges();
+
+      expect(scrollLeftSetterSpy.calls.mostRecent().args[0]).toBe(0);
+    });
   });
 });
