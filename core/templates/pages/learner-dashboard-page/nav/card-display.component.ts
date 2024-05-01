@@ -24,31 +24,41 @@ export class CardDisplayComponent implements OnInit {
   nextCard(num: number): void {
     const allCards = this.cards.nativeElement;
     //(this.numCards - 1 - (this.getMaxShifts(allCards.offsetWidth) - 2)))
+    const maxShifts = this.getMaxShifts(allCards.offsetWidth);
     const lastShift =
-      ((this.cardWidth *
-        (this.numCards - (this.getMaxShifts(allCards.offsetWidth) - 1))) %
+      ((this.cardWidth * (this.numCards - (maxShifts - 1))) %
         allCards.offsetWidth) +
       28.5;
 
     if (allCards !== null) {
       if (this.currentShift > num) {
-        allCards.scrollLeft -=
-          this.currentShift === this.getMaxShifts(allCards.offsetWidth)
-            ? lastShift
-            : this.currentShift === 1
-              ? this.cardWidth - 32
-              : this.cardWidth;
+        allCards.scrollLeft -= this.shiftLeft({
+          max: maxShifts,
+          last: lastShift,
+        });
       } else {
-        allCards.scrollLeft +=
-          num === 1
-            ? this.cardWidth - 32
-            : num === this.getMaxShifts(allCards.offsetWidth)
-              ? lastShift
-              : this.cardWidth;
-        console.log(allCards.scrollLeft + 20);
+        allCards.scrollLeft += this.shiftRight({
+          max: maxShifts,
+          last: lastShift,
+          next: num,
+        });
       }
     }
     this.currentShift = num;
+  }
+
+  shiftLeft(shift: {max: number; last: number}): number {
+    if (this.currentShift === shift.max) {
+      return shift.last;
+    }
+    return this.cardWidth - (this.currentShift === 1 ? 32 : 0);
+  }
+
+  shiftRight(shift: {max: number; last: number; next: number}): number {
+    if (shift.next === 1) {
+      return this.cardWidth - 32;
+    }
+    return shift.next === shift.max ? shift.last : this.cardWidth;
   }
 }
 
