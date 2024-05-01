@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @load('base-components/header.template.html', {"title": "Oppia"})
+    <style>
+      html, body {
+        background: #eee no-repeat center center fixed;
+        background-size: cover;
+      }
+      .oppia-collection-path-section {
+        background: #fff;
+        border-radius: 2px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 2px 4px rgba(0, 0, 0, 0.23);
+        float: left;
+        margin-top: 20px;
+        max-width: 675px;
+        padding: 40px 10px 60px 20px;
+        position: absolute;
+        text-align: left;
+        top: 168px;
+      }
+      .oppia-collection-table {
+        margin: 0 auto;
+        max-width: 90%;
+        padding: 50px 20px 420px 20px;
+        position: relative;
+        text-align: left;
+        top: 35px;
+        width: 100%;
+      }
+      .collection-mascot {
+        left: 40px;
+        position: absolute;
+        top: 40px;
+        width: 120px;
+      }
+      @media only screen and (max-width : 600px) {
+        .oppia-collection-player-title-font {
+          font-size: 32px;
+        }
+      }
+      /* To avoid double shadows caused by overlaying preview card
+      over the blank preview card */
+      .exploration-summary-tile md-card {
+        box-shadow: none;
+      }
+      .mobile-path-segment {
+        margin: 0 auto;
+        width: 250px;
+      }
+      .mobile-lesson-icon {
+        left: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 100px;
+      }
+
+      @media only screen and (max-width: 998px) {
+        .oppia-activity-summary-tile-mobile-background-mask {
+          align-items: center;
+          background: rgba(0,0,0,0.25);
+          display: flex;
+          height: 100vh;
+          justify-content: space-around;
+          width: 100vw;
+          z-index: -1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <oppia-root>
+      <div ng-controller="Base" dir="<[direction]>">
+        <oppia-base-content>
+          <navbar-breadcrumb>
+            <collection-navbar></collection-navbar>
+          </navbar-breadcrumb>
+          <nav-options>
+            <collection-local-nav></collection-local-nav>
+          </nav-options>
+          <content>
+            <oppia-collection-player-page></oppia-collection-player-page>
+          </content>
+          <page-footer>
+            <collection-footer></collection-footer>
+          </page-footer>
+        </oppia-base-content>
+      </div>
+    </oppia-root>
+    @load('pages/footer_js_libs.html')
+  </body>
+</html>

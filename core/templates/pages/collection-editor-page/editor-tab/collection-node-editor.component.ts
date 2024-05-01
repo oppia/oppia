@@ -19,6 +19,7 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import {CollectionNode} from 'domain/collection/collection-node.model';
 import {Collection} from 'domain/collection/collection.model';
 import {AlertsService} from 'services/alerts.service';
@@ -104,3 +105,10 @@ export class CollectionNodeEditorComponent implements OnInit {
     this.hrefUrl = '/create/' + this.collection.getExplorationIds();
   }
 }
+
+angular
+  .module('oppia')
+  .directive(
+    'oppiaCollectionNodeEditor',
+    downgradeComponent({component: CollectionNodeEditorComponent})
+  );

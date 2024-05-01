@@ -31,7 +31,7 @@ import {VoiceoverAdminNavbarComponent} from './voiceover-admin-navbar.component'
 import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UserInfo} from 'domain/user/user-info.model';
 
-describe('Voiceover Admin navbar component', () => {
+describe('Vocieover Admin navbar component', () => {
   let component: VoiceoverAdminNavbarComponent;
   let userService: UserService;
   let userInfo = {

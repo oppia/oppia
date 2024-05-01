@@ -1642,7 +1642,8 @@ def update_email_preferences(
             to the bulk email provider's database initiated the update here.
 
     Returns:
-        bool. Whether updating the user's bulk email preferences failed.
+        bool. Whether to send a mail to the user to complete bulk email service
+        signup.
     """
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False)

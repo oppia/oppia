@@ -18,7 +18,6 @@
 
 import util from 'util';
 import sourceMapSupport from 'source-map-support';
-import {ConsoleReporter} from '../../puppeteer-testing-utilities/console-reporter';
 
 sourceMapSupport.install();
 
@@ -265,7 +264,3 @@ const Reporter: jasmine.CustomReporter = {
 
 jasmine.getEnv().clearReporters();
 jasmine.getEnv().addReporter(Reporter);
-// Here we report console errors after each test suite.
-afterEach(() => {
-  ConsoleReporter.reportConsoleErrors();
-});

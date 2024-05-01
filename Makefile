@@ -39,7 +39,6 @@ build.%: ## Builds the given docker service. Example: make build.datastore
 
 build: ## Builds the all docker setup.
 	$(MAKE) install_node
-	$(MAKE) install_hooks
 	docker compose build
 
 run-devserver: ## Runs the dev-server
@@ -72,9 +71,10 @@ start-devserver: ## Starts the development server
 	@echo 'Check dev-server logs using "make logs.dev-server"'
 	@echo 'Stop the development server using "make stop"'
 
-install_hooks:  ## Install required hooks
+init: install-hooks build run-devserver ## Initializes the build and runs dev-server.
+
+install-hooks:  ## Install required hooks
 	bash ./docker/pre_push_hook.sh --install
-	bash ./docker/pre_commit_hook.sh --install
 
 clean: ## Cleans the docker containers and volumes.
 	docker compose down --rmi all --volumes
@@ -122,12 +122,6 @@ logs.%: ## Shows the logs of the given docker service. Example: make logs.datast
 restart.%: ## Restarts the given docker service. Example: make restart.datastore
 	docker compose restart $*
 
-run_tests.prettier: ## Formats the code using prettier.
-	docker compose run --no-deps --entrypoint "npx prettier --check ." dev-server
-
-run_tests.third_party_size_check: ## Runs the third party size check
-	docker compose run --no-deps --entrypoint "python -m scripts.third_party_size_check" dev-server
-
 run_tests.lint: ## Runs the linter tests
 	docker compose run --no-deps --entrypoint "/bin/sh -c 'git config --global --add safe.directory /app/oppia && python -m scripts.linters.run_lint_checks $(PYTHON_ARGS)'" dev-server || $(MAKE) stop
 
@@ -153,7 +147,7 @@ run_tests.frontend: ## Runs the frontend unit tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_frontend_tests $(PYTHON_ARGS) --skip_install" dev-server || $(MAKE) stop
 
 run_tests.typescript: ## Runs the typescript checks
-	docker compose run --no-deps --entrypoint "python -m scripts.run_typescript_checks $(PYTHON_ARGS)" dev-server || $(MAKE) stop
+	docker compose run --no-deps --entrypoint "python -m scripts.typescript_checks $(PYTHON_ARGS)" dev-server || $(MAKE) stop
 
 run_tests.custom_eslint: ## Runs the custome eslint tests
 	docker compose run --no-deps --entrypoint "python -m scripts.run_custom_eslint_tests" dev-server || $(MAKE) stop
@@ -180,11 +174,7 @@ run_tests.acceptance: ## Runs the acceptance tests for the parsed suite
 	@echo '------------------------------------------------------'
 	@echo '  Starting acceptance test for the suite: $(suite)'
 	@echo '------------------------------------------------------'
-	@if [ -d ./core/tests/puppeteer-acceptance-tests/build ]; then \
-		rm -rf ./core/tests/puppeteer-acceptance-tests/build; \
-	fi
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/typescript/bin/tsc -p ./tsconfig.puppeteer-acceptance-tests.json
-	../oppia_tools/node-16.13.0/bin/node ./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/build/spec/$(suite).spec.js
+	./node_modules/.bin/jasmine --config="./core/tests/puppeteer-acceptance-tests/jasmine.json" ./core/tests/puppeteer-acceptance-tests/spec/$(suite) || $(MAKE) stop
 	@echo '------------------------------------------------------'
 	@echo '  Acceptance test has been executed successfully....'
 	@echo '------------------------------------------------------'

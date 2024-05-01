@@ -30,7 +30,6 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {CreateActivityButtonComponent} from './create-activity-button.component';
-import {PrimaryButtonComponent} from './primary-button.component';
 
 /**
  * @fileoverview Unit tests for CreateActivityButtonComponent.
@@ -104,7 +103,6 @@ describe('CreateActivityButtonComponent', () => {
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => true,
-    isVoiceoverAdmin: () => false,
   };
 
   let userInfoForNonCollectionCreator = {
@@ -133,18 +131,13 @@ describe('CreateActivityButtonComponent', () => {
     getUsername: () => 'username1',
     getEmail: () => 'tester@example.org',
     isLoggedIn: () => true,
-    isVoiceoverAdmin: () => false,
   };
 
   beforeEach(waitForAsync(() => {
     windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [
-        CreateActivityButtonComponent,
-        PrimaryButtonComponent,
-        MockTranslatePipe,
-      ],
+      declarations: [CreateActivityButtonComponent, MockTranslatePipe],
       providers: [
         UserService,
         {

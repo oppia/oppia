@@ -17,6 +17,7 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 import {Subscription} from 'rxjs';
 
@@ -58,3 +59,9 @@ export class CollectionNavbarComponent implements OnInit, OnDestroy {
     return this.directiveSubscriptions.unsubscribe();
   }
 }
+angular
+  .module('oppia')
+  .directive(
+    'collectionNavbar',
+    downgradeComponent({component: CollectionNavbarComponent})
+  );

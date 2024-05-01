@@ -26,16 +26,9 @@ from core.constants import constants
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.domain import feature_flag_services as feature_services
-from core.platform import models
 from core.tests import test_utils
 
 from typing import Tuple
-
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import user_models
-
-(user_models, ) = models.Registry.import_models([models.Names.USER])
 
 
 class FeatureNames(enum.Enum):
@@ -55,8 +48,6 @@ FeatureStages = feature_flag_domain.FeatureStages
 
 class FeatureFlagServiceTest(test_utils.GenericTestBase):
     """Test for the feature flag services."""
-
-    LOGGED_OUT_USER_ID = None
 
     def _swap_name_to_description_feature_stage_registry(
         self) -> contextlib._GeneratorContextManager[None]:
@@ -101,8 +92,6 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.USER_GROUP_1 = 'user_group_1'
-        self.USER_GROUP_2 = 'user_group_2'
 
         # Feature names that might be used in following tests.
         self.feature_names = ['feature_a', 'feature_b', 'feature_c']
@@ -321,7 +310,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     'feature_that_does_not_exist.'
                 ):
                     feature_services.is_feature_flag_enabled(
-                        'feature_that_does_not_exist', self.owner_id)
+                        self.owner_id, 'feature_that_does_not_exist')
 
     def test_updating_non_existing_feature_results_in_error(self) -> None:
         swap_name_to_description_feature_stage_registry_dict = (
@@ -405,8 +394,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 with self.swap(constants, 'DEV_MODE', True):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name,
-                            self.owner_id)
+                            self.owner_id,
+                            self.dev_feature_flag.name)
                         )
 
     def test_evaluate_test_feature_flag_for_dev_server_returns_true(
@@ -420,8 +409,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 with self.swap(constants, 'DEV_MODE', True):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
-                            self.test_feature_flag.name,
-                            self.owner_id)
+                            self.owner_id,
+                            self.test_feature_flag.name)
                         )
 
     def test_evaluate_prod_feature_flag_for_dev_server_returns_true(
@@ -435,8 +424,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 with swap_name_to_description_feature_stage_registry_dict:
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
-                            self.prod_feature_flag.name,
-                            self.owner_id)
+                            self.owner_id,
+                            self.prod_feature_flag.name)
                         )
 
     def test_evaluate_dev_feature_flag_for_test_server_returns_false(
@@ -453,8 +442,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     ):
                         self.assertFalse(
                             feature_services.is_feature_flag_enabled(
-                                self.dev_feature_flag.name,
-                                self.owner_id)
+                                self.owner_id,
+                                self.dev_feature_flag.name)
                             )
 
     def test_evaluate_test_feature_flag_for_test_server_returns_true(
@@ -471,8 +460,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                     ):
                         self.assertTrue(
                             feature_services.is_feature_flag_enabled(
-                                self.test_feature_flag.name,
-                                self.owner_id)
+                                self.owner_id,
+                                self.test_feature_flag.name)
                             )
 
     def test_evaluate_prod_feature_flag_for_test_server_returns_true(
@@ -490,8 +479,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 ):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
-                            self.prod_feature_flag.name,
-                            self.owner_id)
+                            self.owner_id,
+                            self.prod_feature_flag.name)
                         )
 
     def test_evaluate_dev_feature_flag_for_prod_server_returns_false(
@@ -509,8 +498,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 ):
                     self.assertFalse(
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name,
-                            self.owner_id)
+                            self.owner_id,
+                            self.dev_feature_flag.name)
                         )
 
     def test_evaluate_test_feature_flag_for_prod_server_returns_false(
@@ -528,8 +517,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 ):
                     self.assertFalse(
                         feature_services.is_feature_flag_enabled(
-                            self.test_feature_flag.name,
-                            self.owner_id)
+                            self.owner_id,
+                            self.test_feature_flag.name)
                         )
 
     def test_evaluate_prod_feature_flag_for_prod_server_returns_true(
@@ -547,8 +536,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 ):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
-                            self.prod_feature_flag.name,
-                            self.owner_id)
+                            self.owner_id,
+                            self.prod_feature_flag.name)
                         )
 
     def test_feature_flag_flag_is_enabled_when_force_enable_is_set_to_true(
@@ -557,7 +546,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             self._swap_name_to_description_feature_stage_registry())
         with swap_name_to_description_feature_stage_registry_dict:
             self.assertTrue(feature_services.is_feature_flag_enabled(
-                self.dev_feature_flag.name, self.owner_id))
+                self.owner_id, self.dev_feature_flag.name))
 
     def test_feature_flag_enable_for_logged_out_user_with_force_enable_property(
         self) -> None:
@@ -565,7 +554,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             self._swap_name_to_description_feature_stage_registry())
         with swap_name_to_description_feature_stage_registry_dict:
             self.assertTrue(feature_services.is_feature_flag_enabled(
-                self.dev_feature_flag.name, self.LOGGED_OUT_USER_ID))
+                None, self.dev_feature_flag.name))
 
     def test_feature_flag_not_enabled_for_logged_out_user(self) -> None:
         swap_name_to_description_feature_stage_registry_dict = (
@@ -576,8 +565,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 feature_services.update_feature_flag(
                     self.dev_feature_flag.name, False, 0, [])
                 self.assertFalse(feature_services.is_feature_flag_enabled(
-                    self.dev_feature_flag.name,
-                    self.LOGGED_OUT_USER_ID))
+                    None, self.dev_feature_flag.name))
 
     def _signup_multiple_users_and_return_ids(self) -> Tuple[str, str, str]:
         """Signup multiple users and returns user ids of them
@@ -600,39 +588,6 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         return (user_1_id, user_2_id, user_3_id)
 
-    def test_feature_flag_enabled_for_given_user_groups(self) -> None:
-        (user_1_id, user_2_id, user_3_id) = (
-            self._signup_multiple_users_and_return_ids())
-        user_models.UserGroupModel(
-            id=self.USER_GROUP_1, users=[
-                user_1_id, user_2_id, user_3_id]).put()
-        user_models.UserGroupModel(
-            id=self.USER_GROUP_2, users=[
-                user_1_id, user_2_id]).put()
-        swap_name_to_description_feature_stage_registry_dict = (
-            self._swap_name_to_description_feature_stage_registry())
-        _, swap_all_feature_names_set = self._swap_feature_flags_list()
-        with swap_all_feature_names_set:
-            with swap_name_to_description_feature_stage_registry_dict:
-                feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 0, [
-                        self.USER_GROUP_1, self.USER_GROUP_2]
-                )
-                self.assertTrue(feature_services.is_feature_flag_enabled(
-                    self.dev_feature_flag.name, user_1_id))
-
-    def test_feature_flag_disabled_if_user_not_in_user_groups(self) -> None:
-        swap_name_to_description_feature_stage_registry_dict = (
-            self._swap_name_to_description_feature_stage_registry())
-        _, swap_all_feature_names_set = self._swap_feature_flags_list()
-        with swap_all_feature_names_set:
-            with swap_name_to_description_feature_stage_registry_dict:
-                feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, False, 0, [self.USER_GROUP_2]
-                )
-                self.assertFalse(feature_services.is_feature_flag_enabled(
-                    self.dev_feature_flag.name, 'user_id'))
-
     def test_feature_flag_config_is_same_for_user_with_every_retrieval(
         self) -> None:
         user_1_id, user_2_id, user_3_id = (
@@ -647,31 +602,31 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 feature_services.update_feature_flag(
                     self.dev_feature_flag.name, False, 50, [])
                 initial_user1_value = feature_services.is_feature_flag_enabled(
-                    self.dev_feature_flag.name, user_1_id)
+                    user_1_id, self.dev_feature_flag.name)
                 initial_user2_value = feature_services.is_feature_flag_enabled(
-                    self.dev_feature_flag.name, user_2_id)
+                    user_2_id, self.dev_feature_flag.name)
                 initial_user3_value = feature_services.is_feature_flag_enabled(
-                    self.dev_feature_flag.name, user_3_id)
+                    user_3_id, self.dev_feature_flag.name)
                 for _ in range(500):
                     self.assertEqual(
                         initial_user1_value,
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name,
-                            user_1_id
+                            user_1_id,
+                            self.dev_feature_flag.name
                         )
                     )
                     self.assertEqual(
                         initial_user2_value,
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name,
-                            user_2_id
+                            user_2_id,
+                            self.dev_feature_flag.name
                         )
                     )
                     self.assertEqual(
                         initial_user3_value,
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name,
-                            user_3_id
+                            user_3_id,
+                            self.dev_feature_flag.name
                         )
                     )
 
@@ -695,8 +650,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 for user_id in user_ids_list:
                     feature_is_enabled = (
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name,
-                            user_id
+                            user_id,
+                            self.dev_feature_flag.name
                         )
                     )
                     if feature_is_enabled:
@@ -724,8 +679,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 for user_id in user_ids_list:
                     feature_is_enabled = (
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name,
-                            user_id
+                            user_id,
+                            self.dev_feature_flag.name
                         )
                     )
                     if feature_is_enabled:
@@ -760,7 +715,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 for user_id in user_ids:
                     feature_status_for_users.append(
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name, user_id))
+                            user_id, self.dev_feature_flag.name))
 
         for feature_status in feature_status_for_users:
             self.assertFalse(feature_status)
@@ -781,7 +736,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
                 for user_id in user_ids:
                     feature_status_for_users.append(
                         feature_services.is_feature_flag_enabled(
-                            self.dev_feature_flag.name, user_id))
+                            user_id, self.dev_feature_flag.name))
 
         for feature_status in feature_status_for_users:
             self.assertTrue(feature_status)

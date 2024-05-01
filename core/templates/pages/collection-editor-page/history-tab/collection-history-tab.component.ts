@@ -17,6 +17,7 @@
  */
 
 import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'collection-history-tab',
@@ -26,3 +27,10 @@ import {Component} from '@angular/core';
 export class CollectionHistoryTabComponent {
   constructor() {}
 }
+
+angular
+  .module('oppia')
+  .directive(
+    'collectionHistoryTab',
+    downgradeComponent({component: CollectionHistoryTabComponent})
+  );

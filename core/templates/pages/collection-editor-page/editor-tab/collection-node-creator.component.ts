@@ -17,6 +17,7 @@
  */
 
 import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import {ExplorationCreationBackendApiService} from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import {Collection} from 'domain/collection/collection.model';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
@@ -140,3 +141,10 @@ export class CollectionNodeCreatorComponent {
     this.newExplorationId = '';
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaCollectionNodeCreator',
+  downgradeComponent({
+    component: CollectionNodeCreatorComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -17,6 +17,7 @@
  * playing the exploration in each node.
  */
 import {Component, Input} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 import {CollectionNode} from 'domain/collection/collection-node.model';
 
@@ -33,3 +34,10 @@ export class CollectionNodeListComponent {
   @Input() collectionNodes!: CollectionNode[];
   constructor() {}
 }
+
+angular
+  .module('oppia')
+  .directive(
+    'collectionNodeList',
+    downgradeComponent({component: CollectionNodeListComponent})
+  );

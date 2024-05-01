@@ -107,29 +107,23 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic = topic_domain.Topic.create_default_topic(
             self.TOPIC_ID, self.TOPIC_NAME, 'name', 'description', 'fragm')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
-
         topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
-
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None
         self.assertEqual(topic_model.name, self.TOPIC_NAME)
         self.assertEqual(topic_model.id, self.TOPIC_ID)
 
     def test_get_by_url_fragment(self) -> None:
-        url_fragment = 'name'
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, self.TOPIC_NAME, url_fragment, 'description',
+            self.TOPIC_ID, self.TOPIC_NAME, 'name-two', 'description',
             'fragm')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
-
-        topic_model = topic_models.TopicModel.get_by_url_fragment(
-            url_fragment)
-
+        topic_model = topic_models.TopicModel.get_by_name(self.TOPIC_NAME)
         # Ruling out the possibility of None for mypy type checking.
         assert topic_model is not None
         self.assertEqual(
-            topic_model.url_fragment,
-            url_fragment
+            topic_model.name,
+            self.TOPIC_NAME
         )
         self.assertEqual(
             topic_model.id,

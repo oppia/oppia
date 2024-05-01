@@ -16,12 +16,8 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
+import puppeteer, {Page, Browser} from 'puppeteer';
 import testConstants from './test-constants';
-import isElementClickable from '../functions/is-element-clickable';
-import {ConsoleReporter} from './console-reporter';
-
-const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 /** We accept the empty message because this is what is sent on
@@ -33,29 +29,12 @@ const acceptedBrowserAlerts = [
   'This action is irreversible. Are you sure?',
 ];
 
-interface ClickDetails {
-  position: {x: number; y: number};
-  timeInMilliseconds: number;
-}
-
-declare global {
-  interface Window {
-    logClick: (clickDetails: ClickDetails) => void;
-  }
-}
-
-export type ModalUserInteractions = (
-  _this: BaseUser,
-  container: string
-) => Promise<void>;
-
 export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
   email: string = '';
   username: string = '';
-  startTimeInMilliseconds: number = -1;
 
   constructor() {}
 
@@ -69,7 +48,6 @@ export class BaseUser {
     ];
 
     const headless = process.env.HEADLESS === 'true';
-    const mobile = process.env.MOBILE === 'true';
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -88,29 +66,9 @@ export class BaseUser {
         args,
       })
       .then(async browser => {
-        this.startTimeInMilliseconds = Date.now();
         this.browserObject = browser;
-        ConsoleReporter.trackConsoleMessagesInBrowser(browser);
         this.page = await browser.newPage();
-
-        if (mobile) {
-          // This is the default viewport and user agent settings for iPhone 6.
-          await this.page.setViewport({
-            width: 375,
-            height: 667,
-            deviceScaleFactor: 2,
-            isMobile: true,
-            hasTouch: true,
-            isLandscape: false,
-          });
-          await this.page.setUserAgent(
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
-              'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
-              'Mobile/15A372 Safari/604.1'
-          );
-        } else {
-          this.page.setViewport({width: 1920, height: 1080});
-        }
+        await this.page.setViewport({width: 1920, height: 1080});
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
           if (acceptedBrowserAlerts.includes(alertText)) {
@@ -119,74 +77,8 @@ export class BaseUser {
             throw new Error(`Unexpected alert: ${alertText}`);
           }
         });
-        this.setupDebugTools();
       });
-
     return this.page;
-  }
-
-  /**
-   * Function to setup debug methods for the current page of any acceptance
-   * test.
-   */
-  private async setupDebugTools(): Promise<void> {
-    await this.setupClickLogger();
-  }
-
-  /**
-   * This function sets up a click logger that logs click events to the
-   * terminal.
-   *
-   * Any time this.page object is replaced, this function must be called
-   * again before it start logging clicks again.
-   */
-  private async setupClickLogger(): Promise<void> {
-    await this.page.exposeFunction(
-      'logClick',
-      ({position: {x, y}, timeInMilliseconds}: ClickDetails) => {
-        // eslint-disable-next-line no-console
-        console.log(
-          `- Click position { x: ${x}, y: ${y} } from top-left corner ` +
-            'of the viewport'
-        );
-        // eslint-disable-next-line no-console
-        console.log(
-          '- Click occurred ' +
-            `${timeInMilliseconds - this.startTimeInMilliseconds} ms ` +
-            'into the test'
-        );
-      }
-    );
-  }
-
-  /**
-   * This function logs click events from all enabled elements selected by
-   * a given selector.
-   *
-   * The selector must be present in the document when called.
-   *
-   * this.setupClickLogger() must be called once before it can log click
-   * events from the elements.
-   */
-  async logClickEventsFrom(selector: string): Promise<void> {
-    await this.page.$$eval(
-      selector,
-      (elements: Element[], ...args: unknown[]) => {
-        const selector = args[0] as string;
-        for (const element of elements) {
-          element.addEventListener('click', (event: Event) => {
-            const mouseEvent = event as MouseEvent;
-            // eslint-disable-next-line no-console
-            console.log(`DEBUG: User clicked on ${selector}:`);
-            window.logClick({
-              position: {x: mouseEvent.clientX, y: mouseEvent.clientY},
-              timeInMilliseconds: Date.now(),
-            });
-          });
-        }
-      },
-      selector
-    );
   }
 
   /**
@@ -229,89 +121,21 @@ export class BaseUser {
   }
 
   /**
-   * The function switches the current page to the tab that was just opened by
-   * interacting with an element on the current page.
-   */
-  async switchToPageOpenedByElementInteraction(): Promise<void> {
-    const newPage: Page =
-      (await (
-        await this.browserObject.waitForTarget(
-          target => target.opener() === this.page.target()
-        )
-      ).page()) ?? (await this.browserObject.newPage());
-    this.page = newPage;
-    this.setupDebugTools();
-  }
-
-  /**
-   * The function coordinates user interactions with the selected modal.
-   */
-  async doWithinModal({
-    selector,
-    beforeOpened = async (_this, container) => {
-      await _this.page.waitForSelector(container, {visible: true});
-    },
-    whenOpened,
-    afterClosing = async (_this, container) => {
-      await _this.page.waitForSelector(container, {hidden: true});
-    },
-  }: {
-    selector: string;
-    beforeOpened?: ModalUserInteractions;
-    whenOpened: ModalUserInteractions;
-    afterClosing?: ModalUserInteractions;
-  }): Promise<void> {
-    await beforeOpened(this, selector);
-    await whenOpened(this, selector);
-    await afterClosing(this, selector);
-  }
-
-  /**
-   * This function waits for an element to be clickable either by its CSS selector or
-   * by the ElementHandle.
-   */
-  async waitForElementToBeClickable(
-    selector: string | ElementHandle<Element>
-  ): Promise<void> {
-    try {
-      const element =
-        typeof selector === 'string'
-          ? await this.page.waitForSelector(selector)
-          : selector;
-      await this.page.waitForFunction(isElementClickable, {}, element);
-    } catch (error) {
-      throw new Error(`Element ${selector} took too long to be clickable.`);
-    }
-  }
-
-  /**
    * The function clicks the element using the text on the button.
    */
   async clickOn(selector: string): Promise<void> {
-    /** Normalize-space is used to remove the extra spaces in the text.
-     * Check the documentation for the normalize-space function here :
-     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await this.page.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
-    // If we fail to find the element by its XPATH, then the button is undefined and
-    // we try to find it by its CSS selector.
-    if (button !== undefined) {
-      await this.waitForElementToBeClickable(button);
+    try {
+      /** Normalize-space is used to remove the extra spaces in the text.
+       * Check the documentation for the normalize-space function here :
+       * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
+      const [button] = await this.page.$x(
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`
+      );
       await button.click();
-    } else {
-      await this.waitForElementToBeClickable(selector);
+    } catch (error) {
+      await this.page.waitForSelector(selector);
       await this.page.click(selector);
     }
-  }
-  /**
-   * The function selects all text content and delete it.
-   */
-  async clearAllTextFrom(selector: string): Promise<void> {
-    await this.waitForElementToBeClickable(selector);
-    // Clicking three times on a line of text selects all the text.
-    await this.page.click(selector, {clickCount: 3});
-    await this.page.keyboard.press('Backspace');
   }
 
   /**
@@ -350,28 +174,6 @@ export class BaseUser {
   }
 
   /**
-   * This function validates whether an anchor tag is correctly linked
-   * to external PDFs or not. Use this particularly when interacting with
-   * buttons associated with external PDF links, because Puppeteer,
-   * in headless-mode, does not natively support the opening of external PDFs.
-   */
-  async openExternalPdfLink(
-    selector: string,
-    expectedUrl: string
-  ): Promise<void> {
-    await this.page.waitForSelector(selector);
-    const href = await this.page.$eval(selector, element =>
-      element.getAttribute('href')
-    );
-    if (href === null) {
-      throw new Error(`The ${selector} does not have a href attribute!`);
-    }
-    if (href !== expectedUrl) {
-      throw new Error(`Actual URL differs from expected. It opens: ${href}.`);
-    }
-  }
-
-  /**
    * This function logs out the current user.
    */
   async logout(): Promise<void> {
@@ -384,31 +186,6 @@ export class BaseUser {
    */
   async closeBrowser(): Promise<void> {
     await this.browserObject.close();
-  }
-
-  /**
-   * This function returns the current viewport of the page.
-   */
-  get viewport(): Viewport {
-    const viewport = this.page.viewport();
-    if (viewport === null) {
-      throw new Error('Viewport is not defined.');
-    }
-    return viewport;
-  }
-
-  /**
-   * This function checks if the viewport is at mobile width.
-   */
-  isViewportAtMobileWidth(): boolean {
-    return this.viewport.width < VIEWPORT_WIDTH_BREAKPOINTS.MOBILE_PX;
-  }
-
-  /**
-   * This function gets the current URL of the page without parameters.
-   */
-  getCurrentUrlWithoutParameters(): string {
-    return this.page.url().split('?')[0];
   }
 }
 

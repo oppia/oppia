@@ -24,7 +24,6 @@ import {
   CustomizationArgsForRteType,
   CustomizationArgsSpecsType,
   RteHelperModalComponent,
-  RteComponentId,
 } from './rte-helper-modal.controller';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -62,7 +61,6 @@ export class RteHelperService {
   // before the modal was opened.
   openCustomizationModal(
     componentIsNewlyCreated: boolean,
-    componentId: RteComponentId,
     customizationArgSpecs: CustomizationArgsSpecsType,
     attrsCustomizationArgsDict: CustomizationArgsForRteType,
     onSubmitCallback?: (arg0: unknown) => void,
@@ -74,7 +72,6 @@ export class RteHelperService {
     });
     modalRef.componentInstance.componentIsNewlyCreated =
       componentIsNewlyCreated;
-    modalRef.componentInstance.componentId = componentId;
     modalRef.componentInstance.customizationArgSpecs = customizationArgSpecs;
     modalRef.componentInstance.attrsCustomizationArgsDict =
       attrsCustomizationArgsDict;

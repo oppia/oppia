@@ -474,8 +474,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
-            'At \'http://localhost/skills_dashboard/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'num_skills_to_fetch\' '
             'failed: Could not convert str to int: string'
         )
@@ -503,8 +501,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
-            'At \'http://localhost/skills_dashboard/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'next_cursor\' failed: '
             'Expected string, received 40'
         )
@@ -545,8 +541,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
-            'At \'http://localhost/skills_dashboard/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'classroom_name\' failed: '
             'Expected string, received 20'
         )
@@ -569,8 +563,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
-            'At \'http://localhost/skills_dashboard/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'keywords\' failed: '
             'Expected list, received 20'
         )
@@ -589,8 +581,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
-            'At \'http://localhost/skills_dashboard/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'keywords\' failed: '
             'Expected string, received 20'
         )
@@ -613,8 +603,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
-            'At \'http://localhost/skills_dashboard/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'status\' failed: '
             'Expected string, received 20'
         )
@@ -637,8 +625,6 @@ class SkillsDashboardPageDataHandlerTests(BaseTopicsAndSkillsDashboardTests):
             expected_status_int=400)
 
         expected_error = (
-            'At \'http://localhost/skills_dashboard/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'sort\' failed: '
             'Expected string, received 20'
         )

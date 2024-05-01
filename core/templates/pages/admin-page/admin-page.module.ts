@@ -36,6 +36,7 @@ import {AdminDevModeActivitiesTabComponent} from './activities-tab/admin-dev-mod
 import {OppiaAdminProdModeActivitiesTabComponent} from './activities-tab/admin-prod-mode-activities-tab.component';
 import {AdminMiscTabComponent} from './misc-tab/admin-misc-tab.component';
 import {AdminRolesTabComponent} from './roles-tab/admin-roles-tab.component';
+import {AdminConfigTabComponent} from './config-tab/admin-config-tab.component';
 import {AdminPageComponent} from './admin-page.component';
 
 @NgModule({
@@ -56,6 +57,7 @@ import {AdminPageComponent} from './admin-page.component';
   ],
   declarations: [
     OppiaAdminProdModeActivitiesTabComponent,
+    AdminConfigTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminPageComponent,
@@ -68,6 +70,7 @@ import {AdminPageComponent} from './admin-page.component';
   ],
   entryComponents: [
     OppiaAdminProdModeActivitiesTabComponent,
+    AdminConfigTabComponent,
     AdminMiscTabComponent,
     AdminNavbarComponent,
     AdminPageComponent,

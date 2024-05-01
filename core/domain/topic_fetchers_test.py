@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests the methods defined in topic fetchers."""
+"""Tests for topic domain objects."""
 
 from __future__ import annotations
 

@@ -887,7 +887,8 @@ def _pseudonymize_config_models(
             request object for which to pseudonymize the models.
     """
     snapshot_model_classes = (
-        config_models.PlatformParameterSnapshotMetadataModel,)
+        config_models.ConfigPropertySnapshotMetadataModel,
+        config_models.PlatformParameterSnapshotMetadataModel)
 
     snapshot_metadata_models, _ = (
         _collect_and_save_entity_ids_from_snapshots_and_commits(

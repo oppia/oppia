@@ -17,6 +17,7 @@
  */
 
 import {Component} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import {Collection} from 'domain/collection/collection.model';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {CollectionEditorPageConstants} from '../collection-editor-page.constants';
@@ -70,3 +71,10 @@ export class CollectionEditorNavbarBreadcrumbComponent {
     this.activeTabName = this.collectionEditorRoutingService.getActiveTabName();
   }
 }
+
+angular.module('oppia').directive(
+  'collectionEditorNavbarBreadcrumb',
+  downgradeComponent({
+    component: CollectionEditorNavbarBreadcrumbComponent,
+  })
+);

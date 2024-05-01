@@ -20,7 +20,6 @@
 var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 var forms = require('./forms.js');
-var general = require('./general.js');
 
 var LibraryPage = function () {
   var LIBRARY_URL_SUFFIX = '/community-library';
@@ -107,14 +106,8 @@ var LibraryPage = function () {
     await action.click('Main header', mainHeader);
   };
 
-  this.getHomePage = async function (expectAlertToAppear) {
-    // In the event that the user leaves the exploration or collection page, an alert warning is issued.
-    // The `expectAlertToAppear` must be set to true to handle the alert.
+  this.getHomePage = async function () {
     await action.click('Oppia logo', oppiaLogo);
-    if (expectAlertToAppear) {
-      // Handle the alert if it is expected.
-      await general.acceptAlert();
-    }
     await waitFor.textToBePresentInElement(
       homeSection,
       'Home',

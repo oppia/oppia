@@ -104,9 +104,6 @@ class ClassroomDataHandler(
                         topic_summary_dict['thumbnail_filename']),
                     'thumbnail_bg_color': (
                         topic_summary_dict['thumbnail_bg_color']),
-                    'published_story_exploration_mapping': (
-                        topic_summary_dict[
-                            'published_story_exploration_mapping']),
                     'topic_model_created_on': (
                         topic_summary_dict['topic_model_created_on']),
                     'topic_model_last_updated': (
@@ -249,13 +246,13 @@ class ClassroomHandler(
             classroom_id: str. The ID of the classroom.
 
         Raises:
-            NotFoundException. The classroom with the given id or
+            PageNotFoundException. The classroom with the given id or
                 url doesn't exist.
         """
         classroom = classroom_config_services.get_classroom_by_id(
             classroom_id, strict=False)
         if classroom is None:
-            raise self.NotFoundException(
+            raise self.PageNotFoundException(
                 'The classroom with the given id or url doesn\'t exist.')
 
         self.values.update({
@@ -347,13 +344,13 @@ class ClassroomIdHandler(
             classroom_url_fragment: str. The classroom URL fragment.
 
         Raises:
-            NotFoundException. The classroom with the given url doesn't
+            PageNotFoundException. The classroom with the given url doesn't
                 exist.
         """
         classroom = classroom_config_services.get_classroom_by_url_fragment(
             classroom_url_fragment)
         if classroom is None:
-            raise self.NotFoundException(
+            raise self.PageNotFoundException(
                 'The classroom with the given url doesn\'t exist.')
 
         self.render_json({

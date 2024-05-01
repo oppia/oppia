@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {ReactiveFormsModule, FormsModule} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {
   ComponentFixture,
@@ -30,7 +29,6 @@ import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {StoryReference} from 'domain/topic/story-reference-object.model';
 import {Topic} from 'domain/topic/topic-object.model';
-import {AppConstants} from 'app.constants';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
@@ -110,7 +108,7 @@ describe('Topic editor tab directive', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, FormsModule, ReactiveFormsModule],
+      imports: [HttpClientTestingModule],
       declarations: [
         TopicEditorTabComponent,
         RearrangeSkillsInSubtopicsModalComponent,
@@ -251,24 +249,6 @@ describe('Topic editor tab directive', () => {
     expect(component.SUBTOPIC_LIST).toEqual('subtopic');
     expect(component.SKILL_LIST).toEqual('skill');
     expect(component.STORY_LIST).toEqual('story');
-    expect(component.maxCharsInTopicName).toEqual(
-      AppConstants.MAX_CHARS_IN_TOPIC_NAME
-    );
-    expect(component.maxCharsInTopicUrlFragment).toEqual(
-      AppConstants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
-    );
-    expect(component.maxCharsInTopicDescription).toEqual(
-      AppConstants.MAX_CHARS_IN_TOPIC_DESCRIPTION
-    );
-    expect(component.maxCharsInPageTitleFragmentForWeb).toEqual(
-      AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
-    );
-    expect(component.maxCharsInMetaTagContent).toEqual(
-      AppConstants.MAX_CHARS_IN_META_TAG_CONTENT
-    );
-    expect(component.minCharsInPageTitleFragmentForWeb).toEqual(
-      AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
-    );
   });
 
   it('should call EntityCreationService to create skill', () => {
@@ -765,7 +745,7 @@ describe('Topic editor tab directive', () => {
         topicUpdateService,
         'updateDiagnosticTestSkills'
       );
-      component.skillForDiagnosticTestFormControl.setValue(skillSummary);
+      component.selectedSkillForDiagnosticTest = skillSummary;
       component.availableSkillSummariesForDiagnosticTest = [skillSummary];
       component.addSkillForDiagnosticTest();
       tick();

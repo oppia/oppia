@@ -687,7 +687,9 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             }
           },
           () => {
-            this.questionIsBeingSaved = false;
+            // Note to developers:
+            // This callback is triggered when the Cancel button is
+            // clicked. No further action is needed.
           }
         );
     } else {

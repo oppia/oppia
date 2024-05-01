@@ -33,14 +33,6 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_EDITOR.ROUTE,
-    loadChildren: () =>
-      import('pages/collection-editor-page/collection-editor-page.module').then(
-        m => m.CollectionEditorPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () =>
       import('pages/moderator-page/moderator-page.module').then(
@@ -73,14 +65,6 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
-      .ROUTE,
-    loadChildren: () =>
-      import(
-        'pages/diagnostic-test-player-page/diagnostic-test-player-page.module'
-      ).then(m => m.DiagnosticTestPlayerPageModule),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
@@ -111,15 +95,6 @@ const routes: Route[] = [
       import(
         'pages/learner-group-pages/edit-group/edit-learner-group-page.module'
       ).then(m => m.EditLearnerGroupPageModule),
-    canActivate: [IsLoggedInGuard],
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD
-      .ROUTE,
-    loadChildren: () =>
-      import(
-        'pages/facilitator-dashboard-page/facilitator-dashboard-page.module'
-      ).then(m => m.FacilitatorDashboardPageModule),
     canActivate: [IsLoggedInGuard],
   },
   {
@@ -406,22 +381,6 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/blog-post-page/blog-post-page.module').then(
         m => m.BlogPostPageModule
-      ),
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.ROUTE,
-    loadChildren: () =>
-      import('pages/voiceover-admin-page/voiceover-admin-page.module').then(
-        m => m.VoiceoverAdminPageModule
-      ),
-    canActivate: [IsLoggedInGuard],
-  },
-  {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.COLLECTION_PLAYER.ROUTE,
-    pathMatch: 'full',
-    loadChildren: () =>
-      import('pages/collection-player-page/collection-player-page.module').then(
-        m => m.CollectionPlayerPageModule
       ),
   },
 ];

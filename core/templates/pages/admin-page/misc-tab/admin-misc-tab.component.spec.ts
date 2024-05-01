@@ -728,41 +728,6 @@ describe('Admin misc tab component ', () => {
     );
   });
 
-  describe('when regenerating topic summaries', () => {
-    it('should regenerate all topic summaries successfully', fakeAsync(() => {
-      const topicModelSpy = spyOn(
-        adminBackendApiService,
-        'regenerateTopicSummariesAsync'
-      ).and.returnValue(Promise.resolve());
-
-      component.regenerateTopicSummaries();
-      tick();
-
-      expect(topicModelSpy).toHaveBeenCalled();
-      expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Successfully regenerated all topic summaries.'
-      );
-    }));
-
-    it(
-      'should not regenerate topic summaries in case of ' + 'server error',
-      fakeAsync(() => {
-        const topicModelSpy = spyOn(
-          adminBackendApiService,
-          'regenerateTopicSummariesAsync'
-        ).and.rejectWith('Internal Server Error');
-
-        component.regenerateTopicSummaries();
-        tick();
-
-        expect(topicModelSpy).toHaveBeenCalled();
-        expect(statusMessageSpy).toHaveBeenCalledWith(
-          'Server error: Internal Server Error'
-        );
-      })
-    );
-  });
-
   it('should sumbit query when clicking on submit query button', () => {
     let setQueryDataSpy = spyOn(
       component,
@@ -795,35 +760,39 @@ describe('Admin misc tab component ', () => {
       let interactionSpy = spyOn(
         adminBackendApiService,
         'retrieveExplorationInteractionIdsAsync'
-      ).and.returnValue(Promise.resolve({interaction_ids: ['EndExploration']}));
+      ).and.returnValue(
+        Promise.resolve({interactions: [{id: 'EndExploration'}]})
+      );
 
       component.retrieveExplorationInteractionIds();
       tick();
 
       expect(interactionSpy).toHaveBeenCalled();
       expect(statusMessageSpy).toHaveBeenCalledWith(
-        'Successfully fetched interactionIds in exploration.'
+        'Successfully fetched interactions in exploration.'
       );
-      expect(component.explorationInteractionIds).toEqual(['EndExploration']);
+      expect(component.explorationInteractions).toEqual([
+        {id: 'EndExploration'},
+      ]);
     }));
 
     it(
       'should return empty interaction IDs' +
-        ' if no interactionIds are found in the exploration',
+        ' if no interactions are found in the exploration',
       fakeAsync(() => {
         let interactionSpy = spyOn(
           adminBackendApiService,
           'retrieveExplorationInteractionIdsAsync'
-        ).and.returnValue(Promise.resolve({interaction_ids: []}));
+        ).and.returnValue(Promise.resolve({interactions: []}));
 
         component.retrieveExplorationInteractionIds();
         tick();
 
         expect(interactionSpy).toHaveBeenCalled();
         expect(statusMessageSpy).toHaveBeenCalledWith(
-          'No interactionIds found in exploration.'
+          'No interactions found in exploration.'
         );
-        expect(component.explorationInteractionIds).toEqual([]);
+        expect(component.explorationInteractions).toEqual([]);
       })
     );
 
@@ -840,10 +809,10 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith(
         'Server error: Exploration does not exist'
       );
-      expect(component.explorationInteractionIds).toEqual([]);
+      expect(component.explorationInteractions).toEqual([]);
     }));
 
-    it('should handle the case when expIdToGetInteractionIdsFor is empty', fakeAsync(() => {
+    it('should handle the case when expIdToGetInteractions is empty', fakeAsync(() => {
       let intSpy = spyOn(
         adminBackendApiService,
         'retrieveExplorationInteractionIdsAsync'
@@ -856,7 +825,7 @@ describe('Admin misc tab component ', () => {
       expect(statusMessageSpy).toHaveBeenCalledWith(
         'Server error: Exploration does not exist'
       );
-      expect(component.explorationInteractionIds).toEqual([]);
+      expect(component.explorationInteractions).toEqual([]);
     }));
   });
 });

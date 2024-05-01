@@ -17,6 +17,7 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 
 import {Subscription} from 'rxjs';
 
@@ -57,3 +58,9 @@ export class CollectionLocalNavComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
+angular
+  .module('oppia')
+  .directive(
+    'collectionLocalNav',
+    downgradeComponent({component: CollectionLocalNavComponent})
+  );

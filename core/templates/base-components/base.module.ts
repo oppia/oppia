@@ -53,7 +53,6 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
-import {PrimaryButtonComponent} from 'components/button-directives/primary-button.component';
 
 @NgModule({
   imports: [
@@ -78,7 +77,6 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     BaseContentNavBarPreLogoActionDirective,
     BaseContentNavOptionsDirective,
     BaseContentPageFooterDirective,
-    PrimaryButtonComponent,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
     OppiaAngularRootComponent,
@@ -95,7 +93,6 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
   entryComponents: [
     AlertMessageComponent,
     BaseContentComponent,
-    PrimaryButtonComponent,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
     OppiaAngularRootComponent,
@@ -122,7 +119,6 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     BaseContentNavBarPreLogoActionDirective,
     BaseContentNavOptionsDirective,
     BaseContentPageFooterDirective,
-    PrimaryButtonComponent,
     CreateActivityButtonComponent,
     LoadingMessageComponent,
     OppiaAngularRootComponent,

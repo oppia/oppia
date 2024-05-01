@@ -23,7 +23,6 @@ import {Injectable} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContributorDashboardAdminPageConstants as PageConstants} from '../contributor-dashboard-admin-page.constants';
-import {AppConstants} from 'app.constants';
 
 export interface ViewContributionBackendResponse {
   usernames: string[];
@@ -148,8 +147,8 @@ export class ContributorDashboardAdminBackendApiService {
   }
 
   async removeContributionReviewerAsync(
-    category: string,
     username: string,
+    category: string,
     languageCode: string | null
   ): Promise<void> {
     const url = this.urlInterpolationService.interpolateUrl(
@@ -203,49 +202,6 @@ export class ContributorDashboardAdminBackendApiService {
           }
         );
     });
-  }
-
-  async updateQuestionRightsAsync(
-    username: string,
-    userWasGrantedQuestionSubmissionRights: boolean,
-    userWasGrantedQuestionReviewRights: boolean,
-    userCanCurrentlySubmitQuestions: boolean,
-    userCanCurrentlyReviewQuestions: boolean
-  ): Promise<void> {
-    if (
-      userWasGrantedQuestionSubmissionRights !== userCanCurrentlySubmitQuestions
-    ) {
-      if (userWasGrantedQuestionSubmissionRights) {
-        await this.addContributionReviewerAsync(
-          AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-          username,
-          null
-        );
-      } else {
-        await this.removeContributionReviewerAsync(
-          AppConstants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-          username,
-          null
-        );
-      }
-    }
-    if (
-      userWasGrantedQuestionReviewRights !== userCanCurrentlyReviewQuestions
-    ) {
-      if (userWasGrantedQuestionReviewRights) {
-        await this.addContributionReviewerAsync(
-          AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-          username,
-          null
-        );
-      } else {
-        await this.removeContributionReviewerAsync(
-          AppConstants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-          username,
-          null
-        );
-      }
-    }
   }
 }
 

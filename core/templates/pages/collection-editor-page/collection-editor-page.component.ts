@@ -17,6 +17,7 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -93,3 +94,10 @@ export class CollectionEditorPageComponent implements OnInit, OnDestroy {
     return this.collectionEditorRoutingService.getActiveTabName();
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaCollectionEditorPage',
+  downgradeComponent({
+    component: CollectionEditorPageComponent,
+  }) as angular.IDirectiveFactory
+);

@@ -30,6 +30,7 @@ import {
   CreatorTopicSummaryBackendDict,
 } from 'domain/topic/creator-topic-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {Schema} from 'services/schema-default-value.service';
 import {
   SkillSummary,
   SkillSummaryBackendDict,
@@ -58,6 +59,10 @@ export interface RoleToActionsBackendResponse {
   [role: string]: string[];
 }
 
+export interface ConfigPropertiesBackendResponse {
+  [key: string]: ConfigProperty;
+}
+
 interface PendingDeletionRequestBackendResponse {
   number_of_pending_deletion_models: string;
 }
@@ -79,6 +84,17 @@ export interface VmidSharedSecretKeyMapping {
   vm_id: string;
 }
 
+export interface ConfigProperty {
+  description: string;
+  schema: Schema;
+  value: number | boolean | string | string[] | Object | Object[];
+}
+
+export interface ConfigPropertyValues {
+  classroom_pages_data: ClassroomPageData;
+  record_playthrough_probability: number;
+}
+
 export interface AdminPageDataBackendDict {
   demo_explorations: string[][];
   demo_collections: string[][];
@@ -86,6 +102,7 @@ export interface AdminPageDataBackendDict {
   human_readable_current_time: string;
   updatable_roles: string[];
   role_to_actions: RoleToActionsBackendResponse;
+  config_properties: ConfigPropertiesBackendResponse;
   viewable_roles: string[];
   human_readable_roles: HumanReadableRolesBackendResponse;
   topic_summaries: CreatorTopicSummaryBackendDict[];
@@ -99,6 +116,7 @@ export interface AdminPageData {
   demoExplorationIds: string[];
   updatableRoles: string[];
   roleToActions: RoleToActionsBackendResponse;
+  configProperties: ConfigPropertiesBackendResponse;
   viewableRoles: string[];
   humanReadableRoles: HumanReadableRolesBackendResponse;
   topicSummaries: CreatorTopicSummary[];
@@ -106,8 +124,12 @@ export interface AdminPageData {
   skillList: SkillSummary[];
 }
 
+export interface Interaction {
+  id: string;
+}
+
 export interface ExplorationInteractionIdsBackendResponse {
-  interaction_ids: string[];
+  interactions: Interaction[];
 }
 
 @Injectable({
@@ -132,6 +154,7 @@ export class AdminBackendApiService {
               demoExplorationIds: response.demo_exploration_ids,
               updatableRoles: response.updatable_roles,
               roleToActions: response.role_to_actions,
+              configProperties: response.config_properties,
               humanReadableRoles: response.human_readable_roles,
               viewableRoles: response.viewable_roles,
               topicSummaries: response.topic_summaries.map(
@@ -369,22 +392,6 @@ export class AdminBackendApiService {
     });
   }
 
-  async regenerateTopicSummariesAsync(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .put<void>(AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL, {})
-        .toPromise()
-        .then(
-          response => {
-            resolve(response);
-          },
-          errorResponse => {
-            reject(errorResponse.error.error);
-          }
-        );
-    });
-  }
-
   async rollbackExplorationToSafeState(expId: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http
@@ -548,6 +555,33 @@ export class AdminBackendApiService {
           }
         );
     });
+  }
+
+  // Admin Config Tab Services.
+  async revertConfigPropertyAsync(configPropertyId: string): Promise<void> {
+    let action = 'revert_config_property';
+    let payload = {
+      config_property_id: configPropertyId,
+    };
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      payload,
+      action
+    );
+  }
+
+  async saveConfigPropertiesAsync(
+    newConfigPropertyValues: NewConfigPropertyValues
+  ): Promise<void> {
+    let action = 'save_config_properties';
+    let payload = {
+      new_config_property_values: newConfigPropertyValues,
+    };
+    return this._postRequestAsync(
+      AdminPageConstants.ADMIN_HANDLER_URL,
+      payload,
+      action
+    );
   }
 
   // Admin Dev Mode Activities Tab Services.

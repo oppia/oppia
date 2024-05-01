@@ -18,7 +18,10 @@
 
 import {Component, EventEmitter, Output} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
+import {
+  AdminBackendApiService,
+  Interaction,
+} from 'domain/admin/admin-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AdminPageConstants} from '../admin-page.constants';
 import {AdminTaskManagerService} from '../services/admin-task-manager.service';
@@ -58,8 +61,8 @@ export class AdminMiscTabComponent {
   showDataExtractionQueryStatus: boolean = false;
   MAX_USERNAME_LENGTH: number = AppConstants.MAX_USERNAME_LENGTH;
   message: string = '';
-  expIdToGetInteractionIdsFor!: string;
-  explorationInteractionIds: string[] = [];
+  expIdToGetInteractions!: string;
+  explorationInteractions: Interaction[] = [];
 
   constructor(
     private adminBackendApiService: AdminBackendApiService,
@@ -229,20 +232,6 @@ export class AdminMiscTabComponent {
       );
   }
 
-  regenerateTopicSummaries(): void {
-    this.setStatusMessage.emit('Regenerating all topic summaries...');
-    this.adminBackendApiService.regenerateTopicSummariesAsync().then(
-      () => {
-        this.setStatusMessage.emit(
-          'Successfully regenerated all topic summaries.'
-        );
-      },
-      errorResponse => {
-        this.setStatusMessage.emit('Server error: ' + errorResponse);
-      }
-    );
-  }
-
   getNumberOfPendingDeletionRequestModels(): void {
     this.setStatusMessage.emit(
       'Getting the number of users that are being deleted...'
@@ -344,21 +333,19 @@ export class AdminMiscTabComponent {
   }
 
   retrieveExplorationInteractionIds(): void {
-    this.explorationInteractionIds = [];
+    this.explorationInteractions = [];
     this.setStatusMessage.emit('Retrieving interactions in exploration ...');
     this.adminBackendApiService
-      .retrieveExplorationInteractionIdsAsync(this.expIdToGetInteractionIdsFor)
+      .retrieveExplorationInteractionIdsAsync(this.expIdToGetInteractions)
       .then(
         response => {
-          if (response.interaction_ids.length > 0) {
+          if (response.interactions.length > 0) {
             this.setStatusMessage.emit(
-              'Successfully fetched interactionIds in exploration.'
+              'Successfully fetched interactions in exploration.'
             );
-            this.explorationInteractionIds = response.interaction_ids;
+            this.explorationInteractions = response.interactions;
           } else {
-            this.setStatusMessage.emit(
-              'No interactionIds found in exploration.'
-            );
+            this.setStatusMessage.emit('No interactions found in exploration.');
           }
         },
         errorResponse => {

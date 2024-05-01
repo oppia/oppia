@@ -21,32 +21,20 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
-  forwardRef,
+  EventEmitter,
   Input,
+  Output,
   ViewChild,
 } from '@angular/core';
-import {
-  ControlValueAccessor,
-  FormControl,
-  NG_VALUE_ACCESSOR,
-} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import {MatChipList} from '@angular/material/chips';
 import {LanguageIdAndText} from 'domain/utilities/language-util.service';
 
 @Component({
   selector: 'oppia-preferred-languages',
   templateUrl: './preferred-languages.component.html',
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => PreferredLanguagesComponent),
-      multi: true,
-    },
-  ],
 })
-export class PreferredLanguagesComponent
-  implements AfterViewInit, ControlValueAccessor
-{
+export class PreferredLanguagesComponent implements AfterViewInit {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -54,6 +42,8 @@ export class PreferredLanguagesComponent
   @ViewChild('languageInput') languageInput!: ElementRef<HTMLInputElement>;
   @Input() preferredLanguages!: string[];
   @Input() choices!: LanguageIdAndText[];
+  @Output() preferredLanguagesChange: EventEmitter<string[]> =
+    new EventEmitter();
 
   selectable = true;
   removable = true;
@@ -61,25 +51,6 @@ export class PreferredLanguagesComponent
   formCtrl = new FormControl();
   filteredChoices: LanguageIdAndText[] = [];
   searchQuery: string = '';
-
-  // Implementing the ControlValueAccessor interface through the following
-  // 5 methods to make the component work as a form field.
-  onChange: (value: string[]) => void = () => {};
-  onTouched: () => void = () => {};
-
-  writeValue(value: string[]): void {
-    if (value !== undefined) {
-      this.preferredLanguages = value;
-    }
-  }
-
-  registerOnChange(fn: (value: string[]) => void): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
 
   resetLanguageSearch(): void {
     this.searchQuery = '';
@@ -117,7 +88,7 @@ export class PreferredLanguagesComponent
 
     if (this.validInput(value)) {
       this.preferredLanguages.push(value);
-      this.onChange(this.preferredLanguages);
+      this.preferredLanguagesChange.emit(this.preferredLanguages);
       this.languageInput.nativeElement.value = '';
     }
     this.resetLanguageSearch();
@@ -128,7 +99,7 @@ export class PreferredLanguagesComponent
 
     if (index >= 0) {
       this.preferredLanguages.splice(index, 1);
-      this.onChange(this.preferredLanguages);
+      this.preferredLanguagesChange.emit(this.preferredLanguages);
     }
   }
 

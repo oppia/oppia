@@ -27,6 +27,7 @@ describe('Admin router service', () => {
 
   it('should initially be routed to the activities tab', () => {
     expect(ars.isActivitiesTabOpen()).toBe(true);
+    expect(ars.isConfigTabOpen()).toBe(false);
     expect(ars.isPlatformParamsTabOpen()).toBe(false);
     expect(ars.isRolesTabOpen()).toBe(false);
     expect(ars.isMiscTabOpen()).toBe(false);
@@ -36,11 +37,25 @@ describe('Admin router service', () => {
     // Navigate away from the activities tab (relying on other tests to verify
     // this works correctly) in order to navigate back.
     expect(ars.isActivitiesTabOpen()).toBe(true);
-    ars.showTab('#/misc');
+    ars.showTab('#/config');
 
     expect(ars.isActivitiesTabOpen()).toBe(false);
     ars.showTab('#/activities');
     expect(ars.isActivitiesTabOpen()).toBe(true);
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isPlatformParamsTabOpen()).toBe(false);
+    expect(ars.isRolesTabOpen()).toBe(false);
+    expect(ars.isMiscTabOpen()).toBe(false);
+  });
+
+  it('should be able to navigate to the config tab', () => {
+    expect(ars.isConfigTabOpen()).toBe(false);
+    expect(ars.isActivitiesTabOpen()).toBe(true);
+
+    ars.showTab('#/config');
+
+    expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(true);
     expect(ars.isPlatformParamsTabOpen()).toBe(false);
     expect(ars.isRolesTabOpen()).toBe(false);
     expect(ars.isMiscTabOpen()).toBe(false);
@@ -53,6 +68,7 @@ describe('Admin router service', () => {
     ars.showTab('#/roles');
 
     expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
     expect(ars.isPlatformParamsTabOpen()).toBe(false);
     expect(ars.isRolesTabOpen()).toBe(true);
     expect(ars.isMiscTabOpen()).toBe(false);
@@ -65,6 +81,7 @@ describe('Admin router service', () => {
     ars.showTab('#/misc');
 
     expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
     expect(ars.isPlatformParamsTabOpen()).toBe(false);
     expect(ars.isRolesTabOpen()).toBe(false);
     expect(ars.isMiscTabOpen()).toBe(true);
@@ -77,6 +94,7 @@ describe('Admin router service', () => {
     ars.showTab('#/platform-parameters');
 
     expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
     expect(ars.isPlatformParamsTabOpen()).toBe(true);
     expect(ars.isRolesTabOpen()).toBe(false);
     expect(ars.isMiscTabOpen()).toBe(false);
@@ -90,6 +108,7 @@ describe('Admin router service', () => {
 
     ars.showTab('#/misc');
     expect(ars.isActivitiesTabOpen()).toBe(false);
+    expect(ars.isConfigTabOpen()).toBe(false);
     expect(ars.isRolesTabOpen()).toBe(false);
     expect(ars.isMiscTabOpen()).toBe(true);
   });

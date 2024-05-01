@@ -322,13 +322,13 @@ describe('Rte Helper Service', () => {
     ]);
   });
 
-  it('should evaluate when rich text component is inline', () => {
+  it('should evalute when rich text component is inline', () => {
     expect(rteHelperService.isInlineComponent('link')).toBe(true);
     expect(rteHelperService.isInlineComponent('math')).toBe(true);
     expect(rteHelperService.isInlineComponent('skillreview')).toBe(true);
   });
 
-  it('should evaluate when rich text component is not inline', () => {
+  it('should evalute when rich text component is not inline', () => {
     expect(rteHelperService.isInlineComponent('video')).toBe(false);
     expect(rteHelperService.isInlineComponent('tabs')).toBe(false);
     expect(rteHelperService.isInlineComponent('image')).toBe(false);
@@ -346,7 +346,6 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video',
       [],
       {},
       submitCallBackSpy,
@@ -368,7 +367,6 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video',
       [],
       {},
       submitCallBackSpy,
@@ -391,7 +389,6 @@ describe('Rte Helper Service', () => {
     var dismissCallBackSpy = jasmine.createSpy('dismiss');
     rteHelperService.openCustomizationModal(
       false,
-      'video',
       [],
       {},
       submitCallBackSpy,

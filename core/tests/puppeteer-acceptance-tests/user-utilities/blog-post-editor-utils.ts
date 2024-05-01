@@ -65,11 +65,20 @@ export class BlogPostEditor extends BaseUser {
     draftBlogPostTitle: string
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
+    await this.page.waitForTimeout(500);
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.type(blogTitleInput, draftBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
+    await this.page.waitForSelector(
+      'button.e2e-test-save-as-draft-button:not([disabled])'
+    );
     await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
 
     showMessage('Successfully created a draft blog post!');
@@ -95,13 +104,15 @@ export class BlogPostEditor extends BaseUser {
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click()
         );
+        /** Giving explicit timeout because we need to wait for small
+         * transition to complete. We cannot wait for the next element to click
+         * using its selector as it is instantly loaded in the DOM but cannot
+         * be clicked until the transition is completed.
+         */
+        await this.page.waitForTimeout(100);
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
-        await this.doWithinModal({
-          selector: 'div.modal-dialog',
-          whenOpened: async (_this: BaseUser, container: string) => {
-            _this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
-          },
-        });
+        await this.page.waitForSelector('div.modal-dialog');
+        await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
         showMessage('Draft blog post with given title deleted successfully!');
         return;
       }
@@ -130,37 +141,36 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
-   * This function uploads a blog post thumbnail image.
-   */
-  async uploadBlogPostThumbnailImage(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.uploadFile(blogPostThumbnailImage);
-      await this.clickOn(addThumbnailImageButton);
-    } else {
-      await this.clickOn(thumbnailPhotoBox);
-      await this.uploadFile(blogPostThumbnailImage);
-      await this.clickOn(addThumbnailImageButton);
-      await this.page.waitForSelector('body.modal-open', {hidden: true});
-    }
-  }
-
-  /**
    * This function publishes a blog post with given title.
    */
   async publishNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
     await this.addUserBioInBlogDashboard();
+    /** Giving explicit timeout because we need to wait for small
+     * transition to complete. We cannot wait for the next element to click
+     * using its selector as it is instantly loaded in the DOM but cannot
+     * be clicked until the transition is completed.
+     */
+    await this.page.waitForTimeout(500);
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
-    await this.expectPublishButtonToBeDisabled();
 
-    await this.uploadBlogPostThumbnailImage();
+    await this.expectPublishButtonToBeDisabled();
+    await this.clickOn('button.mat-button-toggle-button');
+    await this.expectPublishButtonToBeDisabled();
+    await this.clickOn(thumbnailPhotoBox);
+    await this.uploadFile(blogPostThumbnailImage);
+    await this.page.waitForSelector(
+      `${addThumbnailImageButton}:not([disabled])`
+    );
+    await this.clickOn(addThumbnailImageButton);
+    await this.page.waitForSelector('body.modal-open', {hidden: true});
     await this.expectPublishButtonToBeDisabled();
 
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
     await this.type(blogBodyInput, 'test blog post body content');
-    await this.clickOn('button.mat-button-toggle-button');
     await this.clickOn(LABEL_FOR_DONE_BUTTON);
 
+    await this.page.waitForSelector(`${publishBlogPostButton}:not([disabled])`);
     await this.clickOn('PUBLISH');
     await this.page.waitForSelector('button.e2e-test-confirm-button');
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
@@ -173,10 +183,13 @@ export class BlogPostEditor extends BaseUser {
   async createNewBlogPostWithTitle(newBlogPostTitle: string): Promise<void> {
     await this.clickOn('NEW POST');
     await this.clickOn('button.mat-button-toggle-button');
-    await this.expectPublishButtonToBeDisabled();
-
-    await this.uploadBlogPostThumbnailImage();
-    await this.expectPublishButtonToBeDisabled();
+    await this.clickOn(thumbnailPhotoBox);
+    await this.uploadFile(blogPostThumbnailImage);
+    await this.page.waitForSelector(
+      `${addThumbnailImageButton}:not([disabled])`
+    );
+    await this.clickOn(addThumbnailImageButton);
+    await this.page.waitForSelector('body.modal-open', {hidden: true});
 
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
@@ -202,6 +215,12 @@ export class BlogPostEditor extends BaseUser {
           '.e2e-test-blog-post-edit-box',
           element => (element as HTMLElement).click()
         );
+        /** Giving explicit timeout because we need to wait for small
+         * transition to complete. We cannot wait for the next element to click
+         * using its selector as it is instantly loaded in the DOM but cannot
+         * be clicked until the transition is completed.
+         */
+        await this.page.waitForTimeout(100);
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
         await this.page.waitForSelector('button.e2e-test-confirm-button');
         await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);

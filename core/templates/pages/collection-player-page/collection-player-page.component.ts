@@ -17,6 +17,7 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -387,3 +388,10 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
+
+angular.module('oppia').directive(
+  'oppiaCollectionPlayerPage',
+  downgradeComponent({
+    component: CollectionPlayerPageComponent,
+  }) as angular.IDirectiveFactory
+);

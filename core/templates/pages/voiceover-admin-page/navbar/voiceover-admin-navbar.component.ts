@@ -18,6 +18,8 @@
  */
 
 import {Component, OnInit} from '@angular/core';
+import {downgradeComponent} from '@angular/upgrade/static';
+
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UserService} from 'services/user.service';
@@ -81,3 +83,10 @@ export class VoiceoverAdminNavbarComponent implements OnInit {
     );
   }
 }
+
+angular
+  .module('oppia')
+  .directive(
+    'oppiaVoiceoverAdminNavbar',
+    downgradeComponent({component: VoiceoverAdminNavbarComponent})
+  );

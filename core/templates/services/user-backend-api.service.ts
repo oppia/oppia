@@ -62,28 +62,6 @@ interface LoginUrlResponseDict {
   login_url: string;
 }
 
-export type BackendPreferenceUpdateType =
-  | 'profile_picture_data_url'
-  | 'user_bio'
-  | 'subject_interests'
-  | 'default_dashboard'
-  | 'preferred_language_codes'
-  | 'preferred_site_language_code'
-  | 'preferred_audio_language_code'
-  | 'email_preferences';
-
-type DataType<UpdateType extends BackendPreferenceUpdateType> =
-  UpdateType extends 'email_preferences'
-    ? EmailPreferencesBackendDict
-    : UpdateType extends 'preferred_language_codes'
-      ? string[]
-      : string;
-
-export interface UpdatePreferenceDict {
-  update_type: BackendPreferenceUpdateType;
-  data: DataType<BackendPreferenceUpdateType>;
-}
-
 export interface UserContributionRightsDataBackendDict {
   can_review_translation_for_language_codes: string[];
   can_review_voiceover_for_language_codes: string[];
@@ -118,12 +96,10 @@ export class UserBackendApiService {
   async setProfileImageDataUrlAsync(
     newProfileImageDataUrl: string
   ): Promise<UpdatePreferencesResponse> {
-    return this.updateMultiplePreferencesDataAsync([
-      {
-        update_type: 'profile_picture_data_url',
-        data: newProfileImageDataUrl,
-      },
-    ]);
+    return this.updatePreferencesDataAsync(
+      'profile_picture_data_url',
+      newProfileImageDataUrl
+    );
   }
 
   async getLoginUrlAsync(currentUrl: string): Promise<string> {
@@ -162,12 +138,14 @@ export class UserBackendApiService {
       .toPromise();
   }
 
-  async updateMultiplePreferencesDataAsync(
-    updates: UpdatePreferenceDict[]
+  async updatePreferencesDataAsync(
+    updateType: string,
+    data: boolean | string | string[] | EmailPreferencesBackendDict
   ): Promise<UpdatePreferencesResponse> {
     return this.http
       .put<UpdatePreferencesResponse>(this.PREFERENCES_DATA_URL, {
-        updates: updates,
+        update_type: updateType,
+        data: data,
       })
       .toPromise();
   }

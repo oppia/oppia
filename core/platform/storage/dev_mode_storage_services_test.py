@@ -73,7 +73,7 @@ class DevModeStorageServicesTests(test_utils.TestBase):
 
     def test_copy_with_non_existing_source_blob_fails(self) -> None:
         with self.assertRaisesRegex(
-            ValueError, 'Source asset does not exist at /file/path.png'
+                Exception, 'Source asset does not exist'
         ):
             dev_mode_storage_services.copy(
                 'bucket', '/file/path.png', '/copy/path.png')

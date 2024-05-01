@@ -91,8 +91,8 @@ export class CdAdminTranslationRoleEditorModal implements OnInit {
     this.languageIdInUpdate = languageIdToRemove;
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
-        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         this.username,
+        constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
         languageIdToRemove
       )
       .then(

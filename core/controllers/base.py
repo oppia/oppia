@@ -132,8 +132,8 @@ class UserFacingExceptions:
 
         pass
 
-    class NotFoundException(Exception):
-        """Error class for resource not found error (error code 404)."""
+    class PageNotFoundException(Exception):
+        """Error class for a page not found error (error code 404)."""
 
         pass
 
@@ -523,11 +523,7 @@ class BaseHandler(
             'Use self.normalized_payload instead of self.payload.')
 
         if errors:
-            raise self.InvalidInputException(
-                'At \'%s\' these errors are happening:\n%s' % (
-                    self.request.uri, '\n'.join(errors)
-                )
-            )
+            raise self.InvalidInputException('\n'.join(errors))
 
     @property
     def current_user_is_site_maintainer(self) -> bool:
@@ -560,7 +556,7 @@ class BaseHandler(
         logging.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
         values: ResponseValueDict = {
-            'error': 'Could not find the resource %s.' % self.request.uri,
+            'error': 'Could not find the page %s.' % self.request.uri,
             'status_code': 404
         }
         self._render_exception(values)
@@ -571,9 +567,9 @@ class BaseHandler(
         """Base method to handle POST requests.
 
         Raises:
-            NotFoundException. Resource not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
-        raise self.NotFoundException
+        raise self.PageNotFoundException
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'put' method with different number of arguments and types.
@@ -581,9 +577,9 @@ class BaseHandler(
         """Base method to handle PUT requests.
 
         Raises:
-            NotFoundException. Resource not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
-        raise self.NotFoundException
+        raise self.PageNotFoundException
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'delete' method with different number of arguments and types.
@@ -591,9 +587,9 @@ class BaseHandler(
         """Base method to handle DELETE requests.
 
         Raises:
-            NotFoundException. Resource not found error (error code 404).
+            PageNotFoundException. Page not found error (error code 404).
         """
-        raise self.NotFoundException
+        raise self.PageNotFoundException
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'head' method with different number of arguments and types.
@@ -806,11 +802,11 @@ class BaseHandler(
         logging.exception(
             'Exception raised at %s: %s', self.request.uri, exception)
 
-        if isinstance(exception, self.NotFoundException):
+        if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
             self.error(404)
             values = {
-                'error': 'Could not find the resource %s.' % self.request.uri,
+                'error': 'Could not find the page %s.' % self.request.uri,
                 'status_code': 404
             }
             self._render_exception(values)
@@ -855,7 +851,7 @@ class BaseHandler(
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
     NotLoggedInException = UserFacingExceptions.NotLoggedInException
-    NotFoundException = UserFacingExceptions.NotFoundException
+    PageNotFoundException = UserFacingExceptions.PageNotFoundException
     UnauthorizedUserException = UserFacingExceptions.UnauthorizedUserException
 
 

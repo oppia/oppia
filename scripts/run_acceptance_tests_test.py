@@ -150,7 +150,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {
                     'suite_name': 'testSuite',
                     'headless': False,
-                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -191,7 +190,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {
                     'suite_name': 'testSuite',
                     'headless': False,
-                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -234,7 +232,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {
                     'suite_name': 'testSuite',
                     'headless': False,
-                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -267,7 +264,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {
                     'suite_name': 'testSuite',
                     'headless': False,
-                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -303,7 +299,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {
                     'suite_name': 'testSuite',
                     'headless': False,
-                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))
@@ -338,7 +333,6 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 {
                     'suite_name': 'testSuite',
                     'headless': False,
-                    'mobile': False,
                     'stdout': subprocess.PIPE,
                 },
             ]))

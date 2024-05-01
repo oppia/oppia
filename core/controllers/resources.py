@@ -127,11 +127,11 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 string is encoded in the frontend using encodeURIComponent().
 
         Raises:
-            NotFoundException. The page cannot be found.
+            PageNotFoundException. The page cannot be found.
             Exception. File not found.
         """
         if not constants.EMULATOR_MODE:
-            raise self.NotFoundException
+            raise self.PageNotFoundException
 
         try:
             filename = urllib.parse.unquote(encoded_filename)
@@ -154,7 +154,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         except Exception as e:
             logging.exception(
                 'File not found: %s. %s' % (encoded_filename, e))
-            raise self.NotFoundException
+            raise self.PageNotFoundException
 
 
 class PromoBarHandlerNormalizedPayloadDict(TypedDict):

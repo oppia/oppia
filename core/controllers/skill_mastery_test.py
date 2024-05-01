@@ -99,8 +99,6 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'At \'http://localhost/skill_mastery_handler/data\' '
-            'these errors are happening:\n'
             'Missing key in handler args: selected_skill_ids.')
 
         self.logout()
@@ -269,8 +267,6 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'At \'http://localhost/skill_mastery_handler/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'mastery_change_per_skill\' failed: ' +
             'Expected dict, received %s' % (mastery_change_per_skill)
         )
@@ -288,8 +284,6 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'At \'http://localhost/skill_mastery_handler/data\' '
-            'these errors are happening:\n'
             'Missing key in handler args: mastery_change_per_skill.'
         )
 
@@ -349,8 +343,6 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'At \'http://localhost/skill_mastery_handler/data\' '
-            'these errors are happening:\n'
             'Schema validation for \'mastery_change_per_skill\' failed: ' +
             'Could not convert dict to float: {}')
 
@@ -366,10 +358,8 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'At \'http://localhost/skill_mastery_handler/data\' '
-            'these errors are happening:\n'
-            'Schema validation for \'mastery_change_per_skill\' failed: '
-            'Expected float, received True')
+           'Schema validation for \'mastery_change_per_skill\' failed: ' +
+           'Expected float, received True')
 
         self.logout()
 
@@ -621,9 +611,6 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             response_json['error'],
-            'At \'http://localhost/subtopic_mastery_handler/data?'
-            'selected_topic_ids=invalid_topic_id\' '
-            'these errors are happening:\n'
             'Schema validation for \'selected_topic_ids\' failed: '
             'Expecting value: line 1 column 1 (char 0)')
 
@@ -637,8 +624,6 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(
             json_response['error'],
-            'At \'http://localhost/subtopic_mastery_handler/data\' '
-            'these errors are happening:\n'
             'Missing key in handler args: selected_topic_ids.')
 
         self.logout()

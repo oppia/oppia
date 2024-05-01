@@ -23,15 +23,20 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {ContributorDashboardAdminStatsBackendApiService} from '../services/contributor-dashboard-admin-stats-backend-api.service';
 import {ContributorDashboardAdminBackendApiService} from '../services/contributor-dashboard-admin-backend-api.service';
-import {ContributorAttribute} from '../services/format-contributor-attributes.service';
 import {ContributorAdminDashboardFilter} from '../contributor-admin-dashboard-filter.model';
 import {AppConstants} from 'app.constants';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContributorStats} from '../contributor-dashboard-admin-summary.model';
+import {
+  QuestionReviewerStats,
+  QuestionSubmitterStats,
+  TranslationReviewerStats,
+  TranslationSubmitterStats,
+} from '../contributor-dashboard-admin-summary.model';
 import {CdAdminQuestionRoleEditorModal} from '../question-role-editor-modal/cd-admin-question-role-editor-modal.component';
 import {CdAdminTranslationRoleEditorModal} from '../translation-role-editor-modal/cd-admin-translation-role-editor-modal.component';
 import constants from 'assets/constants';
 import isEqual from 'lodash/isEqual';
+
 @Component({
   selector: 'contributor-admin-stats-table',
   templateUrl: './contributor-admin-stats-table.component.html',
@@ -70,14 +75,32 @@ export class ContributorAdminStatsTable implements OnInit {
     filter: ContributorAdminDashboardFilter.createDefault(),
   };
 
-  columnsToDisplay: string[] = [];
+  columnsToDisplay = [
+    'chevron',
+    'contributorName',
+    'recentPerformance',
+    'overallAccuracy',
+    'submittedTranslationsCount',
+    'lastContributedInDays',
+    'role',
+  ];
 
-  dataSource: ContributorStats[] = [];
+  dataSource:
+    | TranslationSubmitterStats[]
+    | TranslationReviewerStats[]
+    | QuestionSubmitterStats[]
+    | QuestionReviewerStats[] = [];
 
   nextOffset: number = 0;
   more: boolean = true;
 
-  expandedElement: ContributorStats[] | null = null;
+  expandedElement:
+    | TranslationSubmitterStats[]
+    | TranslationReviewerStats[]
+    | QuestionSubmitterStats[]
+    | QuestionReviewerStats[]
+    | null
+    | [] = null;
 
   TAB_NAME_TRANSLATION_SUBMITTER: string = 'Translation Submitter';
   TAB_NAME_TRANSLATION_REVIEWER: string = 'Translation Reviewer';
@@ -108,80 +131,6 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  getLastContributedType(activeTab: string): string {
-    let lastContributedType: string = '';
-    switch (activeTab) {
-      case this.TAB_NAME_TRANSLATION_SUBMITTER:
-        lastContributedType = 'Last Translated';
-        break;
-      case this.TAB_NAME_TRANSLATION_REVIEWER:
-        lastContributedType = 'Last Reviewed';
-        break;
-      case this.TAB_NAME_QUESTION_SUBMITTER:
-        lastContributedType = 'Last Submitted';
-        break;
-      case this.TAB_NAME_QUESTION_REVIEWER:
-        lastContributedType = 'Last Reviewed';
-        break;
-    }
-
-    return lastContributedType;
-  }
-
-  getContributionCountLabel(activeTab: string): string {
-    let contributionCountLabel: string = '';
-
-    switch (activeTab) {
-      case this.TAB_NAME_TRANSLATION_SUBMITTER:
-        contributionCountLabel = 'Translated Cards';
-        break;
-      case this.TAB_NAME_TRANSLATION_REVIEWER:
-        contributionCountLabel = 'Reviewed Cards';
-        break;
-      case this.TAB_NAME_QUESTION_SUBMITTER:
-        contributionCountLabel = 'Questions Submitted';
-        break;
-      case this.TAB_NAME_QUESTION_REVIEWER:
-        contributionCountLabel = 'Questions Reviewed';
-        break;
-    }
-
-    return contributionCountLabel;
-  }
-
-  getContributionCount(
-    activeTab: string,
-    submittedTranslationCount: number,
-    reviewedTranslationsCount: number,
-    submittedQuestionsCount: number,
-    reviewedQuestionsCount: number
-  ): number {
-    let contributionCount: number = 0;
-
-    switch (activeTab) {
-      case this.TAB_NAME_TRANSLATION_SUBMITTER:
-        contributionCount = submittedTranslationCount;
-        break;
-      case this.TAB_NAME_TRANSLATION_REVIEWER:
-        contributionCount = reviewedTranslationsCount;
-        break;
-      case this.TAB_NAME_QUESTION_SUBMITTER:
-        contributionCount = submittedQuestionsCount;
-        break;
-      case this.TAB_NAME_QUESTION_REVIEWER:
-        contributionCount = reviewedQuestionsCount;
-        break;
-    }
-
-    return contributionCount;
-  }
-
-  getFormattedContributorAttributes(
-    contributorStats: ContributorStats
-  ): ContributorAttribute[] {
-    return contributorStats.getContributorAttributes(contributorStats);
-  }
-
   openCdAdminQuestionRoleEditorModal(username: string): void {
     this.contributorDashboardAdminBackendApiService
       .contributionReviewerRightsAsync(username)
@@ -194,13 +143,36 @@ export class ContributorAdminStatsTable implements OnInit {
         };
         modelRef.result.then(
           results => {
-            this.contributorDashboardAdminBackendApiService.updateQuestionRightsAsync(
-              username,
-              results.isQuestionSubmitter,
-              results.isQuestionReviewer,
-              response.can_submit_questions,
-              response.can_review_questions
-            );
+            if (results.isQuestionSubmitter !== response.can_submit_questions) {
+              if (results.isQuestionSubmitter) {
+                this.contributorDashboardAdminBackendApiService.addContributionReviewerAsync(
+                  constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                  username,
+                  null
+                );
+              } else {
+                this.contributorDashboardAdminBackendApiService.removeContributionReviewerAsync(
+                  username,
+                  constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                  null
+                );
+              }
+            }
+            if (results.isQuestionReviewer !== response.can_review_questions) {
+              if (results.isQuestionReviewer) {
+                this.contributorDashboardAdminBackendApiService.addContributionReviewerAsync(
+                  constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                  username,
+                  null
+                );
+              } else {
+                this.contributorDashboardAdminBackendApiService.removeContributionReviewerAsync(
+                  username,
+                  constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                  null
+                );
+              }
+            }
           },
           () => {
             // Note to developers:
@@ -251,7 +223,7 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  isMobileView(): boolean {
+  checkMobileView(): boolean {
     return this.windowRef.nativeWindow.innerWidth < 800;
   }
 
@@ -279,89 +251,148 @@ export class ContributorAdminStatsTable implements OnInit {
     }
   }
 
-  getContributionType(activeTab: string): string {
-    let contributionType: string = '';
-
-    switch (activeTab) {
-      case this.TAB_NAME_TRANSLATION_SUBMITTER:
-      case this.TAB_NAME_TRANSLATION_REVIEWER:
-        contributionType = AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION;
-        break;
-      case this.TAB_NAME_QUESTION_SUBMITTER:
-      case this.TAB_NAME_QUESTION_REVIEWER:
-        contributionType = AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION;
-        break;
-    }
-
-    return contributionType;
-  }
-
-  getContributionSubType(activeTab: string): string {
-    let contributionSubType: string = '';
-
-    switch (activeTab) {
-      case this.TAB_NAME_TRANSLATION_SUBMITTER:
-      case this.TAB_NAME_QUESTION_SUBMITTER:
-        contributionSubType =
-          AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION;
-        break;
-      case this.TAB_NAME_TRANSLATION_REVIEWER:
-      case this.TAB_NAME_QUESTION_REVIEWER:
-        contributionSubType = AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW;
-        break;
-    }
-
-    return contributionSubType;
-  }
-
-  updateColumns(contributionSubType: string): void {
-    if (this.isMobileView()) {
-      this.columnsToDisplay = ['contributorName'];
-    } else {
-      this.columnsToDisplay = ['chevron', 'contributorName'];
-    }
-    if (
-      contributionSubType === AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION
-    ) {
-      this.columnsToDisplay.push('recentPerformance', 'overallAccuracy');
-    }
-    this.columnsToDisplay.push(
-      'contributionCount',
-      'lastContributedInDays',
-      'role'
-    );
-
-    if (this.isMobileView()) {
-      this.columnsToDisplay.push('chevron');
-    }
-  }
-
   updateColumnsToDisplay(): void {
-    let contributionType: string = this.getContributionType(
-      this.inputs.activeTab
-    );
-    let contributionSubType: string = this.getContributionSubType(
-      this.inputs.activeTab
-    );
-
-    this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
-      this.inputs.filter,
-      this.itemsPerPage,
-      this.nextOffset,
-      contributionType,
-      contributionSubType
-    ).then(response => {
-      this.dataSource = response.stats;
-      this.nextOffset = response.nextOffset;
-      this.more = response.more;
-      this.loadingMessage = '';
-      this.noDataMessage = '';
-      if (this.dataSource.length === 0) {
-        this.noDataMessage = 'No statistics to display';
-      } else {
-        this.updateColumns(contributionSubType);
+    if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_SUBMITTER) {
+      this.columnsToDisplay = [
+        'chevron',
+        'contributorName',
+        'recentPerformance',
+        'overallAccuracy',
+        'submittedTranslationsCount',
+        'lastContributedInDays',
+        'role',
+      ];
+      if (this.checkMobileView()) {
+        this.columnsToDisplay = [
+          'contributorName',
+          'recentPerformance',
+          'overallAccuracy',
+          'submittedTranslationsCount',
+          'lastContributedInDays',
+          'role',
+          'chevron',
+        ];
       }
-    });
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
+    } else if (this.inputs.activeTab === this.TAB_NAME_TRANSLATION_REVIEWER) {
+      this.columnsToDisplay = [
+        'chevron',
+        'contributorName',
+        'reviewedTranslationsCount',
+        'lastContributedInDays',
+        'role',
+      ];
+      if (this.checkMobileView()) {
+        this.columnsToDisplay = [
+          'contributorName',
+          'reviewedTranslationsCount',
+          'lastContributedInDays',
+          'role',
+          'chevron',
+        ];
+      }
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_TRANSLATION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
+    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_SUBMITTER) {
+      this.columnsToDisplay = [
+        'chevron',
+        'contributorName',
+        'recentPerformance',
+        'overallAccuracy',
+        'submittedQuestionsCount',
+        'lastContributedInDays',
+        'role',
+      ];
+      if (this.checkMobileView()) {
+        this.columnsToDisplay = [
+          'contributorName',
+          'recentPerformance',
+          'overallAccuracy',
+          'submittedQuestionsCount',
+          'lastContributedInDays',
+          'role',
+          'chevron',
+        ];
+      }
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_SUBMISSION
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
+    } else if (this.inputs.activeTab === this.TAB_NAME_QUESTION_REVIEWER) {
+      this.columnsToDisplay = [
+        'chevron',
+        'contributorName',
+        'reviewedQuestionsCount',
+        'lastContributedInDays',
+        'role',
+      ];
+      if (this.checkMobileView()) {
+        this.columnsToDisplay = [
+          'contributorName',
+          'reviewedQuestionsCount',
+          'lastContributedInDays',
+          'role',
+          'chevron',
+        ];
+      }
+      this.ContributorDashboardAdminStatsBackendApiService.fetchContributorAdminStats(
+        this.inputs.filter,
+        this.itemsPerPage,
+        this.nextOffset,
+        AppConstants.CONTRIBUTION_STATS_TYPE_QUESTION,
+        AppConstants.CONTRIBUTION_STATS_SUBTYPE_REVIEW
+      ).then(response => {
+        this.dataSource = response.stats;
+        this.nextOffset = response.nextOffset;
+        this.more = response.more;
+        this.loadingMessage = '';
+        this.noDataMessage = '';
+        if (this.dataSource.length === 0) {
+          this.noDataMessage = 'No statistics to display';
+        }
+      });
+    }
   }
 
   refreshPagination(): void {

@@ -1,0 +1,42 @@
+<mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
+  <h3>Configuration properties</h3>
+  <div class="container ml-0" *ngIf="isNonemptyObject(configProperties)">
+    <div *ngFor="let property of configProperties | keyvalue">
+      <div class="row e2e-test-config-property oppia-description-text-container">
+        <span class="col-lg-2 col-md-2 col-sm-2">
+          <em class="e2e-test-config-title">{{ property.value.description }}</em>
+        </span>
+        <span class="col-lg-6 col-md-6 col-sm-6">
+          <schema-based-editor [schema]="property.value.schema" [(ngModel)]="property.value.value">
+          </schema-based-editor>
+        </span>
+        <span class="col-lg-2 col-md-2 col-sm-2">
+          <button type="button" class="btn btn-secondary oppia-revert-button" (click)="revertToDefaultConfigPropertyValue(property.key)">
+            Revert to default
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <button (click)="saveConfigProperties()" class="e2e-test-save-all-configs">Save</button>
+    <button (click)="reloadConfigProperties()">Undo changes</button>
+  </div>
+
+  <div *ngIf="!isNonemptyObject(configProperties)">
+    No configuration properties are available.
+  </div>
+</mat-card>
+<style>
+  .oppia-long-text-card {
+    max-width: 1050px;
+  }
+  .oppia-description-text-container {
+    padding-bottom: 10px;
+  }
+  .mat-card.oppia-page-card {
+    background: rgb(255,255,255);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    padding: 30px 55px 30px 45px;
+    position: relative;
+  }
+</style>

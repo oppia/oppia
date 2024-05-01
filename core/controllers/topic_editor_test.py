@@ -350,13 +350,12 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=400)
 
         invalid_description = 'Story Description' * 60
-        self.assertIn(
+        self.assertEqual(
+            json_response['error'],
             'Schema validation for \'description\' failed: '
             'Validation failed: has_length_at_most '
             f'({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
-            f'for object {invalid_description}',
-            json_response['error'],
-        )
+            f'for object {invalid_description}')
 
         self.logout()
 
@@ -648,13 +647,12 @@ class TopicEditorTests(
             '%s/%s' % (
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=400)
-        self.assertIn(
+        self.assertEqual(
+            json_response['error'],
             'Schema validation for \'commit_message\' failed: '
             'Validation failed: has_length_at_most '
             f'({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
-            f'for object {commit_msg}',
-            json_response['error'],
-        )
+            f'for object {commit_msg}')
 
     def test_editable_topic_handler_put_raises_error_with_invalid_name(
         self
@@ -863,10 +861,9 @@ class TopicEditorTests(
             }, csrf_token=csrf_token,
             expected_status_int=400)
 
-        self.assertIn(
-            'Missing key in handler args: version.',
+        self.assertEqual(
             json_response['error'],
-        )
+            'Missing key in handler args: version.')
 
         self.logout()
 
@@ -1111,11 +1108,10 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': invalid}, csrf_token=csrf_token,
             expected_status_int=400)
-        self.assertIn(
-            'Schema validation for \'publish_status\' failed: '
-            f'Expected bool, received {invalid}',
+        self.assertEqual(
             response['error'],
-        )
+            'Schema validation for \'publish_status\' failed: '
+            f'Expected bool, received {invalid}')
 
         self.logout()
 

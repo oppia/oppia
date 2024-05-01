@@ -20,7 +20,6 @@ import datetime
 import enum
 import logging
 
-from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -542,10 +541,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(classrooms), 1)
         self.logout()
 
-    @test_utils.enable_feature_flags([
-        feature_flag_list.FeatureNames
-        .SERIAL_CHAPTER_LAUNCH_CURRICULUM_ADMIN_VIEW
-    ])
     def test_regenerate_topic_related_opportunities_action(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
@@ -577,7 +572,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         story_services.save_new_story(owner_id, story)
         topic_services.add_canonical_story(
             owner_id, topic_id, story_id)
-
         topic_services.publish_story(topic_id, story_id, self.admin_id)
         story_services.update_story(
             owner_id, story_id, [story_domain.StoryChange({
@@ -969,7 +963,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
-            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'platform_param_name\' failed: Expected '
             'string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -993,7 +986,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
-            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'commit_message\' failed: Expected '
             'string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -1017,7 +1009,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
         error_msg = (
-            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'new_rules\' failed: Expected list, '
             'received {}')
         self.assertEqual(response['error'], error_msg)
@@ -1031,7 +1022,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         error_msg = (
-            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'new_rules\' failed: \'int\' '
             'object is not subscriptable')
         response = self.post_json(
@@ -1135,11 +1125,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
             expected_status_int=400)
 
-        error_msg = (
-            'At \'http://localhost/adminsuperadminhandler\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: username.'
-        )
+        error_msg = 'Missing key in handler args: username.'
         self.assertEqual(response['error'], error_msg)
 
     def test_grant_super_admin_privileges_fails_with_invalid_username(
@@ -1147,9 +1133,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        self.put_json(
+        response = self.put_json(
             '/adminsuperadminhandler', {'username': 'fakeusername'},
-            csrf_token=self.get_new_csrf_token(), expected_status_int=404)
+            csrf_token=self.get_new_csrf_token(), expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
 
     def test_revoke_super_admin_privileges(self) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
@@ -1191,11 +1179,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response = self.delete_json(
             '/adminsuperadminhandler', params={}, expected_status_int=400)
 
-        error_msg = (
-            'At \'http://localhost/adminsuperadminhandler\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: username.'
-        )
+        error_msg = 'Missing key in handler args: username.'
         self.assertEqual(response['error'], error_msg)
 
     def test_revoke_super_admin_privileges_fails_with_invalid_username(
@@ -1203,9 +1187,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
 
-        self.delete_json(
+        response = self.delete_json(
             '/adminsuperadminhandler',
-            params={'username': 'fakeusername'}, expected_status_int=404)
+            params={'username': 'fakeusername'}, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'No such user exists')
 
     def test_revoke_super_admin_privileges_fails_for_default_admin(
         self
@@ -1286,7 +1272,6 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
-            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'num_dummy_exps_to_generate\' failed: '
             'Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
@@ -1311,7 +1296,6 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
-            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'num_dummy_exps_to_publish\' failed: '
             'Could not convert str to int: invalid_type')
         self.assertEqual(response['error'], error_msg)
@@ -1434,7 +1418,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'filter_criterion': 'username', 'username': username},
-            expected_status_int=404)
+            expected_status_int=400)
 
         # Trying to update role of non-existent user.
         csrf_token = self.get_new_csrf_token()
@@ -1442,17 +1426,20 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
             csrf_token=csrf_token,
-            expected_status_int=404)
+            expected_status_int=400)
 
     def test_removing_role_with_invalid_username(self) -> None:
         username = 'invaliduser'
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        self.delete_json(
+        response = self.delete_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'role': feconf.ROLE_ID_TOPIC_MANAGER, 'username': username},
-            expected_status_int=404)
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'User with given username does not exist.')
 
     def test_cannot_view_role_with_invalid_view_filter_criterion(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -1461,9 +1448,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             params={'filter_criterion': 'invalid', 'username': 'user1'},
             expected_status_int=400)
         error_msg = (
-            'At \'http://localhost/adminrolehandler?'
-            'filter_criterion=invalid&username=user1\' '
-            'these errors are happening:\n'
             'Schema validation for \'filter_criterion\' failed: Received '
             'invalid which is not in the allowed range of choices: '
             '[\'role\', \'username\']')
@@ -1645,44 +1629,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             })
 
 
-class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
-    """Tests for RegenerateTopicSummariesHandler."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
-
-    def test_regenerate_topic_summaries(self) -> None:
-        topic_id_1 = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id_1, self.admin_id, name='Topic 1',
-            abbreviated_name='T1', url_fragment='url-frag-one',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
-
-        topic_id_2 = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(
-            topic_id_2, self.admin_id, name='Topic 2',
-            abbreviated_name='T2', url_fragment='url-frag-two',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[], next_subtopic_id=1)
-
-        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        # Order of function calls in expected_args should not
-        # matter for this test.
-        with self.swap_with_checks(
-                topic_services, 'generate_topic_summary',
-                topic_services.generate_topic_summary,
-                expected_args=[(topic_id_1,), (topic_id_2,)]):
-            self.put_json(
-                feconf.REGENERATE_TOPIC_SUMMARIES_URL, {},
-                csrf_token=csrf_token, expected_status_int=200)
-
-
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicManagerRoleHandler."""
 
@@ -1702,12 +1648,15 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        response = self.put_json(
             '/topicmanagerrolehandler', {
                 'action': 'assign',
                 'username': username,
                 'topic_id': topic_id
-            }, csrf_token=csrf_token, expected_status_int=404)
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'User with given username does not exist.')
 
     def test_adding_topic_manager_role_to_user(self) -> None:
         user_email = 'user1@example.com'
@@ -1841,12 +1790,15 @@ class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
 
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        response = self.put_json(
             '/translationcoordinatorrolehandler', {
                 'action': 'assign',
                 'username': username,
                 'language_id': 'en'
-            }, csrf_token=csrf_token, expected_status_int=404)
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'User with given username does not exist.')
 
     def test_adding_translation_coordinator_role_to_language(self) -> None:
         user_email = 'user1@example.com'
@@ -2196,10 +2148,13 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
     def test_ban_user_with_invalid_username(self) -> None:
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
-        self.put_json(
+        response_dict = self.put_json(
             '/bannedusershandler', {
                 'username': 'invalidUsername'
-            }, csrf_token=csrf_token, expected_status_int=404)
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'], 'User with given username does not exist.')
 
     def test_unmark_a_banned_user(self) -> None:
         user_email = 'user1@example.com'
@@ -2241,10 +2196,13 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
 
     def test_unban_user_with_invalid_username(self) -> None:
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
-        self.delete_json(
+        response_dict = self.delete_json(
             '/bannedusershandler',
             params={'username': 'invalidUsername'},
-            expected_status_int=404)
+            expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'], 'User with given username does not exist.')
 
 
 class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
@@ -2347,9 +2305,6 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         }
 
         error_msg = (
-            'At \'http://localhost/explorationdataextractionhandler?'
-            'exp_id=exp&exp_version=a&state_name=Introduction&num_answers=0\' '
-            'these errors are happening:\n'
             'Schema validation for \'exp_version\' failed: '
             'Could not convert str to int: a')
         response = self.get_json(
@@ -2384,9 +2339,14 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0
         }
 
-        self.get_json(
+        response = self.get_json(
             '/explorationdataextractionhandler', params=payload,
-            expected_status_int=404)
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Entity for exploration with id invalid_exp_id and version 1 not '
+            'found.')
 
     def test_handler_raises_error_with_invalid_exploration_version(
         self
@@ -2399,9 +2359,14 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0
         }
 
-        self.get_json(
+        response = self.get_json(
             '/explorationdataextractionhandler', params=payload,
-            expected_status_int=404)
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Entity for exploration with id %s and version 10 not found.'
+            % self.EXP_ID)
 
 
 class ClearSearchIndexTest(test_utils.GenericTestBase):
@@ -2497,11 +2462,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': None},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = (
-            'At \'http://localhost/updateusernamehandler\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: new_username.'
-        )
+        error_msg = 'Missing key in handler args: new_username.'
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_none_old_username(self) -> None:
@@ -2514,11 +2475,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
             expected_status_int=400)
-        error_msg = (
-            'At \'http://localhost/updateusernamehandler\' '
-            'these errors are happening:\n'
-            'Missing key in handler args: old_username.'
-        )
+        error_msg = 'Missing key in handler args: old_username.'
         self.assertEqual(response['error'], error_msg)
 
     def test_update_username_with_non_string_new_username(self) -> None:
@@ -2532,10 +2489,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         self.assertEqual(
-            response['error'],
-            'At \'http://localhost/updateusernamehandler\' '
-            'these errors are happening:\n'
-            'Schema validation for \'new_username\' failed:'
+            response['error'], 'Schema validation for \'new_username\' failed:'
             ' Expected string, received 123')
 
     def test_update_username_with_non_string_old_username(self) -> None:
@@ -2549,8 +2503,6 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         error_msg = (
-            'At \'http://localhost/updateusernamehandler\' '
-            'these errors are happening:\n'
             'Schema validation for \'old_username\' failed: Expected'
             ' string, received 123')
         self.assertEqual(response['error'], error_msg)
@@ -2567,8 +2519,6 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=400)
         error_msg = (
-            'At \'http://localhost/updateusernamehandler\' '
-            'these errors are happening:\n'
             'Schema validation for \'new_username\' failed: Validation failed'
             ': has_length_at_most ({\'max_value\': %s}) for object %s'
             % (constants.MAX_USERNAME_LENGTH, long_username))
@@ -2578,13 +2528,14 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         non_existent_username = 'invalid'
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json(
+        response = self.put_json(
             '/updateusernamehandler',
             {
                 'old_username': non_existent_username,
                 'new_username': self.NEW_USERNAME},
             csrf_token=csrf_token,
-            expected_status_int=404)
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Invalid username: invalid')
 
     def test_update_username_with_new_username_already_taken(self) -> None:
         csrf_token = self.get_new_csrf_token()
@@ -2662,25 +2613,32 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME)
         image_png = old_fs.get('profile_picture.png')
         old_fs.delete('profile_picture.png')
-        self.put_json(
+        response = self.put_json(
             '/updateusernamehandler',
             {
                 'old_username': self.EDITOR_USERNAME,
                 'new_username': self.NEW_USERNAME},
                 csrf_token=csrf_token,
-                expected_status_int=404)
+                expected_status_int=400)
 
+        self.assertEqual(response['error'], (
+            'The user with username %s does not have a profile '
+            'picture with png extension.' % self.EDITOR_USERNAME))
         old_fs.commit(
             'profile_picture.png', image_png, mimetype='image/png')
 
         old_fs.delete('profile_picture.webp')
-        self.put_json(
+        response = self.put_json(
             '/updateusernamehandler',
             {
                 'old_username': self.EDITOR_USERNAME,
                 'new_username': self.NEW_USERNAME},
                 csrf_token=csrf_token,
-                expected_status_int=404)
+                expected_status_int=400)
+
+        self.assertEqual(response['error'], (
+            'The user with username %s does not have a profile '
+            'picture with webp extension.' % self.EDITOR_USERNAME))
 
 
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
@@ -2763,7 +2721,7 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
                 'username': 'someusername',
                 'user_id': 'aa'
             },
-            expected_status_int=404)
+            expected_status_int=400)
 
     def test_delete_with_differing_user_id_and_username_raises_error(
         self
@@ -2862,7 +2820,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     def test_update_blog_post_with_wrong_username_raises_error(self) -> None:
         csrf_token = self.get_new_csrf_token()
 
-        self.put_json(
+        response = self.put_json(
             '/updateblogpostdatahandler',
             {
                 'blog_post_id': self.blog_post.id,
@@ -2870,7 +2828,10 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
                 'published_on': '05/09/2000'
             },
             csrf_token=csrf_token,
-            expected_status_int=404)
+            expected_status_int=400)
+
+        error_msg = 'Invalid username: someusername'
+        self.assertEqual(response['error'], error_msg)
 
     def test_update_blog_post_with_wrong_blog_post_id_raises_error(
         self
@@ -2902,7 +2863,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
                 'published_on': '05/09/2000'
             },
             csrf_token=csrf_token,
-            expected_status_int=401)
+            expected_status_int=400)
 
         error_msg = 'User does not have enough rights to be blog post author.'
         self.assertEqual(response['error'], error_msg)
@@ -3019,7 +2980,6 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token, expected_status_int=400)
 
         error_msg = (
-            'At \'http://localhost/adminhandler\' these errors are happening:\n'
             'Schema validation for \'blog_post_title\' failed: Received %s '
             'which is not in the allowed range of choices: [\'Leading The '
             'Arabic Translations Team\', \'Education\', \'Blog with different'
@@ -3055,7 +3015,8 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '/interactions', params=payload)
-        interaction_ids = response['interaction_ids']
+        interaction_ids = sorted(
+            interaction['id'] for interaction in response['interactions'])
         self.assertEqual(
             sorted(interaction_ids), ['EndExploration', 'TextInput'])
 
@@ -3066,9 +3027,10 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             'exp_id': 'invalid'
         }
 
-        self.get_json(
+        response = self.get_json(
             '/interactions', params=payload,
-            expected_status_int=404)
+            expected_status_int=400)
+        self.assertEqual(response['error'], 'Exploration does not exist.')
 
     def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None: # pylint: disable=line-too-long
         self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
@@ -3076,7 +3038,4 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             '/interactions', params={},
             expected_status_int=400)
         self.assertEqual(
-            response['error'],
-            'At \'http://localhost/interactions\' these errors are happening:\n'
-            'Missing key in handler args: exp_id.'
-        )
+            response['error'], 'Missing key in handler args: exp_id.')

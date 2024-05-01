@@ -60,7 +60,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NonExistentTopicsAndStories} from 'domain/learner_dashboard/non-existent-topics-and-stories.model';
 import {NonExistentCollections} from 'domain/learner_dashboard/non-existent-collections.model';
 import {NonExistentExplorations} from 'domain/learner_dashboard/non-existent-explorations.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {PageTitleService} from 'services/page-title.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
@@ -96,16 +95,6 @@ class MockTranslateService {
   }
 }
 
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      ShowRedesignedLearnerDashboard: {
-        isEnabled: false,
-      },
-    };
-  }
-}
-
 @Component({selector: 'background-banner', template: ''})
 class BackgroundBannerComponentStub {}
 
@@ -137,7 +126,6 @@ describe('Learner dashboard page', () => {
   let pageTitleService: PageTitleService = null;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let urlService: UrlService;
-  let platformFeatureService: PlatformFeatureService;
 
   let explorationDict: ExplorationBackendDict = {
     init_state_name: 'Introduction',
@@ -337,14 +325,6 @@ describe('Learner dashboard page', () => {
               getResizeEvent: () => mockResizeEmitter,
             },
           },
-          {
-            provide: PlatformFeatureService,
-            useClass: MockPlatformFeatureService,
-          },
-          {
-            provide: PlatformFeatureService,
-            useClass: MockPlatformFeatureService,
-          },
           SuggestionModalForLearnerDashboardService,
           UrlInterpolationService,
           UserService,
@@ -381,7 +361,6 @@ describe('Learner dashboard page', () => {
       learnerGroupBackendApiService = TestBed.inject(
         LearnerGroupBackendApiService
       );
-      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       const mockElement = document.createElement('div');
       mockElement.className = 'oppia-exploration-title';
@@ -697,14 +676,6 @@ describe('Learner dashboard page', () => {
 
       expect(result).toBe('шеллы');
     });
-
-    it('should get show_redesigned_learner_dashboard flag', () => {
-      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        ShowRedesignedLearnerDashboard: {
-          isEnabled: false,
-        },
-      });
-    });
   });
 
   describe('when fetching dashboard data fails', () => {
@@ -737,10 +708,6 @@ describe('Learner dashboard page', () => {
             provide: TranslateService,
             useClass: MockTranslateService,
           },
-          {
-            provide: PlatformFeatureService,
-            useClass: MockPlatformFeatureService,
-          },
         ],
         schemas: [NO_ERRORS_SCHEMA],
       }).compileComponents();
@@ -757,7 +724,6 @@ describe('Learner dashboard page', () => {
       userService = TestBed.inject(UserService);
       translateService = TestBed.inject(TranslateService);
       pageTitleService = TestBed.inject(PageTitleService);
-      platformFeatureService = TestBed.inject(PlatformFeatureService);
 
       spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
         Promise.resolve('sample-csrf-token')

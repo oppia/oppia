@@ -932,6 +932,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             commit_cmds=self.COMMIT_CMDS
         ).put()
 
+        config_models.ConfigPropertySnapshotMetadataModel(
+            id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
+            commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
+            commit_cmds=self.COMMIT_CMDS
+        ).put()
+
         exploration_models.ExplorationRightsSnapshotMetadataModel(
             id=self.GENERIC_MODEL_ID, committer_id=self.USER_ID_1,
             commit_type=self.COMMIT_TYPE, commit_message=self.COMMIT_MESSAGE,
@@ -969,14 +975,38 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             parent_user_id=self.PROFILE_ID_1
         ).put()
 
-        language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN'
+        voiceover1: voiceover_models.VoiceoverDict = {
+            'filename': 'filename1.mp3',
+            'file_size_bytes': 3000,
+            'needs_update': False,
+            'duration_secs': 6.1
+        }
+        voiceover2: voiceover_models.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.9
+        }
+        voiceover3: voiceover_models.VoiceoverDict = {
+            'filename': 'filename3.mp3',
+            'file_size_bytes': 3500,
+            'needs_update': False,
+            'duration_secs': 5.0
+        }
+        voiceovers_and_contents_mapping: (
+            voiceover_models.VoiceoversAndContentsMappingType) = {
+            'en': {
+                'language_accent_code': 'en-US',
+                'exploration_id_to_content_ids': {
+                    'exp_1': ['content_1', 'content_2', 'content_3']
+                },
+                'voiceovers': [voiceover1, voiceover2, voiceover3]
+            }
         }
         # Setup for VoiceArtistMetadataModel.
-        voiceover_models.VoiceArtistMetadataModel.create_model(
+        voiceover_models.VoiceArtistMetadataModel.create(
             voice_artist_id=self.USER_ID_1,
-            language_code_to_accent=language_code_to_accent
+            voiceovers_and_contents_mapping=voiceovers_and_contents_mapping
         )
 
         # Set-up for AppFeedbackReportModel scrubbed by user.
@@ -1159,7 +1189,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'display_alias': None,
             'has_viewed_lesson_info_modal_once': False,
         }
-        user_group: Dict[str, str] = {}
         skill_data: Dict[str, str] = {}
         stats_data: Dict[str, stats_domain.AggregatedStatsDict] = {}
         story_progress_data: Dict[str, List[str]] = {}
@@ -1223,6 +1252,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         }
         expected_story_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_question_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
+        expected_config_property_sm: Dict[str, Dict[str, Dict[str, str]]] = {}
         expected_exploration_rights_sm: Dict[
             str, Dict[str, Dict[str, str]]
         ] = {}
@@ -1239,7 +1269,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
-        expected_voice_artist_data: Dict[str, str] = {}
+        expected_voice_artist_data: Dict[
+            str, voiceover_models.VoiceoversAndContentsMappingType] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1253,7 +1284,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'user_stats': stats_data,
             'user_settings': user_settings_data,
             'user_subscriptions': subscriptions_data,
-            'user_group': user_group,
             'user_skill_mastery': skill_data,
             'user_contributions': contribution_data,
             'exploration_user_data': exploration_data,
@@ -1309,6 +1339,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 expected_translation_coordinator_stats,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
+            'config_property_snapshot_metadata':
+                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
@@ -1573,17 +1605,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         )
         feedback_thread_model.update_timestamps()
         feedback_thread_model.put()
-
-        user_group_model = user_models.UserGroupModel(
-            id='user_group_model', users=[self.USER_ID_1]
-        )
-        user_group_model.put()
-
-        expected_user_group_data = {
-            'user_group_model': {
-                'users': self.USER_ID_1
-            }
-        }
 
         blog_post_model = blog_models.BlogPostModel(
             id=self.BLOG_POST_ID_1,
@@ -1854,6 +1875,12 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
                 'commit_message': self.COMMIT_MESSAGE,
             }
         }
+        expected_config_property_sm = {
+            self.GENERIC_MODEL_ID: {
+                'commit_type': self.COMMIT_TYPE,
+                'commit_message': self.COMMIT_MESSAGE,
+            }
+        }
 
         expected_exploration_rights_sm = {
             self.GENERIC_MODEL_ID: {
@@ -2115,13 +2142,39 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
-        expected_language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN'
-        }
+        expected_voice_artist_data: Dict[
+            str, voiceover_models.VoiceoversAndContentsMappingType] = {
+                'voiceovers_and_contents_mapping': {
+                    'en': {
+                        'language_accent_code': 'en-US',
+                        'exploration_id_to_content_ids': {
+                            'exp_1': ['content_1', 'content_2', 'content_3']
+                        },
+                        'voiceovers': [
+                            {
+                                'filename': 'filename1.mp3',
+                                'file_size_bytes': 3000,
+                                'needs_update': False,
+                                'duration_secs': 6.1,
+                            },
+                            {
+                                'filename': 'filename2.mp3',
+                                'file_size_bytes': 3500,
+                                'needs_update': False,
+                                'duration_secs': 5.9,
+                            },
+                            {
+                                'filename': 'filename3.mp3',
+                                'file_size_bytes': 3500,
+                                'needs_update': False,
+                                'duration_secs': 5.0,
+                            },
+                        ],
+                    }
+                }
+            }
         expected_user_data = {
             'user_stats': expected_stats_data,
-            'user_group': expected_user_group_data,
             'user_settings': expected_user_settings_data,
             'user_subscriptions': expected_subscriptions_data,
             'user_skill_mastery': expected_user_skill_data,
@@ -2182,6 +2235,8 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'pinned_opportunity': expected_pinned_opportunities_data,
             'story_snapshot_metadata': expected_story_sm,
             'question_snapshot_metadata': expected_question_sm,
+            'config_property_snapshot_metadata':
+                expected_config_property_sm,
             'exploration_rights_snapshot_metadata':
                 expected_exploration_rights_sm,
             'exploration_snapshot_metadata': expected_exploration_sm,
@@ -2193,7 +2248,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
             'blog_author_details': expected_blog_author_details,
-            'voice_artist_metadata': expected_language_code_to_accent
+            'voice_artist_metadata': expected_voice_artist_data
         }
 
         with utils.open_file(

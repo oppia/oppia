@@ -59,11 +59,9 @@ class FeatureFlagDummyHandler(
         # This handler is gated by the dummy_feature_flag_for_e2e_tests flag,
         # i.e. it's only visible when the dummy_feature_flag_for_e2e_tests
         # is enabled.
-        dummy_feature_flag_for_e2e_tests = (
-            feature_flag_list.FeatureNames
-            .DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value)
         self.render_json({
             'msg': 'ok',
             'is_enabled': feature_flag_services.is_feature_flag_enabled(
-                dummy_feature_flag_for_e2e_tests, self.user_id)
+                self.user_id, feature_flag_list.FeatureNames.
+                DUMMY_FEATURE_FLAG_FOR_E2E_TESTS.value)
         })
