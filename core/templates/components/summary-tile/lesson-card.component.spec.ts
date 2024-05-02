@@ -18,13 +18,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
-import {
-  fakeAsync,
-  waitForAsync,
-  ComponentFixture,
-  TestBed,
-  tick,
-} from '@angular/core/testing';
+import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {LessonCardComponent} from './lesson-card.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
