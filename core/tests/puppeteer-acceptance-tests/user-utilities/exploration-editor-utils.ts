@@ -914,7 +914,7 @@ export class ExplorationEditor extends BaseUser {
       currentSubscriberCount &&
       parseInt(currentSubscriberCount) === subscriberCount
     ) {
-      showMessage(`Number of subscribers is equal to ${subscriberCount}`);
+      showMessage(`Number of subscribers is equal to ${subscriberCount}.`);
     } else {
       throw new Error(
         `Number of subscribers is not equal to ${subscriberCount}`
