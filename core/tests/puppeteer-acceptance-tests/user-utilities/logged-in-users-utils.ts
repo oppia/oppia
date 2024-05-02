@@ -741,7 +741,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.clickOn(subscribeButton);
     await this.page.waitForSelector(unsubscribeLabel);
-    showMessage(`Subscribed to the creator with username ${username}`);
+    showMessage(`Subscribed to the creator with username ${username}.`);
   }
 
   /**
@@ -754,7 +754,7 @@ export class LoggedInUser extends BaseUser {
     const explorations = await this.page.$$(explorationCard);
 
     if (explorations.length === 0) {
-      throw new Error('There are no explorations authored by the creator');
+      throw new Error('There are no explorations authored by the creator.');
     }
 
     const explorationTitle = await explorations[0].$eval(
@@ -763,9 +763,9 @@ export class LoggedInUser extends BaseUser {
     );
 
     if (explorationTitle?.trim() === title) {
-      showMessage(`Exploration with title ${title} is present`);
+      showMessage(`Exploration with title ${title} is present.`);
     } else {
-      throw new Error(`Exploration with title ${title} is not present`);
+      throw new Error(`Exploration with title ${title} is not present.`);
     }
   }
 

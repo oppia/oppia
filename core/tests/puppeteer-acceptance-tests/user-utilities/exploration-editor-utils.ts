@@ -880,8 +880,8 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function for creating an exploration with only EndExploration interaction with given title.
    */
-  async createExplorationWithOnlyEndInteraction(
-    title: string
+  async createAndPublishAMinimalExplorationWithTitle(
+    title
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
@@ -890,14 +890,12 @@ export class ExplorationEditor extends BaseUser {
       'Exploration intro text',
       'End Exploration'
     );
-    await this.navigateToSettingsTab();
-    await this.updateTitleTo(title);
-    await this.updateGoalTo('OppiaAcceptanceTestsCheck');
-    await this.selectCategory('Algebra');
-    await this.selectLanguage('Arabic');
-    await this.addTags(['TagA', 'TagB', 'TagC']);
     await this.saveExplorationDraft();
-    return await this.publishExploration();
+    return await this.publishExplorationWithContent(
+      title,
+      'This is Goal here.',
+      'Algebra'
+    );
   }
 
   /**
@@ -917,7 +915,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage(`Number of subscribers is equal to ${subscriberCount}.`);
     } else {
       throw new Error(
-        `Number of subscribers is not equal to ${subscriberCount}`
+        `Number of subscribers is not equal to ${subscriberCount}.`
       );
     }
   }
@@ -957,9 +955,9 @@ export class ExplorationEditor extends BaseUser {
     );
 
     if (truncatedUsername === subscriberUsername) {
-      showMessage(`User ${username} is a subscriber`);
+      showMessage(`User ${username} is a subscriber.`);
     } else {
-      throw new Error(`User ${username} is not a subscriber`);
+      throw new Error(`User ${username} is not a subscriber.`);
     }
   }
 }
