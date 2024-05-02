@@ -576,7 +576,7 @@ class CreateExplorationVoiceArtistLinkModelsJobTests(
     def test_should_raise_exception_for_empty_accent_code(self) -> None:
         self._create_curated_explorations()
         self._create_exp_voice_artists_link()
-        self._create_voice_artist_metadata_with_empty_accent_code()
+        self._create_voice_artist_metadata_with_missing_accent_code()
 
         error_message = (
             'Please assign all the accents for voice artists in '
