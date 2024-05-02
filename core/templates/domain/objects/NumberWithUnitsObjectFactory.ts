@@ -144,7 +144,7 @@ export class NumberWithUnits {
         : mathjsUnit(unit).units[0].unit.name;
 
       const unitPrefix = currencyUnits.includes(unit)
-        ? null
+        ? ''
         : mathjsUnit(unit).units[0].prefix.name;
 
       let normalizedUnit =
