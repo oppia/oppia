@@ -26,18 +26,6 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
 
-interface LessonUrl {
-  classroom: string | undefined;
-  topicFragment: string | undefined;
-  story: string;
-  currentStory: StoryNode;
-}
-
-interface ThumbnailUrl {
-  filename: string;
-  id: string;
-}
-
 @Component({
   selector: 'lesson-card',
   templateUrl: './lesson-card.component.html',
@@ -122,41 +110,33 @@ export class LessonCardComponent implements OnInit {
     this.lessonTopic = 'Community Lessons';
   }
 
-  getStorySummaryThumbnailUrl({filename, id}: ThumbnailUrl): string {
-    if (!filename) {
-      return this.urlInterpolationService.getStaticImageUrl(
-        '/subjects/Lightbulb.svg'
-      );
-    }
+  getStorySummaryThumbnailUrl(storyData: {
+    filename: string;
+    id: string;
+  }): string {
     return this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.STORY,
-      id,
-      filename
+      storyData.id,
+      storyData.filename
     );
   }
 
-  getStorySummaryLessonUrl({
-    classroom,
-    topicFragment,
-    story,
-    currentStory,
-  }: LessonUrl): string {
+  getStorySummaryLessonUrl(storyData: {
+    classroom: string;
+    topicFragment: string;
+    story: string;
+    currentStory: StoryNode;
+  }): string {
     return (
-      `/explore/${currentStory.getExplorationId()}?` +
+      `/explore/${storyData.currentStory.getExplorationId()}?` +
       Object.entries({
-        topic_url_fragment: topicFragment,
-        classroom_url_fragment: classroom,
-        story_url_fragment: story,
-        node_id: currentStory.getId(),
+        topic_url_fragment: storyData.topicFragment,
+        classroom_url_fragment: storyData.classroom,
+        story_url_fragment: storyData.story,
+        node_id: storyData.currentStory.getId(),
       })
         .map(([key, value]) => `${key}=${value}`)
         .join('&')
-    );
-  }
-
-  handleImageError(): void {
-    this.imgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/subjects/Lightbulb.svg'
     );
   }
 

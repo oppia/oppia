@@ -122,12 +122,12 @@ describe('LessonCardComponent', () => {
     topic_url_fragment: 'topic',
   };
 
-  const emptyImgTopic = {
+  const newTopic = {
     id: '0',
     title: 'Story Title',
     description: 'Story Description',
     node_titles: ['Title 1', 'Title 2'],
-    thumbnail_filename: null,
+    thumbnail_filename: 'image.svg',
     thumbnail_bg_color: '#F8BF74',
     story_is_published: true,
     completed_node_titles: [],
@@ -232,30 +232,6 @@ describe('LessonCardComponent', () => {
     );
   });
 
-  it('should set story to StorySummary and set its null imgUrl correctly', () => {
-    component.story = StorySummary.createFromBackendDict(emptyImgTopic);
-    component.topic = emptyImgTopic.topic_name;
-
-    fixture.detectChanges();
-
-    expect(component.imgUrl).toBe('/assets/images/subjects/Lightbulb.svg');
-  });
-
-  it('should set imgUrl to default if encountering an error', () => {
-    component.story = StorySummary.createFromBackendDict(sampleTopic);
-    component.topic = sampleTopic.topic_name;
-
-    fixture.detectChanges();
-    const img = fixture.debugElement.nativeElement.querySelector('img');
-    const spyError = spyOn(component, 'handleImageError').and.callThrough();
-    img.dispatchEvent(new Event('error'));
-
-    fixture.detectChanges();
-
-    expect(spyError).toHaveBeenCalled();
-    expect(component.imgUrl).toBe('/assets/images/subjects/Lightbulb.svg');
-  });
-
   it('should return Redo translation key when progress is 100', () => {
     component.story = StorySummary.createFromBackendDict(sampleTopic);
     component.topic = sampleTopic.topic_name;
@@ -277,8 +253,8 @@ describe('LessonCardComponent', () => {
   });
 
   it('should return Start translation key when progress is 0', () => {
-    component.story = StorySummary.createFromBackendDict(emptyImgTopic);
-    component.topic = emptyImgTopic.topic_name;
+    component.story = StorySummary.createFromBackendDict(newTopic);
+    component.topic = newTopic.topic_name;
 
     fixture.detectChanges();
 
