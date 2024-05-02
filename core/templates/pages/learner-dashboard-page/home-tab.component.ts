@@ -71,9 +71,6 @@ export class HomeTabComponent {
     this.currentGoalsLength = this.currentGoals.length;
     this.goalTopicsLength = this.goalTopics.length;
 
-    console.log(this.continueWhereYouLeftOffList);
-    console.log(this.incompleteExplorationsList);
-
     if (allGoals.length !== 0) {
       var allGoalIds = [];
       for (var goal of allGoals) {
