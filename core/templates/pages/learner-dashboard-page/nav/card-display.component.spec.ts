@@ -42,7 +42,7 @@ describe('CardDisplayComponent', () => {
 
     component.numCards = 5;
     component.tabType = 'home';
-    component.heading = 'Mock Heading';
+    component.headingI18n = 'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION';
     fixture.detectChanges();
 
     spyOnProperty(

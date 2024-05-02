@@ -1,12 +1,12 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, ViewChild} from '@angular/core';
 import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'card-display',
   templateUrl: './card-display.component.html',
 })
-export class CardDisplayComponent implements OnInit {
-  @Input() heading!: string;
+export class CardDisplayComponent {
+  @Input() headingI18n!: string;
   @Input() numCards!: number;
   @Input() tabType!: string;
   @Input() cardWidth: number = 232;
@@ -16,8 +16,6 @@ export class CardDisplayComponent implements OnInit {
   currentShift: number = 0;
   maxShifts: number = 0;
   lastShift: number = 0;
-
-  ngOnInit(): void {}
 
   getMaxShifts(width: number): number {
     return this.numCards - Math.floor(width / this.cardWidth);

@@ -97,7 +97,7 @@
       </p>
       <div class="d-flex flex-wrap justify-content-between w-100"> 
         <!--TODO(#18384): Replace with all lessons in progress data (only contains classroom cards); affects ngIf, numCards, ng-content-->
-        <card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [heading]="'Lessons in progress'" [numCards]="4" [tabType]="'home'">
+        <card-display *ngIf="continueWhereYouLeftOffList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="1" [tabType]="'home'">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [displayArea]="'homeTab'"
@@ -105,13 +105,10 @@
               </oppia-learner-story-summary-tile>
             </ng-container>
           </ng-container>
-          <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
-            <lesson-card [story]="lesson" [last]="last"></lesson-card>
-          </ng-container>
         </card-display>
         <!--TODO(#18384): Replace with recommended lessons data (placeholder with explorations); affects numCards and ng-content-->
         <!--TODO(#18384): Styling: https://shorturl.at/oAUY5 (links to Figma frame) -->
-        <card-display [heading]="'Recommended for you'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
+        <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_RECOMMEND_SECTION'" [numCards]="incompleteExplorationsList.length" [tabType]="'home'">
           <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
             <lesson-card [story]="lesson" [last]="last"></lesson-card>
           </ng-container>
@@ -120,21 +117,27 @@
     </div>
     <div class="oppia-learner-dash-section e2e-test-suggested-for-you" *ngIf="isNonemptyObject(untrackedTopics) && !isGoalLimitReached()">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
-      <!--TODO(#18384): Search bar -->
-      <!--TODO(#18384): Replace with classroom topic data, only untracked topics at the moment-->
+      <!--TODO(#18384): Add search bar -->
+      <!--TODO(#18384): Replace with classroom topic data, only untracked topics at the moment; affects heading-->
       <ng-container *ngFor="let item of untrackedTopics | keyvalue">
-        <card-display [heading]="'Basic math'" [numCards]="item.value.length" [tabType]="'homeTopics'" [cardWidth]="226">
+        <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION'" [numCards]="item.value.length" [tabType]="'homeFull'" [cardWidth]="226">
           <ng-container *ngFor="let topicSummaryTile of item.value; last as last">
             <oppia-learner-topic-summary-tile [topicSummary]="topicSummaryTile" [redesignFeatureFlag]="redesignFeatureFlag" [last]="last">
             </oppia-learner-topic-summary-tile>
           </ng-container>
         </card-display>
         <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-           class="align-items-center d-inline-flex justify-content-center mt-4 oppia-learner-dash-home-button text-center">
+           class="align-items-center d-inline-flex justify-content-center mb-4 oppia-learner-dash-home-button text-center">
           <span class="fas fa-arrow-right mr-2"></span>
-          {{ 'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key} }}
+          {{ 'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION_LINK' | translate }}
         </a>
       </ng-container>
+       <!--TODO(#18384): Replace with saved lessons data (placeholder with explorations); affects numCards and ng-content-->
+      <card-display [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_SAVED_SECTION'" [tabType]="'homeFull'" [numCards]="incompleteExplorationsList.length">
+        <ng-container *ngFor="let lesson of incompleteExplorationsList; last as last">
+          <lesson-card [story]="lesson" [last]="last"></lesson-card>
+        </ng-container>
+      </card-display>
     </div>
     <div class="oppia-learner-dash-section px-3 py-4 w-100"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">

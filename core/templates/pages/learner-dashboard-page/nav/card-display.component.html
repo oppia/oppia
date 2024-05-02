@@ -1,22 +1,18 @@
-<div class="card-display-container d-flex flex-column h-100 mb-4" [ngStyle]="{'max-width': (tabType === 'homeTopics' || tabType.includes('progress') ? '100%' : 'fit-content')}">
+<div class="d-flex flex-column h-100 mb-4 w-100" [ngStyle]="{'max-width': (tabType === 'homeFull' || tabType.includes('progress') ? '100%' : 'fit-content')}">
   <div class="d-flex justify-content-between">
-    <p class="card-display-heading"> {{ heading }} </p>
+    <p class="card-display-heading"> {{ headingI18n | translate }} </p>
     <div class="d-flex" *ngIf="(numCards > 1) && ((numCards - 1) * cardWidth + (cardWidth - 32) > cards.offsetWidth) && (tabType.includes('home'))">
-      <button [disabled]="currentShift === 0" class="align-items-center border-0 d-flex justify-content-center mr-2 px-0 card-display-button" (click)="nextCard(currentShift - 1)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-left" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/>
-        </svg>
+      <button [disabled]="currentShift === 0" class="mr-2 px-0 card-display-button" (click)="nextCard(currentShift - 1)">
+        <span class="fas fa-chevron-left"></span>
       </button>
       <p> </p>
-      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="align-items-center border-0 d-flex justify-content-center px-0 card-display-button card-display-button-right" (click)="nextCard(currentShift + 1)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/>
-        </svg>
+      <button [disabled]="currentShift === getMaxShifts(cards.offsetWidth)" class="px-0 card-display-button" (click)="nextCard(currentShift + 1)">
+        <span class="fas fa-chevron-right"></span>
       </button>
     </div>
   </div>
   <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-  <div class="d-flex card-display-content-container pb-1 mb-n1" #cards [ngClass]="cardWidth === 216 && 'card-display-content-container-offset'"> 
+  <div class="d-flex card-display-content-container pb-1 mb-n1" #cards> 
     <ng-content></ng-content>
   </div>
   <!--TODO(#18384): Implement view more for progress tab-->
@@ -30,10 +26,14 @@
   }
 
   .card-display-button {
+    align-items: center;
+    display: flex;
     background-color: #00645c;
+    border: none;
     border-radius: .25em;
     color: #fff;
     height: 24px;
+    justify-content: center;
     width: 24px;
   }
 
@@ -41,20 +41,15 @@
     background-color: #667085;
   }
 
-  .card-display-container {
-    width: 100%;
-  } 
+  .card-display-button:not(:disabled):hover {
+    background-color:#429488;
+  }
 
   .card-display-content-container {
     display: flex;
     max-width: 100%;
     overflow-x: hidden;
-  }
-
-  .card-display-content-container-offset {
-    left: -.5px;
     padding: .5px;
-    position: relative;
   }
 
   .card-display-heading {
