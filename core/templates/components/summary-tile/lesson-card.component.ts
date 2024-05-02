@@ -122,11 +122,14 @@ export class LessonCardComponent implements OnInit {
   }
 
   getStorySummaryLessonUrl(storyData: {
-    classroom: string;
-    topicFragment: string;
+    classroom: string | undefined;
+    topicFragment: string | undefined;
     story: string;
     currentStory: StoryNode;
   }): string {
+    if (!storyData.classroom || !storyData.topicFragment) {
+      throw new Error('Class and/or topic does not exist');
+    }
     return (
       `/explore/${storyData.currentStory.getExplorationId()}?` +
       Object.entries({

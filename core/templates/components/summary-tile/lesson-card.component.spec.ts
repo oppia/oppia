@@ -18,7 +18,13 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {FormsModule} from '@angular/forms';
-import {waitForAsync, ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  fakeAsync,
+  waitForAsync,
+  ComponentFixture,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {LessonCardComponent} from './lesson-card.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -138,6 +144,22 @@ describe('LessonCardComponent', () => {
     topic_url_fragment: 'topic',
   };
 
+  const undefinedTopic = {
+    id: '0',
+    title: 'Story Title',
+    description: 'Story Description',
+    node_titles: ['Title 1', 'Title 2'],
+    thumbnail_filename: 'image.svg',
+    thumbnail_bg_color: '#F8BF74',
+    story_is_published: true,
+    completed_node_titles: [],
+    url_fragment: 'story-title',
+    all_node_dicts: [sampleNode, sampleNode],
+    topic_name: 'Topic',
+    classroom_url_fragment: 'math',
+    topic_url_fragment: undefined,
+  };
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
@@ -230,6 +252,13 @@ describe('LessonCardComponent', () => {
     expect(component.imgUrl).toBe(
       '/assetsdevhandler/story/0/assets/thumbnail/image.svg'
     );
+  });
+
+  it('should set story to StorySummary and throw error for undefined topic_url_fragment', () => {
+    expect(() => {
+      component.story = StorySummary.createFromBackendDict(undefinedTopic);
+      fixture.detectChanges();
+    }).toThrowError('Class and/or topic does not exist');
   });
 
   it('should return Redo translation key when progress is 100', () => {
